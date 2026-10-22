@@ -13,8 +13,8 @@ import type { Product } from "../types/shopping";
 import { ProductActions } from "./product-actions";
 import { ProductEssentialBadge } from "./product-essential-badge";
 import { SharedStockBadge } from "./product-alternatives";
-import { ProductCategoryIcon } from "./product-category-icon";
 import { ProductLinkFormDialog } from "./product-link-form-dialog";
+import { ProductThumb } from "./product-thumb";
 
 type ProductCardProps = {
   product: Product;
@@ -40,13 +40,7 @@ export function ProductCard({ product, shops, canManage, initialSelections, prod
   return (
     <Card className={cn("gap-3 p-4 transition-opacity", actions.deleting && "opacity-60")} aria-busy={actions.busy || undefined}>
       <div className="flex items-start justify-between gap-2">
-        {product.imageUrl ? (
-          <img src={product.imageUrl} alt="" referrerPolicy="no-referrer" className="size-11 shrink-0 rounded-lg border bg-white object-contain" />
-        ) : (
-          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-section-soft text-section">
-            <ProductCategoryIcon category={product.category} className="size-5" />
-          </span>
-        )}
+        <ProductThumb product={product} size="lg" />
         <Button
           variant="ghost"
           size="icon"

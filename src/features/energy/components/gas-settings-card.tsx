@@ -7,14 +7,17 @@ import { currentLocale } from "@/lib/i18n";
 import type { EnergySettings } from "../types/energy";
 import { formatCalorific } from "./energy-format";
 import { GasSettingsFormDialog } from "./gas-settings-form-dialog";
+import { useCanManage } from "@/lib/permissions";
 
 type GasSettingsCardProps = {
   settings: EnergySettings;
-  canManage: boolean;
+  /** Defaults to the nearest `CanManageProvider`. */
+  canManage?: boolean;
 };
 
 /** The gas connection at a glance: EAN and the calorific value for manual readings. */
-export function GasSettingsCard({ settings, canManage }: GasSettingsCardProps) {
+export function GasSettingsCard({ settings, canManage: canManageProp }: GasSettingsCardProps) {
+  const canManage = useCanManage(canManageProp);
   const { t } = useTranslation("energy");
   const { t: tCommon } = useTranslation();
   return (

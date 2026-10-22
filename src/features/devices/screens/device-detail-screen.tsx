@@ -1,12 +1,12 @@
 import type * as React from "react";
-import { ArrowLeftIcon, MapIcon, MapPinOffIcon, PencilIcon, Trash2Icon, ZapIcon } from "lucide-react";
+import { MapIcon, MapPinOffIcon, PencilIcon, Trash2Icon, ZapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher } from "react-router";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { DescriptionItem, DescriptionList } from "@/components/shared/description-list";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { PageHeader } from "@/components/shared/page-header";
@@ -22,8 +22,9 @@ import { DeviceValuesList } from "../components/device-values-list";
 import { LiveStatusBadge } from "../components/live-status-badge";
 import type { DevicesActionResult } from "../data/devices-loaders";
 import { useLiveDevices } from "../data/use-live-devices";
-import { useNow } from "../data/use-now";
+import { useNow } from "@/lib/hooks/use-now";
 import type { Device, DeviceProfile } from "../types/devices";
+import { BackLink } from "@/components/shared/link-buttons";
 
 type DeviceDetailScreenProps = {
   device: Device;
@@ -68,10 +69,7 @@ export function DeviceDetailScreen({
     <PageContainer>
       <PageHeader
         eyebrow={
-          <Link to="/devices" className="inline-flex items-center gap-1 hover:underline">
-            <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-            {t("page.title")}
-          </Link>
+          <BackLink to="/devices">{t("page.title")}</BackLink>
         }
         title={
           <span className="flex items-center gap-3">
@@ -100,7 +98,7 @@ export function DeviceDetailScreen({
                       </Button>
                     }
                   />
-                  <ConfirmDialog
+                  <DeleteConfirmDialog
                     trigger={
                       <Button variant="outline">
                         <Trash2Icon />
@@ -109,9 +107,6 @@ export function DeviceDetailScreen({
                     }
                     title={t("delete.title", { name: device.name })}
                     description={t("delete.description")}
-                    confirmLabel={tCommon("actions.delete")}
-                    cancelLabel={tCommon("actions.cancel")}
-                    destructive
                     onConfirm={() => remove.submit({ intent: "delete", id: device.id, redirectTo: "/devices" }, { method: "post" })}
                   />
                 </>

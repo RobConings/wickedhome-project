@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { useTranslation } from "react-i18next";
 
 type ConfirmDialogProps = {
   /** The element that opens the dialog, usually a Button. */
@@ -19,7 +20,8 @@ type ConfirmDialogProps = {
   title: React.ReactNode;
   description?: React.ReactNode;
   confirmLabel: string;
-  cancelLabel: string;
+  /** "Cancel" (common) by default. */
+  cancelLabel?: string;
   /** Styles the confirm button as destructive. */
   destructive?: boolean;
   /**
@@ -39,6 +41,7 @@ export function ConfirmDialog({
   destructive = false,
   onConfirm,
 }: ConfirmDialogProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
 
@@ -64,7 +67,7 @@ export function ConfirmDialog({
           {description && <AlertDialogDescription>{description}</AlertDialogDescription>}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={busy}>{cancelLabel}</AlertDialogCancel>
+          <AlertDialogCancel disabled={busy}>{cancelLabel ?? t("actions.cancel")}</AlertDialogCancel>
           <AlertDialogAction
             className={destructive ? buttonVariants({ variant: "destructive" }) : undefined}
             disabled={busy}
@@ -78,4 +81,15 @@ export function ConfirmDialog({
       </AlertDialogContent>
     </AlertDialog>
   );
+}
+
+type DeleteConfirmDialogProps = Omit<ConfirmDialogProps, "destructive" | "confirmLabel"> & {
+  /** "Delete" (common) by default. */
+  confirmLabel?: string;
+};
+
+/** `ConfirmDialog` for deletes: destructive, with "Delete" / "Cancel" unless told otherwise. */
+export function DeleteConfirmDialog({ confirmLabel, ...props }: DeleteConfirmDialogProps) {
+  const { t } = useTranslation();
+  return <ConfirmDialog {...props} confirmLabel={confirmLabel ?? t("actions.delete")} destructive />;
 }

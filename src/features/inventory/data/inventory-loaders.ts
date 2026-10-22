@@ -1,10 +1,10 @@
 import i18n from "i18next";
-import { data, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
 import { fetchPlaces, type Place } from "@/features/places";
 import { fetchProduct, fetchProducts, handleProductAlternativeForm, handleProductForm, type Product } from "@/features/shopping";
 import { fetchShops, type Shop } from "@/features/shops";
-import { ApiRequestError } from "@/lib/api-client";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { failedAction, type FormResult, formString, parseForm } from "@/lib/forms";
+import { notFoundAs404 } from "@/lib/loaders";
 import { stockItemInputSchema, stockItemUpdateFormSchema, type ProductStock, type StockItem } from "../types/inventory";
 import { createStockItem, deleteStockItem, fetchProductStock, fetchStock, updateStockItem } from "./inventory-requests";
 
@@ -45,8 +45,7 @@ export async function productStockLoader({ params, request }: LoaderFunctionArgs
     const from = new URL(request.url).searchParams.get("from");
     return { product, stock, places, shops, products, highlightId: from };
   } catch (error) {
-    if (error instanceof ApiRequestError && error.status === 404) throw data(null, { status: 404 });
-    throw error;
+    return notFoundAs404(error);
   }
 }
 
@@ -58,8 +57,8 @@ export async function scanLoader(): Promise<ScanPageData> {
 /** Inventory pages: stock items (create/update/delete) and products from the scan screen. */
 export async function inventoryAction({ request }: ActionFunctionArgs): Promise<InventoryActionResult> {
   const formData = await request.formData();
-  const intent = String(formData.get("intent") ?? "");
-  const id = String(formData.get("id") ?? "");
+  const intent = formString(formData, "intent");
+  const id = formString(formData, "id");
   try {
     switch (intent) {
       case "create-product":
@@ -87,12 +86,9 @@ export async function inventoryAction({ request }: ActionFunctionArgs): Promise<
         return { formError: i18n.t("inventory:errors.generic"), intent };
     }
   } catch (error) {
-    return {
-      ...toFormResult(error, {
+    return failedAction(error, intent, {
         conflict: i18n.t("inventory:errors.alreadyKept"),
         forbidden: i18n.t("inventory:errors.forbidden"),
-      }),
-      intent,
-    };
+      });
   }
 }

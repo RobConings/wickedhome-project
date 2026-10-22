@@ -23,7 +23,8 @@ import { myAccountClient, type MyAccountClient } from "../data/accounts-requests
 import { updateAccount } from "../data/auth-requests";
 import { changeEmailInputSchema, changePasswordFormSchema, type DeviceSession, type MyAccount } from "../types/accounts";
 import type { SessionUser } from "../types/auth";
-import { describeUserAgent, relativeTime } from "./account-format";
+import { describeUserAgent } from "./account-format";
+import { formatRelativeTime } from "@/lib/format";
 
 type MyAccountSectionProps = {
   /**
@@ -358,7 +359,7 @@ function Devices({ data, client }: { data?: MyAccount | null; client: MyAccountC
                 <span className="text-xs text-muted-foreground">
                   {session.current
                     ? t("myAccount.devices.activeNow")
-                    : t("myAccount.devices.lastSeen", { when: relativeTime(session.lastSeenAt, locale, now) })}
+                    : t("myAccount.devices.lastSeen", { when: formatRelativeTime(session.lastSeenAt, locale, now) })}
                 </span>
               </div>
             </li>
@@ -376,7 +377,6 @@ function Devices({ data, client }: { data?: MyAccount | null; client: MyAccountC
           title={t("myAccount.devices.confirmTitle")}
           description={t("myAccount.devices.confirmDescription", { count: others })}
           confirmLabel={t("myAccount.devices.signOutOthers")}
-          cancelLabel={tCommon("actions.cancel")}
           onConfirm={signOutOthers}
         />
       </div>

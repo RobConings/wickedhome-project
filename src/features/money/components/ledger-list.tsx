@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher } from "react-router";
-import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/shared/card";
@@ -25,13 +24,17 @@ import type { Habitant } from "@/features/household";
 import type { FormResult } from "@/lib/forms";
 import { cn } from "@/lib/utils";
 import type { JointAccount, LedgerLine, LedgerType } from "../types/money";
-import { accountName, dateText, money, signedMoney, usePersonName } from "./use-money-text";
+import { accountName, usePersonName } from "./use-money-text";
+import { useFetcherErrorToast } from "@/lib/hooks/use-fetcher-result";
+import { dateText, money, signedMoney } from "@/lib/locale-text";
+import { useCanManage } from "@/lib/permissions";
 
 type LedgerListProps = {
   lines: LedgerLine[];
   accounts: JointAccount[];
   habitants: Habitant[];
-  canManage: boolean;
+  /** Defaults to the nearest `CanManageProvider`. */
+  canManage?: boolean;
   pending?: boolean;
   /** Stories: a stable key for the remembered list/tiles view. */
   storageKey?: string;
@@ -80,7 +83,6 @@ function useLineTitle(accounts: JointAccount[], habitants: Habitant[]) {
 
 function LineRow({ line, title, canManage }: { line: LedgerLine; title: string; canManage: boolean }) {
   const { t } = useTranslation("money");
-  const { t: tCommon } = useTranslation();
   const fetcher = useFetcher<FormResult>();
   const Icon =
     line.type === "other" && line.amountCents >= 0
@@ -90,9 +92,7 @@ function LineRow({ line, title, canManage }: { line: LedgerLine; title: string; 
         : ICONS[line.type];
   const correction = line.type === "correction";
 
-  React.useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.formError) toast.error(fetcher.data.formError);
-  }, [fetcher.state, fetcher.data]);
+  useFetcherErrorToast(fetcher);
 
   const details = [
     dateText(line.date),
@@ -140,7 +140,6 @@ function LineRow({ line, title, canManage }: { line: LedgerLine; title: string; 
           title={t("ledger.deleteTitle")}
           description={t("ledger.deleteDescription")}
           confirmLabel={t("actions.deleteEntry")}
-          cancelLabel={tCommon("actions.cancel")}
           destructive
           onConfirm={() => fetcher.submit({ intent: "delete-entry", id: line.sourceId }, { method: "post" })}
         />
@@ -153,7 +152,8 @@ function LineRow({ line, title, canManage }: { line: LedgerLine; title: string; 
  * An account's history for the month, newest first: contributions, transfers, paid joint expenses, incomes
  * and corrections (marked, with the difference and the balance they set), each with the balance after it.
  */
-export function LedgerList({ lines, accounts, habitants, canManage, pending, storageKey = "money-ledger" }: LedgerListProps) {
+export function LedgerList({ lines, accounts, habitants, canManage: canManageProp, pending, storageKey = "money-ledger" }: LedgerListProps) {
+  const canManage = useCanManage(canManageProp);
   const { t } = useTranslation("money");
   const title = useLineTitle(accounts, habitants);
   return (

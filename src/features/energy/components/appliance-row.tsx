@@ -6,12 +6,14 @@ import type { Appliance } from "../types/energy";
 import { ApplianceActions } from "./appliance-actions";
 import { ApplianceCategoryIcon } from "./appliance-category-icon";
 import { ApplianceMarkers, ApplianceSummary } from "./appliance-markers";
+import { useCanManage } from "@/lib/permissions";
 
 type ApplianceRowProps = {
   appliance: Appliance;
   /** Places for the edit dialog. */
   places: Place[];
-  canManage: boolean;
+  /** Defaults to the nearest `CanManageProvider`. */
+  canManage?: boolean;
   /**
    * The appliance's documents (manuals, warranties, receipts), rendered by the route (the documents
    * feature's `DocumentAttachments`). Shown in a dialog behind a paperclip button, for every role.
@@ -23,7 +25,8 @@ type ApplianceRowProps = {
  * One appliance as a row of a list (content only; the list draws the dividers and padding): category icon,
  * name, power figures, whether it is measured, and actions.
  */
-export function ApplianceRow({ appliance, places, canManage, documents }: ApplianceRowProps) {
+export function ApplianceRow({ appliance, places, canManage: canManageProp, documents }: ApplianceRowProps) {
+  const canManage = useCanManage(canManageProp);
   const deleting = useApplianceDeleting(appliance.id);
 
   return (

@@ -8,7 +8,8 @@ import { HabitantAvatar, type Habitant } from "@/features/household";
 import { cn } from "@/lib/utils";
 import type { Income, IncomeOccurrence, IncomeTargetAccount } from "../types/income";
 import { IncomeFormDialog } from "./income-form-dialog";
-import { dateText, money, useWhoName } from "./use-income-text";
+import { useWhoName } from "./use-income-text";
+import { dateText, money } from "@/lib/locale-text";
 
 type IncomeOccurrenceListProps = {
   occurrences: IncomeOccurrence[];

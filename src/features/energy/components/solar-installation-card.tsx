@@ -2,10 +2,9 @@ import * as React from "react";
 import { PencilIcon, SunIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { DescriptionItem, DescriptionList } from "@/components/shared/description-list";
 import { currentLocale } from "@/lib/i18n";
 import { formatDate } from "@/types/date-format";
@@ -13,21 +12,23 @@ import type { EnergyActionResult } from "../data/energy-loaders";
 import { compassPoint, type SolarInstallation } from "../types/energy";
 import { formatKwp } from "./energy-format";
 import { SolarInstallationFormDialog } from "./solar-installation-form-dialog";
+import { useFetcherErrorToast } from "@/lib/hooks/use-fetcher-result";
+import { useCanManage } from "@/lib/permissions";
 
 type SolarInstallationCardProps = {
   installation: SolarInstallation;
-  canManage: boolean;
+  /** Defaults to the nearest `CanManageProvider`. */
+  canManage?: boolean;
 };
 
-export function SolarInstallationCard({ installation, canManage }: SolarInstallationCardProps) {
+export function SolarInstallationCard({ installation, canManage: canManageProp }: SolarInstallationCardProps) {
+  const canManage = useCanManage(canManageProp);
   const { t } = useTranslation("energy");
   const { t: tCommon } = useTranslation();
   const locale = currentLocale();
   const fetcher = useFetcher<EnergyActionResult>();
 
-  React.useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.formError) toast.error(fetcher.data.formError);
-  }, [fetcher.state, fetcher.data]);
+  useFetcherErrorToast(fetcher);
 
   const orientation = [
     installation.azimuthDeg != null &&
@@ -72,7 +73,7 @@ export function SolarInstallationCard({ installation, canManage }: SolarInstalla
               </Button>
             }
           />
-          <ConfirmDialog
+          <DeleteConfirmDialog
             trigger={
               <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
                 <Trash2Icon />
@@ -81,9 +82,6 @@ export function SolarInstallationCard({ installation, canManage }: SolarInstalla
             }
             title={t("solar.delete.title", { name: installation.name })}
             description={t("solar.delete.description")}
-            confirmLabel={tCommon("actions.delete")}
-            cancelLabel={tCommon("actions.cancel")}
-            destructive
             onConfirm={() => fetcher.submit({ intent: "delete-solar", id: installation.id }, { method: "post" })}
           />
         </CardFooter>

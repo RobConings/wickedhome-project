@@ -6,7 +6,8 @@ import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import { recordTransferSchema, type JointAccount } from "../types/money";
-import { dateText, people } from "./use-money-text";
+import { people } from "./use-money-text";
+import { dateText } from "@/lib/locale-text";
 
 export type TransferDefaults = {
   /** `habitant:<id>` or `account:<id>`. */

@@ -1,6 +1,7 @@
 // Public API of the household feature. Routes, the app frame and other features import from here only.
-export { HabitantAvatar } from "./components/habitant-avatar";
+export { HabitantAvatar, HabitantAvatarStack } from "./components/habitant-avatar";
 export { HabitantPicker } from "./components/habitant-picker";
+export { HabitantToggleChips, type HabitantToggleChipsProps } from "./components/habitant-toggle-chips";
 export { habitantsAction, habitantsLoader } from "./data/household-loaders";
 export { fetchHouseholdOverview } from "./data/household-requests";
 export { HabitantsScreen } from "./screens/habitants-screen";

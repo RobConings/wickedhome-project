@@ -1,4 +1,5 @@
 import { calendarViewSchema, type CalendarView } from "../types/calendar";
+import { matchesMedia, readStored, writeStored } from "@/lib/storage";
 
 /*
  * The calendar view chosen on this device (localStorage), used when the URL names none (the menu link, the
@@ -13,29 +14,14 @@ const PHONE_QUERY = "(max-width: 47.99rem)";
 
 /** The view before anyone picks one on this device. */
 export function defaultCalendarView(): CalendarView {
-  try {
-    return window.matchMedia(PHONE_QUERY).matches ? "day" : "month";
-  } catch {
-    return "month";
-  }
+  return matchesMedia(PHONE_QUERY) ? "day" : "month";
 }
 
 /** The remembered view, else the device default. */
 export function preferredCalendarView(): CalendarView {
-  try {
-    const stored = calendarViewSchema.safeParse(localStorage.getItem(STORAGE_KEY));
-    if (stored.success) return stored.data;
-  } catch {
-    // Storage unavailable: fall through to the default.
-  }
-  return defaultCalendarView();
+  const stored = calendarViewSchema.safeParse(readStored(STORAGE_KEY));
+  return stored.success ? stored.data : defaultCalendarView();
 }
 
 /** Remembers the view someone picked in the switcher. */
-export function rememberCalendarView(view: CalendarView): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, view);
-  } catch {
-    // Not remembered; harmless.
-  }
-}
+export const rememberCalendarView = (view: CalendarView): void => writeStored(STORAGE_KEY, view);

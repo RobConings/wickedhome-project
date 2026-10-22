@@ -10,7 +10,7 @@ import { FormField } from "@/components/shared/form-field";
 import { IconChip } from "@/components/shared/icon-chip";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { SegmentedControl } from "@/components/shared/segmented-control";
-import { intlLocale } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { HOUSEHOLD_SETTINGS_INTENT, type HouseholdSettingsActionResult } from "../data/household-settings-requests";
 import {
@@ -55,7 +55,7 @@ export function HouseholdSettingsForm({ settings, canManage }: HouseholdSettings
       (HOUSEHOLD_SETTINGS_ERROR_CODES as readonly string[]).includes(message) ? t(`settings.errors.${message}`) : message,
     );
   const coordinate = (value: number | undefined) =>
-    value === undefined ? "" : new Intl.NumberFormat(intlLocale(locale), { maximumFractionDigits: 6, useGrouping: false }).format(value);
+    value === undefined ? "" : formatNumber(value, locale, { maximumFractionDigits: 6, useGrouping: false });
   const address = settings.address;
   const location = settings.location;
 

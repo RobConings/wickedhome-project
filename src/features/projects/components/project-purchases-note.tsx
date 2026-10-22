@@ -2,12 +2,12 @@ import * as React from "react";
 import { ReceiptIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import type { ProjectActionResult } from "../data/projects-loaders";
 import type { ProjectMaterial } from "../types/projects";
 import type { RenderLogExpense } from "./project-expenses-section";
 import { useProjectText } from "./use-project-text";
+import { useFetcherErrorToast } from "@/lib/hooks/use-fetcher-result";
 
 type ProjectPurchasesNoteProps = {
   projectId: string;
@@ -27,9 +27,7 @@ export function ProjectPurchasesNote({ projectId, projectName, materials, render
   const unlogged = materials.filter((material) => material.bought && material.expenseId === null);
   const totalCents = unlogged.reduce((sum, material) => sum + (material.lineCents ?? 0), 0);
 
-  React.useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.formError) toast.error(fetcher.data.formError);
-  }, [fetcher.state, fetcher.data]);
+  useFetcherErrorToast(fetcher);
 
   if (unlogged.length === 0 || !renderLogExpense) return null;
   const itemIds = unlogged.map((material) => material.id).join(",");

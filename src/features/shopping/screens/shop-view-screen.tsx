@@ -1,7 +1,7 @@
 import * as React from "react";
-import { ArrowLeftIcon, CircleHelpIcon, PartyPopperIcon, RefreshCwIcon, SearchXIcon, StoreIcon } from "lucide-react";
+import { CircleHelpIcon, PartyPopperIcon, RefreshCwIcon, SearchXIcon, StoreIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useRevalidator } from "react-router";
+import { useRevalidator } from "react-router";
 import { toast } from "sonner";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
@@ -36,6 +36,8 @@ import { createShoppingItem } from "../data/shopping-requests";
 import { LIVE_REFRESH_MS, useLiveRevalidation } from "../data/use-live-shopping";
 import { useShoppingItemActions } from "../data/use-shopping-item-actions";
 import { NO_SHOP, PRODUCT_CATEGORIES, estimateTotal, type LinkPreview, type ProductCategory, type ShoppingItem } from "../types/shopping";
+import { BackLink } from "@/components/shared/link-buttons";
+import { readStored, writeStored } from "@/lib/storage";
 
 type ShopViewScreenProps = {
   data: ShoppingPageData;
@@ -99,10 +101,7 @@ export function ShopViewScreen({
   }
 
   const back = (
-    <Link to={shopKey ? "/shopping/shops" : "/shopping"} className="inline-flex items-center gap-1 hover:underline">
-      <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-      {shopKey ? t("shopView.title") : t("actions.backToShopping")}
-    </Link>
+    <BackLink to={shopKey ? "/shopping/shops" : "/shopping"}>{shopKey ? t("shopView.title") : t("actions.backToShopping")}</BackLink>
   );
 
   if (!shopKey) {
@@ -254,18 +253,8 @@ const SORT_STORAGE_KEY = "wh-shop-view-sort";
 
 /** The sort picked before on this device; priority until then (or when storage is unavailable). */
 function readStoredSort(): ShopViewSort {
-  try {
-    const stored = globalThis.localStorage?.getItem(SORT_STORAGE_KEY);
-    return (SHOP_VIEW_SORTS as readonly string[]).includes(stored ?? "") ? (stored as ShopViewSort) : "priority";
-  } catch {
-    return "priority";
-  }
+  const stored = readStored(SORT_STORAGE_KEY);
+  return (SHOP_VIEW_SORTS as readonly string[]).includes(stored ?? "") ? (stored as ShopViewSort) : "priority";
 }
 
-function storeSort(sort: ShopViewSort) {
-  try {
-    globalThis.localStorage?.setItem(SORT_STORAGE_KEY, sort);
-  } catch {
-    // Not remembered on this device; the view still sorts.
-  }
-}
+const storeSort = (sort: ShopViewSort) => writeStored(SORT_STORAGE_KEY, sort);

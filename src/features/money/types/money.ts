@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { LoanSummary } from "@/features/expenses";
 import type { VoucherBalance } from "@/features/income";
 import { hexColorSchema, idSchema, isoDateSchema } from "@/types/common";
+import { canManageHousehold } from "@/types/roles";
 
 /*
  * Money flow (Finance, phase 2): the joint current account and the joint savings account with their ledger
@@ -432,4 +433,4 @@ export const TIMELINE_MONTHS_BACK = 12;
 export const TIMELINE_MONTHS_AHEAD = 24;
 
 /** Admins (owner, adult) manage the joint accounts; children can only look. Mirrors the API's role check. */
-export const canManageMoney = (role: "owner" | "adult" | "child") => role !== "child";
+export const canManageMoney = canManageHousehold;

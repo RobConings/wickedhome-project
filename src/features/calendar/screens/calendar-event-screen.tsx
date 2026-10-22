@@ -1,16 +1,18 @@
 import * as React from "react";
-import { ArrowLeftIcon, PencilIcon, Trash2Icon } from "lucide-react";
+import { PencilIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useFetcher } from "react-router";
-import { toast } from "sonner";
+import { useFetcher } from "react-router";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { Card } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { PageHeader } from "@/components/shared/page-header";
 import { CalendarEntryDetails, type RenderShopList } from "../components/calendar-entry-details";
 import { CalendarEventFormDialog } from "../components/calendar-event-form-dialog";
 import { type CalendarActionResult, type CalendarEventScreenData } from "../data/calendar-loaders";
+import { useFetcherErrorToast } from "@/lib/hooks/use-fetcher-result";
+import { BackButton } from "@/components/shared/link-buttons";
+import { ColorDot } from "@/components/shared/color-dot";
 
 type CalendarEventScreenProps = {
   data: CalendarEventScreenData;
@@ -21,34 +23,26 @@ type CalendarEventScreenProps = {
 /** One event on its own page (`/calendar/events/:eventId`), e.g. linked from a shop or the dashboard. */
 export function CalendarEventScreen({ data, canManage, renderShopList }: CalendarEventScreenProps) {
   const { t } = useTranslation("calendar");
-  const { t: tCommon } = useTranslation();
   const { event, habitants, shops } = data;
   const fetcher = useFetcher<CalendarActionResult>();
 
-  React.useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.formError) toast.error(fetcher.data.formError);
-  }, [fetcher.state, fetcher.data]);
+  useFetcherErrorToast(fetcher);
 
   return (
     <PageContainer className="max-w-3xl gap-6">
-      <Button asChild variant="ghost" size="sm" className="self-start">
-        <Link to={`/calendar?date=${event.startDate}`}>
-          <ArrowLeftIcon />
-          {t("eventPage.back")}
-        </Link>
-      </Button>
+      <BackButton to={`/calendar?date=${event.startDate}`} className="self-start">{t("eventPage.back")}</BackButton>
 
       <PageHeader
         title={
           <span className="flex items-center gap-3">
-            <span className="size-3.5 shrink-0 rounded-full" style={{ backgroundColor: event.color }} aria-hidden="true" />
+            <ColorDot color={event.color} className="size-3.5 shrink-0 rounded-full" />
             {event.title}
           </span>
         }
         actions={
           canManage && (
             <>
-              <ConfirmDialog
+              <DeleteConfirmDialog
                 trigger={
                   <Button variant="outline" disabled={fetcher.state !== "idle"}>
                     <Trash2Icon />
@@ -57,9 +51,6 @@ export function CalendarEventScreen({ data, canManage, renderShopList }: Calenda
                 }
                 title={t("delete.title", { title: event.title })}
                 description={event.rrule ? t("delete.recurringDescription") : t("delete.description")}
-                confirmLabel={tCommon("actions.delete")}
-                cancelLabel={tCommon("actions.cancel")}
-                destructive
                 onConfirm={() =>
                   fetcher.submit({ intent: "delete", id: event.id, date: event.startDate }, { method: "post" })
                 }

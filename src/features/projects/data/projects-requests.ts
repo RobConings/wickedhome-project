@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api, restResource, withQuery } from "@/lib/api-client";
 import type {
   Project,
   ProjectBudgetsSummaryData,
@@ -14,32 +14,33 @@ import type {
   ProjectStatusInput,
 } from "../types/projects";
 
-const path = (id: string) => `/projects/${encodeURIComponent(id)}`;
+const projects = restResource<Project, ProjectInput, ProjectDetail>("/projects");
+const path = projects.path;
 
 /** Every project with its budget and task counts, running ones first. */
 export const fetchProjects = () => api.get<ProjectsOverview>("/projects");
-export const fetchProjectDetail = (id: string) => api.get<ProjectDetail>(path(id));
+export const fetchProjectDetail = projects.get;
 /** Running projects with their budget for a month (`YYYY-MM`, default this month): for the money flow page. */
 export const fetchProjectBudgetsSummary = (month?: string) =>
-  api.get<ProjectBudgetsSummaryData>(`/projects/summary${month ? `?month=${encodeURIComponent(month)}` : ""}`);
+  api.get<ProjectBudgetsSummaryData>(withQuery("/projects/summary", { month }));
 /** Unlinked open tasks, one-off expenses and recurring expenses that could join a project. */
 export const fetchProjectCandidates = () => api.get<ProjectCandidates>("/projects/candidates");
 
-export const createProject = (input: ProjectInput) => api.post<Project>("/projects", input);
-export const updateProject = (id: string, input: ProjectInput) => api.put<Project>(path(id), input);
+export const createProject = projects.create;
+export const updateProject = projects.update;
 export const setProjectStatus = (id: string, input: ProjectStatusInput) => api.post<Project>(`${path(id)}/status`, input);
 export const setProjectCover = (id: string, input: ProjectCoverInput) => api.put<Project>(`${path(id)}/cover`, input);
-export const deleteProject = (id: string) => api.delete(path(id));
+export const deleteProject = projects.remove;
 export const linkToProject = (id: string, input: ProjectLinkInput) => api.post(`${path(id)}/links`, input);
 export const unlinkFromProject = (id: string, input: ProjectLinkInput) =>
-  api.delete(`${path(id)}/links/${input.kind}/${encodeURIComponent(input.id)}`);
+  api.delete(path(id, "links", input.kind, input.id));
 export const recordProjectPurchase = (id: string, input: ProjectPurchaseInput) => api.post(`${path(id)}/purchases`, input);
 /** The materials on an invoice (expense) of the project, as a whole ("Link materials"). */
 export const setExpenseMaterials = (id: string, expenseId: string, input: ProjectExpenseMaterialsInput) =>
-  api.put(`${path(id)}/expenses/${encodeURIComponent(expenseId)}/materials`, input);
+  api.put(path(id, "expenses", expenseId, "materials"), input);
 /** Takes one material off its invoice (it stays bought). */
 export const unlinkExpenseMaterial = (id: string, expenseId: string, itemId: string) =>
-  api.delete(`${path(id)}/expenses/${encodeURIComponent(expenseId)}/materials/${encodeURIComponent(itemId)}`);
+  api.delete(path(id, "expenses", expenseId, "materials", itemId));
 /** "Read invoice with AI": the invoice's lines and the materials on them, proposed (slow: a model call, up to ~90 s). */
 export const readProjectInvoice = (id: string, expenseId: string) =>
-  api.post<ProjectInvoiceReading>(`${path(id)}/expenses/${encodeURIComponent(expenseId)}/read-invoice`);
+  api.post<ProjectInvoiceReading>(path(id, "expenses", expenseId, "read-invoice"));

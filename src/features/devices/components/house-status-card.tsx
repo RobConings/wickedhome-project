@@ -9,7 +9,7 @@ import type { LiveEventsStatus } from "@/lib/live-events";
 import { cn } from "@/lib/utils";
 import { PlanMarkerDot } from "@/features/places";
 import { useLiveDevices } from "../data/use-live-devices";
-import { useNow } from "../data/use-now";
+import { useNow } from "@/lib/hooks/use-now";
 import type { HouseStatus } from "../types/devices";
 import { useDeviceStates } from "./device-indicator";
 import { DeviceStateChip } from "./device-state-chip";

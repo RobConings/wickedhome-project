@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api, resourcePath, withQuery } from "@/lib/api-client";
 import type {
   MarkReadInput,
   NotificationPreferences,
@@ -12,11 +12,7 @@ import type {
 } from "../types/notifications";
 
 export function fetchNotifications(query: NotificationsQuery = {}): Promise<NotificationsPage> {
-  const params = new URLSearchParams();
-  if (query.cursor) params.set("cursor", query.cursor);
-  if (query.limit) params.set("limit", String(query.limit));
-  const search = params.toString();
-  return api.get<NotificationsPage>(`/notifications${search ? `?${search}` : ""}`);
+  return api.get<NotificationsPage>(withQuery("/notifications", { cursor: query.cursor, limit: query.limit || undefined }));
 }
 
 export const fetchUnreadCount = () => api.get<{ unread: number }>("/notifications/unread-count");
@@ -25,7 +21,7 @@ export const fetchNotificationSettings = () => api.get<NotificationSettings>("/n
 export const saveNotificationPreferences = (input: PreferencesInput) => api.put<NotificationPreferences>("/notifications/preferences", input);
 export const setNotificationScope = (input: ScopeInput) => api.post<{ on: boolean; scope: string[] }>("/notifications/scope", input);
 export const registerPushDevice = (input: PushSubscriptionInput) => api.post<PushDevice>("/notifications/devices", input);
-export const removePushDevice = (id: string) => api.delete(`/notifications/devices/${encodeURIComponent(id)}`);
+export const removePushDevice = (id: string) => api.delete(resourcePath("/notifications/devices")(id));
 export const sendTestNotification = () => api.post<{ devices: number; pushed: boolean }>("/notifications/test");
 
 /** What the notification screens and sections need from the API; stories pass a fake. */

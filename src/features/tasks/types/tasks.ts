@@ -3,6 +3,7 @@ import { idSchema, isoDateSchema } from "@/types/common";
 import { addDays, daysBetween } from "@/types/dates";
 import type { ProjectRef } from "@/types/projects";
 import { expandRRule, isValidRRule, nextOccurrence, parseRRule } from "@/types/recurrence";
+import { canManageHousehold } from "@/types/roles";
 
 // ── Enums ─────────────────────────────────────────────────────────────────────────────────────────────
 
@@ -597,4 +598,4 @@ export function wouldCreateCycle(edges: readonly (readonly [string, string])[], 
 }
 
 /** Adults and owners create and change tasks. Mirrors the API's role check. */
-export const canManageTasks = (role: "owner" | "adult" | "child") => role !== "child";
+export const canManageTasks = canManageHousehold;

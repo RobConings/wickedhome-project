@@ -1,10 +1,11 @@
 import i18n from "i18next";
-import { data, redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type ShouldRevalidateFunctionArgs } from "react-router";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type ShouldRevalidateFunctionArgs } from "react-router";
 import type { z } from "zod";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
 import { fetchPlaces, type Place } from "@/features/places";
 import { ApiRequestError } from "@/lib/api-client";
-import { formDataToObject, toFormResult, type FormResult } from "@/lib/forms";
+import { failedAction, formDataToObject, type FormResult, formString, readIntent } from "@/lib/forms";
+import { notFoundAs404 } from "@/lib/loaders";
 import {
   checklistToggleInputSchema,
   taskCommentInputSchema,
@@ -94,8 +95,7 @@ export async function taskDetailLoader({ params }: LoaderFunctionArgs): Promise<
     ]);
     return { detail, habitants: household.habitants, places };
   } catch (error) {
-    if (error instanceof ApiRequestError && error.status === 404) throw data(null, { status: 404 });
-    throw error;
+    return notFoundAs404(error);
   }
 }
 
@@ -135,8 +135,8 @@ function taskFormValues(formData: FormData) {
  */
 export async function tasksAction({ request }: ActionFunctionArgs): Promise<TaskActionResult | Response> {
   const formData = await request.formData();
-  const intent = (formData.get("intent") as TaskIntent | null) ?? "create";
-  const id = String(formData.get("id") ?? "");
+  const intent = readIntent<TaskIntent>(formData, "create");
+  const id = formString(formData, "id");
   const redirectTo = formData.get("redirectTo");
   const done = (task?: Task): TaskActionResult | Response =>
     typeof redirectTo === "string" && redirectTo.startsWith("/") ? redirect(redirectTo) : { ok: true, intent, task };
@@ -185,37 +185,34 @@ export async function tasksAction({ request }: ActionFunctionArgs): Promise<Task
         return done();
       }
       case "link-remove":
-        await removeTaskLink(id, String(formData.get("otherTaskId") ?? ""));
+        await removeTaskLink(id, formString(formData, "otherTaskId"));
         return done();
       case "comment-add":
       case "comment-edit": {
         const { data: input, errors } = validate(taskCommentInputSchema, formDataToObject(formData));
         if (errors) return { errors, intent };
         if (intent === "comment-add") await addTaskComment(id, input);
-        else await updateTaskComment(id, String(formData.get("commentId") ?? ""), input);
+        else await updateTaskComment(id, formString(formData, "commentId"), input);
         return done();
       }
       case "comment-delete":
-        await deleteTaskComment(id, String(formData.get("commentId") ?? ""));
+        await deleteTaskComment(id, formString(formData, "commentId"));
         return done();
       case "toggle-item": {
         const values = { done: formData.get("done") === "true" };
         const { data: input, errors } = validate(checklistToggleInputSchema, values);
         if (errors) return { errors, intent };
-        return done(await toggleChecklistItem(id, String(formData.get("itemId") ?? ""), input));
+        return done(await toggleChecklistItem(id, formString(formData, "itemId"), input));
       }
       default:
         return { formError: i18n.t("common:errors.generic") };
     }
   } catch (error) {
     if (error instanceof ApiRequestError && error.code === "blocked") return { intent, blocked: true };
-    return {
-      ...toFormResult(error, {
+    return failedAction(error, intent, {
         not_found: i18n.t("tasks:errors.notFound"),
         conflict: intent === "delete" ? i18n.t("tasks:errors.linkedDelete") : i18n.t("tasks:errors.alreadyClosed"),
         forbidden: i18n.t("tasks:errors.forbidden"),
-      }),
-      intent,
-    };
+      });
   }
 }

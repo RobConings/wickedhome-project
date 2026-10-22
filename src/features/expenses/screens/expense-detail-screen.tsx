@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ArrowLeftIcon, CheckIcon, PauseCircleIcon, PencilIcon, RepeatIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
+import { CheckIcon, PauseCircleIcon, PencilIcon, RepeatIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher } from "react-router";
 import { toast } from "sonner";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { DescriptionItem, DescriptionList } from "@/components/shared/description-list";
 import { PageHeader } from "@/components/shared/page-header";
 import { HabitantAvatar, type Habitant } from "@/features/household";
@@ -27,6 +27,7 @@ import { useOptimisticExpense } from "../components/use-optimistic-expense";
 import type { ExpenseActionResult } from "../data/expenses-loaders";
 import type { ExpenseDetail } from "../types/expenses";
 import { formatIban, formatStructuredCommunication } from "../types/payment-references";
+import { BackButton } from "@/components/shared/link-buttons";
 
 type ExpenseDetailScreenProps = {
   detail: ExpenseDetail;
@@ -116,7 +117,7 @@ export function ExpenseDetailScreen({
           </Button>
         }
       />
-      <ConfirmDialog
+      <DeleteConfirmDialog
         trigger={
           <Button variant="ghost" className="text-destructive hover:text-destructive" disabled={busy}>
             <Trash2Icon />
@@ -125,9 +126,6 @@ export function ExpenseDetailScreen({
         }
         title={t("delete.title", { payee: expense.payee })}
         description={recurring ? t("delete.inRecurringDescription") : t("delete.description")}
-        confirmLabel={tCommon("actions.delete")}
-        cancelLabel={tCommon("actions.cancel")}
-        destructive
         onConfirm={() => submit("delete", { redirectTo: "/expenses" })}
       />
     </>
@@ -145,12 +143,7 @@ export function ExpenseDetailScreen({
 
   return (
     <PageContainer>
-      <Button asChild variant="ghost" size="sm" className="-mb-4 self-start">
-        <Link to="/expenses">
-          <ArrowLeftIcon />
-          {t("detail.back")}
-        </Link>
-      </Button>
+      <BackButton to="/expenses" className="-mb-4 self-start">{t("detail.back")}</BackButton>
 
       <PageHeader
         eyebrow={recurring ? t(`kinds.${recurring.kind}`) : t(`categories.${expense.category}`)}

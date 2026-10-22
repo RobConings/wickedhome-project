@@ -2,9 +2,8 @@ import * as React from "react";
 import { PencilIcon, RepeatIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import type { Shop } from "@/features/shops";
 import { currentLocale } from "@/lib/i18n";
 import type { UseSelectionsOptions } from "@/lib/selections";
@@ -13,6 +12,7 @@ import type { ShoppingActionResult } from "../data/shopping-loaders";
 import { formatQuantity, type Product, type ShoppingList, type ShoppingStaple } from "../types/shopping";
 import { StapleFormDialog } from "./staple-form-dialog";
 import { describeStapleRepeat } from "./staple-repeat";
+import { useFetcherErrorToast } from "@/lib/hooks/use-fetcher-result";
 
 type StapleListProps = {
   staples: ShoppingStaple[];
@@ -26,13 +26,10 @@ type StapleListProps = {
 /** Recurring staples with how often they come back and when next. Managers edit and stop them. */
 export function StapleList({ staples, lists, products, shops, canManage, initialSelections }: StapleListProps) {
   const { t } = useTranslation("shopping");
-  const { t: tCommon } = useTranslation();
   const fetcher = useFetcher<ShoppingActionResult>();
   const locale = currentLocale();
 
-  React.useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.formError) toast.error(fetcher.data.formError);
-  }, [fetcher.state, fetcher.data]);
+  useFetcherErrorToast(fetcher);
   const listName = (id: string) => lists.find((list) => list.id === id)?.name ?? "";
   const shopName = (id: string | null) => (id ? shops.find((shop) => shop.id === id)?.name : undefined);
 
@@ -77,7 +74,7 @@ export function StapleList({ staples, lists, products, shops, canManage, initial
                     </Button>
                   }
                 />
-                <ConfirmDialog
+                <DeleteConfirmDialog
                   trigger={
                     <Button variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-destructive" aria-label={t("staples.deleteTitle", { name: staple.name })}>
                       <Trash2Icon />
@@ -85,9 +82,6 @@ export function StapleList({ staples, lists, products, shops, canManage, initial
                   }
                   title={t("staples.deleteTitle", { name: staple.name })}
                   description={t("staples.deleteDescription")}
-                  confirmLabel={tCommon("actions.delete")}
-                  cancelLabel={tCommon("actions.cancel")}
-                  destructive
                   onConfirm={() => fetcher.submit({ intent: "delete-staple", id: staple.id }, { method: "post" })}
                 />
               </>

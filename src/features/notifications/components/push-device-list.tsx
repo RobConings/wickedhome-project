@@ -18,7 +18,6 @@ type PushDeviceListProps = {
 /** The person's devices that get push notifications, with when the last one arrived and Remove. */
 export function PushDeviceList({ devices, currentEndpoint, onRemove }: PushDeviceListProps) {
   const { t } = useTranslation("notifications");
-  const { t: tCommon } = useTranslation();
   const locale = currentLocale();
   if (devices.length === 0) return <p className="text-sm text-muted-foreground">{t("devices.empty")}</p>;
   return (
@@ -51,7 +50,6 @@ export function PushDeviceList({ devices, currentEndpoint, onRemove }: PushDevic
               title={t("devices.removeTitle", { name: device.label })}
               description={t("devices.removeDescription")}
               confirmLabel={t("devices.remove")}
-              cancelLabel={tCommon("actions.cancel")}
               destructive
               onConfirm={() => onRemove(device)}
             />

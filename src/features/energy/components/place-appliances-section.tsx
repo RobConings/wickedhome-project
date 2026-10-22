@@ -1,7 +1,6 @@
 import * as React from "react";
 import { GaugeIcon, PlugZapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SkeletonList } from "@/components/shared/loading-state";
@@ -10,14 +9,15 @@ import { fetchAppliances } from "../data/energy-requests";
 import type { Appliance } from "../types/energy";
 import { ApplianceCategoryIcon } from "./appliance-category-icon";
 import { formatWatts } from "./energy-format";
+import { GhostLinkButton } from "@/components/shared/link-buttons";
+import { usePanelData } from "@/lib/hooks/use-panel-data";
+import { byName } from "@/types/collections";
 
 type PlaceAppliancesSectionProps = {
   placeId: string;
   /** All household appliances instead of fetching them (stories, tests). */
   initialData?: Appliance[];
 };
-
-type State = { status: "loading" } | { status: "error" } | { status: "ready"; appliances: Appliance[] };
 
 /**
  * The appliances in one room or zone, for the place detail page: category, rated power and whether a
@@ -27,25 +27,7 @@ type State = { status: "loading" } | { status: "error" } | { status: "ready"; ap
 export function PlaceAppliancesSection({ placeId, initialData }: PlaceAppliancesSectionProps) {
   const { t } = useTranslation("energy");
   const locale = currentLocale();
-  const [state, setState] = React.useState<State>(() =>
-    initialData ? { status: "ready", appliances: initialData } : { status: "loading" },
-  );
-  const [reloads, setReloads] = React.useState(0);
-
-  React.useEffect(() => {
-    if (initialData && reloads === 0) return;
-    let cancelled = false;
-    fetchAppliances()
-      .then((appliances) => {
-        if (!cancelled) setState({ status: "ready", appliances });
-      })
-      .catch(() => {
-        if (!cancelled) setState({ status: "error" });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [reloads, initialData]);
+  const { state, retry } = usePanelData(fetchAppliances, [], { initialData });
 
   if (state.status === "loading") {
     return (
@@ -64,16 +46,16 @@ export function PlaceAppliancesSection({ placeId, initialData }: PlaceAppliances
     return (
       <div className="flex flex-col items-start gap-2">
         <p className="text-sm text-muted-foreground">{t("appliances.place.error")}</p>
-        <Button variant="outline" size="sm" onClick={() => setReloads((value) => value + 1)}>
+        <Button variant="outline" size="sm" onClick={retry}>
           {t("appliances.place.retry")}
         </Button>
       </div>
     );
   }
 
-  const here = state.appliances
+  const here = state.data
     .filter((appliance) => appliance.placeId === placeId)
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort(byName);
 
   return (
     <div className="flex flex-col gap-2">
@@ -111,12 +93,7 @@ export function PlaceAppliancesSection({ placeId, initialData }: PlaceAppliances
           ))}
         </ul>
       )}
-      <Button asChild variant="ghost" size="sm" className="self-start text-muted-foreground">
-        <Link to="/energy/appliances">
-          <PlugZapIcon />
-          {here.length > 0 ? t("appliances.place.manage") : t("appliances.place.add")}
-        </Link>
-      </Button>
+      <GhostLinkButton to="/energy/appliances" icon={PlugZapIcon} className="self-start text-muted-foreground">{here.length > 0 ? t("appliances.place.manage") : t("appliances.place.add")}</GhostLinkButton>
     </div>
   );
 }

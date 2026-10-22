@@ -1,5 +1,6 @@
 import { monthBounds } from "./money-calculations";
 import type { ContributionEntry, ContributionRow, JointCosts } from "./money";
+import { sumCents } from "@/types/collections";
 
 /*
  * Settling the month's contributions (docs/FINANCE.md, "Contributions: settling the month"). Pure and
@@ -121,7 +122,7 @@ export function settleAccount(accountId: string, rows: readonly ContributionRow[
     steps,
     netting: netContributions(people),
     endResult,
-    totalCents: endResult.reduce((sum, item) => sum + item.amountCents, 0),
+    totalCents: sumCents(endResult),
     settled: steps.length === 0,
   };
 }
@@ -148,7 +149,7 @@ export function jointCostsOfMonth(items: readonly { date: string; amountCents: n
     .sort((a, b) => a.date.localeCompare(b.date));
   return {
     paidCents: inMonth.filter((item) => item.paid).reduce((sum, item) => sum + item.amountCents, 0),
-    toPayCents: toPay.reduce((sum, item) => sum + item.amountCents, 0),
+    toPayCents: sumCents(toPay),
     toPay,
   };
 }
@@ -238,7 +239,7 @@ export function contributionCoverage(input: {
       if (running < 0 && !belowZeroOn) belowZeroOn = event.date;
     }
     const toReceiveCents =
-      people.reduce((sum, person) => sum + person.shortCents, 0) + incoming.reduce((sum, item) => sum + item.amountCents, 0);
+      people.reduce((sum, person) => sum + person.shortCents, 0) + sumCents(incoming);
     projection = { balanceCents, toReceiveCents, toPayCents: costs.toPayCents, endCents: balanceCents + toReceiveCents - costs.toPayCents, lowestCents, belowZeroOn };
   }
 

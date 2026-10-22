@@ -1,7 +1,7 @@
 import i18n from "i18next";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { failedAction, type FormResult, formString, parseForm, readIntent } from "@/lib/forms";
 import {
   accountCreateSchema,
   accountUpdateSchema,
@@ -71,8 +71,8 @@ export async function moneyLoader({ request }: LoaderFunctionArgs): Promise<Mone
 /** One action for the money flow page; the form's `intent` says what to do. */
 export async function moneyAction({ request }: ActionFunctionArgs): Promise<MoneyActionResult> {
   const formData = await request.formData();
-  const intent = (formData.get("intent") as MoneyIntent | null) ?? "record-transfer";
-  const id = String(formData.get("id") ?? "");
+  const intent = readIntent<MoneyIntent>(formData, "record-transfer");
+  const id = formString(formData, "id");
 
   try {
     switch (intent) {
@@ -152,10 +152,9 @@ export async function moneyAction({ request }: ActionFunctionArgs): Promise<Mone
         return { formError: i18n.t("common:errors.generic") };
     }
   } catch (error) {
-    const result = toFormResult(error, {
+    return failedAction(error, intent, {
       not_found: i18n.t("money:errors.notFound"),
       conflict: i18n.t("money:errors.openingBalance"),
     });
-    return { ...result, intent };
   }
 }

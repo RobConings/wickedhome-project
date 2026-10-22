@@ -42,6 +42,3 @@ export function useTotalOpenSummary() {
       : t("totalOpen.summaryEven", { count: preview.count, amount: formatCurrency(preview.partial ? preview.lastCents : preview.regularCents, locale) });
   };
 }
-
-/** A date, e.g. "12/10/2026". */
-export const shortDate = (date: string) => formatDate(date, currentLocale());

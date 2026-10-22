@@ -9,6 +9,7 @@ import type { Habitant } from "@/features/household";
 import { TASK_TYPES, type TaskLocation, type TaskType } from "../types/tasks";
 import { TASK_TYPE_ICONS } from "./task-type-icons";
 import { TASK_VIEWS, type TaskFilters, type TaskGrouping, type TaskView } from "../types/task-views";
+import { FilterSelect } from "@/components/shared/filter-select";
 
 type TaskFiltersBarProps = {
   filters: TaskFilters;
@@ -66,19 +67,16 @@ export function TaskFilterControls({ filters, onChange, habitants, placeName }: 
   const update = (patch: Partial<TaskFilters>) => onChange({ ...filters, ...patch });
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Select value={filters.assignee ?? EVERYONE} onValueChange={(value) => update({ assignee: value === EVERYONE ? null : value })}>
-        <SelectTrigger size="sm" className="min-w-0 flex-[1_1_9rem] sm:w-44 sm:flex-none" aria-label={t("filters.assignee")}>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={EVERYONE}>{t("filters.everyone")}</SelectItem>
-          {habitants.map((habitant) => (
-            <SelectItem key={habitant.id} value={habitant.id}>
-              {habitant.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <FilterSelect
+        label={t("filters.assignee")}
+        value={filters.assignee ?? EVERYONE}
+        onValueChange={(value) => update({ assignee: value === EVERYONE ? null : value })}
+        allLabel={t("filters.everyone")}
+        allValue={EVERYONE}
+        options={habitants.map((habitant) => ({ value: habitant.id, label: habitant.name }))}
+        className="min-w-0 flex-[1_1_9rem] sm:w-44 sm:flex-none"
+        size="sm"
+      />
 
       <Select value={filters.type ?? ALL_TYPES} onValueChange={(value) => update({ type: value === ALL_TYPES ? null : (value as TaskType) })}>
         <SelectTrigger size="sm" className="min-w-0 flex-[1_1_9rem] sm:w-40 sm:flex-none" aria-label={t("filters.type")}>

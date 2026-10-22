@@ -2,11 +2,10 @@ import * as React from "react";
 import { BatteryFullIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
-import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { DescriptionItem, DescriptionList } from "@/components/shared/description-list";
 import { currentLocale } from "@/lib/i18n";
 import { formatDate } from "@/types/date-format";
@@ -14,24 +13,26 @@ import type { EnergyActionResult } from "../data/energy-loaders";
 import type { HomeBattery } from "../types/energy";
 import { BatteryFormDialog } from "./battery-form-dialog";
 import { formatKw, formatKwh } from "./energy-format";
+import { useFetcherErrorToast } from "@/lib/hooks/use-fetcher-result";
+import { useCanManage } from "@/lib/permissions";
 
 type BatteryCardProps = {
   battery: HomeBattery;
   /** Today (`YYYY-MM-DD`); a battery installed later is shown as planned. */
   today: string;
-  canManage: boolean;
+  /** Defaults to the nearest `CanManageProvider`. */
+  canManage?: boolean;
 };
 
-export function BatteryCard({ battery, today, canManage }: BatteryCardProps) {
+export function BatteryCard({ battery, today, canManage: canManageProp }: BatteryCardProps) {
+  const canManage = useCanManage(canManageProp);
   const { t } = useTranslation("energy");
   const { t: tCommon } = useTranslation();
   const locale = currentLocale();
   const fetcher = useFetcher<EnergyActionResult>();
   const planned = battery.installedOn !== null && battery.installedOn > today;
 
-  React.useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.formError) toast.error(fetcher.data.formError);
-  }, [fetcher.state, fetcher.data]);
+  useFetcherErrorToast(fetcher);
 
   return (
     <Card className={fetcher.state !== "idle" ? "opacity-50" : undefined}>
@@ -69,7 +70,7 @@ export function BatteryCard({ battery, today, canManage }: BatteryCardProps) {
               </Button>
             }
           />
-          <ConfirmDialog
+          <DeleteConfirmDialog
             trigger={
               <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
                 <Trash2Icon />
@@ -78,9 +79,6 @@ export function BatteryCard({ battery, today, canManage }: BatteryCardProps) {
             }
             title={t("battery.delete.title", { name: battery.name })}
             description={t("battery.delete.description")}
-            confirmLabel={tCommon("actions.delete")}
-            cancelLabel={tCommon("actions.cancel")}
-            destructive
             onConfirm={() => fetcher.submit({ intent: "delete-battery", id: battery.id }, { method: "post" })}
           />
         </CardFooter>

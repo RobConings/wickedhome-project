@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import type { TaskActionResult, TaskIntent } from "../data/tasks-loaders";
 import type { Task } from "../types/tasks";
 import { useTaskText } from "./use-task-text";
+import { useFetcherResult } from "@/lib/hooks/use-fetcher-result";
 
 type UseTaskActionsOptions = {
   /** Route that handles the action; defaults to the current route (use `"/tasks"` from other pages). */
@@ -28,7 +29,6 @@ export function useTaskActions(
   const { t } = useTranslation("tasks");
   const text = useTaskText();
   const fetcher = useFetcher<TaskActionResult>();
-  const handled = React.useRef<TaskActionResult | null>(null);
 
   // Returns the fetcher's promise (settles after the action and the reload), e.g. for `ConfirmDialog`.
   const submit = React.useCallback(
@@ -37,10 +37,7 @@ export function useTaskActions(
     [fetcher, task.id, action],
   );
 
-  React.useEffect(() => {
-    const result = fetcher.data;
-    if (fetcher.state !== "idle" || !result || handled.current === result) return;
-    handled.current = result;
+  useFetcherResult(fetcher, (result) => {
     if (result.blocked) {
       if (onBlocked) onBlocked();
       else toast.warning(t("blocked.toast", { title: task.title }));
@@ -86,7 +83,7 @@ export function useTaskActions(
         break;
     }
     onChanged?.();
-  }, [fetcher.state, fetcher.data, t, text, task.title, canUndo, submit, onChanged, onBlocked]);
+  });
 
   const pendingIntent = fetcher.state !== "idle" ? (fetcher.formData?.get("intent") as TaskIntent | null) : null;
   return { submit, busy: fetcher.state !== "idle", pendingIntent, result: fetcher.data };

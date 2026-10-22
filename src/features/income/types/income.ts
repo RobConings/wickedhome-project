@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { idSchema, isoDateSchema } from "@/types/common";
 import { isValidRRule, type MonthEndPolicy, type RRuleSupport } from "@/types/recurrence";
+import { canManageHousehold } from "@/types/roles";
 
 /*
  * Income (Finance, phase 2): recurring household incomes per member (or joint) and incomes actually
@@ -311,7 +312,7 @@ export type IncomeOverview = {
 };
 
 /** Admins (owner, adult) manage incomes; children can only look. Mirrors the API's role check. */
-export const canManageIncome = (role: "owner" | "adult" | "child") => role !== "child";
+export const canManageIncome = canManageHousehold;
 
 /** `YYYY-MM` */
 export const monthSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);

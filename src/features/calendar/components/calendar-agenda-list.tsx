@@ -2,7 +2,7 @@ import * as React from "react";
 import { BellIcon, CalendarDaysIcon, ChevronRightIcon, MapPinIcon, RepeatIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { EmptyState } from "@/components/shared/empty-state";
-import { HabitantAvatar, type Habitant } from "@/features/household";
+import { type Habitant, HabitantAvatarStack } from "@/features/household";
 import { ShopLogo } from "@/features/shops";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -125,11 +125,7 @@ export function CalendarAgendaList({
             )}
           </span>
           {people.length > 0 && entry.kind !== "birthday" && (
-            <span className="flex shrink-0 -space-x-1.5">
-              {people.slice(0, 3).map((habitant) => (
-                <HabitantAvatar key={habitant.id} habitant={habitant} size="sm" />
-              ))}
-            </span>
+            <HabitantAvatarStack habitants={people.slice(0, 3)} />
           )}
         </button>
       </li>

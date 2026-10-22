@@ -1,13 +1,6 @@
-import { formatBytes } from "@/lib/format-bytes";
 import { currentLocale } from "@/lib/i18n";
-import { formatDate } from "@/types/date-format";
 import type { DocumentSort } from "../data/use-document-view";
 import type { DocumentFile, DocumentFolder } from "../types/documents";
-
-export const fileSize = (bytes: number) => formatBytes(bytes, currentLocale());
-
-/** A date, e.g. "12/10/2026". */
-export const shortDate = (iso: string) => formatDate(iso, currentLocale());
 
 /** When a file was last changed: its upload, or a later rename/move. */
 export const fileModified = (file: DocumentFile) => file.updatedAt;

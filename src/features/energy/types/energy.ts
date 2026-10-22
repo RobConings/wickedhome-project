@@ -2,6 +2,7 @@ import { z } from "zod";
 import { idSchema, isoDateSchema } from "@/types/common";
 import { energyPeriodSchema, type EnergyPeriod } from "./energy-period";
 import { zonedDateTimeToIso } from "./energy-time";
+import { canManageHousehold } from "@/types/roles";
 
 // Enums --------------------------------------------------------------------------------------------------
 
@@ -494,4 +495,4 @@ export const compassPoint = (azimuthDeg: number): CompassPoint =>
   COMPASS_POINTS[Math.round((((azimuthDeg % 360) + 360) % 360) / 45) % 8] ?? "s";
 
 /** Adults and owners manage energy data; children can only look. Mirrors the API's role check. */
-export const canManageEnergy = (role: "owner" | "adult" | "child") => role !== "child";
+export const canManageEnergy = canManageHousehold;

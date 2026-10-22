@@ -4,7 +4,8 @@ import { PageGrid } from "@/components/layout/page-grid";
 import { StatTile } from "@/components/shared/stat-tile";
 import type { Habitant } from "@/features/household";
 import { JOINT, type IncomeMonthTotals } from "../types/income";
-import { money, useWhoName } from "./use-income-text";
+import { useWhoName } from "./use-income-text";
+import { money } from "@/lib/locale-text";
 
 type IncomeMonthTotalsProps = {
   totals: IncomeMonthTotals;

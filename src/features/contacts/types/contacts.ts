@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { idSchema } from "@/types/common";
 import type { ProjectRef } from "@/types/projects";
+import { canManageHousehold } from "@/types/roles";
 
 /*
  * Contacts: the people and organisations a household deals with (a contractor, the plumber, a supplier, the bank,
@@ -195,7 +196,5 @@ export const contactSubtitle = (contact: Pick<Contact, "trade" | "company">) =>
 export const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, "")}`;
 export const mailtoHref = (email: string) => `mailto:${email}`;
 
-type Role = "owner" | "adult" | "child";
-
 /** Adults and owners add, edit, delete and link contacts; children look them up (and may call them). Mirrors the API. */
-export const canManageContacts = (role: Role) => role !== "child";
+export const canManageContacts = canManageHousehold;

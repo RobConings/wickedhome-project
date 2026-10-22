@@ -7,6 +7,7 @@ import { playAudio, unlockAudio } from "../data/speech-audio";
 import { createSpeechPlayer, type SpeechPlayer } from "../data/speech-player";
 import { SpeechChunker } from "../data/speech-text";
 import { readVoicePreference, writeVoicePreference } from "../data/voice-preferences";
+import { readStoredFlag, writeStoredFlag } from "@/lib/storage";
 
 const STORAGE_KEY = "wh-assistant-read-aloud";
 /** Set to "1" in this device's localStorage to log when the first audio of an answer plays (console.debug). */
@@ -14,21 +15,8 @@ const TIMING_KEY = "wh-speech-timing";
 /** Chunks made ahead of the one playing. */
 const PREFETCH = 2;
 
-function readSetting(): boolean {
-  try {
-    return localStorage.getItem(STORAGE_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function timingEnabled(): boolean {
-  try {
-    return localStorage.getItem(TIMING_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
+const readSetting = () => readStoredFlag(STORAGE_KEY);
+const timingEnabled = () => readStoredFlag(TIMING_KEY);
 
 // ── One player per page ───────────────────────────────────────────────────────────────────────────────
 // A new conversation remounts the chat right as its first answer is read out, so the playback lives here,
@@ -195,11 +183,7 @@ export function useSpeechOutput(locale: "en" | "nl", { client = assistantClient,
   const setEnabled = React.useCallback(
     (value: boolean) => {
       setEnabledState(value);
-      try {
-        localStorage.setItem(STORAGE_KEY, value ? "1" : "0");
-      } catch {
-        // Not remembered on this device.
-      }
+      writeStoredFlag(STORAGE_KEY, value);
       if (value) unlock();
       else cancel();
     },

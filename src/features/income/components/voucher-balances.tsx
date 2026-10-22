@@ -5,7 +5,7 @@ import { InlineAlert } from "@/components/shared/inline-alert";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import { cn } from "@/lib/utils";
 import type { VoucherBalance } from "../types/income";
-import { dateText, money } from "./use-income-text";
+import { dateText, money } from "@/lib/locale-text";
 
 type VoucherBalancesProps = {
   balances: VoucherBalance[];

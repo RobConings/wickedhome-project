@@ -2,26 +2,14 @@
  * The server voice chosen on this device, per language (localStorage; not remembered when storage is off), and
  * friendly names derived from voice ids such as `nl_BE-rdh-medium`.
  */
+import { readStored, writeStored } from "@/lib/storage";
 
 const voiceKey = (locale: "en" | "nl") => `wh-assistant-voice-${locale}`;
 
 /** The voice picked on this device for `locale`, or `null` for the server's default. */
-export function readVoicePreference(locale: "en" | "nl"): string | null {
-  try {
-    return localStorage.getItem(voiceKey(locale)) || null;
-  } catch {
-    return null;
-  }
-}
+export const readVoicePreference = (locale: "en" | "nl"): string | null => readStored(voiceKey(locale)) || null;
 
-export function writeVoicePreference(locale: "en" | "nl", voice: string | null) {
-  try {
-    if (voice) localStorage.setItem(voiceKey(locale), voice);
-    else localStorage.removeItem(voiceKey(locale));
-  } catch {
-    // Not remembered on this device.
-  }
-}
+export const writeVoicePreference = (locale: "en" | "nl", voice: string | null) => writeStored(voiceKey(locale), voice || null);
 
 /** Voices whose id doesn't say they are male (Piper names). Everything else is read from the id. */
 const MALE_VOICES = new Set(["rdh"]);

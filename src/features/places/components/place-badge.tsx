@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { isOutside, type Place } from "../types/places";
+import { ColorDot } from "@/components/shared/color-dot";
 
 type PlaceBadgeProps = {
   place: Pick<Place, "name" | "kind" | "color" | "icon">;
@@ -25,7 +26,7 @@ export function PlaceBadge({ place, floorName, className }: PlaceBadgeProps) {
           {place.icon}
         </span>
       ) : (
-        <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: place.color }} aria-hidden="true" />
+        <ColorDot color={place.color} />
       )}
       <span className="truncate">{place.name}</span>
       {floorName && <span className="truncate font-normal text-muted-foreground">· {floorName}</span>}

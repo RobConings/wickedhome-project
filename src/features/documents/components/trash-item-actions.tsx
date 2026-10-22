@@ -21,7 +21,6 @@ export type TrashItemActionsProps = {
 /** Restore, and delete forever (after a confirmation), for one trashed folder or file. */
 export function TrashItemActions({ item, busy = null, onRestore, onDelete, compact = false, className }: TrashItemActionsProps) {
   const { t } = useTranslation("documents");
-  const { t: tCommon } = useTranslation();
   const mine = isTrashBusyFor(busy, item);
   const name = itemName(item);
 
@@ -53,7 +52,6 @@ export function TrashItemActions({ item, busy = null, onRestore, onDelete, compa
         title={t("trash.deleteTitle", { name })}
         description={item.kind === "folder" ? t("trash.deleteFolderDescription") : t("trash.deleteDescription")}
         confirmLabel={t("actions.deleteForever")}
-        cancelLabel={tCommon("actions.cancel")}
         destructive
         onConfirm={() => onDelete(item)}
       />

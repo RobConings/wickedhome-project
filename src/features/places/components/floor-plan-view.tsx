@@ -11,6 +11,7 @@ import { FloorPlanCanvas, PlanViewToggle } from "./floor-plan-canvas";
 import { initPlanEditor, planEditorReducer } from "./floor-plan-state";
 import { compassPoint } from "./plan-orientation";
 import type { PlanMarker } from "./plan-markers";
+import { readStoredFlag, writeStoredFlag } from "@/lib/storage";
 
 type FloorPlanViewProps = {
   plan: FloorPlan;
@@ -35,21 +36,8 @@ const NORTH_UP_KEY = "wh-plan-north-up";
 const MINUTES_PER_DAY = 24 * 60;
 const SUN_STEP_MINUTES = 5;
 
-function readNorthUp(): boolean {
-  try {
-    return window.localStorage.getItem(NORTH_UP_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function writeNorthUp(value: boolean) {
-  try {
-    window.localStorage.setItem(NORTH_UP_KEY, value ? "1" : "0");
-  } catch {
-    // Private mode or blocked storage: the setting lasts until the page closes.
-  }
-}
+const readNorthUp = () => readStoredFlag(NORTH_UP_KEY);
+const writeNorthUp = (value: boolean) => writeStoredFlag(NORTH_UP_KEY, value);
 
 /**
  * A read-only floor plan to look at: pan, zoom, tap places, and markers with a legend. For live views

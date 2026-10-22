@@ -5,6 +5,7 @@ import { currentLocale } from "@/lib/i18n";
 import { PlanMarkerDot } from "@/features/places";
 import type { Device, DeviceProfile } from "../types/devices";
 import type { DeviceState } from "./device-indicator";
+import { byName } from "@/types/collections";
 
 type RoomTemperaturesProps = {
   devices: Device[];
@@ -47,7 +48,7 @@ export function RoomTemperatures({ devices, profiles, stateOf, floorId }: RoomTe
       </h2>
       <ul className="grid grid-cols-1 gap-x-4 gap-y-1 text-sm sm:grid-cols-2">
         {[...rooms.values()]
-          .sort((a, b) => a.name.localeCompare(b.name))
+          .sort(byName)
           .map((room) => (
             <li key={room.name} className="flex min-w-0 items-center justify-between gap-2">
               <span className="flex min-w-0 items-center gap-2">

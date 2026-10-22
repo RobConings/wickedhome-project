@@ -3,25 +3,15 @@ import { CheckIcon, CopyIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import type { IntegrationSetupStep } from "../types/integrations";
+import { useCopyToClipboard } from "@/lib/hooks/use-copy-to-clipboard";
 
 function CopyButton({ text }: { text: string }) {
   const { t } = useTranslation("integrations");
-  const [copied, setCopied] = React.useState(false);
+  const { supported, copied, copy } = useCopyToClipboard();
   // The clipboard needs https; on the plain-http LAN address the text can still be selected by hand.
-  if (typeof navigator === "undefined" || !navigator.clipboard) return null;
+  if (!supported) return null;
   return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="icon-sm"
-      aria-label={t("setup.copy")}
-      onClick={() => {
-        void navigator.clipboard.writeText(text).then(() => {
-          setCopied(true);
-          window.setTimeout(() => setCopied(false), 1500);
-        });
-      }}
-    >
+    <Button type="button" variant="ghost" size="icon-sm" aria-label={t("setup.copy")} onClick={() => copy(text)}>
       {copied ? <CheckIcon /> : <CopyIcon />}
     </Button>
   );

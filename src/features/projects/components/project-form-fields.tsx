@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { PROJECT_ICONS, PROJECT_TAG_SUGGESTIONS } from "../types/projects";
 import { PROJECT_ICON_COMPONENTS } from "./project-icons";
+import { ColorDot } from "@/components/shared/color-dot";
 
 /*
  * The custom controls of the project form (plugged into `GeneralFormDialog` as `custom` fields). Each posts one
@@ -118,7 +119,7 @@ export function ProjectPlacesField({ id, name, value, onChange, places, disabled
             ) : place.icon ? (
               <span aria-hidden="true">{place.icon}</span>
             ) : (
-              <span className="size-2.5 rounded-full" style={{ backgroundColor: place.color }} aria-hidden="true" />
+              <ColorDot color={place.color} className="size-2.5 rounded-full" />
             )}
             {place.name}
           </button>

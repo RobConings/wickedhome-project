@@ -3,7 +3,6 @@ import { BanknoteIcon, PencilIcon, PlusIcon, RepeatIcon, Trash2Icon } from "luci
 import { useTranslation } from "react-i18next";
 import { useFetcher, useSearchParams } from "react-router";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageSection } from "@/components/layout/page-section";
 import { Card } from "@/components/shared/card";
@@ -23,11 +22,13 @@ import { IncomeOccurrenceList } from "../components/income-occurrence-list";
 import { IncomeRow } from "../components/income-row";
 import { IncomeSourceFormDialog } from "../components/income-source-form-dialog";
 import { IncomeSourceList } from "../components/income-source-list";
-import { earners, monthLabel, useWhoName } from "../components/use-income-text";
+import { earners, useWhoName } from "../components/use-income-text";
 import { VoucherBalances } from "../components/voucher-balances";
 import { INCOME_MONTH_PARAM } from "../data/income-loaders";
 import { shiftMonth } from "../types/income-calculations";
 import { INCOME_KINDS, JOINT, type Income, type IncomeOverview } from "../types/income";
+import { monthLabel } from "@/lib/locale-text";
+import { FILTER_ALL, FilterSelect } from "@/components/shared/filter-select";
 
 type IncomeScreenProps = {
   overview: IncomeOverview;
@@ -38,12 +39,9 @@ type IncomeScreenProps = {
   currentHabitantId?: string | null;
 };
 
-const ALL = "all";
-
 /** Edit and delete buttons of a received income. */
 function IncomeActions({ income, overview, habitants }: { income: Income; overview: IncomeOverview; habitants: Habitant[] }) {
   const { t } = useTranslation("income");
-  const { t: tCommon } = useTranslation();
   const fetcher = useFetcher();
   const [editing, setEditing] = React.useState(false);
   return (
@@ -60,7 +58,6 @@ function IncomeActions({ income, overview, habitants }: { income: Income; overvi
         title={t("form.deleteIncomeTitle")}
         description={t("form.deleteIncomeDescription")}
         confirmLabel={t("actions.delete")}
-        cancelLabel={tCommon("actions.cancel")}
         destructive
         onConfirm={() => fetcher.submit({ intent: "delete-income", id: income.id }, { method: "post" })}
       />
@@ -89,8 +86,8 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
   const [, setSearchParams] = useSearchParams();
   const pending = useSamePagePending();
   const whoName = useWhoName(habitants);
-  const [whoFilter, setWhoFilter] = React.useState<string>(ALL);
-  const [kindFilter, setKindFilter] = React.useState<string>(ALL);
+  const [whoFilter, setWhoFilter] = React.useState<string>(FILTER_ALL);
+  const [kindFilter, setKindFilter] = React.useState<string>(FILTER_ALL);
   // `?new=1` (the dashboard's "Record income") opens the one-off form at once.
   const [openNew, setOpenNew] = useOpenFromUrl(canManage);
   const currentMonth = overview.today.slice(0, 7);
@@ -139,7 +136,7 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
     );
 
   const incomes = overview.incomes.filter(
-    (income) => (whoFilter === ALL || (income.habitantId ?? JOINT) === whoFilter) && (kindFilter === ALL || income.kind === kindFilter),
+    (income) => (whoFilter === FILTER_ALL || (income.habitantId ?? JOINT) === whoFilter) && (kindFilter === FILTER_ALL || income.kind === kindFilter),
   );
   const people = [...earners(habitants).map((habitant) => habitant.id), JOINT];
 
@@ -238,35 +235,24 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
           storageKey="incomes"
           groupBy={(income) => income.date.slice(0, 7)}
           renderGroupHeader={(month) => <span className="first-letter:uppercase">{monthLabel(month)}</span>}
-          filtered={whoFilter !== ALL || kindFilter !== ALL}
+          filtered={whoFilter !== FILTER_ALL || kindFilter !== FILTER_ALL}
           toolbar={
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Select value={whoFilter} onValueChange={setWhoFilter}>
-                <SelectTrigger className="w-full sm:w-44" aria-label={t("who.label")}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ALL}>{t("who.everyone")}</SelectItem>
-                  {people.map((key) => (
-                    <SelectItem key={key} value={key}>
-                      {whoName(key)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={kindFilter} onValueChange={setKindFilter}>
-                <SelectTrigger className="w-full sm:w-48" aria-label={t("incomes.kindFilter")}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ALL}>{t("incomes.allKinds")}</SelectItem>
-                  {INCOME_KINDS.map((kind) => (
-                    <SelectItem key={kind} value={kind}>
-                      {t(`kinds.${kind}`)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FilterSelect
+                label={t("who.label")}
+                value={whoFilter}
+                onValueChange={setWhoFilter}
+                allLabel={t("who.everyone")}
+                options={people.map((key) => ({ value: key, label: whoName(key) }))}
+                className="w-full sm:w-44"
+              />
+              <FilterSelect
+                label={t("incomes.kindFilter")}
+                value={kindFilter}
+                onValueChange={setKindFilter}
+                allLabel={t("incomes.allKinds")}
+                options={INCOME_KINDS.map((kind) => ({ value: kind, label: t(`kinds.${kind}`) }))}
+              />
             </div>
           }
           emptyState={

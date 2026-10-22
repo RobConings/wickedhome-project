@@ -5,11 +5,12 @@ import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import type { TaskActionResult } from "../data/tasks-loaders";
 import type { TaskComment } from "../types/tasks";
 import { useTaskText } from "./use-task-text";
+import { useFetcherResult } from "@/lib/hooks/use-fetcher-result";
 
 type TaskCommentsProps = {
   taskId: string;
@@ -25,16 +26,12 @@ type TaskCommentsProps = {
 function useCommentFetcher(onDone: () => void, onChanged?: () => void) {
   const { t } = useTranslation("tasks");
   const fetcher = useFetcher<TaskActionResult>();
-  const handled = React.useRef<TaskActionResult | null>(null);
-  React.useEffect(() => {
-    const result = fetcher.data;
-    if (fetcher.state !== "idle" || !result || handled.current === result) return;
-    handled.current = result;
+  useFetcherResult(fetcher, (result) => {
     if (result.ok) {
       onDone();
       onChanged?.();
     } else toast.error(result.formError ?? t("comments.error"));
-  }, [fetcher.state, fetcher.data, onDone, onChanged, t]);
+  });
   return fetcher;
 }
 
@@ -96,16 +93,13 @@ function CommentItem({
           <Button variant="ghost" size="icon-sm" aria-label={t("comments.edit")} onClick={() => setEditing(true)} disabled={busy}>
             <PencilIcon />
           </Button>
-          <ConfirmDialog
+          <DeleteConfirmDialog
             trigger={
               <Button variant="ghost" size="icon-sm" aria-label={t("comments.delete")} disabled={busy}>
                 <Trash2Icon />
               </Button>
             }
             title={t("comments.deleteTitle")}
-            confirmLabel={tCommon("actions.delete")}
-            cancelLabel={tCommon("actions.cancel")}
-            destructive
             onConfirm={() =>
               fetcher.submit({ intent: "comment-delete", id: taskId, commentId: comment.id }, { method: "post", ...(action && { action }) })
             }

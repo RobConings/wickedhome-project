@@ -1,28 +1,14 @@
 import * as React from "react";
-import {
-  AlarmClockIcon,
-  ArrowLeftIcon,
-  BellIcon,
-  CheckIcon,
-  Link2Icon,
-  MessageSquareIcon,
-  PauseCircleIcon,
-  PencilIcon,
-  PlayCircleIcon,
-  RepeatIcon,
-  RotateCcwIcon,
-  SkipForwardIcon,
-  Trash2Icon,
-} from "lucide-react";
+import { AlarmClockIcon, BellIcon, CheckIcon, Link2Icon, MessageSquareIcon, PauseCircleIcon, PencilIcon, PlayCircleIcon, RepeatIcon, RotateCcwIcon, SkipForwardIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Spinner } from "@/components/ui/spinner";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { DescriptionItem, DescriptionList } from "@/components/shared/description-list";
 import { PageHeader } from "@/components/shared/page-header";
 import type { Habitant } from "@/features/household";
@@ -46,6 +32,7 @@ import { SNOOZE_OPTIONS, snoozeDate } from "../types/task-views";
 import { useTaskActions } from "../components/use-task-actions";
 import { useTaskText } from "../components/use-task-text";
 import { canCompleteTask, dueState, movedStartDate, taskLocation, type TaskDetail, type TaskViewer } from "../types/tasks";
+import { BackLink } from "@/components/shared/link-buttons";
 
 type TaskDetailScreenProps = {
   detail: TaskDetail;
@@ -181,7 +168,7 @@ export function TaskDetailScreen({
             }
           />
           {!linked && (
-          <ConfirmDialog
+          <DeleteConfirmDialog
             trigger={
               <Button variant="ghost" className="text-destructive hover:text-destructive" disabled={busy}>
                 <Trash2Icon />
@@ -190,9 +177,6 @@ export function TaskDetailScreen({
             }
             title={t("delete.title", { title: task.title })}
             description={task.materials ? t("delete.withMaterials") : t("delete.description")}
-            confirmLabel={tCommon("actions.delete")}
-            cancelLabel={tCommon("actions.cancel")}
-            destructive
             onConfirm={() => submit("delete", { redirectTo: "/tasks" })}
           />
           )}
@@ -205,10 +189,7 @@ export function TaskDetailScreen({
     <PageContainer>
       <PageHeader
         eyebrow={
-          <Link to="/tasks" className="inline-flex items-center gap-1 hover:underline">
-            <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-            {t("page.title")}
-          </Link>
+          <BackLink to="/tasks">{t("page.title")}</BackLink>
         }
         title={task.title}
         description={recurrence ?? undefined}

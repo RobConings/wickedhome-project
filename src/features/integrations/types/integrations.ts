@@ -1,3 +1,4 @@
+import { canManageHousehold } from "@/types/roles";
 /**
  * Contracts shared by every card on the Integrations page (`/integrations`). Each integration owns its own
  * contract file; this one only holds what the page frame needs to show a status the same way everywhere.
@@ -19,4 +20,4 @@ export type IntegrationSetupStep =
   | { kind: "text"; text: string };
 
 /** Owners and adults connect household-wide integrations; personal ones (Google) everyone connects for themselves. */
-export const canManageIntegrations = (role: "owner" | "adult" | "child") => role !== "child";
+export const canManageIntegrations = canManageHousehold;

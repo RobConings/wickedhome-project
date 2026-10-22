@@ -1,4 +1,5 @@
 import i18n from "i18next";
+import { optionalData } from "@/lib/loaders";
 import type { ActionFunctionArgs } from "react-router";
 import {
   HOUSEHOLD_SETTINGS_INTENT,
@@ -33,11 +34,7 @@ export type SettingsData = {
   habitants: Habitant[];
 };
 
-const settle = <T>(promise: Promise<T>): Promise<T | null> =>
-  promise.catch((error: unknown) => {
-    console.warn("Settings: a section could not load", error);
-    return null;
-  });
+const settle = <T>(promise: Promise<T>) => optionalData(promise, "Settings: a section");
 
 export async function settingsLoader(): Promise<SettingsData> {
   const [household, waste, weather, overview] = await Promise.all([

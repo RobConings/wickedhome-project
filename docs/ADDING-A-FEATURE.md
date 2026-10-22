@@ -1,7 +1,47 @@
 # Adding a feature
 
 A feature is one business domain (habitants, places, shops, bills, energy…). It owns its data model, its
-API, its UI and its translations. This is the checklist; [ARCHITECTURE.md](ARCHITECTURE.md) explains why.
+API, its contract and its translations — but **its browser code should be a thin composition of the shared
+layers**. This is the checklist; [ARCHITECTURE.md](ARCHITECTURE.md#shared-first-the-shared-max-rule) explains why.
+
+## 0. Check the shared layers first
+
+Before writing a component, hook, helper or request in your feature, find it below (or grep `src/lib`,
+`src/components`, `src/types` and the other features' `index.ts`). If something is close but not quite
+right, **extend it with a prop** (keep the existing callers' output identical) instead of writing a
+variant in your feature. If you are about to write the second copy of anything, extract it first.
+
+| You need… | Use | From |
+|---|---|---|
+| Requests for a REST resource | `restResource<T, Input, Detail>("/x")` → `.list/.get/.create/.update/.remove/.path(id, "sub", subId)` | `@/lib/api-client` |
+| A query string / encoded path | `withQuery("/x", { q, placeId })`, `resourcePath("/x")(id, "sub")` | `@/lib/api-client` |
+| A detail loader that 404s | `orNotFound(fetchX(id))` or `catch (e) { return notFoundAs404(e) }` | `@/lib/loaders` |
+| Part of a page that may fail alone | `optionalData(promise, "Label")` (resolves `null`) | `@/lib/loaders` |
+| Skip reloading for client-only params | `export const xShouldRevalidate = revalidateUnlessOnly(["view"], { sort: true })` | `@/lib/loaders` |
+| An intent-switch action | `readIntent<XIntent>(formData, "create")`, `formString(formData, "id")`, `parseForm`, `return failedAction(error, intent, { conflict: … })` | `@/lib/forms` |
+| Another feature's optional data | `fetchShopsOrEmpty()` and friends | that feature's index |
+| Who may change things | `canManageHousehold` (contracts: `export const canManageX = canManageHousehold`); `CanManageProvider` + `useCanManage(prop)` in screens/cards | `@/types/roles`, `@/lib/permissions` |
+| Money / dates / numbers in the UI | `money`, `signedMoney`, `dateText`, `dateTimeText`, `monthLabel`, `fileSize`; `formatNumber`, `formatPercent`, `formatRelativeTime`, `initials` | `@/lib/locale-text`, `@/lib/format` |
+| Sorting / totals | `byName`, `sumCents` | `@/types/collections` |
+| React to a fetcher's result once | `useFetcherResult(fetcher, (result) => …)`; just toast its error: `useFetcherErrorToast(fetcher)` | `@/lib/hooks/use-fetcher-result` |
+| A panel that loads its own data | `usePanelData(load, deps, { initialData, keepDataOnError })` → `{ state, reload, retry, refreshing }` | `@/lib/hooks/use-panel-data` |
+| A clock, a media query, the clipboard | `useNow`, `useMediaQuery`, `useCopyToClipboard` | `@/lib/hooks/*` |
+| A per-device preference | `readStored` / `writeStored` (`…Flag`), `matchesMedia` | `@/lib/storage` |
+| A list with search, list/tiles, empty/loading states | `GeneralList` | `components/shared/general-list` |
+| A form or form dialog | `GeneralForm` / `GeneralFormDialog` | `components/shared` |
+| A toolbar filter with "All …" | `FilterSelect` (+ `FILTER_ALL`) | `components/shared/filter-select` |
+| "Are you sure?" | `DeleteConfirmDialog` (Delete/Cancel/destructive by default), `ConfirmDialog` (Cancel by default) | `components/shared/confirm-dialog` |
+| An entity picker with favourites/recents | `SelectionsPicker entityType="…" items={…}`; wrap it once as `<Thing>Picker` | `components/shared/selections-picker` |
+| "← Back" / "go to …" links | `BackLink` (PageHeader eyebrow), `BackButton`, `GhostLinkButton` | `components/shared/link-buttons` |
+| A card header with an icon chip | `IconCardHeader icon tone title description` | `components/shared/icon-card-header` |
+| Empty / failed states | `EmptyState` (page/list), `EmptyNote` (panel), `ErrorState` (page), `LoadFailedNotice` / `InlineRetry` (panel) | `components/shared` |
+| A deferred (un-awaited) loader value | `DeferredContent data fallback failed>{(value) => …}` | `components/shared/deferred-content` |
+| Habitant chips / avatars | `HabitantPicker`, `HabitantToggleChips`, `HabitantAvatar`, `HabitantAvatarStack` | `@/features/household` |
+| Images attached as a cover | `DocumentCoverChooser entityType entityId namespace` | `@/features/documents` |
+
+New shared code follows the layer rules (lint-enforced), stays domain-agnostic in `lib`/`components`,
+takes the differences between its callers as props, gets a story when it renders something, and gets a
+unit test when it is logic (`src/lib/*.test.ts`, `src/types/*.test.ts`).
 
 ## 1. Files a feature owns
 
@@ -12,8 +52,8 @@ src/api/<feature>/
   <feature>.service.ts                   business logic + Prisma; the only code routes and assistant tools call
 src/features/<feature>/
   types/<feature>.ts                     zod schemas + types: the contract shared by API and UI
-  data/<feature>-requests.ts             fetch functions (api client)
-  data/<feature>-loaders.ts              React Router loaders and actions
+  data/<feature>-requests.ts             fetch functions: `restResource` + the few requests that don't fit
+  data/<feature>-loaders.ts              React Router loaders and actions, built from `@/lib/loaders` + `@/lib/forms`
   components/<thing>.tsx                feature components
   screens/<page>-screen.tsx              full pages
   locales/en.json, locales/nl.json       translations, namespace = feature name; always both languages
@@ -76,9 +116,10 @@ These files are shared by all features. Re-read them right before editing and ch
 | `src/app/quick-actions.ts` | optionally one quick action (see [Quick actions](#quick-actions)) |
 | `prisma/schema/household.prisma` / `auth.prisma` | only the back-relation field your model needs (e.g. `shops Shop[]`) |
 
-Need a new primitive (`components/ui`) or shared pattern (`components/shared`)? It must stay
-domain-agnostic, gets its own story, and goes in the right layer. If two features need the same pattern,
-it belongs in `shared`, not in one of the features.
+Need a new primitive (`components/ui`), shared pattern (`components/shared`), helper (`lib`) or hook
+(`lib/hooks`)? It must stay domain-agnostic, gets its own story (components) or test (logic), and goes in
+the right layer. If two features need the same pattern, it belongs in a shared layer, not in one of the
+features — and the first feature's copy moves there in the same change.
 
 ## 4. Commands (always on the server)
 
@@ -221,7 +262,7 @@ that value, show this colour"; the floor plan editor), multi-step flows and impo
 plan import, waste setup), lists with inline editing, drag and drop or optimistic ticking (the shopping
 list), and timelines. Small panels embedded in another page (e.g. a place's tasks) don't need the search
 and view switch either. If you build one, still use the shared parts: `SearchField`, `FormField`,
-`FormGrid`, `EmptyState`, the skeletons.
+`FormGrid`, `FilterSelect`, `EmptyState`/`EmptyNote`, the skeletons, `usePanelData`, `useFetcherResult`.
 
 ## Loading states
 
@@ -234,13 +275,13 @@ follow the table below.
 | Situation | What to do |
 |---|---|
 | Going to another page | Nothing: the frame shows a top bar and fades the page after 500 ms (`AppShell busy`). |
-| A loader with slow parts (aggregates, external APIs, > ~300 ms) | Await only the fast, essential data; return the slow part as an un-awaited promise. In the screen: `<Suspense fallback={<SkeletonTiles />}><Await resolve={data.summary}>…</Await></Suspense>`, with a skeleton shaped like the content. |
+| A loader with slow parts (aggregates, external APIs, > ~300 ms) | Await only the fast, essential data; return the slow part as an un-awaited promise. In the screen: `<DeferredContent data={data.summary} fallback={<SkeletonTiles />} failed={…}>{(summary) => …}</DeferredContent>` (Suspense + Await + failure in one), with a skeleton shaped like the content; wrap the slow request in `optionalData` so a failure only empties that part. |
 | Same page, new search params (period, filter, tab, folder) or revalidation after a submit | `const pending = useSamePagePending()` and wrap the affected content in `<PendingContent pending={pending} label=…>`. |
 | `<Form>` submit | Submit button `loading={useIsSubmitting(intent)}`; disable the fields with `<fieldset disabled={busy}>`. |
-| Fetcher submit (dialogs, inline edits) | `loading={fetcher.state !== "idle"}`; dialogs stay open until the fetcher is idle and succeeded, then close. |
+| Fetcher submit (dialogs, inline edits) | `loading={fetcher.state !== "idle"}`; dialogs stay open until the fetcher is idle and succeeded, then close (`useFetcherResult`). |
 | Toggles and quick marks (bought, done, favourite, check) | Optimistic UI from `fetcher.formData` instead of a spinner; roll back on error with a toast. |
 | Deletes and other confirms | `ConfirmDialog onConfirm={() => fetcher.submit(…)}`: returning the promise keeps the dialog open with a busy button until done. |
-| Components that load their own data (`fetcher.load`, pickers, sections) | Skeleton until the first data; afterwards keep showing the old data while refreshing. |
+| Components that load their own data (`fetcher.load`, pickers, sections) | Skeleton until the first data; afterwards keep showing the old data while refreshing (`usePanelData` + `PendingContent pending={refreshing}`; failures: `InlineRetry` / `LoadFailedNotice`). |
 | Long work in the browser (CSV parsing, uploads, batch posts, scanning) | `Progress` with a value and a step text ("Parsing file…", "Saving 3 of 12…"), counts when known, a cancel button when the work can be stopped, and a clear result at the end. |
 
 Rules: no blank or frozen screens; never block the whole page for a part of it; don't show spinners for

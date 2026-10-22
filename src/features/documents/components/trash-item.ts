@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { fileSize, shortDate } from "./document-format";
 import { itemId, type DocumentItem } from "./document-item";
 import { useFolderSummary } from "./use-folder-summary";
+import { dateText, fileSize } from "@/lib/locale-text";
 
 /** The action in progress: on one item (`id`), or on the whole trash (no `id`, e.g. emptying it). */
 export type TrashBusy = { intent: "restore" | "delete" | "empty-trash"; id?: string };
@@ -17,6 +17,6 @@ export function useTrashDetail() {
   return (item: DocumentItem) => {
     const deletedAt = item.kind === "folder" ? item.folder.deletedAt : item.file.deletedAt;
     const detail = item.kind === "folder" ? summary(item.folder) : fileSize(item.file.sizeBytes);
-    return deletedAt ? `${detail} · ${t("trash.trashedOn", { date: shortDate(deletedAt) })}` : detail;
+    return deletedAt ? `${detail} · ${t("trash.trashedOn", { date: dateText(deletedAt) })}` : detail;
   };
 }

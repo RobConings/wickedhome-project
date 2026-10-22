@@ -1,14 +1,15 @@
 import * as React from "react";
 import { HandCoinsIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Await, Link } from "react-router";
+import { Link } from "react-router";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardTitle } from "@/components/shared/card";
 import { TotalOpenProgressBar, totalOpenPaidPercent } from "@/features/expenses";
 import { cn } from "@/lib/utils";
 import type { MoneyLoans } from "../types/money";
-import { money } from "./use-money-text";
+import { money } from "@/lib/locale-text";
+import { DeferredContent } from "@/components/shared/deferred-content";
 
 type LoansCardProps = {
   /** Data, or a deferred promise from the route's loader (resolving to `null` when it failed). */
@@ -23,18 +24,11 @@ type LoansCardProps = {
 export function LoansCard({ data, className }: LoansCardProps) {
   const { t } = useTranslation("money");
   const failed = <p className="text-sm text-muted-foreground">{t("loans.error")}</p>;
-  const content =
-    data instanceof Promise ? (
-      <React.Suspense fallback={<LoansSkeleton label={t("loans.loading")} />}>
-        <Await resolve={data} errorElement={failed}>
-          {(resolved: MoneyLoans | null) => (resolved ? <LoansSummary data={resolved} /> : failed)}
-        </Await>
-      </React.Suspense>
-    ) : data === null ? (
-      failed
-    ) : (
-      <LoansSummary data={data} />
-    );
+  const content = (
+    <DeferredContent data={data} failed={failed} fallback={<LoansSkeleton label={t("loans.loading")} />}>
+      {(value) => <LoansSummary data={value} />}
+    </DeferredContent>
+  );
 
   return (
     <Card className={cn("gap-3", className)}>

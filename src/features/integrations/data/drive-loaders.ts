@@ -1,4 +1,5 @@
 import type { LoaderFunctionArgs } from "react-router";
+import { optionalData } from "@/lib/loaders";
 import type { DriveFolderListing } from "../types/google";
 import { fetchDriveListing } from "./google-requests";
 
@@ -15,5 +16,5 @@ export type DriveFolderLoaderData = {
 export function driveFolderLoader({ params, request }: LoaderFunctionArgs): DriveFolderLoaderData {
   const linkId = params.linkId ?? "";
   const folderId = new URL(request.url).searchParams.get(DRIVE_FOLDER_PARAM) ?? undefined;
-  return { linkId, listing: fetchDriveListing(linkId, folderId).catch(() => null) };
+  return { linkId, listing: optionalData(fetchDriveListing(linkId, folderId)) };
 }

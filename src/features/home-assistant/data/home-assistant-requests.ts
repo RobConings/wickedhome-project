@@ -1,4 +1,5 @@
 import { api } from "@/lib/api-client";
+import { optionalData } from "@/lib/loaders";
 import type {
   AlarmActionResponse,
   AlarmArmInput,
@@ -25,7 +26,7 @@ export const saveHaSettings = (input: HaSettingsInput) => api.put("/home-assista
  * The alarm card's data. A promise a loader can return un-awaited (`<Suspense fallback={<AlarmCardSkeleton />}>`).
  * Never rejects: a failure reads as "not configured", and the card then renders nothing.
  */
-export const fetchAlarmOverview = (): Promise<AlarmOverview | null> => api.get<AlarmOverview>("/home-assistant/alarm").catch(() => null);
+export const fetchAlarmOverview = (): Promise<AlarmOverview | null> => optionalData(api.get<AlarmOverview>("/home-assistant/alarm"));
 export const armAlarm = (input: AlarmArmInput) => api.post<AlarmActionResponse>("/home-assistant/alarm/arm", input);
 /** UI only: the code is sent once to the server, which passes it to Home Assistant and never stores it. */
 export const disarmAlarm = (code: string) => api.post<AlarmActionResponse>("/home-assistant/alarm/disarm", { code });

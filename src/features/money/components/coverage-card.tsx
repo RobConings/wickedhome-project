@@ -12,7 +12,10 @@ import { cn } from "@/lib/utils";
 import { contributionCoverage, personSettlement, type PlanSuggestion } from "../types/contribution-settlement";
 import type { AccountMonth, ContributionRow, JointAccount, JointCosts, MoneyIncomeRow } from "../types/money";
 import { MoneyCardHeader } from "./money-card-header";
-import { dateText, money, usePersonName } from "./use-money-text";
+import { usePersonName } from "./use-money-text";
+import { useFetcherResult } from "@/lib/hooks/use-fetcher-result";
+import { dateText, money } from "@/lib/locale-text";
+import { useCanManage } from "@/lib/permissions";
 
 type CoverageCardProps = {
   rows: ContributionRow[];
@@ -25,7 +28,8 @@ type CoverageCardProps = {
   habitants: Habitant[];
   month: string;
   today: string;
-  canManage: boolean;
+  /** Defaults to the nearest `CanManageProvider`. */
+  canManage?: boolean;
   className?: string;
 };
 
@@ -36,7 +40,8 @@ type CoverageCardProps = {
  */
 const NO_MONTHS: AccountMonth[] = [];
 
-export function CoverageCard({ rows, accounts, accountMonths = NO_MONTHS, costs, income, habitants, month, today, canManage, className }: CoverageCardProps) {
+export function CoverageCard({ rows, accounts, accountMonths = NO_MONTHS, costs, income, habitants, month, today, canManage: canManageProp, className }: CoverageCardProps) {
+  const canManage = useCanManage(canManageProp);
   const { t } = useTranslation("money");
   const { t: tCommon } = useTranslation();
   const personName = usePersonName(habitants);
@@ -60,14 +65,10 @@ export function CoverageCard({ rows, accounts, accountMonths = NO_MONTHS, costs,
   );
   const monthStart = `${month}-01`;
   const canUpdate = canManage && month >= today.slice(0, 7);
-
-  const handled = React.useRef<unknown>(null);
-  React.useEffect(() => {
-    if (fetcher.state !== "idle" || !fetcher.data || handled.current === fetcher.data) return;
-    handled.current = fetcher.data;
-    if (fetcher.data.ok) toast.success(t("coverage.plansUpdated"));
-    else toast.error(fetcher.data.formError ?? tCommon("errors.generic"));
-  }, [fetcher.state, fetcher.data, t, tCommon]);
+  useFetcherResult(fetcher, (result) => {
+    if (result.ok) toast.success(t("coverage.plansUpdated"));
+    else toast.error(result.formError ?? tCommon("errors.generic"));
+  });
 
   const update = (suggestions: PlanSuggestion[]) =>
     fetcher.submit(

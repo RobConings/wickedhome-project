@@ -156,7 +156,6 @@ function DriveStoragePanel({ initial, client = driveStorageClient, pollMs = 2000
             title={t("driveStorage.stopConfirm.title")}
             description={t("driveStorage.stopConfirm.description")}
             confirmLabel={t("driveStorage.stop")}
-            cancelLabel={tCommon("actions.cancel")}
             onConfirm={() =>
               client
                 .disable(target.kind)

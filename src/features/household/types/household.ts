@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { hexColorSchema, isoDateSchema } from "@/types/common";
+import { canManageHousehold } from "@/types/roles";
 
 export const HABITANT_TYPES = ["adult", "child", "pet", "guest"] as const;
 export const habitantTypeSchema = z.enum(HABITANT_TYPES);
@@ -50,4 +51,4 @@ export const HABITANT_COLORS = [
 ] as const;
 
 /** Adults and owners manage habitants; children can only look. Mirrors the API's role check. */
-export const canManageHabitants = (role: "owner" | "adult" | "child") => role !== "child";
+export const canManageHabitants = canManageHousehold;

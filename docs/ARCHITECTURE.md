@@ -37,21 +37,31 @@ WickedHome/
 │  │
 │  ├─ components/
 │  │  ├─ ui/                     1. primitives / atoms        (Button, Input, Dialog…)
-│  │  ├─ shared/                 2. compositions / molecules  (PageHeader, Card, FormField…)
+│  │  ├─ shared/                 2. compositions / molecules  (PageHeader, Card, GeneralList, FilterSelect,
+│  │  │                             DeleteConfirmDialog, SelectionsPicker, BackLink, EmptyNote…)
 │  │  └─ layout/                 3. structure                 (AppShell, PageContainer, PageGrid, Stack…)
 │  │
-│  ├─ features/<feature>/        BROWSER: everything one domain needs
-│  │  ├─ components/             4. feature components        (HabitantCard…)
+│  ├─ features/<feature>/        BROWSER: what is genuinely specific to one domain
+│  │  ├─ components/             4. feature components        (HabitantCard…) — thin compositions of shared parts
 │  │  ├─ screens/                5. full pages                (HabitantsScreen…)
 │  │  ├─ types/                  zod schemas + types: the contract, also used by src/api/<feature>
-│  │  ├─ data/                   API requests, route loaders and actions
+│  │  ├─ data/                   requests (restResource), loaders/actions (lib/loaders + lib/forms helpers)
 │  │  ├─ locales/                en.json, nl.json
 │  │  └─ index.ts                the feature's public API
 │  │
 │  ├─ routes/                    route files: loader/action + render one screen
 │  ├─ app/                       composition root: router, app frame (nav, quick actions), providers, status screens
-│  ├─ lib/                       browser infrastructure: api client, i18n, theme, forms, formatting
-│  ├─ types/                     app-wide types (Locale, ApiError…)
+│  ├─ lib/                       browser infrastructure, shared by every feature:
+│  │  ├─ api-client.ts              api, withQuery/queryString, resourcePath, restResource (typed CRUD)
+│  │  ├─ loaders.ts                 orNotFound/notFoundAs404, optionalData, revalidateUnlessOnly
+│  │  ├─ forms.ts                   parseForm, readIntent, formString, failedAction, toFormResult
+│  │  ├─ format.ts, locale-text.ts  numbers, money, percent, relative time, initials; current-locale text
+│  │  ├─ storage.ts                 per-device preferences (localStorage/matchMedia without try/catch)
+│  │  ├─ permissions.ts             CanManageProvider / useCanManage
+│  │  ├─ selections.ts, pending.ts, i18n.ts, theme.ts…
+│  │  └─ hooks/                     shared hooks: useFetcherResult, useFetcherErrorToast, usePanelData,
+│  │                                useNow, useMediaQuery, useCopyToClipboard
+│  ├─ types/                     app-wide types and pure helpers (Locale, ApiError, dates, roles, collections…)
 │  ├─ locales/                   "common" translations (ui, shared, layout, app frame)
 │  └─ styles/index.css           design tokens
 ├─ stories/                      Storybook stories + fixtures, mirroring the layers (ui, shared, layout, features/<f>)
@@ -61,6 +71,30 @@ WickedHome/
 ├─ scripts/build-server.mjs      bundles src/api into dist/server.js
 └─ ecosystem.config.cjs          pm2: wickedhome (prod), wickedhome-dev, wickedhome-storybook
 ```
+
+## Shared first (the "shared-max" rule)
+
+WickedHome is built from the bottom up: **most code lives in the shared layers, and a feature is a thin
+composition of shared building blocks plus the parts that are really about its domain** (its contract,
+its texts, the fields of its form, the content of its row). Before you write anything inside
+`src/features/<x>`, look for it in this order, and extend the shared layer instead of copying:
+
+1. `src/types` — pure helpers that also run in the API (dates, `canManageHousehold`, `byName`, `sumCents`).
+2. `src/lib` and `src/lib/hooks` — data access, formatting, storage, permissions, behaviour without markup.
+3. `src/components/ui` → `layout` → `shared` — primitives, structure, compositions.
+4. Another feature's public index — domain building blocks other features reuse (`ShopPicker`,
+   `HabitantToggleChips`, `HabitantAvatarStack`, `DocumentCoverChooser`, `fetchShopsOrEmpty`).
+
+When two features need the same thing, it moves down a layer (a domain-agnostic pattern to `shared`/`lib`,
+a domain pattern to the owning feature's index) and both use it. Differences between the copies become
+props (`className`, `size`, `icon`, labels, flags such as `awaitFavorite`), so the rendered DOM stays
+exactly the same. The catalogue of what exists is in
+[ADDING-A-FEATURE.md](ADDING-A-FEATURE.md#0-check-the-shared-layers-first).
+
+App-wide concerns are context, not props: the session layout provides `CanManageProvider` with the
+household rule; a screen that gets its own rule from its route provides it again, and cards and rows read
+it with `useCanManage(canManageProp)` (an explicit prop still wins, for stories and embedded use). The
+current user comes from `useCurrentUser()` (`@/features/auth`), the language from `currentLocale()`.
 
 ## How a page is built
 
@@ -102,11 +136,12 @@ The rules live in `eslint.config.js`, not in a wiki. A violation is a lint error
 
 | Folder | May import | May not import |
 |---|---|---|
+| `lib`, `lib/hooks` | `@/types`, other lib files | components, features, app, routes, api |
 | `components/ui` | other primitives, `lib` | shared, layout, features, app, routes, api |
 | `components/shared` | ui, layout, other shared, `lib` | features, app, routes, api |
 | `components/layout` | ui, other layout, `lib` | shared, features, app, routes, api |
 | `features/<x>` | all component layers, `lib`, own files, other features **via their index** | another feature's internals, app, routes, api |
-| `features/<x>/types` | `@/types`, zod | React, components, lib (it must also run in Node) |
+| `features/<x>/types` | `@/types` (incl. `roles`, `collections`), zod | React, components, lib (it must also run in Node) |
 | `routes` | features (index), `app`, `lib` | components, feature internals, api |
 | `app` | everything browser-side, features via index | api |
 | `api` | its own files, `@/types`, `@/features/<x>/types/*` | components, lib, app, routes, any other feature code, React |
@@ -161,6 +196,8 @@ query at a time anyway, so nothing is lost). Queries outside transactions use th
   only `src/api/app.ts` mounts it. Start at [ai/README.md](../ai/README.md); the chat UI stays in
   `src/features/assistant`.
 - **Naming**: kebab-case files that say what they are (`habitant-card.tsx`, `household.service.ts`).
+- **Reuse**: no copy-paste between features. A second copy of a pattern is the signal to extract it (see
+  "Shared first"); a shared abstraction needs at least two users.
 - **Stories**: every component in `ui`, `shared`, `layout` and a feature's `components`/`screens` gets
   a story in `stories/` (mirroring its layer), never next to the component.
 

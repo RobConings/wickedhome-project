@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { hexColorSchema, idSchema } from "@/types/common";
+import { canManageHousehold } from "@/types/roles";
 
 // Devices: things with a state and a place, shown as coloured indicators on the floor plan.
 // A *profile* (household-level type) defines the fields and the indicator rules; a *device* uses a profile,
@@ -326,7 +327,7 @@ export type DeviceChangedEvent = {
 // Helpers shared by the API and the UI ------------------------------------------------------------------
 
 /** Adults and owners manage devices and set manual values; children only look. Mirrors the API. */
-export const canManageDevices = (role: "owner" | "adult" | "child") => role !== "child";
+export const canManageDevices = canManageHousehold;
 
 /**
  * Validates and normalises a value for a field: booleans, numbers and choices must fit the field.

@@ -3,7 +3,6 @@ import { CheckIcon, LinkIcon, MapPinIcon, SearchXIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/shared/card";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -11,6 +10,7 @@ import { GeneralList } from "@/components/shared/general-list";
 import { cn } from "@/lib/utils";
 import { entityFitsField } from "../types/ha-entity-kind";
 import type { HaEntity } from "../types/home-assistant";
+import { FilterSelect } from "@/components/shared/filter-select";
 
 type HaEntityBrowserProps = {
   entities: HaEntity[];
@@ -44,19 +44,15 @@ export function HaEntityBrowser({ entities, loading, error, onRetry, fieldType, 
 
   const toolbar = (
     <div className="flex flex-wrap items-center gap-3">
-      <Select value={domain} onValueChange={setDomain}>
-        <SelectTrigger className="w-full sm:w-52" aria-label={t("entities.domain")}>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL}>{t("entities.allDomains")}</SelectItem>
-          {domains.map((value) => (
-            <SelectItem key={value} value={value}>
-              {value}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <FilterSelect
+        label={t("entities.domain")}
+        value={domain}
+        onValueChange={setDomain}
+        allLabel={t("entities.allDomains")}
+        allValue={ALL}
+        options={domains.map((value) => ({ value: value, label: value }))}
+        className="w-full sm:w-52"
+      />
       {fieldType && (
         <div className="flex items-center gap-2">
           <Switch id="ha-fitting-only" checked={fittingOnly} onCheckedChange={setFittingOnly} />

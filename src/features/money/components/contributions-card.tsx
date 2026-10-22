@@ -18,7 +18,10 @@ import { ContributionPlanDialog } from "./contribution-plan-dialog";
 import { MoneyCardHeader } from "./money-card-header";
 import { RecordTransferDialog, type TransferDefaults } from "./record-transfer-dialog";
 import { TakeBackDialog } from "./take-back-dialog";
-import { accountName, dateText, money, signedMoney, usePersonName } from "./use-money-text";
+import { accountName, usePersonName } from "./use-money-text";
+import { useFetcherResult } from "@/lib/hooks/use-fetcher-result";
+import { dateText, money, signedMoney } from "@/lib/locale-text";
+import { useCanManage } from "@/lib/permissions";
 
 type ContributionsCardProps = {
   rows: ContributionRow[];
@@ -27,7 +30,8 @@ type ContributionsCardProps = {
   habitants: Habitant[];
   month: string;
   today: string;
-  canManage: boolean;
+  /** Defaults to the nearest `CanManageProvider`. */
+  canManage?: boolean;
   className?: string;
 };
 
@@ -39,13 +43,10 @@ type TakeBack = { habitantId: string; accountId: string; amountCents: number };
 /** Toast when a quick action (fetcher) is done or failed. */
 function useFetcherToast(fetcher: ReturnType<typeof useFetcher<FormResult>>, success: string) {
   const { t: tCommon } = useTranslation();
-  const handled = React.useRef<unknown>(null);
-  React.useEffect(() => {
-    if (fetcher.state !== "idle" || !fetcher.data || handled.current === fetcher.data) return;
-    handled.current = fetcher.data;
-    if (fetcher.data.ok) toast.success(success);
-    else toast.error(fetcher.data.formError ?? tCommon("errors.generic"));
-  }, [fetcher.state, fetcher.data, success, tCommon]);
+  useFetcherResult(fetcher, (result) => {
+    if (result.ok) toast.success(success);
+    else toast.error(result.formError ?? tCommon("errors.generic"));
+  });
 }
 
 /**
@@ -53,9 +54,9 @@ function useFetcherToast(fetcher: ReturnType<typeof useFetcher<FormResult>>, suc
  * what was taken back), and the result ("€ 800,00 too much", "still € 1.450,00 to transfer", "Done"). Below:
  * what still needs to happen, the netting alternative and the end result. Plans are managed here too.
  */
-export function ContributionsCard({ rows, plans, accounts, habitants, month, today, canManage, className }: ContributionsCardProps) {
+export function ContributionsCard({ rows, plans, accounts, habitants, month, today, canManage: canManageProp, className }: ContributionsCardProps) {
+  const canManage = useCanManage(canManageProp);
   const { t } = useTranslation("money");
-  const { t: tCommon } = useTranslation();
   const personName = usePersonName(habitants);
   // One fetcher per quick action, so each answers with its own toast.
   const planFetcher = useFetcher<FormResult>();
@@ -188,7 +189,6 @@ export function ContributionsCard({ rows, plans, accounts, habitants, month, tod
                   title={t("form.deletePlanTitle")}
                   description={t("form.deletePlanDescription")}
                   confirmLabel={t("actions.deletePlan")}
-                  cancelLabel={tCommon("actions.cancel")}
                   destructive
                   onConfirm={() => planFetcher.submit({ intent: "delete-plan", id: plan.id }, { method: "post" })}
                 />
@@ -368,7 +368,6 @@ type SettlementSummaryProps = {
 /** What still needs to happen this month, the netting alternative and the explicit end result. */
 function SettlementSummary({ settlement, accountLabel, personName, canManage, onDirect }: SettlementSummaryProps) {
   const { t } = useTranslation("money");
-  const { t: tCommon } = useTranslation();
   if (settlement.people.length === 0) return null;
   const total = money(settlement.totalCents);
 
@@ -453,7 +452,6 @@ function SettlementSummary({ settlement, accountLabel, personName, canManage, on
                 title={t("settlement.directTitle", { from: personName(payment.fromHabitantId), to: personName(payment.toHabitantId), amount: money(payment.amountCents) })}
                 description={t("settlement.directDescription", { from: personName(payment.fromHabitantId), to: personName(payment.toHabitantId), amount: money(payment.amountCents) })}
                 confirmLabel={t("actions.recordDirect")}
-                cancelLabel={tCommon("actions.cancel")}
                 onConfirm={() => onDirect(payment)}
               />
             ))}

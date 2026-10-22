@@ -6,7 +6,8 @@ import { Card } from "@/components/shared/card";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import type { MoneyMonth } from "../types/money";
 import { MoneyCardHeader } from "./money-card-header";
-import { money, usePersonName } from "./use-money-text";
+import { usePersonName } from "./use-money-text";
+import { money } from "@/lib/locale-text";
 
 type IncomeFlowCardProps = {
   income: MoneyMonth["income"];

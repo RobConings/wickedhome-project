@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
 import { setBalanceSchema, type JointAccount } from "../types/money";
-import { money } from "./use-money-text";
+import { money } from "@/lib/locale-text";
 
 type SetBalanceDialogProps = {
   trigger?: React.ReactElement;

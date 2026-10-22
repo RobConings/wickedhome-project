@@ -1,6 +1,7 @@
 import i18n from "i18next";
+import { optionalData } from "@/lib/loaders";
 import type { ActionFunctionArgs } from "react-router";
-import { toFormResult, type FormResult } from "@/lib/forms";
+import { failedAction, type FormResult } from "@/lib/forms";
 import { fetchAppliances, type Appliance } from "@/features/energy";
 import { haApplianceLinksInputSchema, haSettingsInputSchema } from "../types/home-assistant";
 import {
@@ -24,9 +25,9 @@ export async function homeAssistantLoader() {
   const status = await fetchHaStatus();
   return {
     status,
-    entities: fetchHaEntities().catch(() => null),
-    suggestions: fetchHaSuggestions().catch(() => null),
-    energy: fetchHaEnergy().catch(() => null),
+    entities: optionalData(fetchHaEntities()),
+    suggestions: optionalData(fetchHaSuggestions()),
+    energy: optionalData(fetchHaEnergy()),
     alarm: fetchAlarmOverview(),
     appliances: fetchAppliances().catch((): Appliance[] => []),
   };
@@ -58,6 +59,6 @@ export async function homeAssistantAction({ request }: ActionFunctionArgs): Prom
         return { formError: i18n.t("common:errors.generic"), intent };
     }
   } catch (error) {
-    return { ...toFormResult(error, { ha_unavailable: i18n.t("home-assistant:errors.unreachable"), conflict: i18n.t("home-assistant:energy.alreadyRunning") }), intent };
+    return failedAction(error, intent, { ha_unavailable: i18n.t("home-assistant:errors.unreachable"), conflict: i18n.t("home-assistant:energy.alreadyRunning") });
   }
 }

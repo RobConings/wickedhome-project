@@ -2,16 +2,16 @@ import * as React from "react";
 import { PaperclipIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { cn } from "@/lib/utils";
 import type { Place } from "@/features/places";
 import type { EnergyActionResult } from "../data/energy-loaders";
 import { applianceDeleteKey } from "../data/use-appliance-deleting";
 import type { Appliance } from "../types/energy";
 import { ApplianceFormDialog } from "./appliance-form-dialog";
+import { useFetcherErrorToast } from "@/lib/hooks/use-fetcher-result";
 
 type ApplianceActionsProps = {
   appliance: Appliance;
@@ -29,9 +29,7 @@ export function ApplianceActions({ appliance, places, canManage, documents, clas
   const { t: tCommon } = useTranslation();
   const fetcher = useFetcher<EnergyActionResult>({ key: applianceDeleteKey(appliance.id) });
 
-  React.useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.formError) toast.error(fetcher.data.formError);
-  }, [fetcher.state, fetcher.data]);
+  useFetcherErrorToast(fetcher);
 
   if (!canManage && !documents) return null;
 
@@ -69,7 +67,7 @@ export function ApplianceActions({ appliance, places, canManage, documents, clas
               </Button>
             }
           />
-          <ConfirmDialog
+          <DeleteConfirmDialog
             trigger={
               <Button
                 variant="ghost"
@@ -82,9 +80,6 @@ export function ApplianceActions({ appliance, places, canManage, documents, clas
             }
             title={t("appliances.delete.title", { name: appliance.name })}
             description={t("appliances.delete.description")}
-            confirmLabel={tCommon("actions.delete")}
-            cancelLabel={tCommon("actions.cancel")}
-            destructive
             onConfirm={() => fetcher.submit({ intent: "delete", id: appliance.id }, { method: "post" })}
           />
         </>

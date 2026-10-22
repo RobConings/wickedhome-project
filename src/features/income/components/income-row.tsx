@@ -5,7 +5,8 @@ import { HabitantAvatar, type Habitant } from "@/features/household";
 import { cn } from "@/lib/utils";
 import { isReceived } from "../types/income-calculations";
 import type { Income, IncomeSource, IncomeTargetAccount } from "../types/income";
-import { dateText, money, useWhoName } from "./use-income-text";
+import { useWhoName } from "./use-income-text";
+import { dateText, money } from "@/lib/locale-text";
 
 type IncomeRowProps = {
   income: Income;

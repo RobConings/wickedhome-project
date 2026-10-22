@@ -10,6 +10,7 @@ import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { isEqualSplit, splitEqually } from "../types/expense-calculations";
 import type { ExpenseShare, PayerType } from "../types/expenses";
+import { sumCents } from "@/types/collections";
 
 type SplitMode = "equal" | "custom";
 
@@ -83,7 +84,7 @@ export function PayerField({
       : mode === "equal"
         ? splitEqually(total, selectedIds)
         : selectedIds.map((id) => ({ habitantId: id, amountCents: custom[id] ?? 0 }));
-  const remaining = total - shares.reduce((sum, share) => sum + share.amountCents, 0);
+  const remaining = total - sumCents(shares);
 
   const toggle = (id: string) =>
     setSelected((current) => (current.includes(id) ? current.filter((value) => value !== id) : [...current, id]));

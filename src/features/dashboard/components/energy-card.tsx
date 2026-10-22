@@ -2,13 +2,13 @@ import { ArrowRightIcon, FlameIcon, ZapIcon, type LucideIcon } from "lucide-reac
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
-import { Card, CardFooter, CardHeader, CardTitle } from "@/components/shared/card";
-import { IconChip } from "@/components/shared/icon-chip";
+import { Card, CardFooter } from "@/components/shared/card";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { formatKwh, formatM3 } from "@/features/energy";
-import { intlLocale } from "@/lib/format";
+import { formatNumber, formatPercent } from "@/lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { energyFigures, gasFigures, type DashboardEnergy } from "../data/dashboard-items";
+import { IconCardHeader } from "@/components/shared/icon-card-header";
 
 type EnergyCardProps = {
   today: string;
@@ -59,10 +59,7 @@ export function EnergyCard({ today, summary }: EnergyCardProps) {
 
   return (
     <Card>
-      <CardHeader className="items-center justify-start gap-3">
-        <IconChip icon={ZapIcon} tone="highlight" size="sm" />
-        <CardTitle>{t("energy.title")}</CardTitle>
-      </CardHeader>
+      <IconCardHeader icon={ZapIcon} tone="highlight" title={t("energy.title")} />
 
       {!figures ? (
         <InlineAlert tone="error">{t("loadError")}</InlineAlert>
@@ -97,16 +94,14 @@ export function EnergyCard({ today, summary }: EnergyCardProps) {
               {[
                 figures.solarShare !== null && {
                   term: t("energy.solarShare"),
-                  value: new Intl.NumberFormat(intlLocale(locale), { style: "percent", maximumFractionDigits: 0 }).format(
-                    figures.solarShare,
-                  ),
+                  value: formatPercent(figures.solarShare, locale),
                 },
                 {
                   term: t("energy.peak"),
                   value:
                     figures.peakKw === null
                       ? t("energy.noPeak")
-                      : `${new Intl.NumberFormat(intlLocale(locale), { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(figures.peakKw)} kW`,
+                      : `${formatNumber(figures.peakKw, locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kW`,
                 },
               ]
                 .filter((row): row is { term: string; value: string } => row !== false)

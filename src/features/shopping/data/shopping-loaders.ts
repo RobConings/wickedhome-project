@@ -2,7 +2,7 @@ import i18n from "i18next";
 import type { ActionFunctionArgs, ShouldRevalidateFunctionArgs } from "react-router";
 import { fetchShops, type Shop } from "@/features/shops";
 import { ApiRequestError } from "@/lib/api-client";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { failedAction, type FormResult, formString, parseForm } from "@/lib/forms";
 import {
   editToUpdate,
   productAlternativeInputSchema,
@@ -64,7 +64,7 @@ export async function productsLoader(): Promise<ProductsPageData> {
 const errorMessages = () => ({ forbidden: i18n.t("shopping:errors.forbidden") });
 
 function failed(error: unknown, intent: string | undefined): ShoppingActionResult {
-  return { ...toFormResult(error, errorMessages()), intent };
+  return failedAction(error, intent, errorMessages());
 }
 
 /**
@@ -72,8 +72,8 @@ function failed(error: unknown, intent: string | undefined): ShoppingActionResul
  * Exported so other pages with the dialog (e.g. the scan screen) can handle it in their own action.
  */
 export async function handleProductForm(formData: FormData): Promise<ShoppingActionResult> {
-  const intent = String(formData.get("intent") ?? "");
-  const id = String(formData.get("id") ?? "");
+  const intent = formString(formData, "intent");
+  const id = formString(formData, "id");
   try {
     const { data, errors } = parseForm(productInputSchema, formData);
     if (errors) return { errors, intent };
@@ -86,7 +86,7 @@ export async function handleProductForm(formData: FormData): Promise<ShoppingAct
       await upsertProductLink(product.id, { shopId: link.shopId, url: link.url, priceCents: link.priceCents ?? existing?.priceCents ?? null, articleNumber: existing?.articleNumber ?? null });
     }
     // The field was cleared (the form asked first): that shop's link goes.
-    const removeShopId = String(formData.get("removeLinkShopId") ?? "");
+    const removeShopId = formString(formData, "removeLinkShopId");
     if (!link && removeShopId) await deleteProductLink(product.id, removeShopId);
     return { ok: true, intent, id: product.id };
   } catch (error) {
@@ -96,10 +96,10 @@ export async function handleProductForm(formData: FormData): Promise<ShoppingAct
 
 /** The product form's link fields: nothing, a link to save, or an error message for the field. */
 function productLinkFromForm(formData: FormData): { url: string; shopId: string; priceCents: number | null } | { error: string } | null {
-  const url = String(formData.get("linkUrl") ?? "").trim();
+  const url = formString(formData, "linkUrl").trim();
   if (!url) return null;
   if (!webUrlSchema.safeParse(url).success) return { error: i18n.t("shopping:productLink.invalidUrl") };
-  const shopId = String(formData.get("linkShopId") ?? "");
+  const shopId = formString(formData, "linkShopId");
   if (!shopId) return { error: i18n.t("shopping:productLink.chooseShop") };
   const cents = Number(formData.get("linkPriceCents"));
   return { url, shopId, priceCents: formData.get("linkPriceCents") && Number.isInteger(cents) && cents >= 0 ? cents : null };
@@ -111,8 +111,8 @@ function productLinkFromForm(formData: FormData): { url: string; shopId: string;
  * its group). Exported so every page with those components handles them in its own action.
  */
 export async function handleProductAlternativeForm(formData: FormData): Promise<ShoppingActionResult> {
-  const intent = String(formData.get("intent") ?? "");
-  const id = String(formData.get("id") ?? "");
+  const intent = formString(formData, "intent");
+  const id = formString(formData, "id");
   try {
     if (intent === "unlink-alternative") {
       await unlinkProductAlternative(id);
@@ -137,8 +137,8 @@ export async function handleProductAlternativeForm(formData: FormData): Promise<
  */
 export async function shoppingAction({ request }: ActionFunctionArgs): Promise<ShoppingActionResult> {
   const formData = await request.formData();
-  const intent = String(formData.get("intent") ?? "");
-  const id = String(formData.get("id") ?? "");
+  const intent = formString(formData, "intent");
+  const id = formString(formData, "id");
   try {
     switch (intent) {
       case "create-list":
@@ -179,8 +179,8 @@ export async function shoppingAction({ request }: ActionFunctionArgs): Promise<S
 /** Products page: the catalogue and its shop links. */
 export async function productsAction({ request }: ActionFunctionArgs): Promise<ShoppingActionResult> {
   const formData = await request.formData();
-  const intent = String(formData.get("intent") ?? "");
-  const id = String(formData.get("id") ?? "");
+  const intent = formString(formData, "intent");
+  const id = formString(formData, "id");
   try {
     switch (intent) {
       case "create-product":
@@ -199,7 +199,7 @@ export async function productsAction({ request }: ActionFunctionArgs): Promise<S
         return { ok: true, intent, id };
       }
       case "delete-link":
-        await deleteProductLink(id, String(formData.get("shopId") ?? ""));
+        await deleteProductLink(id, formString(formData, "shopId"));
         return { ok: true, intent, id };
       case "add-to-list":
         await createShoppingItem({ productId: id, source: "manual" });

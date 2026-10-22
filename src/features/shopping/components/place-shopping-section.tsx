@@ -1,13 +1,12 @@
 import * as React from "react";
 import { ShoppingCartIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
-import { Button } from "@/components/ui/button";
 import { useLiveShoppingItems } from "../data/use-live-shopping";
 import { useShoppingItemActions } from "../data/use-shopping-item-actions";
 import type { ShoppingItem } from "../types/shopping";
 import { ShoppingItemRow } from "./shopping-item-row";
 import { ShoppingItemsError, ShoppingItemsSkeleton } from "./shopping-items-status";
+import { GhostLinkButton } from "@/components/shared/link-buttons";
 
 type PlaceShoppingSectionProps = {
   placeId: string;
@@ -40,12 +39,7 @@ export function PlaceShoppingSection({ placeId, initialItems }: PlaceShoppingSec
           ))}
         </ul>
       )}
-      <Button asChild variant="ghost" size="sm" className="self-start text-muted-foreground">
-        <Link to="/shopping">
-          <ShoppingCartIcon />
-          {t("actions.backToShopping")}
-        </Link>
-      </Button>
+      <GhostLinkButton to="/shopping" icon={ShoppingCartIcon} className="self-start text-muted-foreground">{t("actions.backToShopping")}</GhostLinkButton>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import * as React from "react";
-import { ArrowLeftIcon, BarcodeIcon, MapPinIcon, PencilIcon, PlusIcon, QrCodeIcon } from "lucide-react";
+import { BarcodeIcon, MapPinIcon, PencilIcon, PlusIcon, QrCodeIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useRevalidator } from "react-router";
+import { useRevalidator } from "react-router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
@@ -9,7 +9,7 @@ import { PageGrid } from "@/components/layout/page-grid";
 import { Stack } from "@/components/layout/stack";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
 import { PageHeader } from "@/components/shared/page-header";
-import { ProductAlternatives, ProductCategoryIcon, ProductFormDialog, formatQuantity } from "@/features/shopping";
+import { formatQuantity, ProductAlternatives, ProductFormDialog, ProductThumb } from "@/features/shopping";
 import { currentLocale } from "@/lib/i18n";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import { StockItemFormDialog } from "../components/stock-item-form-dialog";
@@ -17,6 +17,7 @@ import { StockItemRow } from "../components/stock-item-row";
 import { StockMovementList } from "../components/stock-movement-list";
 import type { ProductStockPageData } from "../data/inventory-loaders";
 import { useStockActions } from "../data/use-stock-actions";
+import { BackLink } from "@/components/shared/link-buttons";
 
 type ProductStockScreenProps = {
   data: ProductStockPageData;
@@ -50,20 +51,11 @@ export function ProductStockScreen({ data, canManage, initialSelections }: Produ
     <PageContainer>
       <PageHeader
         eyebrow={
-          <Link to="/inventory" className="inline-flex items-center gap-1 hover:underline">
-            <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-            {t("page.title")}
-          </Link>
+          <BackLink to="/inventory">{t("page.title")}</BackLink>
         }
         title={
           <span className="flex items-center gap-3">
-            {product.imageUrl ? (
-              <img src={product.imageUrl} alt="" referrerPolicy="no-referrer" className="size-11 shrink-0 rounded-lg border bg-white object-contain" />
-            ) : (
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-section-soft text-section">
-                <ProductCategoryIcon category={product.category} className="size-6" />
-              </span>
-            )}
+            <ProductThumb product={product} size="lg" iconClassName="size-6" />
             <span className="min-w-0 break-words">{product.name}</span>
           </span>
         }

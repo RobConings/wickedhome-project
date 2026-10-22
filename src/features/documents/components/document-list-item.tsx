@@ -3,13 +3,14 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Spinner } from "@/components/ui/spinner";
 import { FileTypeIcon } from "@/components/shared/file-type-icon";
-import { fileModified, fileSize, shortDate } from "./document-format";
+import { fileModified } from "./document-format";
 import { folderHref, type DocumentListEntry, type OnDocumentAction } from "./document-item";
 import { DocumentItemMenu } from "./document-item-menu";
 import { DocumentStorageBadge } from "./document-storage-badge";
 import { FolderGlyph } from "./folder-glyph";
 import { useFolderSummary } from "./use-folder-summary";
 import { useOpeningFolder } from "./use-opening-folder";
+import { dateText, fileSize } from "@/lib/locale-text";
 
 export type DocumentEntryProps = {
   item: DocumentListEntry;
@@ -38,7 +39,7 @@ export function DocumentListItem({ item, canManage, onAction, showPath = false }
   const isFolder = item.kind === "folder";
   const opening = useOpeningFolder(isFolder ? item.folder.id : null);
   const name = isFolder ? item.folder.name : item.file.name;
-  const detail = isFolder ? summary(item.folder) : `${fileSize(item.file.sizeBytes)} · ${shortDate(fileModified(item.file))}`;
+  const detail = isFolder ? summary(item.folder) : `${fileSize(item.file.sizeBytes)} · ${dateText(fileModified(item.file))}`;
   const path = showPath ? (isFolder ? item.folder.path : item.file.path) : undefined;
   const pathLabel = path && (path.length ? path.map((crumb) => crumb.name).join(" / ") : t("page.title"));
 

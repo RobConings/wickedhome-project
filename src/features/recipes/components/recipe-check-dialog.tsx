@@ -16,6 +16,7 @@ import { IngredientProductLink, IngredientShopLink, IngredientThumbnail } from "
 import { IngredientStatusDot } from "./ingredient-status-dot";
 import { IngredientStockText } from "./ingredient-stock-text";
 import { useAmountText } from "./use-amount-text";
+import { useFetcherResult } from "@/lib/hooks/use-fetcher-result";
 
 type RecipeCheckDialogProps = {
   recipe: Pick<Recipe, "id" | "name" | "servings">;
@@ -94,16 +95,13 @@ export function RecipeCheckDialog({ recipe, trigger, open: controlledOpen, onOpe
   React.useEffect(() => {
     close.current = () => setOpen(false);
   });
-  const handled = React.useRef<RecipeActionResult | undefined>(undefined);
-  React.useEffect(() => {
-    if (fetcher.state !== "idle" || !fetcher.data || handled.current === fetcher.data) return;
-    handled.current = fetcher.data;
-    if (fetcher.data.ok && fetcher.data.intent === "plan") {
-      const items = (fetcher.data.added ?? 0) + (fetcher.data.merged ?? 0);
+  useFetcherResult(fetcher, (result) => {
+    if (result.ok && result.intent === "plan") {
+      const items = (result.added ?? 0) + (result.merged ?? 0);
       toast.success(items ? t("check.planned", { count: items }) : t("check.plannedNoItems"));
       close.current();
-    } else if (fetcher.data.formError) toast.error(fetcher.data.formError);
-  }, [fetcher.state, fetcher.data, t]);
+    } else if (result.formError) toast.error(result.formError);
+  });
 
   const selected = picked ?? new Set<string>();
   const toggle = (id: string) => {

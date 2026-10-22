@@ -4,10 +4,9 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardFooter, CardHeader, CardTitle } from "@/components/shared/card";
-import { IconChip } from "@/components/shared/icon-chip";
+import { Card, CardFooter } from "@/components/shared/card";
 import { InlineAlert } from "@/components/shared/inline-alert";
-import { intlLocale } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { formatWeekday } from "@/types/date-format";
 import {
@@ -19,6 +18,7 @@ import {
   type WeatherResponse,
 } from "../types/weather";
 import { WeatherIcon } from "./weather-icon";
+import { IconCardHeader } from "@/components/shared/icon-card-header";
 
 type WeatherCardProps = {
   /** `null` when the request failed. */
@@ -34,10 +34,7 @@ function CardShell({ children, footer }: { children: React.ReactNode; footer?: R
   const { t } = useTranslation("weather");
   return (
     <Card>
-      <CardHeader className="items-center justify-start gap-3">
-        <IconChip icon={CloudSunIcon} tone="info" size="sm" />
-        <CardTitle>{t("card.title")}</CardTitle>
-      </CardHeader>
+      <IconCardHeader icon={CloudSunIcon} tone="info" title={t("card.title")} />
       {children}
       {footer}
     </Card>
@@ -47,7 +44,7 @@ function CardShell({ children, footer }: { children: React.ReactNode; footer?: R
 function Forecast({ forecast, hours, days }: { forecast: WeatherForecast; hours: number; days: number }) {
   const { t } = useTranslation("weather");
   const locale = currentLocale();
-  const mm = (value: number) => new Intl.NumberFormat(intlLocale(locale), { maximumFractionDigits: 1 }).format(value);
+  const mm = (value: number) => formatNumber(value, locale, { maximumFractionDigits: 1 });
   const degrees = (value: number) => `${Math.round(value)}°`;
   /** Compact column label of a forecast day: "za" / "Sat". */
   const weekday = (date: string) => formatWeekday(date, locale, "short");
@@ -219,13 +216,11 @@ export function WeatherCardSkeleton() {
   const { t } = useTranslation("weather");
   return (
     <Card aria-busy="true">
-      <CardHeader className="items-center justify-start gap-3">
-        <IconChip icon={CloudSunIcon} tone="info" size="sm" />
-        <CardTitle>{t("card.title")}</CardTitle>
+      <IconCardHeader icon={CloudSunIcon} tone="info" title={t("card.title")}>
         <span className="sr-only" role="status">
           {t("card.loading")}
         </span>
-      </CardHeader>
+      </IconCardHeader>
       <div aria-hidden className="flex items-center gap-4">
         <Skeleton className="size-12 rounded-full" />
         <div className="flex flex-col gap-2">

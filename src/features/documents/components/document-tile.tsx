@@ -4,7 +4,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Card } from "@/components/shared/card";
 import { FileTypeIcon } from "@/components/shared/file-type-icon";
 import type { DocumentFile, DocumentFolder } from "../types/documents";
-import { fileModified, fileSize, shortDate } from "./document-format";
+import { fileModified } from "./document-format";
 import { folderHref, type OnDocumentAction } from "./document-item";
 import { DocumentItemMenu } from "./document-item-menu";
 import type { DocumentEntryProps } from "./document-list-item";
@@ -12,6 +12,7 @@ import { DocumentStorageBadge } from "./document-storage-badge";
 import { FolderGlyph } from "./folder-glyph";
 import { useFolderSummary } from "./use-folder-summary";
 import { useOpeningFolder } from "./use-opening-folder";
+import { dateText, fileSize } from "@/lib/locale-text";
 
 const tileClass = "relative gap-2 transition-colors hover:bg-accent/40";
 /** Makes the name's link or button cover the whole tile. */
@@ -86,7 +87,7 @@ function FileTile({ file, canManage, onAction }: MenuProps & { file: DocumentFil
             {file.name}
           </button>
           <span className="truncate text-xs text-muted-foreground">
-            {fileSize(file.sizeBytes)} · {shortDate(fileModified(file))}
+            {fileSize(file.sizeBytes)} · {dateText(fileModified(file))}
           </span>
         </div>
         <DocumentItemMenu item={item} canManage={canManage} onAction={onAction} {...menu} />

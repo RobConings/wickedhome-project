@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { isoDateSchema } from "@/types/common";
 import { addDays } from "@/types/dates";
+import { canManageHousehold } from "@/types/roles";
 
 /**
  * Waste collection: which collector serves the home (a provider adapter in src/api/waste/providers),
@@ -243,4 +244,4 @@ export function suggestWasteProvider(postalCode: string | null | undefined, prov
 }
 
 /** Adults and owners set up the collector; everyone sees the collections. Mirrors the API's role check. */
-export const canManageWaste = (role: "owner" | "adult" | "child") => role !== "child";
+export const canManageWaste = canManageHousehold;

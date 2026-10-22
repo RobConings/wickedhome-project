@@ -2,7 +2,7 @@ import type * as React from "react";
 import { useTranslation } from "react-i18next";
 import type { GeneralFormField } from "@/components/shared/general-form";
 import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
-import { intlLocale } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 import { currentLocale } from "@/lib/i18n";
 import type { EnergyActionResult } from "../data/energy-loaders";
 import { energySettingsFormSchema, type EnergySettings } from "../types/energy";
@@ -38,9 +38,7 @@ export function GasSettingsFormDialog({ settings, trigger }: GasSettingsFormDial
       intent="save-gas-settings"
       defaultValues={{
         gasEan: settings.gasEan ?? "",
-        gasCalorificKwhPerM3: new Intl.NumberFormat(intlLocale(currentLocale()), { useGrouping: false, maximumFractionDigits: 3 }).format(
-          settings.gasCalorificKwhPerM3,
-        ),
+        gasCalorificKwhPerM3: formatNumber(settings.gasCalorificKwhPerM3, currentLocale(), { useGrouping: false, maximumFractionDigits: 3 }),
       }}
       contentClassName="sm:max-w-md"
     />

@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api, resourcePath, withQuery } from "@/lib/api-client";
 import { uploadBlob, type UploadProgress } from "@/lib/upload";
 import {
   FALLBACK_MIME_TYPE,
@@ -17,10 +17,12 @@ import {
   type StorageUsage,
 } from "../types/documents";
 
-const id = (value: string) => encodeURIComponent(value);
+const folderPath = resourcePath("/documents/folders");
+const filePath = resourcePath("/documents/files");
+const trashPath = resourcePath("/documents/trash");
 
 export const fetchContents = (folderId?: string) =>
-  api.get<FolderContents>(`/documents/contents${folderId ? `?folderId=${id(folderId)}` : ""}`);
+  api.get<FolderContents>(withQuery("/documents/contents", { folderId }));
 export const fetchFolders = () => api.get<DocumentFolder[]>("/documents/folders");
 export const searchDocuments = (q: string) =>
   api.get<DocumentSearchResult>(`/documents/search?q=${encodeURIComponent(q)}`);
@@ -29,17 +31,17 @@ export const fetchTrash = () => api.get<DocumentTrash>("/documents/trash");
 
 export const createFolder = (input: FolderCreateInput) => api.post<DocumentFolder>("/documents/folders", input);
 export const updateFolder = (folderId: string, input: FolderUpdateInput) =>
-  api.patch<DocumentFolder>(`/documents/folders/${id(folderId)}`, input);
-export const trashFolder = (folderId: string) => api.delete(`/documents/folders/${id(folderId)}`);
-export const restoreFolder = (folderId: string) => api.post<DocumentFolder>(`/documents/folders/${id(folderId)}/restore`);
-export const deleteFolderPermanently = (folderId: string) => api.delete(`/documents/trash/folders/${id(folderId)}`);
+  api.patch<DocumentFolder>(folderPath(folderId), input);
+export const trashFolder = (folderId: string) => api.delete(folderPath(folderId));
+export const restoreFolder = (folderId: string) => api.post<DocumentFolder>(folderPath(folderId, "restore"));
+export const deleteFolderPermanently = (folderId: string) => api.delete(trashPath("folders", folderId));
 
 export const createFile = (input: FileCreateInput) => api.post<DocumentFile>("/documents/files", input);
 export const updateFile = (fileId: string, input: FileUpdateInput) =>
-  api.patch<DocumentFile>(`/documents/files/${id(fileId)}`, input);
-export const trashFile = (fileId: string) => api.delete(`/documents/files/${id(fileId)}`);
-export const restoreFile = (fileId: string) => api.post<DocumentFile>(`/documents/files/${id(fileId)}/restore`);
-export const deleteFilePermanently = (fileId: string) => api.delete(`/documents/trash/files/${id(fileId)}`);
+  api.patch<DocumentFile>(filePath(fileId), input);
+export const trashFile = (fileId: string) => api.delete(filePath(fileId));
+export const restoreFile = (fileId: string) => api.post<DocumentFile>(filePath(fileId, "restore"));
+export const deleteFilePermanently = (fileId: string) => api.delete(trashPath("files", fileId));
 export const emptyTrash = () => api.delete("/documents/trash");
 
 /** Streams the file's bytes as the raw request body, with progress. */
@@ -47,7 +49,7 @@ export const uploadFileContent = (
   fileId: string,
   body: Blob,
   options: { contentType: string; onProgress?: (progress: UploadProgress) => void; signal?: AbortSignal },
-) => uploadBlob<DocumentFile>(`/documents/files/${id(fileId)}/content`, body, options);
+) => uploadBlob<DocumentFile>(filePath(fileId, "content"), body, options);
 
 export type UploadDocumentOptions = {
   /** Display name including extension; the blob's own name (for a File) by default. */
@@ -80,4 +82,4 @@ export const fetchLinkedFiles =({ entityType, entityId }: DocumentLinkRef) =>
   api.get<DocumentFile[]>(`/documents/links?entityType=${entityType}&entityId=${encodeURIComponent(entityId)}`);
 export const attachFile = (input: DocumentLinkInput) => api.post("/documents/links", input);
 export const detachFile = ({ fileId, entityType, entityId }: DocumentLinkInput) =>
-  api.delete(`/documents/links/${id(fileId)}/${entityType}/${id(entityId)}`);
+  api.delete(resourcePath("/documents/links")(fileId, entityType, entityId));

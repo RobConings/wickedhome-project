@@ -3,6 +3,7 @@ import { idSchema, isoDateSchema } from "@/types/common";
 import { daysBetween } from "@/types/dates";
 import { isValidRRule, type RRuleSupport } from "@/types/recurrence";
 import type { ShopRef } from "@/types/shops";
+import { canManageHousehold } from "@/types/roles";
 
 /**
  * The RRULE subset calendar events accept (`@/types/recurrence`): daily, weekly (optionally on chosen
@@ -383,4 +384,4 @@ export function matchesCalendarFilter(
 export const calendarEventPath = (eventId: string) => `/calendar/events/${encodeURIComponent(eventId)}`;
 
 /** Adults and owners create and change events; children look. Mirrors the API's role check. */
-export const canManageCalendar = (role: "owner" | "adult" | "child") => role !== "child";
+export const canManageCalendar = canManageHousehold;

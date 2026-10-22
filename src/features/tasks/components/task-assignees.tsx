@@ -1,6 +1,6 @@
 import { RotateCwIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { HabitantAvatar, type Habitant } from "@/features/household";
+import { type Habitant, HabitantAvatarStack } from "@/features/household";
 import { cn } from "@/lib/utils";
 import { onDutyIds, type Task } from "../types/tasks";
 
@@ -25,11 +25,7 @@ export function TaskAssignees({ task, habitants, withNames = false, className }:
 
   return (
     <div className={cn("flex min-w-0 items-center gap-2", className)} title={rotation ?? names}>
-      <div className="flex shrink-0 -space-x-1.5">
-        {onDuty.map((habitant) => (
-          <HabitantAvatar key={habitant.id} habitant={habitant} size="sm" />
-        ))}
-      </div>
+      <HabitantAvatarStack habitants={onDuty} as="div" />
       {withNames && <span className="truncate text-sm">{names}</span>}
       {rotation && <RotateCwIcon className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />}
       <span className="sr-only">{rotation ? `${t("assignees.onDuty", { names })} (${rotation})` : t("assignees.label", { names })}</span>

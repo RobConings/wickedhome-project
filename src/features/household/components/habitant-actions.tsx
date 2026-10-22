@@ -2,14 +2,14 @@ import * as React from "react";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Inline } from "@/components/layout/inline";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import type { HabitantActionResult } from "../data/household-loaders";
 import type { Habitant } from "../types/household";
 import { HabitantFormDialog } from "./habitant-form-dialog";
+import { useFetcherErrorToast } from "@/lib/hooks/use-fetcher-result";
 
 type HabitantActionsProps = {
   habitant: Habitant;
@@ -23,9 +23,7 @@ export function HabitantActions({ habitant, iconOnly = false }: HabitantActionsP
   const { t: tCommon } = useTranslation();
   const fetcher = useFetcher<HabitantActionResult>();
 
-  React.useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.formError) toast.error(fetcher.data.formError);
-  }, [fetcher.state, fetcher.data]);
+  useFetcherErrorToast(fetcher);
 
   const size = iconOnly ? "icon" : "sm";
   const text = (label: string) => <span className={iconOnly ? "sr-only" : "max-sm:sr-only"}>{label}</span>;
@@ -62,13 +60,10 @@ export function HabitantActions({ habitant, iconOnly = false }: HabitantActionsP
           <TooltipContent>{t("delete.hasAccount")}</TooltipContent>
         </Tooltip>
       ) : (
-        <ConfirmDialog
+        <DeleteConfirmDialog
           trigger={deleteButton({})}
           title={t("delete.title", { name: habitant.name })}
           description={t("delete.description")}
-          confirmLabel={tCommon("actions.delete")}
-          cancelLabel={tCommon("actions.cancel")}
-          destructive
           onConfirm={() => fetcher.submit({ intent: "delete", id: habitant.id }, { method: "post" })}
         />
       )}

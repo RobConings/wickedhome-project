@@ -3,7 +3,6 @@ import { CpuIcon, HouseIcon, PlusIcon, SlidersHorizontalIcon } from "lucide-reac
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageContainer } from "@/components/layout/page-container";
 import { EmptyState } from "@/components/shared/empty-state";
 import { GeneralList } from "@/components/shared/general-list";
@@ -18,8 +17,9 @@ import { DeviceRow } from "../components/device-row";
 import { DeviceTile } from "../components/device-tile";
 import { LiveStatusBadge } from "../components/live-status-badge";
 import { useLiveDevices } from "../data/use-live-devices";
-import { useNow } from "../data/use-now";
+import { useNow } from "@/lib/hooks/use-now";
 import { DEVICE_CATEGORIES, type Device, type DeviceProfile } from "../types/devices";
+import { FILTER_ALL, FilterSelect } from "@/components/shared/filter-select";
 
 type DevicesScreenProps = {
   devices: Device[];
@@ -35,8 +35,6 @@ type DevicesScreenProps = {
   pending?: boolean;
 };
 
-const ALL = "all";
-
 export function DevicesScreen({ devices: loaded, profiles, places, appliances, canManage, live = true, now: fixedNow, pending: forcedPending }: DevicesScreenProps) {
   const { t } = useTranslation("devices");
   const now = useNow(60_000, fixedNow);
@@ -44,13 +42,13 @@ export function DevicesScreen({ devices: loaded, profiles, places, appliances, c
   const samePagePending = useSamePagePending();
   const pending = forcedPending ?? samePagePending;
   const stateOf = useDeviceStates(profiles, now);
-  const [category, setCategory] = React.useState<string>(ALL);
-  const [profileId, setProfileId] = React.useState<string>(ALL);
+  const [category, setCategory] = React.useState<string>(FILTER_ALL);
+  const [profileId, setProfileId] = React.useState<string>(FILTER_ALL);
 
   const profilesById = React.useMemo(() => new Map(profiles.map((profile) => [profile.id, profile])), [profiles]);
   const visible = devices.filter((device) => {
     const profile = profilesById.get(device.profileId);
-    return (category === ALL || profile?.category === category) && (profileId === ALL || device.profileId === profileId);
+    return (category === FILTER_ALL || profile?.category === category) && (profileId === FILTER_ALL || device.profileId === profileId);
   });
   const usedCategories = DEVICE_CATEGORIES.filter((candidate) => profiles.some((profile) => profile.category === candidate));
 
@@ -70,33 +68,21 @@ export function DevicesScreen({ devices: loaded, profiles, places, appliances, c
 
   const filters = (
     <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap" role="group" aria-label={t("filters.label")}>
-      <Select value={category} onValueChange={setCategory}>
-        <SelectTrigger className="w-full sm:w-48" aria-label={t("filters.category")}>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL}>{t("filters.allCategories")}</SelectItem>
-          {usedCategories.map((candidate) => (
-            <SelectItem key={candidate} value={candidate}>
-              {t(`categories.${candidate}`)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Select value={profileId} onValueChange={setProfileId}>
-        <SelectTrigger className="w-full sm:w-56" aria-label={t("filters.profile")}>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL}>{t("filters.allProfiles")}</SelectItem>
-          {profiles.map((profile) => (
-            <SelectItem key={profile.id} value={profile.id}>
-              <DeviceIcon icon={profile.icon} />
-              {profile.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <FilterSelect
+        label={t("filters.category")}
+        value={category}
+        onValueChange={setCategory}
+        allLabel={t("filters.allCategories")}
+        options={usedCategories.map((candidate) => ({ value: candidate, label: t(`categories.${candidate}`) }))}
+      />
+      <FilterSelect
+        label={t("filters.profile")}
+        value={profileId}
+        onValueChange={setProfileId}
+        allLabel={t("filters.allProfiles")}
+        options={profiles.map((profile) => ({ value: profile.id, label: <><DeviceIcon icon={profile.icon} />{profile.name}</> }))}
+        className="w-full sm:w-56"
+      />
     </div>
   );
 
@@ -159,7 +145,7 @@ export function DevicesScreen({ devices: loaded, profiles, places, appliances, c
           storageKey="devices"
           defaultView="list"
           toolbar={filters}
-          filtered={category !== ALL || profileId !== ALL}
+          filtered={category !== FILTER_ALL || profileId !== FILTER_ALL}
           groupBy={(device) => placeGroupKey(device.place)}
           groupOrder={placeGroupOrder(visible.map((device) => device.place))}
           renderGroupHeader={(key, list) => {

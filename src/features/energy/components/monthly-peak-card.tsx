@@ -2,7 +2,7 @@ import { GaugeIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
 import { StackedBarChart } from "@/components/shared/stacked-bar-chart";
-import { intlLocale } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { formatDate, formatMonthName } from "@/types/date-format";
 import { CAPACITY_MINIMUM_KW, type EnergyPeak } from "../types/energy";
@@ -67,7 +67,7 @@ export function MonthlyPeakCard({ peak, className }: MonthlyPeakCardProps) {
             values: { kw: month.kw },
           }))}
           formatValue={(kw) => formatKw(kw, locale)}
-          formatTick={(kw) => new Intl.NumberFormat(intlLocale(locale)).format(kw)}
+          formatTick={(kw) => formatNumber(kw, locale)}
           axisLabel="kW"
           referenceLine={{ value: CAPACITY_MINIMUM_KW, label: formatKw(CAPACITY_MINIMUM_KW, locale) }}
           labels={{ showTable: t("chart.showTable"), hideTable: t("chart.hideTable"), category: t("chart.category") }}

@@ -4,9 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { bindingsForProfile, isValueStale, type Device, type DeviceProfile } from "../types/devices";
-import { formatRelative } from "./device-format";
 import { useFieldFormatter } from "./device-indicator";
 import { DeviceValueControl } from "./device-value-control";
+import { formatRelativeTime } from "@/lib/format";
 
 type DeviceValuesListProps = {
   device: Device;
@@ -39,7 +39,7 @@ export function DeviceValuesList({ device, profile, canSetValues, now, className
                 {profile.primaryField === field.key && <Badge variant="secondary">{t("values.primary")}</Badge>}
               </span>
               <span className="text-xs text-muted-foreground">
-                {binding.updatedAt ? t("values.updated", { when: formatRelative(binding.updatedAt, now, locale) }) : t("values.never")}
+                {binding.updatedAt ? t("values.updated", { when: formatRelativeTime(binding.updatedAt, locale, now) }) : t("values.never")}
                 {fromHa && (
                   <>
                     {" · "}

@@ -1,8 +1,9 @@
 import i18n from "i18next";
-import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type ShouldRevalidateFunctionArgs } from "react-router";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
 import { fetchShops, type Shop } from "@/features/shops";
-import { formDataToObject, toFormResult, type FormResult } from "@/lib/forms";
+import { failedAction, formDataToObject, type FormResult, formString, readIntent } from "@/lib/forms";
+import { revalidateUnlessOnly } from "@/lib/loaders";
 import { NEW_FORM_PARAM } from "@/lib/open-from-url";
 import { isoDateSchema } from "@/types/common";
 import { todayIn } from "@/types/dates";
@@ -72,18 +73,7 @@ export function calendarSearch(
  * Changing only the legend filter (categories, sources) needs no new data: the screen filters what it already has. Neither
  * does removing `?new=1` after the new-event form opened.
  */
-export function calendarShouldRevalidate({ currentUrl, nextUrl, formMethod, defaultShouldRevalidate }: ShouldRevalidateFunctionArgs) {
-  if (formMethod || currentUrl.pathname !== nextUrl.pathname) return defaultShouldRevalidate;
-  const withoutFilter = (url: URL) => {
-    const search = new URLSearchParams(url.search);
-    search.delete(CATEGORY_FILTER_PARAM);
-    search.delete(SOURCE_FILTER_PARAM);
-    search.delete(NEW_FORM_PARAM);
-    search.sort();
-    return search.toString();
-  };
-  return withoutFilter(currentUrl) === withoutFilter(nextUrl) ? false : defaultShouldRevalidate;
-}
+export const calendarShouldRevalidate = revalidateUnlessOnly([CATEGORY_FILTER_PARAM, SOURCE_FILTER_PARAM, NEW_FORM_PARAM], { sort: true });
 
 export async function calendarLoader({ request }: LoaderFunctionArgs): Promise<CalendarScreenData> {
   const today = todayIn();
@@ -134,8 +124,8 @@ export function parseEventForm(
 }
 
 async function handleEventForm(formData: FormData): Promise<CalendarActionResult> {
-  const intent = formData.get("intent") as CalendarIntent | null;
-  const id = String(formData.get("id") ?? "");
+  const intent = readIntent<CalendarIntent>(formData);
+  const id = formString(formData, "id");
 
   try {
     if (intent === "delete") {
@@ -149,10 +139,7 @@ async function handleEventForm(formData: FormData): Promise<CalendarActionResult
     // `null`: created in another calendar (a Google calendar), not as a household event.
     return { ok: true, intent: intent ?? "create", event: event ?? undefined };
   } catch (error) {
-    return {
-      ...toFormResult(error, { not_found: i18n.t("calendar:errors.notFound") }),
-      intent: intent ?? undefined,
-    };
+    return failedAction(error, intent ?? undefined, { not_found: i18n.t("calendar:errors.notFound") });
   }
 }
 

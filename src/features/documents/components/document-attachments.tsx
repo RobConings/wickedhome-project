@@ -27,11 +27,11 @@ import {
   type DocumentLinkRef,
 } from "../types/documents";
 import { AttachDocumentDialog } from "./attach-document-dialog";
-import { fileSize, shortDate } from "./document-format";
 import { folderHref, type WithPath } from "./document-item";
 import { DocumentPreviewDialog } from "./document-preview-dialog";
 import { DocumentStorageBadge } from "./document-storage-badge";
 import { UploadProgressList } from "./upload-progress-list";
+import { dateText, fileSize } from "@/lib/locale-text";
 
 export type DocumentAttachmentsProps = {
   /** The kind of item, e.g. "bill" or "appliance" (see DOCUMENT_ENTITY_TYPES). */
@@ -167,7 +167,7 @@ export function DocumentAttachments({
                   <span className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
                     <DocumentStorageBadge file={file} />
                     <span className="truncate">
-                      {fileSize(file.sizeBytes)} · {shortDate(file.uploadedAt ?? file.createdAt)}
+                      {fileSize(file.sizeBytes)} · {dateText(file.uploadedAt ?? file.createdAt)}
                       {fileNote?.(file) ? <> · {fileNote(file)}</> : null}
                     </span>
                   </span>

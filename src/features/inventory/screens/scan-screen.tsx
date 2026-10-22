@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ArrowLeftIcon, CircleHelpIcon, Layers2Icon, PackageMinusIcon, PackagePlusIcon, PackageSearchIcon, PlusIcon, ScanLineIcon } from "lucide-react";
+import { CircleHelpIcon, Layers2Icon, PackageMinusIcon, PackagePlusIcon, PackageSearchIcon, PlusIcon, ScanLineIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useRevalidator } from "react-router";
 import { toast } from "sonner";
@@ -31,6 +31,7 @@ import type { ScanPageData } from "../data/inventory-loaders";
 import { scanCode as defaultScanCode } from "../data/inventory-requests";
 import { useStockActions } from "../data/use-stock-actions";
 import type { ScanMode, ScanResult, StockItem } from "../types/inventory";
+import { BackLink } from "@/components/shared/link-buttons";
 
 type ScanScreenProps = {
   data: ScanPageData;
@@ -194,10 +195,7 @@ export function ScanScreen({
     <PageContainer>
       <PageHeader
         eyebrow={
-          <Link to="/inventory" className="inline-flex items-center gap-1 hover:underline">
-            <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-            {t("page.title")}
-          </Link>
+          <BackLink to="/inventory">{t("page.title")}</BackLink>
         }
         title={t("scan.title")}
         description={t("scan.description")}

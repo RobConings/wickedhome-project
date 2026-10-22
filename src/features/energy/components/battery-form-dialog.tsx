@@ -2,7 +2,7 @@ import type * as React from "react";
 import { useTranslation } from "react-i18next";
 import type { GeneralFormField } from "@/components/shared/general-form";
 import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
-import { intlLocale } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 import { currentLocale } from "@/lib/i18n";
 import type { EnergyActionResult } from "../data/energy-loaders";
 import { batteryFormSchema, type HomeBattery } from "../types/energy";
@@ -18,7 +18,7 @@ export function BatteryFormDialog({ battery, trigger }: BatteryFormDialogProps) 
   const isEdit = Boolean(battery);
   // The form speaks kWh and kW with a decimal comma; the API stores Wh and W.
   const decimal = (value: number | null | undefined) =>
-    value == null ? "" : new Intl.NumberFormat(intlLocale(currentLocale()), { useGrouping: false, maximumFractionDigits: 2 }).format(value / 1000);
+    value == null ? "" : formatNumber(value / 1000, currentLocale(), { useGrouping: false, maximumFractionDigits: 2 });
 
   // Decimal fields are text inputs: "13,5" with a comma must stay as typed (a number input would drop it).
   const fields: GeneralFormField[] = [

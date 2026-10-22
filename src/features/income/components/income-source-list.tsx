@@ -9,7 +9,8 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import { JOINT, type IncomeSource, type IncomeTargetAccount } from "../types/income";
 import { IncomeSourceFormDialog } from "./income-source-form-dialog";
-import { dateText, money, useRecurrenceText, useWhoName } from "./use-income-text";
+import { useRecurrenceText, useWhoName } from "./use-income-text";
+import { dateText, money } from "@/lib/locale-text";
 
 type IncomeSourceListProps = {
   sources: IncomeSource[];
@@ -21,7 +22,6 @@ type IncomeSourceListProps = {
 
 function IncomeSourceRow({ source, habitants, accounts, today, canManage }: Omit<IncomeSourceListProps, "sources"> & { source: IncomeSource }) {
   const { t } = useTranslation("income");
-  const { t: tCommon } = useTranslation();
   const recurrence = useRecurrenceText();
   const fetcher = useFetcher();
   const [editing, setEditing] = React.useState(false);
@@ -70,7 +70,6 @@ function IncomeSourceRow({ source, habitants, accounts, today, canManage }: Omit
             title={t("form.deleteSourceTitle", { name: source.name })}
             description={t("form.deleteSourceDescription")}
             confirmLabel={t("actions.delete")}
-            cancelLabel={tCommon("actions.cancel")}
             destructive
             onConfirm={() => fetcher.submit({ intent: "delete-source", id: source.id }, { method: "post" })}
           />

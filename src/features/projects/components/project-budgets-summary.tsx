@@ -11,6 +11,7 @@ import { ProjectBudgetBadge } from "./project-badges";
 import { ProjectBudgetBar } from "./project-budget-bar";
 import { ProjectAvatar } from "./project-icon";
 import { useProjectText } from "./use-project-text";
+import { InlineRetry } from "@/components/shared/inline-retry";
 
 type ProjectBudgetsSummaryProps = {
   /** `YYYY-MM`; this month when left out. */
@@ -61,19 +62,13 @@ export function ProjectBudgetsSummary({ month, data }: ProjectBudgetsSummaryProp
   }
   if (state.status === "error") {
     return (
-      <div className="flex flex-col items-start gap-2 text-sm text-muted-foreground">
-        {t("summary.error")}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            setFetched({ status: "loading" });
-            setAttempt((value) => value + 1);
-          }}
-        >
-          {tCommon("actions.retry")}
-        </Button>
-      </div>
+      <InlineRetry
+        message={t("summary.error")}
+        onRetry={() => {
+          setFetched({ status: "loading" });
+          setAttempt((value) => value + 1);
+        }}
+      />
     );
   }
 

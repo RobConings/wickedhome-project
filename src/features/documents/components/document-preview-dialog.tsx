@@ -8,7 +8,7 @@ import { FileTypeIcon } from "@/components/shared/file-type-icon";
 import { LoadingState } from "@/components/shared/loading-state";
 import { cn } from "@/lib/utils";
 import { documentContentUrl, previewKind, type DocumentFile } from "../types/documents";
-import { fileSize, shortDate } from "./document-format";
+import { dateText, fileSize } from "@/lib/locale-text";
 
 /** What the dialog needs of a file: a document, or a file elsewhere (a linked Drive folder) shown through `src`. */
 export type PreviewFile = Pick<DocumentFile, "id" | "name" | "mimeType"> &
@@ -48,7 +48,7 @@ export function DocumentPreviewDialog({ file, onOpenChange, src, downloadSrc, te
                   <DialogDescription className="truncate">
                     {[
                       typeof file.sizeBytes === "number" && fileSize(file.sizeBytes),
-                      file.uploadedAt && shortDate(file.uploadedAt),
+                      file.uploadedAt && dateText(file.uploadedAt),
                       file.uploadedBy && t("preview.uploadedBy", { name: file.uploadedBy.name }),
                     ]
                       .filter(Boolean)

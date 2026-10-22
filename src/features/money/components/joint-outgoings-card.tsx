@@ -5,7 +5,7 @@ import { Card } from "@/components/shared/card";
 import { cn } from "@/lib/utils";
 import type { MoneyMonth } from "../types/money";
 import { MoneyCardHeader } from "./money-card-header";
-import { dateText, money } from "./use-money-text";
+import { dateText, money } from "@/lib/locale-text";
 
 type JointOutgoingsCardProps = {
   outgoings: MoneyMonth["jointOutgoings"];

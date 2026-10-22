@@ -1,7 +1,7 @@
 import i18n from "i18next";
-import { data, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
-import { ApiRequestError } from "@/lib/api-client";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
+import { failedAction, type FormResult, formString, parseForm, readIntent, toFormResult } from "@/lib/forms";
+import { orNotFound } from "@/lib/loaders";
 import { floorInputSchema, floorPlanInputSchema, placeInputSchema, type FloorPlan } from "../types/places";
 import {
   createFloor,
@@ -30,15 +30,6 @@ export type PlacesIntent = (typeof PLACES_INTENTS)[number];
 
 export type PlacesActionResult = FormResult & { intent?: PlacesIntent };
 
-/** A missing floor or place (or one of another household) shows the not-found page. */
-async function orNotFound<T>(request: Promise<T>): Promise<T> {
-  try {
-    return await request;
-  } catch (error) {
-    if (error instanceof ApiRequestError && error.status === 404) throw data(null, { status: 404 });
-    throw error;
-  }
-}
 
 export function placesLoader() {
   return fetchPlacesOverview();
@@ -58,8 +49,8 @@ export function placeDetailLoader({ params }: LoaderFunctionArgs) {
  */
 export async function placesAction({ request }: ActionFunctionArgs): Promise<PlacesActionResult | Response> {
   const formData = await request.formData();
-  const intent = formData.get("intent") as PlacesIntent | null;
-  const id = String(formData.get("id") ?? "");
+  const intent = readIntent<PlacesIntent>(formData);
+  const id = formString(formData, "id");
 
   try {
     switch (intent) {
@@ -92,10 +83,7 @@ export async function placesAction({ request }: ActionFunctionArgs): Promise<Pla
         return { formError: i18n.t("common:errors.generic") };
     }
   } catch (error) {
-    return {
-      ...toFormResult(error, { conflict: i18n.t("places:floor.delete.hasPlaces") }),
-      intent: intent ?? undefined,
-    };
+    return failedAction(error, intent ?? undefined, { conflict: i18n.t("places:floor.delete.hasPlaces") });
   }
 }
 

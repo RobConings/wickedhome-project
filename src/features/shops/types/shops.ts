@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { SHOP_TYPES, type ShopRef, type ShopType } from "@/types/shops";
+import { canManageHousehold, type HouseholdRole } from "@/types/roles";
 
 // The types and the reference other features embed live in `@/types/shops` (contracts can't import each other).
 export { SHOP_TYPES, type ShopRef, type ShopType };
@@ -73,10 +74,10 @@ export type Shop = {
   ingredientSearch: boolean;
 };
 
-type Role = "owner" | "adult" | "child";
+type Role = HouseholdRole;
 
 /** Adults and owners add shops. Mirrors the API's role check. */
-export const canAddShops = (role: Role) => role !== "child";
+export const canAddShops = canManageHousehold;
 
 /**
  * Own shops: adults and owners. Built-in catalogue shops: only the owner may edit them (this is a
@@ -84,9 +85,9 @@ export const canAddShops = (role: Role) => role !== "child";
  */
 export const canEditShop = (role: Role, shop: Pick<Shop, "isBuiltIn">) =>
   role === "owner" || (role === "adult" && !shop.isBuiltIn);
-export const canDeleteShop = (role: Role, shop: Pick<Shop, "isBuiltIn">) => role !== "child" && !shop.isBuiltIn;
+export const canDeleteShop = (role: Role, shop: Pick<Shop, "isBuiltIn">) => canManageHousehold(role) && !shop.isBuiltIn;
 
 /** Only a shop with a webshop and a website can be searched for ingredients. */
 export const canSearchIngredients = (shop: Pick<Shop, "hasWebshop" | "websiteUrl">) => shop.hasWebshop && Boolean(shop.websiteUrl);
 /** Adults and owners choose which shops are searched (also built-in ones: the setting is the household's). */
-export const canSetIngredientSearch = (role: Role) => role !== "child";
+export const canSetIngredientSearch = canManageHousehold;

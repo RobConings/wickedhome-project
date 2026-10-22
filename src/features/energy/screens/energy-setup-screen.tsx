@@ -16,6 +16,7 @@ import { GasSettingsCard } from "../components/gas-settings-card";
 import { SolarInstallationCard } from "../components/solar-installation-card";
 import { SolarInstallationFormDialog } from "../components/solar-installation-form-dialog";
 import type { EnergySetup } from "../types/energy";
+import { CanManageProvider } from "@/lib/permissions";
 
 type EnergySetupScreenProps = {
   setup: EnergySetup;
@@ -50,52 +51,54 @@ export function EnergySetupScreen({ setup, today, canManage }: EnergySetupScreen
   );
 
   return (
-    <PageContainer>
-      <PageHeader title={t("page.setup.title")} description={t("page.setup.description")} />
-      <EnergyNav />
+    <CanManageProvider value={canManage}>
+      <PageContainer>
+        <PageHeader title={t("page.setup.title")} description={t("page.setup.description")} />
+        <EnergyNav />
 
-      <PageSection aria-labelledby="solar-heading">
-        <SectionHeader
-          id="solar-heading"
-          title={t("solar.title")}
-          description={totalKwp ? t("solar.total", { kwp: formatKwp(totalKwp, currentLocale()) }) : undefined}
-          actions={setup.solarInstallations.length > 0 && addSolar}
-        />
-        {setup.solarInstallations.length === 0 ? (
-          <EmptyState icon={SunIcon} title={t("solar.empty.title")} description={t("solar.empty.description")} action={addSolar} />
-        ) : (
-          <PageGrid columns="2">
-            {setup.solarInstallations.map((installation) => (
-              <SolarInstallationCard key={installation.id} installation={installation} canManage={canManage} />
-            ))}
-          </PageGrid>
-        )}
-      </PageSection>
-
-      <PageSection aria-labelledby="gas-heading">
-        <SectionHeader id="gas-heading" title={t("gas.title")} description={t("gas.description")} />
-        <PageGrid columns="2">
-          <GasSettingsCard settings={setup.settings} canManage={canManage} />
-        </PageGrid>
-      </PageSection>
-
-      <PageSection aria-labelledby="battery-heading">
-        <SectionHeader id="battery-heading" title={t("battery.title")} actions={setup.batteries.length > 0 && addBattery} />
-        {setup.batteries.length === 0 ? (
-          <EmptyState
-            icon={BatteryFullIcon}
-            title={t("battery.empty.title")}
-            description={t("battery.empty.description")}
-            action={addBattery}
+        <PageSection aria-labelledby="solar-heading">
+          <SectionHeader
+            id="solar-heading"
+            title={t("solar.title")}
+            description={totalKwp ? t("solar.total", { kwp: formatKwp(totalKwp, currentLocale()) }) : undefined}
+            actions={setup.solarInstallations.length > 0 && addSolar}
           />
-        ) : (
+          {setup.solarInstallations.length === 0 ? (
+            <EmptyState icon={SunIcon} title={t("solar.empty.title")} description={t("solar.empty.description")} action={addSolar} />
+          ) : (
+            <PageGrid columns="2">
+              {setup.solarInstallations.map((installation) => (
+                <SolarInstallationCard key={installation.id} installation={installation} />
+              ))}
+            </PageGrid>
+          )}
+        </PageSection>
+
+        <PageSection aria-labelledby="gas-heading">
+          <SectionHeader id="gas-heading" title={t("gas.title")} description={t("gas.description")} />
           <PageGrid columns="2">
-            {setup.batteries.map((battery) => (
-              <BatteryCard key={battery.id} battery={battery} today={today} canManage={canManage} />
-            ))}
+            <GasSettingsCard settings={setup.settings} />
           </PageGrid>
-        )}
-      </PageSection>
-    </PageContainer>
+        </PageSection>
+
+        <PageSection aria-labelledby="battery-heading">
+          <SectionHeader id="battery-heading" title={t("battery.title")} actions={setup.batteries.length > 0 && addBattery} />
+          {setup.batteries.length === 0 ? (
+            <EmptyState
+              icon={BatteryFullIcon}
+              title={t("battery.empty.title")}
+              description={t("battery.empty.description")}
+              action={addBattery}
+            />
+          ) : (
+            <PageGrid columns="2">
+              {setup.batteries.map((battery) => (
+                <BatteryCard key={battery.id} battery={battery} today={today} />
+              ))}
+            </PageGrid>
+          )}
+        </PageSection>
+      </PageContainer>
+    </CanManageProvider>
   );
 }

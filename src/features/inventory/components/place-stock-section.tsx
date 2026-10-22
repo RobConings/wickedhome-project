@@ -1,13 +1,13 @@
 import * as React from "react";
-import { BoxIcon, RotateCwIcon } from "lucide-react";
+import { BoxIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
-import { Button } from "@/components/ui/button";
 import { SkeletonList } from "@/components/shared/loading-state";
 import { fetchStock } from "../data/inventory-requests";
 import { useStockActions } from "../data/use-stock-actions";
 import type { StockItem } from "../types/inventory";
 import { StockItemRow } from "./stock-item-row";
+import { LoadFailedNotice } from "@/components/shared/inline-retry";
+import { GhostLinkButton } from "@/components/shared/link-buttons";
 
 type PlaceStockSectionProps = {
   placeId: string;
@@ -22,10 +22,8 @@ type PlaceStockSectionProps = {
  */
 export function PlaceStockSection({ placeId, initialItems }: PlaceStockSectionProps) {
   const { t } = useTranslation("inventory");
-  const { t: tCommon } = useTranslation();
   const [items, setItems] = React.useState<StockItem[] | null>(initialItems ?? null);
   const [failed, setFailed] = React.useState(false);
-  const [retrying, setRetrying] = React.useState(false);
   const seeded = Boolean(initialItems);
 
   const load = React.useCallback(async () => {
@@ -59,29 +57,9 @@ export function PlaceStockSection({ placeId, initialItems }: PlaceStockSectionPr
   );
   const { adjust, isPending, show } = useStockActions({ onChanged: replace });
 
-  async function retry() {
-    setRetrying(true);
-    try {
-      await load();
-    } finally {
-      setRetrying(false);
-    }
-  }
-
   if (items === null) {
     if (failed) {
-      return (
-        <div
-          role="alert"
-          className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground"
-        >
-          <span>{t("loading.stockFailed")}</span>
-          <Button type="button" variant="outline" size="sm" loading={retrying} onClick={() => void retry()}>
-            <RotateCwIcon />
-            {tCommon("actions.retry")}
-          </Button>
-        </div>
-      );
+      return <LoadFailedNotice message={t("loading.stockFailed")} onRetry={load} />;
     }
     return (
       <div role="status" aria-label={t("loading.stock")} className="rounded-xl border bg-card px-3">
@@ -107,12 +85,7 @@ export function PlaceStockSection({ placeId, initialItems }: PlaceStockSectionPr
           ))}
         </ul>
       )}
-      <Button asChild variant="ghost" size="sm" className="self-start text-muted-foreground">
-        <Link to="/inventory">
-          <BoxIcon />
-          {t("page.title")}
-        </Link>
-      </Button>
+      <GhostLinkButton to="/inventory" icon={BoxIcon} className="self-start text-muted-foreground">{t("page.title")}</GhostLinkButton>
     </div>
   );
 }

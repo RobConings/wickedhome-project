@@ -1,6 +1,5 @@
-import { ArrowLeftIcon, PackageIcon, PlusIcon } from "lucide-react";
+import { PackageIcon, PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -12,6 +11,7 @@ import { ProductCard } from "../components/product-card";
 import { ProductFormDialog } from "../components/product-form-dialog";
 import { ProductListItem } from "../components/product-list-item";
 import type { ProductsPageData } from "../data/shopping-loaders";
+import { BackLink } from "@/components/shared/link-buttons";
 
 type ProductsScreenProps = {
   data: ProductsPageData;
@@ -42,10 +42,7 @@ export function ProductsScreen({ data, canManage, initialSelections }: ProductsS
     <PageContainer>
       <PageHeader
         eyebrow={
-          <Link to="/shopping" className="inline-flex items-center gap-1 hover:underline">
-            <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-            {t("actions.backToShopping")}
-          </Link>
+          <BackLink to="/shopping">{t("actions.backToShopping")}</BackLink>
         }
         title={t("products.title")}
         description={t("products.description")}

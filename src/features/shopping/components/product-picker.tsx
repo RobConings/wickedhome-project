@@ -1,30 +1,21 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-import { EntityPicker, type EntityPickerItem } from "@/components/shared/entity-picker";
-import type { UseSelectionsOptions } from "@/lib/selections";
-import { useProductSelections } from "../data/use-product-selections";
+import { type EntityPickerItem } from "@/components/shared/entity-picker";
 import type { Product } from "../types/shopping";
 import { ProductCategoryIcon } from "./product-category-icon";
+import { SelectionsPicker, type SelectionsPickerBaseProps } from "@/components/shared/selections-picker";
 
-type ProductPickerProps = Omit<
-  React.ComponentProps<typeof EntityPicker>,
-  "items" | "favoriteIds" | "recentIds" | "onToggleFavorite"
-> & {
+type ProductPickerProps = SelectionsPickerBaseProps & {
   /** Products to choose from, e.g. from `fetchProducts()`. */
   products: Product[];
-  /** Seed favourites/recents instead of fetching them (stories, tests). */
-  initialSelections?: UseSelectionsOptions["initial"];
 };
 
 /**
  * Choose a product from the household catalogue, with favourites and recently used products on top.
  * Works in a `<Form>` via `name`. After the form saves, call `recordUse(productId)` from `useProductSelections()`.
  */
-export function ProductPicker({ products, initialSelections, placeholder, loading, ...props }: ProductPickerProps) {
+export function ProductPicker({ products, placeholder, ...props }: ProductPickerProps) {
   const { t } = useTranslation("shopping");
-  const selections = useProductSelections({ initial: initialSelections });
-  const { favoriteIds, recentIds, toggleFavorite } = selections;
 
   const items = React.useMemo<EntityPickerItem[]>(
     () =>
@@ -39,14 +30,12 @@ export function ProductPicker({ products, initialSelections, placeholder, loadin
   );
 
   return (
-    <EntityPicker
+    <SelectionsPicker
       {...props}
+      entityType="product"
       items={items}
-      favoriteIds={favoriteIds}
-      recentIds={recentIds}
-      // Favourites and recents arrive separately from the products: show placeholders until both are known.
-      loading={loading || selections.loading}
-      onToggleFavorite={(id) => toggleFavorite(id).catch(() => toast.error(t("errors.favorite")))}
+      waitForSelections
+      favoriteFailedMessage={t("errors.favorite")}
       placeholder={placeholder ?? t("picker.product")}
     />
   );

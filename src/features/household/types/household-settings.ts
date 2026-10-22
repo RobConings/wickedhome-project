@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { HOUSEHOLD_TIME_ZONE } from "@/types/dates";
+import { canManageHousehold } from "@/types/roles";
 
 /**
  * Household settings: the household's name and the home address with its coordinates. The coordinates
@@ -118,4 +119,4 @@ export function mapUrl(location: Pick<HomeLocation, "latitude" | "longitude">, z
 }
 
 /** Adults and owners change household settings; children look. Mirrors the API's role check. */
-export const canManageHouseholdSettings = (role: "owner" | "adult" | "child") => role !== "child";
+export const canManageHouseholdSettings = canManageHousehold;

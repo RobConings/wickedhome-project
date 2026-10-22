@@ -1,7 +1,7 @@
 import i18n from "i18next";
-import { data, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
-import { ApiRequestError } from "@/lib/api-client";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
+import { failedAction, type FormResult, formString, parseForm, readIntent } from "@/lib/forms";
+import { notFoundAs404 } from "@/lib/loaders";
 import { z } from "zod";
 import {
   folderCreateSchema,
@@ -61,10 +61,6 @@ export type DocumentsTrashLoaderData = {
   usage: Promise<StorageUsage>;
 };
 
-const notFoundToRoute = (error: unknown): never => {
-  if (error instanceof ApiRequestError && error.status === 404) throw data(null, { status: 404 });
-  throw error;
-};
 
 /**
  * `/documents` and `/documents/folders/:folderId`, optionally with `?q=` to search. Waits only for the
@@ -81,7 +77,7 @@ export async function documentsLoader({ params, request }: LoaderFunctionArgs): 
     ]);
     return { contents, search, query, folders, usage };
   } catch (error) {
-    return notFoundToRoute(error);
+    return notFoundAs404(error);
   }
 }
 
@@ -106,8 +102,8 @@ export const folderFormSchema = z.object({
 export const fileRenameFormSchema = z.object({ name: nameField });
 
 async function handleDocumentsForm(formData: FormData): Promise<DocumentActionResult> {
-  const intent = formData.get("intent") as DocumentIntent | null;
-  const id = String(formData.get("id") ?? "");
+  const intent = readIntent<DocumentIntent>(formData);
+  const id = formString(formData, "id");
   const kind = kindSchema.safeParse(formData.get("kind")).data;
 
   try {
@@ -150,15 +146,12 @@ async function handleDocumentsForm(formData: FormData): Promise<DocumentActionRe
         return { formError: i18n.t("common:errors.generic") };
     }
   } catch (error) {
-    return {
-      ...toFormResult(error, {
+    return failedAction(error, intent ?? undefined, {
         conflict: i18n.t("documents:errors.conflict"),
         forbidden: i18n.t("documents:errors.forbidden"),
         not_found: i18n.t("documents:errors.notFound"),
         bad_request: i18n.t("documents:errors.badRequest"),
-      }),
-      intent: intent ?? undefined,
-    };
+      });
   }
 }
 

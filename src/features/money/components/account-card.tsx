@@ -12,7 +12,8 @@ import { AccountFormDialog } from "./account-form-dialog";
 import { OtherEntryDialog } from "./other-entry-dialog";
 import { RecordTransferDialog } from "./record-transfer-dialog";
 import { SetBalanceDialog } from "./set-balance-dialog";
-import { dateText, money } from "./use-money-text";
+import { dateText, money } from "@/lib/locale-text";
+import { useCanManage } from "@/lib/permissions";
 
 type AccountCardProps = {
   account: JointAccount;
@@ -20,7 +21,8 @@ type AccountCardProps = {
   accounts: JointAccount[];
   habitants: Habitant[];
   today: string;
-  canManage: boolean;
+  /** Defaults to the nearest `CanManageProvider`. */
+  canManage?: boolean;
 };
 
 /** A card action: grows to fill the row, wraps to its own row below ~11rem, and wraps its label if needed. */
@@ -33,7 +35,8 @@ const groupIban = (iban: string) => iban.replace(/(.{4})/g, "$1 ").trim();
  * One joint account: balance today, the latest correction, this month's in and out, and the actions
  * "Set real balance" and "Record transfer" (more: edit, other money in or out).
  */
-export function AccountCard({ account, month, accounts, habitants, today, canManage }: AccountCardProps) {
+export function AccountCard({ account, month, accounts, habitants, today, canManage: canManageProp }: AccountCardProps) {
+  const canManage = useCanManage(canManageProp);
   const { t } = useTranslation("money");
   const [dialog, setDialog] = React.useState<"edit" | "other" | null>(null);
   const Icon = account.kind === "savings" ? PiggyBankIcon : LandmarkIcon;

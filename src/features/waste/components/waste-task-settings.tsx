@@ -9,6 +9,7 @@ import type { Habitant } from "@/features/household";
 import { AssigneePicker } from "@/features/tasks";
 import type { WasteActionResult } from "../data/waste-requests";
 import { WASTE_TASK_TIMES, type WasteTaskSettings as Settings, type WasteTaskTiming } from "../types/waste";
+import { useFetcherResult } from "@/lib/hooks/use-fetcher-result";
 
 type WasteTaskSettingsProps = {
   settings: Settings;
@@ -25,16 +26,12 @@ export function WasteTaskSettings({ settings, habitants, canManage }: WasteTaskS
   const { t } = useTranslation("waste");
   const fetcher = useFetcher<WasteActionResult>({ key: "waste-tasks" });
   const [value, setValue] = React.useState(settings);
-  const handled = React.useRef<WasteActionResult | undefined>(undefined);
   const saving = fetcher.state !== "idle";
 
-  React.useEffect(() => {
-    const result = fetcher.state === "idle" ? fetcher.data : undefined;
-    if (!result || result === handled.current) return;
-    handled.current = result;
+  useFetcherResult(fetcher, (result) => {
     if (result.formError) toast.error(result.formError);
     else if (result.ok) toast.success(t("tasks.saved"));
-  }, [fetcher.state, fetcher.data, t]);
+  });
 
   function save(next: Settings) {
     setValue(next);

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { StorageUsage } from "../types/documents";
-import { fileSize } from "./document-format";
+import { fileSize } from "@/lib/locale-text";
 
 type StorageUsageMeterProps = {
   /** `undefined` while it is still loading: a skeleton of the same size is shown. */

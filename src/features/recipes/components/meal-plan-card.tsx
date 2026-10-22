@@ -30,7 +30,6 @@ type MealPlanCardProps = {
  */
 export function MealPlanCard({ entry, canManage, action }: MealPlanCardProps) {
   const { t } = useTranslation("recipes");
-  const { t: tCommon } = useTranslation();
   const locale = currentLocale();
   const fetcher = useFetcher<RecipeActionResult>();
   const [removeItems, setRemoveItems] = React.useState(true);
@@ -135,7 +134,6 @@ export function MealPlanCard({ entry, canManage, action }: MealPlanCardProps) {
               </span>
             }
             confirmLabel={cooked ? t("toCook.clear") : t("toCook.remove")}
-            cancelLabel={tCommon("actions.cancel")}
             destructive
             onConfirm={() =>
               submit("remove-entry", {

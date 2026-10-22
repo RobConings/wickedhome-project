@@ -1,7 +1,7 @@
 import i18n from "i18next";
 import type { ActionFunctionArgs } from "react-router";
-import { fetchShops, type Shop } from "@/features/shops";
-import { formDataToObject, parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { fetchShopsOrEmpty, type Shop } from "@/features/shops";
+import { failedAction, formDataToObject, type FormResult, parseForm, readIntent } from "@/lib/forms";
 import { contactFormSchema, contactProjectLinkSchema, type Contact } from "../types/contacts";
 import {
   createContact,
@@ -20,7 +20,7 @@ export type ContactActionResult = FormResult & { intent?: ContactIntent; contact
 export type ContactsPageData = { contacts: Contact[]; shops: Shop[] };
 
 export async function contactsLoader(): Promise<ContactsPageData> {
-  const [contacts, shops] = await Promise.all([fetchContacts(), fetchShops().catch(() => [] as Shop[])]);
+  const [contacts, shops] = await Promise.all([fetchContacts(), fetchShopsOrEmpty()]);
   return { contacts, shops };
 }
 
@@ -31,7 +31,7 @@ export async function contactsLoader(): Promise<ContactsPageData> {
  */
 export async function contactsAction({ request }: ActionFunctionArgs): Promise<ContactActionResult> {
   const formData = await request.formData();
-  const intent = (formData.get("intent") as ContactIntent | null) ?? "create";
+  const intent = readIntent<ContactIntent>(formData, "create");
   const values = formDataToObject(formData);
   const id = String(values.id ?? "");
 
@@ -68,9 +68,6 @@ export async function contactsAction({ request }: ActionFunctionArgs): Promise<C
         return { formError: i18n.t("common:errors.generic") };
     }
   } catch (error) {
-    return {
-      ...toFormResult(error, { not_found: i18n.t("contacts:errors.notFound"), forbidden: i18n.t("contacts:errors.forbidden") }),
-      intent,
-    };
+    return failedAction(error, intent, { not_found: i18n.t("contacts:errors.notFound"), forbidden: i18n.t("contacts:errors.forbidden") });
   }
 }

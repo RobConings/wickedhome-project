@@ -12,6 +12,9 @@ import { chainDepths } from "../types/task-chain";
 import { compareTasks, type Task, type TasksOverview } from "../types/tasks";
 import { TaskFormDialog } from "./task-form-dialog";
 import { TaskRow } from "./task-row";
+import { InlineRetry } from "@/components/shared/inline-retry";
+import { EmptyNote } from "@/components/shared/empty-note";
+import { usePanelData } from "@/lib/hooks/use-panel-data";
 
 type ProjectTasksPanelProps = {
   projectId: string;
@@ -23,11 +26,6 @@ type ProjectTasksPanelProps = {
   initialData?: { overview: TasksOverview; habitants: Habitant[]; places: Place[] };
 };
 
-type State =
-  | { status: "loading" }
-  | { status: "error" }
-  | { status: "ready"; overview: TasksOverview; habitants: Habitant[]; places: Place[] };
-
 /**
  * The tasks of one project, for the project page: open ones as a chain (what can start first, then what waits
  * for it, e.g. "Buy materials" → "Start tiling"), the done ones folded away, and "Add a task" in the project.
@@ -36,33 +34,21 @@ type State =
 export function ProjectTasksPanel({ projectId, placeId, onChanged, initialData }: ProjectTasksPanelProps) {
   const { t } = useTranslation("tasks");
   const { t: tCommon } = useTranslation();
-  const [state, setState] = React.useState<State>(() => (initialData ? { status: "ready", ...initialData } : { status: "loading" }));
-  const [reloads, setReloads] = React.useState(0);
-  const [refreshing, setRefreshing] = React.useState(false);
+  const { state, reload: reloadData, retry, refreshing } = usePanelData(
+    () =>
+      Promise.all([fetchTasksOverview({ projectId }), fetchHouseholdOverview(), fetchPlaces()]).then(([overview, household, places]) => ({
+        overview,
+        habitants: household.habitants,
+        places,
+      })),
+    [projectId],
+    { initialData, keepDataOnError: true },
+  );
   const [showDone, setShowDone] = React.useState(false);
   const reload = React.useCallback(() => {
-    setRefreshing(true);
-    setReloads((value) => value + 1);
+    reloadData();
     onChanged?.();
-  }, [onChanged]);
-
-  React.useEffect(() => {
-    if (initialData && reloads === 0) return;
-    let cancelled = false;
-    Promise.all([fetchTasksOverview({ projectId }), fetchHouseholdOverview(), fetchPlaces()])
-      .then(([overview, household, places]) => {
-        if (!cancelled) setState({ status: "ready", overview, habitants: household.habitants, places });
-      })
-      .catch(() => {
-        if (!cancelled) setState((previous) => (previous.status === "ready" ? previous : { status: "error" }));
-      })
-      .finally(() => {
-        if (!cancelled) setRefreshing(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [projectId, reloads, initialData]);
+  }, [reloadData, onChanged]);
 
   if (state.status === "loading") {
     return (
@@ -74,16 +60,11 @@ export function ProjectTasksPanel({ projectId, placeId, onChanged, initialData }
   }
   if (state.status === "error") {
     return (
-      <div className="flex flex-col items-start gap-2 text-sm text-muted-foreground">
-        {t("project.error")}
-        <Button variant="outline" size="sm" onClick={() => setReloads((value) => value + 1)}>
-          {tCommon("actions.retry")}
-        </Button>
-      </div>
+      <InlineRetry message={t("project.error")} onRetry={retry} />
     );
   }
 
-  const { overview, habitants, places } = state;
+  const { overview, habitants, places } = state.data;
   const open = overview.tasks.filter((task) => task.status === "open");
   const done = overview.tasks.filter((task) => task.status !== "open").sort((a, b) => (b.closedAt ?? "").localeCompare(a.closedAt ?? ""));
   const depths = chainDepths(open);
@@ -101,10 +82,7 @@ export function ProjectTasksPanel({ projectId, placeId, onChanged, initialData }
     <div className="flex flex-col gap-3">
       <PendingContent pending={refreshing} label={tCommon("loading.updating")}>
         {open.length === 0 && done.length === 0 ? (
-          <p className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-4 text-sm text-muted-foreground">
-            <ListChecksIcon className="size-4 shrink-0" aria-hidden="true" />
-            {t("project.empty")}
-          </p>
+          <EmptyNote icon={ListChecksIcon}>{t("project.empty")}</EmptyNote>
         ) : (
           <div className="flex flex-col gap-2">
             {open.length === 0 && <p className="text-sm text-muted-foreground">{t("project.allDone")}</p>}

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { canManageHousehold } from "@/types/roles";
 
 /**
  * Weather forecast for the home, from the household's chosen provider (Open-Meteo by default, KMI/IRM or
@@ -246,4 +247,4 @@ export function windCompass(degrees: number): "N" | "NE" | "E" | "SE" | "S" | "S
 }
 
 /** Adults and owners pick the weather provider; everyone sees the forecast. Mirrors the API's role check. */
-export const canManageWeather = (role: "owner" | "adult" | "child") => role !== "child";
+export const canManageWeather = canManageHousehold;

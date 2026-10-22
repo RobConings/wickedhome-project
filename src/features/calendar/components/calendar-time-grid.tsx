@@ -10,6 +10,7 @@ import { CalendarEntryGlyph } from "./calendar-category-icon";
 import { entryTitle, formatEntryTime, groupEntriesByDate, isMultiDay } from "./calendar-format";
 import { CalendarEntryBadge } from "./calendar-entry-badge";
 import { SPAN_LANE_HEIGHT, layoutDay, layoutSpans, spanBarStyle } from "./calendar-layout";
+import { useNow } from "@/lib/hooks/use-now";
 
 export type CalendarTimeGridProps = {
   /** Consecutive days, one column each (a week, or one day). */
@@ -33,13 +34,8 @@ const pad = (value: number) => String(value).padStart(2, "0");
 
 /** Minutes since midnight in the household time zone, kept current (a minute timer) unless `now` is fixed. */
 function useNowMinute(now: Date | undefined): number {
-  const [live, setLive] = React.useState(() => zonedParts(new Date()).minutes);
-  React.useEffect(() => {
-    if (now) return;
-    const timer = window.setInterval(() => setLive(zonedParts(new Date()).minutes), 60_000);
-    return () => window.clearInterval(timer);
-  }, [now]);
-  return now ? zonedParts(now).minutes : live;
+  const live = useNow(60_000, now?.getTime());
+  return zonedParts(now ?? new Date(live)).minutes;
 }
 
 /**

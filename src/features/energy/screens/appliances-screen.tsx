@@ -13,6 +13,7 @@ import { ApplianceRow } from "../components/appliance-row";
 import { ApplianceTile } from "../components/appliance-tile";
 import { EnergyNav } from "../components/energy-nav";
 import type { Appliance } from "../types/energy";
+import { CanManageProvider } from "@/lib/permissions";
 
 type AppliancesScreenProps = {
   appliances: Appliance[];
@@ -42,52 +43,54 @@ export function AppliancesScreen({ appliances, places, canManage, documents }: A
   );
 
   return (
-    <PageContainer>
-      <PageHeader title={t("page.appliances.title")} description={t("page.appliances.description")} actions={addButton} />
-      <EnergyNav />
+    <CanManageProvider value={canManage}>
+      <PageContainer>
+        <PageHeader title={t("page.appliances.title")} description={t("page.appliances.description")} actions={addButton} />
+        <EnergyNav />
 
-      <GeneralList
-        label={t("page.appliances.title")}
-        items={appliances}
-        getKey={(appliance) => appliance.id}
-        renderRow={(appliance) => (
-          <ApplianceRow appliance={appliance} places={places} canManage={canManage} documents={documents?.(appliance)} />
-        )}
-        renderTile={(appliance) => (
-          <ApplianceTile appliance={appliance} places={places} canManage={canManage} documents={documents?.(appliance)} />
-        )}
-        search={{
-          keys: (appliance) => [
-            appliance.name,
-            t(`categories.${appliance.category}`),
-            appliance.place?.name,
-            appliance.place?.floorName,
-            appliance.notes,
-          ],
-        }}
-        storageKey="appliances"
-        defaultView="list"
-        groupBy={(appliance) => placeGroupKey(appliance.place)}
-        groupOrder={placeGroupOrder(appliances.map((appliance) => appliance.place))}
-        renderGroupHeader={(key, list) => {
-          const place = key === NO_PLACE_GROUP ? null : (list[0]?.place ?? null);
-          return (
-            <span className="flex flex-wrap items-center gap-2">
-              {place ? <PlaceBadge place={place} floorName={place.floorName} /> : t("appliances.noPlace")}
-              <span className="text-sm font-normal text-muted-foreground">{t("appliances.count", { count: list.length })}</span>
-            </span>
-          );
-        }}
-        pending={pending}
-        emptyState={
-          <EmptyState
-            icon={PlugIcon}
-            title={t("appliances.empty.title")}
-            description={t("appliances.empty.description")}
-            action={addButton}
-          />
-        }
-      />
-    </PageContainer>
+        <GeneralList
+          label={t("page.appliances.title")}
+          items={appliances}
+          getKey={(appliance) => appliance.id}
+          renderRow={(appliance) => (
+            <ApplianceRow appliance={appliance} places={places} documents={documents?.(appliance)} />
+          )}
+          renderTile={(appliance) => (
+            <ApplianceTile appliance={appliance} places={places} documents={documents?.(appliance)} />
+          )}
+          search={{
+            keys: (appliance) => [
+              appliance.name,
+              t(`categories.${appliance.category}`),
+              appliance.place?.name,
+              appliance.place?.floorName,
+              appliance.notes,
+            ],
+          }}
+          storageKey="appliances"
+          defaultView="list"
+          groupBy={(appliance) => placeGroupKey(appliance.place)}
+          groupOrder={placeGroupOrder(appliances.map((appliance) => appliance.place))}
+          renderGroupHeader={(key, list) => {
+            const place = key === NO_PLACE_GROUP ? null : (list[0]?.place ?? null);
+            return (
+              <span className="flex flex-wrap items-center gap-2">
+                {place ? <PlaceBadge place={place} floorName={place.floorName} /> : t("appliances.noPlace")}
+                <span className="text-sm font-normal text-muted-foreground">{t("appliances.count", { count: list.length })}</span>
+              </span>
+            );
+          }}
+          pending={pending}
+          emptyState={
+            <EmptyState
+              icon={PlugIcon}
+              title={t("appliances.empty.title")}
+              description={t("appliances.empty.description")}
+              action={addButton}
+            />
+          }
+        />
+      </PageContainer>
+    </CanManageProvider>
   );
 }

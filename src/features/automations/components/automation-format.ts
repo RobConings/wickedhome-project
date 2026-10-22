@@ -1,7 +1,7 @@
 import type { TFunction } from "i18next";
 import { intlLocale } from "@/lib/format";
 import type { Locale } from "@/types/common";
-import { formatDate, formatDateTime } from "@/types/date-format";
+import { formatDateTime } from "@/types/date-format";
 import { describeSchedule } from "../types/schedule-description";
 
 /** Formatting for the automations UI: schedules in words, relative times, durations. */
@@ -38,19 +38,6 @@ export function scheduleText(t: TFunction, locale: Locale, expression: string): 
     case "custom":
       return t("automations:schedule.custom", { expression: schedule.expression });
   }
-}
-
-/** "in 3 hours", "5 minutes ago", "yesterday"; a date (dd/mm/yyyy) after a month. */
-export function relativeTime(iso: string, locale: Locale, now: number): string {
-  const date = new Date(iso);
-  const seconds = (date.getTime() - now) / 1000;
-  const abs = Math.abs(seconds);
-  const format = new Intl.RelativeTimeFormat(intlLocale(locale), { numeric: "auto" });
-  if (abs < 45) return format.format(0, "second");
-  if (abs < 3600) return format.format(Math.round(seconds / 60), "minute");
-  if (abs < 86_400) return format.format(Math.round(seconds / 3600), "hour");
-  if (abs < 86_400 * 30) return format.format(Math.round(seconds / 86_400), "day");
-  return formatDate(date, locale);
 }
 
 /** "di 06/10/2026 05:15", for the exact time next to a relative one. */

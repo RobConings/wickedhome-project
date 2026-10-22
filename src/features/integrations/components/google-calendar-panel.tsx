@@ -8,10 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { CALENDAR_CATEGORIES } from "@/features/calendar";
-import { currentLocale } from "@/lib/i18n";
-import { formatDateTime } from "@/types/date-format";
 import type { GoogleClient } from "../data/google-client";
 import type { GoogleCalendarInfo, GoogleCalendarSettings, GoogleCalendarVisibility, GoogleFeature, GoogleStatus } from "../types/google";
+import { dateTimeText } from "@/lib/locale-text";
+import { ColorDot } from "@/components/shared/color-dot";
 
 type GoogleCalendarPanelProps = {
   settings: GoogleCalendarSettings;
@@ -24,7 +24,6 @@ type GoogleCalendarPanelProps = {
 };
 
 const OFF = "off";
-const when = (iso: string) => formatDateTime(iso, currentLocale());
 
 /**
  * The person's Google calendars: which ones show on the WickedHome calendar (and for whom), "Sync now", and
@@ -104,7 +103,7 @@ export function GoogleCalendarPanel({ settings, client, onStatus, onConnect, can
             <li key={calendar.id} className="flex flex-col gap-2 rounded-lg border p-2.5 sm:flex-row sm:items-center sm:justify-between">
               <label className="flex min-h-10 min-w-0 flex-1 cursor-pointer items-center gap-3">
                 <Switch checked={calendar.selected} onCheckedChange={(selected) => update(calendar, { selected })} aria-label={t("google.calendar.show", { name: calendar.name })} />
-                <span className="size-3 shrink-0 rounded-full" style={{ backgroundColor: calendar.color }} aria-hidden="true" />
+                <ColorDot color={calendar.color} className="size-3 shrink-0 rounded-full" />
                 <span className="flex min-w-0 flex-col">
                   <span className="truncate text-sm font-medium">{calendar.name}</span>
                   {calendar.primary && <span className="text-xs text-muted-foreground">{t("google.calendar.primary")}</span>}
@@ -139,7 +138,7 @@ export function GoogleCalendarPanel({ settings, client, onStatus, onConnect, can
           {t("google.calendar.refreshList")}
         </Button>
         <span className="text-xs text-muted-foreground">
-          {lastSynced ? t("google.calendar.lastSynced", { time: when(lastSynced) }) : t("google.calendar.neverSynced")}
+          {lastSynced ? t("google.calendar.lastSynced", { time: dateTimeText(lastSynced) }) : t("google.calendar.neverSynced")}
         </span>
       </div>
 
@@ -196,7 +195,7 @@ export function GoogleCalendarPanel({ settings, client, onStatus, onConnect, can
             {settings.publish.lastError && <InlineAlert tone="error">{t("google.publish.failed", { error: settings.publish.lastError })}</InlineAlert>}
             {settings.publish.calendarId && settings.publish.lastPublishedAt && (
               <p className="text-xs text-muted-foreground">
-                {t("google.publish.status", { count: settings.publish.publishedCount, time: when(settings.publish.lastPublishedAt) })}
+                {t("google.publish.status", { count: settings.publish.publishedCount, time: dateTimeText(settings.publish.lastPublishedAt) })}
               </p>
             )}
             <Button size="sm" className="w-fit" onClick={savePublish} loading={busy === "publish"} disabled={!publishChanged || busy !== null || (target !== OFF && categories.length === 0)}>

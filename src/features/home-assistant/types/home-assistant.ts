@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { idSchema } from "@/types/common";
+import { canManageHousehold } from "@/types/roles";
 
 // Home Assistant: the household's HA instance, reached by the server over its WebSocket API with a
 // long-lived token from .env. Entities feed device values, energy statistics feed energy intervals, and
@@ -254,7 +255,7 @@ export const haSettingsInputSchema = z.object({
 export type HaSettingsInput = z.infer<typeof haSettingsInputSchema>;
 
 /** Owners and adults bind entities, import devices, link statistics and use the alarm; children look. */
-export const canManageHomeAssistant = (role: "owner" | "adult" | "child") => role !== "child";
+export const canManageHomeAssistant = canManageHousehold;
 
 // Live events ----------------------------------------------------------------------------------------------
 

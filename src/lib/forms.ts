@@ -48,3 +48,21 @@ export function toFormResult(error: unknown, messages: Record<string, string> = 
       (error.status === 429 ? i18n.t("common:errors.tooManyAttempts") : i18n.t("common:errors.generic")),
   };
 }
+
+/** A posted string field; missing fields give `fallback` (default `""`). */
+export const formString = (formData: FormData, name: string, fallback = ""): string => String(formData.get(name) ?? fallback);
+
+/** The form's `intent` field: `null` when missing, or `fallback` when one is given. */
+export function readIntent<T extends string>(formData: FormData): T | null;
+export function readIntent<T extends string>(formData: FormData, fallback: T): T;
+export function readIntent<T extends string>(formData: FormData, fallback?: T): T | null {
+  return (formData.get("intent") as T | null) ?? fallback ?? null;
+}
+
+/**
+ * The result of an action whose API call failed: `toFormResult` plus the intent it was for, so the screen
+ * knows which form to show the error in.
+ */
+export function failedAction<TIntent>(error: unknown, intent: TIntent, messages?: Record<string, string>): FormResult & { intent: TIntent } {
+  return { ...toFormResult(error, messages), intent };
+}

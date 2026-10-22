@@ -12,6 +12,7 @@ import { formatMonth } from "@/types/date-format";
 import { monthOf } from "@/types/dates";
 import type { Expense } from "../types/expenses";
 import { ExpenseRow } from "./expense-row";
+import { sumCents } from "@/types/collections";
 
 type ExpenseListProps = {
   expenses: Expense[];
@@ -123,7 +124,7 @@ export function ExpenseList({
         renderGroupActions={(_month, items) => (
           <span className="text-sm text-muted-foreground tabular-nums">
             {formatCurrency(
-              items.reduce((sum, expense) => sum + expense.amountCents, 0),
+              sumCents(items),
               locale,
             )}
           </span>

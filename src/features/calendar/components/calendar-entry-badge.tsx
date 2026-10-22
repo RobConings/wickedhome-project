@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import type { CalendarEntry } from "../types/calendar";
 import { CalendarEntryGlyph } from "./calendar-category-icon";
 import { entryTitle } from "./calendar-format";
+import { ColorDot } from "@/components/shared/color-dot";
 
 type CalendarEntryBadgeProps = {
   entry: Pick<CalendarEntry, "kind" | "title" | "color" | "allDay" | "recurring" | "meta"> & {
@@ -42,7 +43,7 @@ export function CalendarEntryBadge({
   const filled = entry.allDay || bar;
   const content = (
     <>
-      {!filled && <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: entry.color }} aria-hidden="true" />}
+      {!filled && <ColorDot color={entry.color} className="size-2 shrink-0 rounded-full" />}
       {time && <span className="shrink-0 text-muted-foreground tabular-nums">{time}</span>}
       <CalendarEntryGlyph entry={entry} className="size-3" />
       <span className="min-w-0 truncate">{title}</span>

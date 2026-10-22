@@ -1,7 +1,7 @@
 import i18n from "i18next";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { failedAction, type FormResult, formString, parseForm, readIntent } from "@/lib/forms";
 import {
   incomeInputSchema,
   incomeSourceCreateSchema,
@@ -48,8 +48,8 @@ export async function incomeLoader({ request }: LoaderFunctionArgs): Promise<Inc
 /** One action for the income page; the form's `intent` says what to do. */
 export async function incomeAction({ request }: ActionFunctionArgs): Promise<IncomeActionResult> {
   const formData = await request.formData();
-  const intent = (formData.get("intent") as IncomeIntent | null) ?? "create-income";
-  const id = String(formData.get("id") ?? "");
+  const intent = readIntent<IncomeIntent>(formData, "create-income");
+  const id = formString(formData, "id");
 
   try {
     switch (intent) {
@@ -69,7 +69,7 @@ export async function incomeAction({ request }: ActionFunctionArgs): Promise<Inc
         await deleteIncomeSource(id);
         return { ok: true, intent };
       case "delete-amount":
-        await deleteIncomeAmount(id, String(formData.get("amountId") ?? ""));
+        await deleteIncomeAmount(id, formString(formData, "amountId"));
         return { ok: true, intent };
       case "create-income": {
         const { data, errors } = parseForm(incomeInputSchema, formData);
@@ -90,10 +90,9 @@ export async function incomeAction({ request }: ActionFunctionArgs): Promise<Inc
         return { formError: i18n.t("common:errors.generic") };
     }
   } catch (error) {
-    const result = toFormResult(error, {
+    return failedAction(error, intent, {
       not_found: i18n.t("income:errors.notFound"),
       conflict: i18n.t("income:errors.A fixed income keeps at least one amount"),
     });
-    return { ...result, intent };
   }
 }

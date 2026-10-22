@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api, resourcePath } from "@/lib/api-client";
 import type {
   AcceptInviteInput,
   AccountsOverview,
@@ -13,7 +13,7 @@ import type {
 } from "../types/accounts";
 import type { Role } from "../types/auth";
 
-const accountPath = (id: string, action = "") => `/auth/accounts/${encodeURIComponent(id)}${action}`;
+const accountPath = resourcePath("/auth/accounts");
 
 // Links (public). The token goes in the body, never in an API URL.
 export const lookupLink = (token: string) => api.post<LinkPreview>("/auth/links/lookup", { token });
@@ -40,11 +40,11 @@ export type AccountsClient = {
 export const accountsClient: AccountsClient = {
   list: fetchAccounts,
   invite: (input) => api.post<CreatedInvite>("/auth/accounts/invites", input),
-  revokeInvite: (inviteId) => api.delete(`/auth/accounts/invites/${encodeURIComponent(inviteId)}`),
-  changeRole: (userId, role) => api.put(accountPath(userId, "/role"), { role }),
-  setDisabled: (userId, disabled) => api.post(accountPath(userId, disabled ? "/disable" : "/enable")),
-  signOut: (userId) => api.post<{ signedOut: number }>(accountPath(userId, "/sign-out")),
-  resetLink: (userId) => api.post<CreatedLink>(accountPath(userId, "/reset-link")),
+  revokeInvite: (inviteId) => api.delete(accountPath("invites", inviteId)),
+  changeRole: (userId, role) => api.put(accountPath(userId, "role"), { role }),
+  setDisabled: (userId, disabled) => api.post(accountPath(userId, disabled ? "disable" : "enable")),
+  signOut: (userId) => api.post<{ signedOut: number }>(accountPath(userId, "sign-out")),
+  resetLink: (userId) => api.post<CreatedLink>(accountPath(userId, "reset-link")),
   remove: (userId) => api.delete(accountPath(userId)),
 };
 

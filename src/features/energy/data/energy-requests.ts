@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api, resourcePath, restResource } from "@/lib/api-client";
 import { todayIn } from "@/types/dates";
 import {
   IMPORT_BATCH_SIZE,
@@ -22,7 +22,9 @@ import {
 import type { EnergyPeriod } from "../types/energy-period";
 import { batchIntervals, type FluviusParseResult } from "../types/fluvius-csv";
 
-const path = (id: string) => encodeURIComponent(id);
+const appliances = restResource<Appliance, ApplianceInput>("/energy/appliances");
+const solar = restResource<SolarInstallation, SolarInstallationInput>("/energy/solar");
+const batteries = restResource<HomeBattery, BatteryInput>("/energy/batteries");
 
 /**
  * Totals, series, breakdown and capacity peak for the period containing `date` (`YYYY-MM-DD`), for one
@@ -31,29 +33,25 @@ const path = (id: string) => encodeURIComponent(id);
 export const fetchEnergySummary = (period: EnergyPeriod, date: string, carrier: SummaryView = "electricity") =>
   api.get<EnergySummary>(`/energy/summary?period=${period}&date=${date}&carrier=${carrier}`);
 
-export const fetchAppliances = () => api.get<Appliance[]>("/energy/appliances");
-export const createAppliance = (input: ApplianceInput) => api.post<Appliance>("/energy/appliances", input);
-export const updateAppliance = (id: string, input: ApplianceInput) =>
-  api.put<Appliance>(`/energy/appliances/${path(id)}`, input);
-export const deleteAppliance = (id: string) => api.delete(`/energy/appliances/${path(id)}`);
+export const fetchAppliances = () => appliances.list();
+export const createAppliance = appliances.create;
+export const updateAppliance = appliances.update;
+export const deleteAppliance = appliances.remove;
 
 export const fetchEnergySetup = () => api.get<EnergySetup>("/energy/setup");
-export const createSolarInstallation = (input: SolarInstallationInput) =>
-  api.post<SolarInstallation>("/energy/solar", input);
-export const updateSolarInstallation = (id: string, input: SolarInstallationInput) =>
-  api.put<SolarInstallation>(`/energy/solar/${path(id)}`, input);
-export const deleteSolarInstallation = (id: string) => api.delete(`/energy/solar/${path(id)}`);
-export const createBattery = (input: BatteryInput) => api.post<HomeBattery>("/energy/batteries", input);
-export const updateBattery = (id: string, input: BatteryInput) =>
-  api.put<HomeBattery>(`/energy/batteries/${path(id)}`, input);
-export const deleteBattery = (id: string) => api.delete(`/energy/batteries/${path(id)}`);
+export const createSolarInstallation = solar.create;
+export const updateSolarInstallation = solar.update;
+export const deleteSolarInstallation = solar.remove;
+export const createBattery = batteries.create;
+export const updateBattery = batteries.update;
+export const deleteBattery = batteries.remove;
 export const saveEnergySettings = (input: EnergySettingsInput) => api.put<EnergySettings>("/energy/settings", input);
 
 export const fetchEnergyData = () => api.get<EnergyDataOverview>("/energy/data");
 export const importIntervals = (body: IntervalImport) =>
   api.post<IntervalImportResult>("/energy/intervals/import", body);
 export const createReading = (input: MeterReadingInput) => api.post("/energy/readings", input);
-export const deleteReading = (id: string) => api.delete(`/energy/readings/${path(id)}`);
+export const deleteReading = (id: string) => api.delete(resourcePath("/energy/readings")(id));
 
 export type FluviusUploadProgress = {
   /** Batches sent so far, out of `batches`. */

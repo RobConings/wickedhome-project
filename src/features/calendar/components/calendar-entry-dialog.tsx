@@ -5,13 +5,14 @@ import { Link, useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import type { Habitant } from "@/features/household";
 import type { Shop } from "@/features/shops";
 import type { CalendarActionResult } from "../data/calendar-loaders";
 import { calendarEventPath, type CalendarEntry, type CalendarEvent } from "../types/calendar";
 import { entryTitle } from "./calendar-format";
 import { CalendarEntryDetails, type RenderShopList } from "./calendar-entry-details";
+import { ColorDot } from "@/components/shared/color-dot";
 
 type CalendarEntryDialogProps = {
   /** The entry to show; `null` closes the dialog. */
@@ -39,7 +40,6 @@ export function CalendarEntryDialog({
   renderShopList,
 }: CalendarEntryDialogProps) {
   const { t } = useTranslation("calendar");
-  const { t: tCommon } = useTranslation();
   const fetcher = useFetcher<CalendarActionResult>();
   const deleting = fetcher.state !== "idle";
   // Keep showing the last entry while the dialog animates closed.
@@ -66,7 +66,7 @@ export function CalendarEntryDialog({
       <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <div className="flex items-start gap-3">
-            <span className="mt-1.5 size-3 shrink-0 rounded-full" style={{ backgroundColor: current.color }} aria-hidden="true" />
+            <ColorDot color={current.color} className="mt-1.5 size-3 shrink-0 rounded-full" />
             <div className="flex min-w-0 flex-col gap-1">
               <DialogTitle className="text-xl">{title}</DialogTitle>
               <DialogDescription className="sr-only">{t(`kinds.${current.kind}`)}</DialogDescription>
@@ -104,7 +104,7 @@ export function CalendarEntryDialog({
           )}
           {editable && (
             <div className="flex gap-2">
-              <ConfirmDialog
+              <DeleteConfirmDialog
                 trigger={
                   <Button variant="outline" disabled={deleting}>
                     <Trash2Icon />
@@ -113,9 +113,6 @@ export function CalendarEntryDialog({
                 }
                 title={t("delete.title", { title: event.title })}
                 description={event.rrule ? t("delete.recurringDescription") : t("delete.description")}
-                confirmLabel={tCommon("actions.delete")}
-                cancelLabel={tCommon("actions.cancel")}
-                destructive
                 onConfirm={() => fetcher.submit({ intent: "delete", id: event.id }, { method: "post" })}
               />
               <Button onClick={() => onEdit?.(event)}>

@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api, resourcePath, withQuery } from "@/lib/api-client";
 import type {
   CookRecipeInput,
   CookUseResult,
@@ -17,17 +17,15 @@ import type {
   RecipeSummary,
 } from "../types/recipes";
 
-const path = (id: string) => `/recipes/${encodeURIComponent(id)}`;
-const entryPath = (id: string) => `/recipes/meal-plan/${encodeURIComponent(id)}`;
+const path = resourcePath("/recipes");
+const entryPath = resourcePath("/recipes/meal-plan");
+const categoryPath = resourcePath("/recipes/categories");
 
-export const fetchRecipes = (q?: string, categoryId?: string) => {
-  const params = new URLSearchParams({ ...(q ? { q } : {}), ...(categoryId ? { categoryId } : {}) });
-  return api.get<RecipeSummary[]>(`/recipes${params.size ? `?${params}` : ""}`);
-};
+export const fetchRecipes = (q?: string, categoryId?: string) => api.get<RecipeSummary[]>(withQuery("/recipes", { q, categoryId }));
 export const fetchRecipeCategories = () => api.get<RecipeCategory[]>("/recipes/categories");
 export const createRecipeCategory = (input: RecipeCategoryInput) => api.post<RecipeCategory>("/recipes/categories", input);
-export const updateRecipeCategory = (id: string, input: RecipeCategoryInput) => api.put<RecipeCategory>(`/recipes/categories/${encodeURIComponent(id)}`, input);
-export const deleteRecipeCategory = (id: string) => api.delete(`/recipes/categories/${encodeURIComponent(id)}`);
+export const updateRecipeCategory = (id: string, input: RecipeCategoryInput) => api.put<RecipeCategory>(categoryPath(id), input);
+export const deleteRecipeCategory = (id: string) => api.delete(categoryPath(id));
 export const fetchRecipe = (id: string) => api.get<Recipe>(path(id));
 export const createRecipe = (input: RecipeInput) => api.post<Recipe>("/recipes", input);
 export const updateRecipe = (id: string, input: RecipeInput) => api.put<Recipe>(path(id), input);
@@ -46,7 +44,7 @@ export const deleteMealPlanEntry = (id: string, removeItems: boolean) =>
 export const fetchCookingState = (id: string) => api.get<CookingState>(entryPath(id));
 export const startCooking = (id: string) => api.post<CookingState>(`${entryPath(id)}/start`);
 export const useIngredient = (id: string, input: MealPlanUseInput) => api.post<CookUseResult>(`${entryPath(id)}/use`, input);
-export const undoUsage = (id: string, usageId: string) => api.delete<CookingState>(`${entryPath(id)}/use/${encodeURIComponent(usageId)}`);
+export const undoUsage = (id: string, usageId: string) => api.delete<CookingState>(entryPath(id, "use", usageId));
 export const addExtra = (id: string, input: MealPlanExtraInput) => api.post<CookingState>(`${entryPath(id)}/extras`, input);
 export const setCookingStep = (id: string, step: number) => api.put<CookingState>(`${entryPath(id)}/step`, { step });
 export const markCooked = (id: string) => api.post<CookingState>(`${entryPath(id)}/cooked`);

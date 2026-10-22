@@ -3,25 +3,23 @@ import { HistoryIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { EmptyState } from "@/components/shared/empty-state";
 import { GeneralList } from "@/components/shared/general-list";
 import { auditClient, type AuditClient } from "../data/audit-requests";
 import { AUDIT_CHANNELS, AUDIT_RETENTION_DAYS, auditDomainOf, type AuditChannel, type AuditEntry, type AuditPage, type AuditQuery } from "../types/audit";
 import { AuditEntryRow, AuditEntryTile } from "./audit-entry-row";
-
-const ALL = "all";
+import { FILTER_ALL, FilterSelect } from "@/components/shared/filter-select";
 
 type Filters = { channel: string; userId: string; action: string };
-const NO_FILTERS: Filters = { channel: ALL, userId: ALL, action: ALL };
+const NO_FILTERS: Filters = { channel: FILTER_ALL, userId: FILTER_ALL, action: FILTER_ALL };
 
 type Loaded = AuditPage & { key: string };
 
 const toQuery = (filters: Filters, q: string, cursor?: string): AuditQuery => ({
-  channel: filters.channel === ALL ? undefined : (filters.channel as AuditChannel),
-  userId: filters.userId === ALL ? undefined : filters.userId,
+  channel: filters.channel === FILTER_ALL ? undefined : (filters.channel as AuditChannel),
+  userId: filters.userId === FILTER_ALL ? undefined : filters.userId,
   // The action filter works per domain: "alarm." matches alarm.armed_home, alarm.disarmed…
-  action: filters.action === ALL ? undefined : `${filters.action}.`,
+  action: filters.action === FILTER_ALL ? undefined : `${filters.action}.`,
   q: q || undefined,
   cursor,
 });
@@ -63,7 +61,7 @@ export function ActivitySection({ client = auditClient }: ActivitySectionProps) 
 
   const failed = failedKey === key;
   const pending = !failed && loaded !== null && loaded.key !== key;
-  const filtered = filters.channel !== ALL || filters.userId !== ALL || filters.action !== ALL;
+  const filtered = filters.channel !== FILTER_ALL || filters.userId !== FILTER_ALL || filters.action !== FILTER_ALL;
   const domains = [...new Set((loaded?.actions ?? []).map(auditDomainOf))].sort();
   const domainLabel = (domain: string) => (i18n.exists(`audit:domains.${domain}`) ? t(`domains.${domain}`) : domain);
 
@@ -84,45 +82,29 @@ export function ActivitySection({ client = auditClient }: ActivitySectionProps) 
 
   const toolbar = (
     <div className="flex flex-wrap gap-2">
-      <Select value={filters.channel} onValueChange={setFilter("channel")}>
-        <SelectTrigger className="w-full sm:w-40" aria-label={t("filters.channel")}>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL}>{t("filters.allChannels")}</SelectItem>
-          {AUDIT_CHANNELS.map((channel) => (
-            <SelectItem key={channel} value={channel}>
-              {t(`channels.${channel}`)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Select value={filters.userId} onValueChange={setFilter("userId")}>
-        <SelectTrigger className="w-full sm:w-44" aria-label={t("filters.person")}>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL}>{t("filters.allPeople")}</SelectItem>
-          {(loaded?.people ?? []).map((person) => (
-            <SelectItem key={person.userId} value={person.userId}>
-              {person.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Select value={filters.action} onValueChange={setFilter("action")}>
-        <SelectTrigger className="w-full sm:w-48" aria-label={t("filters.action")}>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL}>{t("filters.allActions")}</SelectItem>
-          {domains.map((domain) => (
-            <SelectItem key={domain} value={domain}>
-              {domainLabel(domain)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <FilterSelect
+        label={t("filters.channel")}
+        value={filters.channel}
+        onValueChange={setFilter("channel")}
+        allLabel={t("filters.allChannels")}
+        options={AUDIT_CHANNELS.map((channel) => ({ value: channel, label: t(`channels.${channel}`) }))}
+        className="w-full sm:w-40"
+      />
+      <FilterSelect
+        label={t("filters.person")}
+        value={filters.userId}
+        onValueChange={setFilter("userId")}
+        allLabel={t("filters.allPeople")}
+        options={(loaded?.people ?? []).map((person) => ({ value: person.userId, label: person.name }))}
+        className="w-full sm:w-44"
+      />
+      <FilterSelect
+        label={t("filters.action")}
+        value={filters.action}
+        onValueChange={setFilter("action")}
+        allLabel={t("filters.allActions")}
+        options={domains.map((domain) => ({ value: domain, label: domainLabel(domain) }))}
+      />
       {filtered && (
         <Button variant="ghost" onClick={() => setFilters(NO_FILTERS)}>
           {t("filters.clear")}

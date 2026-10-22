@@ -15,6 +15,7 @@ import { todayIn } from "@/types/dates";
 import type { TaskActionResult, TasksPageData } from "../data/tasks-loaders";
 import { taskPath, type TaskLinkKind, type TaskLinks, type TaskRef } from "../types/tasks";
 import { useTaskText } from "./use-task-text";
+import { useFetcherResult } from "@/lib/hooks/use-fetcher-result";
 
 type TaskLinksPanelProps = {
   taskId: string;
@@ -63,22 +64,18 @@ function AddLinkDialog({ taskId, open, onOpenChange, action, onChanged }: { task
   const [kind, setKind] = React.useState<TaskLinkKind>("blocked_by");
   const [otherTaskId, setOtherTaskId] = React.useState<string | null>(null);
   const busy = save.state !== "idle";
-  const handled = React.useRef<TaskActionResult | null>(null);
 
   React.useEffect(() => {
     if (open && list.state === "idle" && !list.data) void list.load("/tasks");
   }, [open, list]);
 
-  React.useEffect(() => {
-    const result = save.data;
-    if (save.state !== "idle" || !result || handled.current === result) return;
-    handled.current = result;
+  useFetcherResult(save, (result) => {
     if (result.ok) {
       toast.success(t("links.added"));
       onOpenChange(false);
       onChanged?.();
     }
-  }, [save.state, save.data, t, onOpenChange, onChanged]);
+  });
 
   const items = (list.data?.overview.tasks ?? [])
     .filter((task) => task.id !== taskId && task.status === "open")
@@ -152,14 +149,10 @@ export function TaskLinksPanel({ taskId, links, canManage, action = "/tasks", on
   const [adding, setAdding] = React.useState(false);
   const remove = useFetcher<TaskActionResult>();
   const removing = remove.state !== "idle" ? String(remove.formData?.get("otherTaskId") ?? "") : null;
-  const handled = React.useRef<TaskActionResult | null>(null);
-  React.useEffect(() => {
-    const result = remove.data;
-    if (remove.state !== "idle" || !result || handled.current === result) return;
-    handled.current = result;
+  useFetcherResult(remove, (result) => {
     if (result.ok) onChanged?.();
     else toast.error(result.formError ?? t("common:errors.generic"));
-  }, [remove.state, remove.data, onChanged, t]);
+  });
 
   const onRemove = (other: TaskRef) =>
     canManage ? () => void remove.submit({ intent: "link-remove", id: taskId, otherTaskId: other.id }, { method: "post", action }) : undefined;

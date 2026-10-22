@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useRevalidator } from "react-router";
-import { fetchShops, type Shop } from "@/features/shops";
+import { fetchShopsOrEmpty, type Shop } from "@/features/shops";
 import type { Product, ShoppingItem, ShoppingItemQuery } from "../types/shopping";
 import { fetchProducts, fetchShoppingItems } from "./shopping-requests";
 
@@ -90,7 +90,7 @@ export function useShoppingCatalog(initial?: { products?: Product[]; shops?: Sho
   React.useEffect(() => {
     if (seeded) return;
     let cancelled = false;
-    void Promise.all([fetchProducts().catch(() => []), fetchShops().catch(() => [])]).then(([nextProducts, nextShops]) => {
+    void Promise.all([fetchProducts().catch(() => []), fetchShopsOrEmpty()]).then(([nextProducts, nextShops]) => {
       if (cancelled) return;
       setProducts(nextProducts);
       setShops(nextShops);

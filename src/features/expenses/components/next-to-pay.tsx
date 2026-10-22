@@ -8,7 +8,7 @@ import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { amountFor, nextPerPayer } from "../types/expense-calculations";
 import type { Expense } from "../types/expenses";
-import { shortDate } from "./use-expense-text";
+import { dateText } from "@/lib/locale-text";
 
 type NextToPayProps = {
   /** Unpaid expenses, soonest first. */
@@ -52,7 +52,7 @@ export function NextToPay({ unpaid, habitants, today }: NextToPayProps) {
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span className="font-medium">{row.label}</span>
                   <span className={cn("truncate text-xs text-muted-foreground", row.expense.dueDate < today && "text-destructive")}>
-                    {t("next.onDate", { payee: row.expense.payee, date: shortDate(row.expense.dueDate) })}
+                    {t("next.onDate", { payee: row.expense.payee, date: dateText(row.expense.dueDate) })}
                   </span>
                 </span>
                 <span className="font-semibold tabular-nums">{formatCurrency(row.amount, locale)}</span>

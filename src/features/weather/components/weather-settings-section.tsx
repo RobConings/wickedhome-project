@@ -4,8 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle } from "@/components/shared/card";
-import { IconChip } from "@/components/shared/icon-chip";
+import { Card } from "@/components/shared/card";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { Spinner } from "@/components/ui/spinner";
 import { currentLocale } from "@/lib/i18n";
@@ -13,6 +12,8 @@ import { cn } from "@/lib/utils";
 import { formatDateTime } from "@/types/date-format";
 import { WEATHER_SETTINGS_INTENT, type WeatherSettingsActionResult } from "../data/weather-requests";
 import { WEATHER_PROVIDER_NAMES, type WeatherProviderId, type WeatherSettings } from "../types/weather";
+import { useFetcherResult } from "@/lib/hooks/use-fetcher-result";
+import { IconCardHeader } from "@/components/shared/icon-card-header";
 
 type WeatherSettingsSectionProps = {
   settings: WeatherSettings;
@@ -30,15 +31,10 @@ export function WeatherSettingsSection({ settings, canManage }: WeatherSettingsS
   // Optimistic: the clicked provider is selected while saving; rolls back if the save fails.
   const pending = fetcher.formData?.get("providerId") as WeatherProviderId | undefined;
   const selected = pending ?? settings.providerId;
-
-  const handled = React.useRef<WeatherSettingsActionResult | undefined>(undefined);
-  React.useEffect(() => {
-    const result = fetcher.state === "idle" ? fetcher.data : undefined;
-    if (!result || result === handled.current) return;
-    handled.current = result;
+  useFetcherResult(fetcher, (result) => {
     if (result.ok) toast.success(t("settings.saved"));
     else toast.error(result.formError ?? t("settings.failed"));
-  }, [fetcher.state, fetcher.data, t]);
+  });
 
   const choose = (providerId: WeatherProviderId) => {
     if (providerId === settings.providerId || busy) return;
@@ -48,13 +44,7 @@ export function WeatherSettingsSection({ settings, canManage }: WeatherSettingsS
 
   return (
     <Card>
-      <CardHeader className="items-center justify-start gap-3">
-        <IconChip icon={CloudSunIcon} tone="info" size="sm" />
-        <div className="flex flex-col gap-0.5">
-          <CardTitle>{t("settings.title")}</CardTitle>
-          <p className="text-sm text-muted-foreground">{t("settings.description")}</p>
-        </div>
-      </CardHeader>
+      <IconCardHeader icon={CloudSunIcon} tone="info" title={t("settings.title")} description={t("settings.description")} />
 
       <div role="radiogroup" aria-label={t("settings.title")} className="flex flex-col gap-2">
         {settings.providers.map((provider) => {

@@ -6,9 +6,10 @@ import { Switch } from "@/components/ui/switch";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { AutomationJob } from "../types/automations";
-import { dateTimeText, relativeTime, scheduleText } from "./automation-format";
+import { dateTimeText, scheduleText } from "./automation-format";
 import { AutomationRunHistory } from "./automation-run-history";
 import { JobRunStatusBadge } from "./job-run-status-badge";
+import { formatRelativeTime } from "@/lib/format";
 
 type AutomationJobRowProps = {
   job: AutomationJob;
@@ -68,7 +69,7 @@ export function AutomationJobRow({ job, canManage, now, starting = false, onEnab
         <dd>
           {job.nextRunAt ? (
             <time dateTime={job.nextRunAt} title={dateTimeText(job.nextRunAt, locale)}>
-              {relativeTime(job.nextRunAt, locale, now)} <span className="text-muted-foreground">({dateTimeText(job.nextRunAt, locale)})</span>
+              {formatRelativeTime(job.nextRunAt, locale, now)} <span className="text-muted-foreground">({dateTimeText(job.nextRunAt, locale)})</span>
             </time>
           ) : (
             <span className="text-muted-foreground">{t("job.pausedNext")}</span>
@@ -83,7 +84,7 @@ export function AutomationJobRow({ job, canManage, now, starting = false, onEnab
             <>
               <JobRunStatusBadge status={job.lastRun.status} />
               <time dateTime={job.lastRun.startedAt} title={dateTimeText(job.lastRun.startedAt, locale)}>
-                {relativeTime(job.lastRun.startedAt, locale, now)}
+                {formatRelativeTime(job.lastRun.startedAt, locale, now)}
               </time>
               {(job.lastRun.status === "failed" ? job.lastRun.error : job.lastRun.summary) && (
                 <span className={cn("min-w-0 break-words", job.lastRun.status === "failed" ? "text-destructive" : "text-muted-foreground")}>
@@ -101,7 +102,7 @@ export function AutomationJobRow({ job, canManage, now, starting = false, onEnab
             <dt className="text-muted-foreground">{t("job.lastCheck")}</dt>
             <dd className="min-w-0 break-words">
               <time dateTime={job.lastCheckedAt} title={dateTimeText(job.lastCheckedAt, locale)}>
-                {relativeTime(job.lastCheckedAt, locale, now)}
+                {formatRelativeTime(job.lastCheckedAt, locale, now)}
               </time>{" "}
               <span className="text-muted-foreground">· {t("job.lastCheckHint")}</span>
             </dd>

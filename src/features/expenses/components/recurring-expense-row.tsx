@@ -1,5 +1,4 @@
 import * as React from "react";
-import { toast } from "sonner";
 import { BellIcon, FlaskConicalIcon, PauseIcon, PlayIcon, ScissorsIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher } from "react-router";
@@ -16,14 +15,18 @@ import { RecurringStatusBadge } from "./expense-status-badge";
 import { ExpenseProjectChip } from "./expense-project-chip";
 import { PayerBadge } from "./payer-badge";
 import { TotalOpenProgressBar } from "./total-open-progress";
-import { shortDate, useRecurrenceSummary } from "./use-expense-text";
+import { useRecurrenceSummary } from "./use-expense-text";
+import { useFetcherErrorToast } from "@/lib/hooks/use-fetcher-result";
+import { dateText } from "@/lib/locale-text";
+import { useCanManage } from "@/lib/permissions";
 
 type RecurringExpenseRowProps = {
   recurring: RecurringExpense;
   today: string;
   habitants: Habitant[];
   /** Show the quick pause / resume. */
-  canManage: boolean;
+  /** Defaults to the nearest `CanManageProvider`. */
+  canManage?: boolean;
   /**
    * `card` (default): a bordered `<li>`. `plain`: just the content, for a `GeneralList` row (the list draws
    * dividers and padding). `tile`: a card for the tiles view.
@@ -35,16 +38,15 @@ type RecurringExpenseRowProps = {
  * One recurring expense: kind, rhythm and amount, next date, flags (trial, to cancel, reminder), the
  * monthly and yearly equivalent, and a quick pause / resume (optimistic).
  */
-export function RecurringExpenseRow({ recurring, today, habitants, canManage, variant = "card" }: RecurringExpenseRowProps) {
+export function RecurringExpenseRow({ recurring, today, habitants, canManage: canManageProp, variant = "card" }: RecurringExpenseRowProps) {
+  const canManage = useCanManage(canManageProp);
   const { t } = useTranslation("expenses");
   const locale = currentLocale();
   const recurrence = useRecurrenceSummary()(recurring.rrule);
   const fetcher = useFetcher<ExpenseActionResult>({ key: `recurring-status-${recurring.id}` });
   const pendingStatus = fetcher.formData?.get("status");
   const status = (typeof pendingStatus === "string" ? pendingStatus : recurring.status) as RecurringStatus;
-  React.useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.formError) toast.error(fetcher.data.formError);
-  }, [fetcher.state, fetcher.data]);
+  useFetcherErrorToast(fetcher);
   const remindNow = recurring.reminderOn !== null && recurring.reminderOn <= today;
   const inactive = status !== "active";
 
@@ -53,10 +55,10 @@ export function RecurringExpenseRow({ recurring, today, habitants, canManage, va
       ? t("row.paused")
       : status === "ended"
         ? recurring.endDate
-          ? t("row.endedOn", { date: shortDate(recurring.endDate) })
+          ? t("row.endedOn", { date: dateText(recurring.endDate) })
           : t("recurringStatus.ended")
         : recurring.nextDueDate
-          ? t("row.nextOn", { date: shortDate(recurring.nextDueDate) })
+          ? t("row.nextOn", { date: dateText(recurring.nextDueDate) })
           : t("detail.ended");
 
   const tile = variant === "tile";
@@ -79,7 +81,7 @@ export function RecurringExpenseRow({ recurring, today, habitants, canManage, va
       {recurring.inTrial && recurring.trialEndsOn && (
         <Badge variant="info" className="font-normal">
           <FlaskConicalIcon aria-hidden="true" />
-          {t("row.trialUntil", { date: shortDate(recurring.trialEndsOn) })}
+          {t("row.trialUntil", { date: dateText(recurring.trialEndsOn) })}
         </Badge>
       )}
       {recurring.candidateToCancel && status !== "ended" && (

@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { FavoriteToggle } from "./favorite-toggle";
+import { useMediaQuery } from "@/lib/hooks/use-media-query";
 
 export type EntityPickerItem = {
   id: string;
@@ -86,17 +87,7 @@ const matches = (item: EntityPickerItem, query: string) =>
 
 const SMALL_SCREEN = "(max-width: 639px)";
 
-function useIsSmallScreen() {
-  return React.useSyncExternalStore(
-    (onChange) => {
-      const media = window.matchMedia(SMALL_SCREEN);
-      media.addEventListener("change", onChange);
-      return () => media.removeEventListener("change", onChange);
-    },
-    () => window.matchMedia(SMALL_SCREEN).matches,
-    () => false,
-  );
-}
+const useIsSmallScreen = () => useMediaQuery(SMALL_SCREEN);
 
 /**
  * Searchable single-select for any kind of entity. The list shows Favourites, then Recently used, then

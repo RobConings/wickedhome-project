@@ -1,16 +1,7 @@
 import * as React from "react";
-import {
-  ArrowLeftIcon,
-  ClockIcon,
-  ExternalLinkIcon,
-  MapPinIcon,
-  PencilIcon,
-  RefreshCwIcon,
-  ShoppingCartIcon,
-  Trash2Icon,
-} from "lucide-react";
+import { ClockIcon, ExternalLinkIcon, MapPinIcon, PencilIcon, RefreshCwIcon, ShoppingCartIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useFetcher } from "react-router";
+import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
@@ -18,7 +9,7 @@ import { PageGrid } from "@/components/layout/page-grid";
 import { PageSection } from "@/components/layout/page-section";
 import { Stack } from "@/components/layout/stack";
 import { Card, CardContent, CardTitle } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { FavoriteToggle } from "@/components/shared/favorite-toggle";
 import { PageHeader } from "@/components/shared/page-header";
@@ -33,6 +24,8 @@ import { ShopTypeIcon } from "../components/shop-type-icon";
 import type { ShopActionResult } from "../data/shops-loaders";
 import { useShopSelections } from "../data/use-shop-selections";
 import type { Shop } from "../types/shops";
+import { useFetcherErrorToast } from "@/lib/hooks/use-fetcher-result";
+import { BackButton } from "@/components/shared/link-buttons";
 
 type ShopDetailScreenProps = {
   shop: Shop;
@@ -71,9 +64,7 @@ export function ShopDetailScreen({
   const { favoriteIds, toggleFavorite } = useShopSelections({ initial: initialSelections });
   const isFavorite = favoriteIds.includes(shop.id);
 
-  React.useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.formError) toast.error(fetcher.data.formError);
-  }, [fetcher.state, fetcher.data]);
+  useFetcherErrorToast(fetcher);
 
   React.useEffect(() => {
     if (iconFetcher.state !== "idle" || !iconFetcher.data) return;
@@ -101,7 +92,7 @@ export function ShopDetailScreen({
         />
       )}
       {canDelete && (
-        <ConfirmDialog
+        <DeleteConfirmDialog
           trigger={
             <Button variant="outline" className="text-destructive hover:text-destructive">
               <Trash2Icon />
@@ -110,9 +101,6 @@ export function ShopDetailScreen({
           }
           title={t("delete.title", { name: shop.name })}
           description={t("delete.description")}
-          confirmLabel={tCommon("actions.delete")}
-          cancelLabel={tCommon("actions.cancel")}
-          destructive
           onConfirm={() => fetcher.submit({ intent: "delete", id: shop.id }, { method: "post" })}
         />
       )}
@@ -132,12 +120,7 @@ export function ShopDetailScreen({
   return (
     <PageContainer>
       <Stack gap="md">
-        <Button asChild variant="ghost" size="sm" className="-ml-2 self-start text-muted-foreground">
-          <Link to="/shops">
-            <ArrowLeftIcon />
-            {t("actions.backToShops")}
-          </Link>
-        </Button>
+        <BackButton to="/shops">{t("actions.backToShops")}</BackButton>
         <PageHeader
           title={
             <span className="flex items-center gap-3">

@@ -1,9 +1,10 @@
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { useCurrentUser } from "@/features/auth";
-import { NextToPay, fetchUnpaidExpenses, type Expense } from "@/features/expenses";
+import { NextToPay, fetchUnpaidExpenses } from "@/features/expenses";
 import { VoucherBalances } from "@/features/income";
 import { MoneyFlowScreen, canManageMoney, fetchMoneyLoans, fetchMoneyTimeline, moneyAction, moneyLoader } from "@/features/money";
 import { ProjectBudgetsCard, fetchProjectBudgetsSummary } from "@/features/projects";
+import { optionalData } from "@/lib/loaders";
 import { screenHandle } from "@/lib/screen-context";
 
 /**
@@ -12,10 +13,10 @@ import { screenHandle } from "@/lib/screen-context";
  * awaited); a failure only empties that card.
  */
 export async function loader(args: LoaderFunctionArgs) {
-  const [page, unpaid] = await Promise.all([moneyLoader(args), fetchUnpaidExpenses().catch(() => null as Expense[] | null)]);
-  const projects = fetchProjectBudgetsSummary(page.month.month).catch(() => null);
-  const loans = fetchMoneyLoans().catch(() => null);
-  const timeline = fetchMoneyTimeline().catch(() => null);
+  const [page, unpaid] = await Promise.all([moneyLoader(args), optionalData(fetchUnpaidExpenses())]);
+  const projects = optionalData(fetchProjectBudgetsSummary(page.month.month));
+  const loans = optionalData(fetchMoneyLoans());
+  const timeline = optionalData(fetchMoneyTimeline());
   return { ...page, unpaid, projects, loans, timeline };
 }
 

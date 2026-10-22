@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { projectPath } from "@/types/projects";
 import { cn } from "@/lib/utils";
 import type { ContactProjectLink } from "../types/contacts";
+import { ColorDot } from "@/components/shared/color-dot";
 
 type ContactProjectChipsProps = {
   projects: ContactProjectLink[];
@@ -25,7 +26,7 @@ export function ContactProjectChips({ projects, className }: ContactProjectChips
               !project.running && "text-muted-foreground opacity-80",
             )}
           >
-            <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: project.color }} aria-hidden="true" />
+            <ColorDot color={project.color} className="size-2 shrink-0 rounded-full" />
             <span className="min-w-0 break-words">
               {project.name}
               {project.role && <span className="text-muted-foreground"> · {project.role}</span>}

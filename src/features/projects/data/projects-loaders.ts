@@ -1,10 +1,10 @@
 import i18n from "i18next";
-import { data, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
 import { fetchPlaces, type Place } from "@/features/places";
-import { fetchShops, type Shop } from "@/features/shops";
-import { ApiRequestError } from "@/lib/api-client";
-import { formDataToObject, parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { fetchShopsOrEmpty, type Shop } from "@/features/shops";
+import { failedAction, formDataToObject, type FormResult, formString, parseForm, readIntent } from "@/lib/forms";
+import { notFoundAs404 } from "@/lib/loaders";
 import {
   projectExpenseMaterialsInputSchema,
   projectFormSchema,
@@ -48,19 +48,18 @@ export async function projectDetailLoader({ params }: LoaderFunctionArgs): Promi
       fetchProjectDetail(params.projectId ?? ""),
       fetchPlaces(),
       fetchHouseholdOverview(),
-      fetchShops().catch(() => [] as Shop[]),
+      fetchShopsOrEmpty(),
     ]);
     return { detail, places, habitants: household.habitants, shops };
   } catch (error) {
-    if (error instanceof ApiRequestError && error.status === 404) throw data(null, { status: 404 });
-    throw error;
+    return notFoundAs404(error);
   }
 }
 
 /** One action for the projects pages; the form's `intent` field says what to do. */
 async function handleProjectForm(formData: FormData): Promise<ProjectActionResult> {
-  const intent = (formData.get("intent") as ProjectIntent | null) ?? "create";
-  const id = String(formData.get("id") ?? "");
+  const intent = readIntent<ProjectIntent>(formData, "create");
+  const id = formString(formData, "id");
   const values = formDataToObject(formData);
 
   try {
@@ -119,10 +118,7 @@ async function handleProjectForm(formData: FormData): Promise<ProjectActionResul
         return { formError: i18n.t("common:errors.generic") };
     }
   } catch (error) {
-    return {
-      ...toFormResult(error, { not_found: i18n.t("projects:errors.notFound"), forbidden: i18n.t("projects:errors.forbidden") }),
-      intent,
-    };
+    return failedAction(error, intent, { not_found: i18n.t("projects:errors.notFound"), forbidden: i18n.t("projects:errors.forbidden") });
   }
 }
 

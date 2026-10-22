@@ -10,6 +10,7 @@
 // `ProductSuggestionCard` and passed to `ProductFormDialog suggestion`.
 // For the Dashboard: `fetchShoppingSummary()` → `ShoppingSummary` (items left to buy).
 export { ProductCategoryIcon } from "./components/product-category-icon";
+export { ProductThumb } from "./components/product-thumb";
 export { ProductFormDialog } from "./components/product-form-dialog";
 export { ProductPicker } from "./components/product-picker";
 export { ProductSuggestionCard } from "./components/product-suggestion-card";

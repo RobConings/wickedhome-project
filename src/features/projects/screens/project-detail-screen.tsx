@@ -1,19 +1,5 @@
 import * as React from "react";
-import {
-  ArrowLeftIcon,
-  BanIcon,
-  CalendarIcon,
-  CircleCheckIcon,
-  LinkIcon,
-  ListChecksIcon,
-  MoreVerticalIcon,
-  PackageIcon,
-  PencilIcon,
-  PlayIcon,
-  ReceiptIcon,
-  RotateCcwIcon,
-  Trash2Icon,
-} from "lucide-react";
+import { BanIcon, CalendarIcon, CircleCheckIcon, LinkIcon, ListChecksIcon, MoreVerticalIcon, PackageIcon, PencilIcon, PlayIcon, ReceiptIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher } from "react-router";
 import { toast } from "sonner";
@@ -29,7 +15,7 @@ import { PageGrid } from "@/components/layout/page-grid";
 import { PageSection } from "@/components/layout/page-section";
 import { Stack } from "@/components/layout/stack";
 import { Card, CardTitle } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionHeader } from "@/components/shared/section-header";
 import { documentContentUrl } from "@/features/documents";
@@ -44,6 +30,8 @@ import { ProjectPurchasesNote } from "../components/project-purchases-note";
 import { useProjectText } from "../components/use-project-text";
 import type { ProjectActionResult } from "../data/projects-loaders";
 import type { ProjectDetail, ProjectStatus } from "../types/projects";
+import { BackButton } from "@/components/shared/link-buttons";
+import { ColorDot } from "@/components/shared/color-dot";
 
 type PlaceOption = { id: string; name: string; color: string; icon: string | null };
 
@@ -139,7 +127,7 @@ export function ProjectDetailScreen({ detail, places, canManage, tasks, material
           })}
         </DropdownMenuContent>
       </DropdownMenu>
-      <ConfirmDialog
+      <DeleteConfirmDialog
         trigger={
           <Button variant="outline" size="icon" className="text-destructive hover:text-destructive" aria-label={tCommon("actions.delete")} title={tCommon("actions.delete")}>
             <Trash2Icon />
@@ -147,9 +135,6 @@ export function ProjectDetailScreen({ detail, places, canManage, tasks, material
         }
         title={t("delete.title", { name: project.name })}
         description={t("delete.description")}
-        confirmLabel={tCommon("actions.delete")}
-        cancelLabel={tCommon("actions.cancel")}
-        destructive
         onConfirm={() => fetcher.submit({ intent: "delete", id: project.id }, { method: "post" })}
       />
     </>
@@ -158,12 +143,7 @@ export function ProjectDetailScreen({ detail, places, canManage, tasks, material
   return (
     <PageContainer>
       <Stack gap="md">
-        <Button asChild variant="ghost" size="sm" className="-ml-2 self-start text-muted-foreground">
-          <Link to="/projects">
-            <ArrowLeftIcon />
-            {t("actions.back")}
-          </Link>
-        </Button>
+        <BackButton to="/projects">{t("actions.back")}</BackButton>
         {project.coverFileId && (
           <img src={documentContentUrl(project.coverFileId)} alt="" className="h-36 w-full rounded-xl object-cover sm:h-48" />
         )}
@@ -286,7 +266,7 @@ export function ProjectDetailScreen({ detail, places, canManage, tasks, material
                           {place.icon ? (
                             <span aria-hidden="true">{place.icon}</span>
                           ) : (
-                            <span className="size-2 rounded-full" style={{ backgroundColor: place.color }} aria-hidden="true" />
+                            <ColorDot color={place.color} className="size-2 rounded-full" />
                           )}
                           {place.name}
                         </Link>

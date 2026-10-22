@@ -46,6 +46,7 @@ import { AreaCheck, CalibrateToolContext, UnderlaySection } from "./floor-plan-u
 import { formatArea, formatLength } from "./place-format";
 import { GAP_TOLERANCES } from "./room-from-walls";
 import { labelInside } from "./underlay-geometry";
+import { ColorDot } from "@/components/shared/color-dot";
 
 const TOOL_ICONS: Record<SwitchTool, LucideIcon> = {
   select: MousePointer2Icon,
@@ -400,7 +401,7 @@ function FillToolContext({ state, dispatch, detail }: ContextProps) {
           {feedback.type === "filled" && place && (
             <>
               <p className="flex items-center gap-2 font-medium">
-                <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: place.color }} aria-hidden="true" />
+                <ColorDot color={place.color} />
                 {feedback.reused ? t("editor.fill.reused", { name: place.name }) : t("editor.fill.filled", { name: place.name })}
               </p>
               <AreaCheck areaM2={feedback.areaM2} planAreaM2={feedback.planAreaM2} />
@@ -648,7 +649,7 @@ function NothingSelected({ state, dispatch, floorKind, detail }: ContextProps) {
           <ul className="flex flex-col gap-1">
             {unplaced.map((place) => (
               <li key={place.key} className="flex items-center gap-2 text-sm">
-                <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: place.color }} aria-hidden="true" />
+                <ColorDot color={place.color} />
                 <span className="min-w-0 flex-1 truncate">{place.icon ? `${place.icon} ${place.name}` : place.name}</span>
                 <Button
                   type="button"

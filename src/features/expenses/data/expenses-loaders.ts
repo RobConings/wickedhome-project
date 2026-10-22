@@ -1,16 +1,10 @@
 import i18n from "i18next";
-import {
-  data,
-  redirect,
-  type ActionFunctionArgs,
-  type LoaderFunctionArgs,
-  type ShouldRevalidateFunctionArgs,
-} from "react-router";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
 import type { z } from "zod";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
-import { fetchShops, type Shop } from "@/features/shops";
-import { ApiRequestError } from "@/lib/api-client";
-import { formDataToObject, toFormResult, type FormResult } from "@/lib/forms";
+import { fetchShopsOrEmpty, type Shop } from "@/features/shops";
+import { formDataToObject, type FormResult, formString, readIntent, toFormResult } from "@/lib/forms";
+import { notFoundAs404, revalidateUnlessOnly } from "@/lib/loaders";
 import {
   expenseCreateInputSchema,
   expenseInputSchema,
@@ -69,31 +63,17 @@ const CLIENT_PARAMS = [EXPENSES_VIEW_PARAM, EXPENSES_PAYER_PARAM, EXPENSES_KIND_
  * Switching views and filters only filters the loaded expenses on the client, so it doesn't reload the
  * overview (which also tops up recurring expenses). Submits and other navigations revalidate as usual.
  */
-export function expensesShouldRevalidate({ currentUrl, nextUrl, formMethod, defaultShouldRevalidate }: ShouldRevalidateFunctionArgs) {
-  if (formMethod || currentUrl.pathname !== nextUrl.pathname) return defaultShouldRevalidate;
-  // The same address: an explicit `revalidate()` (e.g. after a mail bill was linked to an expense).
-  if (currentUrl.href === nextUrl.href) return defaultShouldRevalidate;
-  const withoutFilters = (url: URL) => {
-    const search = new URLSearchParams(url.search);
-    for (const param of CLIENT_PARAMS) search.delete(param);
-    search.sort();
-    return search.toString();
-  };
-  return withoutFilters(currentUrl) === withoutFilters(nextUrl) ? false : defaultShouldRevalidate;
-}
+// The same address is an explicit `revalidate()` (e.g. after a mail bill was linked to an expense): reload.
+export const expensesShouldRevalidate = revalidateUnlessOnly(CLIENT_PARAMS, { sort: true, revalidateSameUrl: true });
 
 /** Shops are only needed for the shop picker and logos: a failing shops request leaves them out. */
-const loadShops = () => fetchShops().catch(() => [] as Shop[]);
+const loadShops = fetchShopsOrEmpty;
 
 export async function expensesLoader(): Promise<ExpensesPageData> {
   const [overview, household, shops] = await Promise.all([fetchExpensesOverview(), fetchHouseholdOverview(), loadShops()]);
   return { overview, habitants: household.habitants, shops };
 }
 
-function notFoundAs404(error: unknown): never {
-  if (error instanceof ApiRequestError && error.status === 404) throw data(null, { status: 404 });
-  throw error;
-}
 
 export async function expenseDetailLoader({ params }: LoaderFunctionArgs): Promise<ExpenseDetailPageData> {
   try {
@@ -181,8 +161,8 @@ function renameKey(errors: Record<string, string[]>, from: string, to: string) {
  */
 export async function expensesAction({ request }: ActionFunctionArgs): Promise<ExpenseActionResult | Response> {
   const formData = await request.formData();
-  const intent = (formData.get("intent") as ExpenseIntent | null) ?? "create";
-  const id = String(formData.get("id") ?? "");
+  const intent = readIntent<ExpenseIntent>(formData, "create");
+  const id = formString(formData, "id");
   const redirectTo = formData.get("redirectTo");
   const done = (): ExpenseActionResult | Response =>
     typeof redirectTo === "string" && redirectTo.startsWith("/") ? redirect(redirectTo) : { ok: true, intent };

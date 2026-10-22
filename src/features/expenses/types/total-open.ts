@@ -1,6 +1,7 @@
 import { addDays } from "@/types/dates";
 import { MAX_COUNT, expandRRule, formatRRule, parseRRule, type RRule } from "@/types/recurrence";
 import { EXPENSE_MONTH_END, EXPENSE_RRULE_SUPPORT, type ExpenseShare } from "./expenses";
+import { sumCents } from "@/types/collections";
 
 /*
  * Loans and down payments: "total still open"
@@ -75,7 +76,7 @@ export type TotalOpenPlan = {
 /** Plans the payments that pay off what is still open. See the comment at the top of this file. */
 export function planTotalOpen({ amountCents, totalOpenCents, asOf, rrule, startDate, from, settled = [] }: TotalOpenPlanInput): TotalOpenPlan {
   const counted = settled.filter((item) => item.dueDate >= asOf);
-  const settledCents = counted.reduce((sum, item) => sum + item.amountCents, 0);
+  const settledCents = sumCents(counted);
   const remainingCents = Math.max(0, totalOpenCents - settledCents);
   const lastSettled = counted.reduce<string | null>((last, item) => (last === null || item.dueDate > last ? item.dueDate : last), null);
   const rule = baseRuleOf(rrule);
@@ -114,7 +115,7 @@ export function scaleShares(shares: readonly ExpenseShare[], fromCents: number, 
   if (shares.length === 0) return [];
   if (fromCents <= 0) return shares.map((share, index) => ({ ...share, amountCents: index === 0 ? totalCents : 0 }));
   const scaled = shares.map((share) => ({ ...share, amountCents: Math.floor((share.amountCents * totalCents) / fromCents) }));
-  let leftover = totalCents - scaled.reduce((sum, share) => sum + share.amountCents, 0);
+  let leftover = totalCents - sumCents(scaled);
   for (let index = 0; leftover > 0; index = (index + 1) % scaled.length, leftover -= 1) {
     const share = scaled[index];
     if (share) share.amountCents += 1;
@@ -160,7 +161,7 @@ export function totalOpenProgress(input: {
   const counted = input.instances.filter((item) => item.dueDate >= input.asOf).sort((a, b) => a.dueDate.localeCompare(b.dueDate));
   const paid = counted.filter((item) => item.paid);
   const unpaid = counted.filter((item) => !item.paid);
-  const paidCents = paid.reduce((sum, item) => sum + item.amountCents, 0);
+  const paidCents = sumCents(paid);
   const future =
     input.status === "ended"
       ? []

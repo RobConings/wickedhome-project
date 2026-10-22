@@ -1,25 +1,22 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
-import { EntityPicker, type EntityPickerItem } from "@/components/shared/entity-picker";
-import { useSelections, type UseSelectionsOptions } from "@/lib/selections";
+import { type EntityPickerItem } from "@/components/shared/entity-picker";
 import type { Device, DeviceProfile } from "../types/devices";
 import { DeviceIcon } from "./device-icon";
+import { SelectionsPicker, type SelectionsPickerBaseProps } from "@/components/shared/selections-picker";
 
-type DevicePickerProps = Omit<React.ComponentProps<typeof EntityPicker>, "items" | "favoriteIds" | "recentIds" | "onToggleFavorite"> & {
+type DevicePickerProps = SelectionsPickerBaseProps & {
   devices: Pick<Device, "id" | "name" | "profileId" | "place">[];
   /** To show each device's icon and type. */
   profiles: Pick<DeviceProfile, "id" | "name" | "icon">[];
-  /** Seed favourites/recents instead of fetching them (stories, tests). */
-  initialSelections?: UseSelectionsOptions["initial"];
 };
 
 /**
  * Choose a device, with the user's favourites and recently used ones on top. Works in a `<Form>` via
  * `name`. After the form saves, call `useSelections("device").recordUse(id)`.
  */
-export function DevicePicker({ devices, profiles, initialSelections, placeholder, ...props }: DevicePickerProps) {
+export function DevicePicker({ devices, profiles, placeholder, ...props }: DevicePickerProps) {
   const { t } = useTranslation("devices");
-  const { favoriteIds, recentIds, toggleFavorite } = useSelections("device", { initial: initialSelections });
 
   const items = React.useMemo<EntityPickerItem[]>(() => {
     const byId = new Map(profiles.map((profile) => [profile.id, profile]));
@@ -36,12 +33,11 @@ export function DevicePicker({ devices, profiles, initialSelections, placeholder
   }, [devices, profiles]);
 
   return (
-    <EntityPicker
+    <SelectionsPicker
       {...props}
+      entityType="device"
       items={items}
-      favoriteIds={favoriteIds}
-      recentIds={recentIds}
-      onToggleFavorite={(id) => void toggleFavorite(id).catch(() => undefined)}
+      awaitFavorite={false}
       placeholder={placeholder ?? t("picker.placeholder")}
     />
   );

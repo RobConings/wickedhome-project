@@ -1,15 +1,5 @@
 import * as React from "react";
-import {
-  ArrowLeftIcon,
-  CalendarPlusIcon,
-  ChefHatIcon,
-  ExternalLinkIcon,
-  ListOrderedIcon,
-  PencilIcon,
-  PlayIcon,
-  TimerIcon,
-  Trash2Icon,
-} from "lucide-react";
+import { CalendarPlusIcon, ChefHatIcon, ExternalLinkIcon, ListOrderedIcon, PencilIcon, PlayIcon, TimerIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Await, Link, useFetcher } from "react-router";
 import { toast } from "sonner";
@@ -19,7 +9,7 @@ import { PageGrid } from "@/components/layout/page-grid";
 import { PageSection } from "@/components/layout/page-section";
 import { Stack } from "@/components/layout/stack";
 import { Card, CardTitle } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { FavoriteToggle } from "@/components/shared/favorite-toggle";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { PageHeader } from "@/components/shared/page-header";
@@ -40,6 +30,8 @@ import type { RecipeActionResult } from "../data/recipes-loaders";
 import { recipeCoverUrl } from "../data/recipe-cover-url";
 import { useRecipeSelections } from "../data/use-recipe-selections";
 import type { IngredientCheck, MealPlanEntry, Recipe, RecipeCheck, RecipeCategory } from "../types/recipes";
+import { useFetcherErrorToast } from "@/lib/hooks/use-fetcher-result";
+import { BackButton } from "@/components/shared/link-buttons";
 
 type RecipeDetailScreenProps = {
   categories?: RecipeCategory[];
@@ -86,9 +78,7 @@ export function RecipeDetailScreen({
   const text = useAmountText();
   const coverUrl = recipeCoverUrl(recipe);
 
-  React.useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.formError) toast.error(fetcher.data.formError);
-  }, [fetcher.state, fetcher.data]);
+  useFetcherErrorToast(fetcher);
 
   const cookButton = (fullOnMobile = false) => (
     <Button
@@ -129,7 +119,7 @@ export function RecipeDetailScreen({
         </Button>
       )}
       {canManage && (
-        <ConfirmDialog
+        <DeleteConfirmDialog
           trigger={
             <Button
               variant="outline"
@@ -143,9 +133,6 @@ export function RecipeDetailScreen({
           }
           title={t("delete.title", { name: recipe.name })}
           description={t("delete.description")}
-          confirmLabel={tCommon("actions.delete")}
-          cancelLabel={tCommon("actions.cancel")}
-          destructive
           onConfirm={() => fetcher.submit({ intent: "delete", id: recipe.id }, { method: "post" })}
         />
       )}
@@ -186,12 +173,7 @@ export function RecipeDetailScreen({
   return (
     <PageContainer>
       <Stack gap="md">
-        <Button asChild variant="ghost" size="sm" className="-ml-2 self-start text-muted-foreground">
-          <Link to="/recipes?tab=all">
-            <ArrowLeftIcon />
-            {t("actions.back")}
-          </Link>
-        </Button>
+        <BackButton to="/recipes?tab=all">{t("actions.back")}</BackButton>
         {coverUrl && <img src={coverUrl} alt="" className="h-40 w-full rounded-xl object-cover sm:h-56" />}
         <PageHeader
           title={

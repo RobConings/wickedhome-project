@@ -1,17 +1,7 @@
 import * as React from "react";
-import {
-  ArrowLeftIcon,
-  DownloadIcon,
-  ExternalLinkIcon,
-  EyeIcon,
-  FileInputIcon,
-  FolderIcon,
-  LinkIcon,
-  MoreVerticalIcon,
-  UnlinkIcon,
-} from "lucide-react";
+import { DownloadIcon, ExternalLinkIcon, EyeIcon, FileInputIcon, FolderIcon, LinkIcon, MoreVerticalIcon, UnlinkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,6 +31,7 @@ import { DRIVE_FOLDER_PARAM } from "../data/drive-loaders";
 import { googleClient, type GoogleClient } from "../data/google-client";
 import { driveFileUrl } from "../data/google-requests";
 import type { DriveFolderListing, DriveItem } from "../types/google";
+import { BackButton } from "@/components/shared/link-buttons";
 
 type DriveFolderScreenProps = {
   linkId: string;
@@ -76,12 +67,7 @@ export function DriveFolderScreen({ listing, ...props }: DriveFolderScreenProps)
 function BackLink() {
   const { t } = useTranslation("integrations");
   return (
-    <Button asChild variant="ghost" size="sm" className="w-fit">
-      <Link to="/documents">
-        <ArrowLeftIcon />
-        {t("driveFolder.back")}
-      </Link>
-    </Button>
+    <BackButton to="/documents" className="w-fit">{t("driveFolder.back")}</BackButton>
   );
 }
 
@@ -232,7 +218,6 @@ function DriveFolderContent({ linkId, listing, canManage, client = googleClient 
               }
               title={t("driveFolder.unlinkConfirm", { name: link.name })}
               confirmLabel={t("driveFolder.unlink")}
-              cancelLabel={tCommon("actions.cancel")}
               onConfirm={() =>
                 client
                   .unlinkDriveFolder(link.id)

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { hexColorSchema, idSchema, isoDateSchema } from "@/types/common";
 import { projectPath, type ProjectRef } from "@/types/projects";
 import type { ProjectBudget } from "./project-budget";
+import { canManageHousehold } from "@/types/roles";
 
 /*
  * Projects: open-ended budget pots (a room renovation, a holiday, a family trip, a Christmas budget…). Tasks,
@@ -288,7 +289,7 @@ export type ProjectBudgetsSummaryData = {
 // ── Helpers ─────────────────────────────────────────────────────────────────────────────────────────
 
 /** Adults and owners manage projects; children only look. Mirrors the API's role check. */
-export const canManageProjects = (role: "owner" | "adult" | "child") => role !== "child";
+export const canManageProjects = canManageHousehold;
 
 /** Share of linked tasks that are closed, 0–1 (null without tasks). */
 export const taskProgress = (tasks: ProjectTaskCounts): number | null => (tasks.total > 0 ? tasks.done / tasks.total : null);

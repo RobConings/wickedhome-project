@@ -10,6 +10,7 @@ import type { LinkPreview, Product, ShoppingItem } from "../types/shopping";
 import { AddShoppingItemForm, type AddShoppingItemInput } from "./add-shopping-item-form";
 import { ShoppingItemRow } from "./shopping-item-row";
 import { ShoppingItemsError, ShoppingItemsSkeleton } from "./shopping-items-status";
+import { EmptyNote } from "@/components/shared/empty-note";
 
 type TaskMaterialsPanelProps = {
   taskId: string;
@@ -73,10 +74,7 @@ export function TaskMaterialsPanel({ taskId, canManage, placeId, onChange, initi
           <ShoppingItemsSkeleton className="rounded-lg" />
         )
       ) : visible.length === 0 ? (
-        <p className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-4 text-sm text-muted-foreground">
-          <PackageIcon className="size-4 shrink-0" aria-hidden="true" />
-          {canManage ? t("task.emptyManage") : t("task.empty")}
-        </p>
+        <EmptyNote icon={PackageIcon}>{canManage ? t("task.emptyManage") : t("task.empty")}</EmptyNote>
       ) : (
         <ul className="divide-y rounded-lg border bg-card px-3">
           {visible.map((item) => (

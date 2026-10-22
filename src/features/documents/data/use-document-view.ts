@@ -1,5 +1,6 @@
 import * as React from "react";
 import type { ListView } from "@/components/shared/general-list";
+import { matchesMedia, readStored, writeStored } from "@/lib/storage";
 
 export type DocumentSortKey = "name" | "modified" | "size";
 export type DocumentSort = { key: DocumentSortKey; direction: "asc" | "desc" };
@@ -12,7 +13,7 @@ const DEFAULT_SORT: DocumentSort = { key: "name", direction: "asc" };
 
 function read(): Preference {
   try {
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null") as Partial<Preference> | null;
+    const stored = JSON.parse(readStored(STORAGE_KEY) ?? "null") as Partial<Preference> | null;
     return {
       view: stored?.view,
       sort: stored?.sort && ["name", "modified", "size"].includes(stored.sort.key) ? stored.sort : DEFAULT_SORT,
@@ -26,11 +27,7 @@ function read(): Preference {
 function initialListView(storedView: string | undefined): ListView {
   if (storedView === "list") return "list";
   if (storedView === "grid") return "tiles";
-  try {
-    return window.matchMedia("(min-width: 48rem)").matches ? "tiles" : "list";
-  } catch {
-    return "tiles";
-  }
+  return matchesMedia("(min-width: 48rem)", true) ? "tiles" : "list";
 }
 
 /** The drive's sort order, remembered on this device, and the list/tiles view to start with. */
@@ -41,11 +38,7 @@ export function useDocumentView() {
   const setSort = React.useCallback((sort: DocumentSort) => {
     setPreference((current) => {
       const merged = { ...current, sort };
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-      } catch {
-        // Not remembered on this device; it still works for this visit.
-      }
+      writeStored(STORAGE_KEY, JSON.stringify(merged));
       return merged;
     });
   }, []);

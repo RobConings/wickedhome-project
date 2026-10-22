@@ -1,7 +1,6 @@
 import * as React from "react";
 import { ChartColumnIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Await } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardDescription, CardTitle } from "@/components/shared/card";
 import { SegmentedControl } from "@/components/shared/segmented-control";
@@ -10,7 +9,8 @@ import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { formatMonthName } from "@/types/date-format";
 import type { MoneyTimeline, TimelineMonth } from "../types/money";
-import { money, monthLabel } from "./use-money-text";
+import { money, monthLabel } from "@/lib/locale-text";
+import { DeferredContent } from "@/components/shared/deferred-content";
 
 type MoneyTimelineCardProps = {
   /** Data, or a deferred promise from the route's loader (resolving to `null` when it failed). */
@@ -32,24 +32,18 @@ export function MoneyTimelineCard({ data, className }: MoneyTimelineCardProps) {
         <CardTitle>{t("timeline.title")}</CardTitle>
       </div>
       <CardDescription>{t("timeline.description")}</CardDescription>
-      {data instanceof Promise ? (
-        <React.Suspense
-          fallback={
-            <div className="flex flex-col gap-3" role="status" aria-label={t("timeline.loading")}>
-              <Skeleton className="h-8 w-56 rounded-lg" />
-              <Skeleton className="h-60 rounded-lg" />
-            </div>
-          }
-        >
-          <Await resolve={data} errorElement={failed}>
-            {(resolved: MoneyTimeline | null) => (resolved ? <MoneyTimelineChart data={resolved} /> : failed)}
-          </Await>
-        </React.Suspense>
-      ) : data === null ? (
-        failed
-      ) : (
-        <MoneyTimelineChart data={data} />
-      )}
+      <DeferredContent
+        data={data}
+        failed={failed}
+        fallback={
+          <div className="flex flex-col gap-3" role="status" aria-label={t("timeline.loading")}>
+            <Skeleton className="h-8 w-56 rounded-lg" />
+            <Skeleton className="h-60 rounded-lg" />
+          </div>
+        }
+      >
+        {(value) => <MoneyTimelineChart data={value} />}
+      </DeferredContent>
     </Card>
   );
 }

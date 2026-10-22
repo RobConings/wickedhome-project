@@ -10,6 +10,8 @@ import {
   normalizeIban,
   normalizeStructuredCommunication,
 } from "./payment-references";
+import { canManageHousehold } from "@/types/roles";
+import { sumCents } from "@/types/collections";
 
 /*
  * Expenses: everything the household pays. A one-off expense is a bill to pay or everyday spending logged
@@ -219,7 +221,7 @@ function checkPayment(value: PayerFields, ctx: z.RefinementCtx) {
     if (new Set(value.shares.map((share) => share.habitantId)).size !== value.shares.length) {
       ctx.addIssue({ code: "custom", path: ["shares"], message: "Each habitant can only have one share" });
     }
-    if (value.shares.reduce((sum, share) => sum + share.amountCents, 0) !== value.amountCents) {
+    if (sumCents(value.shares) !== value.amountCents) {
       ctx.addIssue({ code: "custom", path: ["shares"], message: "Shares must add up to the total amount" });
     }
   }
@@ -459,4 +461,4 @@ export type ExpensesSummary = {
 };
 
 /** Admins (owner, adult) manage expenses; children can only look. Mirrors the API's role check. */
-export const canManageExpenses = (role: "owner" | "adult" | "child") => role !== "child";
+export const canManageExpenses = canManageHousehold;

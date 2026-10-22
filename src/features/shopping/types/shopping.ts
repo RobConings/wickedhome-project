@@ -3,6 +3,7 @@ import { idSchema, isoDateSchema } from "@/types/common";
 import type { ProjectRef } from "@/types/projects";
 import type { ShopRef } from "@/types/shops";
 import { isValidStapleRRule } from "./staple-recurrence";
+import { canManageHousehold, type HouseholdRole } from "@/types/roles";
 
 // Enums ------------------------------------------------------------------------------------------------
 
@@ -426,12 +427,12 @@ export type ShoppingItemUpdateResult = {
 
 // Helpers shared by the API and the UI -------------------------------------------------------------------
 
-type Role = "owner" | "adult" | "child";
+type Role = HouseholdRole;
 
 /** Everyone, children included, adds items and ticks them off. */
 export const canAddShoppingItems = (_role: Role) => true;
 /** Lists, staples and the product catalogue: adults and owners. Mirrors the API's role check. */
-export const canManageShopping = (role: Role) => role !== "child";
+export const canManageShopping = canManageHousehold;
 
 /** The list kind that suits an item source when a default list has to be created. */
 export const DEFAULT_LIST_KIND: Record<ShoppingItemSource, ShoppingListKind> = {

@@ -12,7 +12,6 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { GeneralList } from "@/components/shared/general-list";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { PageHeader } from "@/components/shared/page-header";
-import { fileSize } from "../components/document-format";
 import { itemId, itemName, type DocumentItem } from "../components/document-item";
 import { StorageUsageMeter } from "../components/storage-usage-meter";
 import type { TrashBusy } from "../components/trash-item";
@@ -21,6 +20,7 @@ import { TrashTile } from "../components/trash-tile";
 import type { DocumentActionResult } from "../data/documents-loaders";
 import { useSettled } from "../data/use-settled";
 import type { DocumentTrash, StorageUsage } from "../types/documents";
+import { fileSize } from "@/lib/locale-text";
 
 type DocumentsTrashScreenProps = {
   trash: DocumentTrash;
@@ -35,7 +35,6 @@ type TrashIntent = "restore" | "delete" | "empty-trash";
 /** Trashed folders and files: restore them, delete them one by one, or empty the trash. */
 export function DocumentsTrashScreen({ trash, usage: usagePromise, canManage }: DocumentsTrashScreenProps) {
   const { t } = useTranslation("documents");
-  const { t: tCommon } = useTranslation();
   const usage = useSettled(usagePromise);
   const revalidator = useRevalidator();
   const fetcher = useFetcher<DocumentActionResult>({ key: "documents-trash-screen" });
@@ -103,7 +102,6 @@ export function DocumentsTrashScreen({ trash, usage: usagePromise, canManage }: 
               title={t("trash.emptyTitle")}
               description={t("trash.emptyDescription", { size: fileSize(trash.totalBytes) })}
               confirmLabel={t("actions.emptyTrash")}
-              cancelLabel={tCommon("actions.cancel")}
               destructive
               onConfirm={() => submit("empty-trash")}
             />

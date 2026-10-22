@@ -8,11 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardHeader, CardTitle } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import type { PlacesActionResult } from "../data/places-loaders";
 import { PLACE_COLORS, type Floor, type Place } from "../types/places";
 import { FloorFormDialog } from "./floor-form-dialog";
 import { PlaceListItem } from "./place-list-item";
+import { useFetcherErrorToast } from "@/lib/hooks/use-fetcher-result";
 
 type FloorSectionProps = {
   floor: Floor;
@@ -25,14 +26,11 @@ type FloorSectionProps = {
 /** A floor (or the outdoor plan) with its places as a list, a quick way to add one, and the way to its plan. */
 export function FloorSection({ floor, places, canManage }: FloorSectionProps) {
   const { t } = useTranslation("places");
-  const { t: tCommon } = useTranslation();
   const fetcher = useFetcher<PlacesActionResult>();
   const deleting = fetcher.state !== "idle" && fetcher.formData?.get("intent") === "delete-floor";
   const drawn = places.filter((place) => place.polygon).length;
 
-  React.useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.formError) toast.error(fetcher.data.formError);
-  }, [fetcher.state, fetcher.data]);
+  useFetcherErrorToast(fetcher);
 
   return (
     <Card className={deleting ? "opacity-50" : undefined} aria-busy={deleting || undefined} aria-labelledby={`floor-${floor.id}`}>
@@ -80,7 +78,7 @@ export function FloorSection({ floor, places, canManage }: FloorSectionProps) {
                   <TooltipContent>{t("floor.delete.hasPlaces")}</TooltipContent>
                 </Tooltip>
               ) : (
-                <ConfirmDialog
+                <DeleteConfirmDialog
                   trigger={
                     <Button
                       variant="ghost"
@@ -94,9 +92,6 @@ export function FloorSection({ floor, places, canManage }: FloorSectionProps) {
                   }
                   title={t("floor.delete.title", { name: floor.name })}
                   description={t("floor.delete.description")}
-                  confirmLabel={tCommon("actions.delete")}
-                  cancelLabel={tCommon("actions.cancel")}
-                  destructive
                   onConfirm={() => fetcher.submit({ intent: "delete-floor", id: floor.id }, { method: "post" })}
                 />
               )}

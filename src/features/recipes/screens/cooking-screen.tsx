@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ArrowLeftIcon, CheckIcon, ChefHatIcon, ChevronUpIcon, MonitorSmartphoneIcon, UsersIcon } from "lucide-react";
+import { CheckIcon, ChefHatIcon, ChevronUpIcon, MonitorSmartphoneIcon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher } from "react-router";
 import { toast } from "sonner";
@@ -22,6 +22,7 @@ import { CookingStepCard } from "../components/cooking-step-card";
 import { useWakeLock } from "../components/use-wake-lock";
 import type { RecipeActionResult } from "../data/recipes-loaders";
 import { recipePath, usedCount, type CookingState } from "../types/recipes";
+import { BackButton } from "@/components/shared/link-buttons";
 
 type CookingScreenProps = {
   state: CookingState;
@@ -107,12 +108,7 @@ export function CookingScreen({ state, products, canSaveToRecipe, pending = fals
   return (
     <PageContainer>
       <Stack gap="md">
-        <Button asChild variant="ghost" size="sm" className="-ml-2 self-start text-muted-foreground">
-          <Link to={recipePath(recipe.id)}>
-            <ArrowLeftIcon />
-            {t("cooking.backToRecipe")}
-          </Link>
-        </Button>
+        <BackButton to={recipePath(recipe.id)}>{t("cooking.backToRecipe")}</BackButton>
         <PageHeader
           title={
             <span className="flex items-center gap-3">

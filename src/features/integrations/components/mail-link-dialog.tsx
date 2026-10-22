@@ -17,7 +17,6 @@ import { formatCurrency } from "@/lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { googleClient, type GoogleClient } from "../data/google-client";
-import { shortMailDate } from "./use-match-line";
 import type { MailBillSuggestion } from "../types/google";
 import {
   proposeRecurringUpdates,
@@ -33,6 +32,7 @@ import {
   type MailValues,
   type RecurringUpdateField,
 } from "../types/mail-matching";
+import { dateText } from "@/lib/locale-text";
 
 type Tab = "matches" | "expenses" | "recurring";
 type Step = { kind: "choose" } | { kind: "occurrence"; recurring: MailLinkRecurring } | { kind: "review"; target: MailLinkTarget };
@@ -53,7 +53,7 @@ export type MailLinkDialogProps = {
   initialRecurring?: MailLinkRecurring;
 };
 
-const short = shortMailDate;
+const short = dateText;
 
 /** What the review starts with: the diff's defaults; remember on when this recurring expense already is. */
 function reviewDefaults(target: MailLinkTarget, mail: MailValues, rememberedRecurringId: string | null) {

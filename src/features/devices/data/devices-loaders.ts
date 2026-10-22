@@ -1,7 +1,7 @@
 import i18n from "i18next";
-import { data, redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type ShouldRevalidateFunctionArgs } from "react-router";
-import { ApiRequestError } from "@/lib/api-client";
-import { formDataToObject, parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
+import { failedAction, formDataToObject, type FormResult, parseForm } from "@/lib/forms";
+import { orNotFound, revalidateUnlessOnly } from "@/lib/loaders";
 import { fetchAppliances, type Appliance } from "@/features/energy";
 import { fetchFloorPlan, fetchPlaces, fetchPlacesOverview, type FloorPlan, type Place } from "@/features/places";
 import {
@@ -33,15 +33,6 @@ import {
 
 export type DevicesActionResult = FormResult & { intent?: string };
 
-/** A missing device or profile (or one of another household) shows the not-found page. */
-async function orNotFound<T>(request: Promise<T>): Promise<T> {
-  try {
-    return await request;
-  } catch (error) {
-    if (error instanceof ApiRequestError && error.status === 404) throw data(null, { status: 404 });
-    throw error;
-  }
-}
 
 // Other features are optional: devices still work when there are no places or appliances yet.
 const placesOrEmpty = () => fetchPlaces().catch((): Place[] => []);
@@ -77,15 +68,7 @@ export async function houseLoader() {
 export type HouseData = Awaited<ReturnType<typeof houseLoader>>;
 
 /** Switching floor tabs (`?floor=`) is client-side only: don't reload every plan for it. */
-export function houseShouldRevalidate({ currentUrl, nextUrl, formMethod, defaultShouldRevalidate }: ShouldRevalidateFunctionArgs) {
-  if (formMethod || currentUrl.pathname !== nextUrl.pathname) return defaultShouldRevalidate;
-  const strip = (url: URL) => {
-    const params = new URLSearchParams(url.search);
-    params.delete("floor");
-    return params.toString();
-  };
-  return strip(currentUrl) === strip(nextUrl) ? false : defaultShouldRevalidate;
-}
+export const houseShouldRevalidate = revalidateUnlessOnly(["floor"]);
 
 export async function deviceProfilesLoader() {
   const [profiles, presets] = await Promise.all([fetchDeviceProfiles(), fetchDevicePresets()]);
@@ -155,7 +138,7 @@ export async function devicesAction({ request }: ActionFunctionArgs): Promise<De
         return { formError: i18n.t("common:errors.generic"), intent };
     }
   } catch (error) {
-    return { ...toFormResult(error, { conflict: i18n.t("devices:values.fromHomeAssistant") }), intent };
+    return failedAction(error, intent, { conflict: i18n.t("devices:values.fromHomeAssistant") });
   }
 }
 
@@ -182,7 +165,7 @@ export async function deviceProfilesAction({ request }: ActionFunctionArgs): Pro
     }
     return { formError: i18n.t("common:errors.generic"), intent };
   } catch (error) {
-    return { ...toFormResult(error, { conflict: i18n.t("devices:profiles.delete.inUse") }), intent };
+    return failedAction(error, intent, { conflict: i18n.t("devices:profiles.delete.inUse") });
   }
 }
 
@@ -205,6 +188,6 @@ export async function deviceProfileAction({ request, params }: ActionFunctionArg
     await updateDeviceProfile(id, parsed.data);
     return { ok: true, intent };
   } catch (error) {
-    return { ...toFormResult(error, { conflict: i18n.t("devices:profiles.delete.inUse") }), intent };
+    return failedAction(error, intent, { conflict: i18n.t("devices:profiles.delete.inUse") });
   }
 }

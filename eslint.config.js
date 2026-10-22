@@ -97,8 +97,11 @@ export default tseslint.config(
   // Composition root: may use every layer, features only via their index.
   layer(["src/app/**"], [NO_API, NO_FEATURE_INTERNALS, NO_LEAVING_FOLDER]),
 
-  // Browser infrastructure.
+  // Browser infrastructure: data access (api-client, loaders, forms), formatting, storage, permissions.
   layer(["src/lib/**"], [NO_API, NO_APP, NO_ROUTES, NO_FEATURES, NO_COMPONENTS, NO_LEAVING_FOLDER]),
+  // Shared hooks (src/lib/hooks): behaviour without markup (fetcher results, panel data, clocks, media
+  // queries, clipboard). Same rules as lib: domain-agnostic and no components, so every layer above may use them.
+  layer(["src/lib/hooks/**"], [NO_API, NO_APP, NO_ROUTES, NO_FEATURES, NO_COMPONENTS, NO_LEAVING_FOLDER]),
 
   // App-wide types: pure TypeScript and zod.
   layer(["src/types/**"], [NO_API, NO_APP, NO_ROUTES, NO_FEATURES, NO_COMPONENTS, NO_LIB, NO_LEAVING_FOLDER]),

@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api, resourcePath, restResource, withQuery } from "@/lib/api-client";
 import type {
   Income,
   IncomeInput,
@@ -8,18 +8,18 @@ import type {
   IncomeSourceUpdateInput,
 } from "../types/income";
 
-const sourcePath = (id: string) => `/income/sources/${encodeURIComponent(id)}`;
-const incomePath = (id: string) => `/income/incomes/${encodeURIComponent(id)}`;
+const sourcePath = resourcePath("/income/sources");
+const incomes = restResource<Income, IncomeInput>("/income/incomes");
 
 export const fetchIncomeOverview = (month?: string | null) =>
-  api.get<IncomeOverview>(month ? `/income?month=${encodeURIComponent(month)}` : "/income");
+  api.get<IncomeOverview>(withQuery("/income", { month }));
 
 export const createIncomeSource = (input: IncomeSourceCreateInput) => api.post<IncomeSource>("/income/sources", input);
 export const updateIncomeSource = (id: string, input: IncomeSourceUpdateInput) => api.put<IncomeSource>(sourcePath(id), input);
 export const deleteIncomeSource = (id: string) => api.delete(sourcePath(id));
 export const deleteIncomeAmount = (id: string, amountId: string) =>
-  api.delete<IncomeSource>(`${sourcePath(id)}/amounts/${encodeURIComponent(amountId)}`);
+  api.delete<IncomeSource>(sourcePath(id, "amounts", amountId));
 
-export const createIncome = (input: IncomeInput) => api.post<Income>("/income/incomes", input);
-export const updateIncome = (id: string, input: IncomeInput) => api.put<Income>(incomePath(id), input);
-export const deleteIncome = (id: string) => api.delete(incomePath(id));
+export const createIncome = incomes.create;
+export const updateIncome = incomes.update;
+export const deleteIncome = incomes.remove;

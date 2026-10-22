@@ -1,5 +1,5 @@
 import i18n from "i18next";
-import { api } from "@/lib/api-client";
+import { api, withQuery } from "@/lib/api-client";
 import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
 import {
   wasteLookupInputSchema,
@@ -19,7 +19,7 @@ import {
 export const fetchWasteSettings = () => api.get<WasteSettings>("/waste/settings");
 export const fetchWasteSummary = () => api.get<WasteSummary>("/waste/summary");
 export const fetchWasteCollections = (from: string, to: string) =>
-  api.get<WasteDay[]>(`/waste/collections?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
+  api.get<WasteDay[]>(withQuery("/waste/collections", { from, to }));
 export const lookupWasteAddress = (input: WasteLookupInput) => api.post<WasteLookupResult>("/waste/lookup", input);
 export const saveWasteSetup = (input: WasteSetupInput) => api.put<WasteSetup>("/waste/setup", input);
 export const deleteWasteSetup = () => api.delete("/waste/setup");

@@ -1,7 +1,7 @@
 import * as React from "react";
-import { ArrowLeftIcon, SaveIcon, Trash2Icon } from "lucide-react";
+import { SaveIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useBeforeUnload, useFetcher } from "react-router";
+import { useBeforeUnload, useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageContainer } from "@/components/layout/page-container";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { PageHeader } from "@/components/shared/page-header";
 import { DeviceIcon } from "../components/device-icon";
@@ -23,6 +23,8 @@ import { ToneSelect } from "../components/tone-select";
 import type { DevicesActionResult } from "../data/devices-loaders";
 import { DEVICE_CATEGORIES, deviceProfileInputSchema, type DeviceCategory, type DeviceProfile, type FieldValue } from "../types/devices";
 import { evaluateIndicator } from "../types/indicator";
+import { useFetcherResult } from "@/lib/hooks/use-fetcher-result";
+import { BackLink } from "@/components/shared/link-buttons";
 
 type DeviceProfileEditorScreenProps = {
   /** The profile to edit, or null for a new one. */
@@ -55,20 +57,15 @@ export function DeviceProfileEditorScreen({ profile, canManage, initialSampleVal
       [dirty],
     ),
   );
-
-  const handled = React.useRef<DevicesActionResult | undefined>(undefined);
   const submitted = React.useRef<ProfileDraft | null>(null);
-  React.useEffect(() => {
-    const result = fetcher.data;
-    if (fetcher.state !== "idle" || !result || handled.current === result) return;
-    handled.current = result;
+  useFetcherResult(fetcher, (result) => {
     if (result.ok) {
       if (submitted.current) setSaved(submitted.current);
       toast.success(t("editor.saved"));
     } else {
       toast.error(result.formError ?? t("editor.invalid"));
     }
-  }, [fetcher.state, fetcher.data, t]);
+  });
 
   const result = React.useMemo(() => evaluateIndicator(draft, samples), [draft, samples]);
 
@@ -87,10 +84,7 @@ export function DeviceProfileEditorScreen({ profile, canManage, initialSampleVal
     <PageContainer className="max-w-7xl">
       <PageHeader
         eyebrow={
-          <Link to="/devices/profiles" className="inline-flex items-center gap-1 hover:underline">
-            <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-            {t("profiles.title")}
-          </Link>
+          <BackLink to="/devices/profiles">{t("profiles.title")}</BackLink>
         }
         title={
           <span className="flex items-center gap-3">
@@ -108,7 +102,7 @@ export function DeviceProfileEditorScreen({ profile, canManage, initialSampleVal
                 {saving ? tCommon("form.saving") : dirty ? t("editor.unsaved") : ""}
               </span>
               {profile && (
-                <ConfirmDialog
+                <DeleteConfirmDialog
                   trigger={
                     <Button variant="outline" disabled={profile.deviceCount > 0} title={profile.deviceCount > 0 ? t("profiles.delete.inUse") : undefined}>
                       <Trash2Icon />
@@ -117,9 +111,6 @@ export function DeviceProfileEditorScreen({ profile, canManage, initialSampleVal
                   }
                   title={t("profiles.delete.title", { name: profile.name })}
                   description={t("profiles.delete.description")}
-                  confirmLabel={tCommon("actions.delete")}
-                  cancelLabel={tCommon("actions.cancel")}
-                  destructive
                   onConfirm={() => remove.submit({ intent: "delete" }, { method: "post", encType: "application/json" })}
                 />
               )}

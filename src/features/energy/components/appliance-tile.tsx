@@ -7,18 +7,21 @@ import type { Appliance } from "../types/energy";
 import { ApplianceActions } from "./appliance-actions";
 import { ApplianceCategoryIcon } from "./appliance-category-icon";
 import { ApplianceMarkers, ApplianceSummary } from "./appliance-markers";
+import { useCanManage } from "@/lib/permissions";
 
 type ApplianceTileProps = {
   appliance: Appliance;
   /** Places for the edit dialog. */
   places: Place[];
-  canManage: boolean;
+  /** Defaults to the nearest `CanManageProvider`. */
+  canManage?: boolean;
   /** The appliance's documents (rendered by the route), behind a paperclip button, for every role. */
   documents?: React.ReactNode;
 };
 
 /** An appliance as a tile (two per row on a phone): icon, name, badges, power figures and actions. */
-export function ApplianceTile({ appliance, places, canManage, documents }: ApplianceTileProps) {
+export function ApplianceTile({ appliance, places, canManage: canManageProp, documents }: ApplianceTileProps) {
+  const canManage = useCanManage(canManageProp);
   const deleting = useApplianceDeleting(appliance.id);
 
   return (

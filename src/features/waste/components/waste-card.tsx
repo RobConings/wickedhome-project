@@ -3,8 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardFooter, CardHeader, CardTitle } from "@/components/shared/card";
-import { IconChip } from "@/components/shared/icon-chip";
+import { Card, CardFooter } from "@/components/shared/card";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { cn } from "@/lib/utils";
 import { addDays } from "@/types/dates";
@@ -12,6 +11,7 @@ import { wasteTiming, type WasteSummary } from "../types/waste";
 import { useWasteDayLabel } from "./waste-day-label";
 import { WasteDayList } from "./waste-day-list";
 import { WasteCollectionChip } from "./waste-fraction-icon";
+import { IconCardHeader } from "@/components/shared/icon-card-header";
 
 type WasteCardProps = {
   /** `null` when the request failed. */
@@ -23,10 +23,7 @@ type WasteCardProps = {
 function Header() {
   const { t } = useTranslation("waste");
   return (
-    <CardHeader className="items-center justify-start gap-3">
-      <IconChip icon={Trash2Icon} tone="success" size="sm" />
-      <CardTitle>{t("card.title")}</CardTitle>
-    </CardHeader>
+    <IconCardHeader icon={Trash2Icon} tone="success" title={t("card.title")} />
   );
 }
 

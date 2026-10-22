@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import type { DevicesActionResult } from "../data/devices-loaders";
 import type { DeviceField, FieldValue } from "../types/devices";
+import { useFetcherResult } from "@/lib/hooks/use-fetcher-result";
 
 type DeviceValueControlProps = {
   deviceId: string;
@@ -31,13 +32,9 @@ export function DeviceValueControl({ deviceId, field, value, label, className }:
   // Optimistic: show what was just sent until the reload confirms it.
   const pending = fetcher.formData?.get("value");
   const shown: FieldValue = typeof pending === "string" ? (JSON.parse(pending) as FieldValue) : value;
-
-  const handled = React.useRef<DevicesActionResult | undefined>(undefined);
-  React.useEffect(() => {
-    if (fetcher.state !== "idle" || !fetcher.data || handled.current === fetcher.data) return;
-    handled.current = fetcher.data;
-    if (!fetcher.data.ok) toast.error(fetcher.data.formError ?? t("values.saveFailed"));
-  }, [fetcher.state, fetcher.data, t]);
+  useFetcherResult(fetcher, (result) => {
+    if (!result.ok) toast.error(result.formError ?? t("values.saveFailed"));
+  });
 
   const submit = (next: FieldValue) =>
     fetcher.submit({ intent: "set-value", deviceId, fieldKey: field.key, value: JSON.stringify(next) }, { method: "post" });

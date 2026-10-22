@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { hexColorSchema, idSchema } from "@/types/common";
+import { canManageHousehold } from "@/types/roles";
 
 // ── Entity links ────────────────────────────────────────────────────────────────────────────────────
 
@@ -214,10 +215,8 @@ export type StorageUsage = {
 
 // ── Rules shared by API and UI ──────────────────────────────────────────────────────────────────────
 
-type Role = "owner" | "adult" | "child";
-
 /** Owners and adults upload and organise documents; children can look and download. */
-export const canManageDocuments = (role: Role) => role !== "child";
+export const canManageDocuments = canManageHousehold;
 
 export type PreviewKind = "image" | "pdf" | "video" | "audio" | "text" | "none";
 

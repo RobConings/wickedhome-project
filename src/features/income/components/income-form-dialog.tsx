@@ -12,7 +12,8 @@ import {
   type IncomeOccurrence,
   type IncomeTargetAccount,
 } from "../types/income";
-import { dateText, earners } from "./use-income-text";
+import { earners } from "./use-income-text";
+import { dateText } from "@/lib/locale-text";
 
 type IncomeFormDialogProps = {
   trigger?: React.ReactElement;

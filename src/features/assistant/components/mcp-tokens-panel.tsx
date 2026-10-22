@@ -14,24 +14,15 @@ import { currentLocale } from "@/lib/i18n";
 import { formatDate } from "@/types/date-format";
 import { assistantClient, type AssistantClient } from "../data/assistant-client";
 import type { AssistantAccessToken, AssistantTokenScope, CreatedAssistantToken } from "../types/assistant";
+import { useCopyToClipboard } from "@/lib/hooks/use-copy-to-clipboard";
 
 /** Copies `text` to the clipboard (hidden where the browser has no clipboard). Also used by the OAuth panel. */
 export function CopyText({ text }: { text: string }) {
   const { t } = useTranslation("assistant");
-  const [copied, setCopied] = React.useState(false);
-  if (typeof navigator === "undefined" || !navigator.clipboard) return null;
+  const { supported, copied, copy } = useCopyToClipboard();
+  if (!supported) return null;
   return (
-    <Button
-      type="button"
-      variant="outline"
-      size="sm"
-      onClick={() =>
-        void navigator.clipboard.writeText(text).then(() => {
-          setCopied(true);
-          window.setTimeout(() => setCopied(false), 1500);
-        })
-      }
-    >
+    <Button type="button" variant="outline" size="sm" onClick={() => copy(text)}>
       {copied ? <CheckIcon /> : <CopyIcon />}
       {copied ? t("tokens.copied") : t("tokens.copy")}
     </Button>

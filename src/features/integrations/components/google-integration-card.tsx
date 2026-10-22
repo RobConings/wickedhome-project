@@ -187,7 +187,6 @@ function GooglePanel({ initial, client, allFeatures }: { initial: GoogleStatus |
                 : t("google.disconnectConfirm.description")
             }
             confirmLabel={t("google.disconnect")}
-            cancelLabel={tCommon("actions.cancel")}
             destructive
             onConfirm={() =>
               client

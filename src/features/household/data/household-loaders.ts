@@ -1,6 +1,6 @@
 import i18n from "i18next";
 import type { ActionFunctionArgs } from "react-router";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { failedAction, type FormResult, formString, parseForm, readIntent } from "@/lib/forms";
 import { habitantInputSchema } from "../types/household";
 import { createHabitant, deleteHabitant, fetchHouseholdOverview, updateHabitant } from "./household-requests";
 
@@ -16,8 +16,8 @@ export function habitantsLoader() {
 /** One action for the habitants page; the form's `intent` field says what to do. */
 export async function habitantsAction({ request }: ActionFunctionArgs): Promise<HabitantActionResult> {
   const formData = await request.formData();
-  const intent = formData.get("intent") as HabitantIntent | null;
-  const id = String(formData.get("id") ?? "");
+  const intent = readIntent<HabitantIntent>(formData);
+  const id = formString(formData, "id");
 
   try {
     if (intent === "delete") {
@@ -32,9 +32,6 @@ export async function habitantsAction({ request }: ActionFunctionArgs): Promise<
     else await createHabitant(data);
     return { ok: true, intent: intent ?? "create" };
   } catch (error) {
-    return {
-      ...toFormResult(error, { conflict: i18n.t("household:delete.hasAccount") }),
-      intent: intent ?? undefined,
-    };
+    return failedAction(error, intent ?? undefined, { conflict: i18n.t("household:delete.hasAccount") });
   }
 }

@@ -9,6 +9,7 @@ import { fetchHouseholdOverview, type Habitant } from "@/features/household";
 import { fetchTasksOverview } from "../data/tasks-requests";
 import { compareTasks, type TasksOverview } from "../types/tasks";
 import { TaskRow } from "./task-row";
+import { usePanelData } from "@/lib/hooks/use-panel-data";
 
 /** At most this many open tasks; "View all" opens the tasks page filtered on the place. */
 const MAX_SHOWN = 5;
@@ -19,11 +20,6 @@ type PlaceTasksSectionProps = {
   initialData?: { overview: TasksOverview; habitants: Habitant[] };
 };
 
-type State =
-  | { status: "loading" }
-  | { status: "error" }
-  | { status: "ready"; overview: TasksOverview; habitants: Habitant[] };
-
 /**
  * The open tasks of one room or zone, for the place detail page. Loads its own data, so the places
  * feature only renders `<PlaceTasksSection placeId={…} />`. Quick actions post to the tasks route.
@@ -33,38 +29,18 @@ type State =
 export function PlaceTasksSection({ placeId, initialData }: PlaceTasksSectionProps) {
   const { t } = useTranslation("tasks");
   const { t: tCommon } = useTranslation();
-  const [state, setState] = React.useState<State>(() =>
-    initialData ? { status: "ready", ...initialData } : { status: "loading" },
+  // Reloading after a quick action (`reload`): the list stays, faded, until the new one is in.
+  const panel = usePanelData(
+    () => Promise.all([fetchTasksOverview({ placeId }), fetchHouseholdOverview()]).then(([overview, household]) => ({ overview, habitants: household.habitants })),
+    [placeId],
+    { initialData },
   );
-  const [reloads, setReloads] = React.useState(0);
-  // Reloading after a quick action: the list stays, faded, until the new one is in.
-  const [refreshing, setRefreshing] = React.useState(false);
-  const reload = React.useCallback(() => {
-    setRefreshing(true);
-    setReloads((value) => value + 1);
-  }, []);
+  const { reload, refreshing } = panel;
+  const state = panel.state.status === "ready" ? { status: "ready" as const, ...panel.state.data } : panel.state;
   const retry = () => {
-    setState({ status: "loading" });
-    setReloads((value) => value + 1);
+    panel.setState({ status: "loading" });
+    panel.retry();
   };
-
-  React.useEffect(() => {
-    if (initialData && reloads === 0) return;
-    let cancelled = false;
-    Promise.all([fetchTasksOverview({ placeId }), fetchHouseholdOverview()])
-      .then(([overview, household]) => {
-        if (!cancelled) setState({ status: "ready", overview, habitants: household.habitants });
-      })
-      .catch(() => {
-        if (!cancelled) setState({ status: "error" });
-      })
-      .finally(() => {
-        if (!cancelled) setRefreshing(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [placeId, reloads, initialData]);
 
   const open = state.status === "ready" ? state.overview.tasks.filter((task) => task.status === "open").sort(compareTasks) : [];
   const canManage = state.status === "ready" && state.overview.viewer.canManage;

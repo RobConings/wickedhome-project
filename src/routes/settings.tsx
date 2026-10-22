@@ -8,19 +8,14 @@ import { canManageHouseholdSettings } from "@/features/household";
 import { IntegrationsSettingsLink } from "@/features/integrations";
 import { NotificationSettingsSection } from "@/features/notifications";
 import { SettingsScreen, settingsAction, settingsLoader, type SettingsSectionItem } from "@/features/settings";
+import { optionalData } from "@/lib/loaders";
 
 /** Deferred section data: a skeleton until it arrives; a failure only empties that section. */
-const deferred = <T,>(name: string, promise: Promise<T>): Promise<T | null> =>
-  promise.catch((error: unknown) => {
-    console.warn(`Settings: ${name} could not load`, error);
-    return null;
-  });
-
 export async function loader() {
-  const automations = deferred("automations", fetchAutomations());
-  const myAccount = deferred("my account", fetchMyAccount());
+  const automations = optionalData(fetchAutomations(), "Settings: automations");
+  const myAccount = optionalData(fetchMyAccount(), "Settings: my account");
   // Children get a 403 here (→ null); their page doesn't show the Accounts section anyway.
-  const accounts = deferred("accounts", fetchAccounts());
+  const accounts = optionalData(fetchAccounts(), "Settings: accounts");
   return { ...(await settingsLoader()), automations, myAccount, accounts };
 }
 

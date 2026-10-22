@@ -2,13 +2,12 @@ import { ArrowRightIcon, LandmarkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
-import { Card, CardFooter, CardHeader, CardTitle } from "@/components/shared/card";
-import { IconChip } from "@/components/shared/icon-chip";
+import { Card, CardFooter } from "@/components/shared/card";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import type { MoneySummary } from "@/features/money";
-import { formatCurrency } from "@/lib/format";
-import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { money } from "@/lib/locale-text";
+import { IconCardHeader } from "@/components/shared/icon-card-header";
 
 type MoneyCardProps = {
   /** This month's money figures; `null` when they failed to load (only this card shows an error). */
@@ -18,14 +17,10 @@ type MoneyCardProps = {
 /** This month in (income) and out (expenses due), and the joint account balances. */
 export function MoneyCard({ summary }: MoneyCardProps) {
   const { t } = useTranslation("dashboard");
-  const money = (cents: number) => formatCurrency(cents, currentLocale());
 
   return (
     <Card>
-      <CardHeader className="items-center justify-start gap-3">
-        <IconChip icon={LandmarkIcon} tone="success" size="sm" />
-        <CardTitle>{t("money.title")}</CardTitle>
-      </CardHeader>
+      <IconCardHeader icon={LandmarkIcon} tone="success" title={t("money.title")} />
 
       {!summary ? (
         <InlineAlert tone="error">{t("loadError")}</InlineAlert>

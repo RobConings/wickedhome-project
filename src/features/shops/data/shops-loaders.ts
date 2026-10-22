@@ -1,7 +1,7 @@
 import i18n from "i18next";
-import { data, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
-import { ApiRequestError } from "@/lib/api-client";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
+import { failedAction, type FormResult, formString, parseForm, readIntent } from "@/lib/forms";
+import { orNotFound } from "@/lib/loaders";
 import { shopFormSchema } from "../types/shops";
 import { createShop, deleteShop, fetchShop, fetchShops, refreshShopIcon, setShopIngredientSearch, updateShop } from "./shops-requests";
 
@@ -14,18 +14,13 @@ export function shopsLoader() {
   return fetchShops();
 }
 
-export async function shopLoader({ params }: LoaderFunctionArgs) {
-  try {
-    return await fetchShop(params.shopId ?? "");
-  } catch (error) {
-    if (error instanceof ApiRequestError && error.status === 404) throw data(null, { status: 404 });
-    throw error;
-  }
+export function shopLoader({ params }: LoaderFunctionArgs) {
+  return orNotFound(fetchShop(params.shopId ?? ""));
 }
 
 async function handleShopForm(formData: FormData): Promise<ShopActionResult> {
-  const intent = formData.get("intent") as ShopIntent | null;
-  const id = String(formData.get("id") ?? "");
+  const intent = readIntent<ShopIntent>(formData);
+  const id = formString(formData, "id");
 
   try {
     if (intent === "delete") {
@@ -47,17 +42,15 @@ async function handleShopForm(formData: FormData): Promise<ShopActionResult> {
     const shop = intent === "update" ? await updateShop(id, input) : await createShop(input);
     return { ok: true, intent: intent ?? "create", shopId: shop.id };
   } catch (error) {
-    return {
-      ...toFormResult(
-        error,
-        intent === "refresh-icon"
-          ? { icon_not_found: i18n.t("shops:icon.notFound"), conflict: i18n.t("shops:icon.noWebsite") }
-          : intent === "ingredient-search"
-            ? { conflict: i18n.t("shops:ingredientSearch.needsWebshop"), forbidden: i18n.t("shops:ingredientSearch.forbidden") }
-            : { conflict: i18n.t("shops:delete.builtIn"), forbidden: i18n.t("shops:errors.forbidden") },
-      ),
-      intent: intent ?? undefined,
-    };
+    return failedAction(
+      error,
+      intent ?? undefined,
+      intent === "refresh-icon"
+        ? { icon_not_found: i18n.t("shops:icon.notFound"), conflict: i18n.t("shops:icon.noWebsite") }
+        : intent === "ingredient-search"
+          ? { conflict: i18n.t("shops:ingredientSearch.needsWebshop"), forbidden: i18n.t("shops:ingredientSearch.forbidden") }
+          : { conflict: i18n.t("shops:delete.builtIn"), forbidden: i18n.t("shops:errors.forbidden") },
+    );
   }
 }
 

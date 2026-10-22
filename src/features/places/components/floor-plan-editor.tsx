@@ -32,6 +32,8 @@ import { findRoomAt } from "./room-from-walls";
 import { quarterTurn } from "./plan-orientation";
 import { initialUnderlayScale, labelInside, normalizeRotation, underlayToWorld } from "./underlay-geometry";
 import { planOverlaps } from "../types/plan-diagnostics";
+import { useFetcherResult } from "@/lib/hooks/use-fetcher-result";
+import { useMediaQuery } from "@/lib/hooks/use-media-query";
 
 // The import dialog (and pdf.js behind it) loads only when someone imports a plan.
 const PlanImportDialog = React.lazy(() => import("./plan-import-dialog").then((module) => ({ default: module.PlanImportDialog })));
@@ -70,18 +72,6 @@ function placeUnderlay(result: PlanImportResult, doc: PlanDocument): FloorUnderl
 
 /** Editing needs room for the tools window and a precise pointer; smaller screens get a read-only plan. */
 const EDIT_MEDIA_QUERY = "(min-width: 1024px)";
-
-function useMediaQuery(query: string): boolean {
-  return React.useSyncExternalStore(
-    (onChange) => {
-      const media = window.matchMedia(query);
-      media.addEventListener("change", onChange);
-      return () => media.removeEventListener("change", onChange);
-    },
-    () => window.matchMedia(query).matches,
-    () => true,
-  );
-}
 
 const isTyping = (target: EventTarget | null) =>
   target instanceof HTMLElement && Boolean(target.closest("input, textarea, select, [contenteditable], [role=dialog], [role=listbox]"));
@@ -131,7 +121,7 @@ export function FloorPlanEditor({
 }: FloorPlanEditorProps) {
   const { t } = useTranslation("places");
   const [importing, setImporting] = React.useState<null | "new" | "recrop">(null);
-  const wide = useMediaQuery(EDIT_MEDIA_QUERY);
+  const wide = useMediaQuery(EDIT_MEDIA_QUERY, true);
   const readOnly = !canManage || !wide;
   const [state, dispatch] = React.useReducer(planEditorReducer, plan, initPlanEditor);
   const fetcher = useFetcher<FloorPlanActionResult>({ key: `floor-plan-${plan.floor.id}` });
@@ -153,18 +143,14 @@ export function FloorPlanEditor({
   );
 
   // Apply the save result once.
-  const handled = React.useRef<FloorPlanActionResult | undefined>(undefined);
-  React.useEffect(() => {
-    const result = fetcher.data;
-    if (fetcher.state !== "idle" || !result || handled.current === result) return;
-    handled.current = result;
+  useFetcherResult(fetcher, (result) => {
     if (result.ok) {
       dispatch(result.plan ? { type: "loaded", plan: result.plan } : { type: "markSaved" });
       toast.success(t("editor.saved"));
     } else {
       toast.error(result.formError ?? t("editor.saveInvalid"));
     }
-  }, [fetcher.state, fetcher.data, t]);
+  });
 
   const save = React.useCallback(() => {
     if (readOnly || saving || state.draft.length > 0) return;

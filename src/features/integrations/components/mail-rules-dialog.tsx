@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ErrorState } from "@/components/shared/error-state";
 import { FormField } from "@/components/shared/form-field";
 import { SkeletonList } from "@/components/shared/loading-state";
@@ -159,16 +159,13 @@ export function MailRulesDialog({ client, trigger }: { client: GoogleClient; tri
                     <PencilIcon />
                   </Button>
                   {!rule.builtIn && (
-                    <ConfirmDialog
+                    <DeleteConfirmDialog
                       trigger={
                         <Button variant="ghost" size="icon" aria-label={tCommon("actions.delete")}>
                           <Trash2Icon />
                         </Button>
                       }
                       title={t("google.rules.deleteTitle", { payee: rule.payee })}
-                      confirmLabel={tCommon("actions.delete")}
-                      cancelLabel={tCommon("actions.cancel")}
-                      destructive
                       onConfirm={() =>
                         client
                           .deleteRule(rule.id)

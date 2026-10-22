@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api, resourcePath, withQuery } from "@/lib/api-client";
 import type {
   ProductStock,
   ScanResult,
@@ -9,22 +9,18 @@ import type {
   StockMovementInput,
 } from "../types/inventory";
 
-const enc = encodeURIComponent;
+const stockPath = resourcePath("/inventory/stock");
 
 /** Stock items, low stock first. Filter by place or product. */
 export function fetchStock(filter: { placeId?: string; productId?: string } = {}) {
-  const params = new URLSearchParams();
-  if (filter.placeId) params.set("placeId", filter.placeId);
-  if (filter.productId) params.set("productId", filter.productId);
-  const query = params.toString();
-  return api.get<StockItem[]>(`/inventory/stock${query ? `?${query}` : ""}`);
+  return api.get<StockItem[]>(withQuery("/inventory/stock", { placeId: filter.placeId, productId: filter.productId }));
 }
 
 export const createStockItem = (input: StockItemInput) => api.post<StockItem>("/inventory/stock", input);
 export const updateStockItem = (id: string, input: StockItemUpdateInput) =>
-  api.put<StockChangeResult>(`/inventory/stock/${enc(id)}`, input);
-export const deleteStockItem = (id: string) => api.delete(`/inventory/stock/${enc(id)}`);
+  api.put<StockChangeResult>(stockPath(id), input);
+export const deleteStockItem = (id: string) => api.delete(stockPath(id));
 export const addStockMovement = (id: string, input: StockMovementInput) =>
-  api.post<StockChangeResult>(`/inventory/stock/${enc(id)}/movements`, input);
-export const fetchProductStock = (productId: string) => api.get<ProductStock>(`/inventory/products/${enc(productId)}`);
-export const scanCode = (code: string) => api.get<ScanResult>(`/inventory/scan?code=${enc(code)}`);
+  api.post<StockChangeResult>(stockPath(id, "movements"), input);
+export const fetchProductStock = (productId: string) => api.get<ProductStock>(resourcePath("/inventory/products")(productId));
+export const scanCode = (code: string) => api.get<ScanResult>(`/inventory/scan?code=${encodeURIComponent(code)}`);

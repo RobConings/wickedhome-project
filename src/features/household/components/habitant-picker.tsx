@@ -1,9 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-import { EntityPicker } from "@/components/shared/entity-picker";
-import { useSelections } from "@/lib/selections";
 import type { Habitant } from "../types/household";
 import { HabitantAvatar } from "./habitant-avatar";
+import { SelectionsPicker } from "@/components/shared/selections-picker";
 
 type HabitantPickerProps = {
   habitants: Habitant[];
@@ -25,9 +23,8 @@ type HabitantPickerProps = {
  */
 export function HabitantPicker({ habitants, ...props }: HabitantPickerProps) {
   const { t } = useTranslation("household");
-  const { favoriteIds, recentIds, toggleFavorite, loading } = useSelections("habitant");
   return (
-    <EntityPicker
+    <SelectionsPicker
       {...props}
       items={habitants.map((habitant) => ({
         id: habitant.id,
@@ -35,10 +32,10 @@ export function HabitantPicker({ habitants, ...props }: HabitantPickerProps) {
         description: t(`types.${habitant.type}`),
         leading: <HabitantAvatar habitant={habitant} size="sm" />,
       }))}
-      favoriteIds={favoriteIds}
-      recentIds={recentIds}
-      loading={loading}
-      onToggleFavorite={(id) => void toggleFavorite(id).catch(() => toast.error(t("picker.favoriteFailed")))}
+      entityType="habitant"
+      waitForSelections
+      awaitFavorite={false}
+      favoriteFailedMessage={t("picker.favoriteFailed")}
     />
   );
 }

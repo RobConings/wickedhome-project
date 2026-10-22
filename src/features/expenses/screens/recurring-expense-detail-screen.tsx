@@ -1,14 +1,14 @@
 import * as React from "react";
-import { ArrowLeftIcon, ExternalLinkIcon, PauseIcon, PencilIcon, PlayIcon, SquareIcon, Trash2Icon } from "lucide-react";
+import { ExternalLinkIcon, PauseIcon, PencilIcon, PlayIcon, SquareIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useFetcher } from "react-router";
+import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
 import { Card, CardHeader, CardTitle } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { ConfirmDialog, DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { DescriptionItem, DescriptionList } from "@/components/shared/description-list";
 import { FormField } from "@/components/shared/form-field";
 import { PageHeader } from "@/components/shared/page-header";
@@ -28,6 +28,7 @@ import type { ExpenseActionResult } from "../data/expenses-loaders";
 import type { RecurringExpenseDetail, RecurringStatus } from "../types/expenses";
 import { formatIban, formatStructuredCommunication } from "../types/payment-references";
 import { HistoryList } from "./expense-detail-screen";
+import { BackButton } from "@/components/shared/link-buttons";
 
 type RecurringExpenseDetailScreenProps = {
   detail: RecurringExpenseDetail;
@@ -108,11 +109,10 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
             </span>
           }
           confirmLabel={t("actions.end")}
-          cancelLabel={tCommon("actions.cancel")}
           onConfirm={() => setStatus("ended", { endDate })}
         />
       )}
-      <ConfirmDialog
+      <DeleteConfirmDialog
         trigger={
           <Button variant="ghost" className="text-destructive hover:text-destructive" disabled={busy}>
             <Trash2Icon />
@@ -121,9 +121,6 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
         }
         title={t("delete.recurringTitle", { payee: recurring.payee })}
         description={t("delete.recurringDescription")}
-        confirmLabel={tCommon("actions.delete")}
-        cancelLabel={tCommon("actions.cancel")}
-        destructive
         onConfirm={() =>
           fetcher.submit({ intent: "delete-recurring", id: recurring.id, redirectTo: "/expenses?view=recurring" }, { method: "post" })
         }
@@ -135,12 +132,7 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
 
   return (
     <PageContainer>
-      <Button asChild variant="ghost" size="sm" className="-mb-4 self-start">
-        <Link to="/expenses?view=recurring">
-          <ArrowLeftIcon />
-          {t("detail.back")}
-        </Link>
-      </Button>
+      <BackButton to="/expenses?view=recurring" className="-mb-4 self-start">{t("detail.back")}</BackButton>
 
       <PageHeader
         eyebrow={t(`kinds.${recurring.kind}`)}

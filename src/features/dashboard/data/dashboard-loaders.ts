@@ -1,4 +1,5 @@
 import { fetchAgenda, type CalendarAgenda } from "@/features/calendar";
+import { optionalData } from "@/lib/loaders";
 import { fetchCurrentEnergySummary } from "@/features/energy";
 import { fetchExpensesSummary, type ExpensesSummary } from "@/features/expenses";
 import { fetchHouseholdOverview, type HouseholdOverview } from "@/features/household";
@@ -49,11 +50,7 @@ export type DeferredDashboardData = { today: string } & { [K in keyof Slices]: P
 /** Either shape: every slice may still be loading. */
 export type DashboardScreenData = { today: string } & { [K in keyof Slices]: Slices[K] | Promise<Slices[K]> };
 
-const settle = <T>(promise: Promise<T>): Promise<T | null> =>
-  promise.catch((error: unknown) => {
-    console.warn("Dashboard: a card could not load", error);
-    return null;
-  });
+const settle = <T>(promise: Promise<T>) => optionalData(promise, "Dashboard: a card");
 
 /** Starts every card's request in parallel and returns without waiting; a failing request only empties its own card. */
 export function dashboardLoader(): DeferredDashboardData {

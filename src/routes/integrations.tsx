@@ -10,21 +10,16 @@ import {
   fetchDriveStorageStatus,
   fetchGoogleStatus,
 } from "@/features/integrations";
+import { optionalData } from "@/lib/loaders";
 
 /** Deferred card data: each card shows a skeleton until it arrives; a failure only affects that card. */
-const deferred = <T,>(name: string, promise: Promise<T>): Promise<T | null> =>
-  promise.catch((error: unknown) => {
-    console.warn(`Integrations: ${name} could not load`, error);
-    return null;
-  });
-
 export function loader() {
   return {
-    google: deferred("google", fetchGoogleStatus()),
+    google: optionalData(fetchGoogleStatus(), "Integrations: google"),
     // Owners/adults only (children get a 403, i.e. `null`, and don't see the card).
-    driveStorage: fetchDriveStorageStatus().catch(() => null),
+    driveStorage: optionalData(fetchDriveStorageStatus()),
     // ── More integrations: add one deferred entry per card here (Home Assistant, Assistant…). ──
-    assistant: deferred("assistant", assistantClient.status()),
+    assistant: optionalData(assistantClient.status(), "Integrations: assistant"),
   };
 }
 

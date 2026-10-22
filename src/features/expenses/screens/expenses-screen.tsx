@@ -45,11 +45,11 @@ import {
   type RecurringExpense,
   type RecurringStatus,
 } from "../types/expenses";
+import { FILTER_ALL, FilterSelect } from "@/components/shared/filter-select";
+import { CanManageProvider } from "@/lib/permissions";
 
 const VIEWS = ["upcoming", "recurring", "history"] as const;
 type View = (typeof VIEWS)[number];
-const ALL = "all";
-
 type ExpensesScreenProps = {
   overview: ExpensesOverview;
   habitants: Habitant[];
@@ -83,8 +83,8 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
   const params = nextLocation ? new URLSearchParams(nextLocation.search) : searchParams;
   const requestedView = params.get(EXPENSES_VIEW_PARAM);
   const view: View = (VIEWS as readonly string[]).includes(requestedView ?? "") ? (requestedView as View) : "upcoming";
-  const payerParam = params.get(EXPENSES_PAYER_PARAM) ?? ALL;
-  const payerFilter: PayerFilter = payerParam === ALL ? "all" : payerParam === "joint" ? "joint" : { habitantId: payerParam };
+  const payerParam = params.get(EXPENSES_PAYER_PARAM) ?? FILTER_ALL;
+  const payerFilter: PayerFilter = payerParam === FILTER_ALL ? "all" : payerParam === "joint" ? "joint" : { habitantId: payerParam };
   const kindParam = params.get(EXPENSES_KIND_PARAM);
   const kind = (EXPENSE_KINDS as readonly string[]).includes(kindParam ?? "") ? (kindParam as ExpenseKind) : null;
   const statusParam = params.get(EXPENSES_STATUS_PARAM);
@@ -123,7 +123,7 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
   const logRequest = useOpenRequestFromUrl(canManage, "log");
   const payers = habitants.filter((habitant) => habitant.type !== "pet");
   const payerOptions = [
-    { value: ALL, label: t("filters.all") },
+    { value: FILTER_ALL, label: t("filters.all") },
     { value: "joint", label: t("filters.joint") },
     ...payers.map((habitant) => ({ value: habitant.id, label: habitant.name })),
   ];
@@ -169,7 +169,7 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
     <SegmentedControl
       label={t("filters.payer")}
       value={payerParam}
-      onChange={(value) => setParam(EXPENSES_PAYER_PARAM, value === ALL ? null : value)}
+      onChange={(value) => setParam(EXPENSES_PAYER_PARAM, value === FILTER_ALL ? null : value)}
       options={payerOptions}
     />
   );
@@ -179,144 +179,140 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
   );
 
   return (
-    <PageContainer>
-      <PageHeader
-        title={t("page.title")}
-        description={t("page.description")}
-        actions={
-          <>
-            {logButton(logRequest)}
-            {addButton(newRequest)}
-          </>
-        }
-      />
-
-      <div className="flex min-w-0 items-center gap-2">
-        <SegmentedControl
-          label={t("views.label")}
-          size="lg"
-          value={view}
-          onChange={(value) => setParam(EXPENSES_VIEW_PARAM, value === "upcoming" ? null : value)}
-          options={[
-            { value: "upcoming", label: t("views.upcoming"), icon: ListTodoIcon },
-            { value: "recurring", label: t("views.recurring"), icon: RepeatIcon },
-            { value: "history", label: t("views.history"), icon: HistoryIcon },
-          ]}
+    <CanManageProvider value={canManage}>
+      <PageContainer>
+        <PageHeader
+          title={t("page.title")}
+          description={t("page.description")}
+          actions={
+            <>
+              {logButton(logRequest)}
+              {addButton(newRequest)}
+            </>
+          }
         />
-        {overdueCount > 0 && view !== "upcoming" && (
-          <Badge variant="destructive" className="shrink-0 tabular-nums">
-            {overdueCount}
-          </Badge>
-        )}
-      </div>
 
-      <PendingContent pending={pending} label={tCommon("loading.updating")}>
-        {view === "upcoming" && (
-          <div className="flex flex-col gap-6">
-            {suggestions}
-            <ExpenseTotals totals={overview.totals} />
-            {payerFilter === "all" && unpaid.length > 0 && (
-              <NextToPay unpaid={unpaid} habitants={habitants} today={overview.today} />
-            )}
+        <div className="flex min-w-0 items-center gap-2">
+          <SegmentedControl
+            label={t("views.label")}
+            size="lg"
+            value={view}
+            onChange={(value) => setParam(EXPENSES_VIEW_PARAM, value === "upcoming" ? null : value)}
+            options={[
+              { value: "upcoming", label: t("views.upcoming"), icon: ListTodoIcon },
+              { value: "recurring", label: t("views.recurring"), icon: RepeatIcon },
+              { value: "history", label: t("views.history"), icon: HistoryIcon },
+            ]}
+          />
+          {overdueCount > 0 && view !== "upcoming" && (
+            <Badge variant="destructive" className="shrink-0 tabular-nums">
+              {overdueCount}
+            </Badge>
+          )}
+        </div>
+
+        <PendingContent pending={pending} label={tCommon("loading.updating")}>
+          {view === "upcoming" && (
+            <div className="flex flex-col gap-6">
+              {suggestions}
+              <ExpenseTotals totals={overview.totals} />
+              {payerFilter === "all" && unpaid.length > 0 && (
+                <NextToPay unpaid={unpaid} habitants={habitants} today={overview.today} />
+              )}
+              <ExpenseList
+                expenses={lists.upcoming}
+                today={overview.today}
+                habitants={habitants}
+                shops={shops}
+                canManage={canManage}
+                currentHabitantId={currentHabitantId}
+                initialMonths={3}
+                onHoldById={onHoldById}
+                storageKey="expenses-upcoming"
+                toolbar={payerFilterControl}
+                filtered={payerFilter !== "all"}
+                emptyState={
+                  <EmptyState icon={ReceiptIcon} title={t("empty.upcoming.title")} description={t("empty.upcoming.description")} action={addButton()} />
+                }
+                noMatchesState={filteredEmpty(CircleCheckIcon)}
+              />
+            </div>
+          )}
+
+          {view === "recurring" && (
+            <div className="flex flex-col gap-6">
+              <RecurringTotals totals={overview.recurringTotals} />
+              <GeneralList<RecurringExpense>
+                label={t("views.recurring")}
+                items={recurring}
+                getKey={(item) => item.id}
+                renderRow={(item) => (
+                  <RecurringExpenseRow variant="plain" recurring={item} today={overview.today} habitants={habitants} />
+                )}
+                renderTile={(item) => (
+                  <RecurringExpenseRow variant="tile" recurring={item} today={overview.today} habitants={habitants} />
+                )}
+                search={{
+                  query: recurringQuery,
+                  onSearch: setRecurringQuery,
+                  keys: (item) => [item.payee, item.description, item.notes, t(`kinds.${item.kind}`), t(`categories.${item.category}`), item.project?.name],
+                }}
+                storageKey="expenses-recurring"
+                defaultView="list"
+                // With any recurring expense at all, an empty list means the kind/status filters hide them.
+                filtered={overview.recurring.length > 0}
+                toolbar={
+                  <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                    <FilterSelect
+                      label={t("filters.kind")}
+                      value={kind ?? FILTER_ALL}
+                      onValueChange={(value) => setParam(EXPENSES_KIND_PARAM, value === FILTER_ALL ? null : value)}
+                      allLabel={t("filters.allKinds")}
+                      options={EXPENSE_KINDS.map((value) => ({ value: value, label: t(`kinds.${value}`) }))}
+                    />
+                    <Select value={status ?? FILTER_ALL} onValueChange={(value) => setParam(EXPENSES_STATUS_PARAM, value === FILTER_ALL ? null : value)}>
+                      <SelectTrigger className="w-full sm:w-40" aria-label={t("filters.status")}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={FILTER_ALL}>
+                          {t("recurringStatus.active")} + {t("recurringStatus.paused")}
+                        </SelectItem>
+                        {RECURRING_STATUSES.map((value) => (
+                          <SelectItem key={value} value={value}>
+                            {t(`recurringStatus.${value}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                }
+                emptyState={
+                  <EmptyState icon={RepeatIcon} title={t("empty.recurring.title")} description={t("empty.recurring.description")} action={addButton()} />
+                }
+                noResultsState={recurringQuery.trim() ? undefined : filteredEmpty(RepeatIcon)}
+              />
+            </div>
+          )}
+
+          {view === "history" && (
             <ExpenseList
-              expenses={lists.upcoming}
+              expenses={lists.history}
               today={overview.today}
               habitants={habitants}
               shops={shops}
               canManage={canManage}
               currentHabitantId={currentHabitantId}
-              initialMonths={3}
-              onHoldById={onHoldById}
-              storageKey="expenses-upcoming"
+              initialMonths={6}
+              storageKey="expenses-history"
               toolbar={payerFilterControl}
               filtered={payerFilter !== "all"}
-              emptyState={
-                <EmptyState icon={ReceiptIcon} title={t("empty.upcoming.title")} description={t("empty.upcoming.description")} action={addButton()} />
-              }
-              noMatchesState={filteredEmpty(CircleCheckIcon)}
+              emptyState={<EmptyState icon={HistoryIcon} title={t("empty.history.title")} description={t("empty.history.description")} action={logButton()} />}
+              noMatchesState={filteredEmpty(HistoryIcon)}
             />
-          </div>
-        )}
-
-        {view === "recurring" && (
-          <div className="flex flex-col gap-6">
-            <RecurringTotals totals={overview.recurringTotals} />
-            <GeneralList<RecurringExpense>
-              label={t("views.recurring")}
-              items={recurring}
-              getKey={(item) => item.id}
-              renderRow={(item) => (
-                <RecurringExpenseRow variant="plain" recurring={item} today={overview.today} habitants={habitants} canManage={canManage} />
-              )}
-              renderTile={(item) => (
-                <RecurringExpenseRow variant="tile" recurring={item} today={overview.today} habitants={habitants} canManage={canManage} />
-              )}
-              search={{
-                query: recurringQuery,
-                onSearch: setRecurringQuery,
-                keys: (item) => [item.payee, item.description, item.notes, t(`kinds.${item.kind}`), t(`categories.${item.category}`), item.project?.name],
-              }}
-              storageKey="expenses-recurring"
-              defaultView="list"
-              // With any recurring expense at all, an empty list means the kind/status filters hide them.
-              filtered={overview.recurring.length > 0}
-              toolbar={
-                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                  <Select value={kind ?? ALL} onValueChange={(value) => setParam(EXPENSES_KIND_PARAM, value === ALL ? null : value)}>
-                    <SelectTrigger className="w-full sm:w-48" aria-label={t("filters.kind")}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={ALL}>{t("filters.allKinds")}</SelectItem>
-                      {EXPENSE_KINDS.map((value) => (
-                        <SelectItem key={value} value={value}>
-                          {t(`kinds.${value}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={status ?? ALL} onValueChange={(value) => setParam(EXPENSES_STATUS_PARAM, value === ALL ? null : value)}>
-                    <SelectTrigger className="w-full sm:w-40" aria-label={t("filters.status")}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={ALL}>
-                        {t("recurringStatus.active")} + {t("recurringStatus.paused")}
-                      </SelectItem>
-                      {RECURRING_STATUSES.map((value) => (
-                        <SelectItem key={value} value={value}>
-                          {t(`recurringStatus.${value}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              }
-              emptyState={
-                <EmptyState icon={RepeatIcon} title={t("empty.recurring.title")} description={t("empty.recurring.description")} action={addButton()} />
-              }
-              noResultsState={recurringQuery.trim() ? undefined : filteredEmpty(RepeatIcon)}
-            />
-          </div>
-        )}
-
-        {view === "history" && (
-          <ExpenseList
-            expenses={lists.history}
-            today={overview.today}
-            habitants={habitants}
-            shops={shops}
-            canManage={canManage}
-            currentHabitantId={currentHabitantId}
-            initialMonths={6}
-            storageKey="expenses-history"
-            toolbar={payerFilterControl}
-            filtered={payerFilter !== "all"}
-            emptyState={<EmptyState icon={HistoryIcon} title={t("empty.history.title")} description={t("empty.history.description")} action={logButton()} />}
-            noMatchesState={filteredEmpty(HistoryIcon)}
-          />
-        )}
-      </PendingContent>
-    </PageContainer>
+          )}
+        </PendingContent>
+      </PageContainer>
+    </CanManageProvider>
   );
 }

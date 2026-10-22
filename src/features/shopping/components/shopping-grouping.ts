@@ -1,6 +1,7 @@
 import { matchesSearch } from "@/components/shared/general-list-helpers";
 import type { Shop, ShopRef } from "@/features/shops";
 import { NO_SHOP, PRODUCT_CATEGORIES, type ProductCategory, type ShoppingItem } from "../types/shopping";
+import { byName } from "@/types/collections";
 
 export type ShopGroup = {
   /** A shop id, or `NO_SHOP` for items without a preferred shop. */
@@ -37,7 +38,7 @@ export function groupItemsByCategory(items: ShoppingItem[]): { category: Product
     category,
     items: items
       .filter((item) => (item.category ?? "other") === category)
-      .sort((a, b) => a.name.localeCompare(b.name)),
+      .sort(byName),
   })).filter((group) => group.items.length > 0);
 }
 
@@ -56,7 +57,6 @@ export function priorityTier(item: Pick<ShoppingItem, "stockStatus" | "isEssenti
 }
 
 const essentialRank = (item: Pick<ShoppingItem, "isEssential">) => (item.isEssential === true ? 0 : item.isEssential === null ? 1 : 2);
-const byName = (a: ShoppingItem, b: ShoppingItem) => a.name.localeCompare(b.name);
 
 /** Most urgent first; within a tier essentials before the rest, then by name. */
 export const compareByPriority = (a: ShoppingItem, b: ShoppingItem) =>

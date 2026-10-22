@@ -1,7 +1,7 @@
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import type { Shop } from "@/features/shops";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import type { Product } from "../types/shopping";
@@ -34,7 +34,7 @@ export function ProductActions({ product, shops, onDelete, initialSelections, pr
           </Button>
         }
       />
-      <ConfirmDialog
+      <DeleteConfirmDialog
         trigger={
           <Button
             variant="ghost"
@@ -48,9 +48,6 @@ export function ProductActions({ product, shops, onDelete, initialSelections, pr
         }
         title={t("products.deleteTitle", { name: product.name })}
         description={t("products.deleteDescription")}
-        confirmLabel={tCommon("actions.delete")}
-        cancelLabel={tCommon("actions.cancel")}
-        destructive
         onConfirm={onDelete}
       />
     </span>

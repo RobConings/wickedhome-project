@@ -1,4 +1,4 @@
-import { intlLocale } from "@/lib/format";
+import { formatNumber, formatPercent } from "@/lib/format";
 import type { Locale } from "@/types/common";
 import {
   formatDate,
@@ -17,29 +17,28 @@ export function formatKwh(wh: number, locale: Locale, { unit = true }: { unit?: 
   const kwh = wh / 1000;
   const abs = Math.abs(kwh);
   const digits = abs === 0 ? 0 : abs < 10 ? 2 : abs < 100 ? 1 : 0;
-  const number = new Intl.NumberFormat(intlLocale(locale), {
+  const number = formatNumber(kwh, locale, {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
-  }).format(kwh);
+  });
   return unit ? `${number} kWh` : number;
 }
 
 /** kWh without decimals beyond what the scale needs, for chart axes. */
 export function formatKwhAxis(wh: number, locale: Locale): string {
   const kwh = wh / 1000;
-  return new Intl.NumberFormat(intlLocale(locale), { maximumFractionDigits: Math.abs(kwh) < 10 ? 1 : 0 }).format(kwh);
+  return formatNumber(kwh, locale, { maximumFractionDigits: Math.abs(kwh) < 10 ? 1 : 0 });
 }
 
 export const formatKw = (kw: number, locale: Locale) =>
-  `${new Intl.NumberFormat(intlLocale(locale), { minimumFractionDigits: 1, maximumFractionDigits: 2 }).format(kw)} kW`;
+  `${formatNumber(kw, locale, { minimumFractionDigits: 1, maximumFractionDigits: 2 })} kW`;
 
-export const formatWatts = (w: number, locale: Locale) => `${new Intl.NumberFormat(intlLocale(locale)).format(w)} W`;
+export const formatWatts = (w: number, locale: Locale) => `${formatNumber(w, locale)} W`;
 
 export const formatKwp = (kwp: number, locale: Locale) =>
-  `${new Intl.NumberFormat(intlLocale(locale), { maximumFractionDigits: 2 }).format(kwp)} kWp`;
+  `${formatNumber(kwp, locale, { maximumFractionDigits: 2 })} kWp`;
 
-export const formatPercent = (ratio: number, locale: Locale) =>
-  new Intl.NumberFormat(intlLocale(locale), { style: "percent", maximumFractionDigits: 0 }).format(ratio);
+export { formatPercent };
 
 /** The day before a `YYYY-MM-DD` (an exclusive period end → its last day). */
 const dayBefore = (date: string) => new Date(Date.parse(`${date}T00:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
@@ -81,9 +80,9 @@ export const formatMonth = (month: string, locale: Locale) => formatMonthHeader(
 export function formatM3(litres: number, locale: Locale): string {
   const m3 = litres / 1000;
   const digits = Math.abs(m3) < 100 ? 2 : Math.abs(m3) < 1000 ? 1 : 0;
-  return `${new Intl.NumberFormat(intlLocale(locale), { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(m3)} m³`;
+  return `${formatNumber(m3, locale, { minimumFractionDigits: digits, maximumFractionDigits: digits })} m³`;
 }
 
 /** Calorific value: "11,4 kWh/m³". */
 export const formatCalorific = (kwhPerM3: number, locale: Locale) =>
-  `${new Intl.NumberFormat(intlLocale(locale), { maximumFractionDigits: 3 }).format(kwhPerM3)} kWh/m³`;
+  `${formatNumber(kwhPerM3, locale, { maximumFractionDigits: 3 })} kWh/m³`;

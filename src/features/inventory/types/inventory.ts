@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { idSchema, isoDateSchema } from "@/types/common";
+import { canManageHousehold, type HouseholdRole } from "@/types/roles";
 
 /** `cooked`: used while cooking a meal (recipes feature, linked to the meal); also its undo. */
 export const STOCK_MOVEMENT_REASONS = ["scan_use", "scan_add", "bought", "manual_correction", "cooked"] as const;
@@ -118,11 +119,11 @@ export type StockChangeResult = {
 
 // Helpers shared by the API and the UI -------------------------------------------------------------------
 
-type Role = "owner" | "adult" | "child";
+type Role = HouseholdRole;
 
 /** Everyone uses and adds stock (scanning a yoghurt); setting up stock and thresholds is for adults. */
 export const canChangeStock = (_role: Role) => true;
-export const canManageStock = (role: Role) => role !== "child";
+export const canManageStock = canManageHousehold;
 
 export const isBelowMinimum = (quantity: number, minQuantity: number | null) =>
   minQuantity !== null && quantity <= minQuantity;

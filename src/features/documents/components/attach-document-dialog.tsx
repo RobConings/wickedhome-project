@@ -9,8 +9,8 @@ import { FileTypeIcon } from "@/components/shared/file-type-icon";
 import { LoadingState, PendingContent } from "@/components/shared/loading-state";
 import { searchDocuments } from "../data/documents-requests";
 import type { DocumentFile } from "../types/documents";
-import { fileSize } from "./document-format";
 import type { WithPath } from "./document-item";
+import { fileSize } from "@/lib/locale-text";
 
 type AttachDocumentDialogProps = {
   open: boolean;

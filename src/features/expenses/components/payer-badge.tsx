@@ -1,6 +1,6 @@
 import { WalletIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { HabitantAvatar, type Habitant } from "@/features/household";
+import { type Habitant, HabitantAvatarStack } from "@/features/household";
 import { cn } from "@/lib/utils";
 import type { ExpenseShare, PayerType } from "../types/expenses";
 
@@ -34,10 +34,6 @@ export function PayerBadge({ payer, habitants, className }: PayerBadgeProps) {
   const label =
     payer.payerType === "split" ? t("payer.splitBetween", { names: known.map((h) => h.name).join(", ") }) : (known[0]?.name ?? "");
   return (
-    <span role="img" aria-label={label} title={label} className={cn("flex shrink-0 -space-x-1.5", className)}>
-      {known.map((habitant) => (
-        <HabitantAvatar key={habitant.id} habitant={habitant} size="sm" />
-      ))}
-    </span>
+    <HabitantAvatarStack habitants={known} role="img" aria-label={label} title={label} className={className} />
   );
 }

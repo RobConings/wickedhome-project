@@ -1,7 +1,8 @@
 import i18n from "i18next";
+import { optionalData } from "@/lib/loaders";
 import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
 import { ApiRequestError } from "@/lib/api-client";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { failedAction, type FormResult, parseForm } from "@/lib/forms";
 import {
   acceptInviteFormSchema,
   linkTokenSchema,
@@ -30,7 +31,7 @@ export const LINK_LOGOUT_INTENT = "logout";
 /** `/invite/:token` and `/reset/:token` (public, outside the session layout). */
 export async function linkLoader({ params }: LoaderFunctionArgs): Promise<LinkLoaderData> {
   const token = params.token ?? "";
-  const currentUser = fetchCurrentUser().catch(() => null);
+  const currentUser = optionalData(fetchCurrentUser());
   if (!linkTokenSchema.safeParse(token).success) {
     return { token, preview: null, problem: "invalid", currentUser: await currentUser };
   }
@@ -89,7 +90,7 @@ export async function linkAction({ request, params }: ActionFunctionArgs): Promi
     if (error instanceof ApiRequestError && error.code === "email_taken") {
       return { errors: { email: [i18n.t("auth:link.errors.emailTaken")] }, intent: LINK_ACCEPT_INTENT };
     }
-    return { ...toFormResult(error, messages), intent: LINK_ACCEPT_INTENT };
+    return failedAction(error, LINK_ACCEPT_INTENT, messages);
   }
   return redirect("/");
 }

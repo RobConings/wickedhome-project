@@ -24,6 +24,7 @@ import {
   type ProjectMaterial,
 } from "../types/projects";
 import { useProjectText } from "./use-project-text";
+import { EmptyNote } from "@/components/shared/empty-note";
 
 /** A proposed match is ticked by itself from this confidence; below it, it is only shown. */
 const PRE_TICK_CONFIDENCE = 0.5;
@@ -228,7 +229,7 @@ export function LinkInvoiceMaterialsDialog({
         <div className="flex flex-col gap-3">
           <input type="hidden" name={name} value={JSON.stringify(payload)} />
           {candidates.length === 0 ? (
-            <p className="rounded-lg border border-dashed px-3 py-4 text-sm text-muted-foreground">{t("invoice.noMaterials")}</p>
+            <EmptyNote>{t("invoice.noMaterials")}</EmptyNote>
           ) : (
             <ul className="divide-y rounded-lg border bg-card px-3">
               {candidates.map((material) => {

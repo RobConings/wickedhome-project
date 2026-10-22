@@ -11,6 +11,7 @@ import type { RecipeActionResult } from "../data/recipes-loaders";
 import { productPath, type CookingIngredient } from "../types/recipes";
 import { IngredientProductLink, IngredientShopLink, IngredientThumbnail } from "./ingredient-product";
 import { useAmountText } from "./use-amount-text";
+import { useFetcherResult } from "@/lib/hooks/use-fetcher-result";
 
 type CookingIngredientRowProps = {
   item: CookingIngredient;
@@ -52,12 +53,7 @@ export function CookingIngredientRow({ item, entryId, mentioned, disabled, onUnd
   const stockAmount = (value: number) => (product ? text.stockUnits(value, product) : text.amount(value, item.unit));
   const usedText = `${stockAmount(used)}${showRecipeUnit && ratio ? ` (${text.amount(used * ratio, item.unit)})` : ""}`;
   const done = item.needed !== null && (item.neededInStockUnits !== null ? used >= item.neededInStockUnits - 1e-9 : !product && used >= item.needed);
-
-  const handled = React.useRef<RecipeActionResult | undefined>(undefined);
-  React.useEffect(() => {
-    const result = fetcher.data;
-    if (fetcher.state !== "idle" || !result || handled.current === result) return;
-    handled.current = result;
+  useFetcherResult(fetcher, (result) => {
     if (result.formError) {
       toast.error(result.formError);
       return;
@@ -69,8 +65,8 @@ export function CookingIngredientRow({ item, entryId, mentioned, disabled, onUnd
       id: `cook-use-${usageId}`,
       description: result.addedToShoppingList ? t("cooking.addedToList") : undefined,
       action: { label: t("cooking.undo"), onClick: () => onUndo(usageId) },
-    });
-  }, [fetcher.state, fetcher.data, item.name, onUndo, t]);
+  });
+  });
 
   const use = (quantity: number) => {
     if (!(quantity > 0)) return;

@@ -16,7 +16,7 @@ import { DeviceStateChip } from "../components/device-state-chip";
 import { LiveStatusBadge } from "../components/live-status-badge";
 import { RoomTemperatures } from "../components/room-temperatures";
 import { useLiveDevices } from "../data/use-live-devices";
-import { useNow } from "../data/use-now";
+import { useNow } from "@/lib/hooks/use-now";
 import type { Device, DeviceProfile } from "../types/devices";
 
 type HouseScreenProps = {

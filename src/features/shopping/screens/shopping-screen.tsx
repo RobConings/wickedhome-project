@@ -10,7 +10,7 @@ import { PageSection } from "@/components/layout/page-section";
 import { ScrollRow } from "@/components/layout/scroll-row";
 import { Stack } from "@/components/layout/stack";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionHeader } from "@/components/shared/section-header";
@@ -32,6 +32,7 @@ import { useLiveRevalidation } from "../data/use-live-shopping";
 import { useProductSelections } from "../data/use-product-selections";
 import { useShoppingItemActions } from "../data/use-shopping-item-actions";
 import type { LinkPreview, ShoppingItem } from "../types/shopping";
+import { useFetcherErrorToast } from "@/lib/hooks/use-fetcher-result";
 
 type ShoppingScreenProps = {
   data: ShoppingPageData;
@@ -48,7 +49,6 @@ type ShoppingScreenProps = {
 /** All shopping lists: add items, tick them off, see where to buy them, and manage weekly staples. */
 export function ShoppingScreen({ data, canManage, initialSelections, previewLink, refreshIntervalMs = 30_000 }: ShoppingScreenProps) {
   const { t } = useTranslation("shopping");
-  const { t: tCommon } = useTranslation();
   const { overview, shops, products } = data;
   const [searchParams, setSearchParams] = useSearchParams();
   const revalidator = useRevalidator();
@@ -57,9 +57,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
   const shopSelections = useShopSelections({ initial: initialSelections?.shops });
   useLiveRevalidation(refreshIntervalMs);
 
-  React.useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data?.formError) toast.error(fetcher.data.formError);
-  }, [fetcher.state, fetcher.data]);
+  useFetcherErrorToast(fetcher);
 
   const revalidate = React.useCallback(() => void revalidator.revalidate(), [revalidator]);
   const actions = useShoppingItemActions({ items: overview.items, onChanged: revalidate });
@@ -200,7 +198,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
                               </Button>
                             }
                           />
-                          <ConfirmDialog
+                          <DeleteConfirmDialog
                             trigger={
                               <Button variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-destructive" aria-label={t("listForm.deleteTitle", { name: list.name })}>
                                 <Trash2Icon />
@@ -208,9 +206,6 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
                             }
                             title={t("listForm.deleteTitle", { name: list.name })}
                             description={t("listForm.deleteDescription")}
-                            confirmLabel={tCommon("actions.delete")}
-                            cancelLabel={tCommon("actions.cancel")}
-                            destructive
                             onConfirm={async () => {
                               await fetcher.submit({ intent: "delete-list", id: list.id }, { method: "post" });
                               selectList(null);

@@ -48,9 +48,10 @@ import { accountsClient, type AccountsClient } from "../data/accounts-requests";
 import { accountActionError, canManageInvite, invitableRoles, type AccountAction } from "../types/account-rules";
 import { linkPath, type AccountSummary, type AccountsOverview, type PendingInvite } from "../types/accounts";
 import type { Role, SessionUser } from "../types/auth";
-import { initials, relativeTime } from "./account-format";
+import { accountInitials } from "./account-format";
 import { InviteDialog, type InvitePreset } from "./invite-dialog";
 import { ShareLinkDialog, type SharedLink } from "./share-link-dialog";
+import { formatRelativeTime } from "@/lib/format";
 
 type AccountsSectionProps = {
   /**
@@ -412,7 +413,7 @@ function AccountItem({ account, isMe, now, busy, roles, can, lastOwner, ...on }:
       {account.person ? (
         <HabitantAvatar habitant={account.person} className={account.disabled ? "opacity-50" : undefined} />
       ) : (
-        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-muted text-sm font-semibold">{initials(name)}</span>
+        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-muted text-sm font-semibold">{accountInitials(name)}</span>
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -430,14 +431,14 @@ function AccountItem({ account, isMe, now, busy, roles, can, lastOwner, ...on }:
         <span className="truncate text-sm text-muted-foreground">{account.email}</span>
         <span className="text-xs text-muted-foreground">
           {account.lastLoginAt
-            ? t("accounts.lastLogin", { when: relativeTime(account.lastLoginAt, locale, now) })
+            ? t("accounts.lastLogin", { when: formatRelativeTime(account.lastLoginAt, locale, now) })
             : t("accounts.neverLoggedIn")}
           {" · "}
           {t("accounts.sessions", { count: account.activeSessions })}
         </span>
         {account.resetLinkExpiresAt && (
           <span className="text-xs text-muted-foreground">
-            {t("accounts.resetPending", { when: relativeTime(account.resetLinkExpiresAt, locale, now) })}
+            {t("accounts.resetPending", { when: formatRelativeTime(account.resetLinkExpiresAt, locale, now) })}
           </span>
         )}
         {lastOwner && isMe && <span className="text-xs text-muted-foreground">{t("accounts.lastOwnerHint")}</span>}
@@ -533,7 +534,7 @@ function InviteItem({ invite, now, busy, canManage, link, onCopy, onRenew, onRev
         <span className="text-xs text-muted-foreground">
           {invite.createdByName ? t("accounts.invitedBy", { name: invite.createdByName }) : t("accounts.invitedPending")}
           {" · "}
-          {t("accounts.inviteExpires", { when: relativeTime(invite.expiresAt, locale, now) })}
+          {t("accounts.inviteExpires", { when: formatRelativeTime(invite.expiresAt, locale, now) })}
         </span>
       </div>
       {canManage && (

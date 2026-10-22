@@ -10,6 +10,7 @@ import type { ProjectExpense, ProjectMaterial, ProjectRecurringExpense } from ".
 import { LinkInvoiceMaterialsDialog } from "./link-invoice-materials-dialog";
 import { LinkToProjectDialog } from "./link-to-project-dialog";
 import { useProjectText } from "./use-project-text";
+import { EmptyNote } from "@/components/shared/empty-note";
 
 /** What the route needs to open the expenses feature's "Log an expense" for this project. */
 export type LogExpenseRenderOptions = {
@@ -73,10 +74,7 @@ export function ProjectExpensesSection({
   return (
     <div className="flex flex-col gap-3">
       {expenses.length === 0 && recurring.length === 0 ? (
-        <p className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-4 text-sm text-muted-foreground">
-          <ReceiptIcon className="size-4 shrink-0" aria-hidden="true" />
-          {t("expenses.empty")}
-        </p>
+        <EmptyNote icon={ReceiptIcon}>{t("expenses.empty")}</EmptyNote>
       ) : (
         <ul className="divide-y rounded-lg border bg-card">
           {recurring.map((item) => (

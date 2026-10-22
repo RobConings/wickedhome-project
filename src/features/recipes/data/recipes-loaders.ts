@@ -1,9 +1,9 @@
 import i18n from "i18next";
-import { data, redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type ShouldRevalidateFunctionArgs } from "react-router";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type ShouldRevalidateFunctionArgs } from "react-router";
 import { fetchProducts, handleProductForm, type Product } from "@/features/shopping";
-import { fetchShops, type Shop } from "@/features/shops";
-import { ApiRequestError } from "@/lib/api-client";
-import { formDataToObject, parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { fetchShopsOrEmpty, type Shop } from "@/features/shops";
+import { failedAction, formDataToObject, type FormResult, formString, parseForm } from "@/lib/forms";
+import { notFoundAs404 } from "@/lib/loaders";
 import {
   cookingPath,
   mealPlanExtraFormSchema,
@@ -105,12 +105,8 @@ export type CookingPageData = {
 };
 
 const products = () => fetchProducts().catch(() => [] as Product[]);
-const shops = () => fetchShops().catch(() => [] as Shop[]);
+const shops = fetchShopsOrEmpty;
 
-const notFoundAs404 = (error: unknown): never => {
-  if (error instanceof ApiRequestError && error.status === 404) throw data(null, { status: 404 });
-  throw error;
-};
 
 export async function recipesLoader(): Promise<RecipesPageData> {
   const [recipes, mealPlan, categories, productList, shopList] = await Promise.all([fetchRecipes(), fetchMealPlan(true), fetchRecipeCategories(), products(), shops()]);
@@ -160,9 +156,9 @@ const bool = (value: unknown) => value === "on" || value === "true" || value ===
  * `undo`, `extra`, `step`, `done`) and the inline product form (`create-product`, `update-product`).
  */
 export async function handleRecipeForm(formData: FormData): Promise<RecipeActionResult> {
-  const intent = String(formData.get("intent") ?? "create");
-  const id = String(formData.get("id") ?? "");
-  const entryId = String(formData.get("entryId") ?? "");
+  const intent = formString(formData, "intent", "create");
+  const id = formString(formData, "id");
+  const entryId = formString(formData, "entryId");
   const values = formDataToObject(formData);
 
   try {
@@ -264,14 +260,11 @@ export async function handleRecipeForm(formData: FormData): Promise<RecipeAction
         return { formError: i18n.t("common:errors.generic"), intent };
     }
   } catch (error) {
-    return {
-      ...toFormResult(error, {
+    return failedAction(error, intent, {
         not_found: i18n.t("recipes:errors.notFound"),
         forbidden: i18n.t("recipes:errors.forbidden"),
         conflict: i18n.t("recipes:errors.alreadyCooked"),
-      }),
-      intent,
-    };
+      });
   }
 }
 

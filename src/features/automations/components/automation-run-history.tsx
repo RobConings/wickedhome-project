@@ -1,8 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { currentLocale } from "@/lib/i18n";
 import type { JobRun } from "../types/automations";
-import { dateTimeText, durationText, relativeTime } from "./automation-format";
+import { dateTimeText, durationText } from "./automation-format";
 import { JobRunStatusBadge } from "./job-run-status-badge";
+import { formatRelativeTime } from "@/lib/format";
 
 type AutomationRunHistoryProps = {
   runs: JobRun[];
@@ -24,7 +25,7 @@ export function AutomationRunHistory({ runs, now }: AutomationRunHistoryProps) {
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <JobRunStatusBadge status={run.status} />
             <time dateTime={run.startedAt} title={dateTimeText(run.startedAt, locale)} className="text-foreground">
-              {relativeTime(run.startedAt, locale, now)}
+              {formatRelativeTime(run.startedAt, locale, now)}
             </time>
             <span className="text-muted-foreground">
               · {t(`trigger.${run.trigger}`)}

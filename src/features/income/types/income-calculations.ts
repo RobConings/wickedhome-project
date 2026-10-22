@@ -16,6 +16,7 @@ import {
   type IncomeTotal,
   type VoucherBalance,
 } from "./income";
+import { sumCents } from "@/types/collections";
 
 /** Pure calculations on incomes, shared by the API and the screens. */
 
@@ -306,7 +307,7 @@ export function voucherBalances(
       else byExpiry.set(lot.expiresOn, (byExpiry.get(lot.expiresOn) ?? 0) + lot.leftCents);
     }
     const expiries = [...byExpiry].sort(([a], [b]) => a.localeCompare(b)).map(([date, amountCents]) => ({ date, amountCents }));
-    const availableCents = expiries.reduce((sum, expiry) => sum + expiry.amountCents, 0);
+    const availableCents = sumCents(expiries);
     const nextExpiry = expiries[0] ?? null;
     return {
       habitantId,

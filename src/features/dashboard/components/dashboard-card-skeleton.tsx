@@ -1,8 +1,9 @@
 import type { LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardHeader, CardTitle } from "@/components/shared/card";
-import { IconChip, type IconChipTone } from "@/components/shared/icon-chip";
+import { Card } from "@/components/shared/card";
+import type { IconChipTone } from "@/components/shared/icon-chip";
+import { IconCardHeader } from "@/components/shared/icon-card-header";
 
 type DashboardCardSkeletonProps = {
   /** The card's real title, so the layout doesn't change when the content arrives. */
@@ -17,13 +18,11 @@ export function DashboardCardSkeleton({ title, icon, tone = "neutral", rows = 4 
   const { t } = useTranslation();
   return (
     <Card aria-busy="true">
-      <CardHeader className="items-center justify-start gap-3">
-        {icon && <IconChip icon={icon} tone={tone} size="sm" />}
-        <CardTitle>{title}</CardTitle>
+      <IconCardHeader icon={icon} tone={tone} title={title}>
         <span className="sr-only" role="status">
           {t("loading.default")}
         </span>
-      </CardHeader>
+      </IconCardHeader>
       <div aria-hidden className="flex flex-col gap-3">
         {Array.from({ length: rows }, (_, index) => (
           <div key={index} className="flex items-center gap-3">

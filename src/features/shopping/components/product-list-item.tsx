@@ -11,7 +11,7 @@ import type { Product } from "../types/shopping";
 import { ProductActions } from "./product-actions";
 import { ProductEssentialBadge } from "./product-essential-badge";
 import { SharedStockBadge } from "./product-alternatives";
-import { ProductCategoryIcon } from "./product-category-icon";
+import { ProductThumb } from "./product-thumb";
 
 type ProductListItemProps = {
   product: Product;
@@ -46,13 +46,7 @@ export function ProductListItem({ product, shops, canManage, initialSelections, 
       className={cn("flex items-center gap-3 transition-opacity", actions.deleting && "opacity-60")}
       aria-busy={actions.busy || undefined}
     >
-      {product.imageUrl ? (
-        <img src={product.imageUrl} alt="" referrerPolicy="no-referrer" className="size-10 shrink-0 rounded-lg border bg-white object-contain" />
-      ) : (
-        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-section-soft text-section">
-          <ProductCategoryIcon category={product.category} className="size-5" />
-        </span>
-      )}
+      <ProductThumb product={product} />
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="truncate font-medium">{product.name}</span>
         <span><ProductEssentialBadge isEssential={product.isEssential} /></span>

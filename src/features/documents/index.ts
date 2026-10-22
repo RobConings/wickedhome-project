@@ -1,5 +1,6 @@
 // Public API of the documents feature. Routes, the app frame and other features import from here only.
 export { DocumentAttachments, type DocumentAttachmentsProps } from "./components/document-attachments";
+export { DocumentCoverChooser, type DocumentCoverChooserProps } from "./components/document-cover-chooser";
 export { DocumentPreviewDialog, type PreviewFile } from "./components/document-preview-dialog";
 export {
   documentsAction,

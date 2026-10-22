@@ -6,7 +6,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { FileTypeIcon } from "@/components/shared/file-type-icon";
 import { cn } from "@/lib/utils";
 import type { UploadItem } from "../data/use-document-uploads";
-import { fileSize } from "./document-format";
+import { fileSize } from "@/lib/locale-text";
 
 type UploadProgressListProps = {
   items: UploadItem[];

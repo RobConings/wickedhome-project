@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { failedAction, type FormResult, formString, parseForm } from "@/lib/forms";
 import { todayIn } from "@/types/dates";
 import { fetchPlaces, type Place } from "@/features/places";
 import {
@@ -69,7 +69,7 @@ async function save<T>(
 ): Promise<EnergyActionResult> {
   const { data, errors } = parseForm(schema, formData);
   if (errors) return { errors, intent };
-  const id = String(formData.get("id") ?? "");
+  const id = formString(formData, "id");
   await (id ? update(id, data as T) : create(data as T));
   return { ok: true, intent };
 }
@@ -78,7 +78,7 @@ async function runAction(intent: string, run: () => Promise<EnergyActionResult>)
   try {
     return await run();
   } catch (error) {
-    return { ...toFormResult(error), intent };
+    return failedAction(error, intent);
   }
 }
 
@@ -94,10 +94,10 @@ export type AppliancesData = Awaited<ReturnType<typeof appliancesLoader>>;
 
 export async function appliancesAction({ request }: ActionFunctionArgs): Promise<EnergyActionResult> {
   const formData = await request.formData();
-  const intent = String(formData.get("intent") ?? "save");
+  const intent = formString(formData, "intent", "save");
   return runAction(intent, async () => {
     if (intent === "delete") {
-      await deleteAppliance(String(formData.get("id") ?? ""));
+      await deleteAppliance(formString(formData, "id"));
       return { ok: true, intent };
     }
     return save(formData, applianceInputSchema, intent, createAppliance, updateAppliance);
@@ -110,8 +110,8 @@ export const energySetupLoader = () => fetchEnergySetup();
 
 export async function energySetupAction({ request }: ActionFunctionArgs): Promise<EnergyActionResult> {
   const formData = await request.formData();
-  const intent = String(formData.get("intent") ?? "");
-  const id = String(formData.get("id") ?? "");
+  const intent = formString(formData, "intent");
+  const id = formString(formData, "id");
   return runAction(intent, async () => {
     switch (intent) {
       case "save-solar":
@@ -147,10 +147,10 @@ export type EnergyImportData = Awaited<ReturnType<typeof energyImportLoader>>;
 
 export async function energyImportAction({ request }: ActionFunctionArgs): Promise<EnergyActionResult> {
   const formData = await request.formData();
-  const intent = String(formData.get("intent") ?? "");
+  const intent = formString(formData, "intent");
   return runAction(intent, async () => {
     if (intent === "delete-reading") {
-      await deleteReading(String(formData.get("id") ?? ""));
+      await deleteReading(formString(formData, "id"));
       return { ok: true, intent };
     }
     // Fluvius uploads post straight to the API from the import panel; this route only revalidates after.

@@ -1,19 +1,8 @@
 import { useTranslation } from "react-i18next";
 import type { Habitant } from "@/features/household";
-import { formatCurrency } from "@/lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { describeRecurrence } from "@/lib/recurrence-format";
-import { formatDate, formatMonth } from "@/types/date-format";
 import { JOINT } from "../types/income";
-
-/** € 1.234,56 in the current language. */
-export const money = (cents: number) => formatCurrency(cents, currentLocale());
-
-/** "30/10/2026" */
-export const dateText = (date: string) => formatDate(date, currentLocale());
-
-/** "oktober 2026" */
-export const monthLabel = (month: string) => formatMonth(month, currentLocale());
 
 /** Name of who an income belongs to: the habitant, or "Joint". */
 export function useWhoName(habitants: readonly Habitant[]) {

@@ -29,9 +29,10 @@ import { LoansCard } from "../components/loans-card";
 import { MoneyCardHeader } from "../components/money-card-header";
 import { MoneyTimelineCard } from "../components/money-timeline-card";
 import { RecordTransferDialog } from "../components/record-transfer-dialog";
-import { monthLabel } from "../components/use-money-text";
 import { MONEY_MONTH_PARAM } from "../data/money-loaders";
 import type { MoneyLoans, MoneyMonth, MoneyTimeline } from "../types/money";
+import { monthLabel } from "@/lib/locale-text";
+import { CanManageProvider } from "@/lib/permissions";
 
 type MoneyFlowScreenProps = {
   data: MoneyMonth;
@@ -101,167 +102,166 @@ export function MoneyFlowScreen({ data, habitants, canManage, nextToPay, voucher
   const placeholders = canManage && active.length > 0 ? ([!hasJoint && "joint", !hasSavings && "savings"].filter(Boolean) as ("joint" | "savings")[]) : [];
 
   return (
-    <PageContainer>
-      <PageHeader
-        title={t("page.title")}
-        description={t("page.description")}
-        actions={
-          canManage && (
-            <>
-              {active.length > 0 && hasJoint && hasSavings && (
-                <AccountFormDialog
-                  habitants={habitants}
-                  today={data.today}
-                  trigger={
-                    <Button variant="outline">
-                      <PlusIcon />
-                      {t("actions.addAccount")}
-                    </Button>
-                  }
-                />
-              )}
-              {active.length > 0 && (
-                <RecordTransferDialog
-                  accounts={data.accounts}
-                  habitants={habitants}
-                  today={data.today}
-                  trigger={
-                    <Button>
-                      <ArrowLeftRightIcon />
-                      {t("actions.recordTransfer")}
-                    </Button>
-                  }
-                />
-              )}
-            </>
-          )
-        }
-      />
-
-      {data.accounts.length === 0 && (
-        <EmptyState
-          icon={LandmarkIcon}
-          title={t("setup.title")}
-          description={t("setup.description")}
-          action={
+    <CanManageProvider value={canManage}>
+      <PageContainer>
+        <PageHeader
+          title={t("page.title")}
+          description={t("page.description")}
+          actions={
             canManage && (
-              <div className="flex flex-wrap justify-center gap-2">
-                {addAccount("joint", "default")}
-                {addAccount("savings")}
-              </div>
+              <>
+                {active.length > 0 && hasJoint && hasSavings && (
+                  <AccountFormDialog
+                    habitants={habitants}
+                    today={data.today}
+                    trigger={
+                      <Button variant="outline">
+                        <PlusIcon />
+                        {t("actions.addAccount")}
+                      </Button>
+                    }
+                  />
+                )}
+                {active.length > 0 && (
+                  <RecordTransferDialog
+                    accounts={data.accounts}
+                    habitants={habitants}
+                    today={data.today}
+                    trigger={
+                      <Button>
+                        <ArrowLeftRightIcon />
+                        {t("actions.recordTransfer")}
+                      </Button>
+                    }
+                  />
+                )}
+              </>
             )
           }
         />
-      )}
 
-      <PeriodNavigator
-        label={monthLabel(data.month)}
-        onPrevious={() => goToMonth(shift(data.month, -1))}
-        onNext={() => goToMonth(shift(data.month, 1))}
-        onToday={() => goToMonth(currentMonth)}
-        previousLabel={t("month.previous")}
-        nextLabel={t("month.next")}
-        todayLabel={t("month.today")}
-        isCurrent={data.month === currentMonth}
-        pending={pending}
-      />
+        {data.accounts.length === 0 && (
+          <EmptyState
+            icon={LandmarkIcon}
+            title={t("setup.title")}
+            description={t("setup.description")}
+            action={
+              canManage && (
+                <div className="flex flex-wrap justify-center gap-2">
+                  {addAccount("joint", "default")}
+                  {addAccount("savings")}
+                </div>
+              )
+            }
+          />
+        )}
 
-      <PendingContent pending={pending} label={tCommon("loading.updating")} contentClassName="flex flex-col gap-6">
-        {active.length > 0 && (
-          <PageGrid as="section" columns={accountColumns(active.length + placeholders.length)} className="gap-4" aria-label={t("accounts.title")}>
-            {active.map((account) => (
-              <AccountCard
-                key={account.id}
-                account={account}
-                month={data.accountMonths.find((item) => item.accountId === account.id)}
+        <PeriodNavigator
+          label={monthLabel(data.month)}
+          onPrevious={() => goToMonth(shift(data.month, -1))}
+          onNext={() => goToMonth(shift(data.month, 1))}
+          onToday={() => goToMonth(currentMonth)}
+          previousLabel={t("month.previous")}
+          nextLabel={t("month.next")}
+          todayLabel={t("month.today")}
+          isCurrent={data.month === currentMonth}
+          pending={pending}
+        />
+
+        <PendingContent pending={pending} label={tCommon("loading.updating")} contentClassName="flex flex-col gap-6">
+          {active.length > 0 && (
+            <PageGrid as="section" columns={accountColumns(active.length + placeholders.length)} className="gap-4" aria-label={t("accounts.title")}>
+              {active.map((account) => (
+                <AccountCard
+                  key={account.id}
+                  account={account}
+                  month={data.accountMonths.find((item) => item.accountId === account.id)}
+                  accounts={data.accounts}
+                  habitants={habitants}
+                  today={data.today}
+                />
+              ))}
+              {placeholders.map((kind) => (
+                <AddAccountCard key={kind} kind={kind} habitants={habitants} today={data.today} />
+              ))}
+            </PageGrid>
+          )}
+
+          {data.accounts.length > 0 && (
+            <PageGrid columns="main-sidebar" className="items-start">
+              <ContributionsCard
+                rows={data.contributions}
+                plans={data.plans}
                 accounts={data.accounts}
                 habitants={habitants}
+                month={data.month}
                 today={data.today}
-                canManage={canManage}
               />
-            ))}
-            {placeholders.map((kind) => (
-              <AddAccountCard key={kind} kind={kind} habitants={habitants} today={data.today} />
-            ))}
-          </PageGrid>
-        )}
-
-        {data.accounts.length > 0 && (
-          <PageGrid columns="main-sidebar" className="items-start">
-            <ContributionsCard
-              rows={data.contributions}
-              plans={data.plans}
-              accounts={data.accounts}
-              habitants={habitants}
-              month={data.month}
-              today={data.today}
-              canManage={canManage}
-            />
-            <CoverageCard
-              rows={data.contributions}
-              accounts={data.accounts}
-              accountMonths={data.accountMonths}
-              costs={data.jointCosts}
-              income={data.income.people}
-              habitants={habitants}
-              month={data.month}
-              today={data.today}
-              canManage={canManage}
-            />
-          </PageGrid>
-        )}
-
-        <PageGrid columns="2" className="items-start">
-          <IncomeFlowCard income={data.income} habitants={habitants} month={data.month} />
-          <JointOutgoingsCard outgoings={data.jointOutgoings} today={data.today} />
-        </PageGrid>
-
-        {(timeline !== undefined || loans !== undefined) && (
-          <PageGrid columns={timeline !== undefined && loans !== undefined ? "main-sidebar" : "1"} className="items-start">
-            {timeline !== undefined && <MoneyTimelineCard data={timeline} className="min-w-0" />}
-            {loans !== undefined && <LoansCard data={loans} className="min-w-0" />}
-          </PageGrid>
-        )}
-
-        {historyAccount && historyMonth && (
-          <PageSection className="gap-4">
-            <SectionHeader title={t("ledger.title")} description={monthLabel(data.month)} />
-            {data.accounts.length > 1 && (
-              <ScrollRow label={t("ledger.label")} focusable={false}>
-                <SegmentedControl
-                  label={t("ledger.label")}
-                  value={historyAccount.id}
-                  onChange={setHistoryAccountId}
-                  options={data.accounts.map((account) => ({
-                    value: account.id,
-                    label: account.name,
-                    icon: account.kind === "savings" ? PiggyBankIcon : LandmarkIcon,
-                  }))}
-                />
-              </ScrollRow>
-            )}
-            <LedgerList lines={historyMonth.lines} accounts={data.accounts} habitants={habitants} canManage={canManage} />
-          </PageSection>
-        )}
-
-        <PageGrid columns="3" className="items-start">
-          {nextToPay}
-          {vouchers}
-          {projects ?? (
-            <Card className="gap-2">
-              <MoneyCardHeader icon={FolderKanbanIcon} title={t("projects.title")} description={t("projects.placeholder")} />
-            </Card>
+              <CoverageCard
+                rows={data.contributions}
+                accounts={data.accounts}
+                accountMonths={data.accountMonths}
+                costs={data.jointCosts}
+                income={data.income.people}
+                habitants={habitants}
+                month={data.month}
+                today={data.today}
+              />
+            </PageGrid>
           )}
-        </PageGrid>
 
-        {archived.length > 0 && (
-          <PageGrid columns={accountColumns(archived.length)} className="gap-4">
-            {archived.map((account) => (
-              <AccountCard key={account.id} account={account} accounts={data.accounts} habitants={habitants} today={data.today} canManage={canManage} />
-            ))}
+          <PageGrid columns="2" className="items-start">
+            <IncomeFlowCard income={data.income} habitants={habitants} month={data.month} />
+            <JointOutgoingsCard outgoings={data.jointOutgoings} today={data.today} />
           </PageGrid>
-        )}
-      </PendingContent>
-    </PageContainer>
+
+          {(timeline !== undefined || loans !== undefined) && (
+            <PageGrid columns={timeline !== undefined && loans !== undefined ? "main-sidebar" : "1"} className="items-start">
+              {timeline !== undefined && <MoneyTimelineCard data={timeline} className="min-w-0" />}
+              {loans !== undefined && <LoansCard data={loans} className="min-w-0" />}
+            </PageGrid>
+          )}
+
+          {historyAccount && historyMonth && (
+            <PageSection className="gap-4">
+              <SectionHeader title={t("ledger.title")} description={monthLabel(data.month)} />
+              {data.accounts.length > 1 && (
+                <ScrollRow label={t("ledger.label")} focusable={false}>
+                  <SegmentedControl
+                    label={t("ledger.label")}
+                    value={historyAccount.id}
+                    onChange={setHistoryAccountId}
+                    options={data.accounts.map((account) => ({
+                      value: account.id,
+                      label: account.name,
+                      icon: account.kind === "savings" ? PiggyBankIcon : LandmarkIcon,
+                    }))}
+                  />
+                </ScrollRow>
+              )}
+              <LedgerList lines={historyMonth.lines} accounts={data.accounts} habitants={habitants} />
+            </PageSection>
+          )}
+
+          <PageGrid columns="3" className="items-start">
+            {nextToPay}
+            {vouchers}
+            {projects ?? (
+              <Card className="gap-2">
+                <MoneyCardHeader icon={FolderKanbanIcon} title={t("projects.title")} description={t("projects.placeholder")} />
+              </Card>
+            )}
+          </PageGrid>
+
+          {archived.length > 0 && (
+            <PageGrid columns={accountColumns(archived.length)} className="gap-4">
+              {archived.map((account) => (
+                <AccountCard key={account.id} account={account} accounts={data.accounts} habitants={habitants} today={data.today} />
+              ))}
+            </PageGrid>
+          )}
+        </PendingContent>
+      </PageContainer>
+    </CanManageProvider>
   );
 }

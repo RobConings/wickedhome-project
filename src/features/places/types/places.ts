@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { hexColorSchema, idSchema } from "@/types/common";
+import { canManageHousehold } from "@/types/roles";
 
 export const FLOOR_KINDS = ["indoor", "outdoor"] as const;
 export const floorKindSchema = z.enum(FLOOR_KINDS);
@@ -284,4 +285,4 @@ export const PLACE_COLORS = [
 ] as const;
 
 /** Adults and owners manage places and plans; children can only look. Mirrors the API's role check. */
-export const canManagePlaces = (role: "owner" | "adult" | "child") => role !== "child";
+export const canManagePlaces = canManageHousehold;

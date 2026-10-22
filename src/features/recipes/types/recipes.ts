@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { idSchema } from "@/types/common";
 import type { NeedComparison, StockUnitInfo } from "@/types/units";
+import { canManageHousehold, type HouseholdRole } from "@/types/roles";
 
 /*
  * Recipes: ingredients linked to the household's products (so stock can be checked) and steps. A meal on the
@@ -98,10 +99,10 @@ export function sortForStep<T extends { name: string }>(items: readonly T[], ste
   return [...mentioned, ...items.filter((item) => !mentioned.includes(item))];
 }
 
-type Role = "owner" | "adult" | "child";
+type Role = HouseholdRole;
 
 /** Adults and owners add, edit and delete recipes and plan meals; everyone reads. Mirrors the API. */
-export const canManageRecipes = (role: Role) => role !== "child";
+export const canManageRecipes = canManageHousehold;
 /** Everyone, children too, may cook: start, tap what was used, add extras, step through, mark it done. */
 export const canCook = (_role: Role) => true;
 

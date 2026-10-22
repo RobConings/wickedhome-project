@@ -2,7 +2,7 @@ import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { updateDevicePosition } from "../data/devices-requests";
-import { useNow } from "../data/use-now";
+import { useNow } from "@/lib/hooks/use-now";
 import type { Device, DevicePositionInput, DevicesOverview } from "../types/devices";
 import { DevicePaletteSkeleton } from "./device-palette-skeleton";
 import { useDeviceMarkers, useDeviceStates } from "./device-indicator";

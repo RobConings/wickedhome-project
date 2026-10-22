@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { intlLocale } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { FloorUnderlay } from "../types/places";
@@ -46,7 +46,7 @@ type PanelProps = {
 };
 
 const number = (value: number, digits = 1) =>
-  new Intl.NumberFormat(intlLocale(currentLocale()), { maximumFractionDigits: digits }).format(value);
+  formatNumber(value, currentLocale(), { maximumFractionDigits: digits });
 
 /** "Scale 1:50" for a PDF, "1 px = 0,85 cm" for an image. */
 function scaleText(t: TFunction<"places">, underlay: FloorUnderlay): string {

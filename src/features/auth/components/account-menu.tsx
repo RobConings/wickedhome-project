@@ -20,15 +20,9 @@ import { setThemePreference, useTheme, type ThemePreference } from "@/lib/theme"
 import { LOCALES, type Locale } from "@/types/common";
 import { updateAccount } from "../data/auth-requests";
 import type { SessionUser } from "../types/auth";
+import { initials } from "@/lib/format";
 
 const THEMES: ThemePreference[] = ["system", "light", "dark"];
-
-const initials = (name: string) =>
-  name
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? "")
-    .join("");
 
 type AccountMenuProps = {
   user: SessionUser;

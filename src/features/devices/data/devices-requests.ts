@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api, resourcePath, restResource } from "@/lib/api-client";
 import type {
   Device,
   DeviceBindingsInput,
@@ -14,7 +14,8 @@ import type {
   HouseStatus,
 } from "../types/devices";
 
-const path = (id: string) => encodeURIComponent(id);
+const devices = restResource<Device, DeviceInput, DeviceDetail>("/devices");
+const profiles = restResource<DeviceProfile, DeviceProfileInput>("/devices/profiles");
 
 /** Every device and profile of the household. */
 export const fetchDevicesOverview = () => api.get<DevicesOverview>("/devices");
@@ -25,24 +26,23 @@ export const fetchDevicesOverview = () => api.get<DevicesOverview>("/devices");
  */
 export const fetchHouseStatus = (): Promise<HouseStatus> =>
   fetchDevicesOverview().catch((): HouseStatus => ({ devices: [], profiles: [] }));
-export const fetchDeviceDetail = (id: string) => api.get<DeviceDetail>(`/devices/${path(id)}`);
-export const createDevice = (input: DeviceInput) => api.post<Device>("/devices", input);
-export const updateDevice = (id: string, input: DeviceInput) => api.put<Device>(`/devices/${path(id)}`, input);
-export const deleteDevice = (id: string) => api.delete(`/devices/${path(id)}`);
+export const fetchDeviceDetail = devices.get;
+export const createDevice = devices.create;
+export const updateDevice = devices.update;
+export const deleteDevice = devices.remove;
 export const updateDevicePosition = (id: string, input: DevicePositionInput) =>
-  api.put<Device>(`/devices/${path(id)}/position`, input);
+  api.put<Device>(devices.path(id, "position"), input);
 export const updateDeviceBindings = (id: string, input: DeviceBindingsInput) =>
-  api.put<Device>(`/devices/${path(id)}/bindings`, input);
+  api.put<Device>(devices.path(id, "bindings"), input);
 export const setDeviceValue = (id: string, fieldKey: string, value: FieldValue) =>
-  api.put<DeviceFieldBinding>(`/devices/${path(id)}/values/${path(fieldKey)}`, { value });
+  api.put<DeviceFieldBinding>(devices.path(id, "values", fieldKey), { value });
 
-export const fetchDeviceProfiles = () => api.get<DeviceProfile[]>("/devices/profiles");
-export const fetchDeviceProfile = (id: string) => api.get<DeviceProfile>(`/devices/profiles/${path(id)}`);
-export const createDeviceProfile = (input: DeviceProfileInput) => api.post<DeviceProfile>("/devices/profiles", input);
-export const updateDeviceProfile = (id: string, input: DeviceProfileInput) =>
-  api.put<DeviceProfile>(`/devices/profiles/${path(id)}`, input);
-export const deleteDeviceProfile = (id: string) => api.delete(`/devices/profiles/${path(id)}`);
+export const fetchDeviceProfiles = () => profiles.list();
+export const fetchDeviceProfile = profiles.get;
+export const createDeviceProfile = profiles.create;
+export const updateDeviceProfile = profiles.update;
+export const deleteDeviceProfile = profiles.remove;
 
 export const fetchDevicePresets = () => api.get<DevicePresetSummary[]>("/devices/presets");
 /** Creates an editable profile from a preset, in the user's language. */
-export const createProfileFromPreset = (key: string) => api.post<DeviceProfile>(`/devices/presets/${path(key)}`);
+export const createProfileFromPreset = (key: string) => api.post<DeviceProfile>(resourcePath("/devices/presets")(key));

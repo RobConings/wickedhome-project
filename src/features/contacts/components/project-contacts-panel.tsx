@@ -20,6 +20,9 @@ import { ContactFormDialog } from "./contact-form-dialog";
 import { ContactLinks } from "./contact-links";
 import { ContactPicker } from "./contact-picker";
 import { TradeInput } from "./trade-input";
+import { InlineRetry } from "@/components/shared/inline-retry";
+import { EmptyNote } from "@/components/shared/empty-note";
+import { usePanelData } from "@/lib/hooks/use-panel-data";
 
 type ProjectContactsPanelProps = {
   projectId: string;
@@ -30,8 +33,6 @@ type ProjectContactsPanelProps = {
   /** Seed favourites/recents of the picker (stories). */
   initialSelections?: UseSelectionsOptions["initial"];
 };
-
-type State = { status: "loading" } | { status: "error" } | { status: "ready"; contacts: Contact[] };
 
 /** The route the panel posts to (the contacts page's action). */
 const CONTACTS_ACTION = "/contacts";
@@ -46,33 +47,11 @@ const linkFormSchema = z.object({ contactId: z.string().min(1, "chooseContact"),
 export function ProjectContactsPanel({ projectId, canManage, initialData, initialSelections }: ProjectContactsPanelProps) {
   const { t } = useTranslation("contacts");
   const { t: tCommon } = useTranslation();
-  const [state, setState] = React.useState<State>(() => (initialData ? { status: "ready", ...initialData } : { status: "loading" }));
-  const [reloads, setReloads] = React.useState(0);
-  const [refreshing, setRefreshing] = React.useState(false);
+  const { state, reload, retry, refreshing } = usePanelData(() => fetchContacts().then((contacts) => ({ contacts })), [], {
+    initialData,
+    keepDataOnError: true,
+  });
   const { recordUse } = useContactSelections({ initial: initialSelections });
-
-  const reload = React.useCallback(() => {
-    setRefreshing(true);
-    setReloads((value) => value + 1);
-  }, []);
-
-  React.useEffect(() => {
-    if (initialData && reloads === 0) return;
-    let cancelled = false;
-    fetchContacts()
-      .then((contacts) => {
-        if (!cancelled) setState({ status: "ready", contacts });
-      })
-      .catch(() => {
-        if (!cancelled) setState((previous) => (previous.status === "ready" ? previous : { status: "error" }));
-      })
-      .finally(() => {
-        if (!cancelled) setRefreshing(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [reloads, initialData]);
 
   const unlink = async (contact: Contact) => {
     try {
@@ -106,17 +85,12 @@ export function ProjectContactsPanel({ projectId, canManage, initialData, initia
     return (
       <Card>
         {header}
-        <div className="flex flex-col items-start gap-2 text-sm text-muted-foreground">
-          {t("project.error")}
-          <Button variant="outline" size="sm" fullOnMobile onClick={() => setReloads((value) => value + 1)}>
-            {tCommon("actions.retry")}
-          </Button>
-        </div>
+          <InlineRetry message={t("project.error")} onRetry={retry} fullOnMobile />
       </Card>
     );
   }
 
-  const { contacts } = state;
+  const { contacts } = state.data;
   const linked = contacts
     .map((contact) => ({ contact, link: contact.projects.find((project) => project.id === projectId) }))
     .filter((entry): entry is { contact: Contact; link: NonNullable<typeof entry.link> } => Boolean(entry.link));
@@ -169,7 +143,7 @@ export function ProjectContactsPanel({ projectId, canManage, initialData, initia
       {header}
       <PendingContent pending={refreshing} label={tCommon("loading.updating")}>
         {linked.length === 0 ? (
-          <p className="rounded-lg border border-dashed px-3 py-4 text-sm text-muted-foreground">{t("project.empty")}</p>
+          <EmptyNote>{t("project.empty")}</EmptyNote>
         ) : (
           <ul className="flex flex-col divide-y">
             {linked.map(({ contact, link }) => (
@@ -200,7 +174,6 @@ export function ProjectContactsPanel({ projectId, canManage, initialData, initia
                     title={t("project.removeTitle", { name: contact.name })}
                     description={t("project.removeDescription")}
                     confirmLabel={t("project.removeConfirm")}
-                    cancelLabel={tCommon("actions.cancel")}
                     destructive
                     onConfirm={() => unlink(contact)}
                   />

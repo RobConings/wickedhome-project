@@ -1,5 +1,5 @@
 import type * as React from "react";
-import { ArrowLeftIcon, BoxIcon, ListChecksIcon, MapIcon, PencilIcon, PlugIcon, ShoppingCartIcon, Trash2Icon, type LucideIcon } from "lucide-react";
+import { BoxIcon, ListChecksIcon, MapIcon, PencilIcon, PlugIcon, ShoppingCartIcon, Trash2Icon, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher } from "react-router";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
 import { PageSection } from "@/components/layout/page-section";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/shared/confirm-dialog";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionHeader } from "@/components/shared/section-header";
 import { currentLocale } from "@/lib/i18n";
@@ -16,6 +16,7 @@ import { PlaceFormDialog } from "../components/place-form-dialog";
 import { formatArea } from "../components/place-format";
 import type { PlacesActionResult } from "../data/places-loaders";
 import { isOutside, type PlaceDetail } from "../types/places";
+import { BackLink } from "@/components/shared/link-buttons";
 
 type LinkedSectionKey = "tasks" | "stock" | "shopping" | "appliances";
 
@@ -58,7 +59,7 @@ export function PlaceDetailScreen({ detail, canManage, sections = {} }: PlaceDet
           </Button>
         }
       />
-      <ConfirmDialog
+      <DeleteConfirmDialog
         trigger={
           <Button variant="ghost" className="text-destructive hover:text-destructive" disabled={fetcher.state !== "idle"}>
             <Trash2Icon />
@@ -67,9 +68,6 @@ export function PlaceDetailScreen({ detail, canManage, sections = {} }: PlaceDet
         }
         title={t("place.delete.title", { name: place.name })}
         description={t("place.delete.description")}
-        confirmLabel={tCommon("actions.delete")}
-        cancelLabel={tCommon("actions.cancel")}
-        destructive
         onConfirm={() =>
           fetcher.submit({ intent: "delete-place", id: place.id, redirectTo: "/places" }, { method: "post" })
         }
@@ -81,10 +79,7 @@ export function PlaceDetailScreen({ detail, canManage, sections = {} }: PlaceDet
     <PageContainer>
       <PageHeader
         eyebrow={
-          <Link to="/places" className="inline-flex items-center gap-1 hover:underline">
-            <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-            {t("page.title")}
-          </Link>
+          <BackLink to="/places">{t("page.title")}</BackLink>
         }
         title={place.icon ? `${place.icon} ${place.name}` : place.name}
         description={`${place.floorName} · ${isOutside(place) ? t("location.outside") : t("location.inside")}`}

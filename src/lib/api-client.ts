@@ -46,3 +46,47 @@ export const api = {
   patch: <T = void>(path: string, body: unknown) => request<T>("PATCH", path, body),
   delete: <T = void>(path: string) => request<T>("DELETE", path),
 };
+
+/** A query-string value; `undefined`, `null`, `""` and `false` are left out. */
+export type QueryValue = string | number | boolean | null | undefined;
+
+/**
+ * `?a=1&b=2` for the values that are set (in the given order), or `""` when none are. Use it for every
+ * request with filters instead of building a `URLSearchParams` by hand.
+ */
+export function queryString(params: Record<string, QueryValue> | object = {}): string {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params) as [string, QueryValue][]) {
+    if (value === undefined || value === null || value === "" || value === false) continue;
+    search.set(key, String(value));
+  }
+  const text = search.toString();
+  return text ? `?${text}` : "";
+}
+
+/** `path` plus its query string (see `queryString`). */
+export const withQuery = (path: string, params?: Record<string, QueryValue> | object) => `${path}${queryString(params)}`;
+
+/** `/base/<id>/<sub>…` with every id URL-encoded; a resource path builder for request files. */
+export const resourcePath =
+  (base: string) =>
+  (id: string, ...rest: string[]) =>
+    [base, ...[id, ...rest].map(encodeURIComponent)].join("/");
+
+/**
+ * The usual REST requests for one resource under `base` (`GET base?query`, `GET base/:id`, `POST base`,
+ * `PUT base/:id`, `DELETE base/:id`). A request file exports the ones it needs under domain names:
+ * `export const { get: fetchContact, create: createContact } = restResource<Contact, ContactInput>("/contacts")`.
+ * Requests that don't fit (sub-resources, other verbs) use `path(id, "sub", subId)` and `api` directly.
+ */
+export function restResource<TItem, TInput = never, TDetail = TItem, TCreated = TItem>(base: string) {
+  const path = resourcePath(base);
+  return {
+    path,
+    list: <TList = TItem[]>(query?: Record<string, QueryValue> | object) => api.get<TList>(withQuery(base, query)),
+    get: (id: string) => api.get<TDetail>(path(id)),
+    create: (input: TInput) => api.post<TCreated>(base, input),
+    update: (id: string, input: TInput) => api.put<TItem>(path(id), input),
+    remove: (id: string) => api.delete(path(id)),
+  };
+}

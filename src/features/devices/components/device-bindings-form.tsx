@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { InlineAlert } from "@/components/shared/inline-alert";
 import type { DevicesActionResult } from "../data/devices-loaders";
 import { bindingsForProfile, VALUE_SOURCES, type Device, type DeviceProfile, type FieldBindingInput, type ValueSource } from "../types/devices";
+import { useFetcherResult } from "@/lib/hooks/use-fetcher-result";
 
 /** What a route-provided entity picker gets for one field (the Home Assistant entity browser). */
 export type DeviceEntityPickerProps = {
@@ -49,13 +50,9 @@ export function DeviceBindingsForm({ device, profile, renderEntityPicker }: Devi
   const [bindings, setBindings] = React.useState(initial);
   const dirty = JSON.stringify(bindings) !== JSON.stringify(initial);
   const saving = fetcher.state !== "idle";
-
-  const handled = React.useRef<DevicesActionResult | undefined>(undefined);
-  React.useEffect(() => {
-    if (fetcher.state !== "idle" || !fetcher.data || handled.current === fetcher.data) return;
-    handled.current = fetcher.data;
-    if (fetcher.data.ok) toast.success(t("bindings.saved"));
-  }, [fetcher.state, fetcher.data, t]);
+  useFetcherResult(fetcher, (result) => {
+    if (result.ok) toast.success(t("bindings.saved"));
+  });
 
   const update = (index: number, change: Partial<FieldBindingInput>) =>
     setBindings((current) => current.map((binding, i) => (i === index ? { ...binding, ...change } : binding)));
