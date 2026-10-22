@@ -1,0 +1,124 @@
+// Feature: assistant (LM Studio on the LAN + MCP). See docs/ASSISTANT.md.
+// Conversations are per user; the tools themselves are code (src/api/assistant/tools.ts), so they have no
+// table: `toolName` is the tool's code name, e.g. `shopping.add_item`.
+
+enum AssistantMessageRole {
+  USER
+  ASSISTANT
+  TOOL
+}
+
+/// What happened to one tool call of the model.
+enum AssistantToolStatus {
+  /// Waiting for the person to confirm or cancel (a confirmation card in the chat).
+  PENDING
+  /// Ran and succeeded.
+  DONE
+  /// Ran and failed (validation, not found, not allowed…); the error is in `toolResult`.
+  FAILED
+  /// The person cancelled it on the confirmation card.
+  CANCELLED
+}
+
+/// A chat with the assistant. Deleted with its messages after 90 days without activity (`assistant.cleanup`).
+model AssistantConversation {
+  id            String             @id @default(cuid())
+  userId        String
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Set from the first question; the person can rename it.
+  title         String?
+  lastMessageAt DateTime           @default(now())
+  messages      AssistantMessage[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@index([userId, lastMessageAt])
+  @@index([lastMessageAt])
+  @@map("assistant_conversations")
+}
+
+/// One message of a conversation, in the shape of the OpenAI chat format (user / assistant / tool).
+model AssistantMessage {
+  id             String                @id @default(cuid())
+  conversationId String
+  conversation   AssistantConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           AssistantMessageRole
+  /// The text (user question, assistant answer). Empty for tool messages.
+  content        String                @default("")
+  /// ASSISTANT: the tool calls the model asked for, `[{ id, name, arguments }]`.
+  toolCalls      Json?
+  /// TOOL: the call this message answers, and the tool's code name.
+  toolCallId     String?
+  toolName       String?
+  /// TOOL: the validated arguments (also what a pending confirmation will run).
+  toolArgs       Json?
+  /// TOOL: `{ ok: true, data }` or `{ ok: false, error }`, as sent back to the model.
+  toolResult     Json?
+  toolStatus     AssistantToolStatus?
+  /// TOOL: the human summary shown on the confirmation card / activity chip, in the person's language.
+  toolSummary    String?
+  /// USER: images attached to the question.
+  images         AssistantImage[]
+  /// USER: the page the question was asked from (screen context), `{ kind, id?, label }` as the server found it.
+  screen         Json?
+  createdAt      DateTime              @default(now())
+
+  @@index([conversationId, createdAt])
+  @@map("assistant_messages")
+}
+
+/// An image attached to a question (resized in the browser, sent to the model as an image part). Uploaded
+/// first (`POST /api/assistant/images`), then linked to its message when the question is sent; images never
+/// linked are removed by `assistant.cleanup` after a day.
+model AssistantImage {
+  id        String            @id @default(cuid())
+  userId    String
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messageId String?
+  message   AssistantMessage? @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  mimeType  String
+  data      Bytes
+  createdAt DateTime          @default(now())
+
+  @@index([messageId])
+  @@index([userId, createdAt])
+  @@map("assistant_images")
+}
+
+/// "Don't ask again" for one tool, per user. Only offered for tools registered with `confirm: "first-time"`.
+model AssistantToolPreference {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  toolName  String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, toolName])
+  @@map("assistant_tool_preferences")
+}
+
+enum AssistantTokenScope {
+  /// Only read tools are listed and callable.
+  READ
+  /// Read and write tools; every write still needs `confirm: true` in the call.
+  WRITE
+}
+
+/// A personal access token for the MCP server (`/api/mcp`). `tokenHash` is the SHA-256 of the token, which
+/// is shown once when it is made and never stored.
+model AssistantAccessToken {
+  id         String              @id @default(cuid())
+  userId     String
+  user       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  tokenHash  String              @unique
+  /// The first characters of the token (`wh_mcp_ab12…`), to recognise it in the list.
+  prefix     String
+  scope      AssistantTokenScope @default(READ)
+  lastUsedAt DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime            @default(now())
+
+  @@index([userId])
+  @@map("assistant_access_tokens")
+}

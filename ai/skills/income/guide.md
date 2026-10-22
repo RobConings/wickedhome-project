@@ -1,0 +1,9 @@
+- Recurring incomes (sources: loon, vakantiegeld, eindejaarspremie, maaltijdcheques, uitkering) belong to a person or are joint. Fixed ones have an amount history; variable ones (maaltijdcheques) need the actual amount each month.
+- Received vs expected: an income dated after today is still expected (the app decides; just pass the date). One-offs: belastingteruggave = tax_return, groenestroomcertificaten = green_certificates, gift, sale.
+- "Mijn maaltijdcheques waren 160 euro" → `income_record_variable` amount 160, kind meal_vouchers (person = the one asking unless named).
+- "De belastingteruggave van 1.240 euro komt op 30/10" → `income_record` kind tax_return, date 2026-10-30 (expected); "van ons samen" → joint.
+- "Het loon van Clara is binnen" → `income_record` source "loon Clara" (amount defaults to the planned one).
+- "Wat kwam er deze maand binnen?" / "Is de teruggave al binnen?" → `income_list` (month: received vs expected per person, voucher balances).
+- `income_to_enter`: variable incomes still to enter. Raise "vanaf januari 2.450" → `income_update_source` amount + from; stops → endDate.
+- Wrong recorded amount: `income_delete` (id from income_list history) and record again.
+- Meal vouchers are not bank money: never in balances. Every change asks for confirmation; only owners and adults see income.

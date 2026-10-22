@@ -1,0 +1,87 @@
+{
+  "card": {
+    "title": "Weather",
+    "loading": "Loading the forecast…",
+    "loadError": "Couldn't load the forecast.",
+    "noLocation": "Add your home address in Settings to see the forecast for your home here.",
+    "setAddress": "Add address",
+    "unavailable": "The forecast is unavailable right now. Try again later.",
+    "stale": "Showing an older forecast.",
+    "attribution": "Weather data by",
+    "fallback": "({{provider}} unavailable)"
+  },
+  "feelsLike": "feels like {{temperature}}",
+  "max": "max {{temperature}}",
+  "min": "min {{temperature}}",
+  "rain": {
+    "dry": "Dry for the next {{hours}} hours",
+    "nowUntil": "Raining now, dry from {{time}} ({{amount}} mm)",
+    "nowAllDay": "Raining for the next hours ({{amount}} mm)",
+    "later": "Rain expected from {{time}} ({{amount}} mm)"
+  },
+  "today": {
+    "chance": "Today: {{chance}}% chance of rain, {{amount}} mm",
+    "amount": "Today: {{amount}} mm of rain"
+  },
+  "wind": "Wind {{speed}} km/h {{direction}}, gusts {{gusts}} km/h",
+  "hours": {
+    "label": "Next hours"
+  },
+  "days": {
+    "label": "Next days"
+  },
+  "compass": {
+    "N": "N",
+    "NE": "NE",
+    "E": "E",
+    "SE": "SE",
+    "S": "S",
+    "SW": "SW",
+    "W": "W",
+    "NW": "NW"
+  },
+  "conditions": {
+    "clear": "Clear",
+    "mostly_clear": "Mostly clear",
+    "partly_cloudy": "Partly cloudy",
+    "overcast": "Overcast",
+    "fog": "Fog",
+    "drizzle": "Drizzle",
+    "freezing_drizzle": "Freezing drizzle",
+    "rain": "Rain",
+    "heavy_rain": "Heavy rain",
+    "freezing_rain": "Freezing rain",
+    "rain_showers": "Showers",
+    "snow": "Snow",
+    "snow_showers": "Snow showers",
+    "thunderstorm": "Thunderstorm",
+    "thunderstorm_hail": "Thunderstorm with hail",
+    "unknown": "Unknown",
+    "sleet": "Sleet"
+  },
+  "windNoGusts": "Wind {{speed}} km/h {{direction}}",
+  "settings": {
+    "title": "Weather source",
+    "description": "Where the forecast on the dashboard comes from.",
+    "default": "default",
+    "unofficial": "unofficial",
+    "notConfigured": "not configured",
+    "providers": {
+      "open-meteo": "Free, open forecast models (incl. DWD ICON and Météo-France), worldwide.",
+      "kmi": "The Royal Meteorological Institute of Belgium, via its app's API (undocumented, may change).",
+      "google": "Google Maps Platform Weather API. Needs an API key with billing enabled on the server."
+    },
+    "howToConfigure": {
+      "open-meteo": "",
+      "kmi": "",
+      "google": "Set GOOGLE_MAPS_API_KEY in the server's .env and restart WickedHome to enable it."
+    },
+    "last": "Last forecast from {{provider}}, {{time}}.",
+    "lastFallback": "{{chosen}} was unavailable; the last forecast came from {{provider}}, {{time}}.",
+    "noneYet": "No forecast fetched yet. Open the dashboard to load one.",
+    "fallbackHint": "When the chosen source fails, Open-Meteo steps in automatically.",
+    "saved": "Weather source saved.",
+    "failed": "Couldn't save the weather source.",
+    "readOnly": "Only adults can change the weather source."
+  }
+}

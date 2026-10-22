@@ -1,0 +1,127 @@
+{
+  "notifications": {
+    "bins": {
+      "title": "Afval buitenzetten",
+      "description": "\"Vanavond buitenzetten: Papier & karton + Pmd\", voor wie de afvaltaak heeft (of iedereen). Tijd: het uur van de afvaltaak, of een avonduur naar keuze."
+    }
+  },
+  "title": "Afvalophaling",
+  "description": "De ophaalkalender van je afvalophaler, dagelijks bijgewerkt. Ophalingen staan in de kalender en op het dashboard.",
+  "days": {
+    "today": "Vandaag",
+    "tomorrow": "Morgen"
+  },
+  "fractions": {
+    "residual": "Restafval",
+    "organic": "Gft",
+    "pmd": "Pmd",
+    "paper": "Papier & karton",
+    "glass": "Glas",
+    "textile": "Textiel",
+    "garden": "Tuinafval",
+    "bulky": "Grofvuil",
+    "other": "Andere"
+  },
+  "providers": {
+    "limburg-net": {
+      "hint": "Voor de gemeenten in de provincie Limburg (postcodes 3500–3999)."
+    },
+    "recycle-app": {
+      "hint": "De Recycle!-app van Fost Plus: de meeste andere Belgische gemeenten, bv. IVAGO (Gent), IVBO, Mirom, Interza, Net Brussel."
+    }
+  },
+  "setup": {
+    "title": "Koppel je afvalophaler",
+    "changeTitle": "Ophaler of adres wijzigen",
+    "description": "Kies je ophaler en zoek je adres bij hem op. We stellen er een voor op basis van je postcode.",
+    "provider": "Ophaler",
+    "suggested": "voorgesteld",
+    "fields": {
+      "street": "Straat",
+      "number": "Nummer",
+      "box": "Bus",
+      "postalCode": "Postcode",
+      "municipality": "Gemeente"
+    },
+    "mainMunicipality": "Limburg.net gebruikt de hoofdgemeente, bv. Hasselt in plaats van Kermt.",
+    "find": "Adres zoeken",
+    "searching": "Zoeken…",
+    "foundOne": "Gevonden bij de ophaler. Is dit je adres?",
+    "foundMany": "Meerdere adressen passen. Kies het jouwe:",
+    "matches": "Gevonden adressen",
+    "use": "Dit adres gebruiken",
+    "saving": "Opslaan en ophalingen ophalen…",
+    "saved": "Ophaler gekoppeld. De ophaaldagen staan in je kalender.",
+    "savedSyncFailed": "Ophaler opgeslagen, maar de ophaaldagen konden nog niet opgehaald worden. We proberen het later opnieuw.",
+    "invalidMatch": "Kies eerst een adres uit de zoekresultaten.",
+    "change": "Wijzigen",
+    "readOnly": "Alleen volwassenen kunnen de afvalophaler instellen.",
+    "problems": {
+      "not_covered": "{{provider}} bedient deze postcode niet. Probeer een andere ophaler.",
+      "municipality": "{{provider}} kent deze gemeente niet. Controleer de spelling of gebruik de hoofdgemeente.",
+      "street": "{{provider}} kent deze straat niet in deze gemeente. Controleer de spelling.",
+      "number": "{{provider}} kent dit huisnummer niet in deze straat.",
+      "provider_error": "{{provider}} is niet bereikbaar. Probeer het zo meteen opnieuw."
+    }
+  },
+  "sync": {
+    "now": "Nu bijwerken",
+    "running": "Bijwerken…",
+    "done": "Ophaaldagen bijgewerkt.",
+    "failed": "Bijwerken mislukt; de laatst gekende ophaaldagen blijven staan.",
+    "tooSoon": "Net bijgewerkt. Probeer het zo meteen opnieuw.",
+    "lastSync": "Bijgewerkt op {{date}}",
+    "never": "Nog niet bijgewerkt",
+    "daily": "wordt dagelijks bijgewerkt",
+    "lastFailed": "De laatste update is mislukt ({{error}}).",
+    "keptSince": "De ophaaldagen van {{date}} worden getoond.",
+    "nothingYet": "Nog geen ophaaldagen."
+  },
+  "upcoming": {
+    "title": "Volgende ophalingen",
+    "empty": "Geen ophalingen de komende weken.",
+    "calendar": "Alle ophaaldagen staan in de kalender van het huishouden."
+  },
+  "remove": {
+    "action": "Ontkoppelen",
+    "title": "Afvalophaler ontkoppelen?",
+    "description": "De ophaaldagen verdwijnen uit de kalender en van het dashboard. Je kunt altijd opnieuw koppelen.",
+    "confirm": "Ontkoppelen"
+  },
+  "card": {
+    "title": "Afvalophaling",
+    "loading": "Ophalingen laden…",
+    "loadError": "De ophalingen konden niet geladen worden.",
+    "notSetUp": "Koppel je afvalophaler om hier te zien welke containers buiten moeten, en wanneer.",
+    "setUp": "Ophaler instellen",
+    "none": "Geen ophalingen de komende weken.",
+    "syncError": "De ophaler was niet bereikbaar bij de laatste update.",
+    "tomorrow": "Morgen: {{labels}}. Zet het vanavond buiten.",
+    "today": "Vandaag: {{labels}}",
+    "next": "Volgende: {{date}} · {{labels}}",
+    "calendar": "Bekijk kalender"
+  },
+  "jobs": {
+    "sync": {
+      "title": "Afvalkalender bijwerken",
+      "description": "Haalt elke ochtend de ophaaldagen op bij je ophaaldienst, voor de kalender, het dashboard en de afvaltaken."
+    }
+  },
+  "calendarSource": "Afvalophaling",
+  "tasks": {
+    "enabled": "Maak een taak om het afval buiten te zetten",
+    "enabledHint": "Eén taak per ophaaldag op de takenlijst, voor de komende twee weken.",
+    "timing": "Wanneer",
+    "timings": {
+      "evening_before": "De avond ervoor ({{time}})",
+      "morning_of": "De ochtend zelf ({{time}})"
+    },
+    "who": "Wie (optioneel)",
+    "whoHint": "Niemand gekozen: de taken blijven zonder iemand en je kan ze elk toewijzen.",
+    "nobody": "Niemand in het bijzonder",
+    "rotate": "Om beurten",
+    "rotateHint": "Eén persoon per ophaaldag, in de gekozen volgorde.",
+    "saved": "Afvaltaken bijgewerkt",
+    "viewTasks": "Taken bekijken"
+  }
+}

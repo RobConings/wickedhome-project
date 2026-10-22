@@ -1,0 +1,104 @@
+{
+  "page": {
+    "title": "Contacts",
+    "description": "Contractors, suppliers, the bank, the school… everyone your household deals with."
+  },
+  "actions": {
+    "add": "Add contact",
+    "edit": "Edit {{name}}",
+    "call": "Call {{name}} on {{phone}}",
+    "mail": "Email {{name}} at {{email}}",
+    "visitWebsite": "Visit website"
+  },
+  "fields": {
+    "name": "Name",
+    "namePlaceholder": "Jan Peeters",
+    "company": "Company",
+    "trade": "Trade or role",
+    "tradeDescription": "Pick a suggestion or type your own.",
+    "tradePlaceholder": "contractor, plumber, bank…",
+    "emails": "Email addresses",
+    "emailsDescription": "The first one is used when you mail this contact.",
+    "phones": "Phone numbers",
+    "phonesDescription": "The first one is the main number.",
+    "address": "Address",
+    "websiteUrl": "Website",
+    "shop": "Shop",
+    "shopDescription": "For a supplier: the shop it belongs to.",
+    "notes": "Notes",
+    "role": "Role in the project",
+    "rolePlaceholder": "contractor, architect…",
+    "contact": "Contact"
+  },
+  "multi": {
+    "add": "Add another",
+    "remove": "Remove this line"
+  },
+  "groups": {
+    "favorites": "Favourites",
+    "other": "No trade"
+  },
+  "filter": {
+    "search": "Search contacts…"
+  },
+  "favorite": {
+    "add": "Add {{name}} to favourites",
+    "remove": "Remove {{name}} from favourites",
+    "failed": "Couldn't update your favourites. Try again."
+  },
+  "form": {
+    "createTitle": "Add a contact",
+    "editTitle": "Edit contact",
+    "description": "Someone your household deals with: a contractor, supplier, service or school.",
+    "addedOn": "Added on {{date}}",
+    "created": "Contact added",
+    "updated": "Changes saved"
+  },
+  "projects": {
+    "label": "Projects",
+    "linkLabel": "Works on {{name}}"
+  },
+  "delete": {
+    "label": "Delete",
+    "title": "Delete {{name}}?",
+    "description": "The contact disappears from your lists and pickers.",
+    "descriptionLinked_one": "The contact disappears from your lists and pickers, and from the project it is linked to. The project stays.",
+    "descriptionLinked_other": "The contact disappears from your lists and pickers, and from the {{count}} projects it is linked to. The projects stay.",
+    "deleted": "Contact deleted"
+  },
+  "picker": {
+    "placeholder": "Choose a contact…",
+    "empty": "No contacts found."
+  },
+  "project": {
+    "title": "Contacts",
+    "description": "Who works on this project: contractor, architect, suppliers…",
+    "empty": "No contacts linked yet.",
+    "link": "Link a contact",
+    "new": "New contact",
+    "linkTitle": "Link a contact",
+    "linkDescription": "Choose a contact and their role in this project.",
+    "linkSubmit": "Link",
+    "linked": "Contact linked to the project",
+    "newDescription": "The new contact is linked to this project right away.",
+    "remove": "Remove {{name}} from this project",
+    "removeTitle": "Remove {{name}} from this project?",
+    "removeDescription": "The contact stays in your contacts.",
+    "removeConfirm": "Remove",
+    "removed": "Contact removed from the project",
+    "loading": "Loading contacts…",
+    "error": "Couldn't load the contacts."
+  },
+  "empty": {
+    "title": "No contacts yet",
+    "description": "Add the contractors, suppliers and services your household deals with."
+  },
+  "errors": {
+    "notFound": "This contact or project no longer exists.",
+    "forbidden": "Only adults can change contacts.",
+    "chooseContact": "Choose a contact.",
+    "invalidPhone": "Enter a valid phone number.",
+    "duplicateValue": "This one is already in the list.",
+    "unknownShop": "This shop no longer exists."
+  }
+}

@@ -1,0 +1,5 @@
+- Shops: the built-in catalogue (Belgian chains) plus the household's own shops. Each has a type, optional address, opening hours, website, a webshop flag and notes. Favourites are personal (each person stars their own).
+- "Welke winkels hebben een webshop" → `shops_list` webshop true; "openingsuren van de Gamma" / "wat moet ik daar halen" → `shops_list` shop Gamma.
+- "Voeg de bakker De Smet toe" → `shops_save` name + type; edits: give the shop and only what changes.
+- Built-in shops: only the owner edits them, nobody deletes them. Adding, editing, deleting shops is for adults; children may star favourites.
+- Product links per shop (webshop page, price) are on products (inventory skill); a planned shopping trip is a calendar event with a shop.

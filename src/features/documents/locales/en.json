@@ -1,0 +1,206 @@
+{
+  "page": {
+    "title": "Documents",
+    "description": "The household's files in one place: deeds, insurance, warranties, invoices and plans."
+  },
+  "breadcrumbs": "Folder path",
+  "actions": {
+    "menu": "Actions for {{name}}",
+    "open": "Open",
+    "preview": "Preview",
+    "download": "Download",
+    "rename": "Rename",
+    "move": "Move to…",
+    "trash": "Move to trash",
+    "newFolder": "New folder",
+    "upload": "Upload",
+    "chooseFiles": "Choose files",
+    "openInTab": "Open in new tab",
+    "restore": "Restore",
+    "deleteForever": "Delete forever",
+    "deleteForeverNamed": "Delete {{name}} forever",
+    "emptyTrash": "Empty trash",
+    "undo": "Undo"
+  },
+  "list": {
+    "folders": "Folders",
+    "files": "Files",
+    "name": "Name",
+    "modified": "Modified",
+    "size": "Size",
+    "actions": "Actions",
+    "in": "In {{path}}",
+    "inDrive": "In Google Drive"
+  },
+  "storage": {
+    "inDrive": "Drive",
+    "inDriveHint": "Stored in Google Drive; opens through WickedHome",
+    "pending": "Waiting for Drive",
+    "pendingHint": "Kept on the server for now; it moves to Google Drive automatically when Drive is available"
+  },
+  "folder": {
+    "folders_one": "{{count}} folder",
+    "folders_other": "{{count}} folders",
+    "files_one": "{{count}} file",
+    "files_other": "{{count}} files",
+    "empty": "Empty"
+  },
+  "toolbar": {
+    "search": "Search documents…"
+  },
+  "sort": {
+    "label": "Sort by",
+    "name": "Name",
+    "modified": "Last modified",
+    "size": "Size",
+    "asc": {
+      "name": "A to Z",
+      "modified": "Oldest first",
+      "size": "Smallest first"
+    },
+    "desc": {
+      "name": "Z to A",
+      "modified": "Newest first",
+      "size": "Largest first"
+    }
+  },
+  "folderForm": {
+    "createTitle": "New folder",
+    "editTitle": "Edit folder",
+    "description": "Give the folder a name and, if you like, a colour.",
+    "name": "Name",
+    "namePlaceholder": "e.g. Insurance",
+    "color": "Colour",
+    "create": "Create",
+    "created": "Folder created",
+    "updated": "Folder saved"
+  },
+  "renameForm": {
+    "title": "Rename file",
+    "name": "Name",
+    "renamed": "File renamed"
+  },
+  "moveForm": {
+    "title": "Move “{{name}}”",
+    "description": "Choose the folder to move it to.",
+    "destination": "Destination folder",
+    "current": "Current location",
+    "expand": "Show subfolders",
+    "collapse": "Hide subfolders",
+    "submit": "Move here",
+    "moved": "Moved",
+    "loadFailed": "The folders could not be loaded."
+  },
+  "preview": {
+    "uploadedBy": "uploaded by {{name}}",
+    "unavailable": "There's no preview for this kind of file. Download it to open it.",
+    "loading": "Loading preview…",
+    "failed": "The preview could not be loaded.",
+    "truncated": "Only the beginning of the file is shown. Download it to see everything."
+  },
+  "upload": {
+    "title": "Uploads",
+    "progress_one": "Uploading…",
+    "progress_other": "Uploading {{current}} of {{total}}…",
+    "overall": "Upload progress",
+    "bytes": "{{loaded}} of {{total}}",
+    "waiting": "Waiting…",
+    "done": "Uploaded",
+    "finished_zero": "Nothing was uploaded",
+    "finished_one": "{{count}} file uploaded",
+    "finished_other": "{{count}} files uploaded",
+    "failedCount_one": "{{count}} failed",
+    "failedCount_other": "{{count}} failed",
+    "cancelledCount_one": "{{count}} cancelled",
+    "cancelledCount_other": "{{count}} cancelled",
+    "clear": "Clear",
+    "cancelled": "Cancelled",
+    "cancel": "Cancel uploading {{name}}",
+    "cancelAll": "Cancel all",
+    "dropTitle": "Drop to upload to {{folder}}",
+    "tooLarge": "This file is too large.",
+    "network": "The connection dropped. Try again.",
+    "failed": "Upload failed. Try again."
+  },
+  "usage": {
+    "title": "Storage",
+    "files_one": "in {{count}} file",
+    "files_other": "in {{count}} files",
+    "disk": "Disk usage",
+    "free": "{{free}} free of {{total}}",
+    "trash": "{{size}} in the trash",
+    "failed": "The storage details could not be loaded."
+  },
+  "trash": {
+    "title": "Trash",
+    "description": "Restore what you still need. Items stay here until you delete them or empty the trash.",
+    "search": "Search the trash…",
+    "trashedOn": "trashed {{date}}",
+    "deleteTitle": "Delete “{{name}}” forever?",
+    "deleteDescription": "The file is removed from the server. This can't be undone.",
+    "deleteFolderDescription": "The folder and everything in it are removed from the server. This can't be undone.",
+    "moved": "“{{name}}” moved to the trash",
+    "restored": "“{{name}}” restored",
+    "deleted": "“{{name}}” deleted forever",
+    "emptied": "Trash emptied",
+    "emptyTitle": "Empty the trash?",
+    "emptyDescription": "Everything in the trash ({{size}}) is removed from the server. This can't be undone.",
+    "emptyStateTitle": "The trash is empty",
+    "emptyStateDescription": "Files and folders you delete end up here first."
+  },
+  "search": {
+    "results": "Results for “{{query}}” in all folders",
+    "emptyTitle": "Nothing found for “{{query}}”",
+    "emptyDescription": "Try part of the name, or check the trash."
+  },
+  "empty": {
+    "driveTitle": "No documents yet",
+    "folderTitle": "This folder is empty",
+    "dropDescription": "Drop files here, or choose them from your device."
+  },
+  "errors": {
+    "conflict": "There's already a folder with that name here.",
+    "forbidden": "Only adults can change documents.",
+    "notFound": "This item no longer exists. Reload the page.",
+    "badRequest": "That didn't work. Check the name and try again."
+  },
+  "attachments": {
+    "title": "Documents",
+    "attachExisting": "Attach existing",
+    "attachTitle": "Attach a document",
+    "attachDescription": "Search the household's documents.",
+    "searchHint": "Type part of a file name.",
+    "searching": "Searching…",
+    "searchFailed": "Searching failed. Try again.",
+    "noResults": "No documents with that name.",
+    "attach": "Attach",
+    "attached": "Attached",
+    "attachedToast": "“{{name}}” attached",
+    "detached": "“{{name}}” detached. It's still in Documents.",
+    "detach": "Detach",
+    "failed": "That didn't work. Try again.",
+    "loadFailed": "The documents could not be loaded.",
+    "retry": "Try again",
+    "empty": "No documents attached.",
+    "showInDrive": "Show in Documents",
+    "dropTitle": "Add a document",
+    "dropDescription": "Invoice, manual, warranty, quote… up to {{size}}."
+  },
+  "loading": {
+    "folder": "Opening folder…",
+    "search": "Searching…",
+    "folders": "Loading folders…",
+    "usage": "Loading storage details…",
+    "attachments": "Loading documents…"
+  },
+  "jobs": {
+    "abandonedUploads": {
+      "title": "Clean up unfinished uploads",
+      "description": "Removes files whose upload started more than a day ago but never finished."
+    },
+    "moveToTargets": {
+      "title": "Move documents to Google Drive",
+      "description": "Moves bill documents waiting for Drive (Drive was unavailable, or \"move existing\"), verifies each copy, then removes the server copy."
+    }
+  }
+}

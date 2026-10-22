@@ -1,0 +1,156 @@
+// Feature: recipes. Recipes with ingredients linked to products, the "To cook" list and cooking sessions.
+
+/// Where a meal on the "To cook" list is: waiting, being cooked (the cooking view is open), or made.
+enum MealPlanStatus {
+  OPEN
+  COOKING
+  COOKED
+}
+
+/// A recipe: ingredients (linked to the household's products where possible) and steps. Household-wide;
+/// favourites and recently used are per person (selections, entity type "recipe"). An attached image
+/// (documents, entity type "recipe") overrides the original source photo as the cover.
+model Recipe {
+  id              String             @id @default(cuid())
+  householdId     String
+  household       Household          @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name            String
+  categoryId      String?
+  category        RecipeCategory?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  /// How many people the amounts are for; null = not said (amounts are used as they are).
+  servings        Int?
+  /// The web page the recipe came from.
+  sourceUrl       String?
+  /// Original recipe photo from its source page; an attached cover takes precedence.
+  imageUrl        String?
+  /// Soft reference to an attached image (documents feature), shown on the tile and the page.
+  coverFileId     String?
+  notes           String?
+  /// Soft reference to the user who added it.
+  createdByUserId String?
+  ingredients     RecipeIngredient[]
+  steps           RecipeStep[]
+  mealPlanEntries MealPlanEntry[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([householdId, name])
+  @@index([categoryId])
+  @@map("recipes")
+}
+
+/// Categories are shared by the household; deleting one keeps its recipes, without a category.
+model RecipeCategory {
+  id          String    @id @default(cuid())
+  householdId String
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name        String
+  /// Normalized name prevents duplicate categories differing only in case, spaces or accents.
+  nameKey     String
+  recipes     Recipe[]
+
+  @@unique([householdId, nameKey])
+  @@map("recipe_categories")
+}
+
+/// One ingredient of a recipe. `quantity`/`unit` are in the product's stock unit (1 pack), so stock can be
+/// checked and deducted; the recipe's own amount ("200 g, diced") stays in `note`. No unit conversion.
+model RecipeIngredient {
+  id        String   @id @default(cuid())
+  recipeId  String
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  position  Int
+  /// The household product it is (shopping feature); null = free text only.
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name      String
+  quantity  Decimal? @db.Decimal(12, 3)
+  unit      String?
+  note      String?
+  optional  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([recipeId, position])
+  @@index([productId])
+  @@map("recipe_ingredients")
+}
+
+/// One step of a recipe, shown one at a time in the cooking view, optionally with a timer.
+model RecipeStep {
+  id           String @id @default(cuid())
+  recipeId     String
+  recipe       Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  position     Int
+  text         String
+  timerMinutes Int?
+
+  @@index([recipeId, position])
+  @@map("recipe_steps")
+}
+
+/// A meal on the "To cook" list, and its cooking session. Nothing is taken from stock automatically: every
+/// ingredient used while cooking is a `CookUsage` (with its stock movement), so it can be undone per tap.
+model MealPlanEntry {
+  id            String                @id @default(cuid())
+  householdId   String
+  household     Household             @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  recipeId      String
+  recipe        Recipe                @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  servings      Int
+  status        MealPlanStatus        @default(OPEN)
+  /// Soft reference to the user who put it on the list.
+  addedByUserId String?
+  startedAt     DateTime?
+  cookedAt      DateTime?
+  /// The step the cook is at (0-based), so another device or the assistant knows.
+  currentStep   Int                   @default(0)
+  extras        CookExtraIngredient[]
+  usages        CookUsage[]
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  @@index([householdId, status])
+  @@index([recipeId])
+  @@map("meal_plan_entries")
+}
+
+/// An ingredient used while cooking that isn't in the recipe (optionally also saved to the recipe).
+model CookExtraIngredient {
+  id            String        @id @default(cuid())
+  entryId       String
+  entry         MealPlanEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  productId     String?
+  product       Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name          String
+  quantity      Decimal?      @db.Decimal(12, 3)
+  unit          String?
+  savedToRecipe Boolean       @default(false)
+  usages        CookUsage[]
+  createdAt     DateTime      @default(now())
+
+  @@index([entryId])
+  @@map("cook_extra_ingredients")
+}
+
+/// One "used" tap while cooking: how much of which ingredient (or extra), and the stock movement that took it
+/// out of stock (null when the product isn't kept in stock or the stock was already zero). Undoing it adds a
+/// correcting movement and sets `undoneAt`.
+model CookUsage {
+  id           String               @id @default(cuid())
+  entryId      String
+  entry        MealPlanEntry        @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  /// Soft reference to the recipe ingredient (it may be edited away later).
+  ingredientId String?
+  extraId      String?
+  extra        CookExtraIngredient? @relation(fields: [extraId], references: [id], onDelete: Cascade)
+  quantity     Decimal              @db.Decimal(12, 3)
+  /// Soft reference to the stock movement (inventory feature).
+  movementId   String?
+  userId       String?
+  undoneAt     DateTime?
+  createdAt    DateTime             @default(now())
+
+  @@index([entryId])
+  @@map("cook_usages")
+}

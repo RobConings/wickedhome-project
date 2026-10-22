@@ -1,0 +1,206 @@
+{
+  "page": {
+    "title": "Documenten",
+    "description": "Alle bestanden van het huishouden op één plek: aktes, verzekeringen, garanties, facturen en plannen."
+  },
+  "breadcrumbs": "Mappenpad",
+  "actions": {
+    "menu": "Acties voor {{name}}",
+    "open": "Openen",
+    "preview": "Voorbeeld",
+    "download": "Downloaden",
+    "rename": "Naam wijzigen",
+    "move": "Verplaatsen naar…",
+    "trash": "Naar prullenbak",
+    "newFolder": "Nieuwe map",
+    "upload": "Uploaden",
+    "chooseFiles": "Bestanden kiezen",
+    "openInTab": "Openen in nieuw tabblad",
+    "restore": "Terugzetten",
+    "deleteForever": "Definitief verwijderen",
+    "deleteForeverNamed": "{{name}} definitief verwijderen",
+    "emptyTrash": "Prullenbak leegmaken",
+    "undo": "Ongedaan maken"
+  },
+  "list": {
+    "folders": "Mappen",
+    "files": "Bestanden",
+    "name": "Naam",
+    "modified": "Gewijzigd",
+    "size": "Grootte",
+    "actions": "Acties",
+    "in": "In {{path}}",
+    "inDrive": "In Google Drive"
+  },
+  "storage": {
+    "inDrive": "Drive",
+    "inDriveHint": "Bewaard in Google Drive; opent via WickedHome",
+    "pending": "Wacht op Drive",
+    "pendingHint": "Voorlopig op de server bewaard; gaat vanzelf naar Google Drive zodra Drive beschikbaar is"
+  },
+  "folder": {
+    "folders_one": "{{count}} map",
+    "folders_other": "{{count}} mappen",
+    "files_one": "{{count}} bestand",
+    "files_other": "{{count}} bestanden",
+    "empty": "Leeg"
+  },
+  "toolbar": {
+    "search": "Documenten zoeken…"
+  },
+  "sort": {
+    "label": "Sorteren op",
+    "name": "Naam",
+    "modified": "Laatst gewijzigd",
+    "size": "Grootte",
+    "asc": {
+      "name": "A tot Z",
+      "modified": "Oudste eerst",
+      "size": "Kleinste eerst"
+    },
+    "desc": {
+      "name": "Z tot A",
+      "modified": "Nieuwste eerst",
+      "size": "Grootste eerst"
+    }
+  },
+  "folderForm": {
+    "createTitle": "Nieuwe map",
+    "editTitle": "Map bewerken",
+    "description": "Geef de map een naam en, als je wilt, een kleur.",
+    "name": "Naam",
+    "namePlaceholder": "bv. Verzekeringen",
+    "color": "Kleur",
+    "create": "Aanmaken",
+    "created": "Map aangemaakt",
+    "updated": "Map opgeslagen"
+  },
+  "renameForm": {
+    "title": "Naam van bestand wijzigen",
+    "name": "Naam",
+    "renamed": "Naam gewijzigd"
+  },
+  "moveForm": {
+    "title": "“{{name}}” verplaatsen",
+    "description": "Kies de map waar het naartoe moet.",
+    "destination": "Doelmap",
+    "current": "Huidige locatie",
+    "expand": "Submappen tonen",
+    "collapse": "Submappen verbergen",
+    "submit": "Hierheen verplaatsen",
+    "moved": "Verplaatst",
+    "loadFailed": "De mappen konden niet geladen worden."
+  },
+  "preview": {
+    "uploadedBy": "geüpload door {{name}}",
+    "unavailable": "Voor dit soort bestand is er geen voorbeeld. Download het om het te openen.",
+    "loading": "Voorbeeld laden…",
+    "failed": "Het voorbeeld kon niet geladen worden.",
+    "truncated": "Alleen het begin van het bestand wordt getoond. Download het om alles te zien."
+  },
+  "upload": {
+    "title": "Uploads",
+    "progress_one": "Bezig met uploaden…",
+    "progress_other": "{{current}} van {{total}} uploaden…",
+    "overall": "Voortgang van de upload",
+    "bytes": "{{loaded}} van {{total}}",
+    "waiting": "Wacht…",
+    "done": "Geüpload",
+    "finished_zero": "Er is niets geüpload",
+    "finished_one": "{{count}} bestand geüpload",
+    "finished_other": "{{count}} bestanden geüpload",
+    "failedCount_one": "{{count}} mislukt",
+    "failedCount_other": "{{count}} mislukt",
+    "cancelledCount_one": "{{count}} geannuleerd",
+    "cancelledCount_other": "{{count}} geannuleerd",
+    "clear": "Wissen",
+    "cancelled": "Geannuleerd",
+    "cancel": "Uploaden van {{name}} annuleren",
+    "cancelAll": "Alles annuleren",
+    "dropTitle": "Loslaten om te uploaden naar {{folder}}",
+    "tooLarge": "Dit bestand is te groot.",
+    "network": "De verbinding viel weg. Probeer het opnieuw.",
+    "failed": "Uploaden mislukt. Probeer het opnieuw."
+  },
+  "usage": {
+    "title": "Opslag",
+    "files_one": "in {{count}} bestand",
+    "files_other": "in {{count}} bestanden",
+    "disk": "Schijfgebruik",
+    "free": "{{free}} vrij van {{total}}",
+    "trash": "{{size}} in de prullenbak",
+    "failed": "De opslaggegevens konden niet geladen worden."
+  },
+  "trash": {
+    "title": "Prullenbak",
+    "description": "Zet terug wat je nog nodig hebt. Items blijven hier tot je ze verwijdert of de prullenbak leegmaakt.",
+    "search": "Zoeken in de prullenbak…",
+    "trashedOn": "verwijderd op {{date}}",
+    "deleteTitle": "“{{name}}” definitief verwijderen?",
+    "deleteDescription": "Het bestand wordt van de server gewist. Dit kan niet ongedaan gemaakt worden.",
+    "deleteFolderDescription": "De map en alles erin worden van de server gewist. Dit kan niet ongedaan gemaakt worden.",
+    "moved": "“{{name}}” naar de prullenbak verplaatst",
+    "restored": "“{{name}}” teruggezet",
+    "deleted": "“{{name}}” definitief verwijderd",
+    "emptied": "Prullenbak leeggemaakt",
+    "emptyTitle": "Prullenbak leegmaken?",
+    "emptyDescription": "Alles in de prullenbak ({{size}}) wordt van de server gewist. Dit kan niet ongedaan gemaakt worden.",
+    "emptyStateTitle": "De prullenbak is leeg",
+    "emptyStateDescription": "Bestanden en mappen die je verwijdert, komen eerst hier terecht."
+  },
+  "search": {
+    "results": "Resultaten voor “{{query}}” in alle mappen",
+    "emptyTitle": "Niets gevonden voor “{{query}}”",
+    "emptyDescription": "Probeer een deel van de naam, of kijk in de prullenbak."
+  },
+  "empty": {
+    "driveTitle": "Nog geen documenten",
+    "folderTitle": "Deze map is leeg",
+    "dropDescription": "Sleep bestanden hierheen, of kies ze op je toestel."
+  },
+  "errors": {
+    "conflict": "Er staat hier al een map met die naam.",
+    "forbidden": "Alleen volwassenen kunnen documenten wijzigen.",
+    "notFound": "Dit item bestaat niet meer. Laad de pagina opnieuw.",
+    "badRequest": "Dat lukte niet. Controleer de naam en probeer het opnieuw."
+  },
+  "attachments": {
+    "title": "Documenten",
+    "attachExisting": "Bestaand koppelen",
+    "attachTitle": "Document koppelen",
+    "attachDescription": "Zoek in de documenten van het huishouden.",
+    "searchHint": "Typ een deel van de bestandsnaam.",
+    "searching": "Zoeken…",
+    "searchFailed": "Zoeken mislukt. Probeer het opnieuw.",
+    "noResults": "Geen documenten met die naam.",
+    "attach": "Koppelen",
+    "attached": "Gekoppeld",
+    "attachedToast": "“{{name}}” gekoppeld",
+    "detached": "“{{name}}” ontkoppeld. Het staat nog in Documenten.",
+    "detach": "Ontkoppelen",
+    "failed": "Dat lukte niet. Probeer het opnieuw.",
+    "loadFailed": "De documenten konden niet geladen worden.",
+    "retry": "Opnieuw proberen",
+    "empty": "Geen documenten gekoppeld.",
+    "showInDrive": "Tonen in Documenten",
+    "dropTitle": "Document toevoegen",
+    "dropDescription": "Factuur, handleiding, garantie, offerte… tot {{size}}."
+  },
+  "loading": {
+    "folder": "Map openen…",
+    "search": "Zoeken…",
+    "folders": "Mappen laden…",
+    "usage": "Opslaggegevens laden…",
+    "attachments": "Documenten laden…"
+  },
+  "jobs": {
+    "abandonedUploads": {
+      "title": "Onafgewerkte uploads opruimen",
+      "description": "Verwijdert bestanden waarvan de upload meer dan een dag geleden begon maar nooit afrondde."
+    },
+    "moveToTargets": {
+      "title": "Documenten naar Google Drive verplaatsen",
+      "description": "Verplaatst factuurdocumenten die op Drive wachten (Drive was niet bereikbaar, of \"bestaande verplaatsen\"), controleert elke kopie en verwijdert pas dan de kopie op de server."
+    }
+  }
+}

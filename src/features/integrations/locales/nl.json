@@ -1,0 +1,419 @@
+{
+  "notifications": {
+    "mailBills": {
+      "title": "Rekeningen gevonden in mail",
+      "description": "Als een zoekopdracht in Gmail nieuwe rekeningen vond om na te kijken als voorgestelde uitgaven."
+    },
+    "mailReply": {
+      "title": "Antwoorden op je mails",
+      "description": "Als iemand antwoordt op een mail die je via de assistent stuurde of aan een project koppelde (alleen je eigen mailbox)."
+    }
+  },
+  "page": {
+    "title": "Koppelingen",
+    "description": "Verbind WickedHome met andere diensten. Alles werkt zonder; elke koppeling voegt gegevens toe of bespaart typwerk.",
+    "footer": "Sleutels en tokens blijven op de server en worden nooit in de app getoond."
+  },
+  "status": {
+    "not_configured": "Niet ingesteld",
+    "disconnected": "Niet verbonden",
+    "connected": "Verbonden",
+    "error": "Vraagt aandacht"
+  },
+  "loading": {
+    "card": "{{name}} laden…"
+  },
+  "setup": {
+    "copy": "Kopiëren"
+  },
+  "settingsLink": {
+    "title": "Koppelingen",
+    "description": "Google, Home Assistant, de assistent",
+    "text": "Verbindingen met andere diensten hebben een eigen pagina.",
+    "open": "Koppelingen openen"
+  },
+  "google": {
+    "title": "Google",
+    "description": "Je eigen Google-account: je agenda's op de gezinskalender, rekeningen uit Gmail als voorgestelde uitgaven en Drive-mappen in Documenten.",
+    "loadError": "De status van Google kon niet geladen worden.",
+    "connect": "Verbinden",
+    "turnOn": "Aanzetten",
+    "connectFailed": "Verbinden met Google is niet gestart. Probeer opnieuw.",
+    "connectedAs": "Verbonden als {{email}}",
+    "connectedSince": "Verbonden sinds {{date}}. Iedereen in het gezin verbindt zijn eigen account.",
+    "needsReconnect": "Opnieuw verbinden",
+    "reconnect": "Opnieuw verbinden",
+    "reconnectHint": "Google aanvaardt je toestemming niet meer (ingetrokken of verlopen). Verbind opnieuw om verder te synchroniseren.",
+    "disconnect": "Loskoppelen",
+    "disconnectConfirm": {
+      "title": "Google loskoppelen?",
+      "description": "WickedHome trekt zijn toegang bij Google in en vergeet je agenda's, de gekopieerde afspraken, je openstaande mailvoorstellen en je gekoppelde Drive-mappen. In je Google-account wordt niets verwijderd.",
+      "driveFiles_one": "Let op: {{count}} factuurdocument staat in je Drive. Het blijft daar, maar opent niet in WickedHome tot je opnieuw koppelt met hetzelfde Google-account, en nieuwe factuurdocumenten worden intussen op de server bewaard.",
+      "driveFiles_other": "Let op: {{count}} factuurdocumenten staan in je Drive. Ze blijven daar, maar openen niet in WickedHome tot je opnieuw koppelt met hetzelfde Google-account, en nieuwe factuurdocumenten worden intussen op de server bewaard."
+    },
+    "disconnected": "Google losgekoppeld",
+    "finishing": "Verbinding afronden…",
+    "wrongOrigin": "Verbinden werkt alleen vanaf het adres waar Google je naar terugstuurt. Open WickedHome op",
+    "privacy": "WickedHome vraagt Google alleen wat de functie die je aanzet nodig heeft. Je tokens worden versleuteld op de server bewaard.",
+    "return": {
+      "connected": "Google verbonden ({{email}})",
+      "denied": "Je gaf bij Google geen toegang. Er is niets verbonden.",
+      "expired": "Dat duurde te lang. Begin opnieuw met verbinden.",
+      "error": "Google kon niet verbonden worden. Probeer opnieuw."
+    },
+    "setup": {
+      "intro": "Google is nog niet ingesteld op de server. De eigenaar doet dit één keer, daarna verbindt iedereen zijn eigen account:",
+      "key": "Voer dit uit op de server om een sleutel voor de tokens te maken…",
+      "keyEnv": "…en zet hem in .env (nooit meer wijzigen, anders moet iedereen opnieuw verbinden).",
+      "project": "Maak in de Google Cloud Console een project en zet de Google Calendar API, Gmail API en Google Drive API aan.",
+      "consent": "OAuth-toestemmingsscherm: Extern, voeg de Google-accounts van het gezin toe als gebruikers en publiceer de app (\"In productie\"), zodat verbindingen niet na 7 dagen verlopen.",
+      "client": "Inloggegevens → OAuth-client-ID maken → Webapplicatie, met geautoriseerde omleidings-URI {{uri}}. Zet de ID en het geheim in .env:",
+      "restart": "Herstart de app om de nieuwe instellingen te laden.",
+      "outro": "Details: docs/INTEGRATIONS.md, \"Google as built\"."
+    },
+    "features": {
+      "calendar": {
+        "title": "Agenda",
+        "description": "Toon de Google-agenda's die je kiest op de gezinskalender, elke 15 minuten gesynchroniseerd. Optioneel: gezinsafspraken naar Google publiceren."
+      },
+      "calendar_publish": {
+        "title": "Publiceren naar Google Agenda",
+        "description": "Zet gezinsafspraken van gekozen categorieën in een van je agenda's."
+      },
+      "gmail": {
+        "title": "Gmail",
+        "description": "Vindt facturen van bekende afzenders (Fluvius, Telenet…) en stelt ze voor als uitgave met de pdf, en laat de assistent je eigen mail doorzoeken en lezen als je erom vraagt. Alleen lezen; niets wordt toegevoegd zonder jouw tik."
+      },
+      "drive": {
+        "title": "Drive",
+        "description": "Koppel Drive-mappen aan Documenten, open of importeer hun bestanden en bewaar documenten in je Drive."
+      },
+      "gmail_send": {
+        "title": "Mail versturen via de assistent",
+        "description": "De assistent kan mails voor je schrijven (bv. een offerteaanvraag aan een aannemer). Elke mail verschijnt eerst op een kaart: jij tikt Versturen of Als concept bewaren."
+      }
+    },
+    "calendar": {
+      "sourceLabel": "Google Agenda",
+      "listLabel": "Je Google-agenda's",
+      "none": "Geen agenda's gevonden in dit Google-account.",
+      "show": "{{name}} tonen op de kalender",
+      "primary": "Hoofdagenda",
+      "visibilityLabel": "Wie ziet hem",
+      "visibility": {
+        "household": "Het hele gezin",
+        "private": "Alleen ik"
+      },
+      "syncNow": "Nu synchroniseren",
+      "refreshList": "Lijst vernieuwen",
+      "synced": "Agenda's gesynchroniseerd",
+      "syncFailed": "Synchroniseren met Google mislukte. Probeer later opnieuw.",
+      "lastSynced": "Laatst gesynchroniseerd {{time}}",
+      "neverSynced": "Nog niet gesynchroniseerd",
+      "failing": "Deze agenda's konden niet gesynchroniseerd worden: {{names}}",
+      "openInGoogle": "Openen in Google Agenda",
+      "busy": "Bezet"
+    },
+    "publish": {
+      "title": "Gezinsafspraken publiceren",
+      "description": "Eén richting: gezinsafspraken van de categorieën die je kiest verschijnen in een van je Google-agenda's (zodat telefoons ze tonen). Wijzigingen in Google komen niet terug.",
+      "allow": "Schrijven naar Google Agenda toestaan",
+      "target": "Publiceren naar",
+      "off": "Uit (niet publiceren)",
+      "categories": "Te publiceren categorieën",
+      "saved": "Publiceren bewaard; nieuwe en gewijzigde afspraken volgen binnen enkele seconden",
+      "turnedOff": "Publiceren uitgezet; gepubliceerde afspraken worden uit Google verwijderd",
+      "failed": "Publiceren mislukte: {{error}}",
+      "status_one": "{{count}} afspraak gepubliceerd, laatst om {{time}}",
+      "status_other": "{{count}} afspraken gepubliceerd, laatst om {{time}}"
+    },
+    "mail": {
+      "scanNow": "Nu mail doorzoeken",
+      "scanned_one": "Mail doorzocht: {{count}} voorstel wacht",
+      "scanned_other": "Mail doorzocht: {{count}} voorstellen wachten",
+      "scanFailed": "Je mail doorzoeken mislukte. Probeer later opnieuw.",
+      "pending_one": "{{count}} voorgestelde uitgave wacht op de pagina Uitgaven",
+      "pending_other": "{{count}} voorgestelde uitgaven wachten op de pagina Uitgaven",
+      "nonePending": "Geen voorstellen die wachten.",
+      "failed": "Het laatste zoeken mislukte: {{error}}",
+      "rules": "Afzenders…",
+      "lastScan": "Laatst doorzocht {{time}}",
+      "neverScanned": "Nog niet doorzocht",
+      "privacy": "Het zoeken naar rekeningen leest alleen mails van deze afzenders met een pdf en bewaart het bedrag, de vervaldag en de betaalreferentie, nooit de mail. De assistent leest andere mail alleen als jij erom vraagt, en alleen je eigen mailbox.",
+      "send": {
+        "title": "Mail versturen via de assistent",
+        "description": "Laat de assistent mails versturen of als Gmail-concept bewaren vanuit je account, altijd pas nadat je op de kaart Versturen of Als concept bewaren tikte. Google vraagt één keer om toestemming.",
+        "turnOn": "Aanzetten",
+        "on": "Aan: mails worden pas verstuurd of als concept bewaard na jouw tik."
+      }
+    },
+    "rules": {
+      "title": "Afzenders van rekeningen",
+      "description": "Mail van deze afzenders met een pdf erbij wordt een voorgestelde uitgave. Gedeeld door het hele gezin.",
+      "payee": "Begunstigde",
+      "senders": "Afzenders",
+      "sendersHint": "Adressen of domeinen, één per regel (bv. fluvius.be of facturen@luminus.be).",
+      "category": "Categorie",
+      "enable": "Mail van {{payee}} doorzoeken",
+      "builtIn": "Ingebouwd",
+      "add": "Afzender toevoegen",
+      "saved": "Bewaard",
+      "deleteTitle": "{{payee}} verwijderen?",
+      "invalidSender": "Gebruik een adres of een domein, zoals fluvius.be."
+    },
+    "drive": {
+      "link": "Drive-map koppelen",
+      "linkCount_one": "{{count}} map gekoppeld aan Documenten.",
+      "linkCount_other": "{{count}} mappen gekoppeld aan Documenten.",
+      "openDocuments": "Documenten openen",
+      "noLinks": "Nog geen mappen gekoppeld.",
+      "privacy": "Een gekoppelde map is zichtbaar (alleen lezen) voor iedereen in het gezin, via jouw verbinding. Ontkoppelen verwijdert nooit iets in Drive.",
+      "pickTitle": "Drive-map koppelen",
+      "pickDescription": "Open de map die je wil koppelen en koppel ze. Ze verschijnt in Documenten voor het hele gezin.",
+      "myDrive": "Mijn Drive",
+      "path": "Mappad",
+      "loadError": "Je Drive kon niet gelezen worden.",
+      "noSubfolders": "Geen mappen hierin",
+      "linkThis": "\"{{name}}\" koppelen",
+      "openAFolder": "Open een map om te koppelen",
+      "linked": "\"{{name}}\" gekoppeld aan Documenten"
+    }
+  },
+  "suggestions": {
+    "title": "Voorgesteld uit mail",
+    "description": "Rekeningen gevonden in Gmail. Aanvaard om ze als uitgave toe te voegen, met de pdf erbij.",
+    "accept": "Aanvaarden",
+    "dismiss": "Negeren",
+    "dismissed": "Voorstel genegeerd",
+    "accepted": "Uitgave toegevoegd; de pdf staat in Documenten",
+    "attachFailed": "De uitgave is toegevoegd, maar de pdf kon niet uit Gmail gehaald worden.",
+    "fromMailbox": "Uit de mail van {{name}}",
+    "noAmount": "Bedrag niet gevonden",
+    "due": "Vervalt {{date}}",
+    "received": "Ontvangen {{date}}",
+    "loading": "Voorstellen laden…",
+    "showAll_one": "Nog {{count}} tonen",
+    "showAll_other": "Nog {{count}} tonen",
+    "showLess": "Minder tonen",
+    "acceptNew": "Als nieuwe toevoegen",
+    "view": "Bekijken"
+  },
+  "link": {
+    "action": "Koppelen…",
+    "looksLike": "Lijkt op: {{target}}",
+    "maybe": "Misschien: {{target}}",
+    "recurringTag": "(terugkerend)",
+    "recurring": "Terugkerend",
+    "paid": "Betaald",
+    "notCreatedShort": "Nog niet aangemaakt",
+    "notCreated": "Deze betaling bestaat nog niet: ze wordt aangemaakt als je koppelt.",
+    "dialogTitle": "Koppelen aan een bestaande uitgave",
+    "tabsLabel": "Waaraan de mail koppelen",
+    "tabs": {
+      "matches": "Voorstellen",
+      "expenses": "Uitgaven",
+      "recurring": "Terugkerend"
+    },
+    "noMatches": "Geen waarschijnlijke overeenkomsten. Zoek in de uitgaven of kies een terugkerende uitgave.",
+    "loading": "Uitgaven laden…",
+    "loadError": "De uitgaven konden niet geladen worden.",
+    "retry": "Opnieuw",
+    "expensesLabel": "Uitgaven",
+    "recurringLabel": "Terugkerende uitgaven",
+    "searchExpenses": "Uitgaven zoeken",
+    "searchRecurring": "Terugkerende uitgaven zoeken",
+    "noExpenses": "Geen uitgaven rond deze datum",
+    "noRecurring": "Nog geen terugkerende uitgaven",
+    "next": "Volgende {{date}}",
+    "status": {
+      "active": "Actief",
+      "paused": "Gepauzeerd",
+      "ended": "Beëindigd"
+    },
+    "occurrenceTitle": "Voor welke betaling van {{payee}} is deze mail?",
+    "occurrenceHint": "De betaling die het dichtst bij de vervaldatum van de mail ligt, is gekozen.",
+    "noOccurrences": "Geen betalingen rond deze datum.",
+    "suggested": "Past het best",
+    "continue": "Verder",
+    "back": "Terug",
+    "chooseOther": "Andere kiezen",
+    "target": "Koppelen aan",
+    "changesTitle": "Overnemen uit de mail",
+    "noChanges": "De uitgave komt al overeen met de mail.",
+    "becomes": "wordt",
+    "none": "geen",
+    "fields": {
+      "amount": "Bedrag",
+      "dueDate": "Vervaldatum",
+      "structuredCommunication": "Gestructureerde mededeling",
+      "iban": "IBAN",
+      "beneficiaryName": "Begunstigde"
+    },
+    "paidWarning": "Al betaald op {{date}}: bedrag of vervaldatum aanvinken wijzigt wat betaald is.",
+    "recurringTitle": "Ook de terugkerende uitgave aanpassen",
+    "recurringHint": "Voor {{payee}} en de komende onbetaalde betalingen.",
+    "remember": "Mails van {{sender}} altijd koppelen aan {{payee}}",
+    "rememberHint": "Volgende mails staan meteen bij de juiste betaling; je bevestigt nog met één tik.",
+    "pdf": "De pdf {{name}} wordt bij de uitgave gevoegd.",
+    "submit": "Koppelen",
+    "linked": "Gekoppeld aan {{payee}}; de pdf is toegevoegd",
+    "linkedNoPdf": "Gekoppeld aan {{payee}}, maar de pdf kon niet uit Gmail gehaald worden.",
+    "failed": "Koppelen is niet gelukt. Probeer opnieuw.",
+    "fromMail": "Uit mail van {{date}}",
+    "reasons": {
+      "ogm": "Zelfde mededeling",
+      "iban": "Zelfde IBAN",
+      "payee": "Zelfde begunstigde",
+      "remembered": "Altijd gekoppeld",
+      "date": "Vervaldatum dichtbij",
+      "amount": "Zelfde bedrag",
+      "amount_close": "Bedrag in de buurt"
+    }
+  },
+  "driveFolder": {
+    "badge": "Drive",
+    "title": "Gekoppelde Drive-mappen",
+    "linkedBy": "Gekoppeld door {{name}}",
+    "unavailable": "Niet beschikbaar: {{name}} moet Google opnieuw verbinden.",
+    "empty": "Deze map is leeg",
+    "loadError": "Deze Drive-map kon niet geopend worden.",
+    "open": "Openen",
+    "download": "Downloaden",
+    "openInDrive": "Openen in Drive",
+    "importCopy": "Kopie importeren",
+    "addAsLink": "Toevoegen aan Documenten (blijft in Drive)",
+    "imported": "\"{{name}}\" toegevoegd aan Documenten",
+    "unlink": "Map ontkoppelen",
+    "unlinkConfirm": "\"{{name}}\" ontkoppelen? In Drive wordt niets verwijderd.",
+    "unlinked": "Map ontkoppeld",
+    "notDownloadable": "Dit soort Google-bestand kan alleen in Drive geopend worden.",
+    "saveToDrive": "Bewaren in Drive",
+    "savedToDrive": "Bewaard in je Drive (map \"WickedHome\")",
+    "saveFailed": "Bewaren in Drive mislukte. Staat Drive aan bij Koppelingen?",
+    "storedInDrive": "Bewaard in Drive",
+    "back": "Documenten"
+  },
+  "driveStorage": {
+    "title": "Factuurdocumenten in Google Drive",
+    "description": "Bestanden bij uitgaven en pdf's uit mailvoorstellen worden in een Google Drive-map bewaard in plaats van op de server. Ze openen nog altijd in WickedHome.",
+    "loadError": "Deze instelling kon niet geladen worden.",
+    "state": {
+      "off": "Uit",
+      "active": "Aan",
+      "paused": "Gepauzeerd"
+    },
+    "notConfigured": "Stel eerst Google in (zie de Google-kaart hierboven).",
+    "needsDrive": "Zet Drive aan voor je Google-account om een map te kiezen. Facturen worden dan in jouw Drive bewaard, voor het hele gezin.",
+    "connectDrive": "Google Drive koppelen",
+    "turnOnDrive": "Drive aanzetten",
+    "modeLabel": "Welke map",
+    "mode": {
+      "create": "Nieuwe map",
+      "pick": "Bestaande map"
+    },
+    "folderName": "Naam van de map",
+    "defaultFolderName": "Facturen",
+    "createHint": "Wordt aangemaakt in je Mijn Drive. Je kan ze later in Drive verplaatsen of hernoemen; dat blijft werken.",
+    "createAndUse": "Map aanmaken en facturen daar bewaren",
+    "pickHint": "Gebruik een map die je zelf al maakte, bv. \"Facturen\".",
+    "pickScope": "Bestanden toevoegen aan een map die je zelf maakte, vraagt nog één toestemming: toegang tot je Drive. Google toont dan dat WickedHome niet door Google geverifieerd is (Geavanceerd → Ga naar WickedHome). WickedHome voegt daar alleen factuurdocumenten toe en verwijdert nooit iets, tenzij je dat hieronder aanzet.",
+    "allowFullDrive": "Toegang tot mijn Drive geven",
+    "chooseFolder": "Map kiezen",
+    "pickTitle": "Map voor factuurdocumenten",
+    "pickDescription": "Open de map waar factuurdocumenten in moeten komen en kies ze.",
+    "openAFolder": "Open een map om ze te kiezen",
+    "useThis": "Facturen bewaren in \"{{name}}\"",
+    "saved": "Factuurdocumenten worden nu bewaard in \"{{name}}\"",
+    "yearSubfolders": "Een submap per jaar",
+    "yearSubfoldersHint": "Bv. \"{{year}}\", aangemaakt wanneer nodig.",
+    "whereMine": "Bewaard in jouw Drive, map",
+    "whereOther": "Bewaard in de Drive van {{name}}, map",
+    "counts": {
+      "inDrive_one": "{{count}} document in Drive",
+      "inDrive_other": "{{count}} documenten in Drive",
+      "local_one": "{{count}} op de server",
+      "local_other": "{{count}} op de server"
+    },
+    "moveExisting_one": "{{count}} document naar Drive verplaatsen",
+    "moveExisting_other": "{{count}} documenten naar Drive verplaatsen",
+    "moveHint": "Elke kopie wordt in Drive gecontroleerd (grootte en checksum) voor de kopie op de server verdwijnt.",
+    "retryNow": "Nu opnieuw proberen",
+    "moving": "Naar Drive verplaatsen: {{done}} van {{total}}…",
+    "waiting_one": "{{count}} document wacht om naar Drive te gaan (intussen op de server bewaard). Het wordt vanzelf opnieuw geprobeerd.",
+    "waiting_other": "{{count}} documenten wachten om naar Drive te gaan (intussen op de server bewaard). Ze worden vanzelf opnieuw geprobeerd.",
+    "failed_one": "{{count}} daarvan mislukte al meermaals; wordt nog geprobeerd, minder vaak.",
+    "failed_other": "{{count}} daarvan mislukten al meermaals; worden nog geprobeerd, minder vaak.",
+    "lastError": "Laatste probleem: {{error}}",
+    "changeFolder": "Andere map kiezen",
+    "useMyDrive": "Mijn Drive gebruiken",
+    "connectAgain": "Google opnieuw koppelen",
+    "deleteInDrive": "Ook uit Drive verwijderen",
+    "deleteInDriveHint": "Wanneer een factuurdocument definitief verwijderd wordt in WickedHome (prullenbak leeggemaakt), gaat het ook naar de prullenbak van Drive. Uit: Drive houdt het bij.",
+    "paused": {
+      "disconnected_one": "Gepauzeerd: {{name}} koppelde Google los. Nieuwe factuurdocumenten worden op de server bewaard. Het {{count}} document dat al in Drive staat, blijft daar maar opent niet in WickedHome tot {{name}} opnieuw koppelt met hetzelfde Google-account.",
+      "disconnected_other": "Gepauzeerd: {{name}} koppelde Google los. Nieuwe factuurdocumenten worden op de server bewaard. De {{count}} documenten die al in Drive staan, blijven daar maar openen niet in WickedHome tot {{name}} opnieuw koppelt met hetzelfde Google-account.",
+      "needsReconnect": "Gepauzeerd: Google vraagt dat {{name}} opnieuw koppelt. Nieuwe factuurdocumenten wachten op de server en gaan daarna naar Drive.",
+      "missingScope": "Gepauzeerd: {{name}} laat WickedHome geen bestanden meer toevoegen aan deze map. Nieuwe factuurdocumenten wachten op de server."
+    },
+    "stop": "Niet meer in Drive bewaren",
+    "stopConfirm": {
+      "title": "Facturen niet meer in Drive bewaren?",
+      "description": "Nieuwe factuurdocumenten worden weer op de server bewaard. Documenten die al in Drive staan, blijven daar en openen nog altijd in WickedHome; er wordt niets verwijderd."
+    },
+    "stopped": "Factuurdocumenten worden weer op de server bewaard"
+  },
+  "jobs": {
+    "google-calendar": {
+      "title": "Google Agenda synchroniseren",
+      "description": "Kopieert nieuwe en gewijzigde afspraken van de gekozen Google-agenda's en publiceert gezinsafspraken, voor iedereen die Google verbond."
+    },
+    "google-mail": {
+      "title": "Rekeningen uit Gmail",
+      "description": "Doorzoekt de verbonden mailboxen naar facturen van de afzenders van rekeningen en voegt voorgestelde uitgaven toe."
+    },
+    "mail-replies": {
+      "title": "Antwoorden op gekoppelde mails",
+      "description": "Kijkt elke 10 minuten in ieders eigen Gmail of er nieuwe antwoorden zijn op mails die aan projecten gekoppeld zijn."
+    }
+  },
+  "mail": {
+    "preview": {
+      "from": "Van",
+      "to": "Aan",
+      "cc": "Cc",
+      "subject": "Onderwerp",
+      "body": "Bericht",
+      "attachments": "Bijlagen",
+      "replyTo": "Antwoord op “{{subject}}”",
+      "project": "Gekoppeld aan {{project}}",
+      "invalid": "Deze mail kan niet getoond worden."
+    },
+    "project": {
+      "title": "Mail",
+      "description": "Je eigen mails over dit project; antwoorden komen als melding.",
+      "label": "Mails over dit project",
+      "search": "Mails zoeken",
+      "empty": "Nog geen mails gekoppeld. Vraag de assistent om een contact over dit project te mailen.",
+      "open": "Openen in Gmail",
+      "unlink": "Ontkoppelen",
+      "unlinked": "Mail ontkoppeld",
+      "messages_one": "{{count}} bericht",
+      "messages_other": "{{count}} berichten",
+      "waiting": "Wacht op antwoord",
+      "lastFrom": "Laatst van {{name}}",
+      "failed": "Je mails konden niet geladen worden."
+    }
+  },
+  "preview": {
+    "amount": "Bedrag",
+    "dueDate": "Vervaldag",
+    "reference": "Gestructureerde mededeling",
+    "iban": "IBAN",
+    "notFound": "niet gevonden",
+    "text": "Tekst van de mail",
+    "noText": "Deze mail heeft geen tekst.",
+    "textFailed": "De tekst van de mail kon niet uit Gmail gelezen worden.",
+    "pdf": "PDF",
+    "downloadPdf": "PDF downloaden"
+  }
+}

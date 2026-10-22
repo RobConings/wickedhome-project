@@ -1,0 +1,82 @@
+{
+  "section": {
+    "title": "Automations",
+    "description": "Work WickedHome does by itself on a schedule, like fetching the waste calendar. Pause one or run it now.",
+    "loading": "Loading automations…",
+    "error": "Automations couldn't be loaded",
+    "errorDescription": "Check the connection and try again.",
+    "readOnly": "Only owners and adults can pause or run automations.",
+    "empty": {
+      "title": "No automations yet",
+      "description": "Features add their scheduled work here, for example syncing the waste calendar every morning."
+    }
+  },
+  "schedule": {
+    "everyMinute": "Every minute",
+    "everyMinutes_one": "Every minute",
+    "everyMinutes_other": "Every {{count}} minutes",
+    "hourly": "Every hour at :{{minute}}",
+    "everyHours_one": "Every hour at :{{minute}}",
+    "everyHours_other": "Every {{count}} hours at :{{minute}}",
+    "daily": "Every day at {{times}}",
+    "weekdays": "Weekdays at {{times}}",
+    "weekly": "Every {{days}} at {{times}}",
+    "monthly": "Day {{day}} of every month at {{times}}",
+    "custom": "Schedule {{expression}}"
+  },
+  "job": {
+    "schedule": "When",
+    "next": "Next run",
+    "last": "Last run",
+    "lastCheck": "Last check",
+    "lastCheckHint": "checks with nothing to do aren't kept in the history",
+    "on": "On",
+    "paused": "Paused",
+    "pausedNext": "Paused: won't run until you switch it on",
+    "never": "Hasn't run yet",
+    "toggle": "Run \"{{title}}\" on its schedule",
+    "runNow": "Run now",
+    "running": "Running…"
+  },
+  "history": {
+    "show": "Recent runs",
+    "hide": "Hide runs",
+    "empty": "No runs yet.",
+    "log": "Show log"
+  },
+  "status": {
+    "running": "Running",
+    "succeeded": "Succeeded",
+    "failed": "Failed",
+    "skipped": "Skipped"
+  },
+  "trigger": {
+    "schedule": "on schedule",
+    "manual": "started by hand",
+    "startup": "catch-up after a restart"
+  },
+  "duration": {
+    "ms_one": "{{count}} ms",
+    "ms_other": "{{count}} ms",
+    "s_one": "{{count}} s",
+    "s_other": "{{count}} s",
+    "min_one": "{{count}} min",
+    "min_other": "{{count}} min"
+  },
+  "toast": {
+    "paused": "\"{{title}}\" paused",
+    "resumed": "\"{{title}}\" switched on",
+    "toggleFailed": "Couldn't change \"{{title}}\". Try again.",
+    "done": "\"{{title}}\" finished",
+    "failed": "\"{{title}}\" failed",
+    "skipped": "\"{{title}}\" didn't run: it was already running elsewhere",
+    "alreadyRunning": "\"{{title}}\" is already running",
+    "runFailed": "Couldn't start \"{{title}}\". Try again."
+  },
+  "jobs": {
+    "pruneRuns": {
+      "title": "Clean up the run history",
+      "description": "Removes automation runs older than 90 days. The last 20 runs of each automation always stay."
+    }
+  }
+}

@@ -1,0 +1,424 @@
+{
+  "page": {
+    "title": "Places",
+    "description": "Every room inside and every zone outside. Tasks, stock and shopping hang off them."
+  },
+  "actions": {
+    "addPlace": "Add place",
+    "addFloor": "Add floor",
+    "addOutside": "Add the outside plan"
+  },
+  "sections": {
+    "inside": "Inside",
+    "insideDescription": "Floors and their rooms.",
+    "outside": "Outside",
+    "outsideDescription": "Garden, driveway, shed and everything else outdoors."
+  },
+  "floorKinds": {
+    "indoor": "Inside floor",
+    "outdoor": "Outside plan"
+  },
+  "location": {
+    "inside": "Inside",
+    "outside": "Outside"
+  },
+  "fields": {
+    "name": "Name",
+    "kind": "Type",
+    "level": "Level",
+    "floor": "Floor",
+    "color": "Colour",
+    "icon": "Icon",
+    "area": "Area"
+  },
+  "starter": {
+    "indoor": "Ground floor",
+    "outdoor": "Outside"
+  },
+  "empty": {
+    "title": "No places yet",
+    "description": "Start with a ground floor and the outside, then list your rooms. Drawing them is optional.",
+    "starter": "Ground floor + outside",
+    "outsideTitle": "No outside plan yet",
+    "outsideDescription": "Add it for the garden, the driveway, the shed or the jacuzzi."
+  },
+  "floor": {
+    "level": "Level {{level}}",
+    "drawnCount_one": "{{drawn}} of {{count}} drawn",
+    "drawnCount_other": "{{drawn}} of {{count}} drawn",
+    "openPlan": "Floor plan",
+    "edit": "Edit floor",
+    "form": {
+      "createTitle": "Add a floor",
+      "editTitle": "Edit floor",
+      "description": "Each floor, and the outside, gets its own plan.",
+      "namePlaceholder": "First floor",
+      "levelHelp": "0 is the ground floor, -1 the basement.",
+      "created": "Floor added",
+      "updated": "Changes saved"
+    },
+    "delete": {
+      "action": "Delete floor",
+      "title": "Delete {{name}}?",
+      "description": "Its floor plan is deleted too. This can't be undone.",
+      "hasPlaces": "Move or delete its places first."
+    }
+  },
+  "list": {
+    "notDrawn": "Not on the plan yet",
+    "add": "Add",
+    "empty": {
+      "indoor": "No rooms on this floor yet.",
+      "outdoor": "No zones outside yet."
+    },
+    "quickAdd": {
+      "indoor": "New room, e.g. Kitchen",
+      "outdoor": "New zone, e.g. Vegetable garden"
+    }
+  },
+  "place": {
+    "form": {
+      "createTitle": "Add a place",
+      "editTitle": "Edit place",
+      "description": "A room inside or a zone outside. You can draw it on the plan later.",
+      "previewName": "New place",
+      "namePlaceholder": {
+        "indoor": "Kitchen",
+        "outdoor": "Vegetable garden"
+      },
+      "floorHelp": "Moving it to another floor removes its outline from the old plan.",
+      "iconHelp": "An emoji, shown in lists and on the plan.",
+      "created": "Place added",
+      "updated": "Changes saved"
+    },
+    "delete": {
+      "title": "Delete {{name}}?",
+      "description": "It disappears from the list and the plan. This can't be undone."
+    }
+  },
+  "detail": {
+    "contentsTitle": "What lives here",
+    "contentsDescription": "Everything linked to this place shows up here.",
+    "sections": {
+      "tasks": {
+        "title": "Tasks",
+        "empty": "No tasks here yet."
+      },
+      "stock": {
+        "title": "Stock",
+        "empty": "Nothing stored here yet."
+      },
+      "shopping": {
+        "title": "Shopping",
+        "empty": "Nothing to buy for this place."
+      },
+      "appliances": {
+        "title": "Appliances",
+        "empty": "No appliances here yet."
+      }
+    },
+    "planTitle": "On the plan",
+    "planLabel": "{{name}} on the plan of {{floor}}",
+    "notDrawn": "Not drawn on the plan of {{floor}} yet.",
+    "drawOnPlan": "Draw on the plan"
+  },
+  "picker": {
+    "placeholder": "Choose a place",
+    "favoriteFailed": "Couldn't update your favourites. Try again."
+  },
+  "editor": {
+    "description": {
+      "indoor": "Draw the rooms, walls, doors and windows. Rooms you listed but haven't drawn are in the tools window.",
+      "outdoor": "Draw the zones outside: garden, driveway, terrace, shed…"
+    },
+    "canvasLabel": "Floor plan",
+    "save": "Save",
+    "overlapsHint": "Overlaps detected: {{count}}. You can adjust the drawing or save it with these overlaps.",
+    "roomOverlap": "Rooms {{first}} and {{second}} overlap.",
+    "roomWallOverlap": "Wall {{second}} extends into room {{first}}.",
+    "wallOverlap": "Walls {{first}} and {{second}} overlap or cross inside one another.",
+    "moreOverlaps": "{{count}} more overlaps.",
+    "saving": "Saving…",
+    "saved": "Plan saved",
+    "saveInvalid": "The plan couldn't be saved. Check it and try again.",
+    "unsaved": "Unsaved changes",
+    "saveFailed": "Not saved. Try again.",
+    "allSaved": "All changes saved",
+    "finishDraftFirst": "Finish or clear the shape you're drawing first",
+    "nameRequired": "Every place needs a name before saving.",
+    "undo": "Undo",
+    "redo": "Redo",
+    "smallScreen": "Editing the plan works on a larger screen. You can still look around and open places.",
+    "zoom": {
+      "in": "Zoom in",
+      "out": "Zoom out",
+      "fit": "Fit to screen"
+    },
+    "panel": {
+      "label": "Tools",
+      "tools": "Tool",
+      "move": "Move the tools window",
+      "reset": "Put the tools window back",
+      "compact": "Make the tools window smaller",
+      "expand": "Show labels in the tools window",
+      "shortcuts": "V select · R draw · F fill room · W wall (X flips the side) · D door · N window · Enter finish · Esc cancel · Del delete · Ctrl+Z undo · Alt free placement · Space+drag pan"
+    },
+    "tools": {
+      "select": "Select",
+      "indoor": "Room",
+      "outdoor": "Zone",
+      "fill": "Fill",
+      "wall": "Wall",
+      "door": "Door",
+      "window": "Window"
+    },
+    "newPlaceName": {
+      "indoor": "Room {{number}}",
+      "outdoor": "Zone {{number}}"
+    },
+    "outline": {
+      "target": "Drawing the outline of",
+      "new": {
+        "indoor": "A new room",
+        "outdoor": "A new zone"
+      },
+      "missing_one": "{{count}} more point needed",
+      "missing_other": "{{count}} more points needed",
+      "ready_one": "{{count}} point ready",
+      "ready_other": "{{count}} points ready",
+      "complete": "Complete shape",
+      "undoPoint": "Undo point",
+      "clear": "Clear"
+    },
+    "wall": {
+      "start": "Draw walls",
+      "drawing": "Drawing walls",
+      "finish": "Finish walls",
+      "length": "Length {{length}}",
+      "custom": "Other",
+      "customThickness": "Other thickness in cm",
+      "alignment": "The line you click is",
+      "align": {
+        "center": "Centre",
+        "left": "Left face",
+        "right": "Right face"
+      }
+    },
+    "fill": {
+      "title": "Fill room",
+      "labels": "Names come from the plan's room labels.",
+      "gapTolerance": "Close gaps between walls up to",
+      "noGaps": "No gaps",
+      "filled": "{{name}} added",
+      "reused": "Outline added to {{name}}",
+      "existing": "{{name}} is already here.",
+      "open_one": "This area isn't closed: {{count}} open wall end is marked in red.",
+      "open_other": "This area isn't closed: {{count}} open wall ends are marked in red.",
+      "outside": "That's outside every room. Click inside walls that form a closed room.",
+      "onWall": "That's a wall. Click inside the room.",
+      "noWalls": "Draw the walls first (W), then fill the rooms.",
+      "edit": "Edit room"
+    },
+    "area": {
+      "planSays": "plan says {{area}}",
+      "differs": "{{percent}} % off",
+      "matches": "Matches the plan",
+      "mismatch": "Differs from the plan"
+    },
+    "underlay": {
+      "title": "Architect's plan",
+      "empty": "Import a PDF or image of the plan, set its scale and trace over it: lengths and areas follow by themselves.",
+      "import": "Import plan…",
+      "show": "Show the plan",
+      "hide": "Hide the plan",
+      "lock": "Lock the plan",
+      "unlock": "Unlock to move it",
+      "sourcePage": "{{name}} · page {{page}}",
+      "ratio": "Scale 1:{{ratio}}",
+      "pixel": "1 px = {{cm}} cm",
+      "notCalibrated": "Scale not set yet",
+      "calibrate": "Set scale",
+      "opacity": "Opacity",
+      "rotation": "Rotation",
+      "rotateLeft": "Rotate 90° left",
+      "rotateRight": "Rotate 90° right",
+      "fineRotation": "Fine rotation",
+      "lockedHint": "Locked: clicks go to the drawing.",
+      "unlockedHint": "Unlocked: drag it with Select to line it up.",
+      "labelsFound_one": "{{count}} room label found.",
+      "labelsFound_other": "{{count}} room labels found.",
+      "recrop": "Change crop",
+      "replace": "Replace",
+      "remove": "Remove",
+      "removed": "Plan removed from the drawing. The file stays in Documents.",
+      "showInView": "Architect's plan",
+      "loadingImage": "Loading the plan…",
+      "imageFailed": "The plan image couldn't be loaded."
+    },
+    "calibrate": {
+      "noUnderlay": "Import a plan first.",
+      "title": "Set the scale",
+      "hint": "Click two points whose real distance you know, e.g. both ends of a dimension line or a long wall. Drag the ends to adjust, zoom in for precision.",
+      "firstPoint": "Click the first point.",
+      "secondPoint": "Click the second point.",
+      "measures": "This line measures {{length}} on the plan now.",
+      "realLength": "Real length",
+      "placeholder": "12,00 m or 1.200",
+      "apply": "Apply",
+      "formats": "Metres (12,00 m), centimetres (1200 cm) or as on the plan (1.200 = 12 m).",
+      "unreadable": "That length can't be read.",
+      "reads": "Reads as {{length}}",
+      "drawingScale": "Or use the drawing scale",
+      "drawingScaleHint": "For PDFs exported to scale. Check with the line: it should measure what the plan says.",
+      "finish": "Done",
+      "done": "Scale set"
+    },
+    "import": {
+      "title": "Import a plan",
+      "description": "A PDF (or PNG/JPG) of the plan of {{floor}}. The file is kept in Documents.",
+      "pagesTitle": "Choose a page",
+      "pagesDescription": "Which page has the plan of this floor?",
+      "cropTitle": "Crop one drawing",
+      "cropDescription": "Drag a rectangle around the drawing of this floor, e.g. the ground floor in its new state.",
+      "dropTitle": "Drop the plan here",
+      "dropDescription": "PDF, PNG or JPG. Vector PDFs from the architect work best.",
+      "choose": "Choose a file",
+      "privacy": "Plans often show names, addresses and phone numbers. The file stays in your household's Documents.",
+      "opening": "Opening the plan…",
+      "wrongType": "Choose a PDF, PNG or JPG file.",
+      "unreadable": "This file couldn't be opened. Is it a valid PDF or image?",
+      "sourceMissing": "The original file isn't in Documents any more. Choose it again.",
+      "tooLarge": "This file is too large to store in Documents.",
+      "network": "The connection dropped. Try again.",
+      "failed": "Importing failed. Try again.",
+      "imageName": "{{name}} – page {{page}} (plan underlay).png",
+      "stage": {
+        "upload-source": "Saving the original in Documents…",
+        "render": "Rendering the plan in high resolution…",
+        "upload-image": "Saving the plan image…",
+        "labels": "Reading room labels…"
+      },
+      "cancel": "Cancel",
+      "otherPage": "Other page",
+      "otherFile": "Other file",
+      "wholePage": "Whole page",
+      "importCrop": "Import selection",
+      "renderingPages": "Rendering pages: {{done}} of {{count}}",
+      "page": "Page {{number}}",
+      "cropHint": "Drag around one drawing. Ctrl + scroll zooms.",
+      "cropSelected": "Drag again to change the selection.",
+      "renderingPage": "Rendering the page…",
+      "renderFailed": "This page couldn't be rendered.",
+      "rotation": "Turned {{degrees}}°",
+      "done": "Plan imported. Set its scale next."
+    },
+    "place": {
+      "vertices_one": "{{count}} point. Drag points to adjust, drag an edge's dot to add one.",
+      "vertices_other": "{{count}} points. Drag points to adjust, drag an edge's dot to add one.",
+      "vertexSelected": "Point {{index}} of {{count}} selected",
+      "open": "Open place",
+      "deletePoint": "Delete point",
+      "removeOutline": "Remove from plan"
+    },
+    "elements": {
+      "wall": "Wall",
+      "door": "Door",
+      "window": "Window",
+      "delete": "Delete"
+    },
+    "door": {
+      "flipHinge": "Flip hinge",
+      "flipSwing": "Flip swing"
+    },
+    "fields": {
+      "grid": "Grid",
+      "thickness": "Thickness",
+      "width": "Width"
+    },
+    "unplaced": {
+      "indoor": "Rooms not drawn yet",
+      "outdoor": "Zones not drawn yet",
+      "draw": "Draw"
+    },
+    "hints": {
+      "select": "Click a shape to edit it. Drag empty space to move around, scroll to zoom.",
+      "outline": "Click to add points. Click the first point, double-click or press Enter to close the shape.",
+      "wall": "Click to start, click again for every corner. Double-click, Enter or Esc to stop.",
+      "wallFace": "Click along the architect's line: the wall grows to the side shown in the preview. X flips the side.",
+      "fill": "Click inside walls to add a room along their inner faces. Doors and windows don't leak.",
+      "door": "Click on a wall to put a door there.",
+      "window": "Click on a wall to put a window there.",
+      "dragOpening": "Drag it along its wall to move it.",
+      "openingNeedsWall": "Doors and windows go in a wall. Click on a wall.",
+      "wallTooShort": "This wall is too short for that width."
+    },
+    "markers": {
+      "palette": "Things to place",
+      "paletteHint": "Drag onto the plan, or choose “Place on the plan” and tap a spot. Move a placed marker by dragging it, or select it and use the arrow keys (Shift: bigger steps).",
+      "placing": "Tap or click a spot on the plan to place “{{label}}”. Esc cancels.",
+      "placeInMiddle": "Place in the middle",
+      "cancelPlacing": "Cancel"
+    }
+  },
+  "orientation": {
+    "title": "Orientation",
+    "notSet": "North not set yet",
+    "clear": "Clear",
+    "degrees": "North, in degrees clockwise from the top of the plan",
+    "topFaces": "The top of the plan faces",
+    "topFacesValue": "Top faces {{direction}}",
+    "pointNorth": "Point north on the plan",
+    "hint": "One north for the whole house, used on every floor and for the sun. You can also drag the compass on the plan.",
+    "compassValue": "North {{degrees}}°, the top of the plan faces {{facing}}",
+    "dial": "North on the plan",
+    "dialHint": "Drag to turn north (Shift: 15° steps), or use the arrow keys",
+    "importHint": "North on your plan",
+    "points": {
+      "n": "N",
+      "ne": "NE",
+      "e": "E",
+      "se": "SE",
+      "s": "S",
+      "sw": "SW",
+      "w": "W",
+      "nw": "NW"
+    },
+    "names": {
+      "n": "north",
+      "ne": "north-east",
+      "e": "east",
+      "se": "south-east",
+      "s": "south",
+      "sw": "south-west",
+      "w": "west",
+      "nw": "north-west"
+    },
+    "tool": {
+      "title": "Point north",
+      "hint": "Click the tail of the architect's north arrow, then its tip. Zoom in for precision; the plan's rotation is taken into account.",
+      "hintNoPlan": "Click two points along a line that points north: first the tail, then the tip.",
+      "tail": "Click the arrow's tail.",
+      "tip": "Click the arrow's tip.",
+      "result": "North points {{degrees}}° from the top: the top of the plan faces {{direction}}. Click again to start over.",
+      "apply": "Use this",
+      "cancel": "Cancel",
+      "done": "North set to {{degrees}}°. Save the plan to keep it."
+    },
+    "view": {
+      "northUp": "North up",
+      "sun": "Sun",
+      "now": "Now",
+      "time": "Today at {{time}}",
+      "sunAt": "Sun in the {{direction}} ({{azimuth}}°), {{elevation}}° above the horizon",
+      "belowHorizon": "The sun is below the horizon."
+    }
+  },
+  "planDiff": {
+    "label": "Floor plan of {{floor}} with the proposed change",
+    "added": "Added",
+    "changed": "Changed",
+    "removed": "Removed",
+    "before": "Before",
+    "invalid": "The preview of this change can't be shown."
+  }
+}

@@ -1,0 +1,14 @@
+// Feature: weather
+
+/// The household's weather source (src/api/weather/providers). Without a row, Open-Meteo is used.
+model WeatherSettings {
+  id          String    @id @default(cuid())
+  householdId String    @unique
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  /// Provider id: "open-meteo" (default), "kmi" or "google". A string, so adding one needs no migration.
+  providerId  String    @default("open-meteo")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("weather_settings")
+}

@@ -1,0 +1,168 @@
+{
+  "notifications": {
+    "vouchers": {
+      "title": "Maaltijdcheques vervallen",
+      "description": "Een week voor je maaltijdcheques vervallen, en de dag ervoor als ze nog niet gebruikt zijn."
+    }
+  },
+  "page": {
+    "title": "Inkomsten",
+    "description": "Wat er binnenkomt: vaste inkomsten per gezinslid en eenmalige inkomsten."
+  },
+  "actions": {
+    "addRecurring": "Vast inkomen",
+    "addOneOff": "Eenmalig inkomen",
+    "enterAmount": "Bedrag van deze maand invullen",
+    "enterAmountShort": "Bedrag invullen",
+    "confirmReceived": "Ontvangen",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "editIncome": "Inkomen bewerken",
+    "removeAmount": "Dit bedrag verwijderen"
+  },
+  "who": {
+    "joint": "Gezamenlijk",
+    "label": "Wie",
+    "everyone": "Iedereen"
+  },
+  "kinds": {
+    "salary": "Loon",
+    "holiday_pay": "Vakantiegeld",
+    "bonus": "Premie",
+    "meal_vouchers": "Maaltijdcheques",
+    "benefit": "Uitkering",
+    "tax_return": "Belastingteruggave",
+    "green_certificates": "Groenestroomcertificaten",
+    "gift": "Gift",
+    "sale": "Verkoop",
+    "other": "Andere"
+  },
+  "modes": {
+    "fixed": "Vast bedrag",
+    "variable": "Wisselend (telkens invullen)"
+  },
+  "status": {
+    "received": "Ontvangen",
+    "upcoming": "Verwacht {{date}}",
+    "expected": "Verwacht",
+    "to_enter": "In te vullen"
+  },
+  "month": {
+    "title": "Deze maand",
+    "previous": "Vorige maand",
+    "next": "Volgende maand",
+    "today": "Deze maand",
+    "household": "Gezin",
+    "received": "{{amount}} ontvangen",
+    "expected": "{{amount}} nog verwacht",
+    "planned": "Gepland",
+    "nothingPlanned": "Geen vaste of verwachte inkomsten deze maand.",
+    "oneOff": "eenmalig",
+    "vouchers": "Maaltijdcheques: {{amount}}",
+    "toEnter_one": "{{count}} bedrag in te vullen",
+    "toEnter_other": "{{count}} bedragen in te vullen"
+  },
+  "sources": {
+    "title": "Vaste inkomsten",
+    "description": "Loon, vakantiegeld, uitkeringen… per gezinslid of gezamenlijk.",
+    "amountFrom": "vanaf {{date}}: {{amount}}",
+    "variable": "Wisselend",
+    "estimate": "ongeveer {{amount}}",
+    "perMonth": "{{amount}} / maand",
+    "next": "volgende {{date}}",
+    "ended": "Gestopt op {{date}}",
+    "history": "Bedragen door de tijd",
+    "toAccount": "Komt op {{account}}"
+  },
+  "incomes": {
+    "title": "Geregistreerd",
+    "label": "Geregistreerde inkomsten",
+    "searchPlaceholder": "Inkomsten zoeken",
+    "allKinds": "Alle soorten",
+    "kindFilter": "Soort",
+    "forPeriod": "voor {{date}}",
+    "toAccount": "op {{account}}"
+  },
+  "vouchers": {
+    "title": "Maaltijdcheques",
+    "description": "De oudste cheques worden eerst gebruikt; cheques vervallen 12 maanden nadat ze binnenkomen.",
+    "balance": "Saldo",
+    "available": "{{amount}} beschikbaar",
+    "expiresOn": "{{amount}} vervalt op {{date}}",
+    "expired": "{{amount}} vervallen",
+    "uncovered": "{{amount}} betaald zonder geldige cheques",
+    "soonTitle": "Maaltijdcheques vervallen binnenkort",
+    "soon": "{{name}}: {{amount}} vervalt op {{date}}.",
+    "received": "ontvangen {{amount}}",
+    "spent": "uitgegeven {{amount}}",
+    "none": "Nog geen maaltijdcheques. Voeg een wisselend vast inkomen toe van de soort \"Maaltijdcheques\"."
+  },
+  "fields": {
+    "who": "Wie",
+    "name": "Naam",
+    "namePlaceholder": "bv. Loon Acme",
+    "kind": "Soort",
+    "repeat": "Herhaalt",
+    "startDate": "Eerste datum",
+    "endDate": "Stopt op",
+    "amountMode": "Bedrag",
+    "amount": "Bedrag",
+    "newAmount": "Bedrag",
+    "amountFrom": "Nieuw bedrag geldt vanaf",
+    "amountFromDescription": "Eerdere maanden houden hun bedrag.",
+    "estimate": "Schatting",
+    "estimateDescription": "Wat je verwacht tot het echte bedrag is ingevuld.",
+    "targetAccount": "Komt op",
+    "targetAccountDescription": "Enkel gezamenlijke rekeningen tellen mee in de geldstroom; laat leeg voor een eigen rekening.",
+    "noAccount": "Eigen rekening (niet gevolgd)",
+    "notes": "Notities",
+    "date": "Ontvangen op",
+    "description": "Omschrijving",
+    "descriptionPlaceholder": "bv. Belastingteruggave 2025",
+    "note": "Notitie"
+  },
+  "form": {
+    "createSourceTitle": "Vast inkomen toevoegen",
+    "editSourceTitle": "Vast inkomen bewerken",
+    "createIncomeTitle": "Eenmalig inkomen toevoegen",
+    "editIncomeTitle": "Inkomen bewerken",
+    "enterTitle": "{{name}}: {{date}}",
+    "enterDescription": "Vul het bedrag in dat echt binnenkwam.",
+    "sourceCreated": "Vast inkomen toegevoegd",
+    "sourceSaved": "Vast inkomen bewaard",
+    "incomeSaved": "Inkomen bewaard",
+    "deleteSourceTitle": "\"{{name}}\" verwijderen?",
+    "deleteSourceDescription": "Geregistreerde inkomsten blijven in de geschiedenis.",
+    "deleteIncomeTitle": "Dit inkomen verwijderen?",
+    "deleteIncomeDescription": "Het verdwijnt uit de totalen en, als het op een gezamenlijke rekening kwam, uit het saldo.",
+    "deleted": "Verwijderd"
+  },
+  "empty": {
+    "sources": {
+      "title": "Nog geen vaste inkomsten",
+      "description": "Voeg het loon en andere vaste inkomsten van elk gezinslid toe."
+    },
+    "incomes": {
+      "title": "Nog niets ontvangen",
+      "description": "Inkomsten die je registreert komen hier, samen met belastingteruggaves, groenestroomcertificaten en giften."
+    }
+  },
+  "errors": {
+    "notFound": "Dit inkomen bestaat niet meer.",
+    "Enter the amount": "Vul het bedrag in",
+    "Ends before it starts": "Stopt voor het begint",
+    "Already recorded for this period": "Voor deze periode is al een bedrag ingevuld",
+    "Unknown account": "Onbekende rekening",
+    "Unknown habitant": "Onbekende persoon",
+    "A fixed income keeps at least one amount": "Een vast inkomen houdt minstens één bedrag"
+  },
+  "loading": {
+    "page": "Inkomsten laden…"
+  },
+  "jobs": {
+    "voucherTasks": {
+      "title": "Herinneringen maaltijdcheques",
+      "description": "Maakt een taak \"€ … maaltijdcheques gebruiken vóór …\" voor wie cheques heeft die binnen 30 dagen vervallen, en sluit ze zodra ze gebruikt of vervallen zijn."
+    }
+  }
+}

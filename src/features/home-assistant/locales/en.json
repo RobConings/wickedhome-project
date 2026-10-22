@@ -1,0 +1,250 @@
+{
+  "notifications": {
+    "triggered": {
+      "title": "Alarm went off",
+      "description": "Right away to everyone, also during quiet hours."
+    },
+    "armed": {
+      "title": "Alarm armed or disarmed",
+      "description": "When the alarm is armed or disarmed, and by whom when it was done in WickedHome."
+    },
+    "connection": {
+      "title": "Home Assistant offline",
+      "description": "When Home Assistant has been unreachable for 15 minutes, and when it is back."
+    }
+  },
+  "status": {
+    "not_configured": "Not configured",
+    "connecting": "Connecting",
+    "connected": "Connected",
+    "error": "Error"
+  },
+  "errors": {
+    "auth_invalid": "Home Assistant rejected the access token. Create a new long-lived token and update HOME_ASSISTANT_TOKEN.",
+    "unreachable": "Home Assistant can't be reached. Is it running, and is HOME_ASSISTANT_URL right?",
+    "timeout": "Home Assistant stopped answering.",
+    "protocol": "Unexpected answer from Home Assistant. Check HOME_ASSISTANT_URL.",
+    "other_household": "Home Assistant is linked to another household on this server (HOME_ASSISTANT_HOUSEHOLD_ID)."
+  },
+  "card": {
+    "title": "Home Assistant",
+    "description": "Devices, energy statistics and the alarm, live from your Home Assistant.",
+    "loading": "Loading the Home Assistant status…",
+    "loadFailed": "The status couldn't be loaded.",
+    "testOk": "Connected to Home Assistant {{version}}: {{count}} entities, {{ms}} ms.",
+    "testFailed": "The connection test failed.",
+    "nextRetry": "Next attempt {{when}}.",
+    "url": "Address",
+    "version": "Version",
+    "entities": "Entities",
+    "connectedSince": "Connected since",
+    "lastEvent": "Last event",
+    "test": "Test connection",
+    "testing": "Testing…",
+    "open": "Open Home Assistant page"
+  },
+  "setup": {
+    "intro": "Home Assistant isn't connected yet. To set it up:",
+    "steps": {
+      "install": "Install Home Assistant on the LAN (e.g. on this server) and finish its onboarding at <code>http://192.168.1.10:8123</code>.",
+      "integrations": "In Home Assistant, add the integrations: <strong>Verisure</strong> (alarm), <strong>DSMR Smart Meter</strong> or <strong>HomeWizard Energy</strong> (P1 port of the digital meter), your <strong>inverter</strong> (solar), and smart plugs for the washer and dryer.",
+      "energy": "Set up the <strong>Energy dashboard</strong> in Home Assistant (grid import and export per tariff, solar, battery, gas, individual devices).",
+      "token": "Create a token: Home Assistant → your profile (bottom left) → <strong>Security</strong> → <strong>Long-lived access tokens</strong> → Create token. Copy it once; it isn't shown again.",
+      "env": "On the server, add to <code>/var/www/WickedHome/.env</code>: <code>HOME_ASSISTANT_URL=http://192.168.1.10:8123</code> and <code>HOME_ASSISTANT_TOKEN=…</code> (the token stays on the server).",
+      "restart": "Restart the app (<code>pm2 restart wickedhome</code>). This card then shows Connected, and the energy import starts by itself."
+    }
+  },
+  "page": {
+    "title": "Home Assistant",
+    "description": "The connection, the alarm, devices from Home Assistant and its energy statistics.",
+    "loadFailed": "This part couldn't be loaded. Reload the page to try again.",
+    "notConnected": "Available once Home Assistant is connected."
+  },
+  "entities": {
+    "title": "Entities",
+    "description": "Everything Home Assistant knows, with its current state. Bind fields from a device's page.",
+    "domain": "Domain",
+    "allDomains": "All domains",
+    "fittingOnly": "Only entities that fit",
+    "selected": "Bound now",
+    "bound": "Bound",
+    "searchPlaceholder": "Name, entity id or area",
+    "loadFailed": "The entities couldn't be loaded.",
+    "empty": {
+      "title": "No entities",
+      "description": "Home Assistant isn't connected, or it has no entities yet."
+    }
+  },
+  "picker": {
+    "browse": "Browse",
+    "title": "Home Assistant entity for “{{field}}”",
+    "attributeHint": "Read the entity's state, or one of its attributes.",
+    "hint": {
+      "boolean": "Pick an entity that is on/off or open/closed.",
+      "number": "Pick an entity with a number (a temperature, a power…).",
+      "text": "Pick any entity: its state is shown as text.",
+      "choice": "Pick an entity whose states match this field's options (e.g. an alarm panel)."
+    },
+    "unavailable": "Home Assistant is not connected right now.",
+    "readWhat": "What to read",
+    "state": "State",
+    "back": "Back",
+    "use": "Use {{entity}}"
+  },
+  "import": {
+    "title": "Import devices from Home Assistant",
+    "description": "Entities that look like devices, with the profile they'd get. Tick them, adjust the names and import.",
+    "invalid": "Check the names (1 to 60 characters).",
+    "done_one": "{{count}} device imported",
+    "done_other": "{{count}} devices imported",
+    "empty": {
+      "title": "Nothing to import",
+      "description": "No door or window contacts, temperature sensors, alarm panel, washer/dryer power, motion or smoke sensors found."
+    },
+    "presets": {
+      "contact": "Window/door contact",
+      "climate": "Temperature",
+      "laundry": "Washer/dryer",
+      "alarm_panel": "Alarm panel",
+      "motion": "Motion sensor",
+      "alarm_component": "Smoke detector",
+      "light": "Light"
+    },
+    "name": "Device name",
+    "hint": "Profiles come from the presets and stay editable. Place the new devices on the floor plan afterwards.",
+    "importing": "Importing…",
+    "action_one": "Import {{count}} device",
+    "action_other": "Import {{count}} devices"
+  },
+  "energy": {
+    "title": "Energy from Home Assistant",
+    "description": "Hourly statistics from Home Assistant's energy dashboard become energy data. Per hour, Home Assistant wins over Fluvius files and readings, so nothing is counted twice.",
+    "linksSaved": "Links saved; importing their data now",
+    "importStarted": "Import started; see Settings → Automations for the result",
+    "alreadyRunning": "The import is already running.",
+    "lastImport": "Last import {{when}}",
+    "neverImported": "Not imported yet",
+    "enabled": "Import hourly",
+    "importNow": "Import now",
+    "noPrefs": "Home Assistant's energy dashboard isn't set up yet (Settings → Dashboards → Energy in Home Assistant).",
+    "notConnected": "Available once Home Assistant is connected.",
+    "noSources": "The energy dashboard has no grid, solar, battery or gas statistics.",
+    "sources": "Measured by Home Assistant",
+    "kinds": {
+      "grid_import": "Grid offtake",
+      "grid_export": "Grid injection",
+      "solar_production": "Solar production",
+      "battery_charge": "Battery charge",
+      "battery_discharge": "Battery discharge",
+      "appliance": "Appliance",
+      "gas": "Gas"
+    },
+    "registers": {
+      "day": "day",
+      "night": "night"
+    },
+    "hoursUntil_one": "{{count}} hour, until {{when}}",
+    "hoursUntil_other": "{{count}} hours, until {{when}}",
+    "noData": "No data yet",
+    "devices": "Individual devices",
+    "devicesHint": "Link each device Home Assistant measures to an appliance: its use then appears in the breakdown and “unknown” shrinks.",
+    "noDevices": {
+      "title": "No individual devices",
+      "description": "Add smart plugs or sub-meters to “Individual devices” in Home Assistant's energy dashboard."
+    },
+    "includedIn": "Part of {{parent}}: counted once",
+    "hours_one": "{{count}} hour imported",
+    "hours_other": "{{count}} hours imported",
+    "pickAppliance": "Not linked",
+    "saveLinks": "Save links"
+  },
+  "alarm": {
+    "title": "Alarm",
+    "loading": "Loading the alarm…",
+    "since": "Since {{when}}",
+    "history": "Last changes",
+    "code": "Alarm code",
+    "panel": "Alarm panel shown",
+    "states": {
+      "disarmed": "Disarmed",
+      "armed_home": "Armed (home)",
+      "armed_away": "Armed (away)",
+      "armed_night": "Armed (night)",
+      "armed_vacation": "Armed (vacation)",
+      "armed_custom_bypass": "Armed (custom)",
+      "arming": "Arming…",
+      "pending": "Pending",
+      "disarming": "Disarming…",
+      "triggered": "Alarm!",
+      "unavailable": "Unavailable",
+      "unknown": "Unknown"
+    },
+    "errors": {
+      "generic": "That didn't work. Please try again.",
+      "tooMany": "Too many attempts. Wait 15 minutes and try again.",
+      "disarmRefused": "Home Assistant refused to disarm. Is the code right?",
+      "codeRequired": "This alarm needs the code to arm.",
+      "unavailable": "The alarm state is unavailable: Home Assistant isn't connected.",
+      "forbidden": "Only owners and adults can use the alarm."
+    },
+    "arm": {
+      "home": "Arm (home)",
+      "away": "Arm (away)",
+      "confirmTitle": {
+        "home": "Arm the alarm (home)?",
+        "away": "Arm the alarm (away)?"
+      },
+      "confirmDescription": {
+        "home": "{{panel}} switches on the perimeter: doors and windows. Moving around inside stays possible.",
+        "away": "{{panel}} switches on completely. Make sure everyone has left and the windows are closed."
+      },
+      "arming": "Arming…",
+      "confirm": {
+        "home": "Arm (home)",
+        "away": "Arm (away)"
+      },
+      "done": {
+        "home": "Alarm armed (home)",
+        "away": "Alarm armed (away)"
+      }
+    },
+    "disarm": {
+      "action": "Disarm",
+      "title": "Disarm the alarm",
+      "description": "Enter the code of {{panel}}.",
+      "logged": "The code goes straight to Home Assistant and is never stored. Every attempt is logged.",
+      "disarming": "Disarming…",
+      "confirm": "Disarm",
+      "done": "Alarm disarmed"
+    },
+    "log": {
+      "title": "Alarm log",
+      "description": "Who armed or disarmed the alarm from the app, and how it went.",
+      "empty": {
+        "title": "Nothing logged yet",
+        "description": "Arming and disarming from the app appear here."
+      },
+      "actions": {
+        "arm_home": "Armed (home)",
+        "arm_away": "Armed (away)",
+        "disarm": "Disarmed"
+      },
+      "results": {
+        "succeeded": "OK",
+        "failed": "Failed",
+        "refused": "Refused",
+        "rate_limited": "Too many attempts"
+      }
+    }
+  },
+  "jobs": {
+    "energy": {
+      "title": "Home Assistant energy",
+      "description": "Imports the hourly energy statistics of Home Assistant's energy dashboard (grid, solar, battery, gas, linked devices); the first run fetches the past weeks."
+    },
+    "refreshStates": {
+      "title": "Home Assistant device values",
+      "description": "Refreshes device fields bound to Home Assistant whose sensor reported the same value again, so they don't show as out of date."
+    }
+  }
+}

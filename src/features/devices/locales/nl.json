@@ -1,0 +1,345 @@
+{
+  "notifications": {
+    "indicator": {
+      "title": "Toestel wordt oranje of rood",
+      "description": "Voor de toestellen die je volgt (\"Verwittig me\" op de pagina van een toestel), hoogstens eens per 30 minuten per toestel."
+    }
+  },
+  "page": {
+    "title": "Toestellen",
+    "description": "Alles in huis met een toestand: raamcontacten, thermostaten, de droogkast, rookmelders, het alarm.",
+    "liveView": "Live weergave",
+    "profiles": "Profielen"
+  },
+  "houseStatus": {
+    "title": "Huis",
+    "loading": "Status van het huis laden…",
+    "attention": "Vraagt aandacht",
+    "more_one": "en nog {{count}}",
+    "more_other": "en nog {{count}}",
+    "allQuiet": "Alles rustig: niets vraagt aandacht.",
+    "open": "Ramen & deuren",
+    "allClosed": "Alles dicht",
+    "openCount_one": "{{count}} open",
+    "openCount_other": "{{count}} open",
+    "alarm": "Alarm",
+    "running": "Bezig",
+    "nothingRunning": "Niets",
+    "temperatures": "Temperaturen",
+    "openHouse": "Naar de huisweergave",
+    "empty": {
+      "title": "Nog geen toestellen",
+      "description": "Voeg raamcontacten, thermostaten en toestellen toe om het huis in één oogopslag te zien.",
+      "action": "Toestellen toevoegen"
+    }
+  },
+  "add": "Toestel toevoegen",
+  "count_one": "{{count}} toestel",
+  "count_other": "{{count}} toestellen",
+  "noPlace": "Geen plaats",
+  "empty": {
+    "noProfiles": {
+      "title": "Begin met een profiel",
+      "description": "Een profiel bepaalt wat een toestel meldt (open/dicht, temperatuur…) en welke kleur dat krijgt op het plan. Kies een kant-en-klaar profiel.",
+      "action": "Kies een profiel"
+    },
+    "noDevices": {
+      "title": "Nog geen toestellen",
+      "description": "Voeg je raamcontacten, thermostaten en toestellen toe en zet ze daarna op het grondplan."
+    }
+  },
+  "filters": {
+    "label": "Toestellen filteren",
+    "category": "Categorie",
+    "profile": "Profiel",
+    "allCategories": "Alle categorieën",
+    "allProfiles": "Alle profielen"
+  },
+  "fields": {
+    "name": "Naam",
+    "profile": "Profiel",
+    "place": "Plaats",
+    "appliance": "Energietoestel",
+    "notes": "Notities"
+  },
+  "form": {
+    "createTitle": "Toestel toevoegen",
+    "editTitle": "Toestel bewerken",
+    "description": "Waarden en hun bron stel je in op de pagina van het toestel, de plek op het grondplan in de plan-editor.",
+    "namePlaceholder": "bv. Keukenraam",
+    "profilePlaceholder": "Kies een profiel",
+    "profileChangeHint": "Een ander profiel kiezen wist de huidige waarden van het toestel.",
+    "appliancePlaceholder": "Koppel een energietoestel",
+    "created": "Toestel toegevoegd",
+    "updated": "Toestel bewaard"
+  },
+  "delete": {
+    "title": "{{name}} verwijderen?",
+    "description": "Het toestel, zijn waarden en zijn plek op het plan worden verwijderd. Het profiel blijft."
+  },
+  "detail": {
+    "values": "Huidige waarden",
+    "valuesHint": "Stel waarden met de hand in, of koppel ze hieronder aan Home Assistant.",
+    "valuesReadOnly": "De volwassenen in huis houden de waarden bij.",
+    "location": "Waar",
+    "plan": "Grondplan"
+  },
+  "values": {
+    "primary": "Op het plan",
+    "updated": "Bijgewerkt {{when}}",
+    "never": "Nog nooit ingesteld",
+    "set": "Waarde instellen",
+    "invalid": "Deze waarde past niet bij het veld.",
+    "saveFailed": "De waarde kon niet bewaard worden.",
+    "fromHomeAssistant": "Deze waarde komt van Home Assistant en kan niet met de hand ingesteld worden.",
+    "saving": "Bewaren…"
+  },
+  "value": {
+    "yes": "Ja",
+    "no": "Nee"
+  },
+  "state": {
+    "unknown": "Onbekend",
+    "stale": "Geen recente gegevens"
+  },
+  "bindings": {
+    "title": "Bron van de waarden",
+    "description": "Per veld: met de hand ingesteld, of gelezen van een entiteit in Home Assistant.",
+    "entity": "Home Assistant-entiteit",
+    "attribute": "Attribuut",
+    "attributePlaceholder": "Status (standaard)",
+    "noEntity": "nog geen entiteit",
+    "hint": "Kies een entiteit met Bladeren, of typ haar id. Na het bewaren neemt het veld meteen de huidige status over en volgt het die live; gekoppelde waarden kan je niet met de hand instellen.",
+    "save": "Bronnen bewaren",
+    "saved": "Bronnen bewaard",
+    "invalid": "Controleer de entiteiten van Home Assistant (bv. binary_sensor.keukenraam).",
+    "sources": {
+      "manual": "Met de hand",
+      "home_assistant": "Home Assistant"
+    }
+  },
+  "placement": {
+    "placed": "Op het plan",
+    "notPlaced": "Niet op het plan",
+    "placeOnPlan": "Op het plan zetten",
+    "moveOnPlan": "Verplaatsen op het plan",
+    "remove": "Van het plan halen",
+    "open": "Openen",
+    "allPlaced": "Alle toestellen staan op een plan.",
+    "unplacedLabel": "Toestellen die nog niet op een plan staan",
+    "dragHint": "Sleep op het plan, of kies “Op het plan zetten” en tik op een plek",
+    "nudgeHint": "Pijltjestoetsen verplaatsen het (Shift: grotere stappen).",
+    "failed": "De plek kon niet bewaard worden.",
+    "saving": "Plek bewaren…",
+    "loading": "Toestellen laden…",
+    "loadFailed": "De toestellen konden niet geladen worden. Herlaad de pagina om opnieuw te proberen."
+  },
+  "picker": {
+    "placeholder": "Kies een toestel"
+  },
+  "legend": {
+    "title": "Legende"
+  },
+  "house": {
+    "title": "Huis",
+    "description": "Wat er nu open, warm, bezig of ingeschakeld is.",
+    "floors": "Verdiepingen",
+    "panel": "Details van het toestel",
+    "onThisFloor": "Op deze verdieping",
+    "temperatures": "Temperatuur per kamer",
+    "openDevice": "Toestel openen",
+    "unplaced_one": "{{count}} toestel niet op een plan",
+    "unplaced_other": "{{count}} toestellen niet op een plan",
+    "noFloors": {
+      "title": "Nog geen grondplan",
+      "description": "Voeg eerst je verdiepingen en kamers toe; toestellen verschijnen op hun plan.",
+      "action": "Naar plaatsen"
+    },
+    "noDevicesHere": {
+      "title": "Geen toestellen op deze verdieping",
+      "description": "Sleep toestellen op het plan in de plan-editor."
+    }
+  },
+  "profiles": {
+    "title": "Toestelprofielen",
+    "description": "Een profiel is een soort toestel: de waarden die het meldt en de regels die het een kleur geven op het plan.",
+    "mine": "Jouw profielen",
+    "new": "Nieuw profiel",
+    "missing": "Onbekend profiel",
+    "fieldCount_one": "{{count}} veld",
+    "fieldCount_other": "{{count}} velden",
+    "ruleCount_one": "{{count}} regel",
+    "ruleCount_other": "{{count}} regels",
+    "deviceCount_one": "{{count}} toestel",
+    "deviceCount_other": "{{count}} toestellen",
+    "empty": {
+      "title": "Nog geen profielen",
+      "description": "Voeg hieronder een kant-en-klaar profiel toe en pas het aan, of begin van nul."
+    },
+    "delete": {
+      "title": "{{name}} verwijderen?",
+      "description": "Het profiel wordt verwijderd. Dit kan je niet ongedaan maken.",
+      "inUse": "Er zijn toestellen met dit profiel. Geef ze eerst een ander profiel."
+    }
+  },
+  "presets": {
+    "title": "Kant-en-klare profielen",
+    "description": "Toevoegen maakt een eigen kopie die je vrij kan aanpassen.",
+    "add": "Toevoegen",
+    "addNamed": "{{name}} toevoegen",
+    "adding": "Toevoegen…"
+  },
+  "editor": {
+    "newTitle": "Nieuw profiel",
+    "newDescription": "Leg eerst de velden vast, daarna de regels die de indicator kleuren.",
+    "general": "Algemeen",
+    "namePlaceholder": "bv. Raamcontact",
+    "icon": "Pictogram",
+    "category": "Categorie",
+    "staleAfter": "Verouderd na (minuten)",
+    "staleNever": "Nooit",
+    "staleHint": "Waarden van Home Assistant die ouder zijn tonen \"Geen recente gegevens\". Manuele waarden verouderen nooit.",
+    "fallbackTone": "Anders",
+    "fallbackLabel": "Label als niets past",
+    "fallbackHint": "Gebruikt als geen enkele regel past, of als de waarde onbekend of verouderd is.",
+    "moveUp": "Omhoog",
+    "moveDown": "Omlaag",
+    "unsaved": "Niet bewaarde wijzigingen",
+    "saved": "Profiel bewaard",
+    "invalid": "Het profiel is nog niet volledig.",
+    "readOnly": "Alleen volwassenen kunnen profielen aanpassen.",
+    "fields": {
+      "title": "Velden",
+      "description": "Wat het toestel meldt. Het hoofdveld staat naast de indicator op het plan.",
+      "label": "Label",
+      "key": "Sleutel",
+      "type": "Soort",
+      "unit": "Eenheid",
+      "trueLabel": "Tekst bij aan/waar",
+      "falseLabel": "Tekst bij uit/onwaar",
+      "choices": "Keuzes",
+      "choiceValue": "Sleutel van de keuze",
+      "choiceLabel": "Label van de keuze",
+      "addChoice": "Keuze toevoegen",
+      "removeChoice": "Keuze verwijderen",
+      "newChoice": "Keuze {{number}}",
+      "primary": "Tonen op het plan",
+      "add": "Veld toevoegen",
+      "remove": "Veld verwijderen",
+      "newField": "Nieuw veld",
+      "defaultField": "Status"
+    },
+    "rules": {
+      "title": "Regels voor de indicator",
+      "description": "Van boven naar onder overlopen; de eerste regel die past bepaalt de kleur, het label en het pictogram.",
+      "empty": "Nog geen regels: de indicator krijgt altijd de kleur hieronder.",
+      "add": "Regel toevoegen",
+      "remove": "Regel verwijderen",
+      "newRule": "Nieuwe toestand",
+      "untitled": "Zonder naam",
+      "ruleNumber": "Regel {{number}}",
+      "matches": "Past",
+      "when": "Als",
+      "operator": "Is",
+      "value": "Waarde",
+      "values": "Een van",
+      "valuesComma": "Een van (gescheiden door komma's)",
+      "and": "en",
+      "upperBound": "Bovengrens",
+      "pickField": "Kies een veld",
+      "pickValue": "Kies een waarde",
+      "tone": "Kleur",
+      "label": "Label",
+      "icon": "Pictogram",
+      "pulse": "Pulseren om op te vallen",
+      "customColor": "Eigen kleur"
+    },
+    "preview": {
+      "title": "Voorbeeld",
+      "description": "Probeer voorbeeldwaarden en bekijk de indicator.",
+      "sampleValues": "Voorbeeldwaarden",
+      "matched": "Regel {{number}} past",
+      "fallback": "Geen enkele regel past"
+    }
+  },
+  "categories": {
+    "sensor": "Sensor",
+    "appliance": "Toestel",
+    "climate": "Klimaat",
+    "alarm": "Alarm",
+    "light": "Verlichting",
+    "camera": "Camera",
+    "other": "Andere"
+  },
+  "fieldTypes": {
+    "boolean": "Aan/uit",
+    "number": "Getal",
+    "text": "Tekst",
+    "choice": "Keuze"
+  },
+  "operators": {
+    "is_true": "is aan / waar",
+    "is_false": "is uit / onwaar",
+    "eq": "is gelijk aan",
+    "neq": "is niet",
+    "gt": "meer dan",
+    "gte": "minstens",
+    "lt": "minder dan",
+    "lte": "hoogstens",
+    "between": "tussen",
+    "in": "is een van"
+  },
+  "tones": {
+    "success": "Groen (in orde)",
+    "warning": "Oranje (let op)",
+    "danger": "Rood (probleem)",
+    "info": "Blauw (info)",
+    "neutral": "Grijs (neutraal)"
+  },
+  "icons": {
+    "none": "Geen pictogram",
+    "window": "Raam",
+    "door": "Deur",
+    "blinds": "Rolluik",
+    "thermometer": "Thermometer",
+    "droplets": "Vochtigheid",
+    "snowflake": "Koud",
+    "heater": "Verwarming",
+    "fan": "Ventilator",
+    "washing-machine": "Wasmachine",
+    "refrigerator": "Koelkast",
+    "plug": "Stekker",
+    "zap": "Stroom",
+    "power": "Aan/uit",
+    "shield": "Schild",
+    "siren": "Sirene",
+    "smoke": "Rookmelder",
+    "flame": "Vlam",
+    "bell": "Bel",
+    "lock": "Slot",
+    "battery": "Batterij",
+    "lightbulb": "Lamp",
+    "sun": "Zon",
+    "motion": "Beweging",
+    "activity": "Activiteit",
+    "camera": "Camera",
+    "cctv": "Bewakingscamera",
+    "waves": "Water",
+    "wind": "Wind",
+    "gauge": "Meter",
+    "tv": "Tv",
+    "router": "Router",
+    "speaker": "Luidspreker"
+  },
+  "live": {
+    "open": "Live",
+    "updating": "Bijwerken…",
+    "connecting": "Verbinden…",
+    "reconnecting": "Opnieuw verbinden…",
+    "offline": "Offline",
+    "offlineHint": "Geen live verbinding. Waarden kunnen verouderd zijn; er wordt vanzelf opnieuw verbonden."
+  },
+  "loading": {
+    "refreshing": "Vernieuwen…"
+  }
+}

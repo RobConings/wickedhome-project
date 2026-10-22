@@ -1,0 +1,35 @@
+// Audit log (docs/AUDIT.md): who changed what, through which channel. Written by src/api/audit/audit.service.ts,
+// shown under Settings → Activity, kept 365 days (job audit.prune). Never stores secrets (codes, tokens, passwords).
+
+enum AuditChannel {
+  APP
+  ASSISTANT
+  MCP
+  JOB
+}
+
+model AuditEntry {
+  id          String       @id @default(cuid())
+  householdId String
+  household   Household    @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  /// The account that acted; null for jobs, and once the account is removed.
+  userId      String?
+  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  /// Display name at the time (kept when the account is removed); the job id for jobs.
+  actorName   String
+  channel     AuditChannel
+  /// `<domain>.<verb>`, e.g. `expense.paid`, `alarm.armed_away`, `account.role_changed`, or an assistant tool's name.
+  action      String
+  /// What it was about: a type (`expense`, `account`, `invite`, `payment_account`…), its id and a readable label.
+  targetType  String?
+  targetId    String?
+  targetLabel String?
+  /// One line, e.g. "Role: adult → child" or the assistant's description of the call.
+  summary     String?
+  createdAt   DateTime     @default(now())
+
+  @@index([householdId, createdAt])
+  @@index([householdId, userId, createdAt])
+  @@index([createdAt])
+  @@map("audit_entries")
+}

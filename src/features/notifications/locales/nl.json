@@ -1,0 +1,123 @@
+{
+  "page": {
+    "title": "Meldingen",
+    "description": "Afval, betalingen, taken en het alarm. Tik op een melding om ze te openen."
+  },
+  "bell": {
+    "label": "Meldingen",
+    "unread_one": "{{count}} ongelezen melding",
+    "unread_other": "{{count}} ongelezen meldingen"
+  },
+  "list": {
+    "label": "Meldingen",
+    "search": "Meldingen zoeken",
+    "markAllRead": "Alles gelezen",
+    "markRead": "Markeer als gelezen",
+    "allRead": "Alles is gelezen",
+    "new": "Nieuw",
+    "urgent": "Dringend",
+    "more": "Oudere tonen",
+    "moreFailed": "Oudere meldingen konden niet laden.",
+    "error": "Je meldingen konden niet laden.",
+    "markFailed": "Markeren als gelezen lukte niet. Probeer opnieuw.",
+    "unreadOnly": "Alleen ongelezen",
+    "settings": "Instellingen"
+  },
+  "empty": {
+    "title": "Nog geen meldingen",
+    "description": "Afval, betalingen, taken en het alarm verschijnen hier, en op je telefoon zodra je meldingen aanzet in Instellingen."
+  },
+  "section": {
+    "title": "Meldingen",
+    "description": "Op je telefoon en in de app: op welke toestellen, wat en wanneer.",
+    "loading": "Meldingsinstellingen laden…",
+    "error": "Je meldingsinstellingen konden niet laden."
+  },
+  "push": {
+    "title": "Dit toestel",
+    "enable": "Meldingen aanzetten",
+    "enabling": "Aanzetten…",
+    "on": "Meldingen staan aan op dit toestel.",
+    "off": "Krijg afval, betalingen, taken en het alarm als melding op dit toestel.",
+    "enabled": "Meldingen staan aan op dit toestel",
+    "enableFailed": "Meldingen aanzetten op dit toestel lukte niet.",
+    "permissionDismissed": "Je sloot de vraag. Tik op de knop om ze opnieuw te stellen.",
+    "denied": "Meldingen zijn geblokkeerd voor WickedHome op dit toestel. Sta ze toe in de site-instellingen van de browser (Android: tik op het slotje naast het adres → Rechten → Meldingen) of in de instellingen van je telefoon, en kom dan terug.",
+    "insecure": "Meldingen werken alleen op het beveiligde adres. Open https://home.example.be om ze aan te zetten.",
+    "unsupported": "Deze browser kan geen meldingen ontvangen. Gebruik Chrome, Edge, Firefox of Samsung Internet, of de geïnstalleerde app.",
+    "iosTitle": "Op iPhone en iPad: zet WickedHome eerst op je beginscherm",
+    "iosSteps": "Tik in Safari op Deel → Zet op beginscherm → Voeg toe. Open WickedHome via het icoon op je beginscherm, ga naar Instellingen → Meldingen en tik op Meldingen aanzetten. (Vanaf iOS 16.4.)",
+    "androidHint": "Android: werkt in Chrome en in de geïnstalleerde app. iPhone: alleen in de app op het beginscherm.",
+    "test": "Testmelding sturen",
+    "testSent": "Test verstuurd. Hij verschijnt binnen enkele seconden.",
+    "testNoDevice": "Bewaard in de app. Zet meldingen aan op een toestel om hem op je telefoon te krijgen.",
+    "testFailed": "De testmelding versturen lukte niet."
+  },
+  "devices": {
+    "title": "Je toestellen",
+    "empty": "Nog geen toestellen. Zet meldingen aan op je telefoon om hem hier te zien.",
+    "thisDevice": "Dit toestel",
+    "added": "Toegevoegd {{date}}",
+    "lastDelivered": "Laatst bezorgd {{date}}",
+    "neverDelivered": "Nog niets bezorgd",
+    "failing_one": "{{count}} mislukte bezorging",
+    "failing_other": "{{count}} mislukte bezorgingen",
+    "remove": "Verwijderen",
+    "removeTitle": "{{name}} verwijderen?",
+    "removeDescription": "Het krijgt geen meldingen meer. Je kunt ze op dat toestel opnieuw aanzetten.",
+    "removed": "Toestel verwijderd",
+    "removeFailed": "Het toestel verwijderen lukte niet."
+  },
+  "quiet": {
+    "title": "Stille uren",
+    "description": "Geen pushmeldingen in deze periode; ze komen binnen als ze voorbij is (als je ze nog niet las in de app). Het alarm komt altijd door.",
+    "enabled": "Stille uren",
+    "from": "Van",
+    "to": "Tot"
+  },
+  "kinds": {
+    "title": "Waarvoor",
+    "when": "Wanneer",
+    "atTaskTime": "Op het uur van de afvaltaak",
+    "eveningBefore": "De avond voordien, {{time}}",
+    "at": "Om {{time}}",
+    "urgent": "Altijd, ook tijdens stille uren",
+    "scopedCount_one": "{{count}} gekozen",
+    "scopedCount_other": "{{count}} gekozen",
+    "scopedNone": "Nog niets gekozen: gebruik Verwittig me op de pagina van een toestel.",
+    "test": {
+      "title": "Testmelding",
+      "description": "Verstuurd met de testknop."
+    }
+  },
+  "groups": {
+    "household": "Huishouden",
+    "tasks": "Taken",
+    "money": "Geld",
+    "security": "Alarm en Home Assistant",
+    "devices": "Toestellen",
+    "accounts": "Accounts en mail"
+  },
+  "saved": "Bewaard",
+  "saveFailed": "Bewaren lukte niet. Probeer opnieuw.",
+  "keyStorage": {
+    "plain": "Voor de eigenaar: de pushsleutel van de server staat onversleuteld in de database, omdat INTEGRATIONS_KEY niet in .env staat. Zet hem (openssl rand -base64 32) en herstart, dan wordt de sleutel automatisch versleuteld."
+  },
+  "notifyMe": {
+    "label": "Verwittig me",
+    "description": "Als het oranje of rood wordt",
+    "on": "Je krijgt een melding als {{name}} oranje of rood wordt.",
+    "off": "Geen meldingen meer voor {{name}}.",
+    "failed": "Aanpassen lukte niet. Probeer opnieuw."
+  },
+  "jobs": {
+    "dispatch": {
+      "title": "Meldingen versturen",
+      "description": "Elke 5 minuten: afval, het takenoverzicht, betalingen, maaltijdcheques en pushmeldingen die wachtten op het einde van de stille uren"
+    },
+    "prune": {
+      "title": "Meldingen opruimen",
+      "description": "Verwijdert meldingen ouder dan 90 dagen"
+    }
+  }
+}

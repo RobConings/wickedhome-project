@@ -1,0 +1,142 @@
+{
+  "page": {
+    "title": "Kalender",
+    "description": "Alles wat het gezin gepland heeft, van naar school brengen tot winkelbezoeken."
+  },
+  "actions": {
+    "add": "Nieuwe afspraak",
+    "today": "Vandaag",
+    "previous": "Vorige",
+    "next": "Volgende",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "openEvent": "Afspraak openen",
+    "open": "Openen",
+    "openShop": "Winkel openen"
+  },
+  "views": {
+    "label": "Weergave",
+    "day": "Dag",
+    "week": "Week",
+    "month": "Maand",
+    "agenda": "Agenda"
+  },
+  "kinds": {
+    "event": "Afspraak",
+    "store_visit": "Winkelbezoek",
+    "birthday": "Verjaardag",
+    "task": "Taak",
+    "bill": "Te betalen",
+    "renewal": "Verlenging",
+    "waste": "Afvalophaling",
+    "other": "Andere"
+  },
+  "categories": {
+    "none": "Geen categorie",
+    "family": "Gezinsactiviteit",
+    "holiday": "Vakantie & reizen",
+    "school": "School",
+    "work": "Werk",
+    "health": "Gezondheid",
+    "social": "Sociaal",
+    "sport": "Sport",
+    "household": "Huishouden",
+    "other": "Andere"
+  },
+  "entry": {
+    "birthday": "{{name}} wordt {{age}}",
+    "more_one": "+{{count}} meer",
+    "more_other": "+{{count}} meer",
+    "allDay": "Hele dag",
+    "recurring": "Herhaalt",
+    "readOnly": "Elders beheerd",
+    "dayLabel": "{{date}}, afspraak toevoegen",
+    "reminder": "Met herinnering"
+  },
+  "time": {
+    "from": "vanaf {{time}}",
+    "until": "tot {{time}}"
+  },
+  "form": {
+    "createTitle": "Nieuwe afspraak",
+    "editTitle": "Afspraak bewerken",
+    "description": "Wie, wanneer en waar. Kies een winkel om een winkelbezoek te plannen.",
+    "created": "Afspraak toegevoegd",
+    "updated": "Wijzigingen opgeslagen",
+    "deleted": "Afspraak verwijderd",
+    "seriesNote": "Wijzigingen gelden voor elke keer dat deze afspraak terugkomt."
+  },
+  "fields": {
+    "kind": "Soort",
+    "title": "Titel",
+    "titlePlaceholder": "bv. Etentje met het gezin",
+    "shop": "Winkel",
+    "allDay": "Hele dag",
+    "startDate": "Begindatum",
+    "startTime": "Beginuur",
+    "endDate": "Einddatum",
+    "endTime": "Einduur",
+    "participants": "Wie",
+    "category": "Categorie",
+    "location": "Locatie",
+    "locationPlaceholder": "Adres of plaats",
+    "description": "Notities",
+    "repeat": "Herhalen",
+    "calendar": "Agenda"
+  },
+  "detail": {
+    "when": "Wanneer",
+    "repeats": "Herhaling",
+    "participants": "Wie",
+    "everyone": "Niemand in het bijzonder",
+    "location": "Locatie",
+    "notes": "Notities",
+    "shop": "Winkel",
+    "shopList": "Op het lijstje voor deze winkel",
+    "shopListPlaceholder": "Wat je bij {{shop}} moet kopen, verschijnt hier zodra de boodschappenlijstjes er zijn.",
+    "managedIn": "Dit komt uit een ander deel van de app en pas je daar aan."
+  },
+  "delete": {
+    "title": "“{{title}}” verwijderen?",
+    "description": "Dit kan niet ongedaan gemaakt worden.",
+    "recurringDescription": "Hiermee verwijder je elke keer dat deze afspraak terugkomt. Dit kan niet ongedaan gemaakt worden."
+  },
+  "errors": {
+    "timeRequired": "Kies een uur.",
+    "endBeforeStart": "Het einde moet na het begin liggen.",
+    "tooLong": "Een afspraak duurt hoogstens een jaar.",
+    "shopRequired": "Kies de winkel waar je naartoe gaat.",
+    "invalidRecurrence": "Deze herhaling wordt niet ondersteund.",
+    "unknownParticipant": "Iemand in deze lijst hoort niet bij het huishouden.",
+    "unknownShop": "Deze winkel bestaat niet meer.",
+    "notFound": "Deze afspraak bestaat niet meer.",
+    "unknownTarget": "Deze agenda kan niet meer gekozen worden; vernieuw en probeer opnieuw."
+  },
+  "empty": {
+    "title": "Niets gepland",
+    "description": "Er staat deze maand nog niets op de kalender.",
+    "day": "Niets gepland"
+  },
+  "agenda": {
+    "today": "Vandaag",
+    "tomorrow": "Morgen",
+    "nothing": "Niets gepland",
+    "openDay": "{{date}} openen als dag"
+  },
+  "eventPage": {
+    "back": "Terug naar de kalender"
+  },
+  "filter": {
+    "label": "Categorieën en bronnen",
+    "clear": "Alles tonen"
+  },
+  "sources": {
+    "birthdays": "Verjaardagen",
+    "tasks": "Taken",
+    "waste": "Afvalophaling",
+    "expenses": "Uitgaven"
+  },
+  "targets": {
+    "household": "Gezinsagenda"
+  }
+}

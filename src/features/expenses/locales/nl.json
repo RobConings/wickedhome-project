@@ -1,0 +1,353 @@
+{
+  "notifications": {
+    "autoPaid": {
+      "title": "Domiciliëringen betaald",
+      "description": "Een overzicht als domiciliëringen op hun vervaldag als betaald gemarkeerd werden."
+    }
+  },
+  "page": {
+    "title": "Uitgaven",
+    "description": "Rekeningen, abonnementen, leningen en dagelijkse uitgaven: wat eraan komt, wat loopt, wat betaald is."
+  },
+  "views": {
+    "upcoming": "Te betalen",
+    "recurring": "Terugkerend",
+    "history": "Geschiedenis",
+    "label": "Weergave"
+  },
+  "actions": {
+    "add": "Nieuwe uitgave",
+    "log": "Uitgave noteren",
+    "markPaid": "Markeer als betaald",
+    "markUnpaid": "Markeer als onbetaald",
+    "undoAutoPay": "Toch niet betaald",
+    "showMore_one": "Nog {{count}} maand tonen",
+    "showMore_other": "Nog {{count}} maanden tonen",
+    "copy": "Kopiëren",
+    "copied": "Gekopieerd",
+    "pause": "Pauzeren",
+    "resume": "Hervatten",
+    "end": "Stopzetten",
+    "deleteRecurring": "Verwijderen",
+    "editRecurring": "Terugkerende uitgave bewerken",
+    "openRecurring": "Terugkerende uitgave",
+    "website": "Website"
+  },
+  "status": {
+    "upcoming": "Gepland",
+    "due": "Binnenkort",
+    "overdue": "Te laat",
+    "paid": "Betaald"
+  },
+  "recurringStatus": {
+    "active": "Actief",
+    "paused": "Gepauzeerd",
+    "ended": "Stopgezet"
+  },
+  "kinds": {
+    "subscription": "Abonnement",
+    "loan": "Lening",
+    "down_payment": "Afbetaling",
+    "insurance": "Verzekering",
+    "utility": "Nutsvoorziening",
+    "tax": "Belasting",
+    "other": "Andere"
+  },
+  "categories": {
+    "energy": "Energie",
+    "water": "Water",
+    "internet_phone": "Internet & telefoon",
+    "insurance": "Verzekeringen",
+    "taxes": "Belastingen",
+    "housing": "Wonen & hypotheek",
+    "healthcare": "Gezondheid",
+    "school_childcare": "School & opvang",
+    "car": "Auto",
+    "subscriptions": "Abonnementen & lidmaatschappen",
+    "loans": "Leningen & afbetalingen",
+    "groceries": "Boodschappen",
+    "household": "Huishouden",
+    "eating_out": "Uit eten",
+    "transport": "Vervoer & brandstof",
+    "leisure": "Vrije tijd",
+    "gifts": "Cadeaus",
+    "clothing": "Kleding",
+    "personal_care": "Verzorging",
+    "pets": "Huisdieren",
+    "other": "Andere"
+  },
+  "categoryGroups": {
+    "everyday": "Dagelijkse uitgaven",
+    "bills": "Rekeningen & vaste kosten"
+  },
+  "methods": {
+    "direct_debit": "Domiciliëring",
+    "wire_transfer": "Overschrijving",
+    "card": "Kaart",
+    "cash": "Cash",
+    "meal_voucher": "Maaltijdcheques",
+    "other": "Andere",
+    "none": "Niet ingesteld"
+  },
+  "payer": {
+    "label": "Wie betaalt",
+    "joint": "Gezamenlijke rekening",
+    "person": "Eén persoon",
+    "split": "Verdelen",
+    "choosePerson": "Wie betaalt?",
+    "vouchersPersonal": "Maaltijdcheques zijn van één persoon, dus ze kunnen niet van de gezamenlijke rekening komen.",
+    "equal": "Gelijk",
+    "custom": "Bedragen",
+    "pickHabitants": "Wie deelt mee?",
+    "shareOf": "Deel van {{name}}",
+    "balanced": "Klopt met het totaal.",
+    "remaining": "Nog {{amount}} te verdelen",
+    "over": "{{amount}} meer dan het totaal",
+    "splitBetween": "Verdeeld tussen {{names}}"
+  },
+  "filters": {
+    "payer": "Wie betaalt",
+    "all": "Iedereen",
+    "joint": "Gezamenlijk",
+    "kind": "Soort",
+    "allKinds": "Alle soorten",
+    "status": "Status",
+    "allStatuses": "Alle"
+  },
+  "next": {
+    "title": "Volgende betaling",
+    "joint": "Gezamenlijke rekening",
+    "nothing": "Niets te betalen",
+    "onDate": "{{payee}} · {{date}}"
+  },
+  "totals": {
+    "thisMonth": "Deze maand",
+    "nextMonth": "Volgende maand",
+    "overdue": "Te laat",
+    "unpaid": "Nog {{amount}} te betalen",
+    "allPaid_one": "Betaald",
+    "allPaid_other": "Alle {{count}} betaald",
+    "none": "Nog niets",
+    "nothingOverdue": "Niets te laat",
+    "count_one": "{{count}} uitgave",
+    "count_other": "{{count}} uitgaven",
+    "perMonth": "Per maand",
+    "perYear": "Per jaar",
+    "active_one": "{{count}} actief",
+    "active_other": "{{count}} actief",
+    "normalised": "Elk ritme omgerekend naar een jaar",
+    "savings": "Mogelijke besparing per jaar",
+    "candidates_one": "Als je er {{count}} opzegt",
+    "candidates_other": "Als je er {{count}} opzegt",
+    "noCandidates": "Duid aan wat je zou kunnen opzeggen"
+  },
+  "fields": {
+    "payee": "Begunstigde",
+    "previousPayees": "Eerder",
+    "description": "Omschrijving",
+    "amount": "Bedrag",
+    "dueDate": "Vervaldag",
+    "firstDueDate": "Eerste vervaldag",
+    "date": "Datum",
+    "category": "Categorie",
+    "kind": "Soort",
+    "repeats": "Terugkerend",
+    "recurrence": "Ritme",
+    "paymentMethod": "Betaalwijze",
+    "beneficiaryName": "Naam begunstigde",
+    "iban": "IBAN",
+    "bic": "BIC",
+    "communication": "Mededeling",
+    "structured": "Gestructureerd",
+    "freeText": "Vrije tekst",
+    "notes": "Notities",
+    "paidOn": "Betaald op",
+    "paidBy": "Betaald door",
+    "shop": "Winkel",
+    "website": "Website",
+    "trialEndsOn": "Proefperiode tot",
+    "remindDaysBefore": "Herinner me (dagen vooraf)",
+    "candidateToCancel": "Kandidaat om op te zeggen",
+    "status": "Status",
+    "nextDue": "Volgende vervaldag",
+    "endDate": "Einddatum"
+  },
+  "placeholders": {
+    "description": "bv. Maandelijks voorschot elektriciteit",
+    "beneficiaryName": "Zoals op de factuur",
+    "reference": "bv. Factuur 2026-104",
+    "shop": "Waar?"
+  },
+  "hints": {
+    "structured": "Met of zonder +++ en schuine strepen.",
+    "beneficiaryName": "Banken controleren de naam bij het IBAN. Leeg: de begunstigde hierboven.",
+    "directDebit": "Wordt op de vervaldag vanzelf als betaald gemarkeerd.",
+    "remindDaysBefore": "Leeg laten voor geen herinnering.",
+    "candidateToCancel": "Gebruik je het weinig? Duid het aan en zie wat opzeggen bespaart.",
+    "repeats": "Abonnementen, leningen, verzekeringen… worden vooraf ingepland."
+  },
+  "scope": {
+    "label": "Wijzigingen toepassen op",
+    "expense": "Alleen deze",
+    "recurring": "Deze en alle volgende"
+  },
+  "row": {
+    "due": "Vervalt {{date}}",
+    "dueToday": "Vervalt vandaag",
+    "dueInDays_one": "Vervalt morgen",
+    "dueInDays_other": "Vervalt over {{count}} dagen",
+    "overdueDays_one": "1 dag te laat",
+    "overdueDays_other": "{{count}} dagen te laat",
+    "paid": "Betaald {{date}}",
+    "autoPaid": "Automatisch betaald",
+    "perMonth": "{{amount}}/mnd",
+    "perYear": "{{amount}}/jaar",
+    "nextOn": "Volgende {{date}}",
+    "endedOn": "Stopgezet {{date}}",
+    "paused": "Gepauzeerd",
+    "trialUntil": "Proef tot {{date}}",
+    "candidate": "Opzeggen",
+    "reminder": "Herinnering",
+    "onHold": "On hold: {{reason}}"
+  },
+  "form": {
+    "createTitle": "Nieuwe uitgave",
+    "editTitle": "Uitgave bewerken",
+    "editRecurringTitle": "Terugkerende uitgave bewerken",
+    "description": "Een rekening om te betalen, of iets dat terugkomt.",
+    "created": "Uitgave toegevoegd",
+    "updated": "Wijzigingen bewaard",
+    "recurringUpdated": "Terugkerende uitgave bijgewerkt",
+    "normalised": "Dat is {{monthly}} per maand, {{yearly}} per jaar.",
+    "paymentDetails": "Betaalgegevens",
+    "more": "Meer"
+  },
+  "log": {
+    "title": "Uitgave noteren",
+    "description": "Al betaald: boodschappen, uit eten, tanken, een cadeau…",
+    "saved": "Uitgave genoteerd",
+    "more": "Meer details"
+  },
+  "pay": {
+    "title": "{{payee}} betalen",
+    "description": "{{amount}}, vervalt {{date}}",
+    "whoPaid": "Wie betaalde?",
+    "done": "Als betaald gemarkeerd",
+    "undone": "Als onbetaald gemarkeerd"
+  },
+  "delete": {
+    "title": "Deze uitgave van {{payee}} verwijderen?",
+    "description": "Dit kan niet ongedaan worden.",
+    "inRecurringDescription": "Alleen deze wordt verwijderd; de terugkerende uitgave loopt door.",
+    "recurringTitle": "{{payee}} definitief verwijderen?",
+    "recurringDescription": "Komende onbetaalde worden verwijderd; betaalde blijven in de geschiedenis. Wil je het in het overzicht houden, zet het dan stop."
+  },
+  "end": {
+    "title": "{{payee}} stopzetten?",
+    "description": "Geen uitgaven meer na de einddatum; onbetaalde daarna worden verwijderd. Je kunt later hervatten.",
+    "done": "Stopgezet",
+    "paused": "Gepauzeerd: geen nieuwe uitgaven tot je hervat",
+    "resumed": "Hervat"
+  },
+  "detail": {
+    "back": "Alle uitgaven",
+    "payment": "Betaling",
+    "paidOn": "Betaald op {{date}}",
+    "paidOnBy": "Betaald op {{date}} door {{name}}",
+    "autoPaidOn": "Automatisch betaald op {{date}} (domiciliëring)",
+    "notPaid": "Nog niet betaald",
+    "none": "Geen",
+    "recurring": "Terugkerend",
+    "nextDue": "Volgende vervalt {{date}}",
+    "ended": "Niets meer gepland",
+    "amountEach": "{{amount}} per keer",
+    "history": "Betaalgeschiedenis",
+    "noHistory": "Nog niets eerder.",
+    "upcoming": "Komt eraan",
+    "noUpcoming": "Niets gepland.",
+    "unknownHabitant": "Voormalige bewoner",
+    "details": "Gegevens",
+    "reminderOn_one": "{{count}} dag vooraf: op {{date}}",
+    "reminderOn_other": "{{count}} dagen vooraf: op {{date}}"
+  },
+  "qr": {
+    "title": "Betalen met je bankapp",
+    "description": "Scan de code in je bankapp: begunstigde, IBAN, bedrag en mededeling worden ingevuld.",
+    "label": "Betaal-QR-code voor {{payee}}",
+    "missing": "Vul het IBAN in voor een betaal-QR-code.",
+    "loading": "QR-code maken…",
+    "openInApp": "Openen in bankapp",
+    "saveImage": "Afbeelding opslaan",
+    "copyAll": "Alles kopiëren",
+    "shareFailed": "Delen lukte niet. Kopieer de gegevens of sla de afbeelding op.",
+    "fileName": "Betaling {{payee}}.png"
+  },
+  "empty": {
+    "upcoming": {
+      "title": "Niets te betalen",
+      "description": "Voeg een rekening of terugkerende uitgave toe en ze verschijnt hier voor de vervaldag."
+    },
+    "recurring": {
+      "title": "Nog niets terugkerend",
+      "description": "Abonnementen, leningen, afbetalingen, verzekeringen… één keer toevoegen, ze komen vanzelf terug."
+    },
+    "history": {
+      "title": "Nog niets betaald",
+      "description": "Betaalde uitgaven en genoteerde dagelijkse uitgaven komen hier."
+    },
+    "filtered": {
+      "title": "Niets hier",
+      "description": "Niets past bij deze filter."
+    }
+  },
+  "errors": {
+    "notFound": "Deze uitgave bestaat niet meer.",
+    "amount": "Vul een bedrag in, bv. 12,50.",
+    "structuredCommunication": "Dat is geen geldige gestructureerde mededeling. Controleer de cijfers.",
+    "iban": "Dat is geen geldig IBAN.",
+    "bic": "Dat is geen geldige BIC.",
+    "shares": "De delen moeten samen het totaal geven.",
+    "payer": "Kies wie betaalt.",
+    "mealVoucherJoint": "Maaltijdcheques zijn van één persoon: kies wie ermee betaalde.",
+    "rrule": "Dit herhaalpatroon wordt niet ondersteund.",
+    "website": "Dat lijkt geen webadres.",
+    "totalOpen": "Vul het bedrag in dat nog open staat, bv. 10.000,00."
+  },
+  "totalOpen": {
+    "label": "Totaal nog open",
+    "asOf": "Vanaf",
+    "asOfHint": "Eerste betaling die meetelt. Leeg: de volgende betaling.",
+    "hint": "Iets aan het afbetalen? Vul in wat er nog open staat: het aantal betalingen volgt daaruit, en de laatste is voor wat overblijft.",
+    "more": "Iets aan het afbetalen? Totaal nog open",
+    "needAmount": "Vul het bedrag per betaling in om de betalingen te zien.",
+    "summaryPartial": "{{count}} betalingen: {{regular}} × {{amount}} + laatste {{last}}",
+    "summaryEven_one": "1 betaling van {{amount}}",
+    "summaryEven_other": "{{count}} betalingen van {{amount}}",
+    "paidSince": "{{amount}} al betaald, nog {{remaining}} te gaan.",
+    "lastOn": "Laatste betaling op {{date}}.",
+    "lockedEnd_one": "Na 1 betaling, op {{date}}: volgt uit het totaal nog open. Maak dat leeg om het einde zelf te kiezen.",
+    "lockedEnd_other": "Na {{count}} betalingen, op {{date}}: volgt uit het totaal nog open. Maak dat leeg om het einde zelf te kiezen.",
+    "tooMany": "Dat zijn meer dan 999 betalingen. Kijk het bedrag en het totaal na.",
+    "left": "{{remaining}} van {{total}} nog open",
+    "paymentsToGo_one": "nog 1 betaling",
+    "paymentsToGo_other": "nog {{count}} betalingen",
+    "lastPayment": "laatste op {{date}}",
+    "lastAmount": "laatste betaling {{amount}}",
+    "since": "{{paid}} betaald sinds {{date}}",
+    "paidOff": "Afbetaald",
+    "progressLabel": "{{percent}}% afbetaald"
+  },
+  "loading": {
+    "creatingRecurring": "Komende uitgaven toevoegen…",
+    "updatingRecurring": "Komende uitgaven bijwerken…"
+  },
+  "project": {
+    "chip": "Project: {{name}}"
+  },
+  "jobs": {
+    "autoPay": {
+      "title": "Domiciliëringen",
+      "description": "Markeert domiciliëringen als betaald op hun vervaldag."
+    }
+  }
+}

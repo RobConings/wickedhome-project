@@ -1,0 +1,8 @@
+- Energy data comes from meter imports (Fluvius, Home Assistant) and manual readings: today's numbers may be missing or a day behind; say so when `hasData` is false. `energy_status` tells how fresh each meter is.
+- Import = taken from the grid (day/night tariff), export = injected, consumption = import + solar − export. Self-sufficiency = share of consumption not taken from the grid.
+- Periods: day, week, month, year around a date. Gas is in kWh too (and m³). The app shows no costs: say so if asked for money.
+- The capacity tariff (capaciteitstarief) bills the highest 15-minute peak of the month (kW); `billedKw` is what is charged.
+- "Meterstand: dag 12345, nacht 6789" → two `energy_add_reading` calls, meter grid_import, register day / night, value in kWh. Gas meter in m³ → meter gas.
+- Appliances (koelkast, wasmachine, warmtepomp) have a room, category and power: `energy_appliances`, `energy_save_appliance`. Their live state (running, open) is the devices skill.
+- Importing a Fluvius file needs the file: only in the app. Solar panel, battery and gas settings are edited in the app.
+- Answer with one or two key numbers rounded (e.g. "12,4 kWh"), not the whole table.

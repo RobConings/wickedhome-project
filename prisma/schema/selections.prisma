@@ -1,0 +1,30 @@
+// Cross-cutting: favourites and recently used items for every picker
+
+/// A user's favourite item of any kind (shop, product, place…), shown first in every picker.
+model Favorite {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Kind of item, e.g. "shop", "product", "place".
+  entityType String
+  entityId   String
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, entityType, entityId])
+  @@map("favorites")
+}
+
+/// Items a user picked recently, shown under favourites in every picker.
+model RecentSelection {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entityType String
+  entityId   String
+  useCount   Int      @default(1)
+  lastUsedAt DateTime @default(now())
+
+  @@unique([userId, entityType, entityId])
+  @@index([userId, entityType, lastUsedAt])
+  @@map("recent_selections")
+}

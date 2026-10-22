@@ -1,0 +1,4 @@
+- Collection days come from the household's collector (set up in Settings → Waste collection). Bins go out the evening before a collection day.
+- "Welke vuilbak moet buiten vanavond" = the bins of tomorrow's collection; "deze week" = the coming 7 days.
+- If waste collection is not set up, say where to set it up (Settings → Waste collection). The address and the "put the bins out" tasks are set there too.
+- The calendar updates by itself; `waste_refresh` fetches it now (e.g. when a day seems missing or `lastFetchFailed`).

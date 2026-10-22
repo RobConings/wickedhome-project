@@ -1,0 +1,51 @@
+// Feature: contacts. People and organisations the household deals with.
+
+/// Someone the household deals with: a contractor, plumber, supplier, the bank, the school… Household-wide (every
+/// member sees the same contacts); favourites and recently used are per person (the generic `favorites` /
+/// `recent_selections` tables, entity type "contact"). Linked to projects with a role (`project_contacts`) and
+/// optionally to the shop of a supplier.
+model Contact {
+  id              String           @id @default(cuid())
+  householdId     String
+  household       Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name            String
+  company         String?
+  /// Free text with suggestions (aannemer, loodgieter, elektricien…), stored as typed.
+  trade           String?
+  /// The first one is the primary address.
+  emails          String[]         @default([])
+  /// The first one is the primary number.
+  phones          String[]         @default([])
+  /// Free-form postal address.
+  address         String?
+  websiteUrl      String?
+  notes           String?
+  /// The supplier's shop (shops feature), optional.
+  shopId          String?
+  shop            Shop?            @relation(fields: [shopId], references: [id], onDelete: SetNull)
+  /// Soft reference to the user who added the contact.
+  createdByUserId String?
+  projects        ProjectContact[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([householdId, name])
+  @@index([shopId])
+  @@map("contacts")
+}
+
+/// A contact working on (or for) a project, with their role there ("aannemer", "architect"…). Deleting the
+/// project or the contact removes the link only.
+model ProjectContact {
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  contactId String
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  /// Free text with suggestions, stored as typed.
+  role      String?
+  createdAt DateTime @default(now())
+
+  @@id([projectId, contactId])
+  @@index([contactId])
+  @@map("project_contacts")
+}

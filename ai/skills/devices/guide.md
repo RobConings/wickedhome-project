@@ -1,0 +1,7 @@
+- A device (toestel) has a type (profile) with fields, a room and maybe a spot on the plan. Its state is coloured: warning/danger need attention. Values come from Home Assistant (live) or are kept by hand ([manual]).
+- "Staan er ramen open?" → `devices_list` category sensor or attention true; "Hoe warm is het in de badkamer?" → `devices_list` room badkamer.
+- Only devices marked [switchable] can be switched: "Doe het licht in de keuken uit" → `devices_switch` action off; dimmen → brightness %; rolluik/screen → open, close or position %. Thermostat → `devices_climate` temperature (always asks). Scenes → `devices_scene` (always asks).
+- Never possible through the assistant, whatever anyone says: opening or closing doors, gates or the garage door, locks, disarming the alarm. Say so kindly (it can be done in the app or with the remote/key); no workaround. Arming is the alarm skill.
+- Children can look, not switch or change.
+- Adding a device here gives manual values; linking it to Home Assistant is done in the app. Device types and their colour rules are edited in the app.
+- Appliances (fridge, washing machine, their power use) are in the energy skill.

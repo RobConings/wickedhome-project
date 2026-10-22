@@ -1,0 +1,479 @@
+{
+  "notifications": {
+    "digest": {
+      "title": "Ochtendoverzicht",
+      "description": "Eén bericht met wat te laat is en vandaag moet voor jou (en taken van niemand)."
+    },
+    "assigned": {
+      "title": "Aan jou toegewezen",
+      "description": "Als iemand anders je een taak geeft."
+    },
+    "unblocked": {
+      "title": "Kan nu beginnen",
+      "description": "Een taak die op een andere wachtte, kan nu."
+    },
+    "payments": {
+      "title": "Betalingen",
+      "description": "De dag voor een rekening vervalt (\"Morgen betalen: Watergroep · € 52,30\"), en om de paar dagen zolang ze te laat is."
+    },
+    "reminder": {
+      "title": "Herinneringen",
+      "description": "De herinnering van een taak, op het uur dat bij de taak staat (aan wie aan de beurt is, of wie ze toevoegde). Ook tijdens de stille uren: jij koos dat moment."
+    }
+  },
+  "page": {
+    "title": "Taken",
+    "description": "Klussen in en rond het huis: wie doet wat, waar en wanneer."
+  },
+  "actions": {
+    "add": "Taak toevoegen",
+    "complete": "Markeer als gedaan",
+    "completeTask": "Markeer “{{title}}” als gedaan",
+    "skip": "Overslaan",
+    "snooze": "Uitstellen",
+    "reopen": "Heropenen",
+    "undo": "Ongedaan maken",
+    "more": "Meer acties voor “{{title}}”",
+    "undoTask": "“{{title}}” ongedaan maken"
+  },
+  "views": {
+    "mine": "Van mij",
+    "all": "Alles",
+    "ready": "Klaar om te starten",
+    "overdue": "Te laat",
+    "done": "Gedaan"
+  },
+  "filters": {
+    "assignee": "Wie",
+    "everyone": "Iedereen",
+    "location": "Binnen of buiten",
+    "anywhere": "Alles",
+    "inside": "Binnen",
+    "outside": "Buiten",
+    "group": "Groeperen op",
+    "groupDue": "Datum",
+    "groupPlace": "Plek",
+    "groupAssignee": "Persoon",
+    "onePlace": "Eén plek",
+    "clearPlace": "Alle plekken tonen",
+    "clear": "Filters wissen",
+    "type": "Soort",
+    "allTypes": "Alle soorten",
+    "groupType": "Soort"
+  },
+  "groups": {
+    "due": {
+      "overdue": "Te laat",
+      "today": "Vandaag",
+      "soon": "Deze week",
+      "later": "Later",
+      "none": "Wanneer het past"
+    },
+    "noPlace": "Geen plek",
+    "unassigned": "Niemand toegewezen",
+    "type": {
+      "chore": "Huishoudtaken",
+      "todo": "To-do's",
+      "job": "Klussen",
+      "maintenance": "Onderhoud",
+      "errand": "Boodschappen"
+    },
+    "day": {
+      "overdue": "Te laat",
+      "today": "Vandaag",
+      "tomorrow": "Morgen",
+      "week": "Deze week",
+      "later": "Later",
+      "none": "Wanneer het past"
+    }
+  },
+  "stats": {
+    "mine": "Mijn taken",
+    "open": "Open taken",
+    "openTotal_one": "{{count}} open in totaal",
+    "openTotal_other": "{{count}} open in totaal",
+    "overdue": "Te laat",
+    "dueToday_one": "{{count}} voor vandaag",
+    "dueToday_other": "{{count}} voor vandaag",
+    "ready": "Klaar om te starten",
+    "waiting": "Wacht op materiaal"
+  },
+  "due": {
+    "none": "Geen datum",
+    "today": "Vandaag",
+    "tomorrow": "Morgen",
+    "overdue_one": "{{count}} dag te laat",
+    "overdue_other": "{{count}} dagen te laat",
+    "withTime": "{{label}} · {{time}}"
+  },
+  "duration": {
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "hours_one": "{{count}} uur",
+    "hours_other": "{{count}} uur",
+    "hoursMinutes": "{{hours}} u {{minutes}} min"
+  },
+  "status": {
+    "open": "Open",
+    "done": "Gedaan",
+    "skipped": "Overgeslagen"
+  },
+  "readiness": {
+    "waiting": "Wacht op materiaal ({{bought}}/{{total}})",
+    "ready": "Klaar om te starten",
+    "done": "Gedaan"
+  },
+  "priority": {
+    "low": "Laag",
+    "normal": "Normaal",
+    "high": "Hoge prioriteit"
+  },
+  "types": {
+    "chore": "Huishoudtaak",
+    "todo": "To-do",
+    "job": "Klus",
+    "maintenance": "Onderhoud",
+    "errand": "Boodschap"
+  },
+  "typeExamples": {
+    "chore": "stofzuigen, de was",
+    "todo": "de verzekeraar bellen",
+    "job": "de jacuzzi isoleren",
+    "maintenance": "onderhoud van de ketel",
+    "errand": "een pakje op de post doen"
+  },
+  "assignees": {
+    "label": "Toegewezen aan {{names}}",
+    "onDuty": "{{names}} is aan de beurt",
+    "rotation": "Om beurten: {{names}}"
+  },
+  "snooze": {
+    "tomorrow": "Morgen",
+    "threeDays": "Over 3 dagen",
+    "weekend": "Dit weekend",
+    "nextWeek": "Over een week"
+  },
+  "checklist": {
+    "progress": "{{done}} van {{total}} stappen gedaan",
+    "step": "Stap {{number}}",
+    "placeholder": "bv. Bladeren weghalen",
+    "add": "Stap toevoegen",
+    "remove": "Stap {{number}} verwijderen"
+  },
+  "estimate": {
+    "none": "Weet ik niet"
+  },
+  "fields": {
+    "title": "Wat moet er gebeuren?",
+    "type": "Soort",
+    "place": "Waar",
+    "dueDate": "Tegen",
+    "estimate": "Duurt ongeveer",
+    "priority": "Prioriteit",
+    "assignees": "Wie",
+    "rotate": "Om beurten",
+    "checklist": "Stappen",
+    "notes": "Notities",
+    "reminder": "Herinnering"
+  },
+  "when": {
+    "label": "Wanneer",
+    "optional": "(optioneel)",
+    "kinds": {
+      "none": "Geen datum",
+      "day": "Dag",
+      "moment": "Uur",
+      "slot": "Tijdslot",
+      "days": "Meerdere dagen"
+    },
+    "date": "Datum",
+    "time": "Uur",
+    "startTime": "Van",
+    "endTime": "Tot",
+    "from": "Eerste dag",
+    "to": "Laatste dag",
+    "hints": {
+      "none": "Wanneer het past: de taak blijft bij \"Wanneer het past\" tot je een datum kiest.",
+      "day": "De hele dag. Herinneringen tellen terug vanaf 09:00.",
+      "moment": "Op dat uur; zo staat ze ook op dat uur in de agenda.",
+      "slot": "Een blok van begin tot einde in de agenda, bv. 10:00–12:00. Herinneringen tellen terug vanaf het begin.",
+      "days": "De hele dag op elke dag ertussen; tegen de laatste dag. Herinneringen tellen terug vanaf 09:00 op de eerste dag."
+    }
+  },
+  "placeholders": {
+    "title": "bv. Dakgoten reinigen",
+    "notes": "Wat handig is om te weten: gereedschap, waar de ladder staat…"
+  },
+  "hints": {
+    "place": "Optioneel. Een kamer of een zone buiten; zo zie je ook of het binnen of buiten is.",
+    "rotate": "Telkens één persoon, in de gekozen volgorde; daarna is de volgende aan de beurt.",
+    "reminder": "Een pushmelding aan wie aan de beurt is (of aan jou als niemand dat is), ook tijdens de stille uren. Taken voor de hele dag: vanaf 09:00."
+  },
+  "form": {
+    "createTitle": "Taak toevoegen",
+    "editTitle": "Taak bewerken",
+    "description": "Materiaal voeg je toe op de pagina van de taak, zodra ze bewaard is.",
+    "created": "Taak toegevoegd",
+    "updated": "Taak bewaard"
+  },
+  "complete": {
+    "title": "“{{title}}” gedaan?",
+    "description": "Voeg een notitie toe als iets handig is voor de volgende keer.",
+    "recurringDescription": "De taak komt terug op de volgende datum. Voeg een notitie toe als iets het onthouden waard is.",
+    "who": "Wie deed het",
+    "note": "Notitie",
+    "notePlaceholder": "bv. Twee zakken potgrond gebruikt"
+  },
+  "toast": {
+    "done": "“{{title}}” gedaan",
+    "doneNext": "“{{title}}” gedaan. Volgende keer: {{date}}",
+    "skipped": "Overgeslagen",
+    "skippedNext": "Overgeslagen. Volgende keer: {{date}}",
+    "snoozed": "Verplaatst naar {{date}}",
+    "reopened": "Taak heropend",
+    "unblocked": "“{{title}}” kan nu beginnen",
+    "held": "In de wacht gezet",
+    "released": "Hervat"
+  },
+  "detail": {
+    "noPlace": "Overal",
+    "unassigned": "Nog niemand",
+    "repeats": "Herhaling",
+    "thenOn": "Daarna:",
+    "lastOccurrence": "Dit is de laatste keer."
+  },
+  "history": {
+    "title": "Geschiedenis",
+    "empty": "Nog nooit gedaan.",
+    "done": "Gedaan",
+    "doneBy": "Gedaan door {{name}}",
+    "skipped": "Overgeslagen",
+    "skippedBy": "Overgeslagen door {{name}}",
+    "forDate": "Gepland op {{date}}"
+  },
+  "delete": {
+    "title": "“{{title}}” verwijderen?",
+    "description": "De taak en haar geschiedenis worden verwijderd.",
+    "withMaterials": "De taak, haar geschiedenis en haar materiaal op de boodschappenlijsten worden verwijderd."
+  },
+  "place": {
+    "title": "Taken",
+    "count_one": "{{count}} open taak hier",
+    "count_other": "{{count}} open taken hier",
+    "empty": "Hier is nu niets te doen.",
+    "loading": "Taken laden…",
+    "error": "De taken konden niet geladen worden.",
+    "retry": "Opnieuw proberen",
+    "add": "Taak toevoegen hier",
+    "viewAll": "Alle taken hier",
+    "viewAllCount": "Alle {{count}} taken hier"
+  },
+  "empty": {
+    "none": {
+      "title": "Nog geen taken",
+      "description": "Voeg de klussen in en rond het huis toe: dakgoten reinigen, wekelijks stofzuigen, de jacuzzi isoleren…"
+    },
+    "mine": {
+      "title": "Niets op jouw lijst",
+      "description": "Er is nu niets aan jou toegewezen. Geniet ervan."
+    },
+    "all": {
+      "title": "Alles gedaan",
+      "description": "Er zijn geen open taken."
+    },
+    "ready": {
+      "title": "Niets klaar om te starten",
+      "description": "Elke open taak wacht nog op materiaal."
+    },
+    "overdue": {
+      "title": "Niets te laat",
+      "description": "Alles loopt op schema."
+    },
+    "done": {
+      "title": "Niets gedaan de laatste tijd",
+      "description": "Taken die de voorbije 30 dagen gedaan of overgeslagen zijn, staan hier."
+    },
+    "filtered": {
+      "title": "Geen taken gevonden",
+      "description": "Probeer een andere persoon, plek of binnen/buiten."
+    }
+  },
+  "errors": {
+    "dueDateRequired": "Een terugkerende taak heeft een eerste datum nodig.",
+    "invalidRecurrence": "Deze herhaling wordt niet ondersteund.",
+    "unknownPlace": "Deze plek bestaat niet (meer).",
+    "unknownHabitant": "Kies elke persoon één keer, uit dit huishouden.",
+    "notFound": "Deze taak bestaat niet meer.",
+    "alreadyClosed": "Deze taak was al gedaan of overgeslagen.",
+    "forbidden": "Je kan enkel taken afvinken die aan jou toegewezen zijn.",
+    "cycle": "Dan zouden de taken op elkaar wachten.",
+    "sameTask": "Kies een andere taak.",
+    "linkedDelete": "Een gekoppelde taak kan je niet verwijderen; sla ze over.",
+    "unknownProject": "Dit project bestaat niet (meer).",
+    "timeNeedsDate": "Een uur heeft een datum nodig.",
+    "reminderNeedsDate": "Een herinnering heeft een datum nodig.",
+    "endTimeNeedsTime": "Een tijdslot heeft een beginuur nodig.",
+    "endTimeBeforeStart": "Het einde moet na het begin komen.",
+    "startDateNeedsDate": "Meerdere dagen hebben een laatste dag nodig.",
+    "startDateAfterEnd": "De eerste dag moet voor de laatste dag komen.",
+    "daysTooLong": "Hoogstens een jaar van de eerste tot de laatste dag.",
+    "daysAllDay": "Meerdere dagen zijn altijd de hele dag: geen uur."
+  },
+  "project": {
+    "label": "Project",
+    "chip": "Project: {{name}}",
+    "loading": "Taken van het project laden…",
+    "error": "De taken konden niet geladen worden.",
+    "empty": "Nog geen taken. Voeg toe wat er moet gebeuren, zoals “Materiaal kopen” en “Beginnen met tegelen”.",
+    "allDone": "Alle taken zijn klaar.",
+    "done_one": "{{count}} klaar",
+    "done_other": "{{count}} klaar",
+    "add": "Taak toevoegen"
+  },
+  "progress": {
+    "group": "{{done}} van {{total}} gedaan",
+    "open_one": "{{count}} open",
+    "open_other": "{{count}} open",
+    "today": "{{done}} van {{total}} gedaan vandaag",
+    "overdue_one": "{{count}} te laat",
+    "overdue_other": "{{count}} te laat"
+  },
+  "allDone": {
+    "title": "Alles gedaan",
+    "todayTitle": "Alles gedaan voor vandaag",
+    "doneToday_one": "Vandaag {{count}} taak gedaan.",
+    "doneToday_other": "Vandaag {{count}} taken gedaan.",
+    "nothingLeft": "Er staat niets meer op de lijst. Geniet ervan!",
+    "later_one": "Nog {{count}} op de lijst voor later.",
+    "later_other": "Nog {{count}} op de lijst voor later."
+  },
+  "repeat": {
+    "label": "Herhaalt",
+    "presets": {
+      "daily": "Elke dag",
+      "weekly": "Elke {{day}}",
+      "biweekly": "Om de 2 weken",
+      "monthly": "Elke maand",
+      "yearly": "Elk jaar",
+      "custom": "Aangepast…"
+    },
+    "until": "Stopt op (optioneel)",
+    "everyWeekday": "Elke {{days}}",
+    "action": "Herhaal dit…",
+    "change": "Herhaling wijzigen…",
+    "weekdays": "Op deze dagen",
+    "firstTime": "eerste keer {{date}}"
+  },
+  "origin": {
+    "waste": "Van de afvalophaling",
+    "expense": "Van de uitgaven (een betaling)",
+    "vouchers": "Van de inkomsten (maaltijdcheques die binnenkort vervallen)",
+    "other": "Van een ander deel van de app"
+  },
+  "originShort": {
+    "waste": "Afvalophaling",
+    "expense": "Betaling",
+    "vouchers": "Maaltijdcheques",
+    "other": "Gekoppeld"
+  },
+  "hold": {
+    "badge": "In de wacht",
+    "withReason": "In de wacht: {{reason}}",
+    "title": "“{{title}}” in de wacht zetten?",
+    "description": "Ze blijft op de lijst met haar vervaldatum (en staat nog altijd als te laat als ze te laat is), gemarkeerd als geblokkeerd tot je ze hervat.",
+    "reason": "Waarom",
+    "reasonPlaceholder": "bv. De factuur lijkt fout; eerst herberekenen",
+    "confirm": "In de wacht zetten",
+    "action": "In de wacht zetten…",
+    "release": "Hervatten",
+    "noReason": "geen reden opgegeven"
+  },
+  "waiting": {
+    "badge": "Wacht op {{title}}",
+    "badgeMore_one": "Wacht op {{title}} +{{count}}",
+    "badgeMore_other": "Wacht op {{title}} +{{count}}",
+    "summary_one": "Wacht op {{count}} taak",
+    "summary_other": "Wacht op {{count}} taken"
+  },
+  "comments": {
+    "title": "Opmerkingen",
+    "count_one": "{{count}} opmerking",
+    "count_other": "{{count}} opmerkingen",
+    "empty": "Nog geen opmerkingen: schrijf wat je te weten kwam of waarop je wacht.",
+    "placeholder": "Schrijf een opmerking…",
+    "add": "Nieuwe opmerking",
+    "send": "Versturen",
+    "edit": "Opmerking bewerken",
+    "delete": "Opmerking verwijderen",
+    "deleteTitle": "Deze opmerking verwijderen?",
+    "edited": "bewerkt",
+    "formerMember": "Voormalig lid",
+    "error": "De opmerking kon niet bewaard worden."
+  },
+  "blocked": {
+    "toast": "“{{title}}” wacht nog op andere taken.",
+    "title": "“{{title}}” wacht nog",
+    "description": "Ze wacht op: {{titles}}. Toch afronden?",
+    "completeAnyway": "Toch afronden"
+  },
+  "links": {
+    "title": "Hangt af van",
+    "empty": "Niet gekoppeld aan andere taken.",
+    "blockedBy": "Wacht op",
+    "blocks": "Blokkeert",
+    "related": "Verwant",
+    "add": "Taak koppelen",
+    "addTitle": "Taak koppelen",
+    "addDescription": "Wacht op: deze taak kan pas na de andere. Blokkeert: de andere wacht op deze. Verwant: gewoon een verwijzing.",
+    "kind": "Koppeling",
+    "kinds": {
+      "blocked_by": "Wacht op",
+      "blocks": "Blokkeert",
+      "related": "Verwant"
+    },
+    "task": "Taak",
+    "pick": "Kies een taak…",
+    "added": "Taken gekoppeld",
+    "remove": "Koppeling met “{{title}}” verwijderen"
+  },
+  "linked": {
+    "formHint": "Deze taak volgt waar ze vandaan komt: titel, type en vervaldatum passen zichzelf aan. Je kan wel kiezen wie ze doet en notities toevoegen.",
+    "openTask": "Taak openen",
+    "loading": "Taak laden…",
+    "error": "De taak kon niet geladen worden.",
+    "none": "Geen gekoppelde taak.",
+    "payTitle": "Betaaltaak",
+    "directDebit": "Betaald via domiciliëring: geen taak nodig.",
+    "noPayTask": "Twee weken voor de vervaldatum verschijnt een betaaltaak."
+  },
+  "jobs": {
+    "payTasks": {
+      "title": "Betaaltaken bijwerken",
+      "description": "Geeft elke onbetaalde uitgave die je zelf betaalt een taak “Betaal …” (de dag voor de vervaldatum), en rondt ze af of verwijdert ze als de uitgave betaald, gewijzigd of verwijderd wordt."
+    },
+    "reminders": {
+      "title": "Taakherinneringen versturen",
+      "description": "Elke minuut: stuurt de herinneringen die aan de beurt zijn. Een herinnering die minder dan 30 minuten gemist werd (server uit) gaat alsnog weg; oudere worden overgeslagen."
+    }
+  },
+  "reminder": {
+    "none": "Geen herinnering",
+    "atTime": "Op het uur zelf",
+    "minutesBefore_one": "{{count}} minuut ervoor",
+    "minutesBefore_other": "{{count}} minuten ervoor",
+    "hoursBefore_one": "{{count}} uur ervoor",
+    "hoursBefore_other": "{{count}} uur ervoor",
+    "daysBefore_one": "{{count}} dag ervoor",
+    "daysBefore_other": "{{count}} dagen ervoor",
+    "at": "Herinnering {{time}}",
+    "atDate": "Herinnering {{date}} {{time}}",
+    "sent": "Herinnering verstuurd",
+    "label": "Herinnering",
+    "allDay": {
+      "onTheDay": "Op de dag zelf, {{time}}",
+      "daysBefore_one": "{{count}} dag ervoor, {{time}}",
+      "daysBefore_other": "{{count}} dagen ervoor, {{time}}",
+      "before": "{{offset}} {{time}}"
+    }
+  }
+}

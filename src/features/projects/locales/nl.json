@@ -1,0 +1,307 @@
+{
+  "calendarSource": "Projecten",
+  "page": {
+    "title": "Projecten",
+    "description": "Budgetpotjes voor van alles: een kamer opknappen, een vakantie, een familie-uitstap, Kerstmis. Zie wat uitgegeven is, wat er nog komt en of het past."
+  },
+  "actions": {
+    "add": "Nieuw project",
+    "more": "Meer acties",
+    "back": "Alle projecten"
+  },
+  "filter": {
+    "search": "Projecten zoeken",
+    "status": "Toon",
+    "running": "Lopend",
+    "done": "Klaar",
+    "cancelled": "Geannuleerd",
+    "all": "Alle"
+  },
+  "empty": {
+    "title": "Nog geen projecten",
+    "description": "Begin er een voor een renovatie, een uitstap of de kerstcadeaus, en geef het een budget."
+  },
+  "status": {
+    "planned": "Gepland",
+    "active": "Bezig",
+    "done": "Klaar",
+    "cancelled": "Geannuleerd",
+    "changed": "Project bijgewerkt"
+  },
+  "statusActions": {
+    "active": "Starten",
+    "done": "Klaar zetten",
+    "cancelled": "Project annuleren",
+    "planned": "Terug naar gepland",
+    "reopen": "Heropenen"
+  },
+  "budgetStatus": {
+    "in_budget": "Binnen budget",
+    "at_risk": "Bijna aan budget",
+    "overBy": "{{amount}} over budget"
+  },
+  "budget": {
+    "title": "Budget",
+    "label": "Budget",
+    "aria": "{{spent}} uitgegeven en {{committed}} vastgelegd van een budget van {{budget}}",
+    "ariaNoBudget": "{{spent}} uitgegeven en {{committed}} vastgelegd, geen budget",
+    "spentShort": "{{amount}} uitgegeven",
+    "committedShort": "{{amount}} komt nog",
+    "overShort": "{{amount}} te veel",
+    "leftShort": "nog {{amount}}",
+    "noBudgetSpent": "Geen budget · {{amount}} tot nu",
+    "ofBudget": "{{used}} van {{budget}}",
+    "spent": "Uitgegeven",
+    "spentDetail": "Betaalde uitgaven {{expenses}} · gekocht materiaal {{materials}}",
+    "committed": "Vastgelegd",
+    "committedDetail": "Onbetaalde uitgaven {{expenses}} · nog te kopen materiaal {{materials}}",
+    "total": "Totaal",
+    "noBudgetHint": "Geef het project een budget om te zien wat er overblijft.",
+    "over": "Over budget met",
+    "remaining": "Over",
+    "unpriced_one": "{{count}} materiaal heeft nog geen prijs en telt dus niet mee.",
+    "unpriced_other": "{{count}} materialen hebben nog geen prijs en tellen dus niet mee."
+  },
+  "dates": {
+    "range": "{{from}} – {{to}}",
+    "from": "Vanaf {{date}}",
+    "until": "Tot {{date}}"
+  },
+  "tasks": {
+    "title": "Taken",
+    "description": "Wat er moet gebeuren, in volgorde: taken die op andere wachten, komen erna.",
+    "progress": "{{done}}/{{total}} taken klaar",
+    "linkExisting": "Bestaande taak toevoegen"
+  },
+  "materials": {
+    "title": "Materiaal",
+    "description": "Wat er gekocht moet worden, met een prijs of een schatting; het materiaal van de taken van het project staat er ook bij."
+  },
+  "expenses": {
+    "title": "Uitgaven",
+    "description": "Rekeningen, aankopen en terugkerende kosten die meetellen voor dit project.",
+    "empty": "Nog geen uitgaven. Noteer een aankoop of voeg een bestaande rekening toe.",
+    "perOccurrence": "{{amount}} per keer",
+    "unlink": "{{name}} uit het project halen",
+    "unlinkShort": "Uit project halen",
+    "paidOn": "Betaald {{date}}",
+    "dueOn": "Te betalen {{date}}",
+    "unpaid": "Niet betaald",
+    "log": "Uitgave noteren",
+    "linkExisting": "Bestaande uitgave toevoegen",
+    "linkRecurring": "Terugkerende uitgave toevoegen"
+  },
+  "purchases": {
+    "unlogged_one": "{{count}} gekocht materiaal is nog geen uitgave ({{amount}}).",
+    "unlogged_other": "{{count}} gekochte materialen zijn nog geen uitgave ({{amount}}).",
+    "log": "Als uitgave noteren"
+  },
+  "invoice": {
+    "title": "Materiaal koppelen",
+    "description": "Welk materiaal staat op de factuur van {{payee}} ({{date}}, {{amount}})? Het wordt gekocht en telt één keer mee, als deze uitgave.",
+    "link": "Materiaal koppelen",
+    "linkFor": "Materiaal koppelen aan {{name}}",
+    "count_one": "{{count}} materiaal",
+    "count_other": "{{count}} materialen",
+    "materialsLabel": "Materiaal op deze factuur",
+    "noMaterials": "Het project heeft geen materiaal dat niet al op een andere factuur staat.",
+    "bought": "Gekocht",
+    "open": "Nog te kopen",
+    "onThis": "Op deze factuur",
+    "check": "Controleer",
+    "line": "Factuur: {{line}} · {{amount}}",
+    "amountFor": "Wat {{name}} kostte op de factuur",
+    "unmatchedTitle": "Op de factuur, niet op de materiaallijst",
+    "addAll": "Alles toevoegen",
+    "addAsMaterial": "Toevoegen als gekocht materiaal",
+    "linkedTotal": "Gekoppeld",
+    "expenseTotal": "Uitgave",
+    "difference": "Verschil",
+    "matches": "Klopt met de uitgave",
+    "useInvoicePrices": "Prijzen van de factuur gebruiken",
+    "read": "Lees factuur met AI",
+    "readAgain": "Opnieuw lezen",
+    "reading": "Factuur lezen… dit kan tot anderhalve minuut duren.",
+    "readResult": "{{name}} gelezen: {{lines}} lijnen, {{matched}} gekoppeld. Controleer ze voor je bewaart.",
+    "errors": {
+      "no_invoice": "Deze uitgave heeft geen pdf of foto van de factuur. Voeg ze toe aan de uitgave, of koppel het materiaal zelf.",
+      "invoice_unreadable": "De factuur heeft geen leesbare tekst. Voeg een foto toe (als de assistent beelden leest) of koppel het materiaal zelf.",
+      "reader_unavailable": "De assistent is niet ingesteld, dus de factuur kan niet gelezen worden. Koppel het materiaal zelf.",
+      "reader_failed": "De factuur kon nu niet gelezen worden. Probeer opnieuw, of koppel het materiaal zelf.",
+      "generic": "Er liep iets mis bij het lezen van de factuur. Koppel het materiaal zelf."
+    },
+    "nothingSelected": "Vink minstens één materiaal aan.",
+    "submit": "Bewaren",
+    "done": "Materiaal aan de factuur gekoppeld"
+  },
+  "link": {
+    "title": {
+      "task": "Bestaande taak toevoegen",
+      "expense": "Bestaande uitgave toevoegen",
+      "recurring": "Terugkerende uitgave toevoegen"
+    },
+    "description": {
+      "task": "Open taken die nog bij geen project horen.",
+      "expense": "Eenmalige uitgaven van het voorbije jaar die nog bij geen project horen.",
+      "recurring": "Alle voorbije en komende betalingen tellen mee voor het project."
+    },
+    "label": {
+      "task": "Taak",
+      "expense": "Uitgave",
+      "recurring": "Terugkerende uitgave"
+    },
+    "placeholder": {
+      "task": "Kies een taak…",
+      "expense": "Kies een uitgave…",
+      "recurring": "Kies een terugkerende uitgave…"
+    },
+    "empty": {
+      "task": "Geen open taken zonder project.",
+      "expense": "Geen uitgaven zonder project.",
+      "recurring": "Geen terugkerende uitgaven zonder project."
+    },
+    "done": {
+      "task": "Taak toegevoegd aan het project",
+      "expense": "Uitgave toegevoegd aan het project",
+      "recurring": "Terugkerende uitgave toegevoegd aan het project"
+    },
+    "failed": "Kon niet laden wat je kan toevoegen. Probeer opnieuw.",
+    "submit": "Aan project toevoegen"
+  },
+  "cover": {
+    "title": "Omslagfoto",
+    "empty": "Voeg hieronder een foto toe om ze als omslag te gebruiken.",
+    "use": "{{name}} als omslag gebruiken",
+    "remove": "{{name}} niet meer als omslag gebruiken",
+    "clear": "Geen omslag"
+  },
+  "detail": {
+    "details": "Details",
+    "noPlaces": "Geen kamers of zones",
+    "dates": "Wanneer",
+    "noDates": "Geen data",
+    "noDescription": "Geen beschrijving"
+  },
+  "delete": {
+    "title": "{{name}} verwijderen?",
+    "description": "Het project verdwijnt; de taken, uitgaven en materialen blijven, zonder project."
+  },
+  "fields": {
+    "name": "Naam",
+    "tag": "Soort",
+    "budget": "Budget",
+    "status": "Status",
+    "startDate": "Begin",
+    "endDate": "Einde",
+    "places": "Kamers en zones",
+    "icon": "Icoon",
+    "color": "Kleur",
+    "description": "Beschrijving"
+  },
+  "hints": {
+    "tag": "Wat je maar wil; tik op een suggestie of typ zelf.",
+    "budget": "Laat leeg om enkel bij te houden wat het kost.",
+    "places": "Waar het gebeurt, als dat ergens is."
+  },
+  "placeholders": {
+    "name": "Badkamerrenovatie",
+    "tag": "Renovatie, vakantie, uitstap…"
+  },
+  "form": {
+    "createTitle": "Nieuw project",
+    "editTitle": "Project bewerken",
+    "description": "Een budgetpotje: koppel er taken, materiaal en uitgaven aan.",
+    "created": "Project aangemaakt",
+    "updated": "Project bewaard",
+    "noPlaces": "Nog geen kamers of zones."
+  },
+  "errors": {
+    "endBeforeStart": "Het einde kan niet voor het begin liggen.",
+    "unknownPlace": "Een van deze plaatsen bestaat niet (meer).",
+    "notFound": "Dit project bestaat niet meer.",
+    "forbidden": "Dat mag je niet doen."
+  },
+  "icons": {
+    "hammer": "Hamer",
+    "paint": "Verfroller",
+    "home": "Huis",
+    "sofa": "Zetel",
+    "bath": "Bad",
+    "garden": "Tuin",
+    "car": "Auto",
+    "plane": "Vliegtuig",
+    "holiday": "Palmboom",
+    "tent": "Tent",
+    "gift": "Cadeau",
+    "christmas": "Kerstboom",
+    "party": "Feest",
+    "heart": "Hart",
+    "graduation": "Diploma",
+    "folder": "Map"
+  },
+  "tags": {
+    "renovation": "Renovatie",
+    "holiday": "Vakantie",
+    "trip": "Uitstap",
+    "christmas": "Kerstmis",
+    "party": "Feest",
+    "car": "Auto",
+    "garden": "Tuin",
+    "gifts": "Cadeaus"
+  },
+  "picker": {
+    "label": "Project",
+    "placeholder": "Geen project"
+  },
+  "favorite": {
+    "failed": "Je favorieten konden niet bijgewerkt worden. Probeer opnieuw."
+  },
+  "summary": {
+    "loading": "Projectbudgetten laden…",
+    "error": "De projectbudgetten konden niet geladen worden.",
+    "empty": "Geen lopende projecten deze maand.",
+    "open": "Naar de projecten",
+    "totals": "{{paid}} betaald deze maand · nog {{due}} te betalen",
+    "overBudget_one": "{{count}} over budget",
+    "overBudget_other": "{{count}} over budget",
+    "atRisk_one": "{{count}} bijna aan budget",
+    "atRisk_other": "{{count}} bijna aan budget",
+    "month": "Deze maand: {{paid}} betaald · {{due}} te betalen"
+  },
+  "plan": {
+    "invalid": "Dit plan kan niet getoond worden.",
+    "newProject": "Nieuw project",
+    "existingProject": "Toevoegen aan dit project",
+    "budget": "Budget {{amount}}",
+    "noBudget": "Geen budget",
+    "contact": "Contact: {{name}}",
+    "totals": "Budgetcontrole",
+    "materialsEstimate": "Materialen (schatting)",
+    "alreadyUsed": "Al uitgegeven of vastgelegd",
+    "total": "Totaal",
+    "left": "Nog {{amount}} over van het budget van {{budget}}",
+    "over": "{{amount}} boven het budget van {{budget}}",
+    "unpriced_one": "{{count}} materiaal heeft nog geen prijs en telt dus niet mee.",
+    "unpriced_other": "{{count}} materialen hebben nog geen prijs en tellen dus niet mee.",
+    "estimateNote": "≈ is een schatting; prijzen met een webshoplink komen van die pagina.",
+    "warnings": "Bekijk dit voor je toepast",
+    "tasks": "Taken ({{count}})",
+    "hours_one": "~{{count}} uur",
+    "hours_other": "~{{count}} uur",
+    "checklist_one": "{{count}} checklistpunt",
+    "checklist_other": "{{count}} checklistpunten",
+    "waitsFor_one": "Wacht op {{tasks}}",
+    "waitsFor_other": "Wacht op {{tasks}}",
+    "materials": "Materialen ({{count}})",
+    "groupBy": "Materialen groeperen",
+    "byTask": "Per taak",
+    "byShop": "Per winkel",
+    "wholeProject": "Voor het hele project",
+    "noShop": "Nog geen winkel",
+    "noPrice": "geen prijs",
+    "estimate": "Schatting",
+    "link": "Open de webshoppagina van {{name}}",
+    "showAll": "Toon alle {{count}}",
+    "showLess": "Toon minder"
+  }
+}

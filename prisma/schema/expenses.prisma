@@ -1,0 +1,276 @@
+// Feature: expenses (Finance, phase 1). See docs/FINANCE.md.
+//
+// Bills and recurring bills became expenses. The models carry domain names in code (`Expense`,
+// `RecurringExpense`), while tables, columns and enum types keep their original names through @@map / @map,
+// so the rename itself changed nothing in the database.
+
+/// What an expense is about. The first ten are the original bill categories; the rest are for everyday spending.
+enum ExpenseCategory {
+  ENERGY
+  WATER
+  INTERNET_PHONE
+  INSURANCE
+  TAXES
+  HOUSING
+  HEALTHCARE
+  SCHOOL_CHILDCARE
+  CAR
+  OTHER
+  GROCERIES
+  HOUSEHOLD
+  EATING_OUT
+  /// Public transport and fuel.
+  TRANSPORT
+  LEISURE
+  GIFTS
+  CLOTHING
+  PERSONAL_CARE
+  PETS
+  /// Streaming, software, memberships.
+  SUBSCRIPTIONS
+  /// Loans and down payments (afbetalingen).
+  LOANS
+
+  @@map("BillCategory")
+}
+
+/// What kind of recurring expense it is (the Recurring view filters on it).
+enum ExpenseKind {
+  SUBSCRIPTION
+  LOAN
+  /// Afbetaling: paying something off in instalments.
+  DOWN_PAYMENT
+  INSURANCE
+  UTILITY
+  TAX
+  OTHER
+}
+
+enum RecurringExpenseStatus {
+  ACTIVE
+  /// No new instances until it is resumed; occurrences while paused are skipped, not made up later.
+  PAUSED
+  /// Stopped for good on `endDate`; kept for the overview and its history.
+  ENDED
+}
+
+enum PaymentMethod {
+  /// Domiciliëring: the creditor collects it; instances are marked paid on their due date automatically.
+  DIRECT_DEBIT
+  /// Overschrijving.
+  WIRE_TRANSFER
+  CARD
+  CASH
+  /// Maaltijdcheques / titres-repas.
+  MEAL_VOUCHER
+  OTHER
+}
+
+/// Who pays an expense.
+enum ExpensePayerType {
+  /// The joint account (the default).
+  JOINT
+  /// One habitant (`payerHabitantId`).
+  PERSON
+  /// Split between habitants (the shares).
+  SPLIT
+}
+
+enum PaymentAccountKind {
+  /// Shared by several habitants ("Gezamenlijke rekening"): bills paid from it are split among its owners.
+  JOINT
+  /// One habitant's own account. Not used: personal accounts are not modelled ("one person" is enough).
+  PERSONAL
+  /// Joint savings account. Finance phase 2.
+  SAVINGS
+}
+
+/// A bank account the household pays from ("payment account", NL "rekening"). Not a login account.
+/// Finance phase 2 (money feature) manages the joint current account (JOINT) and the joint savings account
+/// (SAVINGS) with a ledger (AccountEntry, money.prisma).
+model PaymentAccount {
+  id                String                @id @default(cuid())
+  householdId       String
+  household         Household             @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name              String
+  kind              PaymentAccountKind
+  /// Compact upper-case IBAN; shown masked.
+  iban              String?
+  color             String
+  /// Icon key from PAYMENT_ACCOUNT_ICONS (src/features/expenses/types/payment-accounts.ts).
+  icon              String?
+  /// At most one per household (enforced by the service): preselected for new expenses.
+  isDefault         Boolean               @default(false)
+  archived          Boolean               @default(false)
+  owners            PaymentAccountOwner[]
+  expenses          Expense[]
+  recurringExpenses RecurringExpense[]
+  subscriptions     Subscription[]
+  entries           AccountEntry[]        @relation("AccountEntryAccount")
+  counterpartEntries AccountEntry[]       @relation("AccountEntryCounterpart")
+  contributionPlans ContributionPlan[]
+  contributionExtras ContributionExtra[]
+  incomeSources     IncomeSource[]        @relation("IncomeSourceTarget")
+  incomes           Income[]              @relation("IncomeTarget")
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+
+  @@index([householdId])
+  @@map("payment_accounts")
+}
+
+/// Who owns a payment account. `position` orders the owners: an equal split gives leftover cents to the first.
+model PaymentAccountOwner {
+  accountId  String
+  account    PaymentAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  habitantId String
+  habitant   Habitant       @relation(fields: [habitantId], references: [id], onDelete: Cascade)
+  position   Int            @default(0)
+
+  @@id([accountId, habitantId])
+  @@index([habitantId])
+  @@map("payment_account_owners")
+}
+
+/// Template of a recurring expense (subscription, loan, down payment, insurance, utility…). Its RRULE (with
+/// `startDate` as DTSTART) says when instances are due; instances are materialised as Expense rows up to a
+/// rolling horizon (see src/api/expenses/expenses.service.ts).
+model RecurringExpense {
+  id                      String                  @id @default(cuid())
+  householdId             String
+  household               Household               @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  payee                   String
+  description             String?
+  amountCents             Int
+  category                ExpenseCategory
+  kind                    ExpenseKind             @default(OTHER)
+  status                  RecurringExpenseStatus  @default(ACTIVE)
+  /// RFC 5545 RRULE without DTSTART, e.g. `FREQ=MONTHLY;INTERVAL=3`.
+  rrule                   String
+  /// DTSTART: the first due date. Later due dates follow from the RRULE.
+  startDate               DateTime                @db.Date
+  /// Set when the expense was ended: no instances after this date.
+  endDate                 DateTime?               @db.Date
+  /// Null: not set.
+  paymentMethod           PaymentMethod?
+  /// Account holder for a transfer (banks check it against the IBAN); falls back to `payee`.
+  beneficiaryName         String?
+  /// Compact upper-case IBAN.
+  iban                    String?
+  bic                     String?
+  /// Belgian structured communication, 12 digits without formatting. Exclusive with `reference`.
+  structuredCommunication String?
+  /// Free-text communication. Exclusive with `structuredCommunication`.
+  reference               String?
+  payerType               ExpensePayerType        @default(JOINT)
+  /// Only with payerType PERSON.
+  payerHabitantId         String?
+  payerHabitant           Habitant?               @relation("RecurringExpensePayer", fields: [payerHabitantId], references: [id], onDelete: SetNull)
+  websiteUrl              String?
+  trialEndsOn             DateTime?               @db.Date
+  remindDaysBefore        Int?
+  candidateToCancel       Boolean                 @default(false)
+  /// Loans and down payments: the amount still to pay off, counted from `totalOpenAsOf`. When set, the rule's
+  /// end (UNTIL) follows from it: ceil(open / amount) payments, the last one for what is left (a partial
+  /// payment). See src/features/expenses/types/total-open.ts.
+  totalOpenCents          Int?
+  /// First due date the total open amount counts from; payments due before it don't count.
+  totalOpenAsOf           DateTime?               @db.Date
+  notes                   String?
+  /// Instances exist for every occurrence up to and including this date.
+  generatedUntil          DateTime?               @db.Date
+  /// The subscription this was migrated from (scripts/migrate-subscriptions-to-expenses.ts): makes the
+  /// migration idempotent and lets old /subscriptions/:id links redirect. No relation: that table goes later.
+  legacySubscriptionId    String?                 @unique
+  /// Account the expense is paid from; copied onto every generated instance. Finance phase 2.
+  paymentAccountId        String?
+  paymentAccount          PaymentAccount?         @relation(fields: [paymentAccountId], references: [id], onDelete: SetNull)
+  /// Project it counts towards (Finance phase 3); copied onto every generated instance.
+  projectId               String?
+  project                 Project?                @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  expenses                Expense[]
+  shares                  RecurringExpenseShare[]
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @updatedAt
+
+  @@index([householdId])
+  @@index([projectId])
+  @@map("bill_series")
+}
+
+/// One expense: a one-off (a bill to pay, or everyday spending logged as paid), or an instance of a
+/// RecurringExpense.
+model Expense {
+  id                      String           @id @default(cuid())
+  householdId             String
+  household               Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  recurringExpenseId      String?          @map("seriesId")
+  recurringExpense        RecurringExpense? @relation(fields: [recurringExpenseId], references: [id], onDelete: SetNull)
+  payee                   String
+  description             String?
+  amountCents             Int
+  dueDate                 DateTime         @db.Date
+  category                ExpenseCategory
+  /// Where it was bought (everyday spending).
+  shopId                  String?
+  shop                    Shop?            @relation("ExpenseShop", fields: [shopId], references: [id], onDelete: SetNull)
+  paymentMethod           PaymentMethod?
+  beneficiaryName         String?
+  iban                    String?
+  bic                     String?
+  /// Belgian structured communication, 12 digits without formatting. Exclusive with `reference`.
+  structuredCommunication String?
+  reference               String?
+  payerType               ExpensePayerType @default(JOINT)
+  payerHabitantId         String?
+  payerHabitant           Habitant?        @relation("ExpensePayer", fields: [payerHabitantId], references: [id], onDelete: SetNull)
+  notes                   String?
+  paidOn                  DateTime?        @db.Date
+  /// Who marked it paid (optional).
+  paidById                String?
+  paidBy                  Habitant?        @relation("ExpensePaidBy", fields: [paidById], references: [id], onDelete: SetNull)
+  /// When the direct-debit job marked it paid. Stays set after an undo, so the job doesn't mark it again.
+  autoPaidAt              DateTime?
+  /// Account it is paid from; null = not set. Finance phase 2.
+  paymentAccountId        String?
+  paymentAccount          PaymentAccount?  @relation(fields: [paymentAccountId], references: [id], onDelete: SetNull)
+  /// Project it counts towards (Finance phase 3); instances copy it from their recurring expense.
+  projectId               String?
+  project                 Project?         @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  shares                  ExpenseShare[]
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
+
+  /// Makes instance generation idempotent: one instance per recurring expense per due date.
+  @@unique([recurringExpenseId, dueDate])
+  @@index([householdId, dueDate])
+  @@index([paymentAccountId])
+  @@index([projectId])
+  @@map("bills")
+}
+
+/// The part of a split expense one habitant pays. Shares of an expense add up to its amount.
+model ExpenseShare {
+  id          String   @id @default(cuid())
+  expenseId   String   @map("billId")
+  expense     Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  habitantId  String
+  habitant    Habitant @relation(fields: [habitantId], references: [id], onDelete: Cascade)
+  amountCents Int
+
+  @@unique([expenseId, habitantId])
+  @@map("bill_shares")
+}
+
+/// Split template of a recurring expense, copied onto every generated instance.
+model RecurringExpenseShare {
+  id                 String           @id @default(cuid())
+  recurringExpenseId String           @map("seriesId")
+  recurringExpense   RecurringExpense @relation(fields: [recurringExpenseId], references: [id], onDelete: Cascade)
+  habitantId         String
+  habitant           Habitant         @relation(fields: [habitantId], references: [id], onDelete: Cascade)
+  amountCents        Int
+
+  @@unique([recurringExpenseId, habitantId])
+  @@map("bill_series_shares")
+}

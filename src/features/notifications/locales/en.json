@@ -1,0 +1,123 @@
+{
+  "page": {
+    "title": "Notifications",
+    "description": "Bins, payments, tasks and the alarm. Tap one to open it."
+  },
+  "bell": {
+    "label": "Notifications",
+    "unread_one": "{{count}} unread notification",
+    "unread_other": "{{count}} unread notifications"
+  },
+  "list": {
+    "label": "Notifications",
+    "search": "Search notifications",
+    "markAllRead": "Mark all as read",
+    "markRead": "Mark as read",
+    "allRead": "Everything is read",
+    "new": "New",
+    "urgent": "Urgent",
+    "more": "Show older",
+    "moreFailed": "Couldn't load older notifications.",
+    "error": "Couldn't load your notifications.",
+    "markFailed": "Couldn't mark as read. Try again.",
+    "unreadOnly": "Unread only",
+    "settings": "Settings"
+  },
+  "empty": {
+    "title": "No notifications yet",
+    "description": "Bins, payments, tasks and the alarm show up here, and on your phone once you turn notifications on in Settings."
+  },
+  "section": {
+    "title": "Notifications",
+    "description": "On your phone and in the app: on which devices, what, and when.",
+    "loading": "Loading notification settings…",
+    "error": "Couldn't load your notification settings."
+  },
+  "push": {
+    "title": "This device",
+    "enable": "Turn on notifications",
+    "enabling": "Turning on…",
+    "on": "Notifications are on for this device.",
+    "off": "Get bins, payments, tasks and the alarm as notifications on this device.",
+    "enabled": "Notifications are on for this device",
+    "enableFailed": "Couldn't turn on notifications on this device.",
+    "permissionDismissed": "You closed the question. Tap the button to ask again.",
+    "denied": "Notifications are blocked for WickedHome on this device. Allow them in the browser's site settings (Android: tap the lock next to the address → Permissions → Notifications) or in the phone's settings, then come back.",
+    "insecure": "Notifications only work on the secure address. Open https://home.example.be to turn them on.",
+    "unsupported": "This browser can't receive notifications. Use Chrome, Edge, Firefox or Samsung Internet, or the installed app.",
+    "iosTitle": "On iPhone and iPad: add WickedHome to your home screen first",
+    "iosSteps": "In Safari, tap Share → Add to Home Screen → Add. Open WickedHome from the home screen icon, go to Settings → Notifications and tap Turn on notifications. (Needs iOS 16.4 or newer.)",
+    "androidHint": "Android: works in Chrome and in the installed app. iPhone: only in the app added to the home screen.",
+    "test": "Send a test notification",
+    "testSent": "Test sent. It should appear in a few seconds.",
+    "testNoDevice": "Saved in the app. Turn on notifications on a device to get it on your phone.",
+    "testFailed": "Couldn't send the test notification."
+  },
+  "devices": {
+    "title": "Your devices",
+    "empty": "No devices yet. Turn on notifications on your phone to see it here.",
+    "thisDevice": "This device",
+    "added": "Added {{date}}",
+    "lastDelivered": "Last delivered {{date}}",
+    "neverDelivered": "Nothing delivered yet",
+    "failing_one": "{{count}} failed delivery",
+    "failing_other": "{{count}} failed deliveries",
+    "remove": "Remove",
+    "removeTitle": "Remove {{name}}?",
+    "removeDescription": "It stops getting notifications. You can turn them on again on that device.",
+    "removed": "Device removed",
+    "removeFailed": "Couldn't remove the device."
+  },
+  "quiet": {
+    "title": "Quiet hours",
+    "description": "No pushes in this window; they arrive when it ends (if you haven't read them in the app). The alarm always comes through.",
+    "enabled": "Quiet hours",
+    "from": "From",
+    "to": "To"
+  },
+  "kinds": {
+    "title": "What to notify",
+    "when": "When",
+    "atTaskTime": "At the bins task's time",
+    "eveningBefore": "Evening before, {{time}}",
+    "at": "At {{time}}",
+    "urgent": "Always, also in quiet hours",
+    "scopedCount_one": "{{count}} chosen",
+    "scopedCount_other": "{{count}} chosen",
+    "scopedNone": "Nothing chosen yet: use Notify me on a device's page.",
+    "test": {
+      "title": "Test notification",
+      "description": "Sent by the test button."
+    }
+  },
+  "groups": {
+    "household": "Household",
+    "tasks": "Tasks",
+    "money": "Money",
+    "security": "Alarm and Home Assistant",
+    "devices": "Devices",
+    "accounts": "Accounts and mail"
+  },
+  "saved": "Saved",
+  "saveFailed": "Couldn't save. Try again.",
+  "keyStorage": {
+    "plain": "Owner note: the server's push key is stored in the database without encryption, because INTEGRATIONS_KEY isn't set in .env. Set it (openssl rand -base64 32) and restart, and the key is encrypted automatically."
+  },
+  "notifyMe": {
+    "label": "Notify me",
+    "description": "When it turns orange or red",
+    "on": "You'll get a notification when {{name}} turns orange or red.",
+    "off": "No more notifications for {{name}}.",
+    "failed": "Couldn't change it. Try again."
+  },
+  "jobs": {
+    "dispatch": {
+      "title": "Send notifications",
+      "description": "Every 5 minutes: bins, the task digest, payments, vouchers and pushes held back by quiet hours"
+    },
+    "prune": {
+      "title": "Clean up notifications",
+      "description": "Removes notifications older than 90 days"
+    }
+  }
+}

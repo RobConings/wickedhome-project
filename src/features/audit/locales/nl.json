@@ -1,0 +1,90 @@
+{
+  "section": {
+    "title": "Activiteit",
+    "description": "Wie wat veranderde: in de app, via de assistent, een MCP-client of een automatisering.",
+    "retention": "Activiteit wordt {{days}} dagen bewaard. Codes, wachtwoorden en links worden nooit opgeslagen."
+  },
+  "list": {
+    "label": "Activiteit",
+    "search": "Zoek op namen en beschrijvingen",
+    "more": "Oudere tonen",
+    "moreFailed": "Oudere activiteit kon niet geladen worden",
+    "error": "De activiteit kon niet geladen worden."
+  },
+  "empty": {
+    "title": "Nog geen activiteit",
+    "description": "Wijzigingen aan accounts, het alarm, rekeningsaldi en alles wat de assistent doet, verschijnen hier."
+  },
+  "filters": {
+    "channel": "Kanaal",
+    "allChannels": "Alle kanalen",
+    "person": "Persoon",
+    "allPeople": "Iedereen",
+    "action": "Soort",
+    "allActions": "Alles",
+    "clear": "Filters wissen"
+  },
+  "channels": {
+    "app": "App",
+    "assistant": "Assistent",
+    "mcp": "MCP",
+    "job": "Automatisering"
+  },
+  "entry": {
+    "job": "Automatisering {{id}}"
+  },
+  "domains": {
+    "account": "Accounts",
+    "alarm": "Alarm",
+    "calendar": "Agenda",
+    "expense": "Uitgaven",
+    "expenses": "Uitgaven",
+    "income": "Inkomsten",
+    "invite": "Uitnodigingen",
+    "payment_account": "Rekeningsaldi",
+    "shopping": "Boodschappen",
+    "tasks": "Taken",
+    "assistant": "Assistent"
+  },
+  "actions": {
+    "alarm": {
+      "armed_home": "Alarm ingeschakeld (thuis)",
+      "armed_away": "Alarm ingeschakeld (afwezig)",
+      "disarmed": "Alarm uitgeschakeld",
+      "attempt_failed": "Alarmactie niet uitgevoerd"
+    },
+    "account": {
+      "role_changed": "Rol gewijzigd",
+      "disabled": "Account uitgeschakeld",
+      "enabled": "Account ingeschakeld",
+      "signed_out": "Overal afgemeld",
+      "reset_link": "Link voor nieuw wachtwoord gemaakt",
+      "removed": "Account verwijderd"
+    },
+    "invite": {
+      "created": "Uitnodigingslink gemaakt",
+      "revoked": "Uitnodiging ingetrokken",
+      "accepted": "Uitnodiging aanvaard"
+    },
+    "payment_account": {
+      "corrected": "Saldo gecorrigeerd",
+      "correction_deleted": "Saldocorrectie verwijderd"
+    },
+    "expense": {
+      "auto_paid": "Domiciliëring als betaald gemarkeerd"
+    },
+    "assistant": {
+      "oauth_connected": "App gekoppeld (OAuth)",
+      "oauth_disconnected": "App ontkoppeld (OAuth)",
+      "oauth_settings": "OAuth-instellingen gewijzigd",
+      "oauth_app_created": "OAuth-app aangemaakt",
+      "oauth_app_deleted": "OAuth-app verwijderd"
+    }
+  },
+  "jobs": {
+    "prune": {
+      "title": "Activiteitenlog opruimen",
+      "description": "Verwijdert activiteit ouder dan 365 dagen."
+    }
+  }
+}

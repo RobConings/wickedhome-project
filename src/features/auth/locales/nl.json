@@ -1,0 +1,277 @@
+{
+  "notifications": {
+    "inviteAccepted": {
+      "title": "Uitnodiging aanvaard",
+      "description": "Als iemand die je uitnodigde (of wie ook, voor eigenaars) een account aanmaakt."
+    }
+  },
+  "fields": {
+    "email": "E-mail",
+    "password": "Wachtwoord",
+    "confirmPassword": "Herhaal wachtwoord",
+    "name": "Je naam",
+    "householdName": "Naam van het huishouden"
+  },
+  "login": {
+    "title": "Welkom thuis",
+    "description": "Log in om je huishouden te beheren.",
+    "submit": "Inloggen",
+    "submitting": "Bezig met inloggen…",
+    "opening": "Je huis wordt geopend…",
+    "invalid": "Dat e-mailadres en wachtwoord horen niet bij elkaar.",
+    "disabled": "Dit account is uitgeschakeld. Vraag een eigenaar van je huishouden om het weer in te schakelen."
+  },
+  "setup": {
+    "title": "WickedHome instellen",
+    "description": "Maak je huishouden en het eerste account aan. De andere bewoners voeg je daarna toe.",
+    "householdNameHint": "Bijvoorbeeld \"Familie Coppens\" of \"Wicked Home\".",
+    "passwordHint": "Minstens 10 tekens.",
+    "submit": "Huishouden aanmaken",
+    "submitting": "Bezig met aanmaken…",
+    "opening": "Je huis wordt geopend…",
+    "alreadyDone": "WickedHome is al ingesteld. Log in."
+  },
+  "account": {
+    "menu": "Accountmenu",
+    "myAccount": "Mijn account",
+    "logout": "Uitloggen",
+    "loggingOut": "Bezig met uitloggen…",
+    "localeFailed": "Je taal kon niet worden opgeslagen. Probeer het opnieuw."
+  },
+  "roles": {
+    "owner": "Eigenaar",
+    "adult": "Volwassene",
+    "child": "Kind",
+    "ownerHint": "Alles, ook eigenaars beheren.",
+    "adultHint": "Alles behalve eigenaars beheren.",
+    "childHint": "Kan de app gebruiken, maar geen instellingen of accounts wijzigen."
+  },
+  "share": {
+    "link": "Link",
+    "copy": "Kopiëren",
+    "copiedShort": "Gekopieerd",
+    "copied": "Link gekopieerd",
+    "copyFailed": "De link kon niet worden gekopieerd. Selecteer hem en kopieer hem zelf.",
+    "share": "Delen…",
+    "shareFailed": "Delen lukte niet. Kopieer de link in de plaats.",
+    "qrLabel": "QR-code van de link voor {{name}}",
+    "qrLoading": "QR-code maken…",
+    "once": "Hij werkt één keer.",
+    "invite": {
+      "title": "Doe mee met {{household}} op WickedHome",
+      "text": "Hoi {{name}}, met deze link doe je mee met {{household}} op WickedHome:",
+      "scanHint": "{{name}} kan dit scannen met de camera van de gsm, of je stuurt de link door.",
+      "expires": "Geldig tot {{date}}."
+    },
+    "reset": {
+      "title": "Nieuw wachtwoord voor WickedHome",
+      "text": "Hoi {{name}}, met deze link kies je een nieuw WickedHome-wachtwoord:",
+      "scanHint": "{{name}} kan dit scannen met de camera van de gsm, of je stuurt de link door.",
+      "expires": "Geldig tot {{date}}."
+    }
+  },
+  "invite": {
+    "title": "Iemand uitnodigen",
+    "renewTitle": "Nieuwe link voor {{name}}",
+    "description": "Die persoon krijgt een link om een eigen login te maken. Alleen jij ziet de link, één keer.",
+    "person": "Wie",
+    "newPerson": "Iemand nieuw…",
+    "newName": "Naam",
+    "newType": "Soort",
+    "newColor": "Kleur",
+    "role": "Rol",
+    "create": "Link maken",
+    "creating": "Link maken…",
+    "readyTitle": "Link voor {{name}}",
+    "readyDescription": "Kopieer of deel hem nu: voor de veiligheid wordt hij niet meer getoond. Je kunt altijd een nieuwe maken.",
+    "done": "Klaar",
+    "errors": {
+      "hasAccount": "Deze persoon heeft al een account.",
+      "forbidden": "Je kunt niemand uitnodigen met deze rol."
+    }
+  },
+  "accounts": {
+    "section": {
+      "title": "Accounts",
+      "description": "Wie kan inloggen, en uitnodigingen voor de anderen."
+    },
+    "loading": "Accounts laden…",
+    "error": "De accounts konden niet worden geladen",
+    "errorDescription": "De rest van de instellingen werkt nog.",
+    "refreshFailed": "De lijst kon niet worden vernieuwd.",
+    "summary_one": "{{count}} account",
+    "summary_other": "{{count}} accounts",
+    "pendingSummary_one": "{{count}} uitnodiging open",
+    "pendingSummary_other": "{{count}} uitnodigingen open",
+    "invite": "Iemand uitnodigen",
+    "listLabel": "Accounts en uitnodigingen",
+    "you": "Jij",
+    "status": {
+      "active": "Actief",
+      "disabled": "Uitgeschakeld",
+      "invited": "Uitgenodigd"
+    },
+    "lastLogin": "Laatst ingelogd {{when}}",
+    "neverLoggedIn": "Nog nooit ingelogd",
+    "sessions_one": "{{count}} actief toestel",
+    "sessions_other": "{{count}} actieve toestellen",
+    "resetPending": "Link voor nieuw wachtwoord open, verloopt {{when}}",
+    "lastOwnerHint": "Je bent de enige eigenaar, dus je kunt niet aftreden of verwijderd worden.",
+    "invitedBy": "Uitgenodigd door {{name}}",
+    "invitedPending": "Uitnodiging open",
+    "inviteExpires": "verloopt {{when}}",
+    "actionsFor": "Acties voor {{name}}",
+    "resetReadyTitle": "Link voor nieuw wachtwoord voor {{name}}",
+    "resetReadyDescription": "Geef hem nu door: hij wordt niet meer getoond. Daarmee kiest die persoon een nieuw wachtwoord, en worden alle toestellen uitgelogd.",
+    "actions": {
+      "role": "Rol",
+      "resetLink": "Link voor nieuw wachtwoord",
+      "signOut": "Overal uitloggen",
+      "enable": "Inschakelen",
+      "disable": "Uitschakelen",
+      "remove": "Account verwijderen",
+      "showLink": "Link opnieuw tonen",
+      "newLink": "Nieuwe link maken",
+      "revoke": "Uitnodiging intrekken"
+    },
+    "confirm": {
+      "changeRole": "Rol wijzigen",
+      "ownerTitle": "{{name}} eigenaar maken?",
+      "ownerDescription": "Eigenaars kunnen alles, ook andere eigenaars wijzigen of verwijderen.",
+      "demoteSelfTitle": "Je eigen rol wijzigen?",
+      "demoteSelfDescription": "Je wordt {{role}}. Alleen een eigenaar kan je weer eigenaar maken.",
+      "disableTitle": "{{name}} uitschakelen?",
+      "disableDescription": "Die persoon wordt op elk toestel uitgelogd en kan niet inloggen tot het account weer is ingeschakeld.",
+      "signOutTitle": "{{name}} overal uitloggen?",
+      "signOutDescription": "Elk toestel waarop die persoon is ingelogd, wordt uitgelogd. Opnieuw inloggen kan met het wachtwoord.",
+      "removeTitle": "Het account van {{name}} verwijderen?",
+      "removeDescription": "De login wordt verwijderd. {{name}} blijft bewoner en houdt de geschiedenis; je kunt later opnieuw uitnodigen.",
+      "revokeTitle": "De uitnodiging voor {{name}} intrekken?",
+      "revokeDescription": "De link werkt meteen niet meer."
+    },
+    "toast": {
+      "roleChanged": "{{name}} is nu {{role}}",
+      "disabled": "{{name}} is uitgeschakeld en uitgelogd",
+      "enabled": "{{name}} kan weer inloggen",
+      "signedOut": "{{name}} is overal uitgelogd",
+      "removed": "Het account van {{name}} is verwijderd",
+      "revoked": "De uitnodiging voor {{name}} is ingetrokken"
+    },
+    "errors": {
+      "lastOwner": "Het huishouden heeft minstens één eigenaar nodig.",
+      "self": "Dat kan niet met je eigen account.",
+      "forbidden": "Je mag dat niet doen met dit account.",
+      "gone": "Dit account of deze uitnodiging bestaat niet meer."
+    }
+  },
+  "myAccount": {
+    "section": {
+      "title": "Mijn account",
+      "description": "Je e-mailadres, wachtwoord, taal en toestellen."
+    },
+    "currentPassword": "Huidig wachtwoord",
+    "wrongPassword": "Dat is niet je huidige wachtwoord.",
+    "saving": "Opslaan…",
+    "email": {
+      "title": "E-mail",
+      "description": "Het adres waarmee je inlogt. Bevestig de wijziging met je wachtwoord.",
+      "submit": "E-mail wijzigen",
+      "same": "Dat is al je e-mailadres.",
+      "saved": "Je logt nu in met {{email}}"
+    },
+    "password": {
+      "title": "Wachtwoord",
+      "description": "Na de wijziging worden je andere toestellen uitgelogd; dit toestel blijft ingelogd.",
+      "new": "Nieuw wachtwoord",
+      "submit": "Wachtwoord wijzigen",
+      "saved": "Wachtwoord gewijzigd. Je andere toestellen zijn uitgelogd."
+    },
+    "languageDescription": "De taal van WickedHome op al je toestellen.",
+    "devices": {
+      "title": "Toestellen",
+      "description": "Waar je bent ingelogd.",
+      "loading": "Toestellen laden…",
+      "error": "Je toestellen konden niet worden geladen",
+      "browserOn": "{{browser}} op {{system}}",
+      "unknown": "Onbekend toestel",
+      "thisDevice": "Dit toestel",
+      "activeNow": "Nu actief",
+      "lastSeen": "Laatst actief {{when}}",
+      "signOutOthers": "Andere toestellen uitloggen",
+      "confirmTitle": "Je andere toestellen uitloggen?",
+      "confirmDescription_one": "{{count}} ander toestel wordt uitgelogd. Hier blijf je ingelogd.",
+      "confirmDescription_other": "{{count}} andere toestellen worden uitgelogd. Hier blijf je ingelogd.",
+      "signedOut_one": "{{count}} toestel uitgelogd",
+      "signedOut_other": "{{count}} toestellen uitgelogd"
+    }
+  },
+  "link": {
+    "askName": "Vraag {{name}} om een nieuwe link.",
+    "askSomeone": "Vraag een volwassene van je huishouden om een nieuwe link.",
+    "toLogin": "Inloggen",
+    "emailHint": "Met dit adres log je in.",
+    "newPassword": "Nieuw wachtwoord",
+    "passwordMismatch": "De wachtwoorden zijn niet gelijk.",
+    "invite": {
+      "title": "Doe mee met {{household}}",
+      "description": "{{inviter}} nodigde je uit als {{name}} ({{role}}). Kies hoe je inlogt.",
+      "submit": "Mijn account aanmaken",
+      "submitting": "Je account wordt aangemaakt…"
+    },
+    "reset": {
+      "title": "Kies een nieuw wachtwoord",
+      "description": "Voor {{name}} ({{email}}). Je toestellen worden uitgelogd; op dit toestel ben je daarna ingelogd.",
+      "submit": "Nieuw wachtwoord opslaan",
+      "submitting": "Opslaan…"
+    },
+    "expired": {
+      "inviteTitle": "Deze uitnodiging is verlopen",
+      "resetTitle": "Deze link voor een nieuw wachtwoord is verlopen",
+      "description": "Links werken maar een beperkte tijd."
+    },
+    "used": {
+      "inviteTitle": "Deze uitnodiging is al gebruikt",
+      "resetTitle": "Deze link voor een nieuw wachtwoord is al gebruikt",
+      "description": "Elke link werkt één keer. Was jij het, log dan gewoon in."
+    },
+    "revoked": {
+      "inviteTitle": "Deze uitnodiging is ingetrokken",
+      "resetTitle": "Deze link voor een nieuw wachtwoord is ingetrokken",
+      "description": "Ze werd vervangen of geannuleerd."
+    },
+    "invalid": {
+      "title": "Deze link werkt niet",
+      "description": "Kijk na of je de volledige link opende, of vraag een nieuwe."
+    },
+    "rateLimited": {
+      "title": "Te veel pogingen",
+      "description": "Wacht een paar minuten en open de link dan opnieuw."
+    },
+    "unavailable": {
+      "title": "WickedHome is niet bereikbaar",
+      "description": "Kijk je verbinding na en probeer opnieuw.",
+      "retry": "Opnieuw proberen"
+    },
+    "loggedIn": {
+      "title": "Je bent ingelogd als {{name}}",
+      "inviteDescription": "Deze uitnodiging is voor {{name}}. Log eerst uit als je dat account op dit toestel wilt aanmaken.",
+      "resetDescription": "Met deze link kies je een nieuw wachtwoord voor {{name}}. Log eerst uit om hem op dit toestel te gebruiken.",
+      "logout": "Eerst uitloggen",
+      "toHome": "Naar mijn dashboard"
+    },
+    "errors": {
+      "expired": "Deze link is verlopen.",
+      "used": "Deze link is al gebruikt.",
+      "revoked": "Deze link is ingetrokken.",
+      "invalid": "Deze link werkt niet.",
+      "loggedIn": "Er is al iemand ingelogd op dit toestel. Log eerst uit.",
+      "emailTaken": "Dit e-mailadres heeft al een account."
+    }
+  },
+  "jobs": {
+    "cleanup": {
+      "title": "Logins opruimen",
+      "description": "Verwijdert verlopen sessies en verlopen uitnodigings- en wachtwoordlinks."
+    }
+  }
+}

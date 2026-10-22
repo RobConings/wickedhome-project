@@ -1,0 +1,56 @@
+// Feature: projects (Finance, phase 3). See docs/FINANCE.md and docs/PROJECTS.md.
+
+enum ProjectStatus {
+  PLANNED
+  ACTIVE
+  DONE
+  CANCELLED
+}
+
+/// An open-ended budget pot: a room renovation with tasks and materials, a holiday, a family trip, a Christmas
+/// budget… Tasks, expenses (one-off and recurring), and shopping items (materials) link to it with `projectId`;
+/// the budget (spent / committed / remaining) is computed from those, never stored.
+model Project {
+  id                String             @id @default(cuid())
+  householdId       String
+  household         Household          @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name              String
+  /// Icon key from PROJECT_ICONS (src/features/projects/types/projects.ts).
+  icon              String?
+  /// `#rrggbb`
+  color             String
+  /// Free text with suggestions (renovation, holiday, trip, Christmas, party, car…).
+  tag               String?
+  description       String?
+  startDate         DateTime?          @db.Date
+  endDate           DateTime?          @db.Date
+  /// Null: no budget, the project only tracks what it costs.
+  budgetCents       Int?
+  status            ProjectStatus      @default(PLANNED)
+  /// Soft reference to an image in the documents feature (attached to the project). Deliberately no relation.
+  coverFileId       String?
+  places            ProjectPlace[]
+  tasks             Task[]
+  expenses          Expense[]
+  recurringExpenses RecurringExpense[]
+  shoppingItems     ShoppingItem[]
+  /// Contacts working on the project, with their role (contacts feature).
+  contacts          ProjectContact[]
+  createdAt        DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@index([householdId, status])
+  @@map("projects")
+}
+
+/// The places (rooms, zones) a project is about. A project may have none, one or several.
+model ProjectPlace {
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  placeId   String
+  place     Place   @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, placeId])
+  @@index([placeId])
+  @@map("project_places")
+}

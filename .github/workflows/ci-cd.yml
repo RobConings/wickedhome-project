@@ -1,0 +1,77 @@
+name: WickedHome CI/CD
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Check, test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: wickedhome_ci
+          POSTGRES_USER: wickedhome_ci
+          POSTGRES_PASSWORD: ci_only_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U wickedhome_ci -d wickedhome_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      DATABASE_URL: postgresql://wickedhome_ci:ci_only_password@127.0.0.1:5432/wickedhome_ci
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Node.js 20.19.6
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.6'
+          cache: npm
+      - name: Check deployment helper
+        run: bash -n scripts/deploy/wickedhome-deploy.sh
+      - name: Install from lockfile
+        run: npm ci --no-audit --no-fund
+      - name: Validate Prisma schema
+        run: npx prisma validate
+      - name: Apply migrations to disposable CI PostgreSQL
+        run: npx prisma migrate deploy
+      - name: Type-check
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Unit tests
+        run: npm test
+      - name: Compile server and client
+        run: npm run build
+
+  deploy:
+    name: Deploy WickedHome (opt-in)
+    needs: verify
+    if: >-
+      github.event_name != 'pull_request' &&
+      github.ref == 'refs/heads/main' &&
+      vars.WICKEDHOME_AUTO_DEPLOY == 'true'
+    runs-on: [self-hosted, linux, x64, wickedhome-deploy]
+    timeout-minutes: 45
+    concurrency:
+      group: wickedhome-deploy
+      cancel-in-progress: false
+    steps:
+      # No checkout into the unprivileged production runner.
+      # Only the fixed, reviewed root-owned helper is allowed through sudo.
+      - name: Deploy exact main commit
+        env:
+          DEPLOY_SHA: ${{ github.sha }}
+        run: sudo -n /usr/local/sbin/wickedhome-deploy "$DEPLOY_SHA"

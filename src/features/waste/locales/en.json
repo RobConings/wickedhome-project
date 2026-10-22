@@ -1,0 +1,127 @@
+{
+  "notifications": {
+    "bins": {
+      "title": "Put the bins out",
+      "description": "\"Put out tonight: Papier & karton + Pmd\", to whoever has the bins task (or everyone). Time: the bins task's own time, or an evening hour you pick."
+    }
+  },
+  "title": "Waste collection",
+  "description": "Your collector's calendar, synced daily. Collections show up on the calendar and the dashboard.",
+  "days": {
+    "today": "Today",
+    "tomorrow": "Tomorrow"
+  },
+  "fractions": {
+    "residual": "Residual waste",
+    "organic": "Organic waste",
+    "pmd": "PMD",
+    "paper": "Paper & cardboard",
+    "glass": "Glass",
+    "textile": "Textiles",
+    "garden": "Garden waste",
+    "bulky": "Bulky waste",
+    "other": "Other"
+  },
+  "providers": {
+    "limburg-net": {
+      "hint": "For the municipalities of the province of Limburg (postal codes 3500–3999)."
+    },
+    "recycle-app": {
+      "hint": "The Recycle! app by Fost Plus: most other Belgian municipalities, e.g. IVAGO (Ghent), IVBO, Mirom, Interza, Bruxelles-Propreté."
+    }
+  },
+  "setup": {
+    "title": "Connect your waste collector",
+    "changeTitle": "Change collector or address",
+    "description": "Pick your collector and find your address at it. We suggest one from your postal code.",
+    "provider": "Collector",
+    "suggested": "suggested",
+    "fields": {
+      "street": "Street",
+      "number": "Number",
+      "box": "Box",
+      "postalCode": "Postal code",
+      "municipality": "Municipality"
+    },
+    "mainMunicipality": "Limburg.net uses the main municipality, e.g. Hasselt instead of Kermt.",
+    "find": "Find address",
+    "searching": "Searching…",
+    "foundOne": "Found at the collector. Is this your address?",
+    "foundMany": "Several addresses match. Pick yours:",
+    "matches": "Matching addresses",
+    "use": "Use this address",
+    "saving": "Saving and fetching collections…",
+    "saved": "Collector connected. The collection days are on your calendar.",
+    "savedSyncFailed": "Collector saved, but the collection days couldn't be fetched yet. We'll try again later.",
+    "invalidMatch": "Pick an address from the search results first.",
+    "change": "Change",
+    "readOnly": "Only adults can set up the waste collector.",
+    "problems": {
+      "not_covered": "{{provider}} doesn't serve this postal code. Try another collector.",
+      "municipality": "{{provider}} doesn't know this municipality. Check the spelling or use the main municipality.",
+      "street": "{{provider}} doesn't know this street in this municipality. Check the spelling.",
+      "number": "{{provider}} doesn't know this house number in this street.",
+      "provider_error": "{{provider}} couldn't be reached. Try again in a moment."
+    }
+  },
+  "sync": {
+    "now": "Refresh now",
+    "running": "Refreshing…",
+    "done": "Collection days updated.",
+    "failed": "Refreshing failed; the last known collection days are kept.",
+    "tooSoon": "Just refreshed. Try again in a moment.",
+    "lastSync": "Updated {{date}}",
+    "never": "Not updated yet",
+    "daily": "updates daily",
+    "lastFailed": "The last update failed ({{error}}).",
+    "keptSince": "Showing the collection days from {{date}}.",
+    "nothingYet": "No collection days yet."
+  },
+  "upcoming": {
+    "title": "Next collections",
+    "empty": "No collections in the next weeks.",
+    "calendar": "All collection days are on the household calendar."
+  },
+  "remove": {
+    "action": "Disconnect",
+    "title": "Disconnect the waste collector?",
+    "description": "The collection days disappear from the calendar and the dashboard. You can connect again any time.",
+    "confirm": "Disconnect"
+  },
+  "card": {
+    "title": "Waste collection",
+    "loading": "Loading collections…",
+    "loadError": "Couldn't load the collections.",
+    "notSetUp": "Connect your waste collector to see here which bins go out, and when.",
+    "setUp": "Set up collector",
+    "none": "No collections in the next weeks.",
+    "syncError": "The collector couldn't be reached on the last update.",
+    "tomorrow": "Tomorrow: {{labels}}. Put it out tonight.",
+    "today": "Today: {{labels}}",
+    "next": "Next: {{date}} · {{labels}}",
+    "calendar": "View calendar"
+  },
+  "jobs": {
+    "sync": {
+      "title": "Sync the waste calendar",
+      "description": "Fetches the collection days from your collector every morning, for the calendar, the dashboard and the bins tasks."
+    }
+  },
+  "calendarSource": "Waste collection",
+  "tasks": {
+    "enabled": "Create a task to put the bins out",
+    "enabledHint": "One task per collection day on the total task list, for the coming two weeks.",
+    "timing": "When",
+    "timings": {
+      "evening_before": "The evening before ({{time}})",
+      "morning_of": "The morning of ({{time}})"
+    },
+    "who": "Who (optional)",
+    "whoHint": "Nobody picked: the tasks stay unassigned and you can assign each one.",
+    "nobody": "Nobody in particular",
+    "rotate": "Take turns",
+    "rotateHint": "One person per collection day, in the order picked.",
+    "saved": "Bins tasks updated",
+    "viewTasks": "View the tasks"
+  }
+}

@@ -1,0 +1,9 @@
+- Lists have items, quantity, shop, note and price. All products at or below minimum auto-list, essential or not.
+- `shopping_list` returns `stockStatus`, `buyingAdvice`, `essential`, `importance`: below minimum = to buy; at minimum = warning. False essential = nice to have. Keep urgency and importance separate; the person chooses what to buy. Optional `stockStatus`/`isEssential` read filters never change the list.
+- Essential settings → `inventory_save_product` `isEssential` true/false; don't infer or change a flag from stock level.
+- "Zet melk en eieren op de lijst" = one `shopping_add_item` per item. For catalogue items also pass `product` to retain stock and importance labels. "1,5 kg gehakt" → quantity 1.5, unit kg.
+- "Wat moet ik bij de Colruyt halen" → `shopping_list` shop Colruyt; `perShop` tells where to go. Task materials → `shopping_list` task, or `shopping_add_item` with task.
+- "Ik heb de melk gekocht" / "vink af" → `shopping_update_item` bought true (one call per item); "zet terug" → bought false. "Koop dat bij Aldi" → shop. If the result says it is kept in stock, offer addToStock.
+- Removing an item, list or staple always asks. Children add, tick off and remove their own items; lists and staples are for adults.
+- "Elke week melk" → `shopping_save_staple` (unit week).
+- Shops themselves (opening hours, webshops, favourites) → shops skill; stock → inventory.

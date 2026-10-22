@@ -1,0 +1,250 @@
+{
+  "notifications": {
+    "triggered": {
+      "title": "Alarm gaat af",
+      "description": "Meteen naar iedereen, ook tijdens stille uren."
+    },
+    "armed": {
+      "title": "Alarm in- of uitgeschakeld",
+      "description": "Als het alarm in- of uitgeschakeld wordt, en door wie als het in WickedHome gebeurde."
+    },
+    "connection": {
+      "title": "Home Assistant offline",
+      "description": "Als Home Assistant 15 minuten onbereikbaar is, en als hij terug is."
+    }
+  },
+  "status": {
+    "not_configured": "Niet ingesteld",
+    "connecting": "Verbinden",
+    "connected": "Verbonden",
+    "error": "Fout"
+  },
+  "errors": {
+    "auth_invalid": "Home Assistant weigert het toegangstoken. Maak een nieuw langlevend token en pas HOME_ASSISTANT_TOKEN aan.",
+    "unreachable": "Home Assistant is niet bereikbaar. Draait het, en klopt HOME_ASSISTANT_URL?",
+    "timeout": "Home Assistant antwoordt niet meer.",
+    "protocol": "Onverwacht antwoord van Home Assistant. Controleer HOME_ASSISTANT_URL.",
+    "other_household": "Home Assistant is op deze server aan een ander huishouden gekoppeld (HOME_ASSISTANT_HOUSEHOLD_ID)."
+  },
+  "card": {
+    "title": "Home Assistant",
+    "description": "Toestellen, energiestatistieken en het alarm, live uit je Home Assistant.",
+    "loading": "Status van Home Assistant laden…",
+    "loadFailed": "De status kon niet geladen worden.",
+    "testOk": "Verbonden met Home Assistant {{version}}: {{count}} entiteiten, {{ms}} ms.",
+    "testFailed": "De verbindingstest is mislukt.",
+    "nextRetry": "Volgende poging {{when}}.",
+    "url": "Adres",
+    "version": "Versie",
+    "entities": "Entiteiten",
+    "connectedSince": "Verbonden sinds",
+    "lastEvent": "Laatste gebeurtenis",
+    "test": "Verbinding testen",
+    "testing": "Testen…",
+    "open": "Pagina Home Assistant openen"
+  },
+  "setup": {
+    "intro": "Home Assistant is nog niet verbonden. Zo stel je het in:",
+    "steps": {
+      "install": "Installeer Home Assistant op het netwerk (bv. op deze server) en rond de eerste configuratie af op <code>http://192.168.1.10:8123</code>.",
+      "integrations": "Voeg in Home Assistant de integraties toe: <strong>Verisure</strong> (alarm), <strong>DSMR Slimme Meter</strong> of <strong>HomeWizard Energy</strong> (P1-poort van de digitale meter), je <strong>omvormer</strong> (zonnepanelen) en slimme stekkers voor de wasmachine en droogkast.",
+      "energy": "Stel in Home Assistant het <strong>Energiedashboard</strong> in (afname en injectie per tarief, zonnepanelen, batterij, gas, individuele toestellen).",
+      "token": "Maak een token: Home Assistant → je profiel (linksonder) → <strong>Beveiliging</strong> → <strong>Langlevende toegangstokens</strong> → Token aanmaken. Kopieer het meteen; het wordt maar één keer getoond.",
+      "env": "Voeg op de server toe aan <code>/var/www/WickedHome/.env</code>: <code>HOME_ASSISTANT_URL=http://192.168.1.10:8123</code> en <code>HOME_ASSISTANT_TOKEN=…</code> (het token blijft op de server).",
+      "restart": "Herstart de app (<code>pm2 restart wickedhome</code>). Deze kaart toont dan Verbonden, en de energie-import start vanzelf."
+    }
+  },
+  "page": {
+    "title": "Home Assistant",
+    "description": "De verbinding, het alarm, toestellen uit Home Assistant en de energiestatistieken.",
+    "loadFailed": "Dit deel kon niet geladen worden. Herlaad de pagina om opnieuw te proberen.",
+    "notConnected": "Beschikbaar zodra Home Assistant verbonden is."
+  },
+  "entities": {
+    "title": "Entiteiten",
+    "description": "Alles wat Home Assistant kent, met de huidige status. Koppel velden vanuit de pagina van een toestel.",
+    "domain": "Domein",
+    "allDomains": "Alle domeinen",
+    "fittingOnly": "Enkel entiteiten die passen",
+    "selected": "Nu gekoppeld",
+    "bound": "Gekoppeld",
+    "searchPlaceholder": "Naam, entiteit-id of ruimte",
+    "loadFailed": "De entiteiten konden niet geladen worden.",
+    "empty": {
+      "title": "Geen entiteiten",
+      "description": "Home Assistant is niet verbonden, of heeft nog geen entiteiten."
+    }
+  },
+  "picker": {
+    "browse": "Bladeren",
+    "title": "Entiteit in Home Assistant voor “{{field}}”",
+    "attributeHint": "Lees de status van de entiteit, of een van haar attributen.",
+    "hint": {
+      "boolean": "Kies een entiteit die aan/uit of open/dicht is.",
+      "number": "Kies een entiteit met een getal (een temperatuur, een vermogen…).",
+      "text": "Kies eender welke entiteit: haar status wordt als tekst getoond.",
+      "choice": "Kies een entiteit waarvan de statussen bij de opties van dit veld passen (bv. een alarmcentrale)."
+    },
+    "unavailable": "Home Assistant is nu niet verbonden.",
+    "readWhat": "Wat lezen",
+    "state": "Status",
+    "back": "Terug",
+    "use": "{{entity}} gebruiken"
+  },
+  "import": {
+    "title": "Toestellen importeren uit Home Assistant",
+    "description": "Entiteiten die op een toestel lijken, met het profiel dat ze zouden krijgen. Vink aan, pas de namen aan en importeer.",
+    "invalid": "Controleer de namen (1 tot 60 tekens).",
+    "done_one": "{{count}} toestel geïmporteerd",
+    "done_other": "{{count}} toestellen geïmporteerd",
+    "empty": {
+      "title": "Niets te importeren",
+      "description": "Geen deur- of raamcontacten, temperatuursensoren, alarmcentrale, vermogen van wasmachine/droogkast, bewegings- of rookmelders gevonden."
+    },
+    "presets": {
+      "contact": "Raam-/deurcontact",
+      "climate": "Temperatuur",
+      "laundry": "Wasmachine/droogkast",
+      "alarm_panel": "Alarmcentrale",
+      "motion": "Bewegingsmelder",
+      "alarm_component": "Rookmelder",
+      "light": "Lamp"
+    },
+    "name": "Naam van het toestel",
+    "hint": "Profielen komen uit de voorinstellingen en blijven aanpasbaar. Zet de nieuwe toestellen daarna op het grondplan.",
+    "importing": "Importeren…",
+    "action_one": "{{count}} toestel importeren",
+    "action_other": "{{count}} toestellen importeren"
+  },
+  "energy": {
+    "title": "Energie uit Home Assistant",
+    "description": "Uurstatistieken van het energiedashboard van Home Assistant worden energiegegevens. Per uur gaat Home Assistant voor op Fluvius-bestanden en meterstanden, zodat niets dubbel telt.",
+    "linksSaved": "Koppelingen bewaard; hun gegevens worden nu geïmporteerd",
+    "importStarted": "Import gestart; het resultaat staat onder Instellingen → Automatisaties",
+    "alreadyRunning": "De import loopt al.",
+    "lastImport": "Laatste import {{when}}",
+    "neverImported": "Nog niet geïmporteerd",
+    "enabled": "Elk uur importeren",
+    "importNow": "Nu importeren",
+    "noPrefs": "Het energiedashboard van Home Assistant is nog niet ingesteld (Instellingen → Dashboards → Energie in Home Assistant).",
+    "notConnected": "Beschikbaar zodra Home Assistant verbonden is.",
+    "noSources": "Het energiedashboard heeft geen statistieken voor net, zonnepanelen, batterij of gas.",
+    "sources": "Gemeten door Home Assistant",
+    "kinds": {
+      "grid_import": "Afname van het net",
+      "grid_export": "Injectie op het net",
+      "solar_production": "Productie zonnepanelen",
+      "battery_charge": "Batterij laden",
+      "battery_discharge": "Batterij ontladen",
+      "appliance": "Toestel",
+      "gas": "Gas"
+    },
+    "registers": {
+      "day": "dag",
+      "night": "nacht"
+    },
+    "hoursUntil_one": "{{count}} uur, tot {{when}}",
+    "hoursUntil_other": "{{count}} uren, tot {{when}}",
+    "noData": "Nog geen gegevens",
+    "devices": "Individuele toestellen",
+    "devicesHint": "Koppel elk toestel dat Home Assistant meet aan een verbruiker: zijn verbruik verschijnt dan in de verdeling en “onbekend” krimpt.",
+    "noDevices": {
+      "title": "Geen individuele toestellen",
+      "description": "Voeg slimme stekkers of tussenmeters toe aan “Individuele toestellen” in het energiedashboard van Home Assistant."
+    },
+    "includedIn": "Deel van {{parent}}: telt één keer",
+    "hours_one": "{{count}} uur geïmporteerd",
+    "hours_other": "{{count}} uren geïmporteerd",
+    "pickAppliance": "Niet gekoppeld",
+    "saveLinks": "Koppelingen bewaren"
+  },
+  "alarm": {
+    "title": "Alarm",
+    "loading": "Alarm laden…",
+    "since": "Sinds {{when}}",
+    "history": "Laatste wijzigingen",
+    "code": "Alarmcode",
+    "panel": "Getoonde alarmcentrale",
+    "states": {
+      "disarmed": "Uitgeschakeld",
+      "armed_home": "Ingeschakeld (thuis)",
+      "armed_away": "Ingeschakeld (afwezig)",
+      "armed_night": "Ingeschakeld (nacht)",
+      "armed_vacation": "Ingeschakeld (vakantie)",
+      "armed_custom_bypass": "Ingeschakeld (aangepast)",
+      "arming": "Inschakelen…",
+      "pending": "In afwachting",
+      "disarming": "Uitschakelen…",
+      "triggered": "Alarm!",
+      "unavailable": "Niet beschikbaar",
+      "unknown": "Onbekend"
+    },
+    "errors": {
+      "generic": "Dat lukte niet. Probeer het opnieuw.",
+      "tooMany": "Te veel pogingen. Wacht 15 minuten en probeer opnieuw.",
+      "disarmRefused": "Home Assistant weigerde uit te schakelen. Klopt de code?",
+      "codeRequired": "Dit alarm vraagt de code om in te schakelen.",
+      "unavailable": "De status van het alarm is niet beschikbaar: Home Assistant is niet verbonden.",
+      "forbidden": "Enkel eigenaars en volwassenen kunnen het alarm bedienen."
+    },
+    "arm": {
+      "home": "Inschakelen (thuis)",
+      "away": "Inschakelen (afwezig)",
+      "confirmTitle": {
+        "home": "Alarm inschakelen (thuis)?",
+        "away": "Alarm inschakelen (afwezig)?"
+      },
+      "confirmDescription": {
+        "home": "{{panel}} bewaakt dan de buitenschil: deuren en ramen. Binnen rondlopen blijft kunnen.",
+        "away": "{{panel}} gaat volledig aan. Zorg dat iedereen weg is en de ramen dicht zijn."
+      },
+      "arming": "Inschakelen…",
+      "confirm": {
+        "home": "Inschakelen (thuis)",
+        "away": "Inschakelen (afwezig)"
+      },
+      "done": {
+        "home": "Alarm ingeschakeld (thuis)",
+        "away": "Alarm ingeschakeld (afwezig)"
+      }
+    },
+    "disarm": {
+      "action": "Uitschakelen",
+      "title": "Alarm uitschakelen",
+      "description": "Geef de code van {{panel}}.",
+      "logged": "De code gaat rechtstreeks naar Home Assistant en wordt nooit bewaard. Elke poging wordt gelogd.",
+      "disarming": "Uitschakelen…",
+      "confirm": "Uitschakelen",
+      "done": "Alarm uitgeschakeld"
+    },
+    "log": {
+      "title": "Alarmlogboek",
+      "description": "Wie het alarm vanuit de app in- of uitschakelde, en hoe het afliep.",
+      "empty": {
+        "title": "Nog niets gelogd",
+        "description": "In- en uitschakelen vanuit de app verschijnt hier."
+      },
+      "actions": {
+        "arm_home": "Ingeschakeld (thuis)",
+        "arm_away": "Ingeschakeld (afwezig)",
+        "disarm": "Uitgeschakeld"
+      },
+      "results": {
+        "succeeded": "OK",
+        "failed": "Mislukt",
+        "refused": "Geweigerd",
+        "rate_limited": "Te veel pogingen"
+      }
+    }
+  },
+  "jobs": {
+    "energy": {
+      "title": "Energie uit Home Assistant",
+      "description": "Importeert de uurstatistieken van het energiedashboard van Home Assistant (net, zonnepanelen, batterij, gas, gekoppelde toestellen); de eerste keer ook de voorbije weken."
+    },
+    "refreshStates": {
+      "title": "Toestelwaarden uit Home Assistant",
+      "description": "Ververst toestelvelden die aan Home Assistant gekoppeld zijn wanneer de sensor dezelfde waarde opnieuw meldde, zodat ze niet als verouderd verschijnen."
+    }
+  }
+}

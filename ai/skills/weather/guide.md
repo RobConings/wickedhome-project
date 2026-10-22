@@ -1,0 +1,3 @@
+- The forecast is for the home address (Settings). Temperatures in °C, rain in mm with a chance in %, wind in km/h.
+- "Moet ik een paraplu meenemen" → look at the rain chance in the next hours; answer yes/no with the reason in one sentence.
+- If the data is stale or unavailable, say so briefly.

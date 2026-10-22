@@ -1,0 +1,153 @@
+// Feature: OAuth 2.1 for the MCP server (ai/docs/MCP-OAUTH.md), so ChatGPT and Claude can connect as a custom
+// connector. Next to the personal `wh_mcp_` tokens (assistant.prisma), never instead of them. Every token,
+// code and client secret is stored as its SHA-256 only; the plain value is shown or sent once.
+
+/// How an OAuth client came to be.
+enum McpOAuthClientKind {
+  /// Registered by the client itself (`POST /oauth/register`, RFC 7591); only allow-listed redirect hosts.
+  DYNAMIC
+  /// Made by an owner under Assistant → MCP ("OAuth app"); any https redirect URI.
+  MANUAL
+}
+
+/// What a grant (and its tokens) may do: the same meaning as the personal token scopes.
+enum McpOAuthScope {
+  READ
+  WRITE
+}
+
+enum McpOAuthTokenKind {
+  /// Bearer token for `/api/mcp`, 1 hour.
+  ACCESS
+  /// Gets a new pair at `/oauth/token`; rotates on every use, 30 days.
+  REFRESH
+}
+
+/// Server-wide OAuth settings, one row (`id = "global"`); without a row the defaults apply.
+model McpOAuthSettings {
+  id                   String   @id @default("global")
+  /// Dynamic client registration on/off. Off hides the endpoint; existing clients keep working.
+  dcrEnabled           Boolean  @default(true)
+  /// Redirect hosts a dynamically registered client may use (exact host names).
+  allowedRedirectHosts String[] @default(["chatgpt.com", "claude.ai"])
+  updatedAt            DateTime @updatedAt
+
+  @@map("mcp_oauth_settings")
+}
+
+model McpOAuthClient {
+  id                      String                         @id @default(cuid())
+  /// The public `client_id`.
+  clientId                String                         @unique
+  kind                    McpOAuthClientKind
+  name                    String
+  redirectUris            String[]
+  /// SHA-256 of the client secret (confidential clients); null for public clients (PKCE only).
+  secretHash              String?
+  /// `none`, `client_secret_post` or `client_secret_basic`, as registered.
+  tokenEndpointAuthMethod String                         @default("none")
+  /// Manual apps belong to the household of the owner who made them; dynamic clients to nobody.
+  householdId             String?
+  household               Household?                     @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  createdById             String?
+  createdBy               User?                          @relation("McpOAuthClientCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  /// Authorize, token or MCP call; idle dynamic clients without a live grant are deleted after 1 hour.
+  lastUsedAt              DateTime?
+  createdAt               DateTime                       @default(now())
+  requests                McpOAuthAuthorizationRequest[]
+  codes                   McpOAuthAuthorizationCode[]
+  grants                  McpOAuthGrant[]
+
+  @@index([kind, lastUsedAt])
+  @@index([householdId])
+  @@map("mcp_oauth_clients")
+}
+
+/// A validated `/oauth/authorize` request waiting for the person's consent (10 minutes). Its id is in the
+/// consent page's URL; the first signed-in person to open it owns it.
+model McpOAuthAuthorizationRequest {
+  id            String         @id
+  clientId      String
+  client        McpOAuthClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  redirectUri   String
+  state         String?
+  codeChallenge String
+  /// Requested scopes: `read`, `write`.
+  scopes        String[]
+  resource      String
+  userId        String?
+  user          User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// SHA-256 of the consent form's CSRF token (renewed every time the page loads).
+  csrfHash      String?
+  expiresAt     DateTime
+  createdAt     DateTime       @default(now())
+
+  @@index([expiresAt])
+  @@map("mcp_oauth_authorization_requests")
+}
+
+/// A one-time authorization code (60 s), bound to client, redirect URI, PKCE challenge, person, scope and resource.
+model McpOAuthAuthorizationCode {
+  id            String         @id @default(cuid())
+  codeHash      String         @unique
+  clientId      String
+  client        McpOAuthClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  householdId   String
+  redirectUri   String
+  codeChallenge String
+  scope         McpOAuthScope
+  resource      String
+  expiresAt     DateTime
+  usedAt        DateTime?
+  /// The grant made from it: revoked when the code is presented again.
+  grantId       String?
+  grant         McpOAuthGrant? @relation(fields: [grantId], references: [id], onDelete: SetNull)
+  createdAt     DateTime       @default(now())
+
+  @@index([expiresAt])
+  @@map("mcp_oauth_authorization_codes")
+}
+
+/// One person's consent for one client ("Connected apps"). Revoking it ends every token made from it.
+model McpOAuthGrant {
+  id          String                      @id @default(cuid())
+  clientId    String
+  client      McpOAuthClient              @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  householdId String
+  household   Household                   @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  scope       McpOAuthScope
+  /// The audience: the MCP endpoint's URL.
+  resource    String
+  lastUsedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime                    @default(now())
+  tokens      McpOAuthToken[]
+  codes       McpOAuthAuthorizationCode[]
+
+  @@index([householdId])
+  @@index([userId])
+  @@index([clientId])
+  @@map("mcp_oauth_grants")
+}
+
+model McpOAuthToken {
+  id        String            @id @default(cuid())
+  grantId   String
+  grant     McpOAuthGrant     @relation(fields: [grantId], references: [id], onDelete: Cascade)
+  kind      McpOAuthTokenKind
+  tokenHash String            @unique
+  scope     McpOAuthScope
+  expiresAt DateTime
+  /// Refresh tokens: when it was exchanged; presenting it again revokes the grant (reuse detection).
+  usedAt    DateTime?
+  revokedAt DateTime?
+  createdAt DateTime          @default(now())
+
+  @@index([grantId])
+  @@index([expiresAt])
+  @@map("mcp_oauth_tokens")
+}

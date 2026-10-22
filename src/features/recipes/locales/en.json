@@ -1,0 +1,267 @@
+{
+  "page": {
+    "title": "Recipes",
+    "description": "What's on the menu: put a recipe on To cook and only the missing ingredients go on the shopping list."
+  },
+  "actions": {
+    "add": "New recipe",
+    "back": "All recipes"
+  },
+  "tabs": {
+    "cook": "To cook",
+    "cookCount": "To cook ({{count}})",
+    "all": "All recipes"
+  },
+  "filter": {
+    "search": "Search recipes or ingredients"
+  },
+  "groups": {
+    "favorites": "Favourites",
+    "all": "All recipes"
+  },
+  "empty": {
+    "title": "No recipes yet",
+    "description": "Add the meals you cook often, with their ingredients linked to your products."
+  },
+  "favorite": {
+    "add": "Add {{name}} to favourites",
+    "remove": "Remove {{name}} from favourites",
+    "failed": "Couldn't save the favourite. Try again."
+  },
+  "facts": {
+    "servings_one": "{{count}} person",
+    "servings_other": "{{count}} people",
+    "ingredients_one": "{{count}} ingredient",
+    "ingredients_other": "{{count}} ingredients",
+    "steps_one": "{{count}} step",
+    "steps_other": "{{count}} steps"
+  },
+  "status": {
+    "in_stock": "In stock",
+    "short": "Not enough in stock",
+    "unknown": "Stock unknown"
+  },
+  "toCook": {
+    "loading": "Loading To cook…",
+    "emptyTitle": "Nothing to cook yet",
+    "emptyDescription": "Open a recipe and tap \"Add to To cook\": the missing ingredients go on the shopping list.",
+    "pickRecipe": "Choose a recipe",
+    "recentlyMade": "Made lately",
+    "markedDone": "{{name}} is made",
+    "removed": "{{name}} is off the list",
+    "openItems_one": "{{count}} item to buy",
+    "openItems_other": "{{count}} items to buy",
+    "addedBy": "Added by {{name}}",
+    "cookingStep": "Cooking · step {{step}} of {{total}}",
+    "cooking": "Cooking",
+    "madeOn": "Made on {{date}}",
+    "made": "Made",
+    "start": "Start cooking",
+    "continue": "Continue cooking",
+    "done": "Done",
+    "remove": "Remove",
+    "clear": "Clear",
+    "removeTitle": "Take {{name}} off the list?",
+    "removeDescription": "What was already used while cooking stays used.",
+    "removeItems_one": "Also remove its {{count}} open item from the shopping list",
+    "removeItems_other": "Also remove its {{count}} open items from the shopping list"
+  },
+  "fields": {
+    "name": "Name",
+    "namePlaceholder": "Spaghetti bolognese",
+    "servings": "Servings",
+    "servingsDescription": "For how many people the amounts are.",
+    "sourceUrl": "Recipe link",
+    "ingredients": "Ingredients",
+    "ingredientsDescription": "Amount and unit as in the recipe (300 g, 2 pcs, 1 el). Link a product to check its stock: grams and litres are compared with the product's content per package.",
+    "steps": "Steps",
+    "stepsDescription": "One step per paragraph or numbered line. \"10 min\" in a step gives it a timer.",
+    "stepsPlaceholder": "1. Chop the onion.\n2. Fry the mince for 10 min.",
+    "notes": "Notes",
+    "category": "Category"
+  },
+  "form": {
+    "createTitle": "New recipe",
+    "editTitle": "Edit recipe",
+    "description": "Ingredients and steps; you can change them any time.",
+    "created": "Recipe added",
+    "updated": "Recipe saved"
+  },
+  "delete": {
+    "label": "Delete recipe",
+    "title": "Delete {{name}}?",
+    "description": "The recipe and its meals on To cook are removed. Shopping items and what was used stay.",
+    "deleted": "Recipe deleted"
+  },
+  "ingredients": {
+    "none": "No ingredients yet.",
+    "product": "Ingredient {{number}}",
+    "productPlaceholder": "Choose a product (optional)",
+    "name": "Name in the recipe",
+    "namePlaceholder": "Onion",
+    "nameRequired": "Give the ingredient a name or choose a product.",
+    "quantity": "Amount (recipe)",
+    "unit": "Unit",
+    "unitPlaceholder": "g, ml, pcs…",
+    "note": "Note",
+    "notePlaceholder": "grated",
+    "optional": "Optional",
+    "optionalShort": "optional",
+    "moveUp": "Move {{name}} up",
+    "moveDown": "Move {{name}} down",
+    "remove": "Remove {{name}}",
+    "add": "Add ingredient",
+    "newProduct": "New product"
+  },
+  "check": {
+    "title": "Add {{name}} to To cook",
+    "description": "Tick what to buy: missing ingredients are ticked already.",
+    "servings": "For how many people",
+    "fewer": "Fewer people",
+    "more": "More people",
+    "failed": "Couldn't check the stock. Try again.",
+    "noIngredients": "This recipe has no ingredients yet.",
+    "buy": "Buy {{name}}",
+    "onList": "On the list",
+    "toBuy": "buy {{amount}}",
+    "submit_one": "Add {{count}} to the shopping list",
+    "submit_other": "Add {{count}} to the shopping list",
+    "submitNoItems": "Add to To cook",
+    "planned_one": "On To cook; {{count}} item on the shopping list",
+    "planned_other": "On To cook; {{count}} items on the shopping list",
+    "plannedNoItems": "On To cook"
+  },
+  "cover": {
+    "title": "Cover photo",
+    "empty": "Attach a photo below to use it as the cover.",
+    "use": "Use {{name}} as the cover",
+    "remove": "Stop using {{name}} as the cover",
+    "clear": "No cover"
+  },
+  "detail": {
+    "addToCook": "Add to To cook",
+    "startCooking": "Start cooking",
+    "ingredients": "Ingredients",
+    "ingredientsFor_one": "For {{count}} person",
+    "ingredientsFor_other": "For {{count}} people",
+    "noIngredients": "No ingredients yet.",
+    "stockFailed": "Couldn't check the stock right now.",
+    "steps": "Steps",
+    "noSteps": "No steps yet.",
+    "timer_one": "Timer: {{count}} minute",
+    "timer_other": "Timer: {{count}} minutes",
+    "details": "Details",
+    "noServings": "Not said"
+  },
+  "cooking": {
+    "backToRecipe": "Recipe",
+    "backToList": "Back to recipes",
+    "screenOn": "Screen stays on",
+    "saving": "Saving…",
+    "madeOn": "Made on {{date}}.",
+    "noSteps": "This recipe has no steps. Tap the ingredients you use.",
+    "stepsRole": "Steps",
+    "stepOf": "Step {{step}} of {{total}}",
+    "previous": "Previous",
+    "next": "Next",
+    "ingredients": "Ingredients",
+    "tray": "Ingredients · {{used}} of {{total}} used",
+    "noIngredients": "No ingredients. Add what you use with \"+ Ingredient\".",
+    "extras": "Added while cooking",
+    "addIngredient": "Ingredient",
+    "used": "Used",
+    "useLabel": "Used {{amount}} {{name}}",
+    "usedToast": "{{name}} taken from stock",
+    "addedToList": "It's running low: added to the shopping list.",
+    "undo": "Undo",
+    "undoFor": "Undo the last use of {{name}}",
+    "undone": "Put back in stock",
+    "usedOf": "used {{used}} of {{needed}}",
+    "usedOnly": "used {{used}}",
+    "stockLeft": "{{amount}} left",
+    "noStock": "not kept in stock",
+    "otherAmount": "Another amount of {{name}}",
+    "howMuch": "How much {{name}}?",
+    "less": "Less",
+    "moreAmount": "More",
+    "amount": "Amount",
+    "inUnit": "In {{unit}}",
+    "useAmount": "Use {{amount}}",
+    "done": "Done cooking",
+    "doneTitle": "Done with {{name}}?",
+    "doneDescription": "Nothing more is taken from stock: only what you tapped was.",
+    "nothingUsed": "Nothing was ticked off as used.",
+    "markMade": "Mark as made",
+    "doneToast": "{{name}} is made. Enjoy!",
+    "noConversion": "The recipe's amount doesn't convert to {{unit}}: \"Used\" asks how much."
+  },
+  "timer": {
+    "start_one": "{{count}} minute",
+    "start_other": "{{count}} minutes",
+    "resume": "Resume",
+    "pause": "Pause",
+    "reset": "Reset the timer",
+    "done": "Time's up: {{step}}"
+  },
+  "extra": {
+    "title": "Add an ingredient",
+    "description": "Something that isn't in the recipe.",
+    "product": "Product",
+    "productDescription": "Or leave it empty and type a name.",
+    "name": "Name",
+    "namePlaceholder": "Garlic",
+    "quantity": "Amount",
+    "unit": "Unit",
+    "use": "I used it now",
+    "useDescription": "Takes the amount (or 1) from stock right away.",
+    "saveToRecipe": "Also add to the recipe",
+    "added": "Ingredient added"
+  },
+  "errors": {
+    "notFound": "This recipe or meal doesn't exist (anymore).",
+    "forbidden": "You can't change recipes.",
+    "alreadyCooked": "This meal was already made.",
+    "chooseOne": "Choose an ingredient.",
+    "chooseProductOrName": "Choose a product or type a name.",
+    "unknownProduct": "That product isn't in your catalogue.",
+    "unknownIngredient": "That ingredient isn't in the recipe.",
+    "notAnAttachedImage": "Choose an image attached to the recipe.",
+    "unknownCategory": "That category isn't in your household.",
+    "duplicateCategory": "A category with this name already exists."
+  },
+  "units": {
+    "times": "{{amount}} ×",
+    "pieces": "pieces"
+  },
+  "stock": {
+    "inStock": "{{amount}} in stock",
+    "notKept": "Not kept in stock",
+    "buy": "buy {{amount}}",
+    "setContent": "Set the content per package",
+    "needHave": "Needs {{need}} · have {{have}}",
+    "needStock": "Needs {{need}} · {{stock}} in stock",
+    "needNotKept": "Needs {{need}} · not kept in stock",
+    "needNoProduct": "Needs {{need}} · no product linked"
+  },
+  "product": {
+    "open": "Open {{name}}",
+    "webshop": "{{name}} at {{shop}} (opens the webshop)"
+  },
+  "categories": {
+    "manage": "Manage categories",
+    "description": "Organize your recipes with your own categories.",
+    "add": "New category",
+    "edit": "Edit category",
+    "editLabel": "Edit {{name}}",
+    "empty": "No categories yet. Create your first category.",
+    "namePlaceholder": "For example soup, pasta or dessert",
+    "saved": "Category saved",
+    "delete": "Delete category",
+    "deleteTitle": "Delete category {{name}}?",
+    "deleteDescription": "The recipes are kept without a category.",
+    "deleted": "Category deleted",
+    "all": "All categories",
+    "uncategorized": "Uncategorized",
+    "chooseHint": "Create categories under Manage categories on the recipes page."
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "notifications": {
+    "vouchers": {
+      "title": "Meal vouchers expiring",
+      "description": "A week before your meal vouchers expire, and the day before if they're still not used."
+    }
+  },
+  "page": {
+    "title": "Income",
+    "description": "What comes in: recurring incomes per member and one-off incomes."
+  },
+  "actions": {
+    "addRecurring": "Recurring income",
+    "addOneOff": "One-off income",
+    "enterAmount": "Enter this month's amount",
+    "enterAmountShort": "Enter amount",
+    "confirmReceived": "Received",
+    "edit": "Edit",
+    "delete": "Delete",
+    "editIncome": "Edit income",
+    "removeAmount": "Remove this amount"
+  },
+  "who": {
+    "joint": "Joint",
+    "label": "Who",
+    "everyone": "Everyone"
+  },
+  "kinds": {
+    "salary": "Salary",
+    "holiday_pay": "Holiday pay",
+    "bonus": "Bonus",
+    "meal_vouchers": "Meal vouchers",
+    "benefit": "Benefit",
+    "tax_return": "Tax return",
+    "green_certificates": "Green certificates",
+    "gift": "Gift",
+    "sale": "Sale",
+    "other": "Other"
+  },
+  "modes": {
+    "fixed": "Fixed amount",
+    "variable": "Variable (enter each time)"
+  },
+  "status": {
+    "received": "Received",
+    "upcoming": "Expected {{date}}",
+    "expected": "Expected",
+    "to_enter": "To enter"
+  },
+  "month": {
+    "title": "This month",
+    "previous": "Previous month",
+    "next": "Next month",
+    "today": "This month",
+    "household": "Household",
+    "received": "{{amount}} received",
+    "expected": "{{amount}} still expected",
+    "planned": "Planned",
+    "nothingPlanned": "No recurring or expected incomes this month.",
+    "oneOff": "one-off",
+    "vouchers": "Meal vouchers: {{amount}}",
+    "toEnter_one": "{{count}} amount to enter",
+    "toEnter_other": "{{count}} amounts to enter"
+  },
+  "sources": {
+    "title": "Recurring incomes",
+    "description": "Salary, holiday pay, benefits… per member or joint.",
+    "amountFrom": "from {{date}}: {{amount}}",
+    "variable": "Variable",
+    "estimate": "about {{amount}}",
+    "perMonth": "{{amount}} / month",
+    "next": "next {{date}}",
+    "ended": "Ended {{date}}",
+    "history": "Amount history",
+    "toAccount": "Lands on {{account}}"
+  },
+  "incomes": {
+    "title": "Recorded",
+    "label": "Recorded incomes",
+    "searchPlaceholder": "Search incomes",
+    "allKinds": "All kinds",
+    "kindFilter": "Kind",
+    "forPeriod": "for {{date}}",
+    "toAccount": "to {{account}}"
+  },
+  "vouchers": {
+    "title": "Meal vouchers",
+    "description": "The oldest vouchers are used first; vouchers expire 12 months after they arrive.",
+    "balance": "Balance",
+    "available": "{{amount}} available",
+    "expiresOn": "{{amount}} expires on {{date}}",
+    "expired": "{{amount}} expired",
+    "uncovered": "{{amount}} paid without valid vouchers",
+    "soonTitle": "Meal vouchers expire soon",
+    "soon": "{{name}}: {{amount}} expires on {{date}}.",
+    "received": "received {{amount}}",
+    "spent": "spent {{amount}}",
+    "none": "No meal vouchers yet. Add a variable recurring income of kind \"Meal vouchers\"."
+  },
+  "fields": {
+    "who": "Who",
+    "name": "Name",
+    "namePlaceholder": "e.g. Salary Acme",
+    "kind": "Kind",
+    "repeat": "Repeats",
+    "startDate": "First date",
+    "endDate": "Ends on",
+    "amountMode": "Amount",
+    "amount": "Amount",
+    "newAmount": "Amount",
+    "amountFrom": "New amount applies from",
+    "amountFromDescription": "Earlier months keep their amount.",
+    "estimate": "Estimate",
+    "estimateDescription": "What to expect until the actual amount is entered.",
+    "targetAccount": "Lands on",
+    "targetAccountDescription": "Only joint accounts count in the money flow; leave empty for a personal account.",
+    "noAccount": "Personal account (not tracked)",
+    "notes": "Notes",
+    "date": "Received on",
+    "description": "Description",
+    "descriptionPlaceholder": "e.g. Tax return 2025",
+    "note": "Note"
+  },
+  "form": {
+    "createSourceTitle": "Add a recurring income",
+    "editSourceTitle": "Edit recurring income",
+    "createIncomeTitle": "Add a one-off income",
+    "editIncomeTitle": "Edit income",
+    "enterTitle": "{{name}}: {{date}}",
+    "enterDescription": "Enter the amount that actually came in.",
+    "sourceCreated": "Recurring income added",
+    "sourceSaved": "Recurring income saved",
+    "incomeSaved": "Income saved",
+    "deleteSourceTitle": "Delete \"{{name}}\"?",
+    "deleteSourceDescription": "Recorded incomes stay in the history.",
+    "deleteIncomeTitle": "Delete this income?",
+    "deleteIncomeDescription": "It disappears from the totals and, when it landed on a joint account, from its balance.",
+    "deleted": "Deleted"
+  },
+  "empty": {
+    "sources": {
+      "title": "No recurring incomes yet",
+      "description": "Add each member's salary and other regular incomes."
+    },
+    "incomes": {
+      "title": "Nothing received yet",
+      "description": "Incomes you record show up here, with tax returns, green certificates and gifts."
+    }
+  },
+  "errors": {
+    "notFound": "This income no longer exists.",
+    "Enter the amount": "Enter the amount",
+    "Ends before it starts": "Ends before it starts",
+    "Already recorded for this period": "An amount was already recorded for this period",
+    "Unknown account": "Unknown account",
+    "Unknown habitant": "Unknown person",
+    "A fixed income keeps at least one amount": "A fixed income keeps at least one amount"
+  },
+  "loading": {
+    "page": "Loading incomes…"
+  },
+  "jobs": {
+    "voucherTasks": {
+      "title": "Meal voucher reminders",
+      "description": "Adds a task \"Use € … meal vouchers before …\" for whoever has vouchers expiring within 30 days, and closes it once they are used or expired."
+    }
+  }
+}

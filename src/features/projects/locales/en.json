@@ -1,0 +1,307 @@
+{
+  "calendarSource": "Projects",
+  "page": {
+    "title": "Projects",
+    "description": "Budget pots for anything: a room to renovate, a holiday, a family trip, Christmas. See what's spent, what's coming and whether it fits."
+  },
+  "actions": {
+    "add": "New project",
+    "more": "More actions",
+    "back": "All projects"
+  },
+  "filter": {
+    "search": "Search projects",
+    "status": "Show",
+    "running": "Running",
+    "done": "Done",
+    "cancelled": "Cancelled",
+    "all": "All"
+  },
+  "empty": {
+    "title": "No projects yet",
+    "description": "Start one for a renovation, a trip or the Christmas presents, and give it a budget."
+  },
+  "status": {
+    "planned": "Planned",
+    "active": "Active",
+    "done": "Done",
+    "cancelled": "Cancelled",
+    "changed": "Project updated"
+  },
+  "statusActions": {
+    "active": "Start",
+    "done": "Mark done",
+    "cancelled": "Cancel project",
+    "planned": "Back to planned",
+    "reopen": "Reopen"
+  },
+  "budgetStatus": {
+    "in_budget": "In budget",
+    "at_risk": "Almost at budget",
+    "overBy": "{{amount}} over budget"
+  },
+  "budget": {
+    "title": "Budget",
+    "label": "Budget",
+    "aria": "Spent {{spent}} and {{committed}} committed of a {{budget}} budget",
+    "ariaNoBudget": "Spent {{spent}} and {{committed}} committed, no budget",
+    "spentShort": "{{amount}} spent",
+    "committedShort": "{{amount}} coming",
+    "overShort": "{{amount}} over",
+    "leftShort": "{{amount}} left",
+    "noBudgetSpent": "No budget · {{amount}} so far",
+    "ofBudget": "{{used}} of {{budget}}",
+    "spent": "Spent",
+    "spentDetail": "Paid expenses {{expenses}} · bought materials {{materials}}",
+    "committed": "Committed",
+    "committedDetail": "Unpaid expenses {{expenses}} · materials to buy {{materials}}",
+    "total": "Total",
+    "noBudgetHint": "Give the project a budget to see what's left.",
+    "over": "Over budget by",
+    "remaining": "Left",
+    "unpriced_one": "{{count}} material has no price yet, so it isn't counted.",
+    "unpriced_other": "{{count}} materials have no price yet, so they aren't counted."
+  },
+  "dates": {
+    "range": "{{from}} – {{to}}",
+    "from": "From {{date}}",
+    "until": "Until {{date}}"
+  },
+  "tasks": {
+    "title": "Tasks",
+    "description": "What needs doing, in order: tasks that wait for others come after them.",
+    "progress": "{{done}}/{{total}} tasks done",
+    "linkExisting": "Add an existing task"
+  },
+  "materials": {
+    "title": "Materials",
+    "description": "What to buy, with a price or an estimate; the materials of the project's tasks are here too."
+  },
+  "expenses": {
+    "title": "Expenses",
+    "description": "Bills, purchases and recurring costs counted in this project.",
+    "empty": "No expenses yet. Log a purchase or add an existing bill.",
+    "perOccurrence": "{{amount}} each time",
+    "unlink": "Remove {{name}} from the project",
+    "unlinkShort": "Remove from project",
+    "paidOn": "Paid {{date}}",
+    "dueOn": "Due {{date}}",
+    "unpaid": "Not paid",
+    "log": "Log an expense",
+    "linkExisting": "Add an existing expense",
+    "linkRecurring": "Add a recurring expense"
+  },
+  "purchases": {
+    "unlogged_one": "{{count}} bought material isn't an expense yet ({{amount}}).",
+    "unlogged_other": "{{count}} bought materials aren't an expense yet ({{amount}}).",
+    "log": "Log as expense"
+  },
+  "invoice": {
+    "title": "Link materials",
+    "description": "Which materials are on the invoice of {{payee}} ({{date}}, {{amount}})? They become bought and count once, as this expense.",
+    "link": "Link materials",
+    "linkFor": "Link materials to {{name}}",
+    "count_one": "{{count}} material",
+    "count_other": "{{count}} materials",
+    "materialsLabel": "Materials on this invoice",
+    "noMaterials": "The project has no materials that aren't on another invoice.",
+    "bought": "Bought",
+    "open": "Still to buy",
+    "onThis": "On this invoice",
+    "check": "Check",
+    "line": "Invoice: {{line}} · {{amount}}",
+    "amountFor": "What {{name}} cost on the invoice",
+    "unmatchedTitle": "On the invoice, not on the materials list",
+    "addAll": "Add all",
+    "addAsMaterial": "Add as a bought material",
+    "linkedTotal": "Linked",
+    "expenseTotal": "Expense",
+    "difference": "Difference",
+    "matches": "Matches the expense",
+    "useInvoicePrices": "Use invoice prices",
+    "read": "Read invoice with AI",
+    "readAgain": "Read again",
+    "reading": "Reading the invoice… this can take up to a minute and a half.",
+    "readResult": "Read {{name}}: {{lines}} lines, {{matched}} matched. Check them before saving.",
+    "errors": {
+      "no_invoice": "This expense has no PDF or photo of the invoice. Attach it to the expense, or link the materials yourself.",
+      "invoice_unreadable": "The invoice has no readable text. Attach a photo (if the assistant reads images) or link the materials yourself.",
+      "reader_unavailable": "The assistant isn't set up, so the invoice can't be read. Link the materials yourself.",
+      "reader_failed": "The invoice couldn't be read this time. Try again, or link the materials yourself.",
+      "generic": "Something went wrong reading the invoice. Link the materials yourself."
+    },
+    "nothingSelected": "Tick at least one material.",
+    "submit": "Save",
+    "done": "Materials linked to the invoice"
+  },
+  "link": {
+    "title": {
+      "task": "Add an existing task",
+      "expense": "Add an existing expense",
+      "recurring": "Add a recurring expense"
+    },
+    "description": {
+      "task": "Open tasks that aren't part of a project yet.",
+      "expense": "One-off expenses of the last year that aren't part of a project yet.",
+      "recurring": "Its past and upcoming payments all count for the project."
+    },
+    "label": {
+      "task": "Task",
+      "expense": "Expense",
+      "recurring": "Recurring expense"
+    },
+    "placeholder": {
+      "task": "Choose a task…",
+      "expense": "Choose an expense…",
+      "recurring": "Choose a recurring expense…"
+    },
+    "empty": {
+      "task": "No open tasks without a project.",
+      "expense": "No expenses without a project.",
+      "recurring": "No recurring expenses without a project."
+    },
+    "done": {
+      "task": "Task added to the project",
+      "expense": "Expense added to the project",
+      "recurring": "Recurring expense added to the project"
+    },
+    "failed": "Couldn't load what can be added. Try again.",
+    "submit": "Add to project"
+  },
+  "cover": {
+    "title": "Cover photo",
+    "empty": "Attach a photo below to use it as the cover.",
+    "use": "Use {{name}} as the cover",
+    "remove": "Stop using {{name}} as the cover",
+    "clear": "No cover"
+  },
+  "detail": {
+    "details": "Details",
+    "noPlaces": "No rooms or zones",
+    "dates": "When",
+    "noDates": "No dates",
+    "noDescription": "No description"
+  },
+  "delete": {
+    "title": "Delete {{name}}?",
+    "description": "The project goes; its tasks, expenses and materials stay, without the project."
+  },
+  "fields": {
+    "name": "Name",
+    "tag": "Kind",
+    "budget": "Budget",
+    "status": "Status",
+    "startDate": "Start",
+    "endDate": "End",
+    "places": "Rooms and zones",
+    "icon": "Icon",
+    "color": "Colour",
+    "description": "Description"
+  },
+  "hints": {
+    "tag": "Anything you like; tap a suggestion or type your own.",
+    "budget": "Leave empty to only track what it costs.",
+    "places": "Where it happens, if anywhere."
+  },
+  "placeholders": {
+    "name": "Bathroom renovation",
+    "tag": "Renovation, holiday, trip…"
+  },
+  "form": {
+    "createTitle": "New project",
+    "editTitle": "Edit project",
+    "description": "A budget pot: link tasks, materials and expenses to it.",
+    "created": "Project created",
+    "updated": "Project saved",
+    "noPlaces": "No rooms or zones yet."
+  },
+  "errors": {
+    "endBeforeStart": "The end can't be before the start.",
+    "unknownPlace": "One of these places doesn't exist (any more).",
+    "notFound": "This project no longer exists.",
+    "forbidden": "You're not allowed to do that."
+  },
+  "icons": {
+    "hammer": "Hammer",
+    "paint": "Paint roller",
+    "home": "House",
+    "sofa": "Sofa",
+    "bath": "Bath",
+    "garden": "Garden",
+    "car": "Car",
+    "plane": "Plane",
+    "holiday": "Palm tree",
+    "tent": "Tent",
+    "gift": "Gift",
+    "christmas": "Christmas tree",
+    "party": "Party",
+    "heart": "Heart",
+    "graduation": "Graduation",
+    "folder": "Folder"
+  },
+  "tags": {
+    "renovation": "Renovation",
+    "holiday": "Holiday",
+    "trip": "Trip",
+    "christmas": "Christmas",
+    "party": "Party",
+    "car": "Car",
+    "garden": "Garden",
+    "gifts": "Gifts"
+  },
+  "picker": {
+    "label": "Project",
+    "placeholder": "No project"
+  },
+  "favorite": {
+    "failed": "Couldn't update your favourites. Try again."
+  },
+  "summary": {
+    "loading": "Loading project budgets…",
+    "error": "Couldn't load the project budgets.",
+    "empty": "No projects running this month.",
+    "open": "Go to projects",
+    "totals": "{{paid}} paid this month · {{due}} still due",
+    "overBudget_one": "{{count}} over budget",
+    "overBudget_other": "{{count}} over budget",
+    "atRisk_one": "{{count}} almost at budget",
+    "atRisk_other": "{{count}} almost at budget",
+    "month": "This month: {{paid}} paid · {{due}} due"
+  },
+  "plan": {
+    "invalid": "This plan can't be shown.",
+    "newProject": "New project",
+    "existingProject": "Adding to this project",
+    "budget": "Budget {{amount}}",
+    "noBudget": "No budget",
+    "contact": "Contact: {{name}}",
+    "totals": "Budget check",
+    "materialsEstimate": "Materials (estimate)",
+    "alreadyUsed": "Already spent or committed",
+    "total": "Total",
+    "left": "{{amount}} left of the {{budget}} budget",
+    "over": "{{amount}} over the {{budget}} budget",
+    "unpriced_one": "{{count}} material has no price yet, so it isn't counted.",
+    "unpriced_other": "{{count}} materials have no price yet, so they aren't counted.",
+    "estimateNote": "≈ is an estimate; prices with a webshop link come from that page.",
+    "warnings": "Check before applying",
+    "tasks": "Tasks ({{count}})",
+    "hours_one": "~{{count}} hour",
+    "hours_other": "~{{count}} hours",
+    "checklist_one": "{{count}} checklist item",
+    "checklist_other": "{{count}} checklist items",
+    "waitsFor_one": "Waits for {{tasks}}",
+    "waitsFor_other": "Waits for {{tasks}}",
+    "materials": "Materials ({{count}})",
+    "groupBy": "Group the materials",
+    "byTask": "By task",
+    "byShop": "By shop",
+    "wholeProject": "For the whole project",
+    "noShop": "No shop yet",
+    "noPrice": "no price",
+    "estimate": "Estimate",
+    "link": "Open the webshop page of {{name}}",
+    "showAll": "Show all {{count}}",
+    "showLess": "Show less"
+  }
+}

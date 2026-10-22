@@ -1,0 +1,353 @@
+{
+  "notifications": {
+    "autoPaid": {
+      "title": "Direct debits paid",
+      "description": "A summary when direct debits were marked paid on their due date."
+    }
+  },
+  "page": {
+    "title": "Expenses",
+    "description": "Bills, subscriptions, loans and everyday spending: what's coming, what's running, what's paid."
+  },
+  "views": {
+    "upcoming": "Upcoming",
+    "recurring": "Recurring",
+    "history": "History",
+    "label": "View"
+  },
+  "actions": {
+    "add": "New expense",
+    "log": "Log an expense",
+    "markPaid": "Mark as paid",
+    "markUnpaid": "Mark as unpaid",
+    "undoAutoPay": "Not paid after all",
+    "showMore_one": "Show {{count}} more month",
+    "showMore_other": "Show {{count}} more months",
+    "copy": "Copy",
+    "copied": "Copied",
+    "pause": "Pause",
+    "resume": "Resume",
+    "end": "End",
+    "deleteRecurring": "Delete",
+    "editRecurring": "Edit recurring expense",
+    "openRecurring": "Recurring expense",
+    "website": "Website"
+  },
+  "status": {
+    "upcoming": "Upcoming",
+    "due": "Due soon",
+    "overdue": "Overdue",
+    "paid": "Paid"
+  },
+  "recurringStatus": {
+    "active": "Active",
+    "paused": "Paused",
+    "ended": "Ended"
+  },
+  "kinds": {
+    "subscription": "Subscription",
+    "loan": "Loan",
+    "down_payment": "Down payment",
+    "insurance": "Insurance",
+    "utility": "Utility",
+    "tax": "Tax",
+    "other": "Other"
+  },
+  "categories": {
+    "energy": "Energy",
+    "water": "Water",
+    "internet_phone": "Internet & phone",
+    "insurance": "Insurance",
+    "taxes": "Taxes",
+    "housing": "Housing & mortgage",
+    "healthcare": "Healthcare",
+    "school_childcare": "School & childcare",
+    "car": "Car",
+    "subscriptions": "Subscriptions & memberships",
+    "loans": "Loans & down payments",
+    "groceries": "Groceries",
+    "household": "Household",
+    "eating_out": "Eating out",
+    "transport": "Transport & fuel",
+    "leisure": "Leisure",
+    "gifts": "Gifts",
+    "clothing": "Clothing",
+    "personal_care": "Personal care",
+    "pets": "Pets",
+    "other": "Other"
+  },
+  "categoryGroups": {
+    "everyday": "Everyday spending",
+    "bills": "Bills & recurring costs"
+  },
+  "methods": {
+    "direct_debit": "Direct debit",
+    "wire_transfer": "Bank transfer",
+    "card": "Card",
+    "cash": "Cash",
+    "meal_voucher": "Meal vouchers",
+    "other": "Other",
+    "none": "Not set"
+  },
+  "payer": {
+    "label": "Who pays",
+    "joint": "Joint account",
+    "person": "One person",
+    "split": "Split",
+    "choosePerson": "Who pays?",
+    "vouchersPersonal": "Meal vouchers belong to a person, so they can't come from the joint account.",
+    "equal": "Equally",
+    "custom": "Amounts",
+    "pickHabitants": "Who shares it?",
+    "shareOf": "Share of {{name}}",
+    "balanced": "Adds up to the total.",
+    "remaining": "{{amount}} still to divide",
+    "over": "{{amount}} more than the total",
+    "splitBetween": "Split between {{names}}"
+  },
+  "filters": {
+    "payer": "Who pays",
+    "all": "Everyone",
+    "joint": "Joint",
+    "kind": "Kind",
+    "allKinds": "All kinds",
+    "status": "Status",
+    "allStatuses": "All"
+  },
+  "next": {
+    "title": "Next to pay",
+    "joint": "Joint account",
+    "nothing": "Nothing to pay",
+    "onDate": "{{payee}} · {{date}}"
+  },
+  "totals": {
+    "thisMonth": "This month",
+    "nextMonth": "Next month",
+    "overdue": "Overdue",
+    "unpaid": "{{amount}} still to pay",
+    "allPaid_one": "Paid",
+    "allPaid_other": "All {{count}} paid",
+    "none": "Nothing yet",
+    "nothingOverdue": "Nothing overdue",
+    "count_one": "{{count}} expense",
+    "count_other": "{{count}} expenses",
+    "perMonth": "Per month",
+    "perYear": "Per year",
+    "active_one": "{{count}} running",
+    "active_other": "{{count}} running",
+    "normalised": "Every rhythm converted to a year",
+    "savings": "Possible savings per year",
+    "candidates_one": "If you cancel {{count}}",
+    "candidates_other": "If you cancel {{count}}",
+    "noCandidates": "Flag what you could cancel"
+  },
+  "fields": {
+    "payee": "Payee",
+    "previousPayees": "Previous",
+    "description": "Description",
+    "amount": "Amount",
+    "dueDate": "Due date",
+    "firstDueDate": "First due date",
+    "date": "Date",
+    "category": "Category",
+    "kind": "Kind",
+    "repeats": "Repeats",
+    "recurrence": "Rhythm",
+    "paymentMethod": "Payment method",
+    "beneficiaryName": "Beneficiary",
+    "iban": "IBAN",
+    "bic": "BIC",
+    "communication": "Communication",
+    "structured": "Structured",
+    "freeText": "Free text",
+    "notes": "Notes",
+    "paidOn": "Paid on",
+    "paidBy": "Paid by",
+    "shop": "Shop",
+    "website": "Website",
+    "trialEndsOn": "Trial ends on",
+    "remindDaysBefore": "Remind me (days before)",
+    "candidateToCancel": "Candidate to cancel",
+    "status": "Status",
+    "nextDue": "Next due",
+    "endDate": "End date"
+  },
+  "placeholders": {
+    "description": "e.g. Monthly advance electricity",
+    "beneficiaryName": "As on the invoice",
+    "reference": "e.g. Invoice 2026-104",
+    "shop": "Where?"
+  },
+  "hints": {
+    "structured": "With or without +++ and slashes.",
+    "beneficiaryName": "Banks check the name against the IBAN. Leave empty to use the payee.",
+    "directDebit": "Marked paid automatically on the due date.",
+    "remindDaysBefore": "Leave empty for no reminder.",
+    "candidateToCancel": "Not using it much? Flag it and see what cancelling would save.",
+    "repeats": "Subscriptions, loans, insurance… instances are added ahead of time."
+  },
+  "scope": {
+    "label": "Apply changes to",
+    "expense": "This one only",
+    "recurring": "This and all upcoming ones"
+  },
+  "row": {
+    "due": "Due {{date}}",
+    "dueToday": "Due today",
+    "dueInDays_one": "Due tomorrow",
+    "dueInDays_other": "Due in {{count}} days",
+    "overdueDays_one": "1 day overdue",
+    "overdueDays_other": "{{count}} days overdue",
+    "paid": "Paid {{date}}",
+    "autoPaid": "Paid automatically",
+    "perMonth": "{{amount}}/mo",
+    "perYear": "{{amount}}/yr",
+    "nextOn": "Next {{date}}",
+    "endedOn": "Ended {{date}}",
+    "paused": "Paused",
+    "trialUntil": "Trial until {{date}}",
+    "candidate": "To cancel",
+    "reminder": "Reminder",
+    "onHold": "On hold: {{reason}}"
+  },
+  "form": {
+    "createTitle": "New expense",
+    "editTitle": "Edit expense",
+    "editRecurringTitle": "Edit recurring expense",
+    "description": "A bill to pay, or something that repeats.",
+    "created": "Expense added",
+    "updated": "Changes saved",
+    "recurringUpdated": "Recurring expense updated",
+    "normalised": "That's {{monthly}} per month, {{yearly}} per year.",
+    "paymentDetails": "Payment details",
+    "more": "More"
+  },
+  "log": {
+    "title": "Log an expense",
+    "description": "Already paid: groceries, eating out, fuel, a gift…",
+    "saved": "Expense logged",
+    "more": "More details"
+  },
+  "pay": {
+    "title": "Pay {{payee}}",
+    "description": "{{amount}}, due {{date}}",
+    "whoPaid": "Who paid?",
+    "done": "Marked as paid",
+    "undone": "Marked as unpaid"
+  },
+  "delete": {
+    "title": "Delete this {{payee}} expense?",
+    "description": "This can't be undone.",
+    "inRecurringDescription": "Only this one is deleted; the recurring expense keeps going.",
+    "recurringTitle": "Delete {{payee}} for good?",
+    "recurringDescription": "Upcoming unpaid ones are removed; paid ones stay in the history. To keep it in the overview, end it instead."
+  },
+  "end": {
+    "title": "End {{payee}}?",
+    "description": "No more expenses after the end date; unpaid ones after it are removed. You can resume it later.",
+    "done": "Ended",
+    "paused": "Paused: no new expenses until you resume it",
+    "resumed": "Resumed"
+  },
+  "detail": {
+    "back": "All expenses",
+    "payment": "Payment",
+    "paidOn": "Paid on {{date}}",
+    "paidOnBy": "Paid on {{date}} by {{name}}",
+    "autoPaidOn": "Paid automatically on {{date}} (direct debit)",
+    "notPaid": "Not paid yet",
+    "none": "None",
+    "recurring": "Repeats",
+    "nextDue": "Next one due {{date}}",
+    "ended": "No more expenses planned",
+    "amountEach": "{{amount}} each time",
+    "history": "Payment history",
+    "noHistory": "Nothing earlier yet.",
+    "upcoming": "Coming up",
+    "noUpcoming": "Nothing planned.",
+    "unknownHabitant": "Former habitant",
+    "details": "Details",
+    "reminderOn_one": "{{count}} day before: on {{date}}",
+    "reminderOn_other": "{{count}} days before: on {{date}}"
+  },
+  "qr": {
+    "title": "Pay with your banking app",
+    "description": "Scan the code in your banking app: beneficiary, IBAN, amount and communication are filled in.",
+    "label": "Payment QR code for {{payee}}",
+    "missing": "Add the IBAN to get a payment QR code.",
+    "loading": "Making the QR code…",
+    "openInApp": "Open in banking app",
+    "saveImage": "Save image",
+    "copyAll": "Copy all",
+    "shareFailed": "Sharing didn't work. Copy the details or save the image.",
+    "fileName": "Payment {{payee}}.png"
+  },
+  "empty": {
+    "upcoming": {
+      "title": "Nothing to pay",
+      "description": "Add a bill or a recurring expense and it shows up here before it's due."
+    },
+    "recurring": {
+      "title": "Nothing recurring yet",
+      "description": "Subscriptions, loans, down payments, insurance… add them once, they repeat by themselves."
+    },
+    "history": {
+      "title": "Nothing paid yet",
+      "description": "Paid expenses and everyday spending you log end up here."
+    },
+    "filtered": {
+      "title": "Nothing here",
+      "description": "Nothing matches this filter."
+    }
+  },
+  "errors": {
+    "notFound": "This expense no longer exists.",
+    "amount": "Enter an amount, like 12,50.",
+    "structuredCommunication": "That's not a valid structured communication. Check the numbers.",
+    "iban": "That's not a valid IBAN.",
+    "bic": "That's not a valid BIC.",
+    "shares": "The shares must add up to the total amount.",
+    "payer": "Choose who pays.",
+    "mealVoucherJoint": "Meal vouchers belong to a person: choose who paid with them.",
+    "rrule": "This repeat pattern isn't supported.",
+    "website": "That doesn't look like a web address.",
+    "totalOpen": "Enter the amount still open, like 10.000,00."
+  },
+  "totalOpen": {
+    "label": "Total still open",
+    "asOf": "As of",
+    "asOfHint": "First payment that counts. Empty: the next payment.",
+    "hint": "Paying something off? Enter what's left: the number of payments follows from it, and the last one is for what remains.",
+    "more": "Paying something off? Total still open",
+    "needAmount": "Enter the amount per payment to see the payments.",
+    "summaryPartial": "{{count}} payments: {{regular}} × {{amount}} + last {{last}}",
+    "summaryEven_one": "1 payment of {{amount}}",
+    "summaryEven_other": "{{count}} payments of {{amount}}",
+    "paidSince": "{{amount}} already paid, {{remaining}} to go.",
+    "lastOn": "Last payment on {{date}}.",
+    "lockedEnd_one": "After 1 payment, on {{date}}: follows from the total still open. Clear that to set the end yourself.",
+    "lockedEnd_other": "After {{count}} payments, on {{date}}: follows from the total still open. Clear that to set the end yourself.",
+    "tooMany": "That's more than 999 payments. Check the amount and the total.",
+    "left": "{{remaining}} of {{total}} left",
+    "paymentsToGo_one": "1 payment to go",
+    "paymentsToGo_other": "{{count}} payments to go",
+    "lastPayment": "last on {{date}}",
+    "lastAmount": "last payment {{amount}}",
+    "since": "{{paid}} paid since {{date}}",
+    "paidOff": "Paid off",
+    "progressLabel": "{{percent}}% paid off"
+  },
+  "loading": {
+    "creatingRecurring": "Adding upcoming expenses…",
+    "updatingRecurring": "Updating upcoming expenses…"
+  },
+  "project": {
+    "chip": "Project: {{name}}"
+  },
+  "jobs": {
+    "autoPay": {
+      "title": "Direct debits",
+      "description": "Marks direct debits paid on their due date."
+    }
+  }
+}

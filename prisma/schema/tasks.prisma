@@ -1,0 +1,206 @@
+// Feature: tasks
+
+/// What kind of task it is. Independent of the place, which is optional for every type.
+enum TaskType {
+  /// Household chore: vacuuming, laundry.
+  CHORE
+  /// To-do: call the insurer.
+  TODO
+  /// Job: insulate the jacuzzi, often with materials.
+  JOB
+  /// Maintenance: test the smoke detectors, boiler service.
+  MAINTENANCE
+  /// Errand: bring a parcel to the post office.
+  ERRAND
+}
+
+enum TaskPriority {
+  LOW
+  NORMAL
+  HIGH
+}
+
+/// A recurring task stays OPEN: completing or skipping it records a TaskCompletion and moves it to the
+/// next occurrence. It only becomes DONE or SKIPPED when its series ends.
+enum TaskStatus {
+  OPEN
+  DONE
+  SKIPPED
+}
+
+enum TaskOutcome {
+  DONE
+  SKIPPED
+}
+
+/// Something to do for the household. The place is optional; when set, it tells inside or outside.
+/// Materials are shopping items with `taskId` (owned by the shopping feature).
+model Task {
+  id               String              @id @default(cuid())
+  householdId      String
+  household        Household           @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  title            String
+  notes            String?
+  type             TaskType            @default(CHORE)
+  placeId          String?
+  place            Place?              @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  priority         TaskPriority        @default(NORMAL)
+  estimatedMinutes Int?
+  status           TaskStatus          @default(OPEN)
+  /// When it should be done: the current occurrence's date, possibly snoozed later.
+  dueDate          DateTime?           @db.Date
+  /// RFC 5545 RRULE without DTSTART (= `recurrenceStart`), e.g. `FREQ=WEEKLY;BYDAY=SA`.
+  rrule            String?
+  /// DTSTART of the RRULE: the first due date of the series.
+  recurrenceStart  DateTime?           @db.Date
+  /// Recurring only: the scheduled date of the current occurrence. Snoozing moves `dueDate`, not this.
+  occurrenceDate   DateTime?           @db.Date
+  /// Recurring only: the first assignee is on duty and moves to the back after each occurrence.
+  rotateAssignees  Boolean             @default(false)
+  /// When the task became DONE or SKIPPED.
+  closedAt         DateTime?
+  /// Optional time of day on the due date, `HH:MM` (e.g. `20:00` the evening before a waste collection).
+  /// With `endTime` it is the start of a timeslot.
+  dueTime          String?
+  /// Timeslot: the end time on the due date, `HH:MM`, later than `dueTime` (the start), e.g. 10:00–12:00.
+  /// `null` for a moment (time only) or an all-day task. Needs `dueTime`.
+  endTime          String?
+  /// Several days: the first day (all-day; `dueDate` is the last day, so overdue and lists keep using it),
+  /// e.g. 12/10 → 14/10. `null` for a single day. Never with a time. Moves along with the due date (same
+  /// number of days) when the task is snoozed or repeats.
+  startDate        DateTime?           @db.Date
+  /// Reminder: minutes before the start of the task to push a reminder (0 = at the start); `null` = none.
+  /// The start is the due date + time (a timeslot: its start), or 09:00 on the (first) day of an all-day
+  /// task. Needs a due date. Recurring tasks remind again for every occurrence.
+  reminderMinutes  Int?
+  /// When the current occurrence's reminder is due (start − `reminderMinutes`, Europe/Brussels).
+  /// Kept in sync by the tasks service; the job `tasks.reminders` sends what is due (src/api/tasks/task-reminders.ts).
+  remindAt         DateTime?
+  /// When the reminder for `remindAt` was sent, or skipped because the server was down too long. Cleared
+  /// when `remindAt` moves (an edit, snooze, the next occurrence).
+  remindedAt       DateTime?
+  /// The account that created the task: gets its reminder when nobody (with an account) is assigned.
+  createdById      String?
+  createdBy        User?               @relation("TaskCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  /// Linked tasks: the feature that keeps this task in sync, e.g. "waste" (put the bins out) or "expense"
+  /// (pay a bill). Only set through the linked-task functions in src/api/tasks/linked-tasks.ts; the
+  /// title, type and due date then come from the origin and aren't editable in the task form.
+  originType       String?
+  /// The origin's own key, unique per household and origin type (a collection day, an expense instance id).
+  originId         String?
+  /// The origin's date the task was last synced from (collection day, due date). While it is unchanged,
+  /// a snoozed due date is left alone.
+  originDate       DateTime?           @db.Date
+  /// Link back to the origin, e.g. `/settings#waste`.
+  originHref       String?
+  /// Set while the task is on hold (e.g. an invoice to check before paying). It keeps its due date and
+  /// still shows overdue when late; it's only visibly blocked.
+  heldAt           DateTime?
+  /// Why it is on hold, optional ("Invoice looks wrong, recalculate first").
+  holdReason       String?
+  assignees        TaskAssignee[]
+  checklist        TaskChecklistItem[]
+  completions      TaskCompletion[]
+  comments         TaskComment[]
+  /// Links from this task: the tasks it waits for (BLOCKED_BY) or is related to (RELATED).
+  links            TaskLink[]          @relation("TaskLinkFrom")
+  /// Links to this task from others: the tasks it blocks, or that call it related.
+  linkedFrom       TaskLink[]          @relation("TaskLinkTo")
+  /// The project this task is part of (projects feature), optional.
+  projectId        String?
+  project          Project?            @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  @@unique([householdId, originType, originId])
+  @@index([householdId, status, dueDate])
+  @@index([placeId])
+  @@index([projectId])
+  /// The reminders job: `remindedAt IS NULL AND remindAt <= now`.
+  @@index([remindedAt, remindAt])
+  @@index([createdById])
+  @@map("tasks")
+}
+
+/// Who a task is assigned to, in order (the order is the rotation).
+model TaskAssignee {
+  taskId     String
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  habitantId String
+  habitant   Habitant @relation(fields: [habitantId], references: [id], onDelete: Cascade)
+  position   Int
+
+  @@id([taskId, habitantId])
+  @@index([habitantId])
+  @@map("task_assignees")
+}
+
+/// Optional steps of a task. Reset when a recurring task moves to its next occurrence.
+model TaskChecklistItem {
+  id       String  @id @default(cuid())
+  taskId   String
+  task     Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  label    String
+  done     Boolean @default(false)
+  position Int
+
+  @@index([taskId])
+  @@map("task_checklist_items")
+}
+
+/// History: every time a task (or one occurrence of a recurring task) was done or skipped.
+model TaskCompletion {
+  id             String      @id @default(cuid())
+  taskId         String
+  task           Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  outcome        TaskOutcome
+  /// The due date of the occurrence this completes.
+  occurrenceDate DateTime?   @db.Date
+  completedAt    DateTime    @default(now())
+  completedById  String?
+  completedBy    Habitant?   @relation("TaskCompletedBy", fields: [completedById], references: [id], onDelete: SetNull)
+  note           String?
+
+  @@index([taskId, completedAt])
+  @@map("task_completions")
+}
+
+/// A comment on a task: the household's thread about it ("I called them, they'll send a new invoice").
+/// A payment's thread is the thread of its pay task (a linked task with origin "expense").
+model TaskComment {
+  id        String    @id @default(cuid())
+  taskId    String
+  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  /// The account that wrote it; only they can edit or delete it. Kept (as "former member") when the
+  /// account is removed.
+  authorId  String?
+  author    User?     @relation("TaskCommentAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  body      String
+  createdAt DateTime  @default(now())
+  /// Set when the author changed the text.
+  editedAt  DateTime?
+
+  @@index([taskId, createdAt])
+  @@map("task_comments")
+}
+
+enum TaskLinkKind {
+  /// `task` waits for `otherTask`: it can't be completed while `otherTask` is open (cycles are refused).
+  BLOCKED_BY
+  /// A plain cross-reference that blocks nothing, shown on both tasks.
+  RELATED
+}
+
+/// A link between two tasks of one household. One link per pair (in either direction).
+model TaskLink {
+  taskId      String
+  task        Task         @relation("TaskLinkFrom", fields: [taskId], references: [id], onDelete: Cascade)
+  otherTaskId String
+  otherTask   Task         @relation("TaskLinkTo", fields: [otherTaskId], references: [id], onDelete: Cascade)
+  kind        TaskLinkKind
+  createdAt   DateTime     @default(now())
+
+  @@id([taskId, otherTaskId])
+  @@index([otherTaskId])
+  @@map("task_links")
+}

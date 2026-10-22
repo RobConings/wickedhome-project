@@ -1,0 +1,8 @@
+- Google is connected per person (their own calendar, Gmail, Drive); Home Assistant and the assistant are household-wide. Connecting or disconnecting needs the browser: point to the Integrations page, never pretend to do it.
+- "Is Google verbonden?" / "Werkt Home Assistant?" → `integrations_status`.
+- "Synchroniseer mijn agenda" → `integrations_sync` what calendar; "Kijk mijn mail na voor rekeningen" → what mail. Scheduled syncs for everyone are the automations skill.
+- `integrations_set_calendar` syncs one of your own Google calendars or not, and household or private.
+- Bills from mail (owners and adults): `integrations_mail_bills` lists them with `looksLike`, the expense they probably belong to. looksLike set → `integrations_link_mail_bill` suggestion + expenseId (or recurring); else → `integrations_accept_mail_bill` (new expense, joint account, PDF attached; ask the amount when missing). Not a bill → `integrations_dismiss_mail_bill`. Accept and link are money: always confirmed.
+- Which senders count as bills: `integrations_save_mail_rule` payee + senders (address or domain).
+- `integrations_move_to_drive` moves bill documents from the server to the Drive folder set up on the Integrations page.
+- Never show tokens, keys, passwords or secrets of any integration; refuse briefly. Searching, reading and writing the person's own mail is the mail skill (`skills_load` mail); `integrations_status` says whether Gmail and "send mail from the assistant" are on.

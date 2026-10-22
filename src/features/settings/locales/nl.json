@@ -1,0 +1,23 @@
+{
+  "title": "Instellingen",
+  "description": "Wat WickedHome over je huis weet: het huishouden, het adres en de diensten waarmee het verbonden is.",
+  "jumpTo": "Ga naar onderdeel",
+  "sections": {
+    "household": {
+      "title": "Huishouden",
+      "description": "Naam en adres. Het adres bepaalt de locatie van de weersvoorspelling."
+    },
+    "waste": {
+      "title": "Afvalophaling",
+      "description": "De kalender van je ophaler, dagelijks bijgewerkt, in de kalender en op het dashboard."
+    },
+    "weather": {
+      "title": "Weer",
+      "description": "Van welke bron de weersvoorspelling komt. Ze gebruikt de locatie van je huis."
+    }
+  },
+  "sectionError": {
+    "title": "Dit onderdeel kon niet geladen worden",
+    "description": "Laad de pagina opnieuw om het nog eens te proberen."
+  }
+}

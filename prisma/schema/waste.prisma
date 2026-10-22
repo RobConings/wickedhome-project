@@ -1,0 +1,79 @@
+// Feature: waste (household waste collection calendar from the local collector)
+
+/// Normalised kind of waste, whatever the provider calls it ("Huisvuil", "Restafval", "Ordures ménagères"…).
+enum WasteFraction {
+  RESIDUAL
+  ORGANIC
+  PMD
+  PAPER
+  GLASS
+  TEXTILE
+  GARDEN
+  BULKY
+  OTHER
+}
+
+enum WasteSyncStatus {
+  OK
+  ERROR
+}
+
+/// The household's collector: which provider (see src/api/waste/providers) and the address as that
+/// provider knows it. One per household.
+model WasteSetup {
+  id             String           @id @default(cuid())
+  householdId    String           @unique
+  household      Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  /// Provider id, e.g. "limburg-net" or "recycle-app". A string, so adding a provider needs no migration.
+  providerId     String
+  /// The provider's own address identifiers (JSON), e.g. `{ nisCode, streetId, houseNumber, addition }`.
+  address        Json
+  /// The address as matched at the provider, for display ("Grote Markt 13, Hasselt").
+  addressLabel   String
+  lastSyncAt     DateTime?
+  lastSyncStatus WasteSyncStatus?
+  /// Short, non-personal error text of the last failed sync.
+  lastSyncError  String?
+  /// Last sync that succeeded; collections stay visible when later syncs fail.
+  lastSuccessAt  DateTime?
+  /// Create a "put the bins out" task per collection day (a linked task, see src/api/waste/waste-tasks.ts).
+  taskEnabled     Boolean         @default(true)
+  taskTiming      WasteTaskTiming @default(EVENING_BEFORE)
+  /// Habitant ids the bins task goes to, in rotation order. Empty: unassigned.
+  taskAssigneeIds String[]        @default([])
+  /// With several assignees: one per collection day, taking turns. Off: all of them on every task.
+  taskRotate      Boolean         @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@map("waste_setups")
+}
+
+/// When the bins task is due: the evening before the collection (20:00) or the morning of it (07:00).
+enum WasteTaskTiming {
+  EVENING_BEFORE
+  MORNING_OF
+}
+
+/// One fraction collected on one day, as fetched from the provider. Synced idempotently: unique per
+/// household, day and the provider's fraction key.
+model WasteCollection {
+  id            String        @id @default(cuid())
+  householdId   String
+  household     Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  date          DateTime      @db.Date
+  fraction      WasteFraction
+  /// The provider's stable key for the fraction (activity code, fraction id…).
+  providerKey   String
+  /// The provider's own label ("Pmd", "Papier & karton") and colour (`#rrggbb`), when it has one.
+  label         String
+  color         String?
+  /// Remark from the provider, e.g. a moved collection.
+  note          String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@unique([householdId, date, providerKey])
+  @@index([householdId, date])
+  @@map("waste_collections")
+}

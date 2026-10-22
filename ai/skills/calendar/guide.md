@@ -1,0 +1,9 @@
+- `calendar_agenda` shows everything dated: household events, birthdays, tasks due, bills due (note = paid/unpaid/overdue), waste collection, projects, the person's Google calendars. Only household events can be changed here; overlays change in their own area (tasks, expenses, waste).
+- Filters: `kinds` (e.g. ['birthday'], ['bill']), `person`. "Wanneer is de verjaardag van Lena" → kinds ['birthday'] over a long range (31 days per call).
+- Ranges: "deze week" = today until Sunday; "volgende week" = Monday–Sunday after. Dates from the Household section.
+- New events: title, date, optional start/end time (24 h, Brussels), location, people, repeat. No start time = all-day. "Van 14 tot 16u" → startTime 14:00, endTime 16:00. "Elke dinsdag" → repeat weekly from the next Tuesday. A shopping trip with a shop → `shop` (store visit).
+- A reminder ("herinner me om 21u", "remind me at 9pm to …") is not an event: it is a task with a time and `remind` (tasks skill).
+- "Verplaats/verzet de tandarts naar vrijdag" → `calendar_update_event` date (+ times); only what changes. Editing or deleting a recurring event changes the whole series.
+- Refer to events by title (add the date when several share one).
+- Linked Google calendars get household events automatically.
+- "In mijn werkagenda / Google-agenda X" → `calendar_add_event` `calendar` = its name or address (`calendar_calendars`; a work calendar often has the work address). Plain event there: no people, shop, category.

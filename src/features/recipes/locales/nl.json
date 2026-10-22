@@ -1,0 +1,267 @@
+{
+  "page": {
+    "title": "Recepten",
+    "description": "Wat staat er op het menu: zet een recept bij Te koken en alleen wat ontbreekt gaat op de boodschappenlijst."
+  },
+  "actions": {
+    "add": "Nieuw recept",
+    "back": "Alle recepten"
+  },
+  "tabs": {
+    "cook": "Te koken",
+    "cookCount": "Te koken ({{count}})",
+    "all": "Alle recepten"
+  },
+  "filter": {
+    "search": "Zoek recepten of ingrediënten"
+  },
+  "groups": {
+    "favorites": "Favorieten",
+    "all": "Alle recepten"
+  },
+  "empty": {
+    "title": "Nog geen recepten",
+    "description": "Voeg de gerechten toe die je vaak maakt, met hun ingrediënten gekoppeld aan je producten."
+  },
+  "favorite": {
+    "add": "{{name}} aan favorieten toevoegen",
+    "remove": "{{name}} uit favorieten halen",
+    "failed": "De favoriet kon niet bewaard worden. Probeer opnieuw."
+  },
+  "facts": {
+    "servings_one": "{{count}} persoon",
+    "servings_other": "{{count}} personen",
+    "ingredients_one": "{{count}} ingrediënt",
+    "ingredients_other": "{{count}} ingrediënten",
+    "steps_one": "{{count}} stap",
+    "steps_other": "{{count}} stappen"
+  },
+  "status": {
+    "in_stock": "In voorraad",
+    "short": "Niet genoeg in voorraad",
+    "unknown": "Voorraad onbekend"
+  },
+  "toCook": {
+    "loading": "Te koken laden…",
+    "emptyTitle": "Nog niets te koken",
+    "emptyDescription": "Open een recept en tik op \"Bij Te koken zetten\": wat ontbreekt gaat op de boodschappenlijst.",
+    "pickRecipe": "Kies een recept",
+    "recentlyMade": "Onlangs gemaakt",
+    "markedDone": "{{name}} is gemaakt",
+    "removed": "{{name}} staat niet meer op de lijst",
+    "openItems_one": "nog {{count}} boodschap",
+    "openItems_other": "nog {{count}} boodschappen",
+    "addedBy": "Toegevoegd door {{name}}",
+    "cookingStep": "Aan het koken · stap {{step}} van {{total}}",
+    "cooking": "Aan het koken",
+    "madeOn": "Gemaakt op {{date}}",
+    "made": "Gemaakt",
+    "start": "Beginnen met koken",
+    "continue": "Verder koken",
+    "done": "Klaar",
+    "remove": "Verwijderen",
+    "clear": "Wissen",
+    "removeTitle": "{{name}} van de lijst halen?",
+    "removeDescription": "Wat al gebruikt is bij het koken, blijft gebruikt.",
+    "removeItems_one": "Ook de {{count}} open boodschap ervoor van de lijst halen",
+    "removeItems_other": "Ook de {{count}} open boodschappen ervoor van de lijst halen"
+  },
+  "fields": {
+    "name": "Naam",
+    "namePlaceholder": "Spaghetti bolognese",
+    "servings": "Personen",
+    "servingsDescription": "Voor hoeveel personen de hoeveelheden zijn.",
+    "sourceUrl": "Link naar het recept",
+    "ingredients": "Ingrediënten",
+    "ingredientsDescription": "Hoeveelheid en eenheid zoals in het recept (300 g, 2 st., 1 el). Koppel een product om de voorraad te checken: gram en liter worden vergeleken met de inhoud per verpakking van het product.",
+    "steps": "Stappen",
+    "stepsDescription": "Eén stap per alinea of genummerde regel. \"10 min\" in een stap geeft er een timer bij.",
+    "stepsPlaceholder": "1. Snipper de ui.\n2. Bak het gehakt 10 min.",
+    "notes": "Notities",
+    "category": "Categorie"
+  },
+  "form": {
+    "createTitle": "Nieuw recept",
+    "editTitle": "Recept bewerken",
+    "description": "Ingrediënten en stappen; je kunt ze altijd aanpassen.",
+    "created": "Recept toegevoegd",
+    "updated": "Recept bewaard"
+  },
+  "delete": {
+    "label": "Recept verwijderen",
+    "title": "{{name}} verwijderen?",
+    "description": "Het recept en zijn gerechten bij Te koken verdwijnen. Boodschappen en wat gebruikt is blijven.",
+    "deleted": "Recept verwijderd"
+  },
+  "ingredients": {
+    "none": "Nog geen ingrediënten.",
+    "product": "Ingrediënt {{number}}",
+    "productPlaceholder": "Kies een product (optioneel)",
+    "name": "Naam in het recept",
+    "namePlaceholder": "Ui",
+    "nameRequired": "Geef het ingrediënt een naam of kies een product.",
+    "quantity": "Hoeveelheid (recept)",
+    "unit": "Eenheid",
+    "unitPlaceholder": "g, ml, st.…",
+    "note": "Notitie",
+    "notePlaceholder": "geraspt",
+    "optional": "Optioneel",
+    "optionalShort": "optioneel",
+    "moveUp": "{{name}} omhoog",
+    "moveDown": "{{name}} omlaag",
+    "remove": "{{name}} verwijderen",
+    "add": "Ingrediënt toevoegen",
+    "newProduct": "Nieuw product"
+  },
+  "check": {
+    "title": "{{name}} bij Te koken zetten",
+    "description": "Vink aan wat je moet kopen: wat ontbreekt staat al aangevinkt.",
+    "servings": "Voor hoeveel personen",
+    "fewer": "Minder personen",
+    "more": "Meer personen",
+    "failed": "De voorraad kon niet gecheckt worden. Probeer opnieuw.",
+    "noIngredients": "Dit recept heeft nog geen ingrediënten.",
+    "buy": "{{name}} kopen",
+    "onList": "Op de lijst",
+    "toBuy": "{{amount}} kopen",
+    "submit_one": "{{count}} op de boodschappenlijst",
+    "submit_other": "{{count}} op de boodschappenlijst",
+    "submitNoItems": "Bij Te koken zetten",
+    "planned_one": "Bij Te koken; {{count}} boodschap op de lijst",
+    "planned_other": "Bij Te koken; {{count}} boodschappen op de lijst",
+    "plannedNoItems": "Bij Te koken"
+  },
+  "cover": {
+    "title": "Omslagfoto",
+    "empty": "Voeg hieronder een foto toe om ze als omslag te gebruiken.",
+    "use": "{{name}} als omslag gebruiken",
+    "remove": "{{name}} niet meer als omslag gebruiken",
+    "clear": "Geen omslag"
+  },
+  "detail": {
+    "addToCook": "Bij Te koken zetten",
+    "startCooking": "Beginnen met koken",
+    "ingredients": "Ingrediënten",
+    "ingredientsFor_one": "Voor {{count}} persoon",
+    "ingredientsFor_other": "Voor {{count}} personen",
+    "noIngredients": "Nog geen ingrediënten.",
+    "stockFailed": "De voorraad kon nu niet gecheckt worden.",
+    "steps": "Stappen",
+    "noSteps": "Nog geen stappen.",
+    "timer_one": "Timer: {{count}} minuut",
+    "timer_other": "Timer: {{count}} minuten",
+    "details": "Details",
+    "noServings": "Niet opgegeven"
+  },
+  "cooking": {
+    "backToRecipe": "Recept",
+    "backToList": "Terug naar recepten",
+    "screenOn": "Scherm blijft aan",
+    "saving": "Bewaren…",
+    "madeOn": "Gemaakt op {{date}}.",
+    "noSteps": "Dit recept heeft geen stappen. Tik de ingrediënten aan die je gebruikt.",
+    "stepsRole": "Stappen",
+    "stepOf": "Stap {{step}} van {{total}}",
+    "previous": "Vorige",
+    "next": "Volgende",
+    "ingredients": "Ingrediënten",
+    "tray": "Ingrediënten · {{used}} van {{total}} gebruikt",
+    "noIngredients": "Geen ingrediënten. Voeg toe wat je gebruikt met \"+ Ingrediënt\".",
+    "extras": "Toegevoegd tijdens het koken",
+    "addIngredient": "Ingrediënt",
+    "used": "Gebruikt",
+    "useLabel": "{{amount}} {{name}} gebruikt",
+    "usedToast": "{{name}} uit de voorraad gehaald",
+    "addedToList": "Het raakt op: op de boodschappenlijst gezet.",
+    "undo": "Ongedaan maken",
+    "undoFor": "Laatste gebruik van {{name}} ongedaan maken",
+    "undone": "Terug in de voorraad",
+    "usedOf": "{{used}} van {{needed}} gebruikt",
+    "usedOnly": "{{used}} gebruikt",
+    "stockLeft": "nog {{amount}}",
+    "noStock": "niet in de voorraad",
+    "otherAmount": "Andere hoeveelheid {{name}}",
+    "howMuch": "Hoeveel {{name}}?",
+    "less": "Minder",
+    "moreAmount": "Meer",
+    "amount": "Hoeveelheid",
+    "inUnit": "In {{unit}}",
+    "useAmount": "{{amount}} gebruiken",
+    "done": "Klaar met koken",
+    "doneTitle": "Klaar met {{name}}?",
+    "doneDescription": "Er gaat niets meer uit de voorraad: alleen wat je aantikte.",
+    "nothingUsed": "Er is niets als gebruikt aangetikt.",
+    "markMade": "Als gemaakt markeren",
+    "doneToast": "{{name}} is klaar. Smakelijk!",
+    "noConversion": "De hoeveelheid uit het recept is niet om te rekenen naar {{unit}}: \"Gebruikt\" vraagt hoeveel."
+  },
+  "timer": {
+    "start_one": "{{count}} minuut",
+    "start_other": "{{count}} minuten",
+    "resume": "Verder",
+    "pause": "Pauze",
+    "reset": "Timer terugzetten",
+    "done": "De tijd is om: {{step}}"
+  },
+  "extra": {
+    "title": "Ingrediënt toevoegen",
+    "description": "Iets dat niet in het recept staat.",
+    "product": "Product",
+    "productDescription": "Of laat leeg en typ een naam.",
+    "name": "Naam",
+    "namePlaceholder": "Look",
+    "quantity": "Hoeveelheid",
+    "unit": "Eenheid",
+    "use": "Ik heb het nu gebruikt",
+    "useDescription": "Haalt de hoeveelheid (of 1) meteen uit de voorraad.",
+    "saveToRecipe": "Ook aan het recept toevoegen",
+    "added": "Ingrediënt toegevoegd"
+  },
+  "errors": {
+    "notFound": "Dit recept of gerecht bestaat niet (meer).",
+    "forbidden": "Je kunt geen recepten wijzigen.",
+    "alreadyCooked": "Dit gerecht is al gemaakt.",
+    "chooseOne": "Kies een ingrediënt.",
+    "chooseProductOrName": "Kies een product of typ een naam.",
+    "unknownProduct": "Dat product staat niet in je catalogus.",
+    "unknownIngredient": "Dat ingrediënt staat niet in het recept.",
+    "notAnAttachedImage": "Kies een afbeelding die bij het recept hoort.",
+    "unknownCategory": "Deze categorie bestaat niet in je huishouden.",
+    "duplicateCategory": "Er bestaat al een categorie met deze naam."
+  },
+  "units": {
+    "times": "{{amount}} ×",
+    "pieces": "stuks"
+  },
+  "stock": {
+    "inStock": "{{amount}} in voorraad",
+    "notKept": "Niet in de voorraad",
+    "buy": "{{amount}} kopen",
+    "setContent": "Stel de inhoud per verpakking in",
+    "needHave": "Nodig {{need}} · in huis {{have}}",
+    "needStock": "Nodig {{need}} · {{stock}} in voorraad",
+    "needNotKept": "Nodig {{need}} · niet in de voorraad",
+    "needNoProduct": "Nodig {{need}} · geen product gekoppeld"
+  },
+  "product": {
+    "open": "{{name}} openen",
+    "webshop": "{{name}} bij {{shop}} (opent de webshop)"
+  },
+  "categories": {
+    "manage": "Categorieën beheren",
+    "description": "Deel je recepten in met eigen categorieën.",
+    "add": "Nieuwe categorie",
+    "edit": "Categorie bewerken",
+    "editLabel": "{{name}} bewerken",
+    "empty": "Nog geen categorieën. Maak je eerste categorie aan.",
+    "namePlaceholder": "Bijvoorbeeld soep, pasta of dessert",
+    "saved": "Categorie bewaard",
+    "delete": "Categorie verwijderen",
+    "deleteTitle": "Categorie {{name}} verwijderen?",
+    "deleteDescription": "De recepten blijven bewaard en krijgen geen categorie.",
+    "deleted": "Categorie verwijderd",
+    "all": "Alle categorieën",
+    "uncategorized": "Zonder categorie",
+    "chooseHint": "Je kunt categorieën aanmaken via Categorieën beheren op de receptenpagina."
+  }
+}

@@ -1,0 +1,411 @@
+{
+  "page": {
+    "overview": {
+      "title": "Energie",
+      "description": "Hoeveel stroom het huis verbruikte, waar die vandaan kwam en wat ze opgebruikte."
+    },
+    "appliances": {
+      "title": "Toestellen",
+      "description": "Alles wat stroom verbruikt, per plaats. Gemeten toestellen krijgen hun eigen aandeel in de verdeling."
+    },
+    "setup": {
+      "title": "Zonnepanelen, batterij & gas",
+      "description": "Je zonnepanelen, thuisbatterij en gasaansluiting. Nodig om te berekenen wat het huis echt verbruikte."
+    },
+    "import": {
+      "title": "Gegevens importeren",
+      "description": "Importeer het kwartierbestand van Mijn Fluvius, of geef meterstanden zelf in."
+    }
+  },
+  "nav": {
+    "label": "Energiepagina's",
+    "overview": "Overzicht",
+    "appliances": "Toestellen",
+    "setup": "Zon, batterij & gas",
+    "import": "Importeren"
+  },
+  "period": {
+    "label": "Periode",
+    "day": "Dag",
+    "week": "Week",
+    "month": "Maand",
+    "year": "Jaar",
+    "previous": "Vorige periode",
+    "next": "Volgende periode",
+    "today": "Vandaag"
+  },
+  "categories": {
+    "heating": "Verwarming",
+    "heat_pump": "Warmtepomp",
+    "cooking": "Koken",
+    "laundry": "Was",
+    "dishwasher": "Vaatwasser",
+    "cold": "Koelkast & diepvries",
+    "jacuzzi_pool": "Jacuzzi & zwembad",
+    "ev_charger": "Laadpaal",
+    "it_media": "IT & multimedia",
+    "lighting": "Verlichting",
+    "tools": "Gereedschap",
+    "other": "Andere"
+  },
+  "kinds": {
+    "grid_import": "Afname",
+    "grid_export": "Injectie",
+    "solar_production": "Zonneproductie",
+    "battery_charge": "Batterij laden",
+    "battery_discharge": "Batterij ontladen",
+    "appliance": "Toestel"
+  },
+  "registers": {
+    "single": "Enkelvoudig tarief",
+    "day": "Dag",
+    "night": "Nacht"
+  },
+  "sources": {
+    "manual": "Meterstanden",
+    "fluvius_csv": "Fluvius-bestand",
+    "home_assistant": "Home Assistant"
+  },
+  "compass": {
+    "n": "Noord",
+    "ne": "Noordoost",
+    "e": "Oost",
+    "se": "Zuidoost",
+    "s": "Zuid",
+    "sw": "Zuidwest",
+    "w": "West",
+    "nw": "Noordwest"
+  },
+  "stats": {
+    "consumption": "Verbruikt",
+    "consumptionUnknown": "Niet te berekenen",
+    "import": "Afname",
+    "importSplit": "Dag {{day}} · nacht {{night}}",
+    "export": "Injectie",
+    "solar": "Zonneproductie",
+    "solarNotMeasured": "Niet gemeten",
+    "solarKwp": "{{kwp}} geïnstalleerd",
+    "battery": "Batterij",
+    "batteryInOut": "In {{charge}} · uit {{discharge}}",
+    "selfSufficiency": "Zelfvoorzienendheid",
+    "selfSufficiencyHint": "Deel van het verbruik niet van het net",
+    "selfConsumption": "Zelfconsumptie",
+    "selfConsumptionHint": "Deel van de zonnestroom zelf gebruikt",
+    "totalConsumption": "Totaal energieverbruik",
+    "gasVolume": "Gasvolume",
+    "calorific": "Calorische waarde {{value}}",
+    "noData": "Geen gegevens in deze periode"
+  },
+  "chart": {
+    "title": "Energiestroom",
+    "description": "Boven de lijn: waar de energie die het huis gebruikte vandaan kwam. Eronder: waar het overschot heen ging.",
+    "descriptionGridOnly": "Boven de lijn: afgenomen van het net. Eronder: geïnjecteerd in het net.",
+    "import": "Afname",
+    "solar": "Zonnestroom zelf gebruikt",
+    "batteryOut": "Uit batterij",
+    "export": "Injectie",
+    "batteryIn": "In batterij",
+    "showTable": "Toon tabel",
+    "hideTable": "Verberg tabel",
+    "category": "Tijd",
+    "consumptionTitle": "Verbruik",
+    "descriptionGas": "Gas voor verwarming, warm water en koken, in kWh.",
+    "descriptionTotal": "Elektriciteit en gas die het huis verbruikte, samen in kWh."
+  },
+  "breakdown": {
+    "title": "Waar ging het naartoe",
+    "description": "Gemeten toestellen krijgen hun aandeel; de rest is Onbekend.",
+    "unknown": "Onbekend",
+    "allUnknown": "Er wordt nog niets apart gemeten, dus al het verbruik is Onbekend. Elke slimme stekker of tussenmeter maakt dat kleiner.",
+    "noConsumption": "Het verbruik is voor deze periode niet te berekenen, dus aandelen worden niet getoond.",
+    "noData": "Geen verbruiksgegevens in deze periode.",
+    "label": "Verbruik per toestel"
+  },
+  "peak": {
+    "title": "Maandpiek",
+    "description": "Hoogste kwartierafname deze maand. Het capaciteitstarief rekent minstens 2,5 kW aan.",
+    "at": "op {{date}} om {{time}}",
+    "billed": "Aangerekend: {{kw}}",
+    "minimum": "Onder het minimum van 2,5 kW, aangerekend als 2,5 kW",
+    "rollingAverage": "Gemiddelde over 12 maanden (aangerekend): {{kw}}",
+    "none": "Nog geen kwartiergegevens voor {{month}}. Importeer een Fluvius-bestand om je piek te zien.",
+    "history": "Pieken van de voorbije 12 maanden",
+    "series": "Maandpiek"
+  },
+  "notices": {
+    "solarNotMeasured": {
+      "title": "Zonneproductie wordt niet gemeten",
+      "description": "Het Fluvius-bestand toont enkel wat door de meter ging. Zonder de productie van je panelen zijn verbruik, zelfvoorzienendheid en de verdeling niet te berekenen. Geef standen van je omvormer in op de importpagina, of koppel later Home Assistant."
+    },
+    "batteryNotMeasured": {
+      "title": "De batterij wordt niet gemeten",
+      "description": "Laden en ontladen zijn nodig om het verbruik te berekenen. Geef batterijstanden in op de importpagina."
+    },
+    "totalWithoutGas": "Geen gasgegevens in deze periode: het totaal is enkel elektriciteit. Importeer het gasbestand van Fluvius om het toe te voegen.",
+    "totalWithoutElectricity": "Geen elektriciteitsgegevens in deze periode: het totaal is enkel gas."
+  },
+  "empty": {
+    "overview": {
+      "title": "Nog geen energiegegevens",
+      "description": "Begin met het kwartierbestand van Mijn Fluvius. Heb je zonnepanelen? Voeg die eerst toe, zodat het verbruik eerlijk berekend wordt.",
+      "import": "Fluvius-bestand importeren",
+      "setup": "Zonnepanelen toevoegen",
+      "appliances": "Toestellen toevoegen"
+    },
+    "period": "Geen gegevens voor deze periode.",
+    "gas": {
+      "title": "Nog geen gasgegevens",
+      "description": "Importeer het uurbestand voor gas van Mijn Fluvius (Verbruikshistoriek → gas), of geef gasmeterstanden in m³ in.",
+      "import": "Gasbestand importeren"
+    }
+  },
+  "appliances": {
+    "add": "Toestel toevoegen",
+    "noPlace": "Geen plaats",
+    "measured": "Gemeten",
+    "notMeasured": "Niet gemeten",
+    "rated": "{{power}} nominaal",
+    "standby": "{{power}} stand-by",
+    "count_one": "{{count}} toestel",
+    "count_other": "{{count}} toestellen",
+    "documents": {
+      "label": "Documenten",
+      "open": "Documenten: {{name}}",
+      "description": "Handleidingen, garantiebewijzen en aankoopbonnen van dit toestel."
+    },
+    "empty": {
+      "title": "Nog geen toestellen",
+      "description": "Voeg de grote verbruikers toe: warmtepomp, jacuzzi, laadpaal, droogkast… Koppel ze aan een plaats, zodat je weet waar de energie heen gaat."
+    },
+    "fields": {
+      "name": "Naam",
+      "category": "Categorie",
+      "place": "Plaats",
+      "ratedPowerW": "Nominaal vermogen (W)",
+      "standbyPowerW": "Stand-byvermogen (W)",
+      "notes": "Notities",
+      "carriers": "Werkt op"
+    },
+    "form": {
+      "createTitle": "Toestel toevoegen",
+      "editTitle": "Toestel bewerken",
+      "description": "Het nominaal vermogen staat op het typeplaatje. Het dient later om niet-gemeten toestellen te schatten.",
+      "placePlaceholder": "Kies een plaats…",
+      "created": "Toestel toegevoegd",
+      "updated": "Wijzigingen opgeslagen",
+      "carriersHint": "Een gasketel werkt op gas en elektriciteit (de pomp); een gaskookplaat enkel op gas."
+    },
+    "delete": {
+      "title": "{{name}} verwijderen?",
+      "description": "Ook de meters en gemeten gegevens worden verwijderd."
+    },
+    "picker": {
+      "placeholder": "Kies een toestel…"
+    },
+    "place": {
+      "empty": "Nog geen toestellen in deze plaats",
+      "error": "De toestellen konden niet geladen worden.",
+      "retry": "Opnieuw proberen",
+      "manage": "Toestellen beheren",
+      "add": "Toestel toevoegen"
+    }
+  },
+  "solar": {
+    "title": "Zonnepanelen",
+    "add": "Zonnepanelen toevoegen",
+    "panels": "{{count}} × {{wp}} Wp",
+    "facing": "Gericht naar {{direction}}",
+    "tilt": "{{tilt}}° helling",
+    "inverter": "Omvormer",
+    "installedOn": "Geplaatst",
+    "total": "{{kwp}} in totaal",
+    "empty": {
+      "title": "Geen zonnepanelen",
+      "description": "Voeg je installatie toe (een oost-westdak telt als twee). Zonder installatie gaat het overzicht ervan uit dat er geen zonneproductie is."
+    },
+    "fields": {
+      "name": "Naam",
+      "panelCount": "Aantal panelen",
+      "panelWp": "Piekvermogen per paneel (Wp)",
+      "orientation": "Oriëntatie",
+      "tiltDeg": "Hellingshoek (°)",
+      "inverterBrand": "Merk omvormer",
+      "inverterModel": "Model omvormer",
+      "installedOn": "Geplaatst op"
+    },
+    "form": {
+      "createTitle": "Zonnepanelen toevoegen",
+      "editTitle": "Zonnepanelen bewerken",
+      "description": "Eén regel per dakvlak. Het totale piekvermogen (kWp) wordt berekend.",
+      "namePlaceholder": "Zuiddak",
+      "orientationNone": "Niet ingesteld",
+      "created": "Zonnepanelen toegevoegd",
+      "updated": "Wijzigingen opgeslagen"
+    },
+    "delete": {
+      "title": "{{name}} verwijderen?",
+      "description": "Meters die aan deze panelen gekoppeld zijn, behouden hun gegevens."
+    }
+  },
+  "battery": {
+    "title": "Thuisbatterij",
+    "add": "Batterij toevoegen",
+    "capacity": "Capaciteit",
+    "maxCharge": "Max. laden",
+    "maxDischarge": "Max. ontladen",
+    "installedOn": "Geplaatst",
+    "planned": "Gepland",
+    "empty": {
+      "title": "Geen thuisbatterij",
+      "description": "Plan je er een? Voeg ze toe met de plaatsingsdatum; ze telt pas mee vanaf die dag."
+    },
+    "fields": {
+      "name": "Naam",
+      "capacityKwh": "Bruikbare capaciteit (kWh)",
+      "maxChargeKw": "Max. laadvermogen (kW)",
+      "maxDischargeKw": "Max. ontlaadvermogen (kW)",
+      "installedOn": "Geplaatst op"
+    },
+    "form": {
+      "createTitle": "Thuisbatterij toevoegen",
+      "editTitle": "Thuisbatterij bewerken",
+      "description": "Gebruik de bruikbare capaciteit uit de datasheet.",
+      "namePlaceholder": "Thuisbatterij",
+      "created": "Batterij toegevoegd",
+      "updated": "Wijzigingen opgeslagen"
+    },
+    "delete": {
+      "title": "{{name}} verwijderen?",
+      "description": "Meters die aan deze batterij gekoppeld zijn, behouden hun gegevens."
+    }
+  },
+  "import": {
+    "drop": {
+      "title": "Sleep je Fluvius-bestand hierheen",
+      "description": "Mijn Fluvius → Verbruikshistoriek → elektriciteit (kwartiertotalen) of gas (uurtotalen) → download CSV. Elektriciteit of gas wordt automatisch herkend; het bestand blijft in je browser tot je bevestigt.",
+      "button": "Kies een bestand"
+    },
+    "preview": {
+      "title": "Klaar om te importeren",
+      "file": "Bestand",
+      "range": "Periode",
+      "ean": "EAN",
+      "rows": "Rijen",
+      "register": "Register",
+      "total": "Totaal",
+      "skipped_one": "{{count}} rij kon niet gelezen worden en wordt overgeslagen.",
+      "skipped_other": "{{count}} rijen konden niet gelezen worden en worden overgeslagen.",
+      "noRows": "Dit bestand bevat geen elektriciteitsrijen om te importeren.",
+      "calorific": "Calorische waarde",
+      "volume": "Volume",
+      "gasOfftake": "Gasafname"
+    },
+    "confirm": "{{count}} rijen importeren",
+    "cancel": "Ander bestand kiezen",
+    "uploading": "Bezig met importeren… {{done}} van {{total}}",
+    "done": {
+      "title": "Import klaar",
+      "description": "{{count}} intervallen opgeslagen. Dezelfde periode opnieuw importeren vervangt de waarden, er wordt niets dubbel geteld.",
+      "view": "Naar het overzicht",
+      "again": "Nog een bestand importeren"
+    },
+    "errors": {
+      "header": "Dit lijkt geen verbruiksbestand van Fluvius. Download de kwartiertotalen voor elektriciteit als CSV.",
+      "empty": "Het bestand is leeg.",
+      "read": "Het bestand kon niet gelezen worden.",
+      "upload": "De import stopte halverwege. Probeer opnieuw: rijen die al opgeslagen zijn, worden gewoon overschreven.",
+      "uploadPartial": "De import stopte bij pakket {{batch}} van {{batches}} ({{rows}} rijen opgeslagen). Probeer opnieuw: rijen die al opgeslagen zijn, worden gewoon overschreven."
+    },
+    "stop": "Import stoppen",
+    "cancelFile": "Ander bestand kiezen",
+    "stages": {
+      "reading": "Bestand lezen…",
+      "parsing": "Rijen lezen: regel {{done}} van {{total}}…",
+      "parsingLabel": "Bestand lezen",
+      "saving": "Pakket {{batch}} van {{batches}} opslaan…",
+      "savingLabel": "Import opslaan",
+      "rows": "{{done}} van {{total}} rijen",
+      "stopping": "Stoppen na dit pakket…"
+    },
+    "stopped": {
+      "title": "Import gestopt",
+      "description": "Gestopt na pakket {{batch}} van {{batches}}. Wat al opgeslagen is, blijft; ga verder om de rest op te slaan (opgeslagen rijen worden gewoon overschreven).",
+      "resume": "Import verderzetten"
+    },
+    "result": {
+      "rows": "Rijen opgeslagen",
+      "rowsOf": "{{done}} van {{total}}",
+      "inserted": "Nieuw",
+      "updated": "Al aanwezig (bijgewerkt)"
+    }
+  },
+  "readings": {
+    "title": "Meterstanden",
+    "description": "Geen export van de digitale meter? Geef af en toe de standen in; het verschil tussen twee standen wordt verbruik.",
+    "add": "Stand opslaan",
+    "created": "Stand opgeslagen",
+    "recent": "Recente standen",
+    "empty": "Nog geen standen.",
+    "delete": "Stand verwijderen",
+    "fields": {
+      "kind": "Meter",
+      "register": "Register",
+      "appliance": "Toestel",
+      "date": "Datum",
+      "time": "Uur",
+      "valueKwh": "Meterstand (kWh)",
+      "valueM3": "Meterstand (m³)"
+    },
+    "gasHint": "Omgerekend naar kWh met de calorische waarde uit Zonnepanelen, batterij & gas."
+  },
+  "meters": {
+    "title": "Gegevens in WickedHome",
+    "description": "Elk kanaal met zijn bron en de periode die het dekt.",
+    "empty": "Nog geen gegevens.",
+    "intervals_one": "{{number}} interval",
+    "intervals_other": "{{number}} intervallen",
+    "range": "{{from}} – {{to}}"
+  },
+  "carriers": {
+    "label": "Energiedrager",
+    "electricity": "Elektriciteit",
+    "gas": "Gas",
+    "total": "Totale energie",
+    "water": "Water",
+    "soon": "Binnenkort"
+  },
+  "readingMeters": {
+    "grid_import": "Elektriciteit · afname",
+    "grid_export": "Elektriciteit · injectie",
+    "solar_production": "Zonneproductie (omvormer)",
+    "battery_charge": "Batterij laden",
+    "battery_discharge": "Batterij ontladen",
+    "appliance": "Toestel (elektriciteit)",
+    "gas": "Gasmeter",
+    "gas_appliance": "Toestel (gas)"
+  },
+  "gas": {
+    "title": "Gas",
+    "description": "Je gasaansluiting. Het gasverbruik komt uit het gasbestand van Fluvius of uit meterstanden.",
+    "meter": "Gasmeter",
+    "noEan": "Niet ingesteld",
+    "calorificExplained": "Een gasmeter telt m³. Eén m³ bevat ongeveer 11 kWh, afhankelijk van het gas: Fluvius-bestanden geven de exacte waarde per uur; zelf ingegeven standen gebruiken de waarde hierboven.",
+    "fields": {
+      "ean": "EAN",
+      "calorific": "Calorische waarde (kWh/m³)"
+    },
+    "form": {
+      "title": "Gasaansluiting",
+      "description": "De EAN staat op je energiefactuur. De calorische waarde rekent zelf ingegeven m³ om naar kWh.",
+      "calorificHint": "Calorische bovenwaarde, meestal 11,0 – 11,6 kWh/m³ (zie je factuur of Fluvius).",
+      "saved": "Gasinstellingen opgeslagen"
+    }
+  },
+  "loading": {
+    "overview": "Energiecijfers laden…",
+    "period": "{{period}} laden…",
+    "carrier": "{{carrier}} laden…",
+    "error": "De energiecijfers konden niet geladen worden.",
+    "appliances": "Toestellen laden…"
+  }
+}

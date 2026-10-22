@@ -1,0 +1,61 @@
+// Feature: inventory
+
+enum StockMovementReason {
+  SCAN_USE
+  SCAN_ADD
+  BOUGHT
+  MANUAL_CORRECTION
+  /// Used while cooking a meal (recipes feature); undoing a tap adds a correcting COOKED movement.
+  COOKED
+}
+
+/// How much of a product is at one place (pantry in the kitchen, screws in the garage).
+model StockItem {
+  id          String          @id @default(cuid())
+  householdId String
+  household   Household       @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  placeId     String
+  place       Place           @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  quantity    Decimal         @default(0) @db.Decimal(12, 3)
+  /// Overrides the product's unit when set.
+  unit        String?
+  /// Stock at or below this goes on the shopping list (LOW_STOCK) for its default shop.
+  minQuantity Decimal?        @db.Decimal(12, 3)
+  /// Earliest expiry date of what is here.
+  expiresOn   DateTime?       @db.Date
+  movements   StockMovement[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@unique([productId, placeId])
+  @@index([householdId])
+  @@index([placeId])
+  @@map("stock_items")
+}
+
+/// Every change to a stock quantity, with who did it and why.
+model StockMovement {
+  id             String              @id @default(cuid())
+  householdId    String
+  household      Household           @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  stockItemId    String
+  stockItem      StockItem           @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+  delta          Decimal             @db.Decimal(12, 3)
+  /// Quantity after the change.
+  quantityAfter  Decimal             @db.Decimal(12, 3)
+  reason         StockMovementReason
+  /// Soft reference to the user (no relation, the auth schema stays untouched).
+  userId         String?
+  /// The shopping item that was bought, for BOUGHT movements.
+  shoppingItemId String?
+  /// Soft reference to the meal being cooked, for COOKED movements (recipes feature).
+  mealPlanEntryId String?
+  note           String?
+  createdAt      DateTime            @default(now())
+
+  @@index([stockItemId, createdAt])
+  @@index([mealPlanEntryId])
+  @@map("stock_movements")
+}

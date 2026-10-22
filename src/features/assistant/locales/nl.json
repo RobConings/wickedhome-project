@@ -1,0 +1,331 @@
+{
+  "page": {
+    "title": "Assistent",
+    "description": "Vraag iets over het huishouden of laat de assistent iets voor je doen. Wijzigingen vragen altijd eerst.",
+    "loading": "Gesprek laden…"
+  },
+  "conversations": {
+    "title": "Gesprekken",
+    "new": "Nieuw gesprek",
+    "untitled": "Nieuw gesprek",
+    "empty": "Nog geen gesprekken.",
+    "rename": "Naam wijzigen",
+    "renameTitle": "Gesprek hernoemen",
+    "titleLabel": "Titel",
+    "save": "Bewaren",
+    "delete": "Verwijderen",
+    "deleteTitle": "Dit gesprek verwijderen?",
+    "deleteDescription": "De berichten worden verwijderd. Wat de assistent veranderde, blijft zoals het is.",
+    "deleted": "Gesprek verwijderd",
+    "menu": "Opties voor het gesprek",
+    "retention": "Gesprekken blijven {{days}} dagen na het laatste bericht bewaard.",
+    "loadFailed": "De gesprekken konden niet geladen worden.",
+    "open": "Gesprekken"
+  },
+  "chat": {
+    "placeholder": "Vraag iets…",
+    "send": "Versturen",
+    "stop": "Stoppen",
+    "thinking": "Even denken…",
+    "status": {
+      "queued": "Wacht op een ander gesprek…",
+      "restarting": "Het model start opnieuw, nog even geduld…"
+    },
+    "emptyTitle": "Wat kan ik voor je doen?",
+    "emptyDescription": "Vraag naar de agenda van vandaag, taken, de boodschappenlijst, betalingen, energie of het weer.",
+    "suggestions": {
+      "today": "Wat staat er vandaag op het programma?",
+      "tasks": "Welke taken zijn te laat?",
+      "pay": "Wat moeten we deze week betalen?",
+      "bins": "Welke vuilnisbak moet als volgende buiten?",
+      "shopping": "Zet melk op de boodschappenlijst"
+    },
+    "you": "Jij",
+    "assistant": "Assistent",
+    "openFull": "Openen in Assistent",
+    "label": "Gesprek met de assistent",
+    "retry": "Opnieuw proberen",
+    "attach": "Afbeelding toevoegen",
+    "images": "Toegevoegde afbeeldingen",
+    "image": "Toegevoegde afbeelding",
+    "removeImage": "Afbeelding verwijderen",
+    "imageUploading": "Bezig met uploaden…",
+    "imageFailed": "Uploaden mislukt; verwijder ze en probeer opnieuw",
+    "screenOn": "Over {{label}}; tik om het weg te laten",
+    "screenOff": "Niet over {{label}}; tik om erover te vragen",
+    "screenAbout": "Gevraagd over"
+  },
+  "tool": {
+    "running": "Bezig: {{label}}",
+    "failed": "Lukte niet: {{label}}",
+    "cancelled": "Geannuleerd: {{label}}",
+    "error": "Waarom: {{error}}"
+  },
+  "confirm": {
+    "title": "Bevestigen",
+    "sensitiveTitle": "Bevestigen — dit vraagt altijd",
+    "confirm": "Bevestigen",
+    "cancel": "Annuleren",
+    "remember": "Niet meer vragen hiervoor",
+    "rememberHint": "Alleen voor onschuldige acties; je zet het terug op de kaart van de assistent.",
+    "edit": "Bewerken",
+    "doneEditing": "Klaar met bewerken"
+  },
+  "notice": {
+    "no_tools": "Dit model kan geen tools gebruiken, dus het kan niets opzoeken of veranderen. Kies een model met tool-ondersteuning (zie de kaart van de assistent).",
+    "max_steps": "Dat vroeg veel stappen; de assistent antwoordde met wat hij had."
+  },
+  "errors": {
+    "not_configured": "De assistent is nog niet ingesteld.",
+    "conflict": "De assistent is nog aan het antwoorden in een ander venster.",
+    "unreachable": "De computer van de assistent is niet bereikbaar. Staat hij aan en serveert LM Studio op het netwerk?",
+    "timeout": "Het model deed er te lang over.",
+    "aborted": "Gestopt.",
+    "no_tools": "Dit model kan geen tools gebruiken.",
+    "http": "De modelserver weigerde: {{message}}",
+    "too_many_requests": "Te veel vragen op korte tijd; wacht even.",
+    "network": "De verbinding met de app viel weg. Controleer het netwerk en probeer opnieuw.",
+    "interrupted": "Het antwoord werd onderbroken (de verbinding of de server viel weg). Probeer opnieuw.",
+    "empty_answer": "Het model gaf geen antwoord. Probeer opnieuw, misschien in andere woorden.",
+    "generic": "Er ging iets mis. Probeer opnieuw."
+  },
+  "voice": {
+    "start": "Ingedrukt houden om te praten",
+    "tapStart": "Praten",
+    "stop": "Stoppen en versturen",
+    "listening": "Ik luister… loslaten om te versturen",
+    "transcribing": "Spraak omzetten naar tekst…",
+    "denied": "De microfoon is geblokkeerd. Sta hem toe in de site-instellingen van de browser.",
+    "no_speech": "Ik hoorde niets.",
+    "failed": "Spraakherkenning lukte niet.",
+    "unsupported": "Spraak werkt niet in deze browser (er is HTTPS nodig).",
+    "readAloud": "Antwoorden voorlezen",
+    "stopSpeaking": "Stoppen met voorlezen"
+  },
+  "voices": {
+    "title": "Stem om voor te lezen",
+    "description": "Kies de stem op dit toestel. Antwoorden worden uitgesproken door de spraakserver in huis.",
+    "loading": "De stemmen laden…",
+    "language": {
+      "nl": "Nederlandse stem",
+      "en": "Engelse stem"
+    },
+    "default": "Standaard: {{voice}}",
+    "test": "Testen",
+    "testLabel": "De {{language}} testen",
+    "testing": "Laden…",
+    "stop": "Stoppen",
+    "testFailed": "Het voorbeeld kon niet afgespeeld worden.",
+    "sample": {
+      "nl": "Hallo, ik ben jullie huisassistent. Zo klink ik als ik iets voorlees.",
+      "en": "Hello, I'm your home assistant. This is how I sound when I read something aloud."
+    },
+    "loadFailed": "De stemmen konden niet geladen worden.",
+    "retry": "Opnieuw proberen",
+    "unreachable": "De spraakserver antwoordt niet; antwoorden worden voorlopig door de stem van de browser voorgelezen.",
+    "none": "De spraakserver heeft geen stem voor deze taal; de standaardstem wordt gebruikt.",
+    "male": "man",
+    "region": {
+      "nl_BE": "Vlaams",
+      "nl_NL": "Nederlands",
+      "en_GB": "Brits",
+      "en_US": "Amerikaans"
+    }
+  },
+  "ask": {
+    "button": "Vraag het de assistent",
+    "title": "Vraag het de assistent",
+    "description": "Een snelle vraag; ze wordt bewaard onder Assistent.",
+    "notConfigured": "De assistent is nog niet ingesteld.",
+    "setup": "Zo stel je hem in"
+  },
+  "card": {
+    "title": "Assistent",
+    "description": "Een lokaal AI-model (LM Studio op een pc in huis) dat vragen beantwoordt en dingen doet met de acties van de app zelf. Ook via MCP voor andere assistenten.",
+    "statusModel": "Model: {{model}}",
+    "server": "Server",
+    "model": "Model",
+    "speech": "Spraak naar tekst",
+    "speechServer": "Lokale server (Whisper)",
+    "speechBrowser": "Herkenning van de browser",
+    "test": "Verbinding testen",
+    "testing": "Testen…",
+    "latency": "Antwoord in {{ms}} ms",
+    "testFailed": "Test mislukt: {{error}}",
+    "modelMissing": "De server kent “{{model}}” niet. Beschikbaar: {{models}}",
+    "tools": "Wat hij kan",
+    "toolsCount": "{{count}} acties",
+    "skillsCount": "{{count}} domeinen, {{tools}} acties",
+    "permission": {
+      "read": "Zoekt op",
+      "write": "Verandert (vraagt eerst)",
+      "sensitive": "Gevoelig (vraagt altijd)"
+    },
+    "confirm": {
+      "never": "Vraagt nooit",
+      "first-time": "Tot “niet meer vragen”",
+      "always": "Elke keer"
+    },
+    "resetPreferences": "Weer alles laten vragen",
+    "preferencesReset": "Elke actie vraagt weer",
+    "open": "Assistent openen",
+    "problem": {
+      "missing_url": "ASSISTANT_BASE_URL is niet ingesteld.",
+      "missing_model": "ASSISTANT_MODEL is niet ingesteld.",
+      "invalid_url": "ASSISTANT_BASE_URL is geen geldige http(s)-URL."
+    },
+    "setup": {
+      "intro": "De assistent draait op je eigen computer met LM Studio. Op die pc:",
+      "install": "Installeer LM Studio en download een model met tool-ondersteuning, bv. Qwen 2.5 7B Instruct of Qwen 3 8B (Q4_K_M past in 8 GB videogeheugen).",
+      "serve": "Tab Developer → laad het model → Settings: zet “Serve on Local Network” aan en start de server (poort 1234). Geef de pc een vast IP-adres in de router.",
+      "url": "Het adres plus /v1, bv. http://192.168.1.20:1234/v1",
+      "model": "De naam van het model precies zoals LM Studio hem toont, bv. qwen2.5-7b-instruct",
+      "stt": "Optioneel: een lokale Whisper-server voor spraak (OpenAI-compatibel), bv. http://192.168.1.20:8000/v1",
+      "restart": "Herstart de app zodat hij de nieuwe instellingen leest",
+      "tts": "Optioneel: een spraakserver voor een natuurlijke stem bij het voorlezen, bv. Piper op deze server: http://127.0.0.1:5005",
+      "search": "Optioneel: een zoekserver op deze server zodat de assistent op internet kan zoeken (ai/docs/WEB-SEARCH.md), bv. http://127.0.0.1:8888"
+    },
+    "voiceOutput": "Voorlezen",
+    "voiceBrowser": "Stem van de browser",
+    "voiceServer": "Spraakserver ({{host}})",
+    "voiceUnreachable": "Spraakserver ({{host}}) antwoordt niet: voorlopig de stem van de browser",
+    "web": "Zoeken op internet",
+    "webOff": "Uit (niet ingesteld)",
+    "webServer": "Aan ({{host}})",
+    "webUnreachable": "Zoekserver ({{host}}) antwoordt niet",
+    "webProblem": {
+      "invalid_url": "SEARCH_URL is geen geldige http(s)-URL; zoeken op internet staat uit."
+    },
+    "ttsProblem": {
+      "invalid_url": "ASSISTANT_TTS_URL is geen geldige http(s)-URL; de stem van de browser wordt gebruikt.",
+      "invalid_kind": "ASSISTANT_TTS_KIND moet piper of openai zijn; de stem van de browser wordt gebruikt.",
+      "invalid_speed": "ASSISTANT_TTS_SPEED moet een getal van 0,5 tot 2 zijn; de normale snelheid wordt gebruikt."
+    }
+  },
+  "tokens": {
+    "title": "MCP-toegang",
+    "description": "Laat een andere assistent op het netwerk (Claude Desktop, LM Studio, Home Assistant…) dezelfde acties gebruiken als jij, met een persoonlijke token.",
+    "url": "Serveradres",
+    "empty": "Nog geen tokens.",
+    "name": "Naam",
+    "namePlaceholder": "bv. Claude op mijn laptop",
+    "scope": "Toegang",
+    "scopeRead": "Alleen lezen",
+    "scopeWrite": "Lezen en veranderen (elke wijziging vraagt confirm: true)",
+    "create": "Token maken",
+    "createdTitle": "Je nieuwe token",
+    "createdDescription": "Kopieer hem nu: hij wordt maar één keer getoond. Gebruik hem als “Authorization: Bearer …”.",
+    "copy": "Kopiëren",
+    "copied": "Gekopieerd",
+    "done": "Klaar",
+    "revoke": "Intrekken",
+    "revokeTitle": "“{{name}}” intrekken?",
+    "revokeDescription": "Assistenten met deze token verliezen meteen de toegang.",
+    "revoked": "Token ingetrokken",
+    "lastUsed": "Laatst gebruikt {{date}}",
+    "neverUsed": "Nog nooit gebruikt",
+    "loadFailed": "De tokens konden niet geladen worden."
+  },
+  "jobs": {
+    "cleanup": {
+      "title": "Assistent: oude gesprekken opruimen",
+      "description": "Verwijdert gesprekken met de assistent zonder activiteit sinds 90 dagen."
+    },
+    "oauthCleanup": {
+      "title": "Assistent: OAuth opruimen",
+      "description": "Verwijdert verlopen OAuth-codes en -tokens, en zelf geregistreerde apps die een uur ongebruikt zijn zonder koppeling."
+    }
+  },
+  "connect": {
+    "title": "Andere assistenten koppelen (MCP)",
+    "description": "Andere assistenten kunnen dezelfde acties gebruiken als jij, als jou. Kies de manier die je assistent ondersteunt.",
+    "whenLabel": "Wanneer:",
+    "methods": {
+      "token": "Persoonlijk token",
+      "dcr": "OAuth automatisch",
+      "app": "OAuth-app"
+    },
+    "when": {
+      "token": "voor Claude Desktop, LM Studio, Cursor en andere programma's waarin je zelf een token plakt.",
+      "dcr": "voor ChatGPT- en Claude-connectors: ze registreren zichzelf en jij staat ze toe op een WickedHome-pagina.",
+      "app": "voor een connector die om een client-ID (en secret) vraagt in plaats van zichzelf te registreren."
+    }
+  },
+  "oauth": {
+    "loadFailed": "De OAuth-koppelingen konden niet geladen worden.",
+    "connected": {
+      "title": "Verbonden apps",
+      "empty": "Nog geen apps verbonden via OAuth.",
+      "revoke": "Ontkoppelen",
+      "revokeTitle": "“{{name}}” ontkoppelen?",
+      "revokeDescription": "De app verliest meteen de toegang voor {{person}}; opnieuw koppelen betekent opnieuw toestaan.",
+      "revoked": "App ontkoppeld"
+    },
+    "dcr": {
+      "chatgpt": "ChatGPT: Server-URL {{url}}, Authenticatie OAuth, Registratie automatisch (DCR) — of maak hier een OAuth-app en plak de client-ID.",
+      "claude": "Claude: Instellingen → Connectors → Aangepaste connector toevoegen, URL {{url}}.",
+      "switch": "Automatische registratie (DCR)",
+      "switchHelp": "Uit: nieuwe apps kunnen zichzelf niet registreren. Al verbonden apps en persoonlijke tokens blijven werken.",
+      "turnedOn": "Automatische registratie staat aan",
+      "turnedOff": "Automatische registratie staat uit",
+      "hostsLabel": "Toegestane domeinen",
+      "hostsHelp": "Apps die zichzelf registreren mogen alleen tokens naar deze domeinen sturen (exacte namen, één per regel), bv. chatgpt.com.",
+      "noHosts": "Geen: geen enkele app kan zichzelf registreren.",
+      "editHosts": "Domeinen wijzigen",
+      "hostsSaved": "Domeinen bewaard",
+      "ownerOnly": "Een eigenaar van het huishouden beheert de automatische registratie en de domeinen."
+    },
+    "apps": {
+      "title": "OAuth-apps",
+      "howTo": "Maak hier een app, kies dan in de connector OAuth met handmatige registratie en plak de client-ID (en het secret, als je er een maakte).",
+      "empty": "Nog geen OAuth-apps.",
+      "create": "Nieuwe OAuth-app",
+      "createDescription": "De client-ID en het secret zie je één keer, meteen na het bewaren.",
+      "name": "Naam",
+      "namePlaceholder": "bv. ChatGPT",
+      "redirectUris": "Redirect-URI's",
+      "redirectUrisHelp": "De callback-URL('s) die de connector toont, één per regel; alleen https.",
+      "confidential": "Client secret maken",
+      "confidentialHelp": "Voor connectors die een secret op hun server bewaren. Zonder secret gebruikt de app alleen PKCE.",
+      "createdTitle": "Je OAuth-app",
+      "createdWithSecret": "Kopieer het secret nu: je ziet het maar één keer.",
+      "createdPublic": "Plak deze client-ID in de connector. Er is geen secret (alleen PKCE).",
+      "clientId": "Client-ID",
+      "clientSecret": "Client secret",
+      "withSecret": "met secret",
+      "pkceOnly": "alleen PKCE",
+      "delete": "Verwijderen",
+      "deleteTitle": "“{{name}}” verwijderen?",
+      "deleteDescription": "Iedereen die via deze app verbonden is, verliest meteen de toegang.",
+      "deleted": "OAuth-app verwijderd",
+      "ownerOnly": "Alleen een eigenaar van het huishouden kan OAuth-apps maken."
+    },
+    "errors": {
+      "invalidHost": "Gebruik exacte domeinnamen zoals chatgpt.com (geen https://, geen paden).",
+      "tooManyHosts": "Hoogstens 20 domeinen.",
+      "invalidRedirectUri": "Elke regel moet een https-URL zonder # zijn.",
+      "redirectUriRequired": "Geef minstens één redirect-URI.",
+      "tooManyRedirectUris": "Hoogstens 5 redirect-URI's."
+    }
+  },
+  "consent": {
+    "title": "{{client}} wil toegang tot WickedHome",
+    "signedInAs": "Je bent aangemeld als {{name}} ({{household}}).",
+    "tokensGoTo": "Tokens gaan naar",
+    "onlyIfYou": "Sta dit alleen toe als je zelf net een koppeling startte vanuit {{host}}.",
+    "accessLabel": "Wat mag het doen?",
+    "read": "Alleen lezen",
+    "readDescription": "De gegevens van je huishouden bekijken, niets wijzigen.",
+    "write": "Lezen en wijzigen",
+    "writeDescription": "Ook dingen toevoegen en wijzigen; {{client}} moet je vóór elke wijziging om bevestiging vragen.",
+    "dataNote": "Wat je met {{client}} deelt, gaat naar die dienst en valt onder haar voorwaarden. Je kunt altijd ontkoppelen op de kaart van de assistent.",
+    "allow": "Toestaan",
+    "deny": "Weigeren",
+    "back": "Terug",
+    "childRefused": "Kinderaccounts kunnen geen apps koppelen. Vraag het aan een volwassene van het huishouden.",
+    "leaving": "Terug naar {{host}}…",
+    "failed": "Dat lukte niet. Herlaad de pagina en probeer opnieuw.",
+    "expiredTitle": "Deze aanvraag is verlopen",
+    "expiredDescription": "Start de koppeling opnieuw vanuit de app waar je vandaan kwam."
+  }
+}

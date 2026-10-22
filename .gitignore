@@ -1,0 +1,21 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+
+# Prisma generated client
+src/api/generated/
+
+# macOS litter from editing over SMB
+.DS_Store
+._*
+
+# Editors
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Logs
+*.log

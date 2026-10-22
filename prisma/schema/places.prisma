@@ -1,0 +1,90 @@
+// Feature: places
+
+enum FloorKind {
+  INDOOR
+  OUTDOOR
+}
+
+enum PlaceKind {
+  ROOM
+  ZONE
+}
+
+enum PlanElementKind {
+  WALL
+  DOOR
+  WINDOW
+}
+
+/// A level of the house, or the outdoor plan (garden, driveway, shed…). Each floor has its own plan.
+model Floor {
+  id          String        @id @default(cuid())
+  householdId String
+  household   Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name        String
+  /// Ordering: 0 = ground floor, 1 = first floor, -1 = basement. The outdoor plan usually sits at 0.
+  level       Int
+  kind        FloorKind
+  /// Editor grid spacing in centimetres.
+  gridSize    Int           @default(25)
+  /// An imported architect's plan shown under the drawing, or null. Source document, page, crop, scale,
+  /// rotation, position, opacity, visible/locked and detected room labels (see FloorUnderlay in
+  /// src/features/places/types/places.ts). The files themselves live in the documents feature.
+  underlay    Json?
+  places      Place[]
+  elements    PlanElement[]
+  devices     Device[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([householdId])
+  @@map("floors")
+}
+
+/// A room (on an indoor floor) or a zone (on the outdoor plan). Exists without a drawing; the floor plan
+/// only adds an optional outline. Tasks, stock, shopping items and appliances hang off a place.
+model Place {
+  id            String         @id @default(cuid())
+  householdId   String
+  household     Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  floorId       String
+  floor         Floor          @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  name          String
+  /// Follows the floor: ROOM on an indoor floor, ZONE on the outdoor plan.
+  kind          PlaceKind
+  color         String
+  icon          String?
+  /// Outline on the floor plan: `[{ x, y }, …]` in centimetres, or null when not drawn yet.
+  polygon       Json?
+  appliances    Appliance[]
+  tasks         Task[]
+  shoppingItems ShoppingItem[]
+  stockItems    StockItem[]
+  devices       Device[]
+  projectPlaces ProjectPlace[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([householdId])
+  @@index([floorId])
+  @@map("places")
+}
+
+/// A wall, door or window on a floor plan. Coordinates are centimetres.
+/// Walls are straight segments with a thickness; doors and windows sit on a wall (`wallId`) at an offset
+/// along it, so they move with the wall.
+model PlanElement {
+  id          String          @id @default(cuid())
+  householdId String
+  household   Household       @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  floorId     String
+  floor       Floor           @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  kind        PlanElementKind
+  /// Element-specific geometry (see PlanElement in src/features/places/types/places.ts).
+  geometry    Json
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([floorId])
+  @@map("plan_elements")
+}

@@ -1,0 +1,99 @@
+// Feature: money (Finance, phase 2: joint accounts and the money flow). See docs/FINANCE.md.
+//
+// The joint current account and the joint savings account are PaymentAccounts (expenses.prisma, kinds JOINT
+// and SAVINGS). Their balance is the latest CORRECTION plus what happened after it: ledger entries below,
+// plus two things that are computed, never copied into the ledger: paid JOINT expenses (not paid with meal
+// vouchers) and incomes with this account as target.
+
+enum AccountEntryType {
+  /// Money a habitant transferred into the account (`habitantId` = who). Negative: taken back ("Take back"),
+  /// or received in a direct payment between two people (a +/− pair with one `transferId`).
+  CONTRIBUTION
+  /// Between two joint accounts (joint ↔ savings): one entry per side, same `transferId`.
+  TRANSFER
+  /// Other money in that is not an Income row (e.g. interest).
+  INCOME
+  /// "Set real balance": `balanceCents` is the balance it set, `amountCents` the difference at that moment.
+  CORRECTION
+  /// Anything else, in or out (e.g. a withdrawal).
+  OTHER
+}
+
+/// One line in the ledger of a joint account.
+model AccountEntry {
+  id                   String           @id @default(cuid())
+  householdId          String
+  household            Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  accountId            String
+  account              PaymentAccount   @relation("AccountEntryAccount", fields: [accountId], references: [id], onDelete: Cascade)
+  date                 DateTime         @db.Date
+  /// Signed: positive is money in. For a CORRECTION: the difference it made.
+  amountCents          Int
+  type                 AccountEntryType
+  /// Who (CONTRIBUTION: who transferred it).
+  habitantId           String?
+  habitant             Habitant?        @relation(fields: [habitantId], references: [id], onDelete: SetNull)
+  /// TRANSFER: the other account.
+  counterpartAccountId String?
+  counterpartAccount   PaymentAccount?  @relation("AccountEntryCounterpart", fields: [counterpartAccountId], references: [id], onDelete: SetNull)
+  /// TRANSFER: shared by both sides, so they are edited and deleted together.
+  transferId           String?
+  /// CORRECTION only: the balance it set.
+  balanceCents         Int?
+  note                 String?
+  createdById          String?
+  createdBy            User?            @relation("AccountEntryCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  @@index([accountId, date])
+  @@index([householdId, date])
+  @@index([transferId])
+  @@map("account_entries")
+}
+
+/// A habitant's fixed monthly contribution to a joint account (planned; transfers are recorded as entries).
+model ContributionPlan {
+  id          String         @id @default(cuid())
+  householdId String
+  household   Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  habitantId  String
+  habitant    Habitant       @relation(fields: [habitantId], references: [id], onDelete: Cascade)
+  accountId   String
+  account     PaymentAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  amountCents Int
+  /// Day of the month the transfer is planned (clamped to the month's last day).
+  dayOfMonth  Int            @default(1)
+  /// First day it applies.
+  activeFrom  DateTime       @db.Date
+  /// Last day it applies; null = open-ended. A new amount ends the old plan and starts a new one.
+  activeTo    DateTime?      @db.Date
+  note        String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([householdId])
+  @@map("contribution_plans")
+}
+
+/// "Keep as extra": a habitant transferred more than planned in a month and that is intentional. Up to
+/// `amountCents` of that month's surplus is no longer flagged; it still counts in the balance (the entries do).
+model ContributionExtra {
+  id          String         @id @default(cuid())
+  householdId String
+  household   Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  habitantId  String
+  habitant    Habitant       @relation(fields: [habitantId], references: [id], onDelete: Cascade)
+  accountId   String
+  account     PaymentAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  /// `YYYY-MM`
+  month       String
+  /// The surplus accepted as extra.
+  amountCents Int
+  createdById String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@unique([householdId, habitantId, accountId, month])
+  @@map("contribution_extras")
+}

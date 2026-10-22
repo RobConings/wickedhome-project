@@ -1,0 +1,204 @@
+// Feature: energy (electricity and gas; water modelled for later; see docs/ENERGY.md)
+
+/// What a meter measures. Energy is always stored in Wh; gas and water also keep their native volume.
+enum EnergyCarrier {
+  ELECTRICITY
+  GAS
+  WATER
+}
+
+enum ApplianceCategory {
+  HEATING
+  HEAT_PUMP
+  COOKING
+  LAUNDRY
+  DISHWASHER
+  COLD
+  JACUZZI_POOL
+  EV_CHARGER
+  IT_MEDIA
+  LIGHTING
+  TOOLS
+  OTHER
+}
+
+/// What a meter (channel) measures, together with its carrier: GRID_IMPORT + GAS is the gas meter,
+/// APPLIANCE + GAS a gas sub-meter. Solar and battery kinds are electricity only.
+/// Home consumption is computed from these, never stored.
+enum EnergyMeterKind {
+  GRID_IMPORT
+  GRID_EXPORT
+  SOLAR_PRODUCTION
+  BATTERY_CHARGE
+  BATTERY_DISCHARGE
+  APPLIANCE
+}
+
+/// Tariff register of a grid meter. In Belgium tariff 1 = day, tariff 2 = night.
+enum EnergyRegister {
+  SINGLE
+  DAY
+  NIGHT
+}
+
+enum EnergySource {
+  MANUAL
+  FLUVIUS_CSV
+  HOME_ASSISTANT
+}
+
+enum EnergyIntervalStatus {
+  VALIDATED
+  ESTIMATED
+  NO_USAGE
+  MEASURED
+}
+
+/// Something in the house that uses electricity. Measured when an APPLIANCE meter points at it.
+model Appliance {
+  id            String            @id @default(cuid())
+  householdId   String
+  household     Household         @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name          String
+  placeId       String?
+  place         Place?            @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  category      ApplianceCategory
+  /// What it runs on: a gas boiler is GAS + ELECTRICITY (its pump), a gas hob GAS.
+  carriers      EnergyCarrier[]   @default([ELECTRICITY])
+  /// Nameplate (electric) power in watts.
+  ratedPowerW   Int?
+  standbyPowerW Int?
+  notes         String?
+  meters        EnergyMeter[]
+  device        Device?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([householdId])
+  @@index([placeId])
+  @@map("appliances")
+}
+
+/// A set of solar panels with one orientation (an east/west roof is two installations). kWp is computed.
+model SolarInstallation {
+  id            String        @id @default(cuid())
+  householdId   String
+  household     Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name          String
+  panelCount    Int
+  /// Peak power of one panel in watts.
+  panelWp       Int
+  /// Compass direction the panels face: 0 = north, 90 = east, 180 = south, 270 = west.
+  azimuthDeg    Int?
+  /// 0 = flat, 90 = vertical.
+  tiltDeg       Int?
+  inverterBrand String?
+  inverterModel String?
+  installedOn   DateTime?     @db.Date
+  meters        EnergyMeter[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([householdId])
+  @@map("solar_installations")
+}
+
+/// A home battery. Modelled from day one so adding one later is a form, not a migration.
+model HomeBattery {
+  id            String        @id @default(cuid())
+  householdId   String
+  household     Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name          String
+  capacityWh    Int
+  maxChargeW    Int?
+  maxDischargeW Int?
+  installedOn   DateTime?     @db.Date
+  meters        EnergyMeter[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([householdId])
+  @@map("home_batteries")
+}
+
+/// One measured channel: a grid register, the inverter, the battery or an appliance's plug/sub-meter.
+/// Each data source gets its own meters; the summary prefers Home Assistant > Fluvius > manual per kind.
+model EnergyMeter {
+  id                  String               @id @default(cuid())
+  householdId         String
+  household           Household            @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name                String
+  carrier             EnergyCarrier        @default(ELECTRICITY)
+  kind                EnergyMeterKind
+  register            EnergyRegister       @default(SINGLE)
+  source              EnergySource
+  /// EAN of the grid connection (Fluvius), when known.
+  ean                 String?
+  applianceId         String?
+  appliance           Appliance?           @relation(fields: [applianceId], references: [id], onDelete: Cascade)
+  solarInstallationId String?
+  solarInstallation   SolarInstallation?   @relation(fields: [solarInstallationId], references: [id], onDelete: SetNull)
+  batteryId           String?
+  battery             HomeBattery?         @relation(fields: [batteryId], references: [id], onDelete: SetNull)
+  /// Home Assistant statistic id (e.g. `sensor.p1_energy_import_t1`), for the phase 8 sync.
+  haStatisticId       String?
+  intervals           EnergyInterval[]
+  readings            EnergyMeterReading[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@index([householdId, carrier, kind])
+  @@index([applianceId])
+  @@map("energy_meters")
+}
+
+/// Energy of one meter over [startAt, endAt), in whole watt-hours. Quarter-hours from Fluvius (gas: hours),
+/// hours from Home Assistant, days or weeks between manual readings. Unique per meter and range, so imports
+/// upsert. Gas and water also keep the measured volume (litres = m³ × 1000) and, for gas, the calorific value
+/// used to convert it.
+model EnergyInterval {
+  id               BigInt               @id @default(autoincrement())
+  meterId          String
+  meter            EnergyMeter          @relation(fields: [meterId], references: [id], onDelete: Cascade)
+  startAt          DateTime             @db.Timestamptz(3)
+  endAt            DateTime             @db.Timestamptz(3)
+  energyWh         Int
+  volumeLitres     Int?
+  /// Gross calorific value in Wh per m³ (11.4 kWh/m³ = 11400).
+  calorificWhPerM3 Int?
+  status           EnergyIntervalStatus
+
+  @@unique([meterId, startAt, endAt])
+  @@index([meterId, endAt])
+  @@map("energy_intervals")
+}
+
+/// A cumulative register value read off a meter. Consecutive readings become intervals.
+model EnergyMeterReading {
+  id               String      @id @default(cuid())
+  meterId          String
+  meter            EnergyMeter @relation(fields: [meterId], references: [id], onDelete: Cascade)
+  readAt           DateTime    @db.Timestamptz(3)
+  valueWh          Int
+  /// Gas/water meters show m³: the register value in litres, and the calorific value used for `valueWh`.
+  valueLitres      Int?
+  calorificWhPerM3 Int?
+  createdAt        DateTime    @default(now())
+
+  @@unique([meterId, readAt])
+  @@map("energy_meter_readings")
+}
+
+/// Energy settings of a household: the gas connection and the calorific value for manual gas readings.
+model EnergySettings {
+  id                  String    @id @default(cuid())
+  householdId         String    @unique
+  household           Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  gasEan              String?
+  /// Gross calorific value for converting manual m³ readings (Wh/m³). Fluvius files carry their own.
+  gasCalorificWhPerM3 Int       @default(11400)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@map("energy_settings")
+}

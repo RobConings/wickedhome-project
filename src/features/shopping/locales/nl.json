@@ -1,0 +1,367 @@
+{
+  "page": {
+    "title": "Boodschappen",
+    "description": "Boodschappen, materiaal voor klussen en wat bijna op is, allemaal op dezelfde lijsten."
+  },
+  "actions": {
+    "shopView": "Winkelweergave",
+    "products": "Producten",
+    "newList": "Nieuwe lijst",
+    "editList": "Lijst bewerken",
+    "addStaple": "Vast product toevoegen",
+    "addProduct": "Product toevoegen",
+    "backToShopping": "Boodschappen",
+    "backToProducts": "Producten",
+    "showBought": "Gekochte tonen",
+    "hideBought": "Gekochte verbergen"
+  },
+  "categories": {
+    "produce": "Groenten & fruit",
+    "bakery": "Brood & banket",
+    "dairy": "Zuivel & eieren",
+    "meat_fish": "Vlees & vis",
+    "pantry": "Voorraadkast",
+    "frozen": "Diepvries",
+    "drinks": "Dranken",
+    "household": "Huishouden",
+    "personal_care": "Verzorging",
+    "baby": "Baby",
+    "pets": "Huisdieren",
+    "pharmacy": "Apotheek",
+    "diy": "Doe-het-zelf",
+    "garden": "Tuin",
+    "other": "Overige"
+  },
+  "listKinds": {
+    "groceries": "Boodschappen",
+    "diy": "Doe-het-zelf",
+    "pharmacy": "Apotheek",
+    "other": "Overige"
+  },
+  "source": {
+    "manual": "Zelf toegevoegd",
+    "staple": "Vast product",
+    "task": "Voor een klus",
+    "taskNamed": "Voor: {{title}}",
+    "low_stock": "Voorraad aanvullen",
+    "recipe": "Voor een recept",
+    "recipeNamed": "Voor {{name}}"
+  },
+  "stockStatus": {
+    "below_minimum": "Onder minimum",
+    "at_minimum": "Op minimum",
+    "above_minimum": "Boven minimum"
+  },
+  "stockAdvice": {
+    "below_minimum": "Te kopen · Onder minimum",
+    "at_minimum": "Waarschuwing · Op minimum"
+  },
+  "stockHelp": {
+    "below_minimum": "De voorraad is onder je minimum en moet worden aangevuld.",
+    "at_minimum": "De voorraad is op je minimum: een vroege waarschuwing om bij te kopen.",
+    "above_minimum": "De voorraad is boven je minimum."
+  },
+  "guidance": {
+    "choice": "Waarschuwingen en wat je moet bijkopen blijven op de lijst. Jij beslist wat je koopt op basis van belang en voorraad."
+  },
+  "fields": {
+    "isEssential": "Essentieel product",
+    "isEssentialDescription": "Markeer essentiële producten. Andere producten staan als extraatje op je boodschappenlijsten.",
+    "packageSize": "Inhoud per verpakking",
+    "packageSizeDescription": "Wat één verpakking bevat, bv. 200 g; een pak 6 x 33 cl is 198 cl. Zo kunnen recepten in gram of liter de voorraad checken.",
+    "packageUnit": "Eenheid van de inhoud",
+    "packageUnitPlaceholder": "Eenheid",
+    "name": "Naam",
+    "quantity": "Aantal",
+    "unit": "Eenheid",
+    "unitPlaceholder": "st.",
+    "shop": "Winkel",
+    "defaultShop": "Meestal gekocht bij",
+    "list": "Lijst",
+    "kind": "Soort",
+    "note": "Opmerking",
+    "category": "Categorie",
+    "barcode": "Streepjescode (EAN)",
+    "barcodeDescription": "Het nummer onder de streepjescode op de verpakking.",
+    "qrCode": "Eigen QR-code",
+    "qrCodeDescription": "De code op een etiket dat je zelf hebt afgedrukt.",
+    "imageUrl": "Link naar afbeelding",
+    "photo": "Foto",
+    "removePhoto": "Foto verwijderen",
+    "notes": "Notities",
+    "repeat": "Komt terug",
+    "startDate": "Eerste keer",
+    "url": "Link naar webshop",
+    "price": "Prijs",
+    "articleNumber": "Artikelnummer"
+  },
+  "repeat": {
+    "weekly": "Elke week",
+    "biweekly": "Om de 2 weken",
+    "monthly": "Elke maand",
+    "daily": "Elke dag",
+    "custom": "Aangepast ({{rule}})"
+  },
+  "add": {
+    "label": "Nieuw item",
+    "placeholder": "Voeg iets toe of plak een link uit een webshop…",
+    "submit": "Toevoegen",
+    "fromCatalogue": "Uit de catalogus…",
+    "shop": "Winkel…",
+    "previewing": "Pagina wordt gelezen…",
+    "previewFailed": "De pagina kon niet gelezen worden; de link wordt zo bewaard.",
+    "clearLink": "Link verwijderen",
+    "added": "Op de lijst gezet",
+    "adding": "Toevoegen…"
+  },
+  "item": {
+    "tick": "{{name}} afvinken als gekocht",
+    "untick": "{{name}} terugzetten als niet gekocht",
+    "delete": "{{name}} verwijderen",
+    "openLink": "Pagina in de webshop openen",
+    "boughtBy": "Gekocht door {{name}}",
+    "project": "Voor project {{name}}",
+    "edit": "{{name}} bewerken"
+  },
+  "project": {
+    "empty": "Niets te kopen voor dit project.",
+    "emptyManage": "Voeg toe wat het project nodig heeft: uit de catalogus, met een naam of door een webshoplink te plakken. Het komt op de materiaallijst.",
+    "toBuy": "nog {{amount}} te kopen",
+    "setPrice": "Prijs van {{name}} instellen",
+    "setPriceShort": "Prijs",
+    "priceLabel": "Prijs per stuk",
+    "priceHint": "Een schatting volstaat: het budget van het project telt ze als vastgelegd tot ze gekocht is.",
+    "onInvoice": "Op factuur {{label}}",
+    "onAnInvoice": "Op een factuur",
+    "unlinkInvoice": "{{name}} loskoppelen van de factuur",
+    "unlinkInvoiceShort": "Loskoppelen van factuur"
+  },
+  "lists": {
+    "all": "Alle lijsten",
+    "filterLabel": "Lijst tonen",
+    "openCount_one": "{{count}} op de lijst",
+    "openCount_other": "{{count}} op de lijst",
+    "empty": "Er staat niets op deze lijst.",
+    "emptyAll": "Niets te kopen. Geniet van de lege koelkast zolang het duurt.",
+    "recentlyBought": "Vandaag gekocht"
+  },
+  "listForm": {
+    "createTitle": "Nieuwe boodschappenlijst",
+    "editTitle": "Lijst bewerken",
+    "description": "Bijvoorbeeld Wekelijkse boodschappen, Doe-het-zelf of Apotheek.",
+    "created": "Lijst aangemaakt",
+    "updated": "Lijst bewaard",
+    "deleteTitle": "{{name}} verwijderen?",
+    "deleteDescription": "De lijst en alles wat erop staat wordt verwijderd, ook de vaste producten.",
+    "deleted": "Lijst verwijderd"
+  },
+  "staples": {
+    "title": "Vaste producten",
+    "description": "Wat volgens een vast schema terug op een lijst komt.",
+    "empty": "Nog geen vaste producten. Voeg melk, brood of koffie toe om ze elke week terug te laten komen.",
+    "nextDue": "Volgende: {{date}}",
+    "createTitle": "Vast product toevoegen",
+    "editTitle": "Vast product bewerken",
+    "formDescription": "Het komt terug op de lijst op de dag dat het nodig is, tenzij het er nog op staat.",
+    "created": "Vast product toegevoegd",
+    "updated": "Vast product bewaard",
+    "deleteTitle": "{{name}} stopzetten?",
+    "deleteDescription": "Het komt niet meer terug op de lijst. Wat er al op staat, blijft staan.",
+    "deleted": "Vast product stopgezet",
+    "edit": "{{name}} bewerken"
+  },
+  "shops": {
+    "title": "Per winkel",
+    "description": "Waar je koopt wat op je lijsten staat.",
+    "noShop": "Geen winkel gekozen",
+    "openShop": "Winkelweergave voor {{name}} openen",
+    "estimate": "ongeveer {{total}}"
+  },
+  "shopView": {
+    "title": "Winkelweergave",
+    "description": "Alles op de lijst voor één winkel. Kies wat je koopt en vink af wat in je kar ligt.",
+    "chooseShop": "Kies een winkel",
+    "noShopDescription": "Items zonder voorkeurswinkel. Koop ze waar je wilt.",
+    "empty": "Hier niets te kopen.",
+    "emptyDescription": "Alles voor deze winkel ligt in je kar.",
+    "nothingAnywhere": "Je lijsten zijn leeg.",
+    "progress": "{{bought}} van {{total}} in de kar",
+    "liveHint": "Wordt vanzelf bijgewerkt terwijl je winkelt.",
+    "planVisit": "Winkelbezoek plannen",
+    "otherItems": "Overige",
+    "estimate": "Nog ongeveer {{total}}",
+    "noPrices": "Nog geen prijzen: voeg ze toe met de bewerkknop",
+    "unpriced_one": "{{count}} item zonder prijs",
+    "unpriced_other": "{{count}} items zonder prijs",
+    "sort": {
+      "label": "Sorteren",
+      "priority": "Op prioriteit",
+      "category": "Per categorie",
+      "name": "Op naam (A–Z)",
+      "price": "Duurste eerst"
+    },
+    "tiers": {
+      "urgent": "Te kopen · onder minimum",
+      "warning": "Waarschuwing · op minimum",
+      "essential": "Essentieel",
+      "normal": "Overige",
+      "extra": "Extraatjes"
+    },
+    "filters": {
+      "label": "Zoeken en filteren",
+      "search": "Zoeken op de lijst…",
+      "priority": "Prioriteit",
+      "priorities": {
+        "all": "Alle prioriteiten",
+        "needed": "Onder of op minimum",
+        "essential": "Alleen essentieel",
+        "extra": "Alleen extraatjes"
+      },
+      "allCategories": "Alle categorieën",
+      "clear": "Filters wissen",
+      "noResults": "Niets voldoet aan deze filters",
+      "noResultsDescription": "Pas de zoekopdracht of filters aan, of wis ze."
+    }
+  },
+  "products": {
+    "essential": "Essentieel",
+    "nonEssential": "Extraatje",
+    "title": "Producten",
+    "description": "De catalogus van je huishouden: wat je koopt, waar en voor hoeveel.",
+    "search": "Producten zoeken…",
+    "empty": "Nog geen producten",
+    "emptyDescription": "Voeg toe wat je vaak koopt. De streepjescode kun je later scannen.",
+    "noResults": "Geen producten gevonden",
+    "links": "Waar te koop",
+    "noLinks": "Nog geen winkels gekoppeld.",
+    "addLink": "Winkel toevoegen",
+    "editLink": "{{shop}} bewerken",
+    "deleteLink": "{{shop}} verwijderen",
+    "defaultShopBadge": "Meestal",
+    "createTitle": "Product toevoegen",
+    "editTitle": "Product bewerken",
+    "formDescription": "Producten gebruik je opnieuw op lijsten, als vast product en in je voorraad.",
+    "created": "Product toegevoegd",
+    "updated": "Product bewaard",
+    "deleteTitle": "{{name}} verwijderen?",
+    "deleteDescription": "Het verdwijnt uit de catalogus en uit je voorraad. Items op lijsten houden hun naam.",
+    "deleted": "Product verwijderd",
+    "linkTitle": "Waar {{name}} te koop is",
+    "linkDescription": "Hetzelfde product in een andere winkel, met een eigen link en prijs.",
+    "linkSaved": "Winkel bewaard",
+    "addToList": "{{name}} op de lijst zetten",
+    "addedToList": "{{name}} staat op de lijst",
+    "priceFrom": "vanaf {{price}}"
+  },
+  "place": {
+    "title": "Te kopen voor deze plek",
+    "empty": "Niets op de boodschappenlijst voor deze plek."
+  },
+  "storeVisit": {
+    "title": "Hier te kopen",
+    "empty": "Niets op de lijst voor deze winkel.",
+    "openShopView": "Winkelweergave openen",
+    "more_one": "en nog {{count}}",
+    "more_other": "en nog {{count}}"
+  },
+  "task": {
+    "title": "Materiaal",
+    "progress": "{{bought}}/{{total}} gekocht",
+    "empty": "Voor deze klus is geen materiaal nodig.",
+    "emptyManage": "Voeg toe wat deze klus nodig heeft: uit de catalogus, met een naam of door een link uit een webshop te plakken."
+  },
+  "restock": {
+    "prompt": "{{name}} in de voorraad zetten bij {{place}}?",
+    "add": "{{quantity}} {{unit}} toevoegen",
+    "done": "{{name}} toegevoegd aan {{place}}"
+  },
+  "picker": {
+    "product": "Kies een product…",
+    "list": "Kies een lijst…"
+  },
+  "packageUnits": {
+    "g": "g",
+    "kg": "kg",
+    "ml": "ml",
+    "cl": "cl",
+    "l": "l",
+    "pcs": "st."
+  },
+  "errors": {
+    "generic": "Dat lukte niet. Probeer het opnieuw.",
+    "favorite": "Je favorieten konden niet bijgewerkt worden. Probeer het opnieuw.",
+    "forbidden": "Dat mag je niet doen.",
+    "packageBoth": "Vul de hoeveelheid én de eenheid in, of geen van beide."
+  },
+  "loading": {
+    "items": "Boodschappenlijst laden…",
+    "itemsFailed": "De boodschappenlijst kon niet geladen worden."
+  },
+  "autofill": {
+    "lookingUp": "Streepjescode opzoeken…",
+    "apply": "Invullen",
+    "filled": "Ingevuld op basis van de streepjescode. Kijk alles na en bewaar.",
+    "notFound": "Niet gevonden. Vul de gegevens zelf in.",
+    "unavailable": "Deze streepjescode kon nu niet opgezocht worden. Vul de gegevens zelf in."
+  },
+  "jobs": {
+    "barcodeCache": {
+      "title": "Opgezochte streepjescodes opruimen",
+      "description": "Verwijdert productgegevens en foto's die via een streepjescode gevonden werden en lang niet meer nodig waren (gevonden producten na 180 dagen, onbekende codes na 30). Foto's die een bewaard product gebruikt, blijven bewaard."
+    }
+  },
+  "edit": {
+    "title": "Item bewerken",
+    "description": "Op {{list}}",
+    "saved": "Item bewaard",
+    "product": "Product",
+    "productHint": "Koppel het aan een product uit de catalogus, of laat het een los item.",
+    "noProduct": "Geen product",
+    "noCategory": "Geen categorie",
+    "price": "Prijs per stuk",
+    "priceHint": "Telt mee in de schatting in de winkelweergave.",
+    "fetch": "Ophalen via link",
+    "fetchedPrice": "{{price}} gevonden op de pagina.",
+    "fetchedNoPrice": "Pagina gelezen, maar er staat geen prijs op.",
+    "fetchFailed": "De pagina kon niet gelezen worden."
+  },
+  "alternatives": {
+    "title": "Alternatieven",
+    "description": "Andere merken van hetzelfde delen één voorraad: wat je ook scant, het telt bij dezelfde voorraad.",
+    "none": "Nog geen alternatieven. Koppel een ander merk van hetzelfde om één voorraad te delen.",
+    "link": "Alternatief koppelen",
+    "linkOf": "Dit is een alternatief voor…",
+    "linkTitle": "Alternatief koppelen aan {{name}}",
+    "linkOfTitle": "{{name}} is een alternatief voor…",
+    "linkDescription": "Beide producten delen dan één voorraad: hun voorraad wordt per plaats samengeteld.",
+    "product": "Product",
+    "sharedName": "Naam voor de gedeelde voorraad",
+    "sharedNameDescription": "Bv. \"Spek\": een nieuw product zonder barcode houdt de voorraad bij, met beide als alternatief.",
+    "submit": "Koppelen",
+    "linked": "Gekoppeld: ze delen nu één voorraad",
+    "unlink": "{{name}} ontkoppelen",
+    "unlinked": "{{name}} deelt geen voorraad meer",
+    "sharesWith": "Deelt voorraad met {{name}}",
+    "sharesWithLink": "Deelt voorraad met <main>{{name}}</main>",
+    "badge": "Gedeelde voorraad",
+    "badgeTitle": "Deelt voorraad met {{names}}",
+    "opened": "Geopend",
+    "chooseProduct": "Kies een product",
+    "or": "of:"
+  },
+  "productLink": {
+    "label": "Link naar webshop",
+    "price": "Prijs",
+    "description": "De productpagina in een webshop; plak er een en naam, foto en prijs worden gelezen.",
+    "others_one": "De hoofdlink; {{count}} andere winkel heeft een eigen link (in het linkmenu van het product).",
+    "others_other": "De hoofdlink; +{{count}} andere winkels hebben een eigen link (in het linkmenu van het product).",
+    "forShop": "Bewaard als link van {{shop}}.",
+    "forDefaultShop": "{{host}} is geen gekende winkel: bewaard als link van {{shop}}.",
+    "chooseShop": "Voor welke winkel is deze link? Kies hem bij \"Meestal gekocht bij\".",
+    "reading": "Pagina lezen…",
+    "fill": "Lege velden invullen",
+    "removing": "Bij bewaren verdwijnt de link van {{shop}}.",
+    "keep": "Link houden",
+    "invalidUrl": "Dit is geen weblink (https://…)."
+  }
+}

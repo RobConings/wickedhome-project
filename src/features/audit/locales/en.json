@@ -1,0 +1,90 @@
+{
+  "section": {
+    "title": "Activity",
+    "description": "Who changed what: in the app, through the assistant, an MCP client or an automation.",
+    "retention": "Activity is kept for {{days}} days. Codes, passwords and links are never recorded."
+  },
+  "list": {
+    "label": "Activity",
+    "search": "Search names and descriptions",
+    "more": "Show older",
+    "moreFailed": "Couldn't load older activity",
+    "error": "The activity couldn't be loaded."
+  },
+  "empty": {
+    "title": "No activity yet",
+    "description": "Changes to accounts, the alarm, account balances and everything the assistant does show up here."
+  },
+  "filters": {
+    "channel": "Channel",
+    "allChannels": "All channels",
+    "person": "Person",
+    "allPeople": "Everyone",
+    "action": "Kind",
+    "allActions": "Everything",
+    "clear": "Clear filters"
+  },
+  "channels": {
+    "app": "App",
+    "assistant": "Assistant",
+    "mcp": "MCP",
+    "job": "Automation"
+  },
+  "entry": {
+    "job": "Automation {{id}}"
+  },
+  "domains": {
+    "account": "Accounts",
+    "alarm": "Alarm",
+    "calendar": "Calendar",
+    "expense": "Expenses",
+    "expenses": "Expenses",
+    "income": "Income",
+    "invite": "Invites",
+    "payment_account": "Account balances",
+    "shopping": "Shopping",
+    "tasks": "Tasks",
+    "assistant": "Assistant"
+  },
+  "actions": {
+    "alarm": {
+      "armed_home": "Alarm armed (home)",
+      "armed_away": "Alarm armed (away)",
+      "disarmed": "Alarm disarmed",
+      "attempt_failed": "Alarm action not done"
+    },
+    "account": {
+      "role_changed": "Role changed",
+      "disabled": "Account disabled",
+      "enabled": "Account enabled",
+      "signed_out": "Signed out everywhere",
+      "reset_link": "Password reset link made",
+      "removed": "Account removed"
+    },
+    "invite": {
+      "created": "Invite link made",
+      "revoked": "Invite revoked",
+      "accepted": "Invite accepted"
+    },
+    "payment_account": {
+      "corrected": "Balance corrected",
+      "correction_deleted": "Balance correction deleted"
+    },
+    "expense": {
+      "auto_paid": "Direct debit marked paid"
+    },
+    "assistant": {
+      "oauth_connected": "App connected (OAuth)",
+      "oauth_disconnected": "App disconnected (OAuth)",
+      "oauth_settings": "OAuth settings changed",
+      "oauth_app_created": "OAuth app made",
+      "oauth_app_deleted": "OAuth app deleted"
+    }
+  },
+  "jobs": {
+    "prune": {
+      "title": "Clean up the activity log",
+      "description": "Deletes activity older than 365 days."
+    }
+  }
+}

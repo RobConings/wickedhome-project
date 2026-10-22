@@ -1,0 +1,23 @@
+{
+  "title": "Settings",
+  "description": "How WickedHome knows your home: the household, its address and the services it connects to.",
+  "jumpTo": "Jump to section",
+  "sections": {
+    "household": {
+      "title": "Household",
+      "description": "Name and home address. The address gives the weather forecast its location."
+    },
+    "waste": {
+      "title": "Waste collection",
+      "description": "Your collector's calendar, synced daily, on the calendar and the dashboard."
+    },
+    "weather": {
+      "title": "Weather",
+      "description": "Which source the forecast comes from. It uses the home's location."
+    }
+  },
+  "sectionError": {
+    "title": "This section couldn't be loaded",
+    "description": "Reload the page to try again."
+  }
+}

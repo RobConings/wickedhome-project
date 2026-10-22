@@ -1,0 +1,66 @@
+// Feature: calendar
+
+enum CalendarEventKind {
+  EVENT
+  STORE_VISIT
+}
+
+enum CalendarCategory {
+  FAMILY
+  HOLIDAY
+  SCHOOL
+  WORK
+  HEALTH
+  SOCIAL
+  SPORT
+  HOUSEHOLD
+  OTHER
+}
+
+/// A household calendar event: timed (instants, shown in Europe/Brussels) or all-day (a date range).
+/// Recurring events store one row with an RRULE; occurrences are expanded per requested range
+/// (see src/types/recurrence.ts). Read-only overlays from other features
+/// (birthdays, later tasks, bills…) are not stored here: see src/api/calendar/calendar-sources.ts.
+model CalendarEvent {
+  id           String                     @id @default(cuid())
+  householdId  String
+  household    Household                  @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  kind         CalendarEventKind          @default(EVENT)
+  title        String
+  description  String?
+  location     String?
+  category     CalendarCategory?
+  allDay       Boolean                    @default(false)
+  /// First and last day (inclusive) in the household time zone. Set for timed and all-day events alike,
+  /// so range queries only need dates.
+  startDate    DateTime                   @db.Date
+  endDate      DateTime                   @db.Date
+  /// Timed events only: exact start and end instants. Null for all-day events.
+  startsAt     DateTime?
+  endsAt       DateTime?
+  /// RFC 5545 RRULE without DTSTART (the first occurrence is startDate), e.g. `FREQ=WEEKLY;BYDAY=MO,WE`.
+  rrule        String?
+  /// Store visits: the shop being visited. Shopping shows that shop's list on the event.
+  shopId       String?
+  shop         Shop?                      @relation(fields: [shopId], references: [id], onDelete: SetNull)
+  participants CalendarEventParticipant[]
+  createdAt    DateTime                   @default(now())
+  updatedAt    DateTime                   @updatedAt
+
+  @@index([householdId, startDate])
+  @@index([shopId])
+  @@map("calendar_events")
+}
+
+/// A habitant taking part in an event. `position` keeps the order: the first participant colours the event.
+model CalendarEventParticipant {
+  eventId    String
+  event      CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  habitantId String
+  habitant   Habitant      @relation(fields: [habitantId], references: [id], onDelete: Cascade)
+  position   Int           @default(0)
+
+  @@id([eventId, habitantId])
+  @@index([habitantId])
+  @@map("calendar_event_participants")
+}

@@ -1,0 +1,57 @@
+// Feature: home-assistant (the household's Home Assistant connection; see docs/INTEGRATIONS.md)
+// The URL and token live in .env (HOME_ASSISTANT_URL, HOME_ASSISTANT_TOKEN), never in the database.
+
+enum AlarmAction {
+  ARM_HOME
+  ARM_AWAY
+  DISARM
+}
+
+enum AlarmActionResult {
+  SUCCEEDED
+  FAILED
+  /// Refused before reaching Home Assistant (role, missing code, not configured).
+  REFUSED
+  RATE_LIMITED
+}
+
+/// Per-household Home Assistant choices: which alarm panel to show and the energy statistics import.
+model HomeAssistantSettings {
+  id                  String    @id @default(cuid())
+  householdId         String    @unique
+  household           Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  /// `alarm_control_panel.*` entity of the alarm card; null = the only alarm panel Home Assistant has.
+  alarmEntityId       String?
+  /// Import hourly energy statistics (energy/get_prefs) into energy intervals.
+  energyImportEnabled Boolean   @default(true)
+  /// Days fetched on the first import (aligned to the start of that month).
+  energyBackfillDays  Int       @default(30)
+  energyLastImportAt  DateTime?
+  /// One-line result of the last import ("312 hours, 6 statistics").
+  energyLastResult    String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@map("home_assistant_settings")
+}
+
+/// Audit log of alarm actions from the UI: who armed or disarmed, when, and the outcome. The alarm code is
+/// never stored. Disarming is not available to the assistant or voice (docs/INTEGRATIONS.md).
+model AlarmActionLog {
+  id          String            @id @default(cuid())
+  householdId String
+  household   Household         @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  /// Name of the actor at the time (kept when the account is deleted).
+  actorName   String
+  action      AlarmAction
+  result      AlarmActionResult
+  entityId    String?
+  /// Error from Home Assistant or the reason of a refusal; never the code.
+  detail      String?
+  createdAt   DateTime          @default(now())
+
+  @@index([householdId, createdAt])
+  @@map("alarm_action_logs")
+}

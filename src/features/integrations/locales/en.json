@@ -1,0 +1,419 @@
+{
+  "notifications": {
+    "mailBills": {
+      "title": "Bills found in mail",
+      "description": "When a Gmail search found new bills to review as suggested expenses."
+    },
+    "mailReply": {
+      "title": "Replies to your mails",
+      "description": "When someone answers a mail you sent from the assistant or linked to a project (only your own mailbox)."
+    }
+  },
+  "page": {
+    "title": "Integrations",
+    "description": "Connect WickedHome to other services. Everything works without them; each one adds data or saves typing.",
+    "footer": "Keys and tokens stay on the server and are never shown in the app."
+  },
+  "status": {
+    "not_configured": "Not configured",
+    "disconnected": "Not connected",
+    "connected": "Connected",
+    "error": "Needs attention"
+  },
+  "loading": {
+    "card": "Loading {{name}}…"
+  },
+  "setup": {
+    "copy": "Copy"
+  },
+  "settingsLink": {
+    "title": "Integrations",
+    "description": "Google, Home Assistant, the assistant",
+    "text": "Connections to other services have their own page.",
+    "open": "Open integrations"
+  },
+  "google": {
+    "title": "Google",
+    "description": "Your own Google account: your calendars on the household calendar, bills from Gmail as suggested expenses, and Drive folders in Documents.",
+    "loadError": "Google's status couldn't be loaded.",
+    "connect": "Connect",
+    "turnOn": "Turn on",
+    "connectFailed": "Connecting to Google didn't start. Try again.",
+    "connectedAs": "Connected as {{email}}",
+    "connectedSince": "Connected since {{date}}. Everyone in the household connects their own account.",
+    "needsReconnect": "Reconnect needed",
+    "reconnect": "Reconnect",
+    "reconnectHint": "Google no longer accepts the consent you gave (it was revoked or expired). Reconnect to continue syncing.",
+    "disconnect": "Disconnect",
+    "disconnectConfirm": {
+      "title": "Disconnect Google?",
+      "description": "WickedHome withdraws its access at Google and forgets your calendars, the events it copied, your pending mail suggestions and your linked Drive folders. Nothing in your Google account is deleted.",
+      "driveFiles_one": "Warning: {{count}} bill document is stored in your Drive. It stays there, but can't be opened in WickedHome until you connect again with the same Google account, and new bill documents are saved on the server meanwhile.",
+      "driveFiles_other": "Warning: {{count}} bill documents are stored in your Drive. They stay there, but can't be opened in WickedHome until you connect again with the same Google account, and new bill documents are saved on the server meanwhile."
+    },
+    "disconnected": "Google disconnected",
+    "finishing": "Finishing the connection…",
+    "wrongOrigin": "Connecting only works from the address Google sends you back to. Open WickedHome at",
+    "privacy": "WickedHome asks Google only for what the feature you turn on needs. Your tokens are stored encrypted on the server.",
+    "return": {
+      "connected": "Google connected ({{email}})",
+      "denied": "You didn't allow access at Google. Nothing was connected.",
+      "expired": "That took too long. Start connecting again.",
+      "error": "Google couldn't be connected. Try again."
+    },
+    "setup": {
+      "intro": "Google isn't set up on the server yet. The owner does this once, then everyone connects their own account:",
+      "key": "Run this on the server to make an encryption key for the tokens…",
+      "keyEnv": "…and put it in .env (never change it afterwards, or everyone has to reconnect).",
+      "project": "In Google Cloud Console, create a project and enable the Google Calendar API, Gmail API and Google Drive API.",
+      "consent": "OAuth consent screen: External, add the household's Google accounts as users, then publish the app (\"In production\"), so connections don't expire after 7 days.",
+      "client": "Credentials → Create OAuth client ID → Web application, with authorised redirect URI {{uri}}. Put its ID and secret in .env:",
+      "restart": "Restart the app to load the new settings.",
+      "outro": "Details: docs/INTEGRATIONS.md, \"Google as built\"."
+    },
+    "features": {
+      "calendar": {
+        "title": "Calendar",
+        "description": "Show the Google calendars you choose on the household calendar, synced every 15 minutes. Optionally publish household events to Google."
+      },
+      "calendar_publish": {
+        "title": "Publish to Google Calendar",
+        "description": "Push household events of chosen categories to one of your calendars."
+      },
+      "gmail": {
+        "title": "Gmail",
+        "description": "Finds invoices from known senders (Fluvius, Telenet…) and suggests them as expenses with the PDF, and lets the assistant search and read your own mail when you ask. Read-only; nothing is added without your tap."
+      },
+      "drive": {
+        "title": "Drive",
+        "description": "Link Drive folders into Documents, open or import their files, and save documents to your Drive."
+      },
+      "gmail_send": {
+        "title": "Send mail from the assistant",
+        "description": "The assistant can write mails for you (e.g. a quote request to a contractor). Each one is shown on a card first: you tap Send or Save as draft."
+      }
+    },
+    "calendar": {
+      "sourceLabel": "Google Calendar",
+      "listLabel": "Your Google calendars",
+      "none": "No calendars found in this Google account.",
+      "show": "Show {{name}} on the calendar",
+      "primary": "Main calendar",
+      "visibilityLabel": "Who sees it",
+      "visibility": {
+        "household": "The whole household",
+        "private": "Only me"
+      },
+      "syncNow": "Sync now",
+      "refreshList": "Refresh list",
+      "synced": "Calendars synced",
+      "syncFailed": "Syncing with Google failed. Try again later.",
+      "lastSynced": "Last synced {{time}}",
+      "neverSynced": "Not synced yet",
+      "failing": "These calendars couldn't be synced: {{names}}",
+      "openInGoogle": "Open in Google Calendar",
+      "busy": "Busy"
+    },
+    "publish": {
+      "title": "Publish household events",
+      "description": "One-way: household events of the categories you choose appear in one of your Google calendars (so phones show them). Changes in Google are not copied back.",
+      "allow": "Allow writing to Google Calendar",
+      "target": "Publish to",
+      "off": "Off (don't publish)",
+      "categories": "Categories to publish",
+      "saved": "Publishing saved; new and changed events follow within seconds",
+      "turnedOff": "Publishing turned off; published events are removed from Google",
+      "failed": "Publishing failed: {{error}}",
+      "status_one": "{{count}} event published, last at {{time}}",
+      "status_other": "{{count}} events published, last at {{time}}"
+    },
+    "mail": {
+      "scanNow": "Search mail now",
+      "scanned_one": "Mail searched: {{count}} suggestion waiting",
+      "scanned_other": "Mail searched: {{count}} suggestions waiting",
+      "scanFailed": "Searching your mail failed. Try again later.",
+      "pending_one": "{{count}} suggested expense waiting on the Expenses page",
+      "pending_other": "{{count}} suggested expenses waiting on the Expenses page",
+      "nonePending": "No suggestions waiting.",
+      "failed": "The last search failed: {{error}}",
+      "rules": "Senders…",
+      "lastScan": "Last searched {{time}}",
+      "neverScanned": "Not searched yet",
+      "privacy": "The bill search reads only mails from these senders with a PDF and keeps the amount, due date and payment reference, never the mail. The assistant reads other mail only when you ask it to, and only your own mailbox.",
+      "send": {
+        "title": "Send mail from the assistant",
+        "description": "Lets the assistant send mails or save them as Gmail drafts from your account, always after you tapped Send or Save as draft on its card. Google asks once to allow it.",
+        "turnOn": "Turn on",
+        "on": "On: mails are sent or saved as drafts only after your tap."
+      }
+    },
+    "rules": {
+      "title": "Bill senders",
+      "description": "Mail from these senders with a PDF attached becomes a suggested expense. Shared by the whole household.",
+      "payee": "Payee",
+      "senders": "Senders",
+      "sendersHint": "Addresses or domains, one per line (e.g. fluvius.be or facturen@luminus.be).",
+      "category": "Category",
+      "enable": "Search mail from {{payee}}",
+      "builtIn": "Built-in",
+      "add": "Add sender",
+      "saved": "Saved",
+      "deleteTitle": "Remove {{payee}}?",
+      "invalidSender": "Use an address or a domain, like fluvius.be."
+    },
+    "drive": {
+      "link": "Link a Drive folder",
+      "linkCount_one": "{{count}} folder linked into Documents.",
+      "linkCount_other": "{{count}} folders linked into Documents.",
+      "openDocuments": "Open Documents",
+      "noLinks": "No folders linked yet.",
+      "privacy": "A linked folder is visible (read-only) to everyone in the household, through your connection. Unlinking never deletes anything in Drive.",
+      "pickTitle": "Link a Drive folder",
+      "pickDescription": "Open the folder you want to link, then link it. It shows up in Documents for the whole household.",
+      "myDrive": "My Drive",
+      "path": "Folder path",
+      "loadError": "Your Drive couldn't be read.",
+      "noSubfolders": "No folders in here",
+      "linkThis": "Link \"{{name}}\"",
+      "openAFolder": "Open a folder to link",
+      "linked": "\"{{name}}\" linked into Documents"
+    }
+  },
+  "suggestions": {
+    "title": "Suggested from mail",
+    "description": "Bills found in Gmail. Accept to add them as an expense with the PDF attached.",
+    "accept": "Accept",
+    "dismiss": "Dismiss",
+    "dismissed": "Suggestion dismissed",
+    "accepted": "Expense added; the PDF is in Documents",
+    "attachFailed": "The expense was added, but the PDF couldn't be fetched from Gmail.",
+    "fromMailbox": "From {{name}}'s mail",
+    "noAmount": "Amount not found",
+    "due": "Due {{date}}",
+    "received": "Received {{date}}",
+    "loading": "Loading suggestions…",
+    "showAll_one": "Show {{count}} more",
+    "showAll_other": "Show {{count}} more",
+    "showLess": "Show less",
+    "acceptNew": "Add as new",
+    "view": "View"
+  },
+  "link": {
+    "action": "Link…",
+    "looksLike": "Looks like: {{target}}",
+    "maybe": "Maybe: {{target}}",
+    "recurringTag": "(recurring)",
+    "recurring": "Recurring",
+    "paid": "Paid",
+    "notCreatedShort": "Not created yet",
+    "notCreated": "This payment doesn't exist yet: it is created when you link.",
+    "dialogTitle": "Link to an existing expense",
+    "tabsLabel": "Where to link the mail",
+    "tabs": {
+      "matches": "Matches",
+      "expenses": "Expenses",
+      "recurring": "Recurring"
+    },
+    "noMatches": "No likely matches. Search the expenses or pick a recurring expense.",
+    "loading": "Loading expenses…",
+    "loadError": "The expenses couldn't be loaded.",
+    "retry": "Retry",
+    "expensesLabel": "Expenses",
+    "recurringLabel": "Recurring expenses",
+    "searchExpenses": "Search expenses",
+    "searchRecurring": "Search recurring expenses",
+    "noExpenses": "No expenses around this date",
+    "noRecurring": "No recurring expenses yet",
+    "next": "Next {{date}}",
+    "status": {
+      "active": "Active",
+      "paused": "Paused",
+      "ended": "Ended"
+    },
+    "occurrenceTitle": "Which payment of {{payee}} is this mail for?",
+    "occurrenceHint": "The payment nearest to the mail's due date is picked.",
+    "noOccurrences": "No payments around this date.",
+    "suggested": "Best fit",
+    "continue": "Continue",
+    "back": "Back",
+    "chooseOther": "Choose another",
+    "target": "Link to",
+    "changesTitle": "Take over from the mail",
+    "noChanges": "The expense already matches the mail.",
+    "becomes": "becomes",
+    "none": "none",
+    "fields": {
+      "amount": "Amount",
+      "dueDate": "Due date",
+      "structuredCommunication": "Structured communication",
+      "iban": "IBAN",
+      "beneficiaryName": "Beneficiary"
+    },
+    "paidWarning": "Already paid on {{date}}: ticking the amount or due date changes what was paid.",
+    "recurringTitle": "Update the recurring expense too",
+    "recurringHint": "For {{payee}} and its upcoming unpaid payments.",
+    "remember": "Always link mails from {{sender}} to {{payee}}",
+    "rememberHint": "Next mails come pre-matched to the right payment; you still confirm with a tap.",
+    "pdf": "The PDF {{name}} is attached to the expense.",
+    "submit": "Link",
+    "linked": "Linked to {{payee}}; the PDF is attached",
+    "linkedNoPdf": "Linked to {{payee}}, but the PDF couldn't be fetched from Gmail.",
+    "failed": "Linking didn't work. Try again.",
+    "fromMail": "From mail on {{date}}",
+    "reasons": {
+      "ogm": "Same communication",
+      "iban": "Same IBAN",
+      "payee": "Same payee",
+      "remembered": "Always linked",
+      "date": "Due date close",
+      "amount": "Same amount",
+      "amount_close": "Amount close"
+    }
+  },
+  "driveFolder": {
+    "badge": "Drive",
+    "title": "Linked Drive folders",
+    "linkedBy": "Linked by {{name}}",
+    "unavailable": "Not available: {{name}} needs to reconnect Google.",
+    "empty": "This folder is empty",
+    "loadError": "This Drive folder couldn't be opened.",
+    "open": "Open",
+    "download": "Download",
+    "openInDrive": "Open in Drive",
+    "importCopy": "Import a copy",
+    "addAsLink": "Add to Documents (stays in Drive)",
+    "imported": "\"{{name}}\" added to Documents",
+    "unlink": "Unlink folder",
+    "unlinkConfirm": "Unlink \"{{name}}\"? Nothing is deleted in Drive.",
+    "unlinked": "Folder unlinked",
+    "notDownloadable": "This kind of Google file can only be opened in Drive.",
+    "saveToDrive": "Save to Drive",
+    "savedToDrive": "Saved to your Drive (folder \"WickedHome\")",
+    "saveFailed": "Saving to Drive failed. Is Drive turned on under Integrations?",
+    "storedInDrive": "Stored in Drive",
+    "back": "Documents"
+  },
+  "driveStorage": {
+    "title": "Bill documents in Google Drive",
+    "description": "Files attached to expenses and PDFs from mail suggestions are saved in a Google Drive folder instead of on the server. They still open in WickedHome.",
+    "loadError": "This setting couldn't be loaded.",
+    "state": {
+      "off": "Off",
+      "active": "On",
+      "paused": "Paused"
+    },
+    "notConfigured": "Set up Google first (see the Google card above).",
+    "needsDrive": "To choose a folder, turn on Drive for your Google account. Bills are then saved in your Drive, for the whole household.",
+    "connectDrive": "Connect Google Drive",
+    "turnOnDrive": "Turn on Drive",
+    "modeLabel": "Which folder",
+    "mode": {
+      "create": "New folder",
+      "pick": "Existing folder"
+    },
+    "folderName": "Folder name",
+    "defaultFolderName": "Bills",
+    "createHint": "Created in your My Drive. You can move or rename it in Drive later; it keeps working.",
+    "createAndUse": "Create folder and save bills there",
+    "pickHint": "Use a folder you already made, e.g. \"Facturen\".",
+    "pickScope": "Adding files to a folder you made needs one more permission: access to your Drive. Google then shows that WickedHome isn't verified by Google (Advanced → Go to WickedHome). WickedHome only adds bill documents there and never deletes anything unless you turn that on below.",
+    "allowFullDrive": "Allow access to my Drive",
+    "chooseFolder": "Choose a folder",
+    "pickTitle": "Folder for bill documents",
+    "pickDescription": "Open the folder bill documents should go to, then choose it.",
+    "openAFolder": "Open a folder to choose it",
+    "useThis": "Save bills in \"{{name}}\"",
+    "saved": "Bill documents are now saved in \"{{name}}\"",
+    "yearSubfolders": "A subfolder per year",
+    "yearSubfoldersHint": "E.g. \"{{year}}\", created when needed.",
+    "whereMine": "Saved in your Drive, folder",
+    "whereOther": "Saved in {{name}}'s Drive, folder",
+    "counts": {
+      "inDrive_one": "{{count}} document in Drive",
+      "inDrive_other": "{{count}} documents in Drive",
+      "local_one": "{{count}} on the server",
+      "local_other": "{{count}} on the server"
+    },
+    "moveExisting_one": "Move {{count}} document to Drive",
+    "moveExisting_other": "Move {{count}} documents to Drive",
+    "moveHint": "Each copy is checked in Drive (size and checksum) before the copy on the server is removed.",
+    "retryNow": "Try again now",
+    "moving": "Moving to Drive: {{done}} of {{total}}…",
+    "waiting_one": "{{count}} document is waiting to move to Drive (kept on the server meanwhile). It's retried automatically.",
+    "waiting_other": "{{count}} documents are waiting to move to Drive (kept on the server meanwhile). They're retried automatically.",
+    "failed_one": "{{count}} of them failed several times; still retried, less often.",
+    "failed_other": "{{count}} of them failed several times; still retried, less often.",
+    "lastError": "Last problem: {{error}}",
+    "changeFolder": "Choose another folder",
+    "useMyDrive": "Use my Drive instead",
+    "connectAgain": "Connect Google again",
+    "deleteInDrive": "Also remove from Drive",
+    "deleteInDriveHint": "When a bill document is deleted for good in WickedHome (emptied from the trash), move it to Drive's trash too. Off: Drive keeps it.",
+    "paused": {
+      "disconnected_one": "Paused: {{name}} disconnected Google. New bill documents are saved on the server. The {{count}} document already in Drive stays there but can't be opened in WickedHome until {{name}} connects again with the same Google account.",
+      "disconnected_other": "Paused: {{name}} disconnected Google. New bill documents are saved on the server. The {{count}} documents already in Drive stay there but can't be opened in WickedHome until {{name}} connects again with the same Google account.",
+      "needsReconnect": "Paused: Google needs {{name}} to reconnect. New bill documents wait on the server and move to Drive afterwards.",
+      "missingScope": "Paused: {{name}} no longer allows WickedHome to add files to this folder. New bill documents wait on the server."
+    },
+    "stop": "Stop saving to Drive",
+    "stopConfirm": {
+      "title": "Stop saving bills to Drive?",
+      "description": "New bill documents are saved on the server again. Documents already in Drive stay there and keep opening in WickedHome; nothing is deleted."
+    },
+    "stopped": "Bill documents are saved on the server again"
+  },
+  "jobs": {
+    "google-calendar": {
+      "title": "Google Calendar sync",
+      "description": "Copies new and changed events of the chosen Google calendars and publishes household events, for everyone who connected Google."
+    },
+    "google-mail": {
+      "title": "Bills from Gmail",
+      "description": "Searches the connected mailboxes for invoices from the bill senders and adds suggested expenses."
+    },
+    "mail-replies": {
+      "title": "Replies to linked mails",
+      "description": "Looks in each person's own Gmail for new replies to mails linked to projects, every 10 minutes."
+    }
+  },
+  "mail": {
+    "preview": {
+      "from": "From",
+      "to": "To",
+      "cc": "Cc",
+      "subject": "Subject",
+      "body": "Message",
+      "attachments": "Attachments",
+      "replyTo": "Reply to “{{subject}}”",
+      "project": "Linked to {{project}}",
+      "invalid": "This mail can't be shown."
+    },
+    "project": {
+      "title": "Mail",
+      "description": "Your own mails about this project; replies come as a notification.",
+      "label": "Mails about this project",
+      "search": "Search mails",
+      "empty": "No mails linked yet. Ask the assistant to mail a contact about this project.",
+      "open": "Open in Gmail",
+      "unlink": "Unlink",
+      "unlinked": "Mail unlinked",
+      "messages_one": "{{count}} message",
+      "messages_other": "{{count}} messages",
+      "waiting": "Waiting for an answer",
+      "lastFrom": "Last from {{name}}",
+      "failed": "Your mails couldn't be loaded."
+    }
+  },
+  "preview": {
+    "amount": "Amount",
+    "dueDate": "Due date",
+    "reference": "Structured communication",
+    "iban": "IBAN",
+    "notFound": "not found",
+    "text": "Mail text",
+    "noText": "This mail has no text.",
+    "textFailed": "The mail text couldn't be read from Gmail.",
+    "pdf": "PDF",
+    "downloadPdf": "Download PDF"
+  }
+}

@@ -1,0 +1,98 @@
+// Feature: devices
+
+enum DeviceCategory {
+  SENSOR
+  APPLIANCE
+  CLIMATE
+  ALARM
+  LIGHT
+  CAMERA
+  OTHER
+}
+
+enum DeviceValueSource {
+  MANUAL
+  HOME_ASSISTANT
+}
+
+/// A household-level device type: its fields and the indicator rules that turn values into a colour on the
+/// plan. Created from a preset or from scratch, always editable. See docs/DEVICES.md.
+model DeviceProfile {
+  id                String         @id @default(cuid())
+  householdId       String
+  household         Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name              String
+  /// Icon key (see DEVICE_ICONS in src/features/devices/types/devices.ts).
+  icon              String
+  category          DeviceCategory
+  /// `[{ key, label, type, unit?, choices?, trueLabel?, falseLabel? }]`, validated by deviceProfileInputSchema.
+  fields            Json
+  /// Key of the field shown next to the indicator ("21,5 °C").
+  primaryField      String?
+  /// Ordered indicator rules; the first match wins.
+  rules             Json
+  /// success | warning | danger | info | neutral, used when no rule matches or values are unknown/stale.
+  fallbackTone      String         @default("neutral")
+  fallbackLabel     String?
+  /// Home Assistant values older than this are stale; null = never.
+  staleAfterMinutes Int?
+  /// The preset this profile was created from (informative).
+  presetKey         String?
+  devices           Device[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([householdId])
+  @@map("device_profiles")
+}
+
+/// A thing with a state and a place: a window contact, the dryer, the alarm panel. Optionally on a floor
+/// plan at (x, y) in centimetres, and optionally linked to one energy appliance.
+model Device {
+  id          String             @id @default(cuid())
+  householdId String
+  household   Household          @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name        String
+  profileId   String
+  profile     DeviceProfile      @relation(fields: [profileId], references: [id], onDelete: Restrict)
+  placeId     String?
+  place       Place?             @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  /// The floor whose plan shows this device; null = not placed. x/y are plan coordinates in cm.
+  floorId     String?
+  floor       Floor?             @relation(fields: [floorId], references: [id], onDelete: SetNull)
+  x           Int?
+  y           Int?
+  applianceId String?            @unique
+  appliance   Appliance?         @relation(fields: [applianceId], references: [id], onDelete: SetNull)
+  notes       String?
+  values      DeviceFieldValue[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([householdId])
+  @@index([floorId])
+  @@index([profileId])
+  @@map("devices")
+}
+
+/// One field of one device: where its value comes from and the latest value.
+model DeviceFieldValue {
+  id          String            @id @default(cuid())
+  deviceId    String
+  device      Device            @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  fieldKey    String
+  source      DeviceValueSource @default(MANUAL)
+  /// Home Assistant entity (`binary_sensor.kitchen_window`) and optional attribute; used from phase 8.
+  haEntityId  String?
+  haAttribute String?
+  /// boolean, number or string; null = unknown.
+  value       Json?
+  /// When the value was last set or reported (drives staleness for Home Assistant sources).
+  valueAt     DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@unique([deviceId, fieldKey])
+  @@index([haEntityId])
+  @@map("device_field_values")
+}

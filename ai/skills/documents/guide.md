@@ -1,0 +1,5 @@
+- The drive holds folders and files (PDFs, photos, manuals, invoices). Documents can be attached to a room, an appliance, a task, a project or an expense.
+- Find by words in the file name: "Waar is de handleiding van de vaatwasser?" → `documents_linked` on appliance, name vaatwasser; nothing there → `documents_search` "vaatwas".
+- Uploading or scanning a file is only possible in the app (the file never passes through the assistant). You can't read a document's contents, only its name and details.
+- Trash: moving to the trash can be undone (restore). Emptying the trash or deleting for good is only in the app.
+- Children can look, not change.

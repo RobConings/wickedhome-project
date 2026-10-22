@@ -1,0 +1,12 @@
+- One kind of expense: a one-off bill, or a payment of a recurring expense (subscription, loan, afbetaling, insurance).
+- Payer: joint account (default), one person, or split equally. Meal vouchers are always the person's own.
+- Domiciliëring = direct_debit: paid automatically on the due date, never tell people to pay it. Overschrijving = wire_transfer.
+- "Wat moeten we deze week betalen?" → `expenses_due` (person or joint to filter). Snapshot line "Bills due" answers simple cases.
+- "Hoe betaal ik Fluvius?" → `expenses_details`: give IBAN and gestructureerde mededeling (OGM) exactly as returned. "not recorded" means unknown: say so, never invent one.
+- "Ik heb 45 euro uitgegeven bij Delhaize" → `expenses_log` (already paid). A bill still to pay → `expenses_add`; recurring: repeat + kind; "via domiciliëring" → paymentMethod direct_debit; a loan with "nog 10.000 open" → totalOpen (the last payment is the rest).
+- "Fluvius is betaald" → `expenses_mark_paid`; "toch niet betaald" → paid false.
+- Price change "from now on" → `expenses_edit` with recurring; one bill → expense. Pause/stop a subscription: edit status paused/ended.
+- Disputed bill: `expenses_hold` with a reason.
+- Names: a payee names its next unpaid bill; add a date (dd/mm) for another payment.
+- `expenses_list`: recurring (with loan progress, monthly totals) or a month's paid history per category.
+- Every change shows a confirmation card; owners and adults only.

@@ -1,0 +1,41 @@
+// Feature: mail — the assistant's mail abilities on each person's own Gmail (ai/skills/mail, src/api/mail).
+// Mail itself is never stored: only which Gmail thread belongs to which project/contact, and what was seen last,
+// so replies can be notified and listed on the project page. Additive on purpose: plain ids, no relations to
+// other models (the reply job prunes links whose user or project is gone).
+
+/// One person's Gmail thread linked to a project and/or contact (a mail sent or saved as draft from the assistant,
+/// or a thread the person linked). Only the mailbox owner (`userId`) ever sees it.
+model MailThreadLink {
+  id               String    @id @default(cuid())
+  householdId      String
+  /// Whose mailbox the thread is in (`users.id`).
+  userId           String
+  /// Gmail's thread id.
+  gmailThreadId    String
+  /// `projects.id`, soft reference.
+  projectId        String?
+  /// `contacts.id`, soft reference.
+  contactId        String?
+  /// Subject line, shortened.
+  subject          String
+  /// The other side of the conversation (the first recipient, or the sender of a linked thread).
+  counterpartEmail String?
+  counterpartName  String?
+  /// Messages in the thread (drafts not counted) when it was last checked.
+  messageCount     Int       @default(0)
+  /// Newest message seen (Gmail internalDate); messages from others after it are new replies.
+  lastMessageAt    DateTime?
+  /// Who wrote the newest message ("Jan Peeters"), and whether it was the mailbox owner.
+  lastFromName     String?
+  lastFromMe       Boolean   @default(true)
+  lastCheckedAt    DateTime?
+  /// Short error of the last reply check (no mail content).
+  checkError       String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([userId, gmailThreadId])
+  @@index([householdId, projectId])
+  @@index([lastMessageAt])
+  @@map("mail_thread_links")
+}

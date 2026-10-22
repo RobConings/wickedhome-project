@@ -1,0 +1,277 @@
+{
+  "notifications": {
+    "inviteAccepted": {
+      "title": "Invite accepted",
+      "description": "When someone you invited (or anyone, for owners) creates their account."
+    }
+  },
+  "fields": {
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Repeat password",
+    "name": "Your name",
+    "householdName": "Household name"
+  },
+  "login": {
+    "title": "Welcome home",
+    "description": "Log in to manage your household.",
+    "submit": "Log in",
+    "submitting": "Logging in…",
+    "opening": "Opening your home…",
+    "invalid": "That email and password don't match.",
+    "disabled": "This account is disabled. Ask an owner of your household to enable it."
+  },
+  "setup": {
+    "title": "Set up WickedHome",
+    "description": "Create your household and the first account. You can add the other habitants afterwards.",
+    "householdNameHint": "For example \"The Coppens family\" or \"Wicked Home\".",
+    "passwordHint": "At least 10 characters.",
+    "submit": "Create household",
+    "submitting": "Creating…",
+    "opening": "Opening your home…",
+    "alreadyDone": "WickedHome is already set up. Log in instead."
+  },
+  "account": {
+    "menu": "Account menu",
+    "myAccount": "My account",
+    "logout": "Log out",
+    "loggingOut": "Logging out…",
+    "localeFailed": "Your language couldn't be saved. Try again."
+  },
+  "roles": {
+    "owner": "Owner",
+    "adult": "Adult",
+    "child": "Child",
+    "ownerHint": "Everything, including managing owners.",
+    "adultHint": "Everything except managing owners.",
+    "childHint": "Can use the app, but can't change settings or accounts."
+  },
+  "share": {
+    "link": "Link",
+    "copy": "Copy",
+    "copiedShort": "Copied",
+    "copied": "Link copied",
+    "copyFailed": "The link couldn't be copied. Select it and copy it by hand.",
+    "share": "Share…",
+    "shareFailed": "Sharing didn't work. Copy the link instead.",
+    "qrLabel": "QR code of the link for {{name}}",
+    "qrLoading": "Making QR code…",
+    "once": "It works once.",
+    "invite": {
+      "title": "Join {{household}} on WickedHome",
+      "text": "Hi {{name}}, here's your link to join {{household}} on WickedHome:",
+      "scanHint": "{{name}} can scan this with their phone camera, or you send the link.",
+      "expires": "Valid until {{date}}."
+    },
+    "reset": {
+      "title": "New password for WickedHome",
+      "text": "Hi {{name}}, use this link to set a new WickedHome password:",
+      "scanHint": "{{name}} can scan this with their phone camera, or you send the link.",
+      "expires": "Valid until {{date}}."
+    }
+  },
+  "invite": {
+    "title": "Invite someone",
+    "renewTitle": "New link for {{name}}",
+    "description": "They get a link to create their own login. Only you see the link, once.",
+    "person": "Who",
+    "newPerson": "Someone new…",
+    "newName": "Name",
+    "newType": "Type",
+    "newColor": "Colour",
+    "role": "Role",
+    "create": "Make link",
+    "creating": "Making link…",
+    "readyTitle": "Link for {{name}}",
+    "readyDescription": "Copy or share it now: for safety it isn't shown again. You can always make a new one.",
+    "done": "Done",
+    "errors": {
+      "hasAccount": "This person already has an account.",
+      "forbidden": "You can't invite someone with this role."
+    }
+  },
+  "accounts": {
+    "section": {
+      "title": "Accounts",
+      "description": "Who can log in, and invites for the others."
+    },
+    "loading": "Loading accounts…",
+    "error": "Accounts couldn't be loaded",
+    "errorDescription": "The rest of the settings still work.",
+    "refreshFailed": "The list couldn't be refreshed.",
+    "summary_one": "{{count}} account",
+    "summary_other": "{{count}} accounts",
+    "pendingSummary_one": "{{count}} invite pending",
+    "pendingSummary_other": "{{count}} invites pending",
+    "invite": "Invite someone",
+    "listLabel": "Accounts and invites",
+    "you": "You",
+    "status": {
+      "active": "Active",
+      "disabled": "Disabled",
+      "invited": "Invited"
+    },
+    "lastLogin": "Last login {{when}}",
+    "neverLoggedIn": "Never logged in",
+    "sessions_one": "{{count}} active device",
+    "sessions_other": "{{count}} active devices",
+    "resetPending": "Password reset link open, expires {{when}}",
+    "lastOwnerHint": "You're the only owner, so you can't step down or be removed.",
+    "invitedBy": "Invited by {{name}}",
+    "invitedPending": "Invite pending",
+    "inviteExpires": "expires {{when}}",
+    "actionsFor": "Actions for {{name}}",
+    "resetReadyTitle": "Password reset link for {{name}}",
+    "resetReadyDescription": "Give it to them now: it isn't shown again. With it they set a new password, and all their devices are signed out.",
+    "actions": {
+      "role": "Role",
+      "resetLink": "Password reset link",
+      "signOut": "Sign out everywhere",
+      "enable": "Enable",
+      "disable": "Disable",
+      "remove": "Remove account",
+      "showLink": "Show link again",
+      "newLink": "Make new link",
+      "revoke": "Revoke invite"
+    },
+    "confirm": {
+      "changeRole": "Change role",
+      "ownerTitle": "Make {{name}} an owner?",
+      "ownerDescription": "Owners can do everything, including changing or removing other owners.",
+      "demoteSelfTitle": "Change your own role?",
+      "demoteSelfDescription": "You become {{role}}. Only an owner can make you owner again.",
+      "disableTitle": "Disable {{name}}?",
+      "disableDescription": "They are signed out on every device and can't log in until the account is enabled again.",
+      "signOutTitle": "Sign {{name}} out everywhere?",
+      "signOutDescription": "Every device they're logged in on is signed out. They can log in again with their password.",
+      "removeTitle": "Remove the account of {{name}}?",
+      "removeDescription": "The login is deleted. {{name}} stays a habitant and keeps their history; you can invite them again later.",
+      "revokeTitle": "Revoke the invite for {{name}}?",
+      "revokeDescription": "The link stops working right away."
+    },
+    "toast": {
+      "roleChanged": "{{name}} is now {{role}}",
+      "disabled": "{{name}} is disabled and signed out",
+      "enabled": "{{name}} can log in again",
+      "signedOut": "{{name}} is signed out everywhere",
+      "removed": "The account of {{name}} is removed",
+      "revoked": "The invite for {{name}} is revoked"
+    },
+    "errors": {
+      "lastOwner": "The household needs at least one owner.",
+      "self": "You can't do that with your own account.",
+      "forbidden": "You're not allowed to do that with this account.",
+      "gone": "This account or invite no longer exists."
+    }
+  },
+  "myAccount": {
+    "section": {
+      "title": "My account",
+      "description": "Your email, password, language and devices."
+    },
+    "currentPassword": "Current password",
+    "wrongPassword": "That's not your current password.",
+    "saving": "Saving…",
+    "email": {
+      "title": "Email",
+      "description": "The address you log in with. Confirm the change with your password.",
+      "submit": "Change email",
+      "same": "That's already your email.",
+      "saved": "You now log in with {{email}}"
+    },
+    "password": {
+      "title": "Password",
+      "description": "Your other devices are signed out after the change; this one stays logged in.",
+      "new": "New password",
+      "submit": "Change password",
+      "saved": "Password changed. Your other devices are signed out."
+    },
+    "languageDescription": "The language of WickedHome on all your devices.",
+    "devices": {
+      "title": "Devices",
+      "description": "Where you're logged in.",
+      "loading": "Loading devices…",
+      "error": "Your devices couldn't be loaded",
+      "browserOn": "{{browser}} on {{system}}",
+      "unknown": "Unknown device",
+      "thisDevice": "This device",
+      "activeNow": "Active now",
+      "lastSeen": "Last active {{when}}",
+      "signOutOthers": "Sign out other devices",
+      "confirmTitle": "Sign out your other devices?",
+      "confirmDescription_one": "{{count}} other device is signed out. You stay logged in here.",
+      "confirmDescription_other": "{{count}} other devices are signed out. You stay logged in here.",
+      "signedOut_one": "{{count}} device signed out",
+      "signedOut_other": "{{count}} devices signed out"
+    }
+  },
+  "link": {
+    "askName": "Ask {{name}} for a new link.",
+    "askSomeone": "Ask an adult of your household for a new link.",
+    "toLogin": "Log in",
+    "emailHint": "You log in with this address.",
+    "newPassword": "New password",
+    "passwordMismatch": "The passwords don't match.",
+    "invite": {
+      "title": "Join {{household}}",
+      "description": "{{inviter}} invited you as {{name}} ({{role}}). Choose how you log in.",
+      "submit": "Create my account",
+      "submitting": "Creating your account…"
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "description": "For {{name}} ({{email}}). Your devices are signed out; this one is logged in afterwards.",
+      "submit": "Save new password",
+      "submitting": "Saving…"
+    },
+    "expired": {
+      "inviteTitle": "This invite has expired",
+      "resetTitle": "This reset link has expired",
+      "description": "Links only work for a limited time."
+    },
+    "used": {
+      "inviteTitle": "This invite was already used",
+      "resetTitle": "This reset link was already used",
+      "description": "Every link works once. If it was you, just log in."
+    },
+    "revoked": {
+      "inviteTitle": "This invite was withdrawn",
+      "resetTitle": "This reset link was withdrawn",
+      "description": "It was replaced or cancelled."
+    },
+    "invalid": {
+      "title": "This link doesn't work",
+      "description": "Check that you opened the whole link, or ask for a new one."
+    },
+    "rateLimited": {
+      "title": "Too many tries",
+      "description": "Wait a few minutes, then open the link again."
+    },
+    "unavailable": {
+      "title": "WickedHome can't be reached",
+      "description": "Check your connection and try again.",
+      "retry": "Try again"
+    },
+    "loggedIn": {
+      "title": "You're logged in as {{name}}",
+      "inviteDescription": "This invite is for {{name}}. Log out first if you want to create that account on this device.",
+      "resetDescription": "This link sets a new password for {{name}}. Log out first to use it on this device.",
+      "logout": "Log out first",
+      "toHome": "Go to my dashboard"
+    },
+    "errors": {
+      "expired": "This link has expired.",
+      "used": "This link was already used.",
+      "revoked": "This link was withdrawn.",
+      "invalid": "This link doesn't work.",
+      "loggedIn": "Someone is logged in on this device. Log out first.",
+      "emailTaken": "This email already has an account."
+    }
+  },
+  "jobs": {
+    "cleanup": {
+      "title": "Clean up logins",
+      "description": "Deletes expired sessions and expired invite and password-reset links."
+    }
+  }
+}

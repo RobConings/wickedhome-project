@@ -1,0 +1,93 @@
+{
+  "page": {
+    "title": "Bewoners",
+    "description": "Iedereen die hier woont, ook de kinderen en de huisdieren."
+  },
+  "actions": {
+    "add": "Bewoner toevoegen"
+  },
+  "types": {
+    "adult": "Volwassene",
+    "child": "Kind",
+    "pet": "Huisdier",
+    "guest": "Gast"
+  },
+  "fields": {
+    "name": "Naam",
+    "type": "Soort",
+    "color": "Kleur",
+    "emoji": "Emoji",
+    "birthday": "Verjaardag"
+  },
+  "form": {
+    "createTitle": "Bewoner toevoegen",
+    "editTitle": "Bewoner bewerken",
+    "description": "Hun kleur en emoji verschijnen bij taken, in de kalender en op lijsten.",
+    "created": "Bewoner toegevoegd",
+    "updated": "Wijzigingen opgeslagen"
+  },
+  "picker": {
+    "favoriteFailed": "Je favorieten konden niet worden bijgewerkt. Probeer het opnieuw."
+  },
+  "card": {
+    "hasAccount": "Kan inloggen"
+  },
+  "delete": {
+    "title": "{{name}} verwijderen?",
+    "description": "Hun taken en geschiedenis blijven bewaard, maar zijn aan niemand meer gekoppeld.",
+    "hasAccount": "Deze bewoner heeft een login en kan niet verwijderd worden."
+  },
+  "empty": {
+    "title": "Nog geen bewoners",
+    "description": "Voeg de mensen en dieren toe die in je huis wonen."
+  },
+  "settings": {
+    "title": "Huishouden",
+    "description": "De naam van je huishouden en waar je woont.",
+    "fields": {
+      "name": "Naam van het huishouden",
+      "street": "Straat",
+      "number": "Nummer",
+      "box": "Bus",
+      "postalCode": "Postcode",
+      "municipality": "Gemeente",
+      "latitude": "Breedtegraad",
+      "longitude": "Lengtegraad"
+    },
+    "address": {
+      "title": "Adres",
+      "description": "Voor de weersvoorspelling en om je afvalophaler te vinden.",
+      "country": "België"
+    },
+    "location": {
+      "title": "Locatie",
+      "none": "Vul het adres in om de locatie te vinden.",
+      "missing": "Nog geen coördinaten voor dit adres. Sla opnieuw op of vul ze zelf in.",
+      "viewOnMap": "Bekijk op kaart",
+      "mode": "Hoe de locatie bepalen",
+      "modes": {
+        "auto": "Zoeken op adres",
+        "manual": "Coördinaten invullen"
+      },
+      "autoHint": "Wordt gezocht bij het opslaan: eerst in het Vlaamse adressenregister (Geopunt), anders via OpenStreetMap.",
+      "usedFor": "De weersvoorspelling gebruikt de locatie, afgerond op ongeveer 1 km.",
+      "sources": {
+        "geopunt": "Geopunt (adressenregister)",
+        "nominatim": "OpenStreetMap",
+        "manual": "Zelf ingevuld"
+      }
+    },
+    "geocode": {
+      "found": "Opgeslagen. De locatie is gevonden; controleer ze op de kaart.",
+      "not_found": "Adres opgeslagen, maar de locatie is niet gevonden. Controleer het adres of vul de coördinaten zelf in.",
+      "failed": "Adres opgeslagen, maar de locatiedienst was niet bereikbaar. Sla later opnieuw op of vul de coördinaten zelf in."
+    },
+    "saved": "Instellingen van het huishouden opgeslagen.",
+    "readOnly": "Alleen volwassenen kunnen deze instellingen wijzigen.",
+    "forbidden": "Alleen volwassenen kunnen de instellingen van het huishouden wijzigen.",
+    "errors": {
+      "addressIncomplete": "Vul het volledige adres in, of laat alles leeg.",
+      "coordinatesRequired": "Vul beide coördinaten in."
+    }
+  }
+}

@@ -1,0 +1,411 @@
+{
+  "page": {
+    "overview": {
+      "title": "Energy",
+      "description": "How much electricity the house used, where it came from and what used it."
+    },
+    "appliances": {
+      "title": "Appliances",
+      "description": "Everything that uses electricity, by place. Measured appliances get their own share in the breakdown."
+    },
+    "setup": {
+      "title": "Solar, battery & gas",
+      "description": "Your solar panels, home battery and gas connection. Needed to compute what the house really consumed."
+    },
+    "import": {
+      "title": "Import data",
+      "description": "Import the quarter-hour file from Mijn Fluvius, or enter meter readings by hand."
+    }
+  },
+  "nav": {
+    "label": "Energy pages",
+    "overview": "Overview",
+    "appliances": "Appliances",
+    "setup": "Solar, battery & gas",
+    "import": "Import"
+  },
+  "period": {
+    "label": "Period",
+    "day": "Day",
+    "week": "Week",
+    "month": "Month",
+    "year": "Year",
+    "previous": "Previous period",
+    "next": "Next period",
+    "today": "Today"
+  },
+  "categories": {
+    "heating": "Heating",
+    "heat_pump": "Heat pump",
+    "cooking": "Cooking",
+    "laundry": "Laundry",
+    "dishwasher": "Dishwasher",
+    "cold": "Fridge & freezer",
+    "jacuzzi_pool": "Jacuzzi & pool",
+    "ev_charger": "EV charger",
+    "it_media": "IT & media",
+    "lighting": "Lighting",
+    "tools": "Tools",
+    "other": "Other"
+  },
+  "kinds": {
+    "grid_import": "Grid import",
+    "grid_export": "Injection",
+    "solar_production": "Solar production",
+    "battery_charge": "Battery charge",
+    "battery_discharge": "Battery discharge",
+    "appliance": "Appliance"
+  },
+  "registers": {
+    "single": "Single tariff",
+    "day": "Day",
+    "night": "Night"
+  },
+  "sources": {
+    "manual": "Meter readings",
+    "fluvius_csv": "Fluvius file",
+    "home_assistant": "Home Assistant"
+  },
+  "compass": {
+    "n": "North",
+    "ne": "North-east",
+    "e": "East",
+    "se": "South-east",
+    "s": "South",
+    "sw": "South-west",
+    "w": "West",
+    "nw": "North-west"
+  },
+  "stats": {
+    "consumption": "Consumed",
+    "consumptionUnknown": "Not computable",
+    "import": "Grid import",
+    "importSplit": "Day {{day}} · night {{night}}",
+    "export": "Injected",
+    "solar": "Solar production",
+    "solarNotMeasured": "Not measured",
+    "solarKwp": "{{kwp}} installed",
+    "battery": "Battery",
+    "batteryInOut": "In {{charge}} · out {{discharge}}",
+    "selfSufficiency": "Self-sufficiency",
+    "selfSufficiencyHint": "Share of use not bought from the grid",
+    "selfConsumption": "Self-consumption",
+    "selfConsumptionHint": "Share of solar used at home",
+    "totalConsumption": "Total energy used",
+    "gasVolume": "Gas volume",
+    "calorific": "Calorific value {{value}}",
+    "noData": "No data in this period"
+  },
+  "chart": {
+    "title": "Energy flow",
+    "description": "Above the line: where the energy the house used came from. Below: where surplus went.",
+    "descriptionGridOnly": "Above the line: taken from the grid. Below: injected into the grid.",
+    "import": "Grid import",
+    "solar": "Solar used at home",
+    "batteryOut": "From battery",
+    "export": "Injected",
+    "batteryIn": "Into battery",
+    "showTable": "Show table",
+    "hideTable": "Hide table",
+    "category": "Time",
+    "consumptionTitle": "Consumption",
+    "descriptionGas": "Gas used for heating, hot water and cooking, in kWh.",
+    "descriptionTotal": "Electricity and gas the house used, together in kWh."
+  },
+  "breakdown": {
+    "title": "Where it went",
+    "description": "Measured appliances get their share; everything else is Unknown.",
+    "unknown": "Unknown",
+    "allUnknown": "Nothing is measured yet, so all consumption is Unknown. Every smart plug or sub-meter you add makes this smaller.",
+    "noConsumption": "Consumption can't be computed for this period, so shares are not shown.",
+    "noData": "No consumption data in this period.",
+    "label": "Consumption per appliance"
+  },
+  "peak": {
+    "title": "Monthly peak",
+    "description": "Highest quarter-hour offtake this month. The capacity tariff bills at least 2,5 kW.",
+    "at": "on {{date}} at {{time}}",
+    "billed": "Billed: {{kw}}",
+    "minimum": "Below the 2,5 kW minimum, billed as 2,5 kW",
+    "rollingAverage": "12-month average (billed): {{kw}}",
+    "none": "No quarter-hour data for {{month}} yet. Import a Fluvius file to see your peak.",
+    "history": "Peaks over the last 12 months",
+    "series": "Monthly peak"
+  },
+  "notices": {
+    "solarNotMeasured": {
+      "title": "Solar production is not measured",
+      "description": "The Fluvius file only shows what went through the meter. Without the production of your panels, consumption, self-sufficiency and the breakdown can't be computed. Enter inverter readings on the import page, or connect Home Assistant later."
+    },
+    "batteryNotMeasured": {
+      "title": "The battery is not measured",
+      "description": "Charge and discharge are needed to compute consumption. Enter battery readings on the import page."
+    },
+    "totalWithoutGas": "No gas data in this period: the total is electricity only. Import the Fluvius gas file to add it.",
+    "totalWithoutElectricity": "No electricity data in this period: the total is gas only."
+  },
+  "empty": {
+    "overview": {
+      "title": "No energy data yet",
+      "description": "Start by importing the quarter-hour file from Mijn Fluvius. Got solar panels? Add them first, so consumption can be computed honestly.",
+      "import": "Import a Fluvius file",
+      "setup": "Add solar panels",
+      "appliances": "Add appliances"
+    },
+    "period": "No data for this period.",
+    "gas": {
+      "title": "No gas data yet",
+      "description": "Import the hourly gas file from Mijn Fluvius (Verbruikshistoriek → gas), or enter gas meter readings in m³.",
+      "import": "Import a gas file"
+    }
+  },
+  "appliances": {
+    "add": "Add appliance",
+    "noPlace": "No place",
+    "measured": "Measured",
+    "notMeasured": "Not measured",
+    "rated": "{{power}} rated",
+    "standby": "{{power}} standby",
+    "count_one": "{{count}} appliance",
+    "count_other": "{{count}} appliances",
+    "documents": {
+      "label": "Documents",
+      "open": "Documents: {{name}}",
+      "description": "Manuals, warranties and receipts for this appliance."
+    },
+    "empty": {
+      "title": "No appliances yet",
+      "description": "Add the things that use a lot: heat pump, jacuzzi, EV charger, dryer… Link them to a place so you know where the energy goes."
+    },
+    "fields": {
+      "name": "Name",
+      "category": "Category",
+      "place": "Place",
+      "ratedPowerW": "Rated power (W)",
+      "standbyPowerW": "Standby power (W)",
+      "notes": "Notes",
+      "carriers": "Runs on"
+    },
+    "form": {
+      "createTitle": "Add an appliance",
+      "editTitle": "Edit appliance",
+      "description": "Rated power is on the nameplate. It will be used to estimate unmeasured appliances later.",
+      "placePlaceholder": "Choose a place…",
+      "created": "Appliance added",
+      "updated": "Changes saved",
+      "carriersHint": "A gas boiler runs on gas and electricity (its pump); a gas hob on gas only."
+    },
+    "delete": {
+      "title": "Delete {{name}}?",
+      "description": "Its meters and measured data are deleted too."
+    },
+    "picker": {
+      "placeholder": "Choose an appliance…"
+    },
+    "place": {
+      "empty": "No appliances in this place yet",
+      "error": "Couldn't load the appliances.",
+      "retry": "Try again",
+      "manage": "Manage appliances",
+      "add": "Add an appliance"
+    }
+  },
+  "solar": {
+    "title": "Solar panels",
+    "add": "Add solar panels",
+    "panels": "{{count}} × {{wp}} Wp",
+    "facing": "Facing {{direction}}",
+    "tilt": "{{tilt}}° tilt",
+    "inverter": "Inverter",
+    "installedOn": "Installed",
+    "total": "{{kwp}} in total",
+    "empty": {
+      "title": "No solar panels",
+      "description": "Add your installation (an east/west roof is two). Without it, the overview assumes there is no solar production."
+    },
+    "fields": {
+      "name": "Name",
+      "panelCount": "Number of panels",
+      "panelWp": "Peak power per panel (Wp)",
+      "orientation": "Orientation",
+      "tiltDeg": "Tilt (°)",
+      "inverterBrand": "Inverter brand",
+      "inverterModel": "Inverter model",
+      "installedOn": "Installed on"
+    },
+    "form": {
+      "createTitle": "Add solar panels",
+      "editTitle": "Edit solar panels",
+      "description": "One entry per roof face. Total peak power (kWp) is computed.",
+      "namePlaceholder": "South roof",
+      "orientationNone": "Not set",
+      "created": "Solar panels added",
+      "updated": "Changes saved"
+    },
+    "delete": {
+      "title": "Delete {{name}}?",
+      "description": "Meters linked to these panels keep their data."
+    }
+  },
+  "battery": {
+    "title": "Home battery",
+    "add": "Add battery",
+    "capacity": "Capacity",
+    "maxCharge": "Max charge",
+    "maxDischarge": "Max discharge",
+    "installedOn": "Installed",
+    "planned": "Planned",
+    "empty": {
+      "title": "No home battery",
+      "description": "Planning one? Add it with its installation date; it only counts from that day on."
+    },
+    "fields": {
+      "name": "Name",
+      "capacityKwh": "Usable capacity (kWh)",
+      "maxChargeKw": "Max charge power (kW)",
+      "maxDischargeKw": "Max discharge power (kW)",
+      "installedOn": "Installed on"
+    },
+    "form": {
+      "createTitle": "Add a home battery",
+      "editTitle": "Edit home battery",
+      "description": "Use the usable capacity from the datasheet.",
+      "namePlaceholder": "Home battery",
+      "created": "Battery added",
+      "updated": "Changes saved"
+    },
+    "delete": {
+      "title": "Delete {{name}}?",
+      "description": "Meters linked to this battery keep their data."
+    }
+  },
+  "import": {
+    "drop": {
+      "title": "Drop your Fluvius file here",
+      "description": "Mijn Fluvius → Verbruikshistoriek → electricity (quarter-hour totals) or gas (hour totals) → download CSV. Electricity or gas is detected automatically; the file stays in your browser until you confirm.",
+      "button": "Choose a file"
+    },
+    "preview": {
+      "title": "Ready to import",
+      "file": "File",
+      "range": "Period",
+      "ean": "EAN",
+      "rows": "Rows",
+      "register": "Register",
+      "total": "Total",
+      "skipped_one": "{{count}} row could not be read and will be skipped.",
+      "skipped_other": "{{count}} rows could not be read and will be skipped.",
+      "noRows": "This file has no electricity rows to import.",
+      "calorific": "Calorific value",
+      "volume": "Volume",
+      "gasOfftake": "Gas offtake"
+    },
+    "confirm": "Import {{count}} rows",
+    "cancel": "Choose another file",
+    "uploading": "Importing… {{done}} of {{total}}",
+    "done": {
+      "title": "Import finished",
+      "description": "{{count}} intervals saved. Importing the same period again replaces the values, nothing is counted twice.",
+      "view": "View overview",
+      "again": "Import another file"
+    },
+    "errors": {
+      "header": "This doesn't look like a Fluvius consumption file. Download the quarter-hour totals for electricity as CSV.",
+      "empty": "The file is empty.",
+      "read": "The file could not be read.",
+      "upload": "The import stopped halfway. Try again: rows already saved are simply overwritten.",
+      "uploadPartial": "The import stopped at batch {{batch}} of {{batches}} ({{rows}} rows saved). Try again: rows already saved are simply overwritten."
+    },
+    "stop": "Stop import",
+    "cancelFile": "Choose another file",
+    "stages": {
+      "reading": "Reading the file…",
+      "parsing": "Reading rows: line {{done}} of {{total}}…",
+      "parsingLabel": "Reading the file",
+      "saving": "Saving batch {{batch}} of {{batches}}…",
+      "savingLabel": "Saving the import",
+      "rows": "{{done}} of {{total}} rows",
+      "stopping": "Stopping after this batch…"
+    },
+    "stopped": {
+      "title": "Import stopped",
+      "description": "Stopped after batch {{batch}} of {{batches}}. The rows saved so far stay; resume to save the rest (rows already saved are simply overwritten).",
+      "resume": "Resume import"
+    },
+    "result": {
+      "rows": "Rows saved",
+      "rowsOf": "{{done}} of {{total}}",
+      "inserted": "New",
+      "updated": "Already there (updated)"
+    }
+  },
+  "readings": {
+    "title": "Meter readings",
+    "description": "No digital meter export? Enter the register values from time to time; the difference between two readings becomes usage.",
+    "add": "Save reading",
+    "created": "Reading saved",
+    "recent": "Recent readings",
+    "empty": "No readings yet.",
+    "delete": "Delete reading",
+    "fields": {
+      "kind": "Meter",
+      "register": "Register",
+      "appliance": "Appliance",
+      "date": "Date",
+      "time": "Time",
+      "valueKwh": "Meter value (kWh)",
+      "valueM3": "Meter value (m³)"
+    },
+    "gasHint": "Converted to kWh with the calorific value from Solar, battery & gas."
+  },
+  "meters": {
+    "title": "Data in WickedHome",
+    "description": "Each channel with its source and the period it covers.",
+    "empty": "No data yet.",
+    "intervals_one": "{{number}} interval",
+    "intervals_other": "{{number}} intervals",
+    "range": "{{from}} – {{to}}"
+  },
+  "carriers": {
+    "label": "Energy carrier",
+    "electricity": "Electricity",
+    "gas": "Gas",
+    "total": "Total energy",
+    "water": "Water",
+    "soon": "Soon"
+  },
+  "readingMeters": {
+    "grid_import": "Electricity · grid import",
+    "grid_export": "Electricity · injection",
+    "solar_production": "Solar production (inverter)",
+    "battery_charge": "Battery charge",
+    "battery_discharge": "Battery discharge",
+    "appliance": "Appliance (electricity)",
+    "gas": "Gas meter",
+    "gas_appliance": "Appliance (gas)"
+  },
+  "gas": {
+    "title": "Gas",
+    "description": "Your gas connection. Gas use comes from the Fluvius gas file or from meter readings.",
+    "meter": "Gas meter",
+    "noEan": "Not set",
+    "calorificExplained": "Gas meters count m³. One m³ holds about 11 kWh, depending on the gas: Fluvius files carry the exact value per hour; manual readings use the value above.",
+    "fields": {
+      "ean": "EAN",
+      "calorific": "Calorific value (kWh/m³)"
+    },
+    "form": {
+      "title": "Gas connection",
+      "description": "The EAN is on your energy bill. The calorific value turns manual m³ readings into kWh.",
+      "calorificHint": "Gross calorific value, usually 11,0 – 11,6 kWh/m³ (see your bill or Fluvius).",
+      "saved": "Gas settings saved"
+    }
+  },
+  "loading": {
+    "overview": "Loading energy figures…",
+    "period": "Loading {{period}}…",
+    "carrier": "Loading {{carrier}}…",
+    "error": "The energy figures could not be loaded.",
+    "appliances": "Loading appliances…"
+  }
+}

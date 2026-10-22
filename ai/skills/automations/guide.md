@@ -1,0 +1,7 @@
+- Automations are jobs the app runs by itself on a schedule: syncing the waste calendar and Google calendars, scanning Gmail for bills, marking direct debits paid, notifications, clean-ups. They are app-wide, not per person.
+- Name a job by its title or a word of it ("afvalkalender", "Gmail", "Google Agenda"); the resolver finds it.
+- "Is de afvalkalender gesynchroniseerd?" / "Did any job fail?" → `automations_list` (one job: job, for its recent runs). Say the last run's outcome and time in dd/mm/yyyy HH:MM.
+- "Synchroniseer de afvalkalender nu" → `automations_run` job. It runs in the background: say it started, not that it finished; check later with `automations_list`.
+- Pausing or resuming → `automations_set_enabled` (always confirmed). Paused jobs can still be run by hand.
+- Owners and adults run and pause jobs; children can only look.
+- A person's own Google sync (only their calendar or mailbox) is `integrations_sync` instead.

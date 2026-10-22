@@ -1,0 +1,331 @@
+{
+  "page": {
+    "title": "Assistant",
+    "description": "Ask about your household, or let the assistant do things for you. Changes always ask first.",
+    "loading": "Loading the conversation…"
+  },
+  "conversations": {
+    "title": "Conversations",
+    "new": "New chat",
+    "untitled": "New conversation",
+    "empty": "No conversations yet.",
+    "rename": "Rename",
+    "renameTitle": "Rename conversation",
+    "titleLabel": "Title",
+    "save": "Save",
+    "delete": "Delete",
+    "deleteTitle": "Delete this conversation?",
+    "deleteDescription": "The messages are deleted. Nothing the assistant changed is undone.",
+    "deleted": "Conversation deleted",
+    "menu": "Conversation options",
+    "retention": "Conversations are kept for {{days}} days after the last message.",
+    "loadFailed": "The conversations could not be loaded.",
+    "open": "Conversations"
+  },
+  "chat": {
+    "placeholder": "Ask something…",
+    "send": "Send",
+    "stop": "Stop",
+    "thinking": "Thinking…",
+    "status": {
+      "queued": "Waiting for another conversation…",
+      "restarting": "The model is restarting, one moment…"
+    },
+    "emptyTitle": "What can I do for you?",
+    "emptyDescription": "Ask about today's agenda, tasks, the shopping list, payments, energy or the weather.",
+    "suggestions": {
+      "today": "What's on today?",
+      "tasks": "Which tasks are overdue?",
+      "pay": "What do we have to pay this week?",
+      "bins": "Which bin goes out next?",
+      "shopping": "Put milk on the shopping list"
+    },
+    "you": "You",
+    "assistant": "Assistant",
+    "openFull": "Open in Assistant",
+    "label": "Conversation with the assistant",
+    "retry": "Try again",
+    "attach": "Attach image",
+    "images": "Attached images",
+    "image": "Attached image",
+    "removeImage": "Remove image",
+    "imageUploading": "Uploading…",
+    "imageFailed": "Upload failed; remove it and try again",
+    "screenOn": "About {{label}}; tap to leave it out",
+    "screenOff": "Not about {{label}}; tap to ask about it",
+    "screenAbout": "Asked about"
+  },
+  "tool": {
+    "running": "Working: {{label}}",
+    "failed": "Didn't work: {{label}}",
+    "cancelled": "Cancelled: {{label}}",
+    "error": "Why: {{error}}"
+  },
+  "confirm": {
+    "title": "Confirm",
+    "sensitiveTitle": "Confirm — this one always asks",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "remember": "Don't ask again for this",
+    "rememberHint": "Only for harmless actions; you can reset it on the assistant's card.",
+    "edit": "Edit",
+    "doneEditing": "Done editing"
+  },
+  "notice": {
+    "no_tools": "This model can't use tools, so it can't look things up or change anything. Choose a model with tool support (see the assistant's card).",
+    "max_steps": "That took many steps; the assistant answered with what it had."
+  },
+  "errors": {
+    "not_configured": "The assistant isn't set up yet.",
+    "conflict": "The assistant is still answering in another window.",
+    "unreachable": "The assistant's computer can't be reached. Is it on, with LM Studio serving on the network?",
+    "timeout": "The model took too long to answer.",
+    "aborted": "Stopped.",
+    "no_tools": "This model can't use tools.",
+    "http": "The model server refused: {{message}}",
+    "too_many_requests": "Too many questions in a short time; wait a moment.",
+    "network": "The connection to the app was lost. Check the network and try again.",
+    "interrupted": "The answer was interrupted (the connection or the server stopped). Try again.",
+    "empty_answer": "The model gave no answer. Try again, perhaps in other words.",
+    "generic": "Something went wrong. Try again."
+  },
+  "voice": {
+    "start": "Hold to talk",
+    "tapStart": "Talk",
+    "stop": "Stop and send",
+    "listening": "Listening… release to send",
+    "transcribing": "Turning speech into text…",
+    "denied": "The microphone is blocked. Allow it in the browser's site settings.",
+    "no_speech": "I didn't hear anything.",
+    "failed": "Speech recognition didn't work.",
+    "unsupported": "Voice input isn't available in this browser (it needs HTTPS).",
+    "readAloud": "Read answers aloud",
+    "stopSpeaking": "Stop reading aloud"
+  },
+  "voices": {
+    "title": "Voice for reading aloud",
+    "description": "Choose the voice on this device. Answers are spoken by the speech server in the house.",
+    "loading": "Loading the voices…",
+    "language": {
+      "nl": "Dutch voice",
+      "en": "English voice"
+    },
+    "default": "Standard: {{voice}}",
+    "test": "Test",
+    "testLabel": "Test the {{language}}",
+    "testing": "Loading…",
+    "stop": "Stop",
+    "testFailed": "The sample couldn't be played.",
+    "sample": {
+      "nl": "Hallo, ik ben jullie huisassistent. Zo klink ik als ik iets voorlees.",
+      "en": "Hello, I'm your home assistant. This is how I sound when I read something aloud."
+    },
+    "loadFailed": "The voices could not be loaded.",
+    "retry": "Try again",
+    "unreachable": "The speech server isn't answering; answers are read by the browser's voice for now.",
+    "none": "The speech server has no voice for this language; the standard one is used.",
+    "male": "male",
+    "region": {
+      "nl_BE": "Flemish",
+      "nl_NL": "Dutch",
+      "en_GB": "British",
+      "en_US": "American"
+    }
+  },
+  "ask": {
+    "button": "Ask the assistant",
+    "title": "Ask the assistant",
+    "description": "A quick question; it is saved under Assistant.",
+    "notConfigured": "The assistant isn't set up yet.",
+    "setup": "How to set it up"
+  },
+  "card": {
+    "title": "Assistant",
+    "description": "A local AI model (LM Studio on a PC in the house) that answers questions and does things with the app's own actions. Also over MCP for other assistants.",
+    "statusModel": "Model: {{model}}",
+    "server": "Server",
+    "model": "Model",
+    "speech": "Speech to text",
+    "speechServer": "Local server (Whisper)",
+    "speechBrowser": "Browser's own recognition",
+    "test": "Test connection",
+    "testing": "Testing…",
+    "latency": "Answered in {{ms}} ms",
+    "testFailed": "Test failed: {{error}}",
+    "modelMissing": "The server doesn't list “{{model}}”. Available: {{models}}",
+    "tools": "What it can do",
+    "toolsCount": "{{count}} actions",
+    "skillsCount": "{{count}} areas, {{tools}} actions",
+    "permission": {
+      "read": "Looks up",
+      "write": "Changes (asks first)",
+      "sensitive": "Sensitive (always asks)"
+    },
+    "confirm": {
+      "never": "Never asks",
+      "first-time": "Until “don't ask again”",
+      "always": "Every time"
+    },
+    "resetPreferences": "Ask again for everything",
+    "preferencesReset": "Every action asks again",
+    "open": "Open the assistant",
+    "problem": {
+      "missing_url": "ASSISTANT_BASE_URL is not set.",
+      "missing_model": "ASSISTANT_MODEL is not set.",
+      "invalid_url": "ASSISTANT_BASE_URL is not a valid http(s) URL."
+    },
+    "setup": {
+      "intro": "The assistant runs on your own computer with LM Studio. On that PC:",
+      "install": "Install LM Studio and download a model with tool support, e.g. Qwen 2.5 7B Instruct or Qwen 3 8B (Q4_K_M fits 8 GB of video memory).",
+      "serve": "Developer tab → load the model → Settings: switch on “Serve on Local Network” and Start the server (port 1234). Give the PC a fixed IP address in the router.",
+      "url": "Its address plus /v1, e.g. http://192.168.1.20:1234/v1",
+      "model": "The model's identifier exactly as LM Studio shows it, e.g. qwen2.5-7b-instruct",
+      "stt": "Optional: a local Whisper server for voice (OpenAI-compatible), e.g. http://192.168.1.20:8000/v1",
+      "restart": "Restart the app so it reads the new settings",
+      "tts": "Optional: a speech server for a natural voice when reading answers aloud, e.g. Piper on this server: http://127.0.0.1:5005",
+      "search": "Optional: a search server on this server so the assistant can search the internet (ai/docs/WEB-SEARCH.md), e.g. http://127.0.0.1:8888"
+    },
+    "voiceOutput": "Reading aloud",
+    "voiceBrowser": "Browser's own voice",
+    "voiceServer": "Speech server ({{host}})",
+    "voiceUnreachable": "Speech server ({{host}}) isn't answering: browser's voice for now",
+    "web": "Web search",
+    "webOff": "Off (not set up)",
+    "webServer": "On ({{host}})",
+    "webUnreachable": "Search server ({{host}}) isn't answering",
+    "webProblem": {
+      "invalid_url": "SEARCH_URL is not a valid http(s) URL; web search is off."
+    },
+    "ttsProblem": {
+      "invalid_url": "ASSISTANT_TTS_URL is not a valid http(s) URL; the browser's voice is used.",
+      "invalid_kind": "ASSISTANT_TTS_KIND must be piper or openai; the browser's voice is used.",
+      "invalid_speed": "ASSISTANT_TTS_SPEED must be a number from 0.5 to 2; the normal speed is used."
+    }
+  },
+  "tokens": {
+    "title": "MCP access",
+    "description": "Let another assistant on the network (Claude Desktop, LM Studio, Home Assistant…) use the same actions as you, with a personal token.",
+    "url": "Server address",
+    "empty": "No tokens yet.",
+    "name": "Name",
+    "namePlaceholder": "e.g. Claude on my laptop",
+    "scope": "Access",
+    "scopeRead": "Read only",
+    "scopeWrite": "Read and change (each change needs confirm: true)",
+    "create": "Make token",
+    "createdTitle": "Your new token",
+    "createdDescription": "Copy it now: it is shown only once. Use it as “Authorization: Bearer …”.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "done": "Done",
+    "revoke": "Revoke",
+    "revokeTitle": "Revoke “{{name}}”?",
+    "revokeDescription": "Assistants using this token lose access at once.",
+    "revoked": "Token revoked",
+    "lastUsed": "Last used {{date}}",
+    "neverUsed": "Never used",
+    "loadFailed": "The tokens could not be loaded."
+  },
+  "jobs": {
+    "cleanup": {
+      "title": "Assistant: clean up old conversations",
+      "description": "Deletes assistant conversations without activity for 90 days."
+    },
+    "oauthCleanup": {
+      "title": "Assistant: clean up OAuth",
+      "description": "Removes expired OAuth codes and tokens, and self-registered apps unused for an hour without a connection."
+    }
+  },
+  "connect": {
+    "title": "Connect other assistants (MCP)",
+    "description": "Other assistants can use the same actions as you, as you. Pick the way your assistant supports.",
+    "whenLabel": "When:",
+    "methods": {
+      "token": "Personal token",
+      "dcr": "OAuth automatic",
+      "app": "OAuth app"
+    },
+    "when": {
+      "token": "for Claude Desktop, LM Studio, Cursor and other clients where you paste a token yourself.",
+      "dcr": "for ChatGPT and Claude connectors: they register themselves and you allow them on a WickedHome page.",
+      "app": "for a connector that asks for a client ID (and secret) instead of registering itself."
+    }
+  },
+  "oauth": {
+    "loadFailed": "The OAuth connections could not be loaded.",
+    "connected": {
+      "title": "Connected apps",
+      "empty": "No apps connected over OAuth yet.",
+      "revoke": "Disconnect",
+      "revokeTitle": "Disconnect “{{name}}”?",
+      "revokeDescription": "The app loses access for {{person}} at once; connecting again means allowing it again.",
+      "revoked": "App disconnected"
+    },
+    "dcr": {
+      "chatgpt": "ChatGPT: Server URL {{url}}, Authentication OAuth, Registration automatic (DCR) — or make an OAuth app here and paste the client ID.",
+      "claude": "Claude: Settings → Connectors → Add custom connector, URL {{url}}.",
+      "switch": "Automatic registration (DCR)",
+      "switchHelp": "Off: new apps can't register themselves. Apps already connected and personal tokens keep working.",
+      "turnedOn": "Automatic registration is on",
+      "turnedOff": "Automatic registration is off",
+      "hostsLabel": "Allowed domains",
+      "hostsHelp": "Apps that register themselves may only send tokens to these domains (exact names, one per line), e.g. chatgpt.com.",
+      "noHosts": "None: no app can register itself.",
+      "editHosts": "Edit domains",
+      "hostsSaved": "Domains saved",
+      "ownerOnly": "An owner of the household manages automatic registration and its domains."
+    },
+    "apps": {
+      "title": "OAuth apps",
+      "howTo": "Make an app here, then in the connector choose OAuth with manual registration and paste the client ID (and the secret, if you made one).",
+      "empty": "No OAuth apps yet.",
+      "create": "New OAuth app",
+      "createDescription": "The client ID and secret are shown once, right after saving.",
+      "name": "Name",
+      "namePlaceholder": "e.g. ChatGPT",
+      "redirectUris": "Redirect URIs",
+      "redirectUrisHelp": "The callback URL(s) the connector shows, one per line; https only.",
+      "confidential": "Make a client secret",
+      "confidentialHelp": "For connectors that keep a secret on their server. Without it the app uses PKCE only.",
+      "createdTitle": "Your OAuth app",
+      "createdWithSecret": "Copy the secret now: it is shown only once.",
+      "createdPublic": "Paste this client ID in the connector. There is no secret (PKCE only).",
+      "clientId": "Client ID",
+      "clientSecret": "Client secret",
+      "withSecret": "with secret",
+      "pkceOnly": "PKCE only",
+      "delete": "Delete",
+      "deleteTitle": "Delete “{{name}}”?",
+      "deleteDescription": "Everyone connected through this app loses access at once.",
+      "deleted": "OAuth app deleted",
+      "ownerOnly": "Only an owner of the household can make OAuth apps."
+    },
+    "errors": {
+      "invalidHost": "Use exact domain names such as chatgpt.com (no https://, no paths).",
+      "tooManyHosts": "At most 20 domains.",
+      "invalidRedirectUri": "Every line must be an https URL without #.",
+      "redirectUriRequired": "Give at least one redirect URI.",
+      "tooManyRedirectUris": "At most 5 redirect URIs."
+    }
+  },
+  "consent": {
+    "title": "{{client}} wants access to WickedHome",
+    "signedInAs": "You are signed in as {{name}} ({{household}}).",
+    "tokensGoTo": "Tokens go to",
+    "onlyIfYou": "Only allow this if you just started connecting from {{host}} yourself.",
+    "accessLabel": "What may it do?",
+    "read": "Read only",
+    "readDescription": "See your household's data, change nothing.",
+    "write": "Read and change",
+    "writeDescription": "Also add and change things; {{client}} must ask you before every change.",
+    "dataNote": "What you share with {{client}} goes to that service and is handled under its terms. You can disconnect it any time on the Assistant card.",
+    "allow": "Allow",
+    "deny": "Deny",
+    "back": "Back",
+    "childRefused": "Child accounts can't connect apps. Ask an adult of the household.",
+    "leaving": "Returning to {{host}}…",
+    "failed": "That didn't work. Reload the page and try again.",
+    "expiredTitle": "This request expired",
+    "expiredDescription": "Start connecting again from the app you came from."
+  }
+}

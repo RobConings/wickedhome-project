@@ -1,0 +1,479 @@
+{
+  "notifications": {
+    "digest": {
+      "title": "Morning overview",
+      "description": "One message with what is overdue and due today for you (and nobody's tasks)."
+    },
+    "assigned": {
+      "title": "Assigned to you",
+      "description": "When someone else gives you a task."
+    },
+    "unblocked": {
+      "title": "Can start now",
+      "description": "A task that waited for another one is ready."
+    },
+    "payments": {
+      "title": "Payments",
+      "description": "The day before a bill is due (\"Pay tomorrow: Watergroep · € 52,30\"), and every few days while it is overdue."
+    },
+    "reminder": {
+      "title": "Reminders",
+      "description": "A task's reminder, at the time set on the task (to the people on duty, or whoever added it). Also during quiet hours: you chose that moment."
+    }
+  },
+  "page": {
+    "title": "Tasks",
+    "description": "Jobs in and around the house: who does what, where and when."
+  },
+  "actions": {
+    "add": "Add task",
+    "complete": "Mark as done",
+    "completeTask": "Mark “{{title}}” as done",
+    "skip": "Skip",
+    "snooze": "Snooze",
+    "reopen": "Reopen",
+    "undo": "Undo",
+    "more": "More actions for “{{title}}”",
+    "undoTask": "Undo “{{title}}”"
+  },
+  "views": {
+    "mine": "Mine",
+    "all": "All",
+    "ready": "Ready to start",
+    "overdue": "Overdue",
+    "done": "Done"
+  },
+  "filters": {
+    "assignee": "Who",
+    "everyone": "Everyone",
+    "location": "Inside or outside",
+    "anywhere": "All",
+    "inside": "Inside",
+    "outside": "Outside",
+    "group": "Group by",
+    "groupDue": "Due date",
+    "groupPlace": "Place",
+    "groupAssignee": "Person",
+    "onePlace": "One place",
+    "clearPlace": "Show all places",
+    "clear": "Clear filters",
+    "type": "Type",
+    "allTypes": "All types",
+    "groupType": "Type"
+  },
+  "groups": {
+    "due": {
+      "overdue": "Overdue",
+      "today": "Today",
+      "soon": "This week",
+      "later": "Later",
+      "none": "Whenever"
+    },
+    "noPlace": "No place",
+    "unassigned": "Unassigned",
+    "type": {
+      "chore": "Household chores",
+      "todo": "To-dos",
+      "job": "Jobs",
+      "maintenance": "Maintenance",
+      "errand": "Errands"
+    },
+    "day": {
+      "overdue": "Overdue",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "week": "This week",
+      "later": "Later",
+      "none": "Whenever"
+    }
+  },
+  "stats": {
+    "mine": "My tasks",
+    "open": "Open tasks",
+    "openTotal_one": "{{count}} open in total",
+    "openTotal_other": "{{count}} open in total",
+    "overdue": "Overdue",
+    "dueToday_one": "{{count}} due today",
+    "dueToday_other": "{{count}} due today",
+    "ready": "Ready to start",
+    "waiting": "Waiting for materials"
+  },
+  "due": {
+    "none": "No due date",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "overdue_one": "{{count}} day overdue",
+    "overdue_other": "{{count}} days overdue",
+    "withTime": "{{label}} · {{time}}"
+  },
+  "duration": {
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "hours_one": "{{count}} hour",
+    "hours_other": "{{count}} hours",
+    "hoursMinutes": "{{hours}} h {{minutes}} min"
+  },
+  "status": {
+    "open": "Open",
+    "done": "Done",
+    "skipped": "Skipped"
+  },
+  "readiness": {
+    "waiting": "Waiting for materials ({{bought}}/{{total}})",
+    "ready": "Ready to start",
+    "done": "Done"
+  },
+  "priority": {
+    "low": "Low",
+    "normal": "Normal",
+    "high": "High priority"
+  },
+  "types": {
+    "chore": "Household chore",
+    "todo": "To-do",
+    "job": "Job",
+    "maintenance": "Maintenance",
+    "errand": "Errand"
+  },
+  "typeExamples": {
+    "chore": "vacuuming, laundry",
+    "todo": "call the insurer",
+    "job": "insulate the jacuzzi",
+    "maintenance": "boiler service",
+    "errand": "post a parcel"
+  },
+  "assignees": {
+    "label": "Assigned to {{names}}",
+    "onDuty": "{{names}}'s turn",
+    "rotation": "Takes turns: {{names}}"
+  },
+  "snooze": {
+    "tomorrow": "Tomorrow",
+    "threeDays": "In 3 days",
+    "weekend": "This weekend",
+    "nextWeek": "In a week"
+  },
+  "checklist": {
+    "progress": "{{done}} of {{total}} steps done",
+    "step": "Step {{number}}",
+    "placeholder": "e.g. Clear the leaves",
+    "add": "Add a step",
+    "remove": "Remove step {{number}}"
+  },
+  "estimate": {
+    "none": "Not sure"
+  },
+  "fields": {
+    "title": "What needs doing?",
+    "type": "Type",
+    "place": "Where",
+    "dueDate": "Due date",
+    "estimate": "Takes about",
+    "priority": "Priority",
+    "assignees": "Who",
+    "rotate": "Take turns",
+    "checklist": "Steps",
+    "notes": "Notes",
+    "reminder": "Reminder"
+  },
+  "when": {
+    "label": "When",
+    "optional": "(optional)",
+    "kinds": {
+      "none": "No date",
+      "day": "Day",
+      "moment": "Time",
+      "slot": "Timeslot",
+      "days": "Several days"
+    },
+    "date": "Date",
+    "time": "Time",
+    "startTime": "From",
+    "endTime": "To",
+    "from": "First day",
+    "to": "Last day",
+    "hints": {
+      "none": "Whenever: it stays in \"Whenever\" until you give it a date.",
+      "day": "All day. Reminders count back from 09:00.",
+      "moment": "At that time; it sits at that hour in the calendar.",
+      "slot": "A block from start to end in the calendar, e.g. 10:00–12:00. Reminders count back from the start.",
+      "days": "All day on every day in between; due on the last day. Reminders count back from 09:00 on the first day."
+    }
+  },
+  "placeholders": {
+    "title": "e.g. Clean the gutters",
+    "notes": "Anything worth knowing: tools, where the ladder is…"
+  },
+  "hints": {
+    "place": "Optional. A room or an outdoor zone, which also shows whether it's inside or outside.",
+    "rotate": "One person at a time, in the order picked; the next one is up after each time.",
+    "reminder": "A push notification to the people on duty (or to you when nobody is), also during quiet hours. All-day tasks: counted from 09:00."
+  },
+  "form": {
+    "createTitle": "Add a task",
+    "editTitle": "Edit task",
+    "description": "Materials can be added on the task's page once it is saved.",
+    "created": "Task added",
+    "updated": "Task saved"
+  },
+  "complete": {
+    "title": "“{{title}}” done?",
+    "description": "Add a note if something is worth remembering for next time.",
+    "recurringDescription": "It comes back on its next date. Add a note if something is worth remembering.",
+    "who": "Who did it",
+    "note": "Note",
+    "notePlaceholder": "e.g. Used two bags of potting soil"
+  },
+  "toast": {
+    "done": "“{{title}}” done",
+    "doneNext": "“{{title}}” done. Next time: {{date}}",
+    "skipped": "Skipped",
+    "skippedNext": "Skipped. Next time: {{date}}",
+    "snoozed": "Moved to {{date}}",
+    "reopened": "Task reopened",
+    "unblocked": "“{{title}}” can start now",
+    "held": "Put on hold",
+    "released": "Resumed"
+  },
+  "detail": {
+    "noPlace": "Anywhere",
+    "unassigned": "Nobody yet",
+    "repeats": "Repeats",
+    "thenOn": "After this one:",
+    "lastOccurrence": "This is the last time."
+  },
+  "history": {
+    "title": "History",
+    "empty": "Not done before.",
+    "done": "Done",
+    "doneBy": "Done by {{name}}",
+    "skipped": "Skipped",
+    "skippedBy": "Skipped by {{name}}",
+    "forDate": "Due {{date}}"
+  },
+  "delete": {
+    "title": "Delete “{{title}}”?",
+    "description": "The task and its history are removed.",
+    "withMaterials": "The task, its history and its materials on the shopping lists are removed."
+  },
+  "place": {
+    "title": "Tasks",
+    "count_one": "{{count}} open task here",
+    "count_other": "{{count}} open tasks here",
+    "empty": "Nothing to do here right now.",
+    "loading": "Loading tasks…",
+    "error": "Tasks couldn't be loaded.",
+    "retry": "Try again",
+    "add": "Add a task here",
+    "viewAll": "All tasks here",
+    "viewAllCount": "All {{count}} tasks here"
+  },
+  "empty": {
+    "none": {
+      "title": "No tasks yet",
+      "description": "Add the jobs in and around the house: cleaning the gutters, the weekly vacuum, insulating the jacuzzi…"
+    },
+    "mine": {
+      "title": "Nothing on your list",
+      "description": "Nothing is assigned to you right now. Enjoy it."
+    },
+    "all": {
+      "title": "All done",
+      "description": "There are no open tasks."
+    },
+    "ready": {
+      "title": "Nothing ready to start",
+      "description": "Every open task is still waiting for materials."
+    },
+    "overdue": {
+      "title": "Nothing overdue",
+      "description": "Every task is on schedule."
+    },
+    "done": {
+      "title": "Nothing done lately",
+      "description": "Tasks done or skipped in the last 30 days show up here."
+    },
+    "filtered": {
+      "title": "No tasks match",
+      "description": "Try another person, place or inside/outside."
+    }
+  },
+  "errors": {
+    "dueDateRequired": "A repeating task needs a first due date.",
+    "invalidRecurrence": "This repeat rule isn't supported.",
+    "unknownPlace": "This place doesn't exist (any more).",
+    "unknownHabitant": "Pick each person once, from this household.",
+    "notFound": "This task no longer exists.",
+    "alreadyClosed": "This task was already done or skipped.",
+    "forbidden": "You can only complete tasks assigned to you.",
+    "cycle": "That would make the tasks wait for each other.",
+    "sameTask": "Pick another task.",
+    "linkedDelete": "A linked task can't be deleted; skip it instead.",
+    "unknownProject": "This project doesn't exist (any more).",
+    "timeNeedsDate": "A time needs a due date.",
+    "reminderNeedsDate": "A reminder needs a date.",
+    "endTimeNeedsTime": "A timeslot needs a start time.",
+    "endTimeBeforeStart": "The end has to be after the start.",
+    "startDateNeedsDate": "Several days need a last day.",
+    "startDateAfterEnd": "The first day has to come before the last day.",
+    "daysTooLong": "At most a year from the first to the last day.",
+    "daysAllDay": "Several days are always all day: no time."
+  },
+  "project": {
+    "label": "Project",
+    "chip": "Project: {{name}}",
+    "loading": "Loading the project's tasks…",
+    "error": "Couldn't load the tasks.",
+    "empty": "No tasks yet. Add what needs doing, like “Buy materials” and “Start tiling”.",
+    "allDone": "Every task is done.",
+    "done_one": "{{count}} done",
+    "done_other": "{{count}} done",
+    "add": "Add a task"
+  },
+  "progress": {
+    "group": "{{done}} of {{total}} done",
+    "open_one": "{{count}} open",
+    "open_other": "{{count}} open",
+    "today": "{{done}} of {{total}} done today",
+    "overdue_one": "{{count}} overdue",
+    "overdue_other": "{{count}} overdue"
+  },
+  "allDone": {
+    "title": "All done",
+    "todayTitle": "All done for today",
+    "doneToday_one": "{{count}} task done today.",
+    "doneToday_other": "{{count}} tasks done today.",
+    "nothingLeft": "Nothing left on the list. Enjoy!",
+    "later_one": "{{count}} more on the list for later.",
+    "later_other": "{{count}} more on the list for later."
+  },
+  "repeat": {
+    "label": "Repeats",
+    "presets": {
+      "daily": "Every day",
+      "weekly": "Every {{day}}",
+      "biweekly": "Every 2 weeks",
+      "monthly": "Every month",
+      "yearly": "Every year",
+      "custom": "Custom…"
+    },
+    "until": "Ends on (optional)",
+    "everyWeekday": "Every {{days}}",
+    "action": "Repeat this…",
+    "change": "Change repeat…",
+    "weekdays": "On these days",
+    "firstTime": "first time {{date}}"
+  },
+  "origin": {
+    "waste": "From waste collection",
+    "expense": "From expenses (a payment)",
+    "vouchers": "From income (meal vouchers that expire soon)",
+    "other": "From another part of the app"
+  },
+  "originShort": {
+    "waste": "Waste collection",
+    "expense": "Payment",
+    "vouchers": "Meal vouchers",
+    "other": "Linked"
+  },
+  "hold": {
+    "badge": "On hold",
+    "withReason": "On hold: {{reason}}",
+    "title": "Put “{{title}}” on hold?",
+    "description": "It stays on the list with its due date (and still shows overdue when late), marked as blocked until you resume it.",
+    "reason": "Why",
+    "reasonPlaceholder": "e.g. The invoice looks wrong; recalculate it first",
+    "confirm": "Put on hold",
+    "action": "Put on hold…",
+    "release": "Resume",
+    "noReason": "no reason given"
+  },
+  "waiting": {
+    "badge": "Waiting for {{title}}",
+    "badgeMore_one": "Waiting for {{title}} +{{count}}",
+    "badgeMore_other": "Waiting for {{title}} +{{count}}",
+    "summary_one": "Waiting for {{count}} task",
+    "summary_other": "Waiting for {{count}} tasks"
+  },
+  "comments": {
+    "title": "Comments",
+    "count_one": "{{count}} comment",
+    "count_other": "{{count}} comments",
+    "empty": "No comments yet: write what you found out or what you're waiting for.",
+    "placeholder": "Write a comment…",
+    "add": "New comment",
+    "send": "Send",
+    "edit": "Edit comment",
+    "delete": "Delete comment",
+    "deleteTitle": "Delete this comment?",
+    "edited": "edited",
+    "formerMember": "Former member",
+    "error": "The comment couldn't be saved."
+  },
+  "blocked": {
+    "toast": "“{{title}}” is still waiting for other tasks.",
+    "title": "“{{title}}” is still waiting",
+    "description": "It waits for: {{titles}}. Complete it anyway?",
+    "completeAnyway": "Complete anyway"
+  },
+  "links": {
+    "title": "Depends on",
+    "empty": "Not linked to other tasks.",
+    "blockedBy": "Waits for",
+    "blocks": "Blocks",
+    "related": "Related",
+    "add": "Link a task",
+    "addTitle": "Link a task",
+    "addDescription": "Waits for: this task can't be done before the other one. Blocks: the other one waits for this. Related: just a reference.",
+    "kind": "Link",
+    "kinds": {
+      "blocked_by": "Waits for",
+      "blocks": "Blocks",
+      "related": "Related"
+    },
+    "task": "Task",
+    "pick": "Pick a task…",
+    "added": "Tasks linked",
+    "remove": "Remove the link with “{{title}}”"
+  },
+  "linked": {
+    "formHint": "This task follows where it comes from: its title, type and due date update by themselves. You can change who does it and the notes.",
+    "openTask": "Open task",
+    "loading": "Loading the task…",
+    "error": "The task couldn't be loaded.",
+    "none": "No task linked.",
+    "payTitle": "Payment task",
+    "directDebit": "Paid by direct debit: no task needed.",
+    "noPayTask": "A payment task appears two weeks before the due date."
+  },
+  "jobs": {
+    "payTasks": {
+      "title": "Keep payment tasks in sync",
+      "description": "Gives every unpaid expense you pay by hand a “Pay …” task (due the day before), and completes or removes it when the expense is paid, changed or deleted."
+    },
+    "reminders": {
+      "title": "Send task reminders",
+      "description": "Every minute: pushes the reminders that are due. A reminder missed by less than 30 minutes (server down) is sent late; older ones are skipped."
+    }
+  },
+  "reminder": {
+    "none": "No reminder",
+    "atTime": "At the time",
+    "minutesBefore_one": "{{count}} minute before",
+    "minutesBefore_other": "{{count}} minutes before",
+    "hoursBefore_one": "{{count}} hour before",
+    "hoursBefore_other": "{{count}} hours before",
+    "daysBefore_one": "{{count}} day before",
+    "daysBefore_other": "{{count}} days before",
+    "at": "Reminder {{time}}",
+    "atDate": "Reminder {{date}} {{time}}",
+    "sent": "Reminder sent",
+    "label": "Reminder",
+    "allDay": {
+      "onTheDay": "On the day, {{time}}",
+      "daysBefore_one": "{{count}} day before, {{time}}",
+      "daysBefore_other": "{{count}} days before, {{time}}",
+      "before": "{{offset}} {{time}}"
+    }
+  }
+}

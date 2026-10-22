@@ -1,0 +1,273 @@
+// Feature: integrations — Google, connected per user (Calendar, Gmail bill suggestions, Drive).
+// See docs/INTEGRATIONS.md. Tokens are encrypted with INTEGRATIONS_KEY (src/api/lib/secrets.ts).
+
+enum GoogleConnectionStatus {
+  CONNECTED
+  /// Google refused the stored consent (revoked, expired): the person connects again.
+  NEEDS_RECONNECT
+}
+
+/// One person's Google account. The refresh token is encrypted and never leaves the server; access tokens
+/// only live in memory.
+model GoogleConnection {
+  id                 String                 @id @default(cuid())
+  userId             String                 @unique
+  user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  householdId        String
+  household          Household              @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  googleAccountEmail String
+  /// Google's stable account id (`sub` of the ID token).
+  googleSubject      String
+  /// AES-256-GCM (`v1.<iv>.<tag>.<data>`), context `google:refresh:<userId>`.
+  refreshTokenEnc    String
+  /// Every scope granted so far (incremental consent adds to it).
+  scopes             String[]
+  status             GoogleConnectionStatus @default(CONNECTED)
+  lastError          String?
+  /// Publishing household events: our GoogleCalendar id of the target; null = off (the default).
+  publishCalendarId  String?
+  /// Lowercase household event categories that are published.
+  publishCategories  String[]
+  lastPublishedAt    DateTime?
+  publishError       String?
+  /// Gmail: when this mailbox was last searched; the next search starts a day before it.
+  gmailLastScanAt    DateTime?
+  gmailError         String?
+  /// Drive: the "WickedHome" folder the app created for "Save to Drive" (drive.file scope).
+  driveAppFolderId   String?
+  connectedAt        DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  calendars          GoogleCalendar[]
+  publishedEvents    GooglePublishedEvent[]
+  mailSuggestions    MailBillSuggestion[]
+  driveLinks         GoogleDriveLink[]
+
+  @@index([householdId])
+  @@map("google_connections")
+}
+
+/// A consent round in progress (authorization code + PKCE + state). Single use, valid 10 minutes, bound to
+/// the session that started it.
+model GoogleOAuthState {
+  /// SHA-256 (hex) of the random `state` sent to Google; the state itself is never stored.
+  id              String   @id
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// `sessions.id` of the session that started it; only that session can finish it.
+  sessionId       String
+  /// PKCE code verifier, encrypted (context `google:pkce:<id>`).
+  codeVerifierEnc String
+  /// Scopes asked for in this round.
+  scopes          String[]
+  redirectUri     String
+  /// The authorization code from the callback, encrypted, until the session finishes the round.
+  codeEnc         String?
+  expiresAt       DateTime
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("google_oauth_states")
+}
+
+enum GoogleCalendarVisibility {
+  /// Everyone in the household sees its events on the WickedHome calendar.
+  HOUSEHOLD
+  /// Only the person who connected it.
+  PRIVATE
+}
+
+/// One calendar in the person's Google calendar list, and whether it is shown.
+model GoogleCalendar {
+  id               String                   @id @default(cuid())
+  connectionId     String
+  connection       GoogleConnection         @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  googleCalendarId String
+  name             String
+  /// `#rrggbb`
+  color            String
+  primary          Boolean                  @default(false)
+  /// Google's accessRole: owner, writer, reader, freeBusyReader.
+  accessRole       String
+  selected         Boolean                  @default(false)
+  visibility       GoogleCalendarVisibility @default(HOUSEHOLD)
+  /// Google's nextSyncToken; null = the next sync is a full one.
+  syncToken        String?
+  lastSyncedAt     DateTime?
+  lastError        String?
+  events           GoogleCalendarEvent[]
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+
+  @@unique([connectionId, googleCalendarId])
+  @@map("google_calendars")
+}
+
+/// Local copy of a Google event (one per occurrence: recurring events are expanded by Google), so the
+/// calendar loads fast and without Google. Only what the calendar shows is kept.
+model GoogleCalendarEvent {
+  id            String         @id @default(cuid())
+  calendarId    String
+  calendar      GoogleCalendar @relation(fields: [calendarId], references: [id], onDelete: Cascade)
+  googleEventId String
+  title         String
+  location      String?
+  allDay        Boolean
+  /// As `CalendarEntry`: all-day `YYYY-MM-DD` (end inclusive), timed ISO instants.
+  start         String
+  end           String
+  /// First and last day it touches in Europe/Brussels, for range queries.
+  startDay      DateTime       @db.Date
+  endDay        DateTime       @db.Date
+  htmlLink      String?
+  updatedAt     DateTime       @updatedAt
+
+  @@unique([calendarId, googleEventId])
+  @@index([calendarId, startDay, endDay])
+  @@map("google_calendar_events")
+}
+
+/// A household event pushed to the person's publish calendar (one-way). `contentHash` is what was last sent,
+/// so unchanged events are not sent again.
+model GooglePublishedEvent {
+  id               String           @id @default(cuid())
+  connectionId     String
+  connection       GoogleConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  /// `calendar_events.id`. No foreign key: the calendar feature doesn't know about publishing.
+  calendarEventId  String
+  /// Google's id of the calendar it was pushed to (the target can change).
+  googleCalendarId String
+  googleEventId    String
+  contentHash      String
+  updatedAt        DateTime         @updatedAt
+
+  @@unique([connectionId, calendarEventId])
+  @@map("google_published_events")
+}
+
+/// Which mails are bills of one payee. Household-wide; every connected mailbox is searched with them.
+model MailBillRule {
+  id          String               @id @default(cuid())
+  householdId String
+  household   Household            @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  payee       String
+  /// Full addresses or domains (a domain also matches its subdomains).
+  senders     String[]
+  /// Lowercase expense category, e.g. "energy".
+  category    String
+  enabled     Boolean              @default(true)
+  /// The built-in Belgian provider it was seeded from (e.g. "fluvius"); null for rules people added.
+  builtInKey  String?
+  /// "Always link mails from this sender to …": the recurring expense (`bill_series.id`) its suggestions are
+  /// pre-matched to (the occurrence nearest to the mail's due date). No foreign key: the expenses feature's table.
+  recurringExpenseId String?
+  suggestions MailBillSuggestion[]
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@unique([householdId, builtInKey])
+  @@index([householdId])
+  @@map("mail_bill_rules")
+}
+
+enum MailSuggestionStatus {
+  PENDING
+  ACCEPTED
+  DISMISSED
+  /// Linked to an expense that already existed (or a recurring expense's occurrence, created when needed).
+  LINKED
+}
+
+/// A bill found in someone's mail. Only extracted fields are stored, never the mail; the PDF is fetched
+/// from Gmail again when the suggestion is accepted and then stored in Documents.
+model MailBillSuggestion {
+  id                      String               @id @default(cuid())
+  householdId             String
+  household               Household            @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  connectionId            String
+  connection              GoogleConnection     @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  ruleId                  String?
+  rule                    MailBillRule?        @relation(fields: [ruleId], references: [id], onDelete: SetNull)
+  gmailMessageId          String
+  /// MIME part id of the PDF (Gmail's attachment ids are not stable, part ids are).
+  attachmentPartId        String?
+  attachmentName          String?
+  payee                   String
+  category                String
+  /// Subject line, shortened to 200 characters.
+  subject                 String
+  receivedAt              DateTime
+  amountCents             Int?
+  dueDate                 DateTime?            @db.Date
+  /// 12 digits, check digits verified.
+  structuredCommunication String?
+  iban                    String?
+  /// The same bill mailed twice or to two people gives one suggestion per household.
+  dedupeKey               String
+  status                  MailSuggestionStatus @default(PENDING)
+  /// After Accept or Link: the expense and the stored PDF (no foreign keys: other features' tables).
+  expenseId               String?
+  documentFileId          String?
+  decidedAt               DateTime?
+  createdAt               DateTime             @default(now())
+
+  @@unique([connectionId, gmailMessageId])
+  @@index([householdId, status])
+  @@index([householdId, dedupeKey])
+  @@map("mail_bill_suggestions")
+}
+
+/// A folder of someone's Google Drive linked into the household's documents. Browsing it uses the linking
+/// person's connection; unlinking or disconnecting removes the link, never anything in Drive.
+model GoogleDriveLink {
+  id            String           @id @default(cuid())
+  householdId   String
+  household     Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  connectionId  String
+  connection    GoogleConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  driveFolderId String
+  name          String
+  createdAt     DateTime         @default(now())
+
+  @@unique([connectionId, driveFolderId])
+  @@index([householdId])
+  @@map("google_drive_links")
+}
+
+enum GoogleDriveFolderMode {
+  /// A folder the app created (works with `drive.file`); the person may move or rename it in Drive later.
+  CREATED
+  /// An existing folder the person picked; writing into it needs the full `drive` scope.
+  PICKED
+}
+
+/// One kind of household document (storage target registry: "bills", later e.g. "manuals") is stored in a
+/// folder of someone's Google Drive instead of on the server. Uploads use that person's connection, looked up
+/// by user so reconnecting resumes; while they are disconnected new files stay on the server.
+model GoogleDriveStorageTarget {
+  id             String                @id @default(cuid())
+  householdId    String
+  household      Household             @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  /// Storage target kind (STORAGE_TARGET_KINDS in the documents contract), e.g. "bills".
+  kind           String
+  /// Whose Google connection is used (an owner or adult with Drive on).
+  userId         String
+  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  driveFolderId  String
+  folderName     String
+  folderMode     GoogleDriveFolderMode
+  /// Put files in a subfolder per year ("2026"), created when needed.
+  yearSubfolders Boolean               @default(true)
+  /// Year → Drive folder id of the year subfolders found or made so far.
+  yearFolders    Json                  @default("{}")
+  /// Also move the Drive file to Drive's trash when its document is deleted for good in WickedHome. Off by default.
+  deleteInDrive  Boolean               @default(false)
+  lastError      String?
+  lastMovedAt    DateTime?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  @@unique([householdId, kind])
+  @@index([userId])
+  @@map("google_drive_storage_targets")
+}

@@ -1,0 +1,47 @@
+// Feature: scheduled jobs ("Automations"). The scheduler lives in src/api/jobs; see docs/AUTOMATIONS.md.
+// Jobs themselves are code (registered with `registerJob`), so they have no table: `jobId` is the job's
+// code id, e.g. `shops.icons`.
+
+enum JobTrigger {
+  SCHEDULE
+  MANUAL
+  STARTUP
+}
+
+enum JobRunStatus {
+  RUNNING
+  SUCCEEDED
+  FAILED
+  SKIPPED
+}
+
+/// One run of a job. Pruned daily by the `jobs.prune` job (older than 90 days, keeping the last runs per job).
+/// A run left RUNNING by a crashed process is marked FAILED when the scheduler starts.
+model JobRun {
+  id         String       @id @default(cuid())
+  jobId      String
+  trigger    JobTrigger
+  status     JobRunStatus @default(RUNNING)
+  startedAt  DateTime     @default(now())
+  finishedAt DateTime?
+  durationMs Int?
+  /// Short result line from the job, e.g. "3 households synced".
+  summary    String?
+  /// Error message of a failed run (or why it was skipped).
+  error      String?
+  /// Lines the job wrote with `ctx.log()`, newline-separated and capped.
+  log        String?
+
+  @@index([jobId, startedAt])
+  @@index([status])
+  @@map("job_runs")
+}
+
+/// Per-job settings changed in the app. No row means the job's defaults (`enabledByDefault`).
+model JobSetting {
+  jobId     String   @id
+  enabled   Boolean
+  updatedAt DateTime @updatedAt
+
+  @@map("job_settings")
+}

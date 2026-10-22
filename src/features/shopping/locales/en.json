@@ -1,0 +1,367 @@
+{
+  "page": {
+    "title": "Shopping",
+    "description": "Groceries, materials for jobs and stock running low, all on the same lists."
+  },
+  "actions": {
+    "shopView": "Shop view",
+    "products": "Products",
+    "newList": "New list",
+    "editList": "Edit list",
+    "addStaple": "Add staple",
+    "addProduct": "Add product",
+    "backToShopping": "Shopping",
+    "backToProducts": "Products",
+    "showBought": "Show bought",
+    "hideBought": "Hide bought"
+  },
+  "categories": {
+    "produce": "Fruit & veg",
+    "bakery": "Bakery",
+    "dairy": "Dairy & eggs",
+    "meat_fish": "Meat & fish",
+    "pantry": "Pantry",
+    "frozen": "Frozen",
+    "drinks": "Drinks",
+    "household": "Household",
+    "personal_care": "Personal care",
+    "baby": "Baby",
+    "pets": "Pets",
+    "pharmacy": "Pharmacy",
+    "diy": "DIY",
+    "garden": "Garden",
+    "other": "Other"
+  },
+  "listKinds": {
+    "groceries": "Groceries",
+    "diy": "DIY",
+    "pharmacy": "Pharmacy",
+    "other": "Other"
+  },
+  "source": {
+    "manual": "Added by hand",
+    "staple": "Weekly staple",
+    "task": "For a task",
+    "taskNamed": "For: {{title}}",
+    "low_stock": "Stock replenishment",
+    "recipe": "For a recipe",
+    "recipeNamed": "For {{name}}"
+  },
+  "stockStatus": {
+    "below_minimum": "Below minimum",
+    "at_minimum": "At minimum",
+    "above_minimum": "Above minimum"
+  },
+  "stockAdvice": {
+    "below_minimum": "To buy · Below minimum",
+    "at_minimum": "Warning · At minimum"
+  },
+  "stockHelp": {
+    "below_minimum": "Stock is below your minimum and needs replenishing.",
+    "at_minimum": "Stock is at your minimum: an early warning to consider buying more.",
+    "above_minimum": "Stock is above your minimum."
+  },
+  "guidance": {
+    "choice": "Both stock warnings and items to buy stay on the list. Use importance and stock level to decide what to buy."
+  },
+  "fields": {
+    "isEssential": "Essential product",
+    "isEssentialDescription": "Mark household essentials. Other products appear as nice to have on shopping lists.",
+    "packageSize": "Content per package",
+    "packageSizeDescription": "What one package holds, e.g. 200 g; a 6 x 33 cl pack is 198 cl. Lets recipes in grams or litres check the stock.",
+    "packageUnit": "Unit of the content",
+    "packageUnitPlaceholder": "Unit",
+    "name": "Name",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "unitPlaceholder": "pcs",
+    "shop": "Shop",
+    "defaultShop": "Usually bought at",
+    "list": "List",
+    "kind": "Kind",
+    "note": "Note",
+    "category": "Category",
+    "barcode": "Barcode (EAN)",
+    "barcodeDescription": "The number under the barcode on the packaging.",
+    "qrCode": "Own QR code",
+    "qrCodeDescription": "The code on a label you printed yourself.",
+    "imageUrl": "Image link",
+    "photo": "Photo",
+    "removePhoto": "Remove photo",
+    "notes": "Notes",
+    "repeat": "Comes back",
+    "startDate": "First time",
+    "url": "Webshop link",
+    "price": "Price",
+    "articleNumber": "Article number"
+  },
+  "repeat": {
+    "weekly": "Every week",
+    "biweekly": "Every 2 weeks",
+    "monthly": "Every month",
+    "daily": "Every day",
+    "custom": "Custom ({{rule}})"
+  },
+  "add": {
+    "label": "New item",
+    "placeholder": "Add an item or paste a webshop link…",
+    "submit": "Add",
+    "fromCatalogue": "From the catalogue…",
+    "shop": "Shop…",
+    "previewing": "Reading the page…",
+    "previewFailed": "Couldn't read the page; the link is saved as is.",
+    "clearLink": "Remove link",
+    "added": "Added to the list",
+    "adding": "Adding…"
+  },
+  "item": {
+    "tick": "Mark {{name}} as bought",
+    "untick": "Mark {{name}} as not bought",
+    "delete": "Remove {{name}}",
+    "openLink": "Open the webshop page",
+    "boughtBy": "Bought by {{name}}",
+    "project": "For project {{name}}",
+    "edit": "Edit {{name}}"
+  },
+  "project": {
+    "empty": "Nothing to buy for this project.",
+    "emptyManage": "Add what the project needs: from the catalogue, by name or by pasting a webshop link. It goes on the materials list.",
+    "toBuy": "{{amount}} still to buy",
+    "setPrice": "Set the price of {{name}}",
+    "setPriceShort": "Price",
+    "priceLabel": "Price per unit",
+    "priceHint": "An estimate is fine: the project's budget counts it as committed until it's bought.",
+    "onInvoice": "On invoice {{label}}",
+    "onAnInvoice": "On an invoice",
+    "unlinkInvoice": "Take {{name}} off its invoice",
+    "unlinkInvoiceShort": "Take off invoice"
+  },
+  "lists": {
+    "all": "All lists",
+    "filterLabel": "Show list",
+    "openCount_one": "{{count}} on the list",
+    "openCount_other": "{{count}} on the list",
+    "empty": "Nothing on this list.",
+    "emptyAll": "Nothing to buy. Enjoy the empty fridge while it lasts.",
+    "recentlyBought": "Bought today"
+  },
+  "listForm": {
+    "createTitle": "New shopping list",
+    "editTitle": "Edit list",
+    "description": "For example Weekly groceries, DIY or Pharmacy.",
+    "created": "List created",
+    "updated": "List saved",
+    "deleteTitle": "Delete {{name}}?",
+    "deleteDescription": "The list and everything on it is deleted, including its staples.",
+    "deleted": "List deleted"
+  },
+  "staples": {
+    "title": "Staples",
+    "description": "Things that come back on a list on a schedule.",
+    "empty": "No staples yet. Add milk, bread or coffee to have them come back every week.",
+    "nextDue": "Next: {{date}}",
+    "createTitle": "Add a staple",
+    "editTitle": "Edit staple",
+    "formDescription": "It goes back on the list on the day it is due, unless it is still on there.",
+    "created": "Staple added",
+    "updated": "Staple saved",
+    "deleteTitle": "Stop {{name}}?",
+    "deleteDescription": "It no longer comes back on the list. Items already on the list stay.",
+    "deleted": "Staple stopped",
+    "edit": "Edit {{name}}"
+  },
+  "shops": {
+    "title": "By shop",
+    "description": "Where to buy what is on your lists.",
+    "noShop": "No shop chosen",
+    "openShop": "Open the shop view for {{name}}",
+    "estimate": "about {{total}}"
+  },
+  "shopView": {
+    "title": "Shop view",
+    "description": "Everything on the list for one shop. Choose what to buy and tick things off as they go in the basket.",
+    "chooseShop": "Choose a shop",
+    "noShopDescription": "Items without a preferred shop. Buy them anywhere.",
+    "empty": "Nothing to buy here.",
+    "emptyDescription": "Everything on the list for this shop is in the basket.",
+    "nothingAnywhere": "Your lists are empty.",
+    "progress": "{{bought}} of {{total}} in the basket",
+    "liveHint": "Updates automatically while you shop.",
+    "planVisit": "Plan a visit",
+    "otherItems": "Other",
+    "estimate": "About {{total}} to go",
+    "noPrices": "No prices yet: add them with the edit button",
+    "unpriced_one": "{{count}} item without a price",
+    "unpriced_other": "{{count}} items without a price",
+    "sort": {
+      "label": "Sort",
+      "priority": "By priority",
+      "category": "By category",
+      "name": "By name (A–Z)",
+      "price": "Most expensive first"
+    },
+    "tiers": {
+      "urgent": "To buy · below minimum",
+      "warning": "Warning · at minimum",
+      "essential": "Essential",
+      "normal": "Other",
+      "extra": "Extras"
+    },
+    "filters": {
+      "label": "Search and filter",
+      "search": "Search the list…",
+      "priority": "Priority",
+      "priorities": {
+        "all": "All priorities",
+        "needed": "Below or at minimum",
+        "essential": "Essentials only",
+        "extra": "Extras only"
+      },
+      "allCategories": "All categories",
+      "clear": "Clear filters",
+      "noResults": "Nothing matches these filters",
+      "noResultsDescription": "Change the search or filters, or clear them."
+    }
+  },
+  "products": {
+    "essential": "Essential",
+    "nonEssential": "Nice to have",
+    "title": "Products",
+    "description": "Your household's catalogue: what you buy, where, and for how much.",
+    "search": "Search products…",
+    "empty": "No products yet",
+    "emptyDescription": "Add the things you buy often. You can scan their barcode later.",
+    "noResults": "No products found",
+    "links": "Where to buy",
+    "noLinks": "No shop links yet.",
+    "addLink": "Add shop",
+    "editLink": "Edit {{shop}}",
+    "deleteLink": "Remove {{shop}}",
+    "defaultShopBadge": "Usually",
+    "createTitle": "Add a product",
+    "editTitle": "Edit product",
+    "formDescription": "Products are reused on lists, as staples and in your stock.",
+    "created": "Product added",
+    "updated": "Product saved",
+    "deleteTitle": "Delete {{name}}?",
+    "deleteDescription": "It disappears from the catalogue and your stock. Items on lists keep their name.",
+    "deleted": "Product deleted",
+    "linkTitle": "Where to buy {{name}}",
+    "linkDescription": "The same product at another shop, with its own link and price.",
+    "linkSaved": "Shop link saved",
+    "addToList": "Put {{name}} on the list",
+    "addedToList": "{{name}} is on the list",
+    "priceFrom": "from {{price}}"
+  },
+  "place": {
+    "title": "To buy for this place",
+    "empty": "Nothing on the shopping list for this place."
+  },
+  "storeVisit": {
+    "title": "To buy here",
+    "empty": "Nothing on the list for this shop.",
+    "openShopView": "Open shop view",
+    "more_one": "and {{count}} more",
+    "more_other": "and {{count}} more"
+  },
+  "task": {
+    "title": "Materials",
+    "progress": "{{bought}}/{{total}} bought",
+    "empty": "This task doesn't need any materials.",
+    "emptyManage": "Add what this job needs: from the catalogue, by name or by pasting a webshop link."
+  },
+  "restock": {
+    "prompt": "Put {{name}} in stock at {{place}}?",
+    "add": "Add {{quantity}} {{unit}}",
+    "done": "{{name}} added to {{place}}"
+  },
+  "picker": {
+    "product": "Choose a product…",
+    "list": "Choose a list…"
+  },
+  "packageUnits": {
+    "g": "g",
+    "kg": "kg",
+    "ml": "ml",
+    "cl": "cl",
+    "l": "l",
+    "pcs": "pcs"
+  },
+  "errors": {
+    "generic": "That didn't work. Please try again.",
+    "favorite": "Couldn't update your favourites. Try again.",
+    "forbidden": "You're not allowed to do that.",
+    "packageBoth": "Fill in both the amount and the unit, or neither."
+  },
+  "loading": {
+    "items": "Loading the shopping list…",
+    "itemsFailed": "Couldn't load the shopping list."
+  },
+  "autofill": {
+    "lookingUp": "Looking up this barcode…",
+    "apply": "Fill in",
+    "filled": "Filled in from the barcode. Check the details and save.",
+    "notFound": "Not found. Fill in the details yourself.",
+    "unavailable": "Couldn't look this barcode up right now. Fill in the details yourself."
+  },
+  "jobs": {
+    "barcodeCache": {
+      "title": "Clean up barcode lookups",
+      "description": "Removes product details and photos found by barcode that nobody needed for a long time (found products after 180 days, unknown codes after 30). Photos a saved product uses are kept."
+    }
+  },
+  "edit": {
+    "title": "Edit item",
+    "description": "On {{list}}",
+    "saved": "Item saved",
+    "product": "Product",
+    "productHint": "Link it to a product from the catalogue, or leave it a loose item.",
+    "noProduct": "No product",
+    "noCategory": "No category",
+    "price": "Price per unit",
+    "priceHint": "Counts towards the estimate in the shop view.",
+    "fetch": "Fetch from link",
+    "fetchedPrice": "Found {{price}} on the page.",
+    "fetchedNoPrice": "Read the page, but it shows no price.",
+    "fetchFailed": "The page couldn't be read."
+  },
+  "alternatives": {
+    "title": "Alternatives",
+    "description": "Other brands of the same thing share one stock: scanning any of them uses or adds to the same stock.",
+    "none": "No alternatives yet. Link another brand of the same thing to share one stock.",
+    "link": "Link an alternative",
+    "linkOf": "This is an alternative for…",
+    "linkTitle": "Link an alternative to {{name}}",
+    "linkOfTitle": "{{name}} is an alternative for…",
+    "linkDescription": "Both products then share one stock: their stock is added together per place.",
+    "product": "Product",
+    "sharedName": "Name for the shared stock",
+    "sharedNameDescription": "E.g. \"Bacon\": a new product without a barcode holds the stock, with both as its alternatives.",
+    "submit": "Link",
+    "linked": "Linked: they share one stock now",
+    "unlink": "Unlink {{name}}",
+    "unlinked": "{{name}} no longer shares stock",
+    "sharesWith": "Shares stock with {{name}}",
+    "sharesWithLink": "Shares stock with <main>{{name}}</main>",
+    "badge": "Shared stock",
+    "badgeTitle": "Shares stock with {{names}}",
+    "opened": "Opened",
+    "chooseProduct": "Choose a product",
+    "or": "or:"
+  },
+  "productLink": {
+    "label": "Webshop link",
+    "price": "Price",
+    "description": "The product page at a webshop; pasting one reads its name, photo and price.",
+    "others_one": "The main link; {{count}} other shop has its own link (in the product's link menu).",
+    "others_other": "The main link; {{count}} other shops have their own link (in the product's link menu).",
+    "forShop": "Saved as the {{shop}} link.",
+    "forDefaultShop": "{{host}} is no known shop: saved as the {{shop}} link.",
+    "chooseShop": "Which shop is this link for? Choose it under \"Usually bought at\".",
+    "reading": "Reading the page…",
+    "fill": "Fill in the empty fields",
+    "removing": "Saving removes the {{shop}} link.",
+    "keep": "Keep the link",
+    "invalidUrl": "This isn't a web link (https://…)."
+  }
+}

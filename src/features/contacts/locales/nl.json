@@ -1,0 +1,104 @@
+{
+  "page": {
+    "title": "Contacten",
+    "description": "Aannemers, leveranciers, de bank, de school… iedereen met wie jullie huishouden te maken heeft."
+  },
+  "actions": {
+    "add": "Contact toevoegen",
+    "edit": "{{name}} bewerken",
+    "call": "{{name}} bellen op {{phone}}",
+    "mail": "{{name}} mailen op {{email}}",
+    "visitWebsite": "Website bezoeken"
+  },
+  "fields": {
+    "name": "Naam",
+    "namePlaceholder": "Jan Peeters",
+    "company": "Bedrijf",
+    "trade": "Vak of rol",
+    "tradeDescription": "Kies een suggestie of typ zelf iets.",
+    "tradePlaceholder": "aannemer, loodgieter, bank…",
+    "emails": "E-mailadressen",
+    "emailsDescription": "Het eerste adres wordt gebruikt als je dit contact mailt.",
+    "phones": "Telefoonnummers",
+    "phonesDescription": "Het eerste nummer is het hoofdnummer.",
+    "address": "Adres",
+    "websiteUrl": "Website",
+    "shop": "Winkel",
+    "shopDescription": "Voor een leverancier: de winkel waar hij bij hoort.",
+    "notes": "Notities",
+    "role": "Rol in het project",
+    "rolePlaceholder": "aannemer, architect…",
+    "contact": "Contact"
+  },
+  "multi": {
+    "add": "Nog een toevoegen",
+    "remove": "Deze regel verwijderen"
+  },
+  "groups": {
+    "favorites": "Favorieten",
+    "other": "Geen vak"
+  },
+  "filter": {
+    "search": "Contacten zoeken…"
+  },
+  "favorite": {
+    "add": "{{name}} bij favorieten zetten",
+    "remove": "{{name}} uit favorieten halen",
+    "failed": "Je favorieten konden niet bijgewerkt worden. Probeer opnieuw."
+  },
+  "form": {
+    "createTitle": "Contact toevoegen",
+    "editTitle": "Contact bewerken",
+    "description": "Iemand met wie jullie te maken hebben: een aannemer, leverancier, dienst of school.",
+    "addedOn": "Toegevoegd op {{date}}",
+    "created": "Contact toegevoegd",
+    "updated": "Wijzigingen bewaard"
+  },
+  "projects": {
+    "label": "Projecten",
+    "linkLabel": "Werkt aan {{name}}"
+  },
+  "delete": {
+    "label": "Verwijderen",
+    "title": "{{name}} verwijderen?",
+    "description": "Het contact verdwijnt uit je lijsten en keuzelijsten.",
+    "descriptionLinked_one": "Het contact verdwijnt uit je lijsten en keuzelijsten, en uit het project waaraan het gekoppeld is. Het project blijft.",
+    "descriptionLinked_other": "Het contact verdwijnt uit je lijsten en keuzelijsten, en uit de {{count}} projecten waaraan het gekoppeld is. De projecten blijven.",
+    "deleted": "Contact verwijderd"
+  },
+  "picker": {
+    "placeholder": "Kies een contact…",
+    "empty": "Geen contacten gevonden."
+  },
+  "project": {
+    "title": "Contacten",
+    "description": "Wie werkt aan dit project: aannemer, architect, leveranciers…",
+    "empty": "Nog geen contacten gekoppeld.",
+    "link": "Contact koppelen",
+    "new": "Nieuw contact",
+    "linkTitle": "Contact koppelen",
+    "linkDescription": "Kies een contact en zijn of haar rol in dit project.",
+    "linkSubmit": "Koppelen",
+    "linked": "Contact gekoppeld aan het project",
+    "newDescription": "Het nieuwe contact wordt meteen aan dit project gekoppeld.",
+    "remove": "{{name}} uit dit project halen",
+    "removeTitle": "{{name}} uit dit project halen?",
+    "removeDescription": "Het contact blijft bij je contacten.",
+    "removeConfirm": "Uit project halen",
+    "removed": "Contact uit het project gehaald",
+    "loading": "Contacten laden…",
+    "error": "De contacten konden niet geladen worden."
+  },
+  "empty": {
+    "title": "Nog geen contacten",
+    "description": "Voeg de aannemers, leveranciers en diensten toe met wie jullie te maken hebben."
+  },
+  "errors": {
+    "notFound": "Dit contact of project bestaat niet meer.",
+    "forbidden": "Alleen volwassenen kunnen contacten wijzigen.",
+    "chooseContact": "Kies een contact.",
+    "invalidPhone": "Geef een geldig telefoonnummer in.",
+    "duplicateValue": "Deze staat al in de lijst.",
+    "unknownShop": "Deze winkel bestaat niet meer."
+  }
+}

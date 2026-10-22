@@ -1,0 +1,11 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../../src/api/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Models live in one file per feature: prisma/schema/<feature>.prisma

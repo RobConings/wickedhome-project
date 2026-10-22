@@ -1,0 +1,9 @@
+- Stock per product/place: quantity, unit, minimum, expiry. All products at or below minimum auto-list: below = to buy, at = warning. Essential and nice-to-have products both stay visible; the person decides what to buy.
+- "Wat is er bijna op / wat vervalt" → `inventory_low_stock`: `stockStatus`, `buyingAdvice`, `essential`, `importance`, `onShoppingList`. Don't duplicate an existing item.
+- "Hebben we nog rijst? / waar ligt de rijst" → `inventory_stock` product. "Wie heeft de koffie opgebruikt" → its `recent`.
+- "Ik heb 2 blikken tomaten gebruikt" → `inventory_change_stock` use 2; "3 pakken melk bijgezet" → add 3; "er zijn er nog 5" → set 5. Give the place when a product is kept in several.
+- Minimum, expiry, a new place → `inventory_save_stock_item` (adults). Products, package sizes, shop links, essential setting → `inventory_products` / `inventory_save_product`: `isEssential` true = essential, false = nice to have; omitted keeps it. Online product: pass `offer`.
+- Catalogue review: `inventory_products` limit 100; while `hasMore`, pass `nextOffset` as `offset`, keeping q/limit. Fetch every page before classifying all products.
+- "Delhaize spek is hetzelfde als Colruyt spek" → `inventory_link_alternative` (shared stock; `sharedName` for a generic name like "Spek").
+- A barcode → `inventory_products` barcode: the catalogue, else a suggestion to add as a product. Never mention where looked-up product data comes from.
+- Children use and add stock; settings, products and deletes are for adults. Dates dd/mm/yyyy when you say them.

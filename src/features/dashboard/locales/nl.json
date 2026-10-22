@@ -1,0 +1,105 @@
+{
+  "greeting": {
+    "morning": "Goedemorgen,",
+    "afternoon": "Goedemiddag,",
+    "evening": "Goedenavond,"
+  },
+  "intro": "Dit gebeurt er vandaag thuis.",
+  "household": {
+    "label_one": "{{name}}: {{count}} bewoner",
+    "label_other": "{{name}}: {{count}} bewoners",
+    "manage": "Bewoners beheren"
+  },
+  "loadError": "Kon dit niet laden.",
+  "stats": {
+    "label": "Vandaag in één oogopslag",
+    "tasks": {
+      "label": "Taken",
+      "hint": "Vandaag gedaan",
+      "overdue_one": "Vandaag gedaan · {{count}} te laat",
+      "overdue_other": "Vandaag gedaan · {{count}} te laat",
+      "allDone": "Alles gedaan voor vandaag"
+    },
+    "shopping": {
+      "label": "Boodschappen",
+      "hint_one": "Item te kopen",
+      "hint_other": "Items te kopen",
+      "nothing": "Niets te kopen"
+    },
+    "bills": {
+      "label": "Te betalen",
+      "hint": "Deze week te betalen",
+      "amount": "{{amount}} te betalen deze week",
+      "overdue_one": "{{count}} te laat",
+      "overdue_other": "{{count}} te laat",
+      "recurring": "{{amount}}/maand terugkerend"
+    }
+  },
+  "today": {
+    "title": "Vandaag",
+    "empty": "Niets gepland vandaag. Geniet ervan!",
+    "allDay": "Hele dag",
+    "ongoing": "Bezig",
+    "viewCalendar": "Naar de agenda",
+    "calendarError": "De agenda kon niet geladen worden; alleen taken worden getoond.",
+    "tasksError": "Taken konden niet geladen worden; alleen de agenda wordt getoond.",
+    "age": "Wordt {{age}}",
+    "kinds": {
+      "event": "Afspraak",
+      "store_visit": "Winkelbezoek",
+      "birthday": "Verjaardag",
+      "task": "Taak",
+      "bill": "Rekening",
+      "renewal": "Verlenging",
+      "waste": "Afvalophaling",
+      "other": "Agenda"
+    }
+  },
+  "upcoming": {
+    "title": "Binnenkort",
+    "description": "De komende twee weken",
+    "empty": "Niets gepland de komende twee weken.",
+    "partial": "Sommige items konden niet geladen worden.",
+    "kinds": {
+      "bill": "Te betalen",
+      "renewal": "Verlenging",
+      "task": "Taak"
+    }
+  },
+  "money": {
+    "title": "Geld deze maand",
+    "in": "In",
+    "out": "Uit",
+    "received": "{{amount}} ontvangen",
+    "paid": "{{amount}} betaald",
+    "joint": "Gezamenlijke rekening",
+    "savings": "Spaarrekening",
+    "noAccounts": "Stel de gezamenlijke rekeningen in op de geldstroompagina om hun saldo te volgen.",
+    "view": "Naar de geldstroom"
+  },
+  "energy": {
+    "title": "Energie",
+    "today": "Vandaag",
+    "month": "Deze maand",
+    "gridOnly": "van het net",
+    "electricity": "Elektriciteit",
+    "gas": "Gas",
+    "solarShare": "Zelfvoorzienend",
+    "peak": "Maandpiek",
+    "noPeak": "Geen kwartierdata",
+    "noData": "Nog geen energiedata. Importeer je meterdata om je verbruik hier te zien.",
+    "import": "Data importeren",
+    "view": "Naar energie"
+  },
+  "comingSoon": {
+    "title": "Binnenkort beschikbaar",
+    "assistant": {
+      "title": "Assistent",
+      "description": "Chatten en praten met je lokale LLM."
+    },
+    "home": {
+      "title": "Slim huis",
+      "description": "Alarm, temperaturen en toestellen via Home Assistant."
+    }
+  }
+}

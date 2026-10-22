@@ -1,0 +1,108 @@
+// Feature: income (Finance, phase 2). See docs/FINANCE.md.
+//
+// Recurring household incomes (salary, holiday pay, meal vouchers…) are IncomeSource templates: their
+// planned occurrences are computed from the RRULE, never stored. What actually came in is an Income row:
+// a one-off (tax return, green certificates…) or the actual amount of one occurrence of a source.
+
+/// What an income is. Sources use the recurring kinds (salary … benefit, other); one-offs any kind.
+enum IncomeKind {
+  SALARY
+  /// Vakantiegeld.
+  HOLIDAY_PAY
+  /// End-of-year bonus (eindejaarspremie), other bonuses.
+  BONUS
+  /// Maaltijdcheques: not money in the bank; they feed the voucher balance per person.
+  MEAL_VOUCHERS
+  /// Child benefit (groeipakket), unemployment, sickness…
+  BENEFIT
+  TAX_RETURN
+  GREEN_CERTIFICATES
+  GIFT
+  SALE
+  OTHER
+}
+
+enum IncomeAmountMode {
+  /// The amount comes from the source's amount history (IncomeAmount).
+  FIXED
+  /// Differs per period (e.g. meal vouchers by days worked): every occurrence asks for the actual amount.
+  VARIABLE
+}
+
+/// A recurring income of one habitant, or of the household as a whole (habitantId null = joint).
+model IncomeSource {
+  id              String           @id @default(cuid())
+  householdId     String
+  household       Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  /// Null: a joint income (e.g. child benefit paid into the joint account).
+  habitantId      String?
+  habitant        Habitant?        @relation(fields: [habitantId], references: [id], onDelete: Cascade)
+  name            String
+  kind            IncomeKind
+  /// RFC 5545 RRULE without DTSTART, e.g. `FREQ=MONTHLY`.
+  rrule           String
+  /// DTSTART: the first occurrence.
+  startDate       DateTime         @db.Date
+  /// No occurrences after this date.
+  endDate         DateTime?        @db.Date
+  amountMode      IncomeAmountMode @default(FIXED)
+  /// VARIABLE only: what to expect when nothing has been entered yet (optional).
+  estimateCents   Int?
+  /// Account the income lands on (only joint accounts are modelled); copied onto recorded incomes.
+  targetAccountId String?
+  targetAccount   PaymentAccount?  @relation("IncomeSourceTarget", fields: [targetAccountId], references: [id], onDelete: SetNull)
+  notes           String?
+  amounts         IncomeAmount[]
+  incomes         Income[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([householdId])
+  @@map("income_sources")
+}
+
+/// Amount history of a FIXED source: the amount from `effectiveFrom` on, until the next row.
+model IncomeAmount {
+  id            String       @id @default(cuid())
+  sourceId      String
+  source        IncomeSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  effectiveFrom DateTime     @db.Date
+  amountCents   Int
+  createdAt     DateTime     @default(now())
+
+  @@unique([sourceId, effectiveFrom])
+  @@map("income_amounts")
+}
+
+/// Income that was actually received: a one-off, or the actual amount of one occurrence of a source.
+model Income {
+  id              String          @id @default(cuid())
+  householdId     String
+  household       Household       @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  /// Null: a joint income.
+  habitantId      String?
+  habitant        Habitant?       @relation(fields: [habitantId], references: [id], onDelete: Cascade)
+  /// Received on.
+  date            DateTime        @db.Date
+  amountCents     Int
+  kind            IncomeKind
+  /// Short label ("Tax return 2025"); falls back to the source name or the kind.
+  description     String?
+  /// Set when this is the actual amount of a source's occurrence.
+  sourceId        String?
+  source          IncomeSource?   @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  /// The occurrence (planned date) of the source this income fulfils.
+  periodDate      DateTime?       @db.Date
+  /// When set, the income counts in that account's balance (computed, not copied into the ledger).
+  targetAccountId String?
+  targetAccount   PaymentAccount? @relation("IncomeTarget", fields: [targetAccountId], references: [id], onDelete: SetNull)
+  note            String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  /// One actual per occurrence of a source.
+  @@unique([sourceId, periodDate])
+  @@index([householdId, date])
+  @@index([targetAccountId])
+  @@map("incomes")
+}

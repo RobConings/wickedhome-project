@@ -1,0 +1,229 @@
+// Feature: shopping
+
+enum ProductCategory {
+  PRODUCE
+  BAKERY
+  DAIRY
+  MEAT_FISH
+  PANTRY
+  FROZEN
+  DRINKS
+  HOUSEHOLD
+  PERSONAL_CARE
+  BABY
+  PETS
+  PHARMACY
+  DIY
+  GARDEN
+  OTHER
+}
+
+enum ShoppingListKind {
+  GROCERIES
+  DIY
+  PHARMACY
+  OTHER
+}
+
+/// Why an item is on a list.
+enum ShoppingItemSource {
+  MANUAL
+  STAPLE
+  TASK
+  LOW_STOCK
+  /// For a meal on the "To cook" list (recipes feature).
+  RECIPE
+}
+
+enum ShoppingItemStatus {
+  OPEN
+  BOUGHT
+}
+
+/// The household's product catalogue: things it buys more than once, keeps in stock or scans.
+model Product {
+  id            String            @id @default(cuid())
+  householdId   String
+  household     Household         @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name          String
+  /// Free-form unit, e.g. "pcs", "kg", "l", "pack".
+  unit          String?
+  category      ProductCategory   @default(OTHER)
+  /// Marks a household essential; shown alongside its stock level on shopping lists.
+  isEssential   Boolean           @default(false)
+  defaultShopId String?
+  defaultShop   Shop?             @relation("ProductDefaultShop", fields: [defaultShopId], references: [id], onDelete: SetNull)
+  /// EAN/UPC barcode printed on the packaging.
+  barcode       String?
+  /// Value encoded in our own printed QR label (e.g. "WH-P-7K2Q9X").
+  qrCode        String?
+  imageUrl      String?
+  notes         String?
+  /// Content of ONE stock package (e.g. 200 g; a "6 x 33 cl" multipack is 198 cl), so recipe amounts in g/ml
+  /// can be compared with stock counted in packages (recipes feature). Both null when unknown.
+  packageAmount Decimal?          @db.Decimal(12, 3)
+  /// "g", "kg", "ml", "cl", "l" or "pcs".
+  packageUnit   String?
+  /// Alternatives: shares stock with this main product (e.g. a brand of "Bacon"). Only main products have
+  /// StockItems; a main product never points at another one (no chains). See docs/INVENTORY.md.
+  stockProductId String?
+  stockProduct   Product?          @relation("ProductAlternatives", fields: [stockProductId], references: [id], onDelete: SetNull)
+  alternatives   Product[]         @relation("ProductAlternatives")
+  shopLinks     ProductShopLink[]
+  shoppingItems ShoppingItem[]
+  staples       ShoppingStaple[]
+  stockItems    StockItem[]
+  recipeIngredients RecipeIngredient[]
+  cookExtras    CookExtraIngredient[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@unique([householdId, barcode])
+  @@unique([householdId, qrCode])
+  @@index([householdId])
+  @@index([stockProductId])
+  @@map("products")
+}
+
+/// Where a product can be bought: the same product at several shops, each with its own link and price.
+model ProductShopLink {
+  id            String   @id @default(cuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  shopId        String
+  shop          Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  /// Product page on the shop's webshop.
+  url           String?
+  priceCents    Int?
+  articleNumber String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([productId, shopId])
+  @@index([shopId])
+  @@map("product_shop_links")
+}
+
+/// A shopping list, e.g. "Weekly groceries", "DIY", "Pharmacy".
+model ShoppingList {
+  id            String              @id @default(cuid())
+  householdId   String
+  household     Household           @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name          String
+  kind          ShoppingListKind
+  /// When set, items from this source land on this list unless a list is chosen (one per source).
+  defaultSource ShoppingItemSource?
+  items         ShoppingItem[]
+  staples       ShoppingStaple[]
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@unique([householdId, defaultSource])
+  @@index([householdId])
+  @@map("shopping_lists")
+}
+
+/// A recurring staple: comes back on its list on a schedule (weekly groceries). Items are added on read
+/// when `nextDueOn` has passed (see src/api/shopping/shopping.service.ts).
+model ShoppingStaple {
+  id          String         @id @default(cuid())
+  householdId String
+  household   Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  listId      String
+  list        ShoppingList   @relation(fields: [listId], references: [id], onDelete: Cascade)
+  productId   String?
+  product     Product?       @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name        String
+  quantity    Decimal        @default(1) @db.Decimal(12, 3)
+  unit        String?
+  shopId      String?
+  shop        Shop?          @relation("ShoppingStapleShop", fields: [shopId], references: [id], onDelete: SetNull)
+  /// RFC 5545 RRULE without DTSTART, e.g. `FREQ=WEEKLY` or `FREQ=WEEKLY;INTERVAL=2`.
+  rrule       String
+  /// DTSTART: the first day it is due.
+  startDate   DateTime       @db.Date
+  /// The next day it goes on the list.
+  nextDueOn   DateTime       @db.Date
+  items       ShoppingItem[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([householdId, nextDueOn])
+  @@map("shopping_staples")
+}
+
+/// One thing to buy.
+model ShoppingItem {
+  id              String             @id @default(cuid())
+  householdId     String
+  household       Household          @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  listId          String
+  list            ShoppingList       @relation(fields: [listId], references: [id], onDelete: Cascade)
+  productId       String?
+  product         Product?           @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name            String
+  quantity        Decimal            @default(1) @db.Decimal(12, 3)
+  unit            String?
+  shopId          String?
+  shop            Shop?              @relation("ShoppingItemShop", fields: [shopId], references: [id], onDelete: SetNull)
+  /// Webshop link to this exact item.
+  url             String?
+  imageUrl        String?
+  priceCents      Int?
+  /// The item's own category (grouping in the shop view) when it has no product; a product's category wins.
+  category        ProductCategory?
+  note            String?
+  /// What the item is for, e.g. the room stock is restocked in.
+  placeId         String?
+  place           Place?             @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  source          ShoppingItemSource @default(MANUAL)
+  /// Soft reference to a task (owned by the Tasks feature). Deliberately no relation.
+  taskId          String?
+  stapleId        String?
+  staple          ShoppingStaple?    @relation(fields: [stapleId], references: [id], onDelete: SetNull)
+  status          ShoppingItemStatus @default(OPEN)
+  boughtAt        DateTime?
+  /// Soft reference to the user who ticked it off.
+  boughtByUserId  String?
+  createdByUserId String?
+  /// The project this item is for (projects feature), optional. Materials of a task in a project count too.
+  projectId       String?
+  project         Project?           @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  /// Soft reference to the expense this purchase was logged as (expenses feature). Deliberately no relation.
+  /// A project budget then counts the expense, not the item (no double counting).
+  expenseId       String?
+  /// Soft reference to the meal on the "To cook" list it was added for (recipes feature, source RECIPE).
+  mealPlanEntryId String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([householdId, status])
+  @@index([listId])
+  @@index([shopId])
+  @@index([taskId])
+  @@index([productId])
+  @@index([projectId])
+  @@index([mealPlanEntryId])
+  @@map("shopping_items")
+}
+
+/// Cache of public product data found by barcode (src/api/shopping/barcode-lookup.service.ts), used to
+/// pre-fill a new product. Shared by all households: it holds no household data. Once the user saves the
+/// product, the household's own Product is what the app uses; this row is never written back to it.
+model BarcodeLookup {
+  /// Normalised code: EAN-13 (UPC-A and UPC-E expanded to EAN-13) or EAN-8.
+  code      String   @id
+  /// False for a code no source knows (a "miss", retried after a week).
+  found     Boolean
+  /// Mapped, source-neutral product data (names per language, brand, quantity, category); null for a miss.
+  data      Json?
+  /// Content type of the product photo stored under STORAGE_DIR/product-images/<code>.<ext>; null when none.
+  imageType String?
+  /// When the sources were last asked. Hits are reused for 90 days, misses for 7.
+  fetchedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([fetchedAt])
+  @@map("barcode_lookups")
+}

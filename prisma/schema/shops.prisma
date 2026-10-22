@@ -1,0 +1,89 @@
+// Feature: shops
+
+enum ShopType {
+  SUPERMARKET
+  DISCOUNT
+  DIY
+  GARDEN
+  HOME
+  ELECTRONICS
+  PHARMACY
+  DRUGSTORE
+  PETS
+  SPORTS
+  FASHION
+  ONLINE
+  OTHER
+}
+
+/// A physical shop, chain or webshop. Built-in catalogue shops have no household and are visible to all;
+/// a household adds its own shops next to them.
+model Shop {
+  id                 String            @id @default(cuid())
+  householdId        String?
+  household          Household?        @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  /// Stable key of a built-in catalogue shop, so the seed can update it in place.
+  catalogKey         String?           @unique
+  name               String
+  type               ShopType
+  /// Free-form postal address of the branch the household uses.
+  address            String?
+  websiteUrl         String?
+  hasWebshop         Boolean           @default(false)
+  /// Free-form, e.g. "Mon–Sat 8:30–20:00".
+  openingHours       String?
+  notes              String?
+  calendarEvents     CalendarEvent[]
+  defaultForProducts Product[]         @relation("ProductDefaultShop")
+  productLinks       ProductShopLink[]
+  shoppingStaples    ShoppingStaple[]  @relation("ShoppingStapleShop")
+  shoppingItems      ShoppingItem[]    @relation("ShoppingItemShop")
+  expenses           Expense[]         @relation("ExpenseShop")
+  icon               ShopIcon?
+  /// The household's own settings for this shop (catalogue shops are shared, so they can't hold them).
+  householdSettings  HouseholdShopSetting[]
+  /// Contacts (suppliers) linked to this shop (contacts feature).
+  contacts           Contact[]
+  createdAt         DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@index([householdId])
+  @@map("shops")
+}
+
+/// Logo/favicon found automatically on the shop's website (src/api/shops/shop-icon.ts). The row is created on
+/// the first attempt; `data` is null until an icon was found. Small images only (capped at 256 KB).
+model ShopIcon {
+  shopId        String    @id
+  shop          Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  /// Sniffed from the bytes: image/png, image/jpeg, image/gif, image/webp, image/x-icon or image/svg+xml.
+  contentType   String?
+  data          Bytes?
+  /// Where the image itself was downloaded from.
+  sourceUrl     String?
+  /// The shop's website at the time of the last attempt, so a changed website triggers a new fetch.
+  websiteUrl    String?
+  /// When the current image was stored; null while there is none. Clients cache-bust on it.
+  fetchedAt     DateTime?
+  lastAttemptAt DateTime
+  /// Why the last attempt found nothing (null after a success).
+  failureReason String?
+
+  @@map("shop_icons")
+}
+
+/// A household's own settings for a shop, also for built-in catalogue shops (which have no household).
+/// `ingredientSearch`: the assistant may search this shop's webshop for recipe ingredients it doesn't know.
+model HouseholdShopSetting {
+  householdId      String
+  household        Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  shopId           String
+  shop             Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  ingredientSearch Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@id([householdId, shopId])
+  @@index([shopId])
+  @@map("household_shop_settings")
+}

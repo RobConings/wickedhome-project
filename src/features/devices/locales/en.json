@@ -1,0 +1,345 @@
+{
+  "notifications": {
+    "indicator": {
+      "title": "Device turns orange or red",
+      "description": "For the devices you follow (\"Notify me\" on a device's page), at most once per 30 minutes per device."
+    }
+  },
+  "page": {
+    "title": "Devices",
+    "description": "Everything in the house with a state: window contacts, thermostats, the dryer, smoke detectors, the alarm.",
+    "liveView": "Live view",
+    "profiles": "Profiles"
+  },
+  "houseStatus": {
+    "title": "House",
+    "loading": "Loading the house status…",
+    "attention": "Needs attention",
+    "more_one": "and {{count}} more",
+    "more_other": "and {{count}} more",
+    "allQuiet": "All quiet: nothing needs attention.",
+    "open": "Windows & doors",
+    "allClosed": "All closed",
+    "openCount_one": "{{count}} open",
+    "openCount_other": "{{count}} open",
+    "alarm": "Alarm",
+    "running": "Running",
+    "nothingRunning": "Nothing",
+    "temperatures": "Temperatures",
+    "openHouse": "Open house view",
+    "empty": {
+      "title": "No devices yet",
+      "description": "Add window contacts, thermostats and appliances to see the house at a glance.",
+      "action": "Add devices"
+    }
+  },
+  "add": "Add device",
+  "count_one": "{{count}} device",
+  "count_other": "{{count}} devices",
+  "noPlace": "No place",
+  "empty": {
+    "noProfiles": {
+      "title": "Start with a profile",
+      "description": "A profile says what a device reports (open/closed, temperature…) and which colour that gets on the plan. Pick a ready-made one.",
+      "action": "Choose a profile"
+    },
+    "noDevices": {
+      "title": "No devices yet",
+      "description": "Add your window contacts, thermostats and appliances, then place them on the floor plan."
+    }
+  },
+  "filters": {
+    "label": "Filter devices",
+    "category": "Category",
+    "profile": "Profile",
+    "allCategories": "All categories",
+    "allProfiles": "All profiles"
+  },
+  "fields": {
+    "name": "Name",
+    "profile": "Profile",
+    "place": "Place",
+    "appliance": "Energy appliance",
+    "notes": "Notes"
+  },
+  "form": {
+    "createTitle": "Add a device",
+    "editTitle": "Edit device",
+    "description": "Values and their sources are set on the device page; the position on the floor plan in the plan editor.",
+    "namePlaceholder": "e.g. Kitchen window",
+    "profilePlaceholder": "Choose a profile",
+    "profileChangeHint": "Changing the profile clears the device's current values.",
+    "appliancePlaceholder": "Link an appliance",
+    "created": "Device added",
+    "updated": "Device saved"
+  },
+  "delete": {
+    "title": "Delete {{name}}?",
+    "description": "The device, its values and its place on the plan are removed. The profile stays."
+  },
+  "detail": {
+    "values": "Current values",
+    "valuesHint": "Set values by hand, or connect them to Home Assistant below.",
+    "valuesReadOnly": "Values are kept up to date by the adults of the house.",
+    "location": "Where",
+    "plan": "Floor plan"
+  },
+  "values": {
+    "primary": "On the plan",
+    "updated": "Updated {{when}}",
+    "never": "Never set",
+    "set": "Set value",
+    "invalid": "This value doesn't fit the field.",
+    "saveFailed": "The value couldn't be saved.",
+    "fromHomeAssistant": "This value comes from Home Assistant and can't be set by hand.",
+    "saving": "Saving…"
+  },
+  "value": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "state": {
+    "unknown": "Unknown",
+    "stale": "No recent data"
+  },
+  "bindings": {
+    "title": "Value sources",
+    "description": "Per field: set by hand, or read from a Home Assistant entity.",
+    "entity": "Home Assistant entity",
+    "attribute": "Attribute",
+    "attributePlaceholder": "State (default)",
+    "noEntity": "no entity yet",
+    "hint": "Pick an entity with Browse, or type its id. After saving, the field takes the entity's current state and follows it live; linked values can't be set by hand.",
+    "save": "Save sources",
+    "saved": "Sources saved",
+    "invalid": "Check the Home Assistant entity ids (e.g. binary_sensor.kitchen_window).",
+    "sources": {
+      "manual": "By hand",
+      "home_assistant": "Home Assistant"
+    }
+  },
+  "placement": {
+    "placed": "On the plan",
+    "notPlaced": "Not on the plan",
+    "placeOnPlan": "Place on the plan",
+    "moveOnPlan": "Move on the plan",
+    "remove": "Remove from plan",
+    "open": "Open",
+    "allPlaced": "Every device is on a plan.",
+    "unplacedLabel": "Devices not on a plan",
+    "dragHint": "Drag onto the plan, or use “Place on the plan” and tap a spot",
+    "nudgeHint": "Arrow keys move it (Shift: bigger steps).",
+    "failed": "The position couldn't be saved.",
+    "saving": "Saving position…",
+    "loading": "Loading devices…",
+    "loadFailed": "The devices couldn't be loaded. Reload the page to try again."
+  },
+  "picker": {
+    "placeholder": "Choose a device"
+  },
+  "legend": {
+    "title": "Legend"
+  },
+  "house": {
+    "title": "House",
+    "description": "What's open, warm, running or armed, right now.",
+    "floors": "Floors",
+    "panel": "Device details",
+    "onThisFloor": "On this floor",
+    "temperatures": "Temperature per room",
+    "openDevice": "Open device",
+    "unplaced_one": "{{count}} device not on a plan",
+    "unplaced_other": "{{count}} devices not on a plan",
+    "noFloors": {
+      "title": "No floor plan yet",
+      "description": "Add your floors and rooms first; devices are shown on their plans.",
+      "action": "Go to places"
+    },
+    "noDevicesHere": {
+      "title": "No devices on this floor",
+      "description": "Drag devices onto the plan in the floor plan editor."
+    }
+  },
+  "profiles": {
+    "title": "Device profiles",
+    "description": "A profile is a type of device: the values it reports and the rules that colour it on the plan.",
+    "mine": "Your profiles",
+    "new": "New profile",
+    "missing": "Unknown profile",
+    "fieldCount_one": "{{count}} field",
+    "fieldCount_other": "{{count}} fields",
+    "ruleCount_one": "{{count}} rule",
+    "ruleCount_other": "{{count}} rules",
+    "deviceCount_one": "{{count}} device",
+    "deviceCount_other": "{{count}} devices",
+    "empty": {
+      "title": "No profiles yet",
+      "description": "Add one of the presets below and adjust it, or start from scratch."
+    },
+    "delete": {
+      "title": "Delete {{name}}?",
+      "description": "The profile is removed. This can't be undone.",
+      "inUse": "Devices use this profile. Move them to another profile first."
+    }
+  },
+  "presets": {
+    "title": "Ready-made profiles",
+    "description": "Adding one creates your own copy that you can change freely.",
+    "add": "Add",
+    "addNamed": "Add {{name}}",
+    "adding": "Adding…"
+  },
+  "editor": {
+    "newTitle": "New profile",
+    "newDescription": "Define the fields first, then the rules that colour the indicator.",
+    "general": "General",
+    "namePlaceholder": "e.g. Window contact",
+    "icon": "Icon",
+    "category": "Category",
+    "staleAfter": "Stale after (minutes)",
+    "staleNever": "Never",
+    "staleHint": "Home Assistant values older than this show as \"No recent data\". Manual values never go stale.",
+    "fallbackTone": "Otherwise",
+    "fallbackLabel": "Label when nothing matches",
+    "fallbackHint": "Used when no rule matches, or when the value is unknown or stale.",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "unsaved": "Unsaved changes",
+    "saved": "Profile saved",
+    "invalid": "The profile isn't complete yet.",
+    "readOnly": "Only adults can change profiles.",
+    "fields": {
+      "title": "Fields",
+      "description": "What the device reports. The primary field is shown next to the indicator on the plan.",
+      "label": "Label",
+      "key": "Key",
+      "type": "Type",
+      "unit": "Unit",
+      "trueLabel": "Text when on/true",
+      "falseLabel": "Text when off/false",
+      "choices": "Options",
+      "choiceValue": "Option key",
+      "choiceLabel": "Option label",
+      "addChoice": "Add option",
+      "removeChoice": "Remove option",
+      "newChoice": "Option {{number}}",
+      "primary": "Show on the plan",
+      "add": "Add field",
+      "remove": "Remove field",
+      "newField": "New field",
+      "defaultField": "State"
+    },
+    "rules": {
+      "title": "Indicator rules",
+      "description": "Checked from top to bottom; the first rule that matches decides the colour, label and icon.",
+      "empty": "No rules yet: the indicator always uses the colour below.",
+      "add": "Add rule",
+      "remove": "Remove rule",
+      "newRule": "New state",
+      "untitled": "Untitled",
+      "ruleNumber": "Rule {{number}}",
+      "matches": "Matches",
+      "when": "When",
+      "operator": "Is",
+      "value": "Value",
+      "values": "One of",
+      "valuesComma": "One of (comma separated)",
+      "and": "and",
+      "upperBound": "Upper bound",
+      "pickField": "Choose a field",
+      "pickValue": "Choose a value",
+      "tone": "Colour",
+      "label": "Label",
+      "icon": "Icon",
+      "pulse": "Pulse to draw attention",
+      "customColor": "Custom colour"
+    },
+    "preview": {
+      "title": "Preview",
+      "description": "Try sample values to see the indicator.",
+      "sampleValues": "Sample values",
+      "matched": "Rule {{number}} matches",
+      "fallback": "No rule matches"
+    }
+  },
+  "categories": {
+    "sensor": "Sensor",
+    "appliance": "Appliance",
+    "climate": "Climate",
+    "alarm": "Alarm",
+    "light": "Light",
+    "camera": "Camera",
+    "other": "Other"
+  },
+  "fieldTypes": {
+    "boolean": "On/off",
+    "number": "Number",
+    "text": "Text",
+    "choice": "Choice"
+  },
+  "operators": {
+    "is_true": "is on / true",
+    "is_false": "is off / false",
+    "eq": "equals",
+    "neq": "is not",
+    "gt": "more than",
+    "gte": "at least",
+    "lt": "less than",
+    "lte": "at most",
+    "between": "between",
+    "in": "is one of"
+  },
+  "tones": {
+    "success": "Green (good)",
+    "warning": "Orange (attention)",
+    "danger": "Red (problem)",
+    "info": "Blue (info)",
+    "neutral": "Grey (neutral)"
+  },
+  "icons": {
+    "none": "No icon",
+    "window": "Window",
+    "door": "Door",
+    "blinds": "Blinds",
+    "thermometer": "Thermometer",
+    "droplets": "Humidity",
+    "snowflake": "Cold",
+    "heater": "Heater",
+    "fan": "Fan",
+    "washing-machine": "Washing machine",
+    "refrigerator": "Fridge",
+    "plug": "Plug",
+    "zap": "Power",
+    "power": "On/off",
+    "shield": "Shield",
+    "siren": "Siren",
+    "smoke": "Smoke detector",
+    "flame": "Flame",
+    "bell": "Bell",
+    "lock": "Lock",
+    "battery": "Battery",
+    "lightbulb": "Light",
+    "sun": "Sun",
+    "motion": "Motion",
+    "activity": "Activity",
+    "camera": "Camera",
+    "cctv": "Security camera",
+    "waves": "Water",
+    "wind": "Wind",
+    "gauge": "Gauge",
+    "tv": "TV",
+    "router": "Router",
+    "speaker": "Speaker"
+  },
+  "live": {
+    "open": "Live",
+    "updating": "Updating…",
+    "connecting": "Connecting…",
+    "reconnecting": "Reconnecting…",
+    "offline": "Offline",
+    "offlineHint": "No live connection. Values may be out of date; it reconnects by itself."
+  },
+  "loading": {
+    "refreshing": "Refreshing…"
+  }
+}

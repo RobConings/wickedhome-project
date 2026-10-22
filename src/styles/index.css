@@ -1,0 +1,397 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/inter";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design tokens. Components only ever use these semantic names (bg-primary, text-muted-foreground…),
+ * never raw colours, so a theme change happens here and nowhere else.
+ */
+:root {
+  --radius: 0.75rem;
+
+  /* Brand palette (docs/BRANDING.md) */
+  --brand-ink: #124734;
+  --brand-leaf: #6b8f73;
+  --brand-mint: #e8f2ec;
+  --brand-peach: #f4d7b5;
+
+  /* Surfaces: page < card < elevated (popovers, menus). Muted = quiet fills (tracks, inactive tabs). */
+  --background: #f6f7f8;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: var(--foreground);
+  --popover: #ffffff;
+  --popover-foreground: var(--foreground);
+  --elevated: #ffffff;
+  --muted: #eef0f2;
+  --muted-foreground: #5b6779;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #6b8f73;
+
+  /* The one call-to-action colour: deep brand green, white text. Secondary buttons stay quiet (mint). */
+  --primary: #124734;
+  --primary-foreground: #ffffff;
+  --secondary: #e8f2ec;
+  --secondary-foreground: #124734;
+  /* shadcn's "accent" = hover/selected fill of menus and ghost buttons (not the section accent below). */
+  --accent: #e8f2ec;
+  --accent-foreground: #124734;
+
+  /* Highlight (peach): emphasis — today, selected, new, "needs you". Strong = edges, dots, icons. */
+  --highlight: #f4d7b5;
+  --highlight-foreground: #6b3f12;
+  --highlight-strong: #c9702a;
+  --highlight-soft: #fbeedd;
+
+  /*
+   * Semantic status colours. `--x` is the solid colour and is also readable as text on cards, the page
+   * and its own soft background (AA). `--x-foreground` is the deeper text colour for badges on `--x-soft`.
+   */
+  --success: #13733a;
+  --success-foreground: #166534;
+  --success-soft: #e6f4ea;
+  --success-border: #b5dcc0;
+  --warning: #a14a08;
+  --warning-foreground: #92400e;
+  --warning-soft: #fdf1dc;
+  --warning-border: #f2cf8f;
+  --soon: #b13b0b;
+  --soon-foreground: #9a3412;
+  --soon-soft: #fdeadd;
+  --soon-border: #f6c3a1;
+  --info: #1f5bd8;
+  --info-foreground: #1e40af;
+  --info-soft: #e7effd;
+  --info-border: #b9cdf8;
+  --destructive: #c81e1e;
+  --destructive-foreground: #ffffff;
+  --danger-foreground: #991b1b;
+  --danger-soft: #fce8e8;
+  --danger-border: #f3b8b8;
+
+  /*
+   * Section accents: one hue per area of the app, picked up via `data-accent` (see below). Solid = icons,
+   * bars, edges, active marks (≥ 3:1 on cards); soft = chip/tint background; border; foreground = text (AA).
+   */
+  --section-home: #2a7650;
+  --section-home-soft: #e8f2ec;
+  --section-home-border: #bcd9c6;
+  --section-home-foreground: #124734;
+  --section-tasks: #2563eb;
+  --section-tasks-soft: #e8effd;
+  --section-tasks-border: #bed0fa;
+  --section-tasks-foreground: #1d4ed8;
+  --section-shopping: #e2530b;
+  --section-shopping-soft: #fdeee3;
+  --section-shopping-border: #f8cdaa;
+  --section-shopping-foreground: #b3410a;
+  --section-calendar: #7c3aed;
+  --section-calendar-soft: #f1eafd;
+  --section-calendar-border: #d9c7fb;
+  --section-calendar-foreground: #6427cf;
+  --section-energy: #c26a05;
+  --section-energy-soft: #fdf3d9;
+  --section-energy-border: #f3d68a;
+  --section-energy-foreground: #92510a;
+  --section-finance: #0d9488;
+  --section-finance-soft: #e0f3f0;
+  --section-finance-border: #a3dbd2;
+  --section-finance-foreground: #0b6b62;
+  --section-documents: #0284c7;
+  --section-documents-soft: #e2f1fa;
+  --section-documents-border: #acd6ef;
+  --section-documents-foreground: #0369a1;
+  --section-devices: #0891b2;
+  --section-devices-soft: #dff3f7;
+  --section-devices-border: #a4dae5;
+  --section-devices-foreground: #0e6a80;
+  --section-assistant: #db2777;
+  --section-assistant-soft: #fce8f1;
+  --section-assistant-border: #f4bcd5;
+  --section-assistant-foreground: #b0215f;
+  --section-integrations: #52607a;
+  --section-integrations-soft: #eef1f5;
+  --section-integrations-border: #ccd4df;
+  --section-integrations-foreground: #3b4759;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #334155;
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: #eef0f2;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+
+  /*
+   * Categorical chart colours, in this fixed order (never cycled); adjacent pairs differ in hue and
+   * lightness. Light slots 4–6 are below 3:1 on white, so charts using them show values in a legend or table.
+   * Income is green (slot 2), expenses coral (slot 3).
+   */
+  --chart-1: #2a78d6;
+  --chart-2: #1a9b6c;
+  --chart-3: #e5604a;
+  --chart-4: #e0a000;
+  --chart-5: #d6589a;
+  --chart-6: #1597b8;
+  --chart-7: #6a4fd6;
+  --chart-8: #c93a3a;
+}
+
+.dark {
+  --brand-ink: #ffffff;
+  --brand-leaf: #8fb89a;
+  --brand-mint: #1d3128;
+  --brand-peach: #f4d7b5;
+
+  /* Neutral-leaning surfaces (a hint of green), so the accents carry the colour. */
+  --background: #0e1211;
+  --foreground: #ecf0ee;
+  --card: #161b1a;
+  --card-foreground: var(--foreground);
+  --popover: #1d2321;
+  --popover-foreground: var(--foreground);
+  --elevated: #1d2321;
+  --muted: #222927;
+  --muted-foreground: #9ba6a2;
+  --border: rgb(255 255 255 / 9%);
+  --input: rgb(255 255 255 / 13%);
+  --ring: #8fb89a;
+
+  /* The call to action is the brightest thing on the page: luminous brand mint with dark text. */
+  --primary: #74dca6;
+  --primary-foreground: #062417;
+  --secondary: #252d2a;
+  --secondary-foreground: #e3e9e6;
+  --accent: #232b28;
+  --accent-foreground: #e3e9e6;
+
+  --highlight: #3a2a1b;
+  --highlight-foreground: #f8d2a6;
+  --highlight-strong: #f5b16f;
+  --highlight-soft: #2e2216;
+
+  --success: #4ade80;
+  --success-foreground: #86efac;
+  --success-soft: #13291c;
+  --success-border: #23543a;
+  --warning: #fbbf24;
+  --warning-foreground: #fcd34d;
+  --warning-soft: #2e2410;
+  --warning-border: #5c4613;
+  --soon: #fb923c;
+  --soon-foreground: #fdba74;
+  --soon-soft: #331f10;
+  --soon-border: #63391a;
+  --info: #60a5fa;
+  --info-foreground: #93c5fd;
+  --info-soft: #142339;
+  --info-border: #274a7a;
+  --destructive: #f87171;
+  --destructive-foreground: #2a0b0b;
+  --danger-foreground: #fca5a5;
+  --danger-soft: #351718;
+  --danger-border: #6a2a2b;
+
+  --section-home: #6fcf97;
+  --section-home-soft: #17281f;
+  --section-home-border: #2b4a38;
+  --section-home-foreground: #a3e2bd;
+  --section-tasks: #60a5fa;
+  --section-tasks-soft: #162238;
+  --section-tasks-border: #284270;
+  --section-tasks-foreground: #a9cbfc;
+  --section-shopping: #fb923c;
+  --section-shopping-soft: #33210f;
+  --section-shopping-border: #5e3a1a;
+  --section-shopping-foreground: #fdbb85;
+  --section-calendar: #a78bfa;
+  --section-calendar-soft: #221c39;
+  --section-calendar-border: #3f3569;
+  --section-calendar-foreground: #cbbafd;
+  --section-energy: #fbbf24;
+  --section-energy-soft: #30270f;
+  --section-energy-border: #5b4716;
+  --section-energy-foreground: #fcd875;
+  --section-finance: #2dd4bf;
+  --section-finance-soft: #0f2c29;
+  --section-finance-border: #1e514a;
+  --section-finance-foreground: #8fe8db;
+  --section-documents: #38bdf8;
+  --section-documents-soft: #0e2937;
+  --section-documents-border: #1c4b63;
+  --section-documents-foreground: #98d9fb;
+  --section-devices: #22d3ee;
+  --section-devices-soft: #0d2c32;
+  --section-devices-border: #1b525b;
+  --section-devices-foreground: #8fe6f4;
+  --section-assistant: #f472b6;
+  --section-assistant-soft: #341a29;
+  --section-assistant-border: #602d4a;
+  --section-assistant-foreground: #f9aed6;
+  --section-integrations: #94a3b8;
+  --section-integrations-soft: #1e242d;
+  --section-integrations-border: #374255;
+  --section-integrations-foreground: #cdd5e0;
+
+  --sidebar: #121716;
+  --sidebar-foreground: #c9d2ce;
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: #1f2624;
+  --sidebar-accent-foreground: #ecf0ee;
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+
+  --chart-1: #4a94ec;
+  --chart-2: #34c48c;
+  --chart-3: #f47c66;
+  --chart-4: #f2b729;
+  --chart-5: #ec7fb8;
+  --chart-6: #3ac0dd;
+  --chart-7: #9d8cf2;
+  --chart-8: #ef6b6b;
+}
+
+/*
+ * Aliases, declared for both themes so they resolve against the theme's own values (also in a `.dark`
+ * subtree, e.g. a side-by-side story). The current section defaults to home; `[data-accent]` swaps it.
+ */
+:root,
+.dark {
+  --danger: var(--destructive);
+  --section: var(--section-home);
+  --section-soft: var(--section-home-soft);
+  --section-border: var(--section-home-border);
+  --section-foreground: var(--section-home-foreground);
+  --chart-income: var(--chart-2);
+  --chart-expense: var(--chart-3);
+}
+
+/*
+ * Section accent: `data-accent="<name>"` on any element (the app frame sets it per page from the route,
+ * nav items set their own) points the `--section*` tokens at that hue. Components use `bg-section-soft`,
+ * `text-section`, `border-section-border`… and never need to know which section they are in.
+ */
+[data-accent="home"] { --section: var(--section-home); --section-soft: var(--section-home-soft); --section-border: var(--section-home-border); --section-foreground: var(--section-home-foreground); }
+[data-accent="tasks"] { --section: var(--section-tasks); --section-soft: var(--section-tasks-soft); --section-border: var(--section-tasks-border); --section-foreground: var(--section-tasks-foreground); }
+[data-accent="shopping"] { --section: var(--section-shopping); --section-soft: var(--section-shopping-soft); --section-border: var(--section-shopping-border); --section-foreground: var(--section-shopping-foreground); }
+[data-accent="calendar"] { --section: var(--section-calendar); --section-soft: var(--section-calendar-soft); --section-border: var(--section-calendar-border); --section-foreground: var(--section-calendar-foreground); }
+[data-accent="energy"] { --section: var(--section-energy); --section-soft: var(--section-energy-soft); --section-border: var(--section-energy-border); --section-foreground: var(--section-energy-foreground); }
+[data-accent="finance"] { --section: var(--section-finance); --section-soft: var(--section-finance-soft); --section-border: var(--section-finance-border); --section-foreground: var(--section-finance-foreground); }
+[data-accent="documents"] { --section: var(--section-documents); --section-soft: var(--section-documents-soft); --section-border: var(--section-documents-border); --section-foreground: var(--section-documents-foreground); }
+[data-accent="devices"] { --section: var(--section-devices); --section-soft: var(--section-devices-soft); --section-border: var(--section-devices-border); --section-foreground: var(--section-devices-foreground); }
+[data-accent="assistant"] { --section: var(--section-assistant); --section-soft: var(--section-assistant-soft); --section-border: var(--section-assistant-border); --section-foreground: var(--section-assistant-foreground); }
+[data-accent="integrations"] { --section: var(--section-integrations); --section-soft: var(--section-integrations-soft); --section-border: var(--section-integrations-border); --section-foreground: var(--section-integrations-foreground); }
+
+@theme inline {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-elevated: var(--elevated);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-highlight-strong: var(--highlight-strong);
+  --color-highlight-soft: var(--highlight-soft);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-success-border: var(--success-border);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-border: var(--warning-border);
+  --color-soon: var(--soon);
+  --color-soon-foreground: var(--soon-foreground);
+  --color-soon-soft: var(--soon-soft);
+  --color-soon-border: var(--soon-border);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-soft: var(--info-soft);
+  --color-info-border: var(--info-border);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-border: var(--danger-border);
+  --color-section: var(--section);
+  --color-section-soft: var(--section-soft);
+  --color-section-border: var(--section-border);
+  --color-section-foreground: var(--section-foreground);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-leaf: var(--brand-leaf);
+  --color-brand-mint: var(--brand-mint);
+  --color-brand-peach: var(--brand-peach);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+  --color-chart-7: var(--chart-7);
+  --color-chart-8: var(--chart-8);
+  --color-chart-income: var(--chart-income);
+  --color-chart-expense: var(--chart-expense);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+}
+
+/* Loading animations: indeterminate progress bars, and "appear after a short delay" so quick loads don't flicker. */
+@theme {
+  --animate-indeterminate: indeterminate 1.2s ease-in-out infinite;
+  --animate-appear: appear 200ms ease-out 150ms both;
+
+  @keyframes indeterminate {
+    from { left: -35%; }
+    to { left: 100%; }
+  }
+
+  @keyframes appear {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}

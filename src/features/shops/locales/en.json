@@ -1,0 +1,118 @@
+{
+  "page": {
+    "title": "Shops",
+    "description": "Where you buy things: supermarkets, DIY stores, pharmacies and webshops."
+  },
+  "actions": {
+    "add": "Add shop",
+    "visitWebsite": "Visit website",
+    "backToShops": "All shops"
+  },
+  "types": {
+    "supermarket": "Supermarket",
+    "discount": "Discount & variety",
+    "diy": "DIY & hardware",
+    "garden": "Garden centre",
+    "home": "Home & furnishing",
+    "electronics": "Electronics",
+    "pharmacy": "Pharmacy",
+    "drugstore": "Drugstore",
+    "pets": "Pet shop",
+    "sports": "Sports",
+    "fashion": "Fashion",
+    "online": "Online shop",
+    "other": "Other"
+  },
+  "fields": {
+    "name": "Name",
+    "type": "Type",
+    "address": "Address",
+    "websiteUrl": "Website",
+    "hasWebshop": "Has a webshop",
+    "hasWebshopDescription": "You can order online and have it delivered or pick it up.",
+    "openingHours": "Opening hours",
+    "openingHoursPlaceholder": "Mon–Sat 8:30–20:00",
+    "notes": "Notes"
+  },
+  "markers": {
+    "builtIn": "Built-in",
+    "builtInDescription": "Part of the built-in catalogue of Belgian shops.",
+    "own": "Own",
+    "ownDescription": "Added by your household.",
+    "webshop": "Webshop",
+    "ingredientSearch": "Ingredients",
+    "ingredientSearchDescription": "The assistant searches this webshop for recipe ingredients."
+  },
+  "filter": {
+    "label": "Filter by type",
+    "all": "All",
+    "search": "Search shops…",
+    "favorites": "Favourites"
+  },
+  "favorite": {
+    "add": "Add {{name}} to favourites",
+    "remove": "Remove {{name}} from favourites",
+    "failed": "Couldn't update your favourites. Try again."
+  },
+  "form": {
+    "createTitle": "Add a shop",
+    "editTitle": "Edit shop",
+    "description": "Shops show up when you plan groceries, DIY jobs and purchases.",
+    "builtInNotice": "This is a built-in shop. Your changes apply to the whole household.",
+    "created": "Shop added",
+    "updated": "Changes saved"
+  },
+  "detail": {
+    "details": "Details",
+    "website": "Website",
+    "noWebsite": "No website yet.",
+    "notes": "Notes",
+    "noNotes": "No notes yet.",
+    "onTheList": "On the list here",
+    "onTheListDescription": "Items on your shopping lists that you buy at this shop.",
+    "onTheListEmpty": "Nothing on the list for this shop yet.",
+    "notSet": "Not set"
+  },
+  "picker": {
+    "placeholder": "Choose a shop…"
+  },
+  "delete": {
+    "title": "Delete {{name}}?",
+    "description": "The shop disappears from your lists and pickers.",
+    "builtIn": "Built-in shops can't be deleted.",
+    "deleted": "Shop deleted"
+  },
+  "errors": {
+    "forbidden": "Only the owner can edit built-in shops."
+  },
+  "empty": {
+    "title": "No shops yet",
+    "description": "Add the shops where your household buys things.",
+    "noResultsTitle": "No shops found",
+    "noResultsDescription": "Try another name or type."
+  },
+  "icon": {
+    "label": "Icon",
+    "auto": "The shop's logo is found automatically on its website.",
+    "missing": "No icon found yet. It is looked up automatically on the website.",
+    "refresh": "Refresh icon",
+    "refreshing": "Looking…",
+    "refreshed": "Icon updated",
+    "notFound": "Couldn't find a usable icon on this website.",
+    "noWebsite": "Add a website first: the icon is looked up there.",
+    "searching": "Looking for the logo on the website…"
+  },
+  "jobs": {
+    "icons": {
+      "title": "Retry shop icons",
+      "description": "Looks up the logo again for shops whose website gave no icon last time."
+    }
+  },
+  "ingredientSearch": {
+    "label": "Use for ingredient search",
+    "description": "The assistant looks on this webshop for recipe ingredients you don't have as a product yet.",
+    "needsWebshop": "Only for a shop with a webshop and a website.",
+    "saving": "Saving…",
+    "forbidden": "Only adults can change which shops are searched."
+  }
+}

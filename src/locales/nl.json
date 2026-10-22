@@ -1,0 +1,220 @@
+{
+  "brand": {
+    "tagline": "Jouw huis. Samen."
+  },
+  "nav": {
+    "menu": "Navigatie openen",
+    "home": "Thuis",
+    "habitants": "Bewoners",
+    "contacts": "Contacten",
+    "places": "Ruimtes",
+    "tasks": "Taken",
+    "shopping": "Boodschappen",
+    "shops": "Winkels",
+    "inventory": "Voorraad",
+    "recipes": "Recepten",
+    "calendar": "Kalender",
+    "expenses": "Uitgaven",
+    "finance": "Financiën",
+    "income": "Inkomsten",
+    "money": "Geldstroom",
+    "projects": "Projecten",
+    "documents": "Documenten",
+    "assistant": "Assistent",
+    "soon": "Binnenkort",
+    "homeAssistant": "Home Assistant",
+    "integrations": "Integraties",
+    "notifications": "Meldingen",
+    "settings": "Instellingen",
+    "energy": "Energie",
+    "house": "Huis",
+    "devices": "Toestellen"
+  },
+  "screen": {
+    "products": "Producten",
+    "shopView": "Boodschappen per winkel",
+    "scan": "Scannen",
+    "appliances": "Toestellen",
+    "floorPlan": "Plattegrond"
+  },
+  "quickActions": {
+    "title": "Snelle acties",
+    "description": "Iets toevoegen of vastleggen, vanaf elke pagina.",
+    "open": "Snelle actie",
+    "openHint": "Snelle actie (toets N)",
+    "search": "Pagina's en acties zoeken",
+    "items": {
+      "task": "Nieuwe taak",
+      "shoppingItem": "Boodschap toevoegen",
+      "logExpense": "Uitgave noteren",
+      "scanProduct": "Product scannen",
+      "recipe": "Nieuw recept",
+      "event": "Nieuwe afspraak",
+      "income": "Inkomen registreren",
+      "assistant": "Vraag het de assistent"
+    }
+  },
+  "commandPalette": {
+    "title": "Zoeken en snelle acties",
+    "description": "Zoek een snelle actie of een pagina. Pijltjes om te kiezen, Enter om te openen, Esc om te sluiten.",
+    "descriptionNew": "Typ de letter van een snelle actie, of zoek. Esc om te sluiten.",
+    "placeholder": "Zoek een actie of pagina…",
+    "placeholderNew": "Typ een letter (T, S, E…) of zoek…",
+    "empty": "Niets gevonden.",
+    "actions": "Snelle acties",
+    "pages": "Ga naar"
+  },
+  "actions": {
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "add": "Toevoegen",
+    "close": "Sluiten",
+    "back": "Terug",
+    "retry": "Opnieuw proberen",
+    "toHome": "Terug naar dashboard"
+  },
+  "form": {
+    "optional": "optioneel",
+    "saving": "Opslaan…",
+    "choose": "Kies…",
+    "checkFields": "Controleer de velden in het rood."
+  },
+  "list": {
+    "search": "Zoeken…",
+    "searchLabel": "Zoeken",
+    "clearSearch": "Zoekopdracht wissen",
+    "view": "Weergave",
+    "views": {
+      "list": "Lijst",
+      "tiles": "Tegels"
+    },
+    "results_one": "{{count}} resultaat",
+    "results_other": "{{count}} resultaten",
+    "noResultsTitle": "Niets gevonden voor “{{query}}”",
+    "noResultsFilteredTitle": "Niets voldoet aan deze filters",
+    "noResultsDescription": "Probeer een ander woord, of wis de zoekopdracht.",
+    "errorTitle": "Deze lijst kon niet geladen worden",
+    "errorDescription": "Controleer je verbinding en probeer opnieuw."
+  },
+  "loading": {
+    "default": "Laden…",
+    "updating": "Bijwerken…",
+    "deleting": "Verwijderen…"
+  },
+  "errors": {
+    "generic": "Er ging iets mis. Probeer het opnieuw.",
+    "tooManyAttempts": "Te veel pogingen. Wacht enkele minuten en probeer opnieuw.",
+    "notFoundTitle": "Pagina niet gevonden",
+    "notFoundDescription": "Deze pagina bestaat niet, of is verplaatst.",
+    "crashTitle": "Er liep iets mis op deze pagina",
+    "crashDescription": "Probeer het opnieuw. Blijft het gebeuren, dan staan de details in de browserconsole."
+  },
+  "theme": {
+    "label": "Thema",
+    "system": "Systeem",
+    "light": "Licht",
+    "dark": "Donker"
+  },
+  "language": {
+    "label": "Taal",
+    "en": "English",
+    "nl": "Nederlands"
+  },
+  "picker": {
+    "favorites": "Favorieten",
+    "recent": "Recent gebruikt",
+    "all": "Alle",
+    "empty": "Geen resultaten",
+    "search": "Zoeken…",
+    "placeholder": "Kies…",
+    "addFavorite": "Toevoegen aan favorieten",
+    "removeFavorite": "Verwijderen uit favorieten",
+    "clear": "Selectie wissen",
+    "loading": "Laden…"
+  },
+  "recurrence": {
+    "repeat": "Herhalen",
+    "options": {
+      "none": "Herhaalt niet",
+      "DAILY": "Dagelijks",
+      "WEEKLY": "Wekelijks",
+      "MONTHLY": "Maandelijks",
+      "YEARLY": "Jaarlijks",
+      "SEASONAL": "Elk seizoen"
+    },
+    "every": "Elke",
+    "unit": {
+      "DAILY_one": "dag",
+      "DAILY_other": "dagen",
+      "WEEKLY_one": "week",
+      "WEEKLY_other": "weken",
+      "MONTHLY_one": "maand",
+      "MONTHLY_other": "maanden",
+      "YEARLY_one": "jaar",
+      "YEARLY_other": "jaar"
+    },
+    "weekdays": "Op deze dagen",
+    "season": "Seizoen",
+    "seasons": {
+      "spring": "Lente",
+      "summer": "Zomer",
+      "autumn": "Herfst",
+      "winter": "Winter"
+    },
+    "seasonsInline": {
+      "spring": "lente",
+      "summer": "zomer",
+      "autumn": "herfst",
+      "winter": "winter"
+    },
+    "ends": "Stopt",
+    "endsOptions": {
+      "never": "Nooit",
+      "until": "Op",
+      "count": "Na"
+    },
+    "occurrences_one": "keer",
+    "occurrences_other": "keer",
+    "summary": {
+      "every": {
+        "DAILY_one": "Elke dag",
+        "DAILY_other": "Om de {{count}} dagen",
+        "WEEKLY_one": "Elke week",
+        "WEEKLY_other": "Om de {{count}} weken",
+        "MONTHLY_one": "Elke maand",
+        "MONTHLY_other": "Om de {{count}} maanden",
+        "YEARLY_one": "Elk jaar",
+        "YEARLY_other": "Om de {{count}} jaar"
+      },
+      "season_one": "Elke {{season}} ({{months}})",
+      "season_other": "Om de {{count}} jaar in de {{season}} ({{months}})",
+      "window_one": "Elk jaar in {{months}}",
+      "window_other": "Om de {{count}} jaar in {{months}}",
+      "onDays": "{{rule}} op {{days}}",
+      "until": "{{rule}}, tot {{date}}",
+      "times_one": "{{rule}}, één keer",
+      "times_other": "{{rule}}, {{count}} keer",
+      "custom": "Aangepaste herhaling"
+    }
+  },
+  "scanner": {
+    "start": "Camera starten",
+    "stop": "Camera stoppen",
+    "starting": "Camera wordt gestart…",
+    "hint": "Houd de streepjescode of QR-code binnen het kader.",
+    "denied": "De camera is geblokkeerd. Sta de camera toe voor deze site in de instellingen van je browser, of typ de code hieronder.",
+    "unavailable": "Geen camera gevonden op dit toestel. Typ de code hieronder.",
+    "insecure": "De camera werkt alleen via een beveiligde (https) verbinding. Open de app op het publieke adres, of typ de code hieronder.",
+    "error": "De camera kon niet gestart worden. Probeer opnieuw, of typ de code hieronder.",
+    "manualLabel": "Code",
+    "manualPlaceholder": "Typ het nummer onder de streepjescode…",
+    "manualSubmit": "Opzoeken"
+  },
+  "pdf": {
+    "loading": "PDF laden…",
+    "failed": "De PDF kon niet geladen worden.",
+    "page": "Pagina {{page}} van {{total}}"
+  }
+}

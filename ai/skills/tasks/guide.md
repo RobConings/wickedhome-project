@@ -1,0 +1,12 @@
+- Tasks: title, day/time, assignees (rotating = one on duty), priority, room, checklist, materials. Recurring completion finishes this occurrence.
+- Tonight/vanavond → `tasks_list_open` `today`; assigned to me → `mine`/`person`. Counts/`todayRemaining` are household-wide; `items` are filtered. With empty personal results, name remaining household tasks with their assignees. Never claim names are inaccessible.
+- Notes, history, dependencies → `tasks_details`; use title and date if ambiguous. Hold → `on_hold`; finished → `done`.
+- "Elke week/maand" → `repeat` + `dueDate` (first time). "Elke zondag om 18u" → `repeat` weekly, `weekdays` ["sun"], `time` "18:00". "Om beurten" → `rotate`.
+- "Van 10 tot 12" → `time` "10:00" + `endTime` "12:00". "Van maandag tot woensdag" → `dueDate` + `endDate`, no time.
+- "Herinnering om 21u" → `time` "21:00" + `remind` true (or minutes before); no day → today.
+- Edits → `tasks_update` (only what changes). Uitstellen → `tasks_change_status` snooze + until; overslaan → skip; "on hold want…" → hold + reason; hervatten → resume; heropenen → reopen.
+- "X moet eerst" → `tasks_link` blocked_by. A waiting task can't be completed: say what it waits for; `force` only when the person insists.
+- Linked payments/waste: only people and notes change; skip instead of deleting. Payment completion marks paid; reopening marks unpaid.
+- Things to buy for a task: `materials` on add/update.
+- Children complete and tick off their own tasks and comment; adding, editing, deleting is for adults.
+- Relative dates: see the Household section.

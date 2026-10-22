@@ -1,0 +1,11 @@
+- A contact is anyone the household deals with: aannemer (contractor), loodgieter (plumber), elektricien, schrijnwerker, leverancier (supplier), the bank, the school, the doctor… Name, company, trade, emails, phones, address, website, notes. The first email and phone are the primary ones.
+- Contacts work on projects with a role ("aannemer" on "Badkamer renovatie"). Project contacts are linked here, not in the projects skill.
+- Refer to a contact by name, company or trade: "Jan", "Bouwbedrijf Peeters", "de aannemer", "the plumber", "de aannemer van de badkamer". Trades match in Dutch and English. Several fit → the one on a running project, otherwise ask which one.
+- "Wat is het nummer van de loodgieter?" → `contacts_find` contact "loodgieter" (or query "loodgieter" for a list).
+- "Wie werkt er aan de badkamer?" → `contacts_find` project "badkamer".
+- "Voeg Jan Peeters toe, aannemer bij Bouwbedrijf Peeters, jan@example.be" → `contacts_save` name, trade, company, email. Add project + role to link it at once.
+- New number or address for someone → `contacts_save` contact + phone/email (becomes the primary one; the others stay).
+- "Peeters is de aannemer voor de keuken" → `contacts_link` contact, project, role "aannemer"; unlink true to remove.
+- Delete only when asked (`contacts_delete`); project links go with it, projects stay.
+- Mailing or calling is not done here: give the email or number, or use the mail skill with the contact.
+- Everyone may look; changes are for owners and adults and always confirmed.

@@ -1,0 +1,86 @@
+// Feature: notifications (docs/NOTIFICATIONS.md). The in-app notification center (bell, /notifications) and
+// Web Push to phones. Written only by src/api/notifications (`notify()`, called by the features); per person.
+
+/// One notification for one person. Shown in the notification center and, per the person's preferences,
+/// pushed to their devices. Pruned by the `notifications.prune` job.
+model Notification {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Registered kind, `<feature>.<what>`: `waste.bins`, `tasks.digest`, `alarm.triggered`…
+  kind          String
+  title         String
+  body          String
+  /// In-app path opened on tap (`/tasks/…`); null opens the notification center.
+  url           String?
+  /// Collapses repeats: one per tag and person within the de-duplication window, and one on the device.
+  tag           String?
+  /// Bypasses quiet hours and is pushed with high urgency (the alarm went off).
+  urgent        Boolean   @default(false)
+  /// Small extra facts for the UI (counts, ids); never secrets.
+  data          Json?
+  readAt        DateTime?
+  /// Push held back by quiet hours: the dispatch job pushes it at this time if it is still unread.
+  pushHeldUntil DateTime?
+  /// When it reached at least one device.
+  pushedAt      DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, readAt])
+  @@index([userId, tag, createdAt])
+  @@index([pushHeldUntil])
+  @@map("notifications")
+}
+
+/// A browser or installed app that accepted Web Push for a person (one per browser install).
+model PushSubscription {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// The push service URL (Google FCM, Mozilla, Apple…); unique per browser install.
+  endpoint      String    @unique
+  /// The browser's P-256 public key and auth secret (base64url), used to encrypt payloads (RFC 8291).
+  p256dh        String
+  auth          String
+  userAgent     String?
+  /// "iPhone · Safari", derived from the user agent.
+  label         String?
+  createdAt     DateTime  @default(now())
+  lastSuccessAt DateTime?
+  /// Failed sends in a row (reset on success). A 404/410 from the push service deletes the row instead.
+  failureCount  Int       @default(0)
+  lastFailureAt DateTime?
+  /// Short reason of the last failure ("HTTP 500"); never payloads or keys.
+  lastError     String?
+
+  @@index([userId])
+  @@map("push_subscriptions")
+}
+
+/// A person's notification settings. No row = the defaults (quiet hours 22:00–07:00, each kind's default).
+model NotificationPreference {
+  userId            String   @id
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quietHoursEnabled Boolean  @default(true)
+  /// "HH:MM", Europe/Brussels.
+  quietStart        String   @default("22:00")
+  quietEnd          String   @default("07:00")
+  /// Per kind: `{ "<kind>": { "enabled": true, "time": "08:00", "scope": ["device:<id>"] } }`; missing = default.
+  kinds             Json     @default("{}")
+  updatedAt         DateTime @updatedAt
+
+  @@map("notification_preferences")
+}
+
+/// The server's VAPID key pair (its Web Push identity), generated once when .env doesn't set one. One row, id "vapid".
+model WebPushKey {
+  id         String   @id
+  /// Uncompressed P-256 public key, base64url (what browsers get as `applicationServerKey`).
+  publicKey  String
+  /// P-256 private key (32 bytes), base64url.
+  privateKey String
+  createdAt  DateTime @default(now())
+
+  @@map("web_push_keys")
+}

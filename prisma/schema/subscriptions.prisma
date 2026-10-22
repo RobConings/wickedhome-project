@@ -1,0 +1,48 @@
+// Feature: subscriptions
+
+enum BillingCycle {
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+  /// Every `cycleMonths` months.
+  MONTHS
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+}
+
+/// A recurring service the household pays for (streaming, software, gym, newspaper…).
+model Subscription {
+  id                String             @id @default(cuid())
+  householdId       String
+  household         Household          @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name              String
+  websiteUrl        String?
+  /// Price per billing cycle, in cents.
+  costCents         Int
+  billingCycle      BillingCycle
+  /// Only for `MONTHS`: the cycle length in months.
+  cycleMonths       Int?
+  /// The renewal date as last entered; read paths roll it forward by whole cycles.
+  nextRenewalOn     DateTime           @db.Date
+  paymentMethod     String?
+  /// Account the subscription is charged to; null = not set.
+  paymentAccountId  String?
+  paymentAccount    PaymentAccount?    @relation(fields: [paymentAccountId], references: [id], onDelete: SetNull)
+  ownerId           String?
+  owner             Habitant?          @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  status            SubscriptionStatus @default(ACTIVE)
+  trialEndsOn       DateTime?          @db.Date
+  remindDaysBefore  Int?
+  candidateToCancel Boolean            @default(false)
+  notes             String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@index([householdId])
+  @@map("subscriptions")
+}

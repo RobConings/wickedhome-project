@@ -1,0 +1,87 @@
+{
+  "card": {
+    "title": "Weer",
+    "loading": "Weersvoorspelling laden…",
+    "loadError": "De weersvoorspelling kon niet geladen worden.",
+    "noLocation": "Vul je adres in bij Instellingen om hier de weersvoorspelling voor je huis te zien.",
+    "setAddress": "Adres invullen",
+    "unavailable": "De weersvoorspelling is nu niet beschikbaar. Probeer het later opnieuw.",
+    "stale": "Een oudere voorspelling wordt getoond.",
+    "attribution": "Weergegevens van",
+    "fallback": "({{provider}} niet beschikbaar)"
+  },
+  "feelsLike": "voelt als {{temperature}}",
+  "max": "max {{temperature}}",
+  "min": "min {{temperature}}",
+  "rain": {
+    "dry": "Droog de komende {{hours}} uur",
+    "nowUntil": "Het regent, droog vanaf {{time}} ({{amount}} mm)",
+    "nowAllDay": "Regen de komende uren ({{amount}} mm)",
+    "later": "Regen verwacht vanaf {{time}} ({{amount}} mm)"
+  },
+  "today": {
+    "chance": "Vandaag: {{chance}}% kans op regen, {{amount}} mm",
+    "amount": "Vandaag: {{amount}} mm regen"
+  },
+  "wind": "Wind {{speed}} km/u {{direction}}, rukwinden {{gusts}} km/u",
+  "hours": {
+    "label": "Komende uren"
+  },
+  "days": {
+    "label": "Komende dagen"
+  },
+  "compass": {
+    "N": "N",
+    "NE": "NO",
+    "E": "O",
+    "SE": "ZO",
+    "S": "Z",
+    "SW": "ZW",
+    "W": "W",
+    "NW": "NW"
+  },
+  "conditions": {
+    "clear": "Helder",
+    "mostly_clear": "Overwegend helder",
+    "partly_cloudy": "Half bewolkt",
+    "overcast": "Bewolkt",
+    "fog": "Mist",
+    "drizzle": "Motregen",
+    "freezing_drizzle": "IJzel (motregen)",
+    "rain": "Regen",
+    "heavy_rain": "Zware regen",
+    "freezing_rain": "IJzel",
+    "rain_showers": "Buien",
+    "snow": "Sneeuw",
+    "snow_showers": "Sneeuwbuien",
+    "thunderstorm": "Onweer",
+    "thunderstorm_hail": "Onweer met hagel",
+    "unknown": "Onbekend",
+    "sleet": "Natte sneeuw"
+  },
+  "windNoGusts": "Wind {{speed}} km/u {{direction}}",
+  "settings": {
+    "title": "Weerbron",
+    "description": "Waar de weersvoorspelling op het dashboard vandaan komt.",
+    "default": "standaard",
+    "unofficial": "onofficieel",
+    "notConfigured": "niet ingesteld",
+    "providers": {
+      "open-meteo": "Gratis, open weermodellen (o.a. DWD ICON en Météo-France), wereldwijd.",
+      "kmi": "Het Koninklijk Meteorologisch Instituut, via de API van zijn app (niet gedocumenteerd, kan wijzigen).",
+      "google": "Google Maps Platform Weather API. Vraagt een API-sleutel met facturatie op de server."
+    },
+    "howToConfigure": {
+      "open-meteo": "",
+      "kmi": "",
+      "google": "Zet GOOGLE_MAPS_API_KEY in de .env van de server en herstart WickedHome om het te gebruiken."
+    },
+    "last": "Laatste voorspelling van {{provider}}, {{time}}.",
+    "lastFallback": "{{chosen}} was niet beschikbaar; de laatste voorspelling kwam van {{provider}}, {{time}}.",
+    "noneYet": "Nog geen voorspelling opgehaald. Open het dashboard om er een te laden.",
+    "fallbackHint": "Als de gekozen bron faalt, neemt Open-Meteo automatisch over.",
+    "saved": "Weerbron opgeslagen.",
+    "failed": "De weerbron kon niet opgeslagen worden.",
+    "readOnly": "Alleen volwassenen kunnen de weerbron wijzigen."
+  }
+}

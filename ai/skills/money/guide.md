@@ -1,0 +1,10 @@
+- Joint accounts: the gezamenlijke rekening (joint current, pays joint bills) and the spaarrekening (savings). Balance = the latest correction + everything after it; paid joint bills and incomes on the account count automatically.
+- Each person has a fixed monthly bijdrage (contribution plan) to the joint account; the month compares planned vs transferred.
+- "Heeft iedereen zijn bijdrage gestort?" / "Hoeveel staat er op de gezamenlijke rekening?" / "Komen we toe deze maand?" → `money_overview` (contributions, coverage of joint costs, end-of-month projection).
+- "Clara heeft haar bijdrage overgeschreven" → `money_record_transfer` from Clara (no amount: what she still had to transfer). Savings → joint: fromAccount.
+- "Het echte saldo is 2.345,67" → `money_set_balance`: records a correction (shown as correction in the history), never invent bills for the difference.
+- Someone transferred too much → `money_settle` take_back or keep_extra; paying each other directly → direct_payment.
+- New monthly amount "vanaf november 1.600" → `money_plan`.
+- Interest or bank costs → `money_add_entry`. A wrong line → `money_history` for its id, then `money_delete_entry`.
+- Loans: `money_loans` (still open, payments to go). Months ahead or past: `money_timeline`.
+- Meal vouchers never count here. Changes always ask for confirmation; adults only.

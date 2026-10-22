@@ -1,0 +1,94 @@
+// Feature: documents
+
+/// Where a file's bytes live. Only LOCAL is implemented; GOOGLE_DRIVE arrives with Google OAuth.
+enum DocumentStorageProvider {
+  LOCAL
+  GOOGLE_DRIVE
+}
+
+/// A folder in the household's document drive. `parentId = null` is the drive root.
+///
+/// Folder names are unique among the non-trashed folders of one parent (case-insensitive). The service
+/// enforces it: PostgreSQL 14 has no `NULLS NOT DISTINCT`, and trashed folders must not block a name.
+model DocumentFolder {
+  id          String           @id @default(cuid())
+  householdId String
+  household   Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  parentId    String?
+  parent      DocumentFolder?  @relation("DocumentFolderTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children    DocumentFolder[] @relation("DocumentFolderTree")
+  name        String
+  /// `#rrggbb`, optional accent colour of the folder icon.
+  color       String?
+  files       DocumentFile[]
+  /// Set when the folder is in the trash. Trashing a folder stamps the same instant on everything inside
+  /// it, so restoring brings back exactly what was trashed together.
+  deletedAt   DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([householdId, parentId])
+  @@index([householdId, deletedAt])
+  @@map("document_folders")
+}
+
+/// A stored file. Created first (pending, `uploadedAt = null`), then its bytes are streamed to the storage
+/// provider; only then does it show up in the drive.
+model DocumentFile {
+  id              String                  @id @default(cuid())
+  householdId     String
+  household       Household               @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  /// `null` = in the drive root.
+  folderId        String?
+  folder          DocumentFolder?         @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  /// Display name including extension, e.g. "Notarisakte.pdf". Never used to build a storage path.
+  name            String
+  mimeType        String
+  sizeBytes       Int
+  /// Hex SHA-256 of the content, computed while streaming. `null` while pending.
+  sha256          String?
+  storageProvider DocumentStorageProvider @default(LOCAL)
+  /// Provider-specific key (LOCAL: `<householdId>/<yyyy>/<mm>/<random>`). `null` while pending.
+  storageKey      String?
+  /// Id of the object at an external provider (Google Drive file id).
+  externalId      String?
+  uploadedById    String?
+  uploadedBy      User?                   @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  /// When the content finished uploading. `null` = pending upload.
+  uploadedAt      DateTime?
+  links           DocumentLink[]
+  /// Set when the file is in the trash.
+  deletedAt       DateTime?
+  /// Storage target kind (e.g. "bills") this local file still has to move to, because the target was
+  /// unavailable at upload or "move existing" asked for it. The local bytes stay until the copy is verified.
+  pendingTarget        String?
+  targetAttempts       Int                     @default(0)
+  targetNextAttemptAt  DateTime?
+  /// Why the last move failed (short, no secrets).
+  targetError          String?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  @@index([householdId, folderId])
+  @@index([householdId, deletedAt])
+  @@index([pendingTarget, targetNextAttemptAt])
+  @@map("document_files")
+}
+
+/// Attaches a file to any other item (bill invoice, appliance manual, task quote, shopping receipt…),
+/// generic like `favorites`: the documents feature does not know the other tables.
+model DocumentLink {
+  id          String       @id @default(cuid())
+  householdId String
+  household   Household    @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  fileId      String
+  file        DocumentFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  /// Kind of item, e.g. "bill", "appliance", "task" (see DOCUMENT_ENTITY_TYPES).
+  entityType  String
+  entityId    String
+  createdAt   DateTime     @default(now())
+
+  @@unique([fileId, entityType, entityId])
+  @@index([householdId, entityType, entityId])
+  @@map("document_links")
+}

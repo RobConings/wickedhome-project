@@ -1,0 +1,142 @@
+{
+  "page": {
+    "title": "Calendar",
+    "description": "Everything the household has planned, from school runs to shop visits."
+  },
+  "actions": {
+    "add": "New event",
+    "today": "Today",
+    "previous": "Previous",
+    "next": "Next",
+    "edit": "Edit",
+    "delete": "Delete",
+    "openEvent": "Open event page",
+    "open": "Open",
+    "openShop": "Open shop"
+  },
+  "views": {
+    "label": "View",
+    "day": "Day",
+    "week": "Week",
+    "month": "Month",
+    "agenda": "Agenda"
+  },
+  "kinds": {
+    "event": "Event",
+    "store_visit": "Store visit",
+    "birthday": "Birthday",
+    "task": "Task",
+    "bill": "Payment due",
+    "renewal": "Renewal",
+    "waste": "Waste collection",
+    "other": "Other"
+  },
+  "categories": {
+    "none": "No category",
+    "family": "Family activity",
+    "holiday": "Holiday & trips",
+    "school": "School",
+    "work": "Work",
+    "health": "Health",
+    "social": "Social",
+    "sport": "Sport",
+    "household": "Household",
+    "other": "Other"
+  },
+  "entry": {
+    "birthday": "{{name}} turns {{age}}",
+    "more_one": "+{{count}} more",
+    "more_other": "+{{count}} more",
+    "allDay": "All day",
+    "recurring": "Repeats",
+    "readOnly": "Managed elsewhere",
+    "dayLabel": "{{date}}, add an event",
+    "reminder": "With a reminder"
+  },
+  "time": {
+    "from": "from {{time}}",
+    "until": "until {{time}}"
+  },
+  "form": {
+    "createTitle": "New event",
+    "editTitle": "Edit event",
+    "description": "Who, when and where. Pick a shop to plan a store visit.",
+    "created": "Event added",
+    "updated": "Changes saved",
+    "deleted": "Event deleted",
+    "seriesNote": "Changes apply to every occurrence of this event."
+  },
+  "fields": {
+    "kind": "Type",
+    "title": "Title",
+    "titlePlaceholder": "e.g. Family dinner",
+    "shop": "Shop",
+    "allDay": "All day",
+    "startDate": "Start date",
+    "startTime": "Start time",
+    "endDate": "End date",
+    "endTime": "End time",
+    "participants": "Who",
+    "category": "Category",
+    "location": "Location",
+    "locationPlaceholder": "Address or place",
+    "description": "Notes",
+    "repeat": "Repeat",
+    "calendar": "Calendar"
+  },
+  "detail": {
+    "when": "When",
+    "repeats": "Repeats",
+    "participants": "Who",
+    "everyone": "No one in particular",
+    "location": "Location",
+    "notes": "Notes",
+    "shop": "Shop",
+    "shopList": "On the list for this shop",
+    "shopListPlaceholder": "What to buy at {{shop}} will show up here once shopping lists are available.",
+    "managedIn": "This comes from another part of the app and can't be changed here."
+  },
+  "delete": {
+    "title": "Delete “{{title}}”?",
+    "description": "This can't be undone.",
+    "recurringDescription": "This deletes every occurrence of this repeating event. It can't be undone."
+  },
+  "errors": {
+    "timeRequired": "Choose a time.",
+    "endBeforeStart": "The end must be after the start.",
+    "tooLong": "An event can last at most a year.",
+    "shopRequired": "Choose the shop you're visiting.",
+    "invalidRecurrence": "This repeat rule isn't supported.",
+    "unknownParticipant": "Someone in this list isn't part of the household.",
+    "unknownShop": "This shop no longer exists.",
+    "notFound": "This event no longer exists.",
+    "unknownTarget": "This calendar can no longer be chosen; refresh and try again."
+  },
+  "empty": {
+    "title": "Nothing planned",
+    "description": "Nothing on the calendar this month yet.",
+    "day": "Nothing planned"
+  },
+  "agenda": {
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "nothing": "Nothing planned",
+    "openDay": "Open {{date}} as a day"
+  },
+  "eventPage": {
+    "back": "Back to calendar"
+  },
+  "filter": {
+    "label": "Categories and sources",
+    "clear": "Show all"
+  },
+  "sources": {
+    "birthdays": "Birthdays",
+    "tasks": "Tasks",
+    "waste": "Waste collection",
+    "expenses": "Expenses"
+  },
+  "targets": {
+    "household": "Household calendar"
+  }
+}

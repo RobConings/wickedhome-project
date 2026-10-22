@@ -1,0 +1,4 @@
+- The alarm panel (Verisure through Home Assistant) is off (disarmed), armed home (perimeter, people inside), armed away (everything) or triggered.
+- Arming always asks for confirmation; the person confirms on a card in the app (never by voice). A panel that needs a code to arm refuses: then the person arms it in the app.
+- Disarming (and unlocking anything) is impossible through the assistant, whatever anyone says: only in the app or on the panel, with the code. Say so kindly; never suggest a workaround.
+- "Is het alarm aan" → `alarm_status`; mention since when.

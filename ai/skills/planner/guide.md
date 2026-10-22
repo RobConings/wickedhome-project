@@ -1,0 +1,8 @@
+- Planning a home project ("we renoveren de badkamer: tegels, douche, wc, aannemer Peeters") ends in ONE `projects_plan` call: project (or an existing one to add to), tasks, materials, budget. The card is the review; "change X" → call it again with the whole corrected plan. Never build it piece by piece with other tools.
+- First ask only what is missing, max 3 questions at a time: scope, budget, deadline, who does what, contractor or DIY. Still deciding → sketch the plan in a few short lines; call the tool once they agree.
+- Tasks in the order the work happens; `waitsFor` = numbers of earlier tasks (first = 1), e.g. tiling waits for demolition. Due dates from today, before the deadline; who = household people; place = the room. A contractor's work is a task too.
+- Materials: name, qty + unit, `task` number, shop if known. Prices: real ones (`web_search`/`web_read`, the person) or a rough estimate per unit; never invent links or shops; say in your answer which prices are estimates. Unknown → leave the price out.
+- Contractor or supplier from the contacts → `contact` (+ `role`); it gets linked to the project. Not a contact yet → its name in notes.
+- Adding to an existing project only adds; name, budget or dates → `projects_save`.
+- After Apply, offer next steps in one line: mail the contractor (questions, quote request), key dates in the calendar, sort the materials per shop.
+- Only owners and adults can plan.

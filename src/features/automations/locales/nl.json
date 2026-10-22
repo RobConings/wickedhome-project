@@ -1,0 +1,82 @@
+{
+  "section": {
+    "title": "Automatisaties",
+    "description": "Werk dat WickedHome zelf op een vast moment doet, zoals de afvalkalender ophalen. Pauzeer er een of voer hem nu uit.",
+    "loading": "Automatisaties laden…",
+    "error": "De automatisaties konden niet geladen worden",
+    "errorDescription": "Controleer de verbinding en probeer opnieuw.",
+    "readOnly": "Alleen eigenaars en volwassenen kunnen automatisaties pauzeren of uitvoeren.",
+    "empty": {
+      "title": "Nog geen automatisaties",
+      "description": "Onderdelen van de app zetten hun geplande werk hier, bijvoorbeeld elke ochtend de afvalkalender bijwerken."
+    }
+  },
+  "schedule": {
+    "everyMinute": "Elke minuut",
+    "everyMinutes_one": "Elke minuut",
+    "everyMinutes_other": "Elke {{count}} minuten",
+    "hourly": "Elk uur om :{{minute}}",
+    "everyHours_one": "Elk uur om :{{minute}}",
+    "everyHours_other": "Elke {{count}} uur om :{{minute}}",
+    "daily": "Elke dag om {{times}}",
+    "weekdays": "Op weekdagen om {{times}}",
+    "weekly": "Elke {{days}} om {{times}}",
+    "monthly": "Dag {{day}} van elke maand om {{times}}",
+    "custom": "Planning {{expression}}"
+  },
+  "job": {
+    "schedule": "Wanneer",
+    "next": "Volgende keer",
+    "last": "Laatste keer",
+    "lastCheck": "Laatste controle",
+    "lastCheckHint": "controles zonder werk worden niet in de geschiedenis bewaard",
+    "on": "Aan",
+    "paused": "Gepauzeerd",
+    "pausedNext": "Gepauzeerd: loopt pas weer als je hem aanzet",
+    "never": "Nog niet uitgevoerd",
+    "toggle": "\"{{title}}\" volgens planning uitvoeren",
+    "runNow": "Nu uitvoeren",
+    "running": "Bezig…"
+  },
+  "history": {
+    "show": "Recente uitvoeringen",
+    "hide": "Uitvoeringen verbergen",
+    "empty": "Nog geen uitvoeringen.",
+    "log": "Log tonen"
+  },
+  "status": {
+    "running": "Bezig",
+    "succeeded": "Gelukt",
+    "failed": "Mislukt",
+    "skipped": "Overgeslagen"
+  },
+  "trigger": {
+    "schedule": "volgens planning",
+    "manual": "met de hand gestart",
+    "startup": "ingehaald na een herstart"
+  },
+  "duration": {
+    "ms_one": "{{count}} ms",
+    "ms_other": "{{count}} ms",
+    "s_one": "{{count}} s",
+    "s_other": "{{count}} s",
+    "min_one": "{{count}} min",
+    "min_other": "{{count}} min"
+  },
+  "toast": {
+    "paused": "\"{{title}}\" gepauzeerd",
+    "resumed": "\"{{title}}\" aangezet",
+    "toggleFailed": "\"{{title}}\" kon niet aangepast worden. Probeer opnieuw.",
+    "done": "\"{{title}}\" is klaar",
+    "failed": "\"{{title}}\" is mislukt",
+    "skipped": "\"{{title}}\" liep niet: hij was elders al bezig",
+    "alreadyRunning": "\"{{title}}\" is al bezig",
+    "runFailed": "\"{{title}}\" kon niet gestart worden. Probeer opnieuw."
+  },
+  "jobs": {
+    "pruneRuns": {
+      "title": "Uitvoeringsgeschiedenis opruimen",
+      "description": "Verwijdert uitvoeringen van automatisaties ouder dan 90 dagen. De laatste 20 van elke automatisatie blijven altijd."
+    }
+  }
+}

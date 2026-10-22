@@ -1,0 +1,9 @@
+- A project is anything with a budget: a verbouwing/renovatie, a holiday, a family trip, the Christmas budget. Expenses, recurring expenses, tasks and materials can be linked to it.
+- Budget: spent = paid linked expenses + bought priced materials; committed = unpaid linked expenses + priced materials still to buy; left = budget − spent − committed. Above 90 % at risk, above 100 % over budget. The app computes it: read it, don't calculate.
+- "Zitten we nog binnen budget met de badkamer?" → `projects_list` or `projects_details` (breakdown, expenses, materials).
+- "Ik heb 120 euro verf gekocht bij Brico voor de badkamer" → `projects_add_cost` (paid; joint unless "zelf betaald"). A quote or bill still to pay → paid false.
+- An existing bill or subscription belongs to a project → `projects_link` (unlink to undo).
+- New project, new budget, start/finish it → `projects_save` (status done when finished; delete only when asked). Planning a project with tasks and materials in one go → `projects_plan` (planner skill).
+- Materials (what to buy) live on the shopping list of the project; add_cost materials marks bought ones as paid by this purchase so they count once.
+- Materials on an invoice (an expense with its PDF or photo attached): "koppel de factuur van Toppy aan het materiaal" → `projects_link_invoice` (reads it, links matching materials as bought at the invoice price, counted once; addUnmatched adds other lines).
+- Everyone may look; changes are for owners and adults and always confirmed.

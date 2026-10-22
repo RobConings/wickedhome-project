@@ -1,0 +1,131 @@
+// Feature: household
+
+enum HabitantType {
+  ADULT
+  CHILD
+  PET
+  GUEST
+}
+
+/// Where the home's coordinates came from.
+enum HouseholdLocationSource {
+  /// Geocoded with the Flemish address register (Geopunt geolocation service).
+  GEOPUNT
+  /// Geocoded with OpenStreetMap Nominatim (outside Flanders, or Geopunt found nothing).
+  NOMINATIM
+  /// Entered by hand.
+  MANUAL
+}
+
+model Household {
+  id                  String                   @id @default(cuid())
+  name                String
+  /// The home address (Belgian structure). All optional: a household can exist without one.
+  addressStreet       String?
+  addressNumber       String?
+  /// "bus" / "boîte"
+  addressBox          String?
+  addressPostalCode   String?
+  addressMunicipality String?
+  /// ISO 3166-1 alpha-2.
+  addressCountry      String                   @default("BE")
+  /// WGS84 coordinates of the home (weather forecast, map link). Null until geocoded or entered.
+  latitude            Float?
+  longitude           Float?
+  locationSource      HouseholdLocationSource?
+  /// Where true north is on the floor plans: degrees clockwise from the plan's "up" (0 = north is up,
+  /// 90 = north points right). One value for every floor, since they share the plan's coordinates. Null
+  /// until set in the plan editor (places feature).
+  planNorthDegrees    Float?
+  wasteSetup          WasteSetup?
+  wasteCollections    WasteCollection[]
+  weatherSettings     WeatherSettings?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  users              User[]
+  habitants          Habitant[]
+  expenses           Expense[]
+  recurringExpenses  RecurringExpense[]
+  paymentAccounts    PaymentAccount[]
+  accountEntries     AccountEntry[]
+  contributionPlans  ContributionPlan[]
+  contributionExtras ContributionExtra[]
+  incomeSources      IncomeSource[]
+  incomes            Income[]
+  subscriptions      Subscription[]
+  shops              Shop[]
+  shopSettings       HouseholdShopSetting[]
+  floors            Floor[]
+  places             Place[]
+  planElements       PlanElement[]
+  calendarEvents     CalendarEvent[]
+  tasks              Task[]
+  appliances         Appliance[]
+  solarInstallations SolarInstallation[]
+  homeBatteries      HomeBattery[]
+  energyMeters       EnergyMeter[]
+  energySettings     EnergySettings?
+  products           Product[]
+  shoppingLists      ShoppingList[]
+  shoppingStaples    ShoppingStaple[]
+  shoppingItems      ShoppingItem[]
+  stockItems         StockItem[]
+  stockMovements     StockMovement[]
+  documentFolders    DocumentFolder[]
+  documentFiles      DocumentFile[]
+  documentLinks      DocumentLink[]
+  deviceProfiles     DeviceProfile[]
+  devices            Device[]
+  invites            Invite[]
+  projects           Project[]
+  contacts           Contact[]
+  recipes            Recipe[]
+  recipeCategories   RecipeCategory[]
+  mealPlanEntries    MealPlanEntry[]
+  homeAssistantSettings HomeAssistantSettings?
+  alarmActionLogs    AlarmActionLog[]
+  googleConnections   GoogleConnection[]
+  mailBillRules       MailBillRule[]
+  mailBillSuggestions MailBillSuggestion[]
+  googleDriveLinks    GoogleDriveLink[]
+  googleDriveStorageTargets GoogleDriveStorageTarget[]
+  auditEntries        AuditEntry[]
+  mcpOAuthClients     McpOAuthClient[]
+  mcpOAuthGrants      McpOAuthGrant[]
+
+  @@map("households")
+}
+
+/// Everyone and everything that lives in the house. Only some habitants can log in (see User).
+model Habitant {
+  id               String                     @id @default(cuid())
+  householdId      String
+  household        Household                  @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name             String
+  type             HabitantType
+  color            String
+  emoji            String?
+  birthday         DateTime?                  @db.Date
+  user             User?
+  invites          Invite[]
+  expensesPaid     Expense[]                  @relation("ExpensePaidBy")
+  expensesPayer    Expense[]                  @relation("ExpensePayer")
+  recurringExpensesPayer RecurringExpense[]   @relation("RecurringExpensePayer")
+  expenseShares    ExpenseShare[]
+  recurringExpenseShares RecurringExpenseShare[]
+  paymentAccountOwnerships PaymentAccountOwner[]
+  accountEntries   AccountEntry[]
+  contributionPlans ContributionPlan[]
+  contributionExtras ContributionExtra[]
+  incomeSources    IncomeSource[]
+  incomes          Income[]
+  subscriptions    Subscription[]
+  calendarEvents   CalendarEventParticipant[]
+  taskAssignments  TaskAssignee[]
+  taskCompletions  TaskCompletion[]           @relation("TaskCompletedBy")
+  createdAt        DateTime                   @default(now())
+  updatedAt        DateTime                   @updatedAt
+
+  @@index([householdId])
+  @@map("habitants")
+}

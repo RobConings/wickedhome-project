@@ -1,0 +1,125 @@
+{
+  "page": {
+    "title": "Inventory",
+    "description": "What you have in stock and where. Running low puts it on the shopping list."
+  },
+  "actions": {
+    "add": "Add stock",
+    "scan": "Scan",
+    "products": "Products",
+    "edit": "Edit {{name}}",
+    "keepAt": "Keep at a place"
+  },
+  "stats": {
+    "tracked": "In stock",
+    "low": "Running low",
+    "expiring": "Expiring soon",
+    "expiringHint_one": "Within {{count}} day",
+    "expiringHint_other": "Within {{count}} days"
+  },
+  "sections": {
+    "low": "Running low",
+    "lowDescription": "At or below their minimum. They are on the shopping list for their usual shop."
+  },
+  "stock": {
+    "minimum": "min. {{quantity}}",
+    "expires": "use by {{date}}",
+    "low": "Low",
+    "useOne": "Use one {{name}}",
+    "addOne": "Add one {{name}}",
+    "saving": "Saving the new amount…"
+  },
+  "loading": {
+    "stock": "Loading the stock…",
+    "stockFailed": "Couldn't load the stock."
+  },
+  "fields": {
+    "product": "Product",
+    "place": "Place",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "minQuantity": "Minimum",
+    "minQuantityDescription": "At or below the minimum, the product goes on the shopping list.",
+    "expiresOn": "Use by"
+  },
+  "form": {
+    "createTitle": "Add stock",
+    "editTitle": "{{name}} in {{place}}",
+    "description": "How much of a product you keep at one place.",
+    "created": "Stock added",
+    "updated": "Stock saved",
+    "deleted": "No longer kept here",
+    "deleteTitle": "Stop keeping {{name}} in {{place}}?",
+    "deleteDescription": "The stock and its history at this place are removed. The product stays in the catalogue."
+  },
+  "reasons": {
+    "scan_use": "Used",
+    "scan_add": "Added",
+    "bought": "Bought",
+    "manual_correction": "Corrected",
+    "cooked": "Used while cooking"
+  },
+  "history": {
+    "title": "History",
+    "empty": "No changes yet.",
+    "after": "now {{quantity}}"
+  },
+  "detail": {
+    "total": "{{quantity}} in total",
+    "places": "Where it is kept",
+    "placesDescription": "Each place has its own quantity and minimum.",
+    "notKept": "Not kept anywhere yet."
+  },
+  "lowStock": {
+    "addedToList": "{{name}} is running low and is on the shopping list."
+  },
+  "place": {
+    "empty": "Nothing in stock here."
+  },
+  "scan": {
+    "title": "Scan",
+    "description": "Point the camera at a barcode or one of your own QR labels.",
+    "modeLabel": "What should a scan do?",
+    "modes": {
+      "use": "Use one",
+      "add": "Add stock",
+      "identify": "What is this?"
+    },
+    "hints": {
+      "use": "Scan something you are taking out of stock.",
+      "add": "Scan something you are putting away.",
+      "identify": "Scan anything to see what it is and where it is kept."
+    },
+    "used": "Used one {{name}} from {{place}}, {{quantity}} left",
+    "added": "Added one {{name}} to {{place}}, now {{quantity}}",
+    "chooseUse": "Kept at more than one place. Where did you take it from?",
+    "chooseAdd": "Kept at more than one place. Where are you putting it?",
+    "useHere": "Use here",
+    "addHere": "Add here",
+    "notKept": "This product isn't kept in stock anywhere yet.",
+    "openProduct": "Stock and history",
+    "next": "Scan the next one",
+    "unknownTitle": "Unknown code",
+    "unknownDescription": "This code isn't in your catalogue yet. Add it as a product, then choose where you keep it.",
+    "unknownChild": "This code isn't in your catalogue yet. Ask an adult to add it.",
+    "createProduct": "Create product",
+    "lookingUp": "Looking up {{code}}…",
+    "findingOut": "Finding out what this is…",
+    "newProduct": "New to your catalogue",
+    "addSuggested": "Add this product",
+    "suggestedChild": "This isn't in your catalogue yet. Ask an adult to add it.",
+    "notFoundTitle": "Not found",
+    "notFoundDescription": "Fill in the details and add it as a product. Then choose where you keep it.",
+    "sharesWith": "Shares stock with {{name}}",
+    "whatNext": "Saved. Where is it kept, or is it another brand of something you already have?"
+  },
+  "empty": {
+    "title": "Nothing in stock yet",
+    "description": "Keep track of the pantry, the freezer or the screws in the garage, and never run out."
+  },
+  "errors": {
+    "generic": "That didn't work. Please try again.",
+    "alreadyKept": "This product is already kept at that place. Edit it there instead.",
+    "forbidden": "You're not allowed to do that."
+  }
+}

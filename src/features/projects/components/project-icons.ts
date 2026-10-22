@@ -1,0 +1,40 @@
+import {
+  BathIcon,
+  CarIcon,
+  FolderKanbanIcon,
+  GiftIcon,
+  GraduationCapIcon,
+  HammerIcon,
+  HeartIcon,
+  HouseIcon,
+  PaintRollerIcon,
+  PartyPopperIcon,
+  PlaneIcon,
+  SofaIcon,
+  SproutIcon,
+  TentIcon,
+  TreePalmIcon,
+  TreePineIcon,
+  type LucideIcon,
+} from "lucide-react";
+import type { ProjectIcon } from "../types/projects";
+
+/** The Lucide icon of each project icon key. */
+export const PROJECT_ICON_COMPONENTS: Record<ProjectIcon, LucideIcon> = {
+  hammer: HammerIcon,
+  paint: PaintRollerIcon,
+  home: HouseIcon,
+  sofa: SofaIcon,
+  bath: BathIcon,
+  garden: SproutIcon,
+  car: CarIcon,
+  plane: PlaneIcon,
+  holiday: TreePalmIcon,
+  tent: TentIcon,
+  gift: GiftIcon,
+  christmas: TreePineIcon,
+  party: PartyPopperIcon,
+  heart: HeartIcon,
+  graduation: GraduationCapIcon,
+  folder: FolderKanbanIcon,
+};

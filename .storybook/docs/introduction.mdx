@@ -1,0 +1,53 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Introduction" />
+
+# WickedHome component library
+
+Every component in WickedHome belongs to exactly one **layer**. The sidebar follows those layers from
+small to large, and so does the code in `src/`.
+
+| Layer | Folder | What it is | Knows about the domain? |
+|---|---|---|---|
+| **UI** (primitives / atoms) | `src/components/ui` | The smallest controls: Button, Input, Select, Dialog… | No |
+| **Shared** (compositions / molecules) | `src/components/shared` | Reusable patterns built from primitives: PageHeader, Card, FormField, EmptyState… | No |
+| **Layout** | `src/components/layout` | Structure and spacing only: AppShell, PageContainer, PageGrid, Stack… | No |
+| **Feature components** | `src/features/<feature>/components` | Domain UI: HabitantCard, HabitantFormDialog… | Yes, one feature |
+| **Screens** | `src/features/<feature>/screens` | A full page, composed from all layers above | Yes, one feature |
+| Route | `src/routes` | Loads data, renders one screen. Not in Storybook | — |
+
+## The rules, in one sentence each
+
+- A **primitive** doesn't know what it's used for. A Button never knows it is "Add habitant".
+- A **shared** component is a pattern, not a feature. Once it mentions habitants, rooms or bills, it moves into a feature.
+- A **layout** component knows it has two columns, not what goes in them.
+- A **feature** uses any layer below it, and other features only through their public `index.ts`.
+- A **screen** composes; it doesn't fetch. The route hands it the data.
+- A **route** file is a few lines: loader, action, screen.
+
+These rules are enforced by ESLint (`eslint.config.js`). Breaking one is a lint error with an explanation,
+not a code-review discussion.
+
+## Lists and forms: shared by default
+
+Most lists and forms differ only in their data, so they are **shared** components driven by data:
+
+- **GeneralList** — every list: the same search field, a list/tiles switch (remembered per list), filters
+  in a toolbar slot, grouping, and the empty, no-results, loading, refreshing and error states. A feature
+  only supplies a row and a tile (e.g. `ShopListItem` and `ShopTile`).
+- **GeneralForm** and **GeneralFormDialog** — every ordinary form: a field config plus the feature's zod
+  schema; validation, server errors, saving state and the dialog behaviour come for free. Features plug
+  in their own pickers through `custom` fields.
+
+A form or list stays a **feature component** only when it is genuinely specific: visual or conditional
+editors, multi-step imports, drag and drop. Layout inside them still comes from the layout components
+(`FormGrid`, `PageGrid`), not ad-hoc markup.
+
+## Using this catalogue
+
+- Use the toolbar to switch **language** (English / Nederlands) and **theme** (light / dark).
+- Every story runs inside a router, so links, forms and dialogs behave as they do in the app.
+- Stories live in the top-level `stories/` folder, which mirrors the layers (`stories/ui/button.stories.tsx`,
+  `stories/features/household/components/habitant-card.stories.tsx`), so feature and component folders
+  contain only production code. Add a story for every new component in `ui`, `shared`, `layout` or a
+  feature's `components` and `screens`; example data goes in `stories/features/<feature>/fixtures.ts`.

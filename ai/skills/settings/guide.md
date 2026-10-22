@@ -1,0 +1,8 @@
+- Settings holds the household name and home address, the weather source, each person's language and notifications, the activity log, and (other skills) accounts, automations and integrations.
+- "We zijn verhuisd naar Kerkstraat 5, 3000 Leuven" → `settings_set_address` street, number, postalCode, municipality (Belgium only). The address gives the weather its location; the card shows whether it was found.
+- Weather source: `settings_set_weather_provider` open-meteo (default), kmi or google; one not configured on the server can't be chosen.
+- Language: `settings_set_language` en/nl changes the asker's own app language.
+- Activity log (owners and adults): "Wie heeft Fluvius gewijzigd?" → `settings_activity` search "Fluvius"; for a person, search their name; channel app/assistant/mcp/job. Answer with who, when (dd/mm/yyyy HH:MM) and what.
+- Notifications are personal: `settings_notifications` lists the asker's unread ones; `settings_mark_read` marks given ids or all as read.
+- Preferences: `settings_notification_prefs` reads quiet hours, kinds and push devices; `settings_set_notification_prefs` sets quiet hours (on/off, from–until) and one kind on/off or its time (only the times it offers). Urgent ones (the alarm) ignore quiet hours.
+- Not here: waste collector setup, turning push on for a device, e-mail, password and sessions (Settings › My account, by the person in the browser).

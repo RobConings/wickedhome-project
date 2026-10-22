@@ -1,0 +1,105 @@
+{
+  "greeting": {
+    "morning": "Good morning,",
+    "afternoon": "Good afternoon,",
+    "evening": "Good evening,"
+  },
+  "intro": "Here's what's happening at home today.",
+  "household": {
+    "label_one": "{{name}}: {{count}} habitant",
+    "label_other": "{{name}}: {{count}} habitants",
+    "manage": "Manage habitants"
+  },
+  "loadError": "Couldn't load this.",
+  "stats": {
+    "label": "Today at a glance",
+    "tasks": {
+      "label": "Tasks",
+      "hint": "Done today",
+      "overdue_one": "Done today · {{count}} overdue",
+      "overdue_other": "Done today · {{count}} overdue",
+      "allDone": "All done for today"
+    },
+    "shopping": {
+      "label": "Shopping",
+      "hint_one": "Item to buy",
+      "hint_other": "Items to buy",
+      "nothing": "Nothing to buy"
+    },
+    "bills": {
+      "label": "To pay",
+      "hint": "Due this week",
+      "amount": "{{amount}} due this week",
+      "overdue_one": "{{count}} overdue",
+      "overdue_other": "{{count}} overdue",
+      "recurring": "{{amount}}/month recurring"
+    }
+  },
+  "today": {
+    "title": "Today",
+    "empty": "Nothing planned today. Enjoy!",
+    "allDay": "All day",
+    "ongoing": "Ongoing",
+    "viewCalendar": "View calendar",
+    "calendarError": "The calendar couldn't be loaded; only tasks are shown.",
+    "tasksError": "Tasks couldn't be loaded; only the calendar is shown.",
+    "age": "Turns {{age}}",
+    "kinds": {
+      "event": "Event",
+      "store_visit": "Store visit",
+      "birthday": "Birthday",
+      "task": "Task",
+      "bill": "Bill",
+      "renewal": "Renewal",
+      "waste": "Waste collection",
+      "other": "Calendar"
+    }
+  },
+  "upcoming": {
+    "title": "Upcoming",
+    "description": "The next two weeks",
+    "empty": "Nothing coming up in the next two weeks.",
+    "partial": "Some items couldn't be loaded.",
+    "kinds": {
+      "bill": "To pay",
+      "renewal": "Renewal",
+      "task": "Task"
+    }
+  },
+  "money": {
+    "title": "Money this month",
+    "in": "In",
+    "out": "Out",
+    "received": "{{amount}} received",
+    "paid": "{{amount}} paid",
+    "joint": "Joint account",
+    "savings": "Savings account",
+    "noAccounts": "Set up the joint accounts on the money flow page to follow their balance.",
+    "view": "View money flow"
+  },
+  "energy": {
+    "title": "Energy",
+    "today": "Today",
+    "month": "This month",
+    "gridOnly": "from the grid",
+    "electricity": "Electricity",
+    "gas": "Gas",
+    "solarShare": "Self-sufficient",
+    "peak": "Monthly peak",
+    "noPeak": "No quarter-hour data",
+    "noData": "No energy data yet. Import your meter data to see your usage here.",
+    "import": "Import data",
+    "view": "View energy"
+  },
+  "comingSoon": {
+    "title": "Coming soon",
+    "assistant": {
+      "title": "Assistant",
+      "description": "Chat and voice with your local LLM."
+    },
+    "home": {
+      "title": "Smart home",
+      "description": "Alarm, temperatures and devices via Home Assistant."
+    }
+  }
+}

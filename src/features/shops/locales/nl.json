@@ -1,0 +1,118 @@
+{
+  "page": {
+    "title": "Winkels",
+    "description": "Waar je dingen koopt: supermarkten, doe-het-zelfzaken, apotheken en webshops."
+  },
+  "actions": {
+    "add": "Winkel toevoegen",
+    "visitWebsite": "Naar de website",
+    "backToShops": "Alle winkels"
+  },
+  "types": {
+    "supermarket": "Supermarkt",
+    "discount": "Discount & allerlei",
+    "diy": "Doe-het-zelf",
+    "garden": "Tuincentrum",
+    "home": "Wonen & interieur",
+    "electronics": "Elektronica",
+    "pharmacy": "Apotheek",
+    "drugstore": "Drogisterij",
+    "pets": "Dierenwinkel",
+    "sports": "Sport",
+    "fashion": "Mode",
+    "online": "Webwinkel",
+    "other": "Andere"
+  },
+  "fields": {
+    "name": "Naam",
+    "type": "Soort",
+    "address": "Adres",
+    "websiteUrl": "Website",
+    "hasWebshop": "Heeft een webshop",
+    "hasWebshopDescription": "Je kunt online bestellen en laten leveren of afhalen.",
+    "openingHours": "Openingsuren",
+    "openingHoursPlaceholder": "ma–za 8.30–20.00 uur",
+    "notes": "Notities"
+  },
+  "markers": {
+    "builtIn": "Ingebouwd",
+    "builtInDescription": "Hoort bij de ingebouwde lijst van Belgische winkels.",
+    "own": "Eigen",
+    "ownDescription": "Toegevoegd door je huishouden.",
+    "webshop": "Webshop",
+    "ingredientSearch": "Ingrediënten",
+    "ingredientSearchDescription": "De assistent zoekt in deze webshop naar ingrediënten voor recepten."
+  },
+  "filter": {
+    "label": "Filter op soort",
+    "all": "Alle",
+    "search": "Winkels zoeken…",
+    "favorites": "Favorieten"
+  },
+  "favorite": {
+    "add": "{{name}} toevoegen aan favorieten",
+    "remove": "{{name}} verwijderen uit favorieten",
+    "failed": "Je favorieten konden niet worden bijgewerkt. Probeer opnieuw."
+  },
+  "form": {
+    "createTitle": "Winkel toevoegen",
+    "editTitle": "Winkel bewerken",
+    "description": "Winkels verschijnen wanneer je boodschappen, klussen en aankopen plant.",
+    "builtInNotice": "Dit is een ingebouwde winkel. Je wijzigingen gelden voor het hele huishouden.",
+    "created": "Winkel toegevoegd",
+    "updated": "Wijzigingen opgeslagen"
+  },
+  "detail": {
+    "details": "Gegevens",
+    "website": "Website",
+    "noWebsite": "Nog geen website.",
+    "notes": "Notities",
+    "noNotes": "Nog geen notities.",
+    "onTheList": "Hier op de lijst",
+    "onTheListDescription": "Items op je boodschappenlijsten die je in deze winkel koopt.",
+    "onTheListEmpty": "Nog niets op de lijst voor deze winkel.",
+    "notSet": "Niet ingevuld"
+  },
+  "picker": {
+    "placeholder": "Kies een winkel…"
+  },
+  "delete": {
+    "title": "{{name}} verwijderen?",
+    "description": "De winkel verdwijnt uit je lijsten en keuzelijsten.",
+    "builtIn": "Ingebouwde winkels kunnen niet verwijderd worden.",
+    "deleted": "Winkel verwijderd"
+  },
+  "errors": {
+    "forbidden": "Alleen de eigenaar kan ingebouwde winkels bewerken."
+  },
+  "empty": {
+    "title": "Nog geen winkels",
+    "description": "Voeg de winkels toe waar je huishouden dingen koopt.",
+    "noResultsTitle": "Geen winkels gevonden",
+    "noResultsDescription": "Probeer een andere naam of soort."
+  },
+  "icon": {
+    "label": "Icoon",
+    "auto": "Het logo van de winkel wordt automatisch op de website gezocht.",
+    "missing": "Nog geen icoon gevonden. Het wordt automatisch op de website gezocht.",
+    "refresh": "Icoon vernieuwen",
+    "refreshing": "Zoeken…",
+    "refreshed": "Icoon bijgewerkt",
+    "notFound": "Geen bruikbaar icoon gevonden op deze website.",
+    "noWebsite": "Vul eerst een website in: daar wordt het icoon gezocht.",
+    "searching": "Logo zoeken op de website…"
+  },
+  "jobs": {
+    "icons": {
+      "title": "Winkeliconen opnieuw proberen",
+      "description": "Zoekt het logo opnieuw voor winkels waarvan de website de vorige keer geen icoon gaf."
+    }
+  },
+  "ingredientSearch": {
+    "label": "Gebruiken om ingrediënten te zoeken",
+    "description": "De assistent zoekt in deze webshop naar ingrediënten voor recepten die je nog niet als product hebt.",
+    "needsWebshop": "Alleen voor een winkel met een webshop en een website.",
+    "saving": "Bewaren…",
+    "forbidden": "Alleen volwassenen kiezen in welke winkels gezocht wordt."
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "page": {
+    "title": "Voorraad",
+    "description": "Wat je in huis hebt en waar. Is iets bijna op, dan komt het op de boodschappenlijst."
+  },
+  "actions": {
+    "add": "Voorraad toevoegen",
+    "scan": "Scannen",
+    "products": "Producten",
+    "edit": "{{name}} bewerken",
+    "keepAt": "Op een plek bijhouden"
+  },
+  "stats": {
+    "tracked": "In voorraad",
+    "low": "Bijna op",
+    "expiring": "Vervalt binnenkort",
+    "expiringHint_one": "Binnen {{count}} dag",
+    "expiringHint_other": "Binnen {{count}} dagen"
+  },
+  "sections": {
+    "low": "Bijna op",
+    "lowDescription": "Op of onder hun minimum. Ze staan op de boodschappenlijst voor hun vaste winkel."
+  },
+  "stock": {
+    "minimum": "min. {{quantity}}",
+    "expires": "te gebruiken tot {{date}}",
+    "low": "Bijna op",
+    "useOne": "Eén {{name}} gebruiken",
+    "addOne": "Eén {{name}} toevoegen",
+    "saving": "Nieuwe hoeveelheid wordt bewaard…"
+  },
+  "loading": {
+    "stock": "Voorraad laden…",
+    "stockFailed": "De voorraad kon niet geladen worden."
+  },
+  "fields": {
+    "product": "Product",
+    "place": "Plek",
+    "quantity": "Aantal",
+    "unit": "Eenheid",
+    "minQuantity": "Minimum",
+    "minQuantityDescription": "Op of onder het minimum komt het product op de boodschappenlijst.",
+    "expiresOn": "Te gebruiken tot"
+  },
+  "form": {
+    "createTitle": "Voorraad toevoegen",
+    "editTitle": "{{name}} in {{place}}",
+    "description": "Hoeveel je van een product op één plek bewaart.",
+    "created": "Voorraad toegevoegd",
+    "updated": "Voorraad bewaard",
+    "deleted": "Wordt hier niet meer bijgehouden",
+    "deleteTitle": "{{name}} in {{place}} niet meer bijhouden?",
+    "deleteDescription": "De voorraad en de geschiedenis op deze plek worden verwijderd. Het product blijft in de catalogus."
+  },
+  "reasons": {
+    "scan_use": "Gebruikt",
+    "scan_add": "Toegevoegd",
+    "bought": "Gekocht",
+    "manual_correction": "Gecorrigeerd",
+    "cooked": "Gebruikt bij het koken"
+  },
+  "history": {
+    "title": "Geschiedenis",
+    "empty": "Nog geen wijzigingen.",
+    "after": "nu {{quantity}}"
+  },
+  "detail": {
+    "total": "{{quantity}} in totaal",
+    "places": "Waar het bewaard wordt",
+    "placesDescription": "Elke plek heeft een eigen aantal en minimum.",
+    "notKept": "Wordt nog nergens bijgehouden."
+  },
+  "lowStock": {
+    "addedToList": "{{name}} is bijna op en staat op de boodschappenlijst."
+  },
+  "place": {
+    "empty": "Hier ligt niets in voorraad."
+  },
+  "scan": {
+    "title": "Scannen",
+    "description": "Richt de camera op een streepjescode of op een van je eigen QR-etiketten.",
+    "modeLabel": "Wat moet een scan doen?",
+    "modes": {
+      "use": "Eén gebruiken",
+      "add": "Aanvullen",
+      "identify": "Wat is dit?"
+    },
+    "hints": {
+      "use": "Scan wat je uit de voorraad neemt.",
+      "add": "Scan wat je opbergt.",
+      "identify": "Scan om het even wat om te zien wat het is en waar het ligt."
+    },
+    "used": "Eén {{name}} gebruikt uit {{place}}, nog {{quantity}}",
+    "added": "Eén {{name}} toegevoegd aan {{place}}, nu {{quantity}}",
+    "chooseUse": "Ligt op meer dan één plek. Waar heb je het genomen?",
+    "chooseAdd": "Ligt op meer dan één plek. Waar berg je het op?",
+    "useHere": "Hier gebruiken",
+    "addHere": "Hier toevoegen",
+    "notKept": "Dit product wordt nog nergens in voorraad bijgehouden.",
+    "openProduct": "Voorraad en geschiedenis",
+    "next": "Volgende scannen",
+    "unknownTitle": "Onbekende code",
+    "unknownDescription": "Deze code staat nog niet in je catalogus. Voeg ze toe als product en kies daarna waar je het bewaart.",
+    "unknownChild": "Deze code staat nog niet in je catalogus. Vraag een volwassene om ze toe te voegen.",
+    "createProduct": "Product aanmaken",
+    "lookingUp": "{{code}} opzoeken…",
+    "findingOut": "Even kijken wat dit is…",
+    "newProduct": "Nieuw in je catalogus",
+    "addSuggested": "Dit product toevoegen",
+    "suggestedChild": "Dit staat nog niet in je catalogus. Vraag een volwassene om het toe te voegen.",
+    "notFoundTitle": "Niet gevonden",
+    "notFoundDescription": "Vul de gegevens zelf in en voeg het toe als product. Daarna kies je waar je het bewaart.",
+    "sharesWith": "Deelt voorraad met {{name}}",
+    "whatNext": "Bewaard. Waar ligt het, of is het een ander merk van iets dat je al hebt?"
+  },
+  "empty": {
+    "title": "Nog niets in voorraad",
+    "description": "Hou de voorraadkast, de diepvries of de schroeven in de garage bij, en zit nooit meer zonder."
+  },
+  "errors": {
+    "generic": "Dat lukte niet. Probeer het opnieuw.",
+    "alreadyKept": "Dit product wordt al op die plek bijgehouden. Bewerk het daar.",
+    "forbidden": "Dat mag je niet doen."
+  }
+}

@@ -1,0 +1,424 @@
+{
+  "page": {
+    "title": "Plaatsen",
+    "description": "Elke kamer binnen en elke zone buiten. Taken, voorraad en boodschappen hangen eraan vast."
+  },
+  "actions": {
+    "addPlace": "Plaats toevoegen",
+    "addFloor": "Verdieping toevoegen",
+    "addOutside": "Buitenplan toevoegen"
+  },
+  "sections": {
+    "inside": "Binnen",
+    "insideDescription": "Verdiepingen en hun kamers.",
+    "outside": "Buiten",
+    "outsideDescription": "Tuin, oprit, tuinhuis en al de rest buiten."
+  },
+  "floorKinds": {
+    "indoor": "Verdieping binnen",
+    "outdoor": "Buitenplan"
+  },
+  "location": {
+    "inside": "Binnen",
+    "outside": "Buiten"
+  },
+  "fields": {
+    "name": "Naam",
+    "kind": "Soort",
+    "level": "Niveau",
+    "floor": "Verdieping",
+    "color": "Kleur",
+    "icon": "Icoon",
+    "area": "Oppervlakte"
+  },
+  "starter": {
+    "indoor": "Gelijkvloers",
+    "outdoor": "Buiten"
+  },
+  "empty": {
+    "title": "Nog geen plaatsen",
+    "description": "Begin met het gelijkvloers en buiten, en zet dan je kamers in de lijst. Tekenen is niet verplicht.",
+    "starter": "Gelijkvloers + buiten",
+    "outsideTitle": "Nog geen buitenplan",
+    "outsideDescription": "Voeg het toe voor de tuin, de oprit, het tuinhuis of de jacuzzi."
+  },
+  "floor": {
+    "level": "Niveau {{level}}",
+    "drawnCount_one": "{{drawn}} van {{count}} getekend",
+    "drawnCount_other": "{{drawn}} van {{count}} getekend",
+    "openPlan": "Grondplan",
+    "edit": "Verdieping bewerken",
+    "form": {
+      "createTitle": "Verdieping toevoegen",
+      "editTitle": "Verdieping bewerken",
+      "description": "Elke verdieping, en ook buiten, krijgt een eigen plan.",
+      "namePlaceholder": "Eerste verdieping",
+      "levelHelp": "0 is het gelijkvloers, -1 de kelder.",
+      "created": "Verdieping toegevoegd",
+      "updated": "Wijzigingen opgeslagen"
+    },
+    "delete": {
+      "action": "Verdieping verwijderen",
+      "title": "{{name}} verwijderen?",
+      "description": "Het grondplan wordt ook verwijderd. Dit kan je niet ongedaan maken.",
+      "hasPlaces": "Verplaats of verwijder eerst de plaatsen erop."
+    }
+  },
+  "list": {
+    "notDrawn": "Nog niet op het plan",
+    "add": "Toevoegen",
+    "empty": {
+      "indoor": "Nog geen kamers op deze verdieping.",
+      "outdoor": "Nog geen zones buiten."
+    },
+    "quickAdd": {
+      "indoor": "Nieuwe kamer, bv. Keuken",
+      "outdoor": "Nieuwe zone, bv. Moestuin"
+    }
+  },
+  "place": {
+    "form": {
+      "createTitle": "Plaats toevoegen",
+      "editTitle": "Plaats bewerken",
+      "description": "Een kamer binnen of een zone buiten. Op het plan tekenen kan later.",
+      "previewName": "Nieuwe plaats",
+      "namePlaceholder": {
+        "indoor": "Keuken",
+        "outdoor": "Moestuin"
+      },
+      "floorHelp": "Naar een andere verdieping verplaatsen haalt de omtrek van het oude plan.",
+      "iconHelp": "Een emoji, te zien in lijsten en op het plan.",
+      "created": "Plaats toegevoegd",
+      "updated": "Wijzigingen opgeslagen"
+    },
+    "delete": {
+      "title": "{{name}} verwijderen?",
+      "description": "Ze verdwijnt uit de lijst en van het plan. Dit kan je niet ongedaan maken."
+    }
+  },
+  "detail": {
+    "contentsTitle": "Wat hier woont",
+    "contentsDescription": "Alles wat aan deze plaats gekoppeld is, verschijnt hier.",
+    "sections": {
+      "tasks": {
+        "title": "Taken",
+        "empty": "Hier nog geen taken."
+      },
+      "stock": {
+        "title": "Voorraad",
+        "empty": "Hier ligt nog niets opgeslagen."
+      },
+      "shopping": {
+        "title": "Boodschappen",
+        "empty": "Niets te kopen voor deze plaats."
+      },
+      "appliances": {
+        "title": "Toestellen",
+        "empty": "Hier nog geen toestellen."
+      }
+    },
+    "planTitle": "Op het plan",
+    "planLabel": "{{name}} op het plan van {{floor}}",
+    "notDrawn": "Nog niet getekend op het plan van {{floor}}.",
+    "drawOnPlan": "Op het plan tekenen"
+  },
+  "picker": {
+    "placeholder": "Kies een plaats",
+    "favoriteFailed": "Je favorieten konden niet bijgewerkt worden. Probeer opnieuw."
+  },
+  "editor": {
+    "description": {
+      "indoor": "Teken de kamers, muren, deuren en ramen. Kamers die je al hebt maar nog niet tekende, staan in het gereedschapsvenster.",
+      "outdoor": "Teken de zones buiten: tuin, oprit, terras, tuinhuis…"
+    },
+    "canvasLabel": "Grondplan",
+    "save": "Opslaan",
+    "overlapsHint": "Overlappingen gevonden: {{count}}. Je kunt de tekening aanpassen of met deze overlappingen opslaan.",
+    "roomOverlap": "Kamers {{first}} en {{second}} overlappen.",
+    "roomWallOverlap": "Muur {{second}} loopt door kamer {{first}}.",
+    "wallOverlap": "Muren {{first}} en {{second}} overlappen of kruisen elkaar in het midden.",
+    "moreOverlaps": "Nog {{count}} overlappingen.",
+    "saving": "Bezig met opslaan…",
+    "saved": "Plan opgeslagen",
+    "saveInvalid": "Het plan kon niet opgeslagen worden. Kijk het na en probeer opnieuw.",
+    "unsaved": "Niet-opgeslagen wijzigingen",
+    "saveFailed": "Niet opgeslagen. Probeer opnieuw.",
+    "allSaved": "Alles is opgeslagen",
+    "finishDraftFirst": "Werk eerst de vorm af die je tekent, of wis ze",
+    "nameRequired": "Elke plaats heeft een naam nodig voor je opslaat.",
+    "undo": "Ongedaan maken",
+    "redo": "Opnieuw",
+    "smallScreen": "Het plan bewerken gaat op een groter scherm. Rondkijken en plaatsen openen kan wel.",
+    "zoom": {
+      "in": "Inzoomen",
+      "out": "Uitzoomen",
+      "fit": "Passend maken"
+    },
+    "panel": {
+      "label": "Gereedschap",
+      "tools": "Gereedschap",
+      "move": "Gereedschapsvenster verplaatsen",
+      "reset": "Gereedschapsvenster terugzetten",
+      "compact": "Gereedschapsvenster kleiner maken",
+      "expand": "Labels tonen in het gereedschapsvenster",
+      "shortcuts": "V kiezen · R tekenen · F kamer vullen · W muur (X wisselt de kant) · D deur · N raam · Enter afwerken · Esc annuleren · Del verwijderen · Ctrl+Z ongedaan maken · Alt vrij plaatsen · Spatie+slepen verschuiven"
+    },
+    "tools": {
+      "select": "Kiezen",
+      "indoor": "Kamer",
+      "outdoor": "Zone",
+      "fill": "Vullen",
+      "wall": "Muur",
+      "door": "Deur",
+      "window": "Raam"
+    },
+    "newPlaceName": {
+      "indoor": "Kamer {{number}}",
+      "outdoor": "Zone {{number}}"
+    },
+    "outline": {
+      "target": "Je tekent de omtrek van",
+      "new": {
+        "indoor": "Een nieuwe kamer",
+        "outdoor": "Een nieuwe zone"
+      },
+      "missing_one": "Nog {{count}} punt nodig",
+      "missing_other": "Nog {{count}} punten nodig",
+      "ready_one": "{{count}} punt klaar",
+      "ready_other": "{{count}} punten klaar",
+      "complete": "Vorm afwerken",
+      "undoPoint": "Punt terug",
+      "clear": "Wissen"
+    },
+    "wall": {
+      "start": "Muren tekenen",
+      "drawing": "Bezig met muren",
+      "finish": "Muren afwerken",
+      "length": "Lengte {{length}}",
+      "custom": "Andere",
+      "customThickness": "Andere dikte in cm",
+      "alignment": "De lijn die je klikt is",
+      "align": {
+        "center": "Midden",
+        "left": "Linkerkant",
+        "right": "Rechterkant"
+      }
+    },
+    "fill": {
+      "title": "Kamer vullen",
+      "labels": "De namen komen uit de ruimtelabels van het plan.",
+      "gapTolerance": "Kieren tussen muren dichten tot",
+      "noGaps": "Geen kieren",
+      "filled": "{{name}} toegevoegd",
+      "reused": "Omtrek toegevoegd aan {{name}}",
+      "existing": "{{name}} staat hier al.",
+      "open_one": "Deze ruimte is niet gesloten: {{count}} open muureinde is rood aangeduid.",
+      "open_other": "Deze ruimte is niet gesloten: {{count}} open muureinden zijn rood aangeduid.",
+      "outside": "Dat ligt buiten elke kamer. Klik binnen muren die een gesloten kamer vormen.",
+      "onWall": "Dat is een muur. Klik in de kamer.",
+      "noWalls": "Teken eerst de muren (W) en vul dan de kamers.",
+      "edit": "Kamer bewerken"
+    },
+    "area": {
+      "planSays": "plan zegt {{area}}",
+      "differs": "{{percent}} % verschil",
+      "matches": "Klopt met het plan",
+      "mismatch": "Wijkt af van het plan"
+    },
+    "underlay": {
+      "title": "Plan van de architect",
+      "empty": "Importeer een pdf of afbeelding van het plan, stel de schaal in en teken erover: lengtes en oppervlaktes volgen vanzelf.",
+      "import": "Plan importeren…",
+      "show": "Plan tonen",
+      "hide": "Plan verbergen",
+      "lock": "Plan vastzetten",
+      "unlock": "Losmaken om te verschuiven",
+      "sourcePage": "{{name}} · pagina {{page}}",
+      "ratio": "Schaal 1:{{ratio}}",
+      "pixel": "1 px = {{cm}} cm",
+      "notCalibrated": "Schaal nog niet ingesteld",
+      "calibrate": "Schaal instellen",
+      "opacity": "Dekking",
+      "rotation": "Draaiing",
+      "rotateLeft": "90° naar links draaien",
+      "rotateRight": "90° naar rechts draaien",
+      "fineRotation": "Fijn draaien",
+      "lockedHint": "Vast: klikken gaan naar de tekening.",
+      "unlockedHint": "Los: sleep het met Kiezen om het uit te lijnen.",
+      "labelsFound_one": "{{count}} ruimtelabel gevonden.",
+      "labelsFound_other": "{{count}} ruimtelabels gevonden.",
+      "recrop": "Uitsnede wijzigen",
+      "replace": "Vervangen",
+      "remove": "Verwijderen",
+      "removed": "Plan van de tekening gehaald. Het bestand blijft in Documenten.",
+      "showInView": "Plan van de architect",
+      "loadingImage": "Plan laden…",
+      "imageFailed": "De afbeelding van het plan kon niet geladen worden."
+    },
+    "calibrate": {
+      "noUnderlay": "Importeer eerst een plan.",
+      "title": "Schaal instellen",
+      "hint": "Klik twee punten waarvan je de echte afstand kent, bv. beide uiteinden van een maatlijn of een lange muur. Sleep de uiteinden om bij te stellen, zoom in voor precisie.",
+      "firstPoint": "Klik het eerste punt.",
+      "secondPoint": "Klik het tweede punt.",
+      "measures": "Deze lijn meet nu {{length}} op het plan.",
+      "realLength": "Echte lengte",
+      "placeholder": "12,00 m of 1.200",
+      "apply": "Toepassen",
+      "formats": "Meter (12,00 m), centimeter (1200 cm) of zoals op het plan (1.200 = 12 m).",
+      "unreadable": "Die lengte kan niet gelezen worden.",
+      "reads": "Gelezen als {{length}}",
+      "drawingScale": "Of gebruik de tekenschaal",
+      "drawingScaleHint": "Voor pdf's die op schaal geëxporteerd zijn. Controleer met de lijn: ze moet meten wat het plan zegt.",
+      "finish": "Klaar",
+      "done": "Schaal ingesteld"
+    },
+    "import": {
+      "title": "Plan importeren",
+      "description": "Een pdf (of png/jpg) van het plan van {{floor}}. Het bestand wordt bewaard in Documenten.",
+      "pagesTitle": "Kies een pagina",
+      "pagesDescription": "Op welke pagina staat het plan van deze verdieping?",
+      "cropTitle": "Eén tekening uitsnijden",
+      "cropDescription": "Sleep een rechthoek rond de tekening van deze verdieping, bv. het gelijkvloers in de nieuwe toestand.",
+      "dropTitle": "Sleep het plan hierheen",
+      "dropDescription": "Pdf, png of jpg. Vector-pdf's van de architect werken het best.",
+      "choose": "Bestand kiezen",
+      "privacy": "Plannen tonen vaak namen, adressen en telefoonnummers. Het bestand blijft in de Documenten van je gezin.",
+      "opening": "Plan openen…",
+      "wrongType": "Kies een pdf-, png- of jpg-bestand.",
+      "unreadable": "Dit bestand kon niet geopend worden. Is het een geldige pdf of afbeelding?",
+      "sourceMissing": "Het originele bestand staat niet meer in Documenten. Kies het opnieuw.",
+      "tooLarge": "Dit bestand is te groot om in Documenten te bewaren.",
+      "network": "De verbinding viel weg. Probeer opnieuw.",
+      "failed": "Importeren mislukt. Probeer opnieuw.",
+      "imageName": "{{name}} – pagina {{page}} (onderlegger).png",
+      "stage": {
+        "upload-source": "Origineel bewaren in Documenten…",
+        "render": "Plan renderen in hoge resolutie…",
+        "upload-image": "Afbeelding van het plan bewaren…",
+        "labels": "Ruimtelabels lezen…"
+      },
+      "cancel": "Annuleren",
+      "otherPage": "Andere pagina",
+      "otherFile": "Ander bestand",
+      "wholePage": "Hele pagina",
+      "importCrop": "Selectie importeren",
+      "renderingPages": "Pagina's renderen: {{done}} van {{count}}",
+      "page": "Pagina {{number}}",
+      "cropHint": "Sleep rond één tekening. Ctrl + scrollen zoomt.",
+      "cropSelected": "Sleep opnieuw om de selectie te wijzigen.",
+      "renderingPage": "Pagina renderen…",
+      "renderFailed": "Deze pagina kon niet gerenderd worden.",
+      "rotation": "{{degrees}}° gedraaid",
+      "done": "Plan geïmporteerd. Stel nu de schaal in."
+    },
+    "place": {
+      "vertices_one": "{{count}} punt. Sleep punten om bij te stellen, sleep het bolletje op een rand om er een toe te voegen.",
+      "vertices_other": "{{count}} punten. Sleep punten om bij te stellen, sleep het bolletje op een rand om er een toe te voegen.",
+      "vertexSelected": "Punt {{index}} van {{count}} geselecteerd",
+      "open": "Plaats openen",
+      "deletePoint": "Punt verwijderen",
+      "removeOutline": "Van het plan halen"
+    },
+    "elements": {
+      "wall": "Muur",
+      "door": "Deur",
+      "window": "Raam",
+      "delete": "Verwijderen"
+    },
+    "door": {
+      "flipHinge": "Scharnier omdraaien",
+      "flipSwing": "Draairichting omdraaien"
+    },
+    "fields": {
+      "grid": "Raster",
+      "thickness": "Dikte",
+      "width": "Breedte"
+    },
+    "unplaced": {
+      "indoor": "Kamers die nog niet getekend zijn",
+      "outdoor": "Zones die nog niet getekend zijn",
+      "draw": "Tekenen"
+    },
+    "hints": {
+      "select": "Klik op een vorm om ze te bewerken. Sleep in een lege ruimte om te verschuiven, scrol om te zoomen.",
+      "outline": "Klik om punten toe te voegen. Klik op het eerste punt, dubbelklik of druk op Enter om de vorm te sluiten.",
+      "wall": "Klik om te beginnen en klik opnieuw bij elke hoek. Dubbelklik, Enter of Esc om te stoppen.",
+      "wallFace": "Klik langs de lijn van de architect: de muur groeit naar de kant die je in de voorbeeldweergave ziet. X wisselt de kant.",
+      "fill": "Klik binnen muren om een kamer toe te voegen langs hun binnenkant. Deuren en ramen lekken niet.",
+      "door": "Klik op een muur om er een deur te plaatsen.",
+      "window": "Klik op een muur om er een raam te plaatsen.",
+      "dragOpening": "Sleep langs de muur om te verplaatsen.",
+      "openingNeedsWall": "Deuren en ramen horen in een muur. Klik op een muur.",
+      "wallTooShort": "Deze muur is te kort voor die breedte."
+    },
+    "markers": {
+      "palette": "Te plaatsen",
+      "paletteHint": "Sleep op het plan, of kies “Op het plan zetten” en tik op een plek. Verplaats een geplaatste markering door ze te slepen, of selecteer ze en gebruik de pijltjestoetsen (Shift: grotere stappen).",
+      "placing": "Tik of klik op een plek op het plan om “{{label}}” te plaatsen. Esc annuleert.",
+      "placeInMiddle": "In het midden zetten",
+      "cancelPlacing": "Annuleren"
+    }
+  },
+  "orientation": {
+    "title": "Oriëntatie",
+    "notSet": "Noorden nog niet ingesteld",
+    "clear": "Wissen",
+    "degrees": "Noorden, in graden met de klok mee vanaf de bovenkant van het plan",
+    "topFaces": "De bovenkant van het plan wijst naar",
+    "topFacesValue": "Bovenkant wijst naar het {{direction}}",
+    "pointNorth": "Noorden aanwijzen op het plan",
+    "hint": "Eén noorden voor het hele huis, gebruikt op elke verdieping en voor de zon. Je kan ook het kompas op het plan verslepen.",
+    "compassValue": "Noorden {{degrees}}°, de bovenkant van het plan wijst naar het {{facing}}",
+    "dial": "Noorden op het plan",
+    "dialHint": "Versleep om het noorden te draaien (Shift: stappen van 15°), of gebruik de pijltjestoetsen",
+    "importHint": "Noorden op je plan",
+    "points": {
+      "n": "N",
+      "ne": "NO",
+      "e": "O",
+      "se": "ZO",
+      "s": "Z",
+      "sw": "ZW",
+      "w": "W",
+      "nw": "NW"
+    },
+    "names": {
+      "n": "noorden",
+      "ne": "noordoosten",
+      "e": "oosten",
+      "se": "zuidoosten",
+      "s": "zuiden",
+      "sw": "zuidwesten",
+      "w": "westen",
+      "nw": "noordwesten"
+    },
+    "tool": {
+      "title": "Noorden aanwijzen",
+      "hint": "Klik op de staart van de noordpijl van de architect, daarna op de punt. Zoom in voor precisie; de draaiing van het plan wordt meegerekend.",
+      "hintNoPlan": "Klik twee punten op een lijn die naar het noorden wijst: eerst de staart, dan de punt.",
+      "tail": "Klik op de staart van de pijl.",
+      "tip": "Klik op de punt van de pijl.",
+      "result": "Het noorden staat {{degrees}}° van de bovenkant: de bovenkant van het plan wijst naar het {{direction}}. Klik opnieuw om te herbeginnen.",
+      "apply": "Gebruiken",
+      "cancel": "Annuleren",
+      "done": "Noorden ingesteld op {{degrees}}°. Bewaar het plan om het te houden."
+    },
+    "view": {
+      "northUp": "Noorden boven",
+      "sun": "Zon",
+      "now": "Nu",
+      "time": "Vandaag om {{time}}",
+      "sunAt": "Zon in het {{direction}} ({{azimuth}}°), {{elevation}}° boven de horizon",
+      "belowHorizon": "De zon staat onder de horizon."
+    }
+  },
+  "planDiff": {
+    "label": "Plan van {{floor}} met de voorgestelde wijziging",
+    "added": "Nieuw",
+    "changed": "Gewijzigd",
+    "removed": "Weg",
+    "before": "Vroeger",
+    "invalid": "De voorvertoning van deze wijziging kan niet getoond worden."
+  }
+}

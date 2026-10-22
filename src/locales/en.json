@@ -1,0 +1,220 @@
+{
+  "brand": {
+    "tagline": "Your home. Together."
+  },
+  "nav": {
+    "menu": "Open navigation",
+    "home": "Home",
+    "habitants": "Habitants",
+    "contacts": "Contacts",
+    "places": "Places",
+    "tasks": "Tasks",
+    "shopping": "Shopping",
+    "shops": "Shops",
+    "inventory": "Inventory",
+    "recipes": "Recipes",
+    "calendar": "Calendar",
+    "expenses": "Expenses",
+    "finance": "Finance",
+    "income": "Income",
+    "money": "Money flow",
+    "projects": "Projects",
+    "documents": "Documents",
+    "assistant": "Assistant",
+    "soon": "Soon",
+    "homeAssistant": "Home Assistant",
+    "integrations": "Integrations",
+    "notifications": "Notifications",
+    "settings": "Settings",
+    "energy": "Energy",
+    "house": "House",
+    "devices": "Devices"
+  },
+  "screen": {
+    "products": "Products",
+    "shopView": "Shopping per shop",
+    "scan": "Scan",
+    "appliances": "Appliances",
+    "floorPlan": "Floor plan"
+  },
+  "quickActions": {
+    "title": "Quick actions",
+    "description": "Add or log something, from any page.",
+    "open": "Quick action",
+    "openHint": "Quick action (key N)",
+    "search": "Search pages and actions",
+    "items": {
+      "task": "New task",
+      "shoppingItem": "Add shopping item",
+      "logExpense": "Log an expense",
+      "scanProduct": "Scan product",
+      "recipe": "New recipe",
+      "event": "New event",
+      "income": "Record income",
+      "assistant": "Ask the assistant"
+    }
+  },
+  "commandPalette": {
+    "title": "Search and quick actions",
+    "description": "Find a quick action or a page. Arrows to choose, Enter to open, Esc to close.",
+    "descriptionNew": "Type the letter of a quick action, or search. Esc to close.",
+    "placeholder": "Search an action or page…",
+    "placeholderNew": "Type a letter (T, S, E…) or search…",
+    "empty": "Nothing found.",
+    "actions": "Quick actions",
+    "pages": "Go to"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "back": "Go back",
+    "retry": "Try again",
+    "toHome": "Back to dashboard"
+  },
+  "form": {
+    "optional": "optional",
+    "saving": "Saving…",
+    "choose": "Choose…",
+    "checkFields": "Check the fields marked in red."
+  },
+  "list": {
+    "search": "Search…",
+    "searchLabel": "Search",
+    "clearSearch": "Clear search",
+    "view": "View",
+    "views": {
+      "list": "List",
+      "tiles": "Tiles"
+    },
+    "results_one": "{{count}} result",
+    "results_other": "{{count}} results",
+    "noResultsTitle": "Nothing found for “{{query}}”",
+    "noResultsFilteredTitle": "Nothing matches these filters",
+    "noResultsDescription": "Try another word, or clear the search.",
+    "errorTitle": "This list couldn't be loaded",
+    "errorDescription": "Check your connection and try again."
+  },
+  "loading": {
+    "default": "Loading…",
+    "updating": "Updating…",
+    "deleting": "Deleting…"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "tooManyAttempts": "Too many attempts. Wait a few minutes and try again.",
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "This page doesn't exist, or it moved.",
+    "crashTitle": "This page ran into a problem",
+    "crashDescription": "Try again. If it keeps happening, the details are in the browser console."
+  },
+  "theme": {
+    "label": "Theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "nl": "Nederlands"
+  },
+  "picker": {
+    "favorites": "Favourites",
+    "recent": "Recently used",
+    "all": "All",
+    "empty": "No results",
+    "search": "Search…",
+    "placeholder": "Choose…",
+    "addFavorite": "Add to favourites",
+    "removeFavorite": "Remove from favourites",
+    "clear": "Clear selection",
+    "loading": "Loading…"
+  },
+  "recurrence": {
+    "repeat": "Repeat",
+    "options": {
+      "none": "Doesn't repeat",
+      "DAILY": "Daily",
+      "WEEKLY": "Weekly",
+      "MONTHLY": "Monthly",
+      "YEARLY": "Yearly",
+      "SEASONAL": "Every season"
+    },
+    "every": "Every",
+    "unit": {
+      "DAILY_one": "day",
+      "DAILY_other": "days",
+      "WEEKLY_one": "week",
+      "WEEKLY_other": "weeks",
+      "MONTHLY_one": "month",
+      "MONTHLY_other": "months",
+      "YEARLY_one": "year",
+      "YEARLY_other": "years"
+    },
+    "weekdays": "On these days",
+    "season": "Season",
+    "seasons": {
+      "spring": "Spring",
+      "summer": "Summer",
+      "autumn": "Autumn",
+      "winter": "Winter"
+    },
+    "seasonsInline": {
+      "spring": "spring",
+      "summer": "summer",
+      "autumn": "autumn",
+      "winter": "winter"
+    },
+    "ends": "Ends",
+    "endsOptions": {
+      "never": "Never",
+      "until": "On",
+      "count": "After"
+    },
+    "occurrences_one": "time",
+    "occurrences_other": "times",
+    "summary": {
+      "every": {
+        "DAILY_one": "Every day",
+        "DAILY_other": "Every {{count}} days",
+        "WEEKLY_one": "Every week",
+        "WEEKLY_other": "Every {{count}} weeks",
+        "MONTHLY_one": "Every month",
+        "MONTHLY_other": "Every {{count}} months",
+        "YEARLY_one": "Every year",
+        "YEARLY_other": "Every {{count}} years"
+      },
+      "season_one": "Every {{season}} ({{months}})",
+      "season_other": "Every {{count}} years in {{season}} ({{months}})",
+      "window_one": "Every year in {{months}}",
+      "window_other": "Every {{count}} years in {{months}}",
+      "onDays": "{{rule}} on {{days}}",
+      "until": "{{rule}}, until {{date}}",
+      "times_one": "{{rule}}, once",
+      "times_other": "{{rule}}, {{count}} times",
+      "custom": "Custom repeat"
+    }
+  },
+  "scanner": {
+    "start": "Start camera",
+    "stop": "Stop camera",
+    "starting": "Starting the camera…",
+    "hint": "Hold the barcode or QR code inside the frame.",
+    "denied": "Camera access was blocked. Allow the camera for this site in your browser settings, or type the code below.",
+    "unavailable": "No camera found on this device. Type the code below.",
+    "insecure": "The camera only works over a secure (https) connection. Open the app on its public address, or type the code below.",
+    "error": "The camera could not be started. Try again, or type the code below.",
+    "manualLabel": "Code",
+    "manualPlaceholder": "Type the number under the barcode…",
+    "manualSubmit": "Look up"
+  },
+  "pdf": {
+    "loading": "Loading the PDF…",
+    "failed": "The PDF couldn't be loaded.",
+    "page": "Page {{page}} of {{total}}"
+  }
+}

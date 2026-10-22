@@ -1,0 +1,93 @@
+{
+  "page": {
+    "title": "Habitants",
+    "description": "Everyone who lives here, including the kids and the pets."
+  },
+  "actions": {
+    "add": "Add habitant"
+  },
+  "types": {
+    "adult": "Adult",
+    "child": "Child",
+    "pet": "Pet",
+    "guest": "Guest"
+  },
+  "fields": {
+    "name": "Name",
+    "type": "Type",
+    "color": "Colour",
+    "emoji": "Emoji",
+    "birthday": "Birthday"
+  },
+  "form": {
+    "createTitle": "Add a habitant",
+    "editTitle": "Edit habitant",
+    "description": "Their colour and emoji show up on tasks, the calendar and lists.",
+    "created": "Habitant added",
+    "updated": "Changes saved"
+  },
+  "picker": {
+    "favoriteFailed": "Couldn't update your favourites. Try again."
+  },
+  "card": {
+    "hasAccount": "Can log in"
+  },
+  "delete": {
+    "title": "Remove {{name}}?",
+    "description": "Their tasks and history stay, but they will no longer be linked to anyone.",
+    "hasAccount": "This habitant has a login and can't be removed."
+  },
+  "empty": {
+    "title": "No habitants yet",
+    "description": "Add the people and pets who live in your home."
+  },
+  "settings": {
+    "title": "Household",
+    "description": "Your household's name and where the home is.",
+    "fields": {
+      "name": "Household name",
+      "street": "Street",
+      "number": "Number",
+      "box": "Box",
+      "postalCode": "Postal code",
+      "municipality": "Municipality",
+      "latitude": "Latitude",
+      "longitude": "Longitude"
+    },
+    "address": {
+      "title": "Home address",
+      "description": "Used for the weather forecast and to find your waste collector.",
+      "country": "Belgium"
+    },
+    "location": {
+      "title": "Location",
+      "none": "Add the address to find the location.",
+      "missing": "No coordinates for this address yet. Save again or enter them yourself.",
+      "viewOnMap": "View on map",
+      "mode": "How to set the location",
+      "modes": {
+        "auto": "Find from address",
+        "manual": "Enter coordinates"
+      },
+      "autoHint": "Found when you save: the Flemish address register (Geopunt) first, otherwise OpenStreetMap.",
+      "usedFor": "The forecast uses the location rounded to about 1 km.",
+      "sources": {
+        "geopunt": "Geopunt (address register)",
+        "nominatim": "OpenStreetMap",
+        "manual": "Entered by hand"
+      }
+    },
+    "geocode": {
+      "found": "Saved. The location was found; check it on the map.",
+      "not_found": "Address saved, but its location wasn't found. Check the address or enter the coordinates yourself.",
+      "failed": "Address saved, but the location service couldn't be reached. Save again later or enter the coordinates yourself."
+    },
+    "saved": "Household settings saved.",
+    "readOnly": "Only adults can change these settings.",
+    "forbidden": "Only adults can change the household settings.",
+    "errors": {
+      "addressIncomplete": "Fill in the whole address, or leave it all empty.",
+      "coordinatesRequired": "Enter both coordinates."
+    }
+  }
+}

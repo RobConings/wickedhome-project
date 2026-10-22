@@ -1,0 +1,104 @@
+// Feature: auth
+
+enum Role {
+  OWNER
+  ADULT
+  CHILD
+}
+
+/// A login. Linked to the habitant it represents.
+model User {
+  id                String            @id @default(cuid())
+  email             String            @unique
+  passwordHash      String
+  role              Role
+  locale            String            @default("en")
+  householdId       String
+  household         Household         @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  habitantId        String?           @unique
+  habitant          Habitant?         @relation(fields: [habitantId], references: [id], onDelete: SetNull)
+  sessions          Session[]
+  favorites         Favorite[]
+  recents           RecentSelection[]
+  uploadedDocuments DocumentFile[]
+  invitesCreated    Invite[]          @relation("InviteCreatedBy")
+  passwordResets    Invite[]          @relation("InviteForUser")
+  taskComments      TaskComment[]     @relation("TaskCommentAuthor")
+  tasksCreated      Task[]            @relation("TaskCreatedBy")
+  accountEntriesCreated AccountEntry[] @relation("AccountEntryCreatedBy")
+  assistantConversations AssistantConversation[]
+  assistantToolPreferences AssistantToolPreference[]
+  assistantAccessTokens AssistantAccessToken[]
+  assistantImages   AssistantImage[]
+  alarmActions      AlarmActionLog[]
+  auditEntries      AuditEntry[]
+  googleConnection  GoogleConnection?
+  googleOAuthStates GoogleOAuthState[]
+  googleDriveStorageTargets GoogleDriveStorageTarget[]
+  notifications     Notification[]
+  pushSubscriptions PushSubscription[]
+  notificationPreference NotificationPreference?
+  mcpOAuthClientsCreated McpOAuthClient[] @relation("McpOAuthClientCreatedBy")
+  mcpOAuthRequests  McpOAuthAuthorizationRequest[]
+  mcpOAuthCodes     McpOAuthAuthorizationCode[]
+  mcpOAuthGrants    McpOAuthGrant[]
+  lastLoginAt      DateTime?
+  /// Set while the account is disabled: login is refused and every session is gone.
+  disabledAt        DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([householdId])
+  @@map("users")
+}
+
+enum InviteKind {
+  /// Creates a new account for a habitant (7 days).
+  INVITE
+  /// Lets an existing account set a new password (24 hours).
+  PASSWORD_RESET
+}
+
+/// A one-time link (`/invite/<token>` or `/reset/<token>`). `tokenHash` is the SHA-256 of the random token
+/// in the link; the token itself is never stored. See docs/ACCOUNTS.md.
+model Invite {
+  id          String     @id @default(cuid())
+  kind        InviteKind @default(INVITE)
+  tokenHash   String     @unique
+  householdId String
+  household   Household  @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  /// INVITE: the habitant the new account is linked to.
+  habitantId  String?
+  habitant    Habitant?  @relation(fields: [habitantId], references: [id], onDelete: Cascade)
+  /// PASSWORD_RESET: the account whose password is reset.
+  userId      String?
+  user        User?      @relation("InviteForUser", fields: [userId], references: [id], onDelete: Cascade)
+  /// INVITE: the role the new account gets.
+  role        Role?
+  createdById String?
+  createdBy   User?      @relation("InviteCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  expiresAt   DateTime
+  usedAt      DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime   @default(now())
+
+  @@index([householdId])
+  @@index([habitantId])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("invites")
+}
+
+/// Server-side session. `id` is the SHA-256 hash of the token in the cookie, never the token itself.
+model Session {
+  id         String   @id
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAgent  String?
+  expiresAt  DateTime
+  lastSeenAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@map("sessions")
+}

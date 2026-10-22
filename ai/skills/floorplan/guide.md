@@ -1,0 +1,8 @@
+- Whole cm, x right, y down; widthCm left–right, depthCm top–bottom. Compass sides follow north; above/below/left/right follow the screen. set_north does not rotate geometry.
+- Simple edits: floorplan_plan, then draw_room (creates/redraws by name), move_room or resize_room. relativeTo + side + align places beside a room; start/end = top/left or bottom/right flush.
+- Precise creation/repair: floorplan_geometry, then floorplan_edit_geometry with numeric {x,y} polygons, walls and openings together. One coordinate system; retain recesses; shared walls appear once. transform rotation 90 rotates supplied geometry clockwise together. Verify source dimensions; do not guess or claim unverified accuracy.
+- Walls use centre-line a/b endpoints and thickness. Rooms: polygon follows inner faces; inside fills from the final walls. Openings attach by wallId; offset is from wall a to CENTRE. Preserve door hinge/swing. Update adjoining contours and walls together.
+- Omitted geometry stays; replaceDrawing clears omitted outlines/elements, retaining room records. Re-read geometry to verify alignment and warnings.
+- New/enlarged overlaps are reported; correct or explicitly keep with allowOverlaps true. Existing overlaps do not block repairs. Successful edits still return warnings; explain intentional overlaps.
+- Side tools require rectangles; offsetCm measures NEAR EDGE from top/left.
+- In-app Apply previews confirm edits; MCP follows its contract. Places manages rooms; devices places devices.
