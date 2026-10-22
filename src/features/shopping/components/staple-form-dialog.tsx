@@ -1,7 +1,7 @@
 import type * as React from "react";
 import { useTranslation } from "react-i18next";
-import type { GeneralFormField, GeneralFormValues } from "@/components/shared/general-form";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
+import type { GeneralFormField, GeneralFormValues } from "./general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
 import { ShopPicker, type Shop } from "@/features/shops";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import { todayIn } from "@/types/dates";

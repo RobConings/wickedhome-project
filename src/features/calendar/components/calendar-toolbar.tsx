@@ -1,7 +1,7 @@
 import { CalendarDaysIcon, CalendarIcon, CalendarRangeIcon, ListIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { PeriodNavigator } from "@/components/shared/period-navigator";
-import { SegmentedControl } from "@/components/shared/segmented-control";
+import { PeriodNavigator } from "./period-navigator";
+import { SegmentedControl } from "./segmented-control";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { addDays, addMonthsClamped } from "@/types/dates";

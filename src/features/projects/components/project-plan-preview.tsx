@@ -1,11 +1,11 @@
 import * as React from "react";
 import { AlertTriangleIcon, CalendarIcon, CircleCheckIcon, ClockIcon, CornerDownRightIcon, ExternalLinkIcon, ListChecksIcon, MapPinIcon, TrendingUpIcon, UserIcon, UsersIcon, WalletIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { InlineAlert } from "@/components/shared/inline-alert";
-import { SegmentedControl } from "@/components/shared/segmented-control";
+import { InlineAlert } from "./inline-alert";
+import { SegmentedControl } from "./segmented-control";
 import { Badge } from "@/components/ui/badge";
 import type { AssistantPreviewRendererProps } from "@/features/assistant";
-import { intlLocale } from "@/lib/format";
+import { intlLocale } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { groupPlanMaterials, planMaterialCents, planTotals, projectPlanDataSchema, type PlanMaterialGrouping, type ProjectPlanData } from "../types/project-plan";

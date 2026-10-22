@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { InlineAlert } from "@/components/shared/inline-alert";
+import { InlineAlert } from "./inline-alert";
 import type { DevicesActionResult } from "../data/devices-loaders";
 import { bindingsForProfile, VALUE_SOURCES, type Device, type DeviceProfile, type FieldBindingInput, type ValueSource } from "../types/devices";
 

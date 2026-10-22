@@ -1,6 +1,6 @@
 import { ThermometerIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 import { currentLocale } from "@/lib/i18n";
 import { PlanMarkerDot } from "@/features/places";
 import type { Device, DeviceProfile } from "../types/devices";

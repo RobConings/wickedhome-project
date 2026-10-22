@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import type { GeneralFormField } from "@/components/shared/general-form";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
-import { InlineAlert } from "@/components/shared/inline-alert";
+import type { GeneralFormField } from "./general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
+import { InlineAlert } from "./inline-alert";
 import { HabitantPicker, type Habitant } from "@/features/household";
 import type { TaskActionResult } from "../data/tasks-loaders";
 import type { Task } from "../types/tasks";

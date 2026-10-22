@@ -1,7 +1,7 @@
 import i18n from "i18next";
 import type { ActionFunctionArgs } from "react-router";
 import { fetchShops, type Shop } from "@/features/shops";
-import { formDataToObject, parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { formDataToObject, parseForm, toFormResult, type FormResult } from "../lib/forms";
 import { contactFormSchema, contactProjectLinkSchema, type Contact } from "../types/contacts";
 import {
   createContact,

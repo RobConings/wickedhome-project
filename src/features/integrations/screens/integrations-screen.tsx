@@ -1,7 +1,7 @@
 import type * as React from "react";
 import { useTranslation } from "react-i18next";
-import { PageContainer } from "@/components/layout/page-container";
-import { PageHeader } from "@/components/shared/page-header";
+import { PageContainer } from "../components/page-container";
+import { PageHeader } from "../components/page-header";
 
 /**
  * `/integrations`: one card per integration (Google, Home Assistant, the assistant…). The cards come from

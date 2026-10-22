@@ -1,6 +1,6 @@
 import { ArrowDownUpIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { SearchField } from "@/components/shared/search-field";
+import { SearchField } from "./search-field";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { ProductCategory } from "../types/shopping";

@@ -1,7 +1,7 @@
 import { Navigate, Outlet, isRouteErrorResponse, useRouteError } from "react-router";
 import { AppProviders } from "@/app/app-providers";
 import { CrashScreen, NotFoundScreen, SplashScreen } from "@/app/status-screens";
-import { ApiRequestError } from "@/lib/api-client";
+import { ApiRequestError } from "./lib/api-client";
 
 export function Component() {
   return (

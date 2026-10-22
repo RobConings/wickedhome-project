@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Card } from "@/components/shared/card";
+import { Card } from "../../../../src/features/devices/components/card";
 import { useDeviceStates } from "@/features/devices/components/device-indicator";
 import { DeviceRow } from "@/features/devices/components/device-row";
 import type { Device } from "@/features/devices/types/devices";

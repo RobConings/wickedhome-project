@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import { ArrowLeftIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { PageHeader } from "@/components/shared/page-header";
+import { PageHeader } from "../components/page-header";
 import { FloorPlanEditor } from "../components/floor-plan-editor";
 import type { FloorPlan } from "../types/places";
 

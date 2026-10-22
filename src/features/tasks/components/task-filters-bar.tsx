@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SegmentedControl } from "@/components/shared/segmented-control";
+import { SegmentedControl } from "./segmented-control";
 import type { Habitant } from "@/features/household";
 import { TASK_TYPES, type TaskLocation, type TaskType } from "../types/tasks";
 import { TASK_TYPE_ICONS } from "./task-type-icons";

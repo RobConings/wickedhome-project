@@ -5,9 +5,9 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { EmptyState } from "@/components/shared/empty-state";
-import { ErrorState } from "@/components/shared/error-state";
-import { SkeletonList } from "@/components/shared/loading-state";
+import { EmptyState } from "./empty-state";
+import { ErrorState } from "./error-state";
+import { SkeletonList } from "./loading-state";
 import { googleClient, type GoogleClient } from "../data/google-client";
 import type { DriveItem, GoogleDriveSettings } from "../types/google";
 

@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import { cn } from "@/lib/utils";
 import type { AccountMonth, JointAccount } from "../types/money";

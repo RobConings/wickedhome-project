@@ -6,7 +6,7 @@ import { Link, useFetcher } from "react-router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Habitant } from "@/features/household";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { ExpenseActionResult } from "../data/expenses-loaders";

@@ -4,7 +4,7 @@ import { DocumentAttachments, canManageDocuments } from "@/features/documents";
 import { ProjectFormField } from "@/features/projects";
 import { TaskMaterialsPanel } from "@/features/shopping";
 import { TaskDetailScreen, canManageTasks, taskDetailLoader, tasksAction } from "@/features/tasks";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = taskDetailLoader;
 export const action = tasksAction;

@@ -1,4 +1,4 @@
-import { FileTypeIcon } from "@/components/shared/file-type-icon";
+import { FileTypeIcon } from "./file-type-icon";
 import { cn } from "@/lib/utils";
 import { itemName } from "./document-item";
 import { FolderGlyph } from "./folder-glyph";

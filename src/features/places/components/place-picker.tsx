@@ -2,7 +2,7 @@ import * as React from "react";
 import { HouseIcon, TreesIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { EntityPicker, type EntityPickerItem } from "@/components/shared/entity-picker";
+import { EntityPicker, type EntityPickerItem } from "./entity-picker";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import { usePlaceSelections } from "../data/use-place-selections";
 import { isOutside, type Place } from "../types/places";

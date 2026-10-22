@@ -4,10 +4,10 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardFooter, CardHeader, CardTitle } from "@/components/shared/card";
-import { IconChip } from "@/components/shared/icon-chip";
-import { InlineAlert } from "@/components/shared/inline-alert";
-import { intlLocale } from "@/lib/format";
+import { Card, CardFooter, CardHeader, CardTitle } from "./card";
+import { IconChip } from "./icon-chip";
+import { InlineAlert } from "./inline-alert";
+import { intlLocale } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { formatWeekday } from "@/types/date-format";
 import {

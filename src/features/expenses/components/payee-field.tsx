@@ -2,7 +2,7 @@ import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-import { EntityPicker } from "@/components/shared/entity-picker";
+import { EntityPicker } from "./entity-picker";
 import { useSelections } from "@/lib/selections";
 import type { PayeeSuggestion } from "../types/expenses";
 import { ExpenseCategoryIcon } from "./expense-category-icon";

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Stack } from "@/components/layout/stack";
+import { Stack } from "./stack";
 import { currentLocale } from "@/lib/i18n";
 import { formatDateTime } from "@/types/date-format";
 import type { LinkKind } from "../types/accounts";

@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import { ShopBadge, type Shop } from "@/features/shops";
 import { currentLocale } from "@/lib/i18n";
-import { describeRecurrence } from "@/lib/recurrence-format";
+import { describeRecurrence } from "../lib/recurrence-format";
 import { cn } from "@/lib/utils";
 import type { CalendarEntry, CalendarEvent } from "../types/calendar";
 import { CalendarCategoryIcon } from "./calendar-category-icon";

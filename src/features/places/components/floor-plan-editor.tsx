@@ -5,7 +5,7 @@ import { Link, useBeforeUnload, useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { InlineAlert } from "@/components/shared/inline-alert";
+import { InlineAlert } from "./inline-alert";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { FloorPlanActionResult } from "../data/places-loaders";

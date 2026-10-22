@@ -14,10 +14,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Stack } from "@/components/layout/stack";
-import { FormField } from "@/components/shared/form-field";
-import { InlineAlert } from "@/components/shared/inline-alert";
-import { MoneyInput } from "@/components/shared/money-input";
+import { Stack } from "./stack";
+import { FormField } from "./form-field";
+import { InlineAlert } from "./inline-alert";
+import { MoneyInput } from "./money-input";
 import { useOptionalCurrentUser } from "@/features/auth";
 import type { Habitant } from "@/features/household";
 import { ShopPicker, useShopSelections, type Shop } from "@/features/shops";

@@ -1,6 +1,6 @@
 import type * as React from "react";
 import type { LucideIcon } from "lucide-react";
-import { CardDescription, CardTitle } from "@/components/shared/card";
+import { CardDescription, CardTitle } from "./card";
 
 type MoneyCardHeaderProps = {
   icon: LucideIcon;

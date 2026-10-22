@@ -61,7 +61,7 @@ function Button({
     /** Busy: disabled, with a spinner in place of its icon (or before its text). Not for `asChild`. */
     loading?: boolean
     /**
-     * On phones: full width, wraps its label, grows in height (docs/ADDING-A-FEATURE.md, "Phone first").
+     * On phones: full width, wraps its label, grows in height.
      * Use for text buttons in cards and sections; not for icon buttons or toolbars.
      */
     fullOnMobile?: boolean

@@ -24,14 +24,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { PageContainer } from "@/components/layout/page-container";
-import { PageGrid } from "@/components/layout/page-grid";
-import { PageSection } from "@/components/layout/page-section";
-import { Stack } from "@/components/layout/stack";
-import { Card, CardTitle } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import { PageHeader } from "@/components/shared/page-header";
-import { SectionHeader } from "@/components/shared/section-header";
+import { PageContainer } from "../components/page-container";
+import { PageGrid } from "../components/page-grid";
+import { PageSection } from "../components/page-section";
+import { Stack } from "../components/stack";
+import { Card, CardTitle } from "../components/card";
+import { ConfirmDialog } from "../components/confirm-dialog";
+import { PageHeader } from "../components/page-header";
+import { SectionHeader } from "../components/section-header";
 import { documentContentUrl } from "@/features/documents";
 import { LinkToProjectDialog } from "../components/link-to-project-dialog";
 import { ProjectBudgetBadge, ProjectStatusBadge } from "../components/project-badges";

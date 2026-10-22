@@ -1,12 +1,12 @@
 import { BatteryFullIcon, PlusIcon, SunIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { PageContainer } from "@/components/layout/page-container";
-import { PageGrid } from "@/components/layout/page-grid";
-import { PageSection } from "@/components/layout/page-section";
-import { EmptyState } from "@/components/shared/empty-state";
-import { PageHeader } from "@/components/shared/page-header";
-import { SectionHeader } from "@/components/shared/section-header";
+import { PageContainer } from "../components/page-container";
+import { PageGrid } from "../components/page-grid";
+import { PageSection } from "../components/page-section";
+import { EmptyState } from "../components/empty-state";
+import { PageHeader } from "../components/page-header";
+import { SectionHeader } from "../components/section-header";
 import { currentLocale } from "@/lib/i18n";
 import { BatteryCard } from "../components/battery-card";
 import { BatteryFormDialog } from "../components/battery-form-dialog";

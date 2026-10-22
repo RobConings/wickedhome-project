@@ -1,5 +1,5 @@
 import type * as React from "react";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 import { cn } from "@/lib/utils";
 import type { Place } from "@/features/places";
 import { useApplianceDeleting } from "../data/use-appliance-deleting";

@@ -1,7 +1,7 @@
 import { AlertTriangleIcon, CalendarClockIcon, CalendarIcon, PiggyBankIcon, RepeatIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { StatTile } from "@/components/shared/stat-tile";
-import { formatCurrency } from "@/lib/format";
+import { StatTile } from "./stat-tile";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import type { ExpensePeriodTotal, ExpenseTotals as ExpenseTotalsData, RecurringTotals as RecurringTotalsData } from "../types/expenses";
 

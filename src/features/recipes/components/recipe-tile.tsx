@@ -1,9 +1,9 @@
 import { ChefHatIcon, ListOrderedIcon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 import { Badge } from "@/components/ui/badge";
-import { FavoriteToggle } from "@/components/shared/favorite-toggle";
+import { FavoriteToggle } from "./favorite-toggle";
 import { recipeCoverUrl } from "../data/recipe-cover-url";
 import { recipePath, type RecipeSummary } from "../types/recipes";
 

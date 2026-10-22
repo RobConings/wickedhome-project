@@ -1,6 +1,6 @@
 import i18n from "i18next";
 import type { ActionFunctionArgs } from "react-router";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { parseForm, toFormResult, type FormResult } from "../lib/forms";
 import { habitantInputSchema } from "../types/household";
 import { createHabitant, deleteHabitant, fetchHouseholdOverview, updateHabitant } from "./household-requests";
 

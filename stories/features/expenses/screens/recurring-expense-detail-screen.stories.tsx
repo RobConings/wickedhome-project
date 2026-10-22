@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { SkeletonPage } from "@/components/shared/loading-state";
+import { SkeletonPage } from "../../../../src/features/expenses/components/loading-state";
 import { RecurringExpenseDetailScreen } from "@/features/expenses/screens/recurring-expense-detail-screen";
 import { expenseHabitants, expenseShops, recurringExpenseDetailFixture, recurringFixtures, recurringLoanDetailFixture } from "../fixtures";
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
-import { EntityPicker, type EntityPickerItem } from "@/components/shared/entity-picker";
+import { EntityPicker, type EntityPickerItem } from "./entity-picker";
 import { useSelections, type UseSelectionsOptions } from "@/lib/selections";
 import type { Device, DeviceProfile } from "../types/devices";
 import { DeviceIcon } from "./device-icon";

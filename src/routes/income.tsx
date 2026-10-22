@@ -1,7 +1,7 @@
 import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { IncomeScreen, canManageIncome, incomeAction, incomeLoader } from "@/features/income";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = incomeLoader;
 export const action = incomeAction;

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { ScrollRow } from "@/components/layout/scroll-row";
+import { ScrollRow } from "./scroll-row";
 import { cn } from "@/lib/utils";
 import type { ShopType } from "../types/shops";
 import { ShopTypeIcon } from "./shop-type-icon";

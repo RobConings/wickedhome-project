@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Inline } from "@/components/layout/inline";
-import { Stack } from "@/components/layout/stack";
-import { ColorSwatchPicker } from "@/components/shared/color-swatch-picker";
-import { FormField } from "@/components/shared/form-field";
-import { InlineAlert } from "@/components/shared/inline-alert";
-import { SegmentedControl } from "@/components/shared/segmented-control";
+import { Inline } from "./inline";
+import { Stack } from "./stack";
+import { ColorSwatchPicker } from "./color-swatch-picker";
+import { FormField } from "./form-field";
+import { InlineAlert } from "./inline-alert";
+import { SegmentedControl } from "./segmented-control";
 import { HABITANT_COLORS, HabitantAvatar } from "@/features/household";
-import { ApiRequestError } from "@/lib/api-client";
+import { ApiRequestError } from "../lib/api-client";
 import { invitableRoles } from "../types/account-rules";
 import {
   ACCOUNT_HABITANT_TYPES,

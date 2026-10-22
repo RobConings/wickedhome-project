@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api } from "../lib/api-client";
 import { todayIn } from "@/types/dates";
 import {
   IMPORT_BATCH_SIZE,

@@ -1,4 +1,4 @@
-import { formatBytes } from "@/lib/format-bytes";
+import { formatBytes } from "../lib/format-bytes";
 import { currentLocale } from "@/lib/i18n";
 import { formatDate } from "@/types/date-format";
 import type { DocumentSort } from "../data/use-document-view";

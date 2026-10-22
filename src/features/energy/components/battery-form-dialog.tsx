@@ -1,8 +1,8 @@
 import type * as React from "react";
 import { useTranslation } from "react-i18next";
-import type { GeneralFormField } from "@/components/shared/general-form";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
-import { intlLocale } from "@/lib/format";
+import type { GeneralFormField } from "./general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
+import { intlLocale } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import type { EnergyActionResult } from "../data/energy-loaders";
 import { batteryFormSchema, type HomeBattery } from "../types/energy";

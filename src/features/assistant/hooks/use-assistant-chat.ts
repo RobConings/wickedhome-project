@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ApiRequestError } from "@/lib/api-client";
+import { ApiRequestError } from "../lib/api-client";
 import { followAnswer, type AnswerSpeech } from "../data/answer-speech";
 import type { AssistantClient } from "../data/assistant-client";
 import { addQuestion, applyEvent, finishStreaming, itemsFromMessages, markConfirmation, type ChatImage, type ChatItem } from "../data/chat-state";

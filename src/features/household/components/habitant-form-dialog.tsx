@@ -1,7 +1,7 @@
 import type * as React from "react";
 import { useTranslation } from "react-i18next";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
-import type { GeneralFormField } from "@/components/shared/general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
+import type { GeneralFormField } from "./general-form";
 import type { HabitantActionResult } from "../data/household-loaders";
 import { HABITANT_COLORS, HABITANT_TYPES, habitantInputSchema, type Habitant } from "../types/household";
 import { HabitantAvatar } from "./habitant-avatar";

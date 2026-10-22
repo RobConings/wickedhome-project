@@ -1,7 +1,7 @@
 import i18n from "i18next";
 import { data, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
-import { ApiRequestError } from "@/lib/api-client";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { ApiRequestError } from "../lib/api-client";
+import { parseForm, toFormResult, type FormResult } from "../lib/forms";
 import { z } from "zod";
 import {
   folderCreateSchema,

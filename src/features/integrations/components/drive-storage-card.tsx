@@ -7,11 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import { ErrorState } from "@/components/shared/error-state";
-import { InlineAlert } from "@/components/shared/inline-alert";
-import { SegmentedControl } from "@/components/shared/segmented-control";
-import { ApiRequestError } from "@/lib/api-client";
+import { ConfirmDialog } from "./confirm-dialog";
+import { ErrorState } from "./error-state";
+import { InlineAlert } from "./inline-alert";
+import { SegmentedControl } from "./segmented-control";
+import { ApiRequestError } from "../lib/api-client";
 import { driveStorageClient, type DriveStorageClient } from "../data/drive-storage-requests";
 import {
   missingFeatureForFolderMode,

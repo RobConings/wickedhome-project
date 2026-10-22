@@ -1,8 +1,8 @@
 import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { CookingScreen, canManageRecipes, cookingAction, cookingLoader, cookingShouldRevalidate } from "@/features/recipes";
-import { useSamePagePending } from "@/lib/pending";
-import { screenHandle } from "@/lib/screen-context";
+import { useSamePagePending } from "./lib/pending";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = cookingLoader;
 export const action = cookingAction;

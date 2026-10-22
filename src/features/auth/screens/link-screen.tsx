@@ -3,12 +3,12 @@ import { CircleAlertIcon, ClockIcon, LinkIcon, LogOutIcon, UserCheckIcon } from 
 import { useTranslation } from "react-i18next";
 import { Form, Link, useNavigation } from "react-router";
 import { Button } from "@/components/ui/button";
-import { CenteredLayout } from "@/components/layout/centered-layout";
-import { Inline } from "@/components/layout/inline";
-import { Stack } from "@/components/layout/stack";
-import { BrandMark } from "@/components/shared/brand-mark";
-import { Card, CardDescription, CardTitle } from "@/components/shared/card";
-import { LanguageSwitcher } from "@/components/shared/language-switcher";
+import { CenteredLayout } from "../components/centered-layout";
+import { Inline } from "../components/inline";
+import { Stack } from "../components/stack";
+import { BrandMark } from "../components/brand-mark";
+import { Card, CardDescription, CardTitle } from "../components/card";
+import { LanguageSwitcher } from "../components/language-switcher";
 import { currentLocale, setLocale } from "@/lib/i18n";
 import { LinkAcceptForm } from "../components/link-accept-form";
 import { LINK_LOGOUT_INTENT, type LinkActionResult, type LinkLoaderData } from "../data/link-loaders";

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { Habitant } from "@/features/household";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { formatDate, formatMonth } from "@/types/date-format";
 import type { JointAccount } from "../types/money";

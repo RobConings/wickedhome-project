@@ -11,7 +11,7 @@ import {
   ZapIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { StatTile } from "@/components/shared/stat-tile";
+import { StatTile } from "./stat-tile";
 import { currentLocale } from "@/lib/i18n";
 import type { EnergySummary } from "../types/energy";
 import { formatCalorific, formatKwh, formatKwp, formatM3, formatPercent } from "./energy-format";

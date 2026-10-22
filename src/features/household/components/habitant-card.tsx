@@ -1,7 +1,7 @@
 import { CakeIcon, KeyRoundIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Inline } from "@/components/layout/inline";
-import { Card, CardFooter, CardHeader, CardTitle } from "@/components/shared/card";
+import { Inline } from "./inline";
+import { Card, CardFooter, CardHeader, CardTitle } from "./card";
 import { currentLocale } from "@/lib/i18n";
 import { formatDate } from "@/types/date-format";
 import type { Habitant } from "../types/household";

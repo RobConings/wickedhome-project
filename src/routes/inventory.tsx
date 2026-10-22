@@ -1,7 +1,7 @@
 import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { InventoryScreen, canManageStock, inventoryAction, inventoryLoader } from "@/features/inventory";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = inventoryLoader;
 export const action = inventoryAction;

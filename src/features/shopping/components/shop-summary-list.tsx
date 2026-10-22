@@ -2,7 +2,7 @@ import { ChevronRightIcon, CircleHelpIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { ShopLogo, type Shop } from "@/features/shops";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { NO_SHOP, estimateTotal, type ShoppingItem } from "../types/shopping";

@@ -3,7 +3,7 @@ import { FolderKanbanIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Await, Link } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardTitle } from "@/components/shared/card";
+import { Card, CardTitle } from "./card";
 import type { ProjectBudgetsSummaryData } from "../types/projects";
 import { ProjectBudgetsSummary } from "./project-budgets-summary";
 

@@ -1,11 +1,11 @@
 import { PlusIcon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { PageContainer } from "@/components/layout/page-container";
-import { EmptyState } from "@/components/shared/empty-state";
-import { GeneralList } from "@/components/shared/general-list";
-import { PageHeader } from "@/components/shared/page-header";
-import { useSamePagePending } from "@/lib/pending";
+import { PageContainer } from "../components/page-container";
+import { EmptyState } from "../components/empty-state";
+import { GeneralList } from "../components/general-list";
+import { PageHeader } from "../components/page-header";
+import { useSamePagePending } from "../lib/pending";
 import { HabitantCard } from "../components/habitant-card";
 import { HabitantFormDialog } from "../components/habitant-form-dialog";
 import { HabitantListItem } from "../components/habitant-list-item";

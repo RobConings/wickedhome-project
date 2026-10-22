@@ -1,8 +1,8 @@
 import type * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
-import type { GeneralFormCustomFieldProps, GeneralFormField } from "@/components/shared/general-form";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
+import type { GeneralFormCustomFieldProps, GeneralFormField } from "./general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
 import type { PlacesActionResult } from "../data/places-loaders";
 import { PLACE_COLORS, placeInputSchema, placeKindForFloor, type Floor, type FloorKind, type Place } from "../types/places";
 import { PlaceBadge } from "./place-badge";

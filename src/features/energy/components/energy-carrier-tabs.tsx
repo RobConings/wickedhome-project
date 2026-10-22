@@ -2,7 +2,7 @@ import { SigmaIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Badge } from "@/components/ui/badge";
-import { ScrollRow } from "@/components/layout/scroll-row";
+import { ScrollRow } from "./scroll-row";
 import { cn } from "@/lib/utils";
 import { SUMMARY_VIEWS, type SummaryView } from "../types/energy";
 import type { EnergyPeriod } from "../types/energy-period";

@@ -6,7 +6,7 @@ import { ExpenseDetailScreen, canManageExpenses, expenseDetailLoader, expensesAc
 import { useMailFileNote } from "@/features/integrations";
 import { ProjectFormField } from "@/features/projects";
 import { LinkedTaskPanel, fetchLinkedHolds } from "@/features/tasks";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 /** The expense, plus whether its pay task is on hold (a missing answer only hides the hold). */
 export async function loader(args: LoaderFunctionArgs) {

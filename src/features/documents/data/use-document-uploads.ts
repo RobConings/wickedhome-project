@@ -1,6 +1,6 @@
 import * as React from "react";
 import i18n from "i18next";
-import { ApiRequestError } from "@/lib/api-client";
+import { ApiRequestError } from "../lib/api-client";
 import { FALLBACK_MIME_TYPE, normalizeMimeType, type DocumentFile, type DocumentLinkRef } from "../types/documents";
 import { createFile, uploadFileContent } from "./documents-requests";
 

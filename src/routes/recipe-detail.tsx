@@ -2,7 +2,7 @@ import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { DocumentAttachments, canManageDocuments } from "@/features/documents";
 import { RecipeDetailScreen, canManageRecipes, recipeAction, recipeDetailLoader } from "@/features/recipes";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = recipeDetailLoader;
 export const action = recipeAction;

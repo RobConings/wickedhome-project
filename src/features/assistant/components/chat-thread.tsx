@@ -2,7 +2,7 @@ import * as React from "react";
 import { BotIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { InlineAlert } from "@/components/shared/inline-alert";
+import { InlineAlert } from "./inline-alert";
 import { cn } from "@/lib/utils";
 import type { ChatItem } from "../data/chat-state";
 import type { ConfirmExtra } from "../hooks/use-assistant-chat";

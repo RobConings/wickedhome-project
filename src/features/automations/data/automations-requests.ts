@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api } from "../lib/api-client";
 import type { AutomationJob, AutomationsOverview, JobRun } from "../types/automations";
 
 const jobPath = (id: string) => `/jobs/${encodeURIComponent(id)}`;

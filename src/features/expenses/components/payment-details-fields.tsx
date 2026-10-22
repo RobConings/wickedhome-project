@@ -2,8 +2,8 @@ import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FormField } from "@/components/shared/form-field";
-import { SegmentedControl } from "@/components/shared/segmented-control";
+import { FormField } from "./form-field";
+import { SegmentedControl } from "./segmented-control";
 import { PAYMENT_METHODS, type PaymentMethod } from "../types/expenses";
 import { MAX_REFERENCE_LENGTH, formatStructuredCommunication } from "../types/payment-references";
 

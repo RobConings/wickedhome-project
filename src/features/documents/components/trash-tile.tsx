@@ -1,5 +1,5 @@
-import { Card } from "@/components/shared/card";
-import { FileTypeIcon } from "@/components/shared/file-type-icon";
+import { Card } from "./card";
+import { FileTypeIcon } from "./file-type-icon";
 import { cn } from "@/lib/utils";
 import { itemName } from "./document-item";
 import { FolderGlyph } from "./folder-glyph";

@@ -1,4 +1,4 @@
-import { ApiRequestError, api } from "@/lib/api-client";
+import { ApiRequestError, api } from "../lib/api-client";
 import type { ApiError } from "@/types/common";
 import type {
   AssistantAccessToken,

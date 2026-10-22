@@ -1,7 +1,7 @@
 import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { PlacesScreen, canManagePlaces, placesAction, placesLoader } from "@/features/places";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = placesLoader;
 export const action = placesAction;

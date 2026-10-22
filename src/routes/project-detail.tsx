@@ -8,7 +8,7 @@ import { ProjectDetailScreen, canManageProjects, projectAction, projectDetailLoa
 import { ProjectMaterialsPanel } from "@/features/shopping";
 import { ProjectTasksPanel } from "@/features/tasks";
 import { currentLocale } from "@/lib/i18n";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 import { formatDate } from "@/types/date-format";
 
 export const loader = projectDetailLoader;

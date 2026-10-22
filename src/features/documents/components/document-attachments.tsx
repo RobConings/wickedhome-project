@@ -13,9 +13,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
-import { Card, CardHeader, CardTitle } from "@/components/shared/card";
-import { FileDropZone } from "@/components/shared/file-drop-zone";
-import { FileTypeIcon } from "@/components/shared/file-type-icon";
+import { Card, CardHeader, CardTitle } from "./card";
+import { FileDropZone } from "./file-drop-zone";
+import { FileTypeIcon } from "./file-type-icon";
 import { cn } from "@/lib/utils";
 import { useDocumentAttachments } from "../data/use-document-attachments";
 import { useDocumentUploads, type UploadItem } from "../data/use-document-uploads";

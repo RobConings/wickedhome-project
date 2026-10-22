@@ -1,5 +1,5 @@
 import type { StorageTargetKind } from "@/features/documents";
-import { api } from "@/lib/api-client";
+import { api } from "../lib/api-client";
 import type {
   DriveStorageMoveResult,
   DriveStorageSetupInput,

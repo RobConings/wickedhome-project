@@ -1,7 +1,7 @@
 import type * as React from "react";
 import { useTranslation } from "react-i18next";
-import type { GeneralFormField } from "@/components/shared/general-form";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
+import type { GeneralFormField } from "./general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
 import type { ShoppingActionResult } from "../data/shopping-loaders";
 import { SHOPPING_LIST_KINDS, shoppingListInputSchema, type ShoppingList } from "../types/shopping";
 

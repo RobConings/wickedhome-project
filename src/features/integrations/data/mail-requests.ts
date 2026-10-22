@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api } from "../lib/api-client";
 import type { ProjectMailThreads } from "../types/mail";
 
 /** Your own mails linked to a project (`GET /api/mail/threads`). */

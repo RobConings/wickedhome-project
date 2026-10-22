@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import type { GeneralFormField } from "@/components/shared/general-form";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
+import type { GeneralFormField } from "./general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
 import { folderFormSchema, type DocumentActionResult } from "../data/documents-loaders";
 import type { DocumentFolder } from "../types/documents";
 import { FolderGlyph } from "./folder-glyph";

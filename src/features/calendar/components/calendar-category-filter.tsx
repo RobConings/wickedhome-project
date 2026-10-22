@@ -1,7 +1,7 @@
 import type * as React from "react";
 import { XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { ScrollRow } from "@/components/layout/scroll-row";
+import { ScrollRow } from "./scroll-row";
 import { cn } from "@/lib/utils";
 import { CALENDAR_CATEGORIES, CALENDAR_CATEGORY_COLORS, CALENDAR_KIND_COLORS, type CalendarCategory, type CalendarEntryKind } from "../types/calendar";
 import { CalendarCategoryIcon } from "./calendar-category-icon";

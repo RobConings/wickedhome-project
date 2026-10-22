@@ -1,8 +1,8 @@
 import i18n from "i18next";
 import type { ActionFunctionArgs, ShouldRevalidateFunctionArgs } from "react-router";
 import { fetchShops, type Shop } from "@/features/shops";
-import { ApiRequestError } from "@/lib/api-client";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { ApiRequestError } from "../lib/api-client";
+import { parseForm, toFormResult, type FormResult } from "../lib/forms";
 import {
   editToUpdate,
   productAlternativeInputSchema,

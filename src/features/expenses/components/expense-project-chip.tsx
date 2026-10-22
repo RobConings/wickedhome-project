@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { TagChip } from "@/components/shared/tag-chip";
+import { TagChip } from "./tag-chip";
 import { projectPath, type ProjectRef } from "@/types/projects";
 
 /** The project an expense counts towards, linking to it. */

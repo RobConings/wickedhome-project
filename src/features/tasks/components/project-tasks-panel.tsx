@@ -3,7 +3,7 @@ import { ChevronDownIcon, CornerDownRightIcon, ListChecksIcon, PlusIcon } from "
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PendingContent } from "@/components/shared/loading-state";
+import { PendingContent } from "./loading-state";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
 import { fetchPlaces, type Place } from "@/features/places";
 import { cn } from "@/lib/utils";

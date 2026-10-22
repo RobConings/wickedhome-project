@@ -3,9 +3,9 @@ import { XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
 import { Button } from "@/components/ui/button";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
-import type { GeneralFormField } from "@/components/shared/general-form";
-import { RecurrenceFields } from "@/components/shared/recurrence-fields";
+import { GeneralFormDialog } from "./general-form-dialog";
+import type { GeneralFormField } from "./general-form";
+import { RecurrenceFields } from "./recurrence-fields";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import {
   AMOUNT_MODES,

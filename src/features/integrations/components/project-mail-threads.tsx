@@ -3,9 +3,9 @@ import { ExternalLinkIcon, MailIcon, ReplyIcon, Unlink2Icon } from "lucide-react
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardTitle } from "@/components/shared/card";
-import { EmptyState } from "@/components/shared/empty-state";
-import { GeneralList } from "@/components/shared/general-list";
+import { Card, CardDescription, CardTitle } from "./card";
+import { EmptyState } from "./empty-state";
+import { GeneralList } from "./general-list";
 import { currentLocale } from "@/lib/i18n";
 import { formatDateTime } from "@/types/date-format";
 import { fetchProjectMailThreads, unlinkMailThread } from "../data/mail-requests";

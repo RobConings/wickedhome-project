@@ -1,7 +1,7 @@
 import { BotIcon, HouseWifiIcon, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Card, CardHeader, CardTitle } from "@/components/shared/card";
-import { IconChip } from "@/components/shared/icon-chip";
+import { Card, CardHeader, CardTitle } from "./card";
+import { IconChip } from "./icon-chip";
 
 /** The parts of WickedHome that are not built yet (docs/ROADMAP.md). Remove an item once it ships. */
 const COMING: { key: string; icon: LucideIcon }[] = [

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn, waitFor } from "storybook/test";
 import type { UploadDocumentOptions } from "@/features/documents";
 import { PlanImportBusy, PlanImportDialog } from "@/features/places/components/plan-import-dialog";
-import { ApiRequestError } from "@/lib/api-client";
+import { ApiRequestError } from "../../../../src/features/places/lib/api-client";
 import { floorFixtures } from "../fixtures";
 import { syntheticPlanPdf, syntheticPlanPdfText, underlayFixture } from "../plan-import-fixtures";
 

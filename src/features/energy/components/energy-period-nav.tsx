@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { ScrollRow } from "@/components/layout/scroll-row";
+import { ScrollRow } from "./scroll-row";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { SummaryView } from "../types/energy";

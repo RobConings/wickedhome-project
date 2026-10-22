@@ -1,7 +1,7 @@
 import { BellRingIcon, CheckCircle2Icon, SendIcon, ShareIcon, SmartphoneIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { InlineAlert } from "@/components/shared/inline-alert";
+import { InlineAlert } from "./inline-alert";
 import type { PushSupport } from "../data/push-support";
 
 type PushEnablePanelProps = {

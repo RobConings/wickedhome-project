@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { PageGrid } from "@/components/layout/page-grid";
+import { PageGrid } from "../../../../src/features/money/components/page-grid";
 import { AddAccountCard } from "@/features/money/components/add-account-card";
 import { ContributionsCard } from "@/features/money/components/contributions-card";
 import { CoverageCard } from "@/features/money/components/coverage-card";

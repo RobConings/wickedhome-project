@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { daysBetween } from "@/types/dates";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
-import { describeRecurrence } from "@/lib/recurrence-format";
+import { describeRecurrence } from "../lib/recurrence-format";
 import { formatDate } from "@/types/date-format";
 import type { Expense } from "../types/expenses";
 import type { TotalOpenPreview } from "../types/total-open";

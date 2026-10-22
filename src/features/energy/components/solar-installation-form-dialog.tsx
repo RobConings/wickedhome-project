@@ -1,8 +1,8 @@
 import type * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { GeneralFormField, GeneralFormValues } from "@/components/shared/general-form";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
+import type { GeneralFormField, GeneralFormValues } from "./general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
 import { currentLocale } from "@/lib/i18n";
 import type { EnergyActionResult } from "../data/energy-loaders";
 import { COMPASS_POINTS, compassPoint, solarInstallationInputSchema, solarKwp, type SolarInstallation } from "../types/energy";

@@ -2,7 +2,7 @@ import { ExternalLinkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
-import { FavoriteToggle } from "@/components/shared/favorite-toggle";
+import { FavoriteToggle } from "./favorite-toggle";
 import type { Shop } from "../types/shops";
 import { ShopMarkers } from "./shop-markers";
 import { ShopLogo } from "./shop-logo";

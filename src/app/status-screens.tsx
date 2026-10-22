@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
-import { CenteredLayout } from "@/components/layout/centered-layout";
-import { PageContainer } from "@/components/layout/page-container";
-import { BrandMark } from "@/components/shared/brand-mark";
-import { ErrorState } from "@/components/shared/error-state";
+import { CenteredLayout } from "./components/centered-layout";
+import { PageContainer } from "./components/page-container";
+import { BrandMark } from "./components/brand-mark";
+import { ErrorState } from "./components/error-state";
 
 export function NotFoundScreen() {
   const { t } = useTranslation();

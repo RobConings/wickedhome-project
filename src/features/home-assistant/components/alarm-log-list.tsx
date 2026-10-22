@@ -1,7 +1,7 @@
 import { ScrollTextIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
-import { EmptyState } from "@/components/shared/empty-state";
+import { EmptyState } from "./empty-state";
 import type { AlarmLogEntry } from "../types/home-assistant";
 import { formatDateTime } from "./ha-format";
 

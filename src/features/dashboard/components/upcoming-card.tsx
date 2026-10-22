@@ -1,11 +1,11 @@
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
-import { DateBlock } from "@/components/shared/date-block";
-import { InlineAlert } from "@/components/shared/inline-alert";
+import { Card, CardDescription, CardHeader, CardTitle } from "./card";
+import { DateBlock } from "./date-block";
+import { InlineAlert } from "./inline-alert";
 import type { ExpensesSummary } from "@/features/expenses";
 import type { TasksSummary } from "@/features/tasks";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { upcomingItems } from "../data/dashboard-items";
 

@@ -1,8 +1,8 @@
 import { Trash2Icon, Undo2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Inline } from "@/components/layout/inline";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { Inline } from "./inline";
+import { ConfirmDialog } from "./confirm-dialog";
 import { itemName, type DocumentItem } from "./document-item";
 import { isTrashBusyFor, type TrashBusy } from "./trash-item";
 

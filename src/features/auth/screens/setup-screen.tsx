@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next";
-import { CenteredLayout } from "@/components/layout/centered-layout";
-import { Inline } from "@/components/layout/inline";
-import { Stack } from "@/components/layout/stack";
-import { BrandMark } from "@/components/shared/brand-mark";
-import { Card, CardDescription, CardTitle } from "@/components/shared/card";
-import { LanguageSwitcher } from "@/components/shared/language-switcher";
-import type { FormResult } from "@/lib/forms";
+import { CenteredLayout } from "../components/centered-layout";
+import { Inline } from "../components/inline";
+import { Stack } from "../components/stack";
+import { BrandMark } from "../components/brand-mark";
+import { Card, CardDescription, CardTitle } from "../components/card";
+import { LanguageSwitcher } from "../components/language-switcher";
+import type { FormResult } from "../lib/forms";
 import { currentLocale, setLocale } from "@/lib/i18n";
 import { SetupForm } from "../components/setup-form";
 

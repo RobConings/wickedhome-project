@@ -38,11 +38,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Spinner } from "@/components/ui/spinner";
-import { Card } from "@/components/shared/card";
-import { ErrorState } from "@/components/shared/error-state";
-import { SkeletonList } from "@/components/shared/loading-state";
+import { Card } from "./card";
+import { ErrorState } from "./error-state";
+import { SkeletonList } from "./loading-state";
 import { HabitantAvatar } from "@/features/household";
-import { ApiRequestError } from "@/lib/api-client";
+import { ApiRequestError } from "../lib/api-client";
 import { currentLocale } from "@/lib/i18n";
 import { accountsClient, type AccountsClient } from "../data/accounts-requests";
 import { accountActionError, canManageInvite, invitableRoles, type AccountAction } from "../types/account-rules";

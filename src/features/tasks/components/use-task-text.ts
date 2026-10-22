@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
-import { intlLocale } from "@/lib/format";
+import { intlLocale } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
-import { describeRecurrence, weekdayNames } from "@/lib/recurrence-format";
+import { describeRecurrence, weekdayNames } from "../lib/recurrence-format";
 import { formatDate, formatDateTime, formatShortDateRange, formatWeekday } from "@/types/date-format";
 import { addDays, daysBetween } from "@/types/dates";
 import { WEEKDAY_CODES, parseRRule } from "@/types/recurrence";

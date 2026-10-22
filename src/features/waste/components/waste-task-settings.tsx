@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
-import { SegmentedControl } from "@/components/shared/segmented-control";
+import { SegmentedControl } from "./segmented-control";
 import type { Habitant } from "@/features/household";
 import { AssigneePicker } from "@/features/tasks";
 import type { WasteActionResult } from "../data/waste-requests";

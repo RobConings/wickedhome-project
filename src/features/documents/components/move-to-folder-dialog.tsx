@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { InlineAlert } from "@/components/shared/inline-alert";
+import { InlineAlert } from "./inline-alert";
 import { cn } from "@/lib/utils";
 import type { DocumentFolder } from "../types/documents";
 import { itemId, itemName, type DocumentItem } from "./document-item";

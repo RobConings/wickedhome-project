@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Link } from "react-router";
 import { Spinner } from "@/components/ui/spinner";
-import { Card } from "@/components/shared/card";
-import { FileTypeIcon } from "@/components/shared/file-type-icon";
+import { Card } from "./card";
+import { FileTypeIcon } from "./file-type-icon";
 import type { DocumentFile, DocumentFolder } from "../types/documents";
 import { fileModified, fileSize, shortDate } from "./document-format";
 import { folderHref, type OnDocumentAction } from "./document-item";

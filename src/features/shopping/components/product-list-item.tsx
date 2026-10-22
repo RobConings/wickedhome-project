@@ -2,7 +2,7 @@ import { ShoppingCartIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ShopBadge, type Shop } from "@/features/shops";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import { cn } from "@/lib/utils";

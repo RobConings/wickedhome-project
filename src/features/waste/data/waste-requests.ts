@@ -1,6 +1,6 @@
 import i18n from "i18next";
-import { api } from "@/lib/api-client";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { api } from "../lib/api-client";
+import { parseForm, toFormResult, type FormResult } from "../lib/forms";
 import {
   wasteLookupInputSchema,
   wasteSetupInputSchema,

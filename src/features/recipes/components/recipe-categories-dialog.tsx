@@ -3,7 +3,7 @@ import { PencilIcon, PlusIcon, TagsIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
+import { GeneralFormDialog } from "./general-form-dialog";
 import type { RecipeActionResult } from "../data/recipes-loaders";
 import { recipeCategoryInputSchema, type RecipeCategory } from "../types/recipes";
 

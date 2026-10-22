@@ -5,7 +5,7 @@ import { Link, useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { ConfirmDialog } from "./confirm-dialog";
 import type { Habitant } from "@/features/household";
 import type { Shop } from "@/features/shops";
 import type { CalendarActionResult } from "../data/calendar-loaders";

@@ -1,7 +1,7 @@
 import { TicketIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Card, CardDescription, CardTitle } from "@/components/shared/card";
-import { InlineAlert } from "@/components/shared/inline-alert";
+import { Card, CardDescription, CardTitle } from "./card";
+import { InlineAlert } from "./inline-alert";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import { cn } from "@/lib/utils";
 import type { VoucherBalance } from "../types/income";

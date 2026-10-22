@@ -1,8 +1,8 @@
 import { CircleHelpIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { BreakdownBars, type BreakdownItem } from "@/components/shared/breakdown-bars";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
-import { InlineAlert } from "@/components/shared/inline-alert";
+import { BreakdownBars, type BreakdownItem } from "./breakdown-bars";
+import { Card, CardDescription, CardHeader, CardTitle } from "./card";
+import { InlineAlert } from "./inline-alert";
 import { currentLocale } from "@/lib/i18n";
 import type { EnergyBreakdown } from "../types/energy";
 import { ApplianceCategoryIcon } from "./appliance-category-icon";

@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import type { Habitant } from "@/features/household";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
-import { describeRecurrence } from "@/lib/recurrence-format";
+import { describeRecurrence } from "../lib/recurrence-format";
 import { formatDate, formatMonth } from "@/types/date-format";
 import { JOINT } from "../types/income";
 

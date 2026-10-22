@@ -4,7 +4,7 @@ import { MailSearchIcon, SendIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { InlineAlert } from "@/components/shared/inline-alert";
+import { InlineAlert } from "./inline-alert";
 import { currentLocale } from "@/lib/i18n";
 import { formatDateTime } from "@/types/date-format";
 import type { GoogleClient } from "../data/google-client";

@@ -1,12 +1,12 @@
 import type * as React from "react";
 import { CircleCheckBigIcon, ShoppingCartIcon, WalletIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { PageGrid } from "@/components/layout/page-grid";
-import { StatTile } from "@/components/shared/stat-tile";
+import { PageGrid } from "./page-grid";
+import { StatTile } from "./stat-tile";
 import type { ExpensesSummary } from "@/features/expenses";
 import type { ShoppingSummary } from "@/features/shopping";
 import type { TasksSummary } from "@/features/tasks";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { expensesDueThisWeek } from "../data/dashboard-items";
 

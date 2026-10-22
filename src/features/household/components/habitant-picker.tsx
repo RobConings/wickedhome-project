@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { EntityPicker } from "@/components/shared/entity-picker";
+import { EntityPicker } from "./entity-picker";
 import { useSelections } from "@/lib/selections";
 import type { Habitant } from "../types/household";
 import { HabitantAvatar } from "./habitant-avatar";

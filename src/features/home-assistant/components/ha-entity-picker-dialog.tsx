@@ -3,7 +3,7 @@ import { ArrowLeftIcon, ListTreeIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { InlineAlert } from "@/components/shared/inline-alert";
+import { InlineAlert } from "./inline-alert";
 import { cn } from "@/lib/utils";
 import { fetchHaEntities } from "../data/home-assistant-requests";
 import type { HaConnectionStatus, HaEntity } from "../types/home-assistant";

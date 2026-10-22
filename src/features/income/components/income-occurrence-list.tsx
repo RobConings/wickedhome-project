@@ -3,7 +3,7 @@ import { CalendarClockIcon, CircleCheckIcon, PencilLineIcon } from "lucide-react
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardTitle } from "@/components/shared/card";
+import { Card, CardTitle } from "./card";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import { cn } from "@/lib/utils";
 import type { Income, IncomeOccurrence, IncomeTargetAccount } from "../types/income";

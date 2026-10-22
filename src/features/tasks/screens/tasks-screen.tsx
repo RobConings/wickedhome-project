@@ -2,13 +2,13 @@ import { CircleCheckBigIcon, ListChecksIcon, PartyPopperIcon, PlusIcon, SearchXI
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 import { Button } from "@/components/ui/button";
-import { PageContainer } from "@/components/layout/page-container";
-import { EmptyState } from "@/components/shared/empty-state";
-import { PageHeader } from "@/components/shared/page-header";
+import { PageContainer } from "../components/page-container";
+import { EmptyState } from "../components/empty-state";
+import { PageHeader } from "../components/page-header";
 import type { Habitant } from "@/features/household";
 import type { Place } from "@/features/places";
-import { useOpenFromUrl } from "@/lib/open-from-url";
-import { useSamePagePending } from "@/lib/pending";
+import { useOpenFromUrl } from "../lib/open-from-url";
+import { useSamePagePending } from "../lib/pending";
 import { TaskFilterControls, TaskViewTabs } from "../components/task-filters-bar";
 import { TaskFormDialog, type TaskProjectField } from "../components/task-form-dialog";
 import { TaskList } from "../components/task-list";

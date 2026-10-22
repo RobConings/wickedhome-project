@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import { ArrowRightIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 
 /** The Settings section pointing to the Integrations page (connections live there, not in Settings). */
 export function IntegrationsSettingsLink() {

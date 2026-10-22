@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api } from "../lib/api-client";
 import type { AuditPage, AuditQuery } from "../types/audit";
 
 /** One page of the activity log; filters, search and the cursor go in the query string. */

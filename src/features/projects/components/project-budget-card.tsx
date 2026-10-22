@@ -1,6 +1,6 @@
 import { InfoIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Card, CardTitle } from "@/components/shared/card";
+import { Card, CardTitle } from "./card";
 import { cn } from "@/lib/utils";
 import type { ProjectBudget } from "../types/project-budget";
 import { ProjectBudgetBadge } from "./project-badges";

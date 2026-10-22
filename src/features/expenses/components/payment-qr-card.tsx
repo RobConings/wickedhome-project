@@ -4,15 +4,15 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardTitle } from "@/components/shared/card";
-import { formatCurrency } from "@/lib/format";
+import { Card, CardTitle } from "./card";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { epcPayload } from "../types/payment-qr";
 import type { Expense } from "../types/expenses";
 import { formatIban, formatStructuredCommunication } from "../types/payment-references";
 
 // The QR encoder is its own chunk, loaded only when a payment QR is shown.
-const QrCode = React.lazy(() => import("@/components/shared/qr-code").then((module) => ({ default: module.QrCode })));
+const QrCode = React.lazy(() => import("./qr-code").then((module) => ({ default: module.QrCode })));
 
 type PaymentQrCardProps = {
   expense: Pick<
@@ -70,7 +70,7 @@ function PaymentQrActions({ payload, fileName, caption, copyText }: { payload: s
   // Made ahead of the tap: phones only open the share sheet straight from a tap, not after awaiting work.
   React.useEffect(() => {
     let current = true;
-    import("@/components/shared/qr-png")
+    import("./qr-png")
       .then(({ qrPngBlob }) => qrPngBlob(payload, { caption: captionKey.split("\n") }))
       .then((blob) => current && blob && setFile(new File([blob], fileName, { type: "image/png" })))
       .catch(() => undefined);

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
-import { FileTypeIcon } from "@/components/shared/file-type-icon";
+import { FileTypeIcon } from "./file-type-icon";
 import { cn } from "@/lib/utils";
 import type { UploadItem } from "../data/use-document-uploads";
 import { fileSize } from "./document-format";

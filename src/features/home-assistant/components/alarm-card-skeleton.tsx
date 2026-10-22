@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 
 /** Shaped like the alarm card, while its data loads (Suspense fallback). */
 export function AlarmCardSkeleton({ compact = false, className }: { compact?: boolean; className?: string }) {

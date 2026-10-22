@@ -2,7 +2,7 @@ import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { DocumentsScreen, canManageDocuments, documentsAction, documentsLoader } from "@/features/documents";
 import { LinkedDriveFolders, SaveToDriveMenuItem } from "@/features/integrations";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = documentsLoader;
 export const action = documentsAction;

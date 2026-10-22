@@ -1,5 +1,5 @@
-import type { AppShellNavSection } from "@/components/layout/app-shell";
-import type { SectionAccent } from "@/lib/section-accent";
+import type { AppShellNavSection } from "./components/app-shell";
+import type { SectionAccent } from "./lib/section-accent";
 
 /**
  * Which section accent (colour) each part of the app uses: the first URL segment → accent. The frame

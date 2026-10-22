@@ -2,7 +2,7 @@ import { ExternalLinkIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 import { cn } from "@/lib/utils";
 import { PlaceBadge } from "@/features/places";
 import type { Device, DeviceProfile } from "../types/devices";

@@ -6,10 +6,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
-import { FileDropZone } from "@/components/shared/file-drop-zone";
-import { InlineAlert } from "@/components/shared/inline-alert";
+import { FileDropZone } from "./file-drop-zone";
+import { InlineAlert } from "./inline-alert";
 import { documentContentUrl, uploadDocument, type UploadDocumentOptions } from "@/features/documents";
-import { ApiRequestError } from "@/lib/api-client";
+import { ApiRequestError } from "../lib/api-client";
 import { cn } from "@/lib/utils";
 import type { Floor, FloorUnderlay, UnderlayLabel, UnderlayRect } from "../types/places";
 import { PlanCompass } from "./plan-compass";

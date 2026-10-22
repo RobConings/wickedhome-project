@@ -1,7 +1,7 @@
 import { ArrowRightIcon, ReceiptIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 import { cn } from "@/lib/utils";
 import type { MoneyMonth } from "../types/money";
 import { MoneyCardHeader } from "./money-card-header";

@@ -3,7 +3,7 @@ import { ChevronLeftIcon, ChevronRightIcon, ListOrderedIcon } from "lucide-react
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 import type { RecipeStep } from "../types/recipes";
 import { StepTimer } from "./step-timer";
 

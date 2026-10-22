@@ -2,7 +2,7 @@ import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { canManageDevices, fetchDevicesOverview, useDevicePlanLayer, type DevicesOverview } from "@/features/devices";
 import { FloorPlanScreen, canManagePlaces, floorPlanAction, floorPlanLoader } from "@/features/places";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 /**
  * The plan, plus the household's devices to show and place on it. Devices are optional and not awaited:

@@ -7,9 +7,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import { InlineAlert } from "@/components/shared/inline-alert";
-import { SkeletonList } from "@/components/shared/loading-state";
+import { ConfirmDialog } from "./confirm-dialog";
+import { InlineAlert } from "./inline-alert";
+import { SkeletonList } from "./loading-state";
 import { currentLocale } from "@/lib/i18n";
 import { formatDate } from "@/types/date-format";
 import { assistantClient, type AssistantClient } from "../data/assistant-client";

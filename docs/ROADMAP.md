@@ -6,8 +6,7 @@ Two missions:
 
 - **Functional**: manage places, tasks, shopping, stock, calendar, habitants, bills and subscriptions, and
   later the house itself through Home Assistant (alarm, climate, appliances).
-- **Coding**: be the reference implementation of the hybrid Atomic + Feature component methodology
-  (see [ARCHITECTURE.md](ARCHITECTURE.md) and [BRANDING.md](BRANDING.md)).
+- **Coding**: be a well-structured, maintainable codebase.
 
 ## Guiding principles
 
@@ -320,7 +319,7 @@ Route 1 comes with the assistant phase. Route 2 comes once Home Assistant is run
 
 | Phase | Goal | Contents |
 |---|---|---|
-| **0 — Foundation** | A skeleton that proves the methodology | Single app (React + `src/api` Express), Prisma + Postgres, auth, i18n (EN/NL), app shell, brand tokens, `components/ui` + first `shared` + `layout`, lint-enforced layer rules, Storybook, household & habitants, deploy to the server |
+| **0 — Foundation** | A skeleton that proves the methodology | Single app (React + `src/api` Express), Prisma + Postgres, auth, i18n (EN/NL), app shell, brand tokens, `components/ui`, Storybook, household & habitants, deploy to the server |
 | **1 — Places** | The spatial backbone | Floors, rooms, outdoor zones, 2D floor plan editor, place detail page |
 | **2 — Tasks & shopping** | Getting jobs done | Tasks with materials and readiness, shops, shopping lists, shop view, recurring staples |
 | **3 — Stock & time** | The house restocks itself | Inventory, barcode/QR scanning, thresholds → shopping; calendar with store visits |

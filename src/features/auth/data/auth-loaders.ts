@@ -1,6 +1,6 @@
 import i18n from "i18next";
 import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type ShouldRevalidateFunctionArgs } from "react-router";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { parseForm, toFormResult, type FormResult } from "../lib/forms";
 import { currentLocale, setLocale } from "@/lib/i18n";
 import { loginInputSchema, setupInputSchema, type SessionUser } from "../types/auth";
 import { fetchCurrentUser, fetchSetupStatus, login, logout, setupHousehold } from "./auth-requests";

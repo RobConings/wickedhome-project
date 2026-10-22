@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigation } from "react-router";
-import { Stack } from "@/components/layout/stack";
-import { GeneralForm } from "@/components/shared/general-form";
-import type { FormResult } from "@/lib/forms";
+import { Stack } from "./stack";
+import { GeneralForm } from "./general-form";
+import type { FormResult } from "../lib/forms";
 import { loginInputSchema } from "../types/auth";
 
 type LoginFormProps = {

@@ -2,7 +2,7 @@ import { SmartphoneIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { ConfirmDialog } from "./confirm-dialog";
 import { currentLocale } from "@/lib/i18n";
 import { formatDate, formatDateTime } from "@/types/date-format";
 import type { PushDevice } from "../types/notifications";

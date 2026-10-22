@@ -1,4 +1,4 @@
-import { QrCode } from "@/components/shared/qr-code";
+import { QrCode } from "./qr-code";
 
 type LinkQrCodeProps = {
   value: string;

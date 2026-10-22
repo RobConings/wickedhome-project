@@ -1,8 +1,8 @@
 import type * as React from "react";
 import { Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { GeneralFormField } from "@/components/shared/general-form";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
+import type { GeneralFormField } from "./general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
 import { ShopPicker, type Shop } from "@/features/shops";
 import { formatDate } from "@/types/date-format";
 import type { ContactActionResult } from "../data/contacts-loaders";

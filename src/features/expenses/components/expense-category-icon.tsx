@@ -23,7 +23,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { SectionAccent } from "@/lib/section-accent";
+import type { SectionAccent } from "../lib/section-accent";
 import { cn } from "@/lib/utils";
 import type { ExpenseCategory } from "../types/expenses";
 

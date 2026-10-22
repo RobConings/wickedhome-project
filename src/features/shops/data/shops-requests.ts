@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api } from "../lib/api-client";
 import type { Shop, ShopInput, ShopListQuery } from "../types/shops";
 
 /** Shops visible to the household: the built-in catalogue plus its own, sorted by name. */

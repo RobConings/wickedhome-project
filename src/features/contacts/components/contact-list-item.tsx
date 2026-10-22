@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { FavoriteToggle } from "@/components/shared/favorite-toggle";
+import { FavoriteToggle } from "./favorite-toggle";
 import { cn } from "@/lib/utils";
 import { contactSubtitle, type Contact } from "../types/contacts";
 import { ContactAvatar } from "./contact-avatar";

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
-import { StackedBarChart, type StackedBarDatum, type StackedBarSeries } from "@/components/shared/stacked-bar-chart";
+import { Card, CardDescription, CardHeader, CardTitle } from "./card";
+import { StackedBarChart, type StackedBarDatum, type StackedBarSeries } from "./stacked-bar-chart";
 import { currentLocale } from "@/lib/i18n";
 import type { EnergySummary } from "../types/energy";
 import { formatBucket, formatKwh, formatKwhAxis } from "./energy-format";

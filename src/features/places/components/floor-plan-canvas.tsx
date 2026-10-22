@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { ZoomControl } from "@/components/shared/zoom-control";
+import { ZoomControl } from "./zoom-control";
 import { documentContentUrl } from "@/features/documents";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";

@@ -3,9 +3,9 @@ import { CheckIcon, ExternalLinkIcon, MapPinIcon, PencilIcon, Trash2Icon } from 
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TagChip } from "@/components/shared/tag-chip";
+import { TagChip } from "./tag-chip";
 import { ShopBadge, type Shop } from "@/features/shops";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { projectPath } from "@/types/projects";

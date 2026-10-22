@@ -1,6 +1,6 @@
 import { useLoaderData, useParams } from "react-router";
 import { ShopViewScreen, shoppingAction, shoppingLoader, shoppingShouldRevalidate } from "@/features/shopping";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = shoppingLoader;
 export const action = shoppingAction;

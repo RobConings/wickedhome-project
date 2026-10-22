@@ -2,7 +2,7 @@ import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { ProjectFormField } from "@/features/projects";
 import { TasksScreen, canManageTasks, tasksAction, tasksLoader, tasksShouldRevalidate } from "@/features/tasks";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = tasksLoader;
 export const action = tasksAction;

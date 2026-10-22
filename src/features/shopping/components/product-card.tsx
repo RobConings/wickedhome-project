@@ -2,9 +2,9 @@ import { BarcodeIcon, ExternalLinkIcon, PencilIcon, PlusIcon, QrCodeIcon, Shoppi
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 import { ShopBadge, type Shop } from "@/features/shops";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import { cn } from "@/lib/utils";

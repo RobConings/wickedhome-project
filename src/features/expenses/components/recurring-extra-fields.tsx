@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FormField } from "@/components/shared/form-field";
+import { FormField } from "./form-field";
 import { EXPENSE_KINDS, type ExpenseKind, type RecurringExpense } from "../types/expenses";
 
 type RecurringKindFieldProps = {

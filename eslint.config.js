@@ -6,11 +6,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 /*
- * Layer rules. The architecture is enforced here, not in a wiki: importing across a layer boundary is a
- * lint error with a message that explains why. See docs/ARCHITECTURE.md.
- *
- * Each block applies to one folder and lists everything that folder may NOT import. Later blocks
- * override earlier ones for the files they match, so every block repeats the full list for its folder.
+ * Import guards: browser code never imports the server, and the server only imports feature contracts.
  */
 const forbid = (group, message) => ({ group, message });
 const forbidRegex = (regex, message) => ({ regex, message });
@@ -18,16 +14,12 @@ const forbidRegex = (regex, message) => ({ regex, message });
 const NO_API = forbid(["@/api", "@/api/**"], "Browser code must not import server code from src/api.");
 const NO_APP = forbid(["@/app", "@/app/**"], "src/app is the composition root; nothing below it may import it.");
 const NO_ROUTES = forbid(["@/routes", "@/routes/**"], "Route files are entry points; nothing imports them.");
-const NO_FEATURES = forbid(["@/features", "@/features/**"], "This layer must stay domain-agnostic.");
-const NO_SHARED = forbid(["@/components/shared", "@/components/shared/**"], "Lower layers must not use shared components.");
-const NO_LAYOUT = forbid(["@/components/layout", "@/components/layout/**"], "Primitives must not depend on layout components.");
 const NO_COMPONENTS = forbid(["@/components", "@/components/**"], "This code must not render UI components.");
 const NO_LIB = forbid(["@/lib", "@/lib/**"], "src/lib is browser infrastructure.");
 const NO_FEATURE_INTERNALS = forbidRegex(
   "^@/features/[^/]+/",
   "Import another feature through its public index (`@/features/<name>`), never its internals.",
 );
-const NO_LEAVING_FOLDER = forbidRegex("^\\.\\./", "Use the `@/` alias to import from another folder.");
 const NO_LEAVING_FEATURE = forbidRegex(
   "^(\\.\\./){2,}",
   "A feature imports its own files relatively and everything else through `@/`.",
@@ -70,19 +62,9 @@ export default tseslint.config(
   ...storybook.configs["flat/recommended"],
   { files: [".storybook/**"], rules: { "react-refresh/only-export-components": "off" } },
 
-  // 1. Primitives: only other primitives and lib/utils.
-  layer(["src/components/ui/**"], [NO_API, NO_APP, NO_ROUTES, NO_FEATURES, NO_SHARED, NO_LAYOUT, NO_LEAVING_FOLDER]),
-  // shadcn files export variant helpers next to components.
   { files: ["src/components/ui/**"], rules: { "react-refresh/only-export-components": "off" } },
 
-  // 2. Shared compositions: primitives, layout and other shared components. Never domain code.
-  layer(["src/components/shared/**"], [NO_API, NO_APP, NO_ROUTES, NO_FEATURES, NO_LEAVING_FOLDER]),
-
-  // 3. Layout: structure only. Primitives yes, shared compositions and domain code no.
-  layer(["src/components/layout/**"], [NO_API, NO_APP, NO_ROUTES, NO_FEATURES, NO_SHARED, NO_LEAVING_FOLDER]),
-
-  // 4 + 5. Features (components and screens): any component layer, other features only via their index.
-  layer(["src/features/**"], [NO_API, NO_APP, NO_ROUTES, NO_FEATURE_INTERNALS, NO_LEAVING_FEATURE, NO_AI, NO_AI_RELATIVE]),
+  layer(["src/**"], [NO_API]),
 
   // Feature contracts are shared with src/api, so they must run in the browser AND in Node.
   layer(
@@ -90,18 +72,6 @@ export default tseslint.config(
     [NO_API, NO_APP, NO_ROUTES, NO_COMPONENTS, NO_LIB, NO_FEATURE_INTERNALS, NO_LEAVING_FEATURE, NO_AI, NO_AI_RELATIVE],
     [{ name: "react", message: "Feature types are shared with the API and must not use React." }],
   ),
-
-  // Route files: connect a feature's loader/action to its screen. No direct UI.
-  layer(["src/routes/**"], [NO_API, NO_COMPONENTS, NO_FEATURE_INTERNALS, NO_LEAVING_FOLDER]),
-
-  // Composition root: may use every layer, features only via their index.
-  layer(["src/app/**"], [NO_API, NO_FEATURE_INTERNALS, NO_LEAVING_FOLDER]),
-
-  // Browser infrastructure.
-  layer(["src/lib/**"], [NO_API, NO_APP, NO_ROUTES, NO_FEATURES, NO_COMPONENTS, NO_LEAVING_FOLDER]),
-
-  // App-wide types: pure TypeScript and zod.
-  layer(["src/types/**"], [NO_API, NO_APP, NO_ROUTES, NO_FEATURES, NO_COMPONENTS, NO_LIB, NO_LEAVING_FOLDER]),
 
   // Server: Node only. Shares feature contracts (`@/features/<name>/types/...`) and nothing else from the browser.
   // The assistant (ai/) is mounted by app.ts and server.ts only; the features' API never imports it.

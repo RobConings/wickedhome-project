@@ -1,7 +1,7 @@
 import { HourglassIcon, Link2Icon, MessageSquareIcon, PauseCircleIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { TagChip } from "@/components/shared/tag-chip";
+import { TagChip } from "./tag-chip";
 import { cn } from "@/lib/utils";
 import { projectPath } from "@/types/projects";
 import type { Task } from "../types/tasks";

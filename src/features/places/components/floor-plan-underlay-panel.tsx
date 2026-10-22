@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { intlLocale } from "@/lib/format";
+import { intlLocale } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { FloorUnderlay } from "../types/places";

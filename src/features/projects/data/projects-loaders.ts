@@ -3,8 +3,8 @@ import { data, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
 import { fetchPlaces, type Place } from "@/features/places";
 import { fetchShops, type Shop } from "@/features/shops";
-import { ApiRequestError } from "@/lib/api-client";
-import { formDataToObject, parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { ApiRequestError } from "../lib/api-client";
+import { formDataToObject, parseForm, toFormResult, type FormResult } from "../lib/forms";
 import {
   projectExpenseMaterialsInputSchema,
   projectFormSchema,

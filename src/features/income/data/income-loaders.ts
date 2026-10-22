@@ -1,7 +1,7 @@
 import i18n from "i18next";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { parseForm, toFormResult, type FormResult } from "../lib/forms";
 import {
   incomeInputSchema,
   incomeSourceCreateSchema,

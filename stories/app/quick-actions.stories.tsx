@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useTranslation } from "react-i18next";
-import { QuickActionMenu, QuickActionSheet } from "@/components/shared/quick-actions";
+import { QuickActionMenu, QuickActionSheet } from "../../src/app/components/quick-actions";
 import { quickActionsFor, toQuickActionItems } from "@/app/quick-actions";
 import type { Role } from "@/features/auth";
 

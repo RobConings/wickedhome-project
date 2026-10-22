@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { PageGrid } from "@/components/layout/page-grid";
+import { PageGrid } from "../../../../src/features/devices/components/page-grid";
 import { useDeviceStates } from "@/features/devices/components/device-indicator";
 import { DeviceTile } from "@/features/devices/components/device-tile";
 import type { Device } from "@/features/devices/types/devices";

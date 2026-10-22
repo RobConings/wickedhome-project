@@ -16,7 +16,7 @@ green and "Home" in sage, set in Inter Bold.
 | `public/brand/icon-maskable-512.png`, `public/apple-touch-icon.png` | Home-screen icons |
 | `public/favicon.svg`, `public/favicon-32.png` | Browser tab (green tile) |
 
-In the app, use the `BrandMark` component (`components/shared/brand-mark.tsx`). It follows the theme
+In the app, use the `BrandMark` component. It follows the theme
 and switches to the inverse colours in dark mode.
 
 ## Colour system

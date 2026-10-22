@@ -1,7 +1,7 @@
 import { CalendarIcon, ListChecksIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 import { documentContentUrl } from "@/features/documents";
 import { cn } from "@/lib/utils";
 import { projectPath, type Project } from "../types/projects";

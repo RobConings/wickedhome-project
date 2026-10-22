@@ -1,7 +1,7 @@
 import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { ProductsScreen, canManageShopping, productsAction, productsLoader } from "@/features/shopping";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = productsLoader;
 export const action = productsAction;

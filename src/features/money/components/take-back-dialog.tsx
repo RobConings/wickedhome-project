@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
+import { GeneralFormDialog } from "./general-form-dialog";
 import { takeBackSchema } from "../types/money";
 
 type TakeBackDialogProps = {

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
-import { intlLocale } from "@/lib/format";
+import { Card, CardDescription, CardHeader, CardTitle } from "./card";
+import { intlLocale } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { formatDate } from "@/types/date-format";
 import type { Appliance, EnergyMeter } from "../types/energy";

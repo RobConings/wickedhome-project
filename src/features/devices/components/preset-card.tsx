@@ -2,7 +2,7 @@ import { PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 import { cn } from "@/lib/utils";
 import type { DevicePresetSummary } from "../types/devices";
 import { DeviceIcon } from "./device-icon";

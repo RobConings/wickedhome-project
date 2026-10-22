@@ -5,7 +5,7 @@ import { Link } from "react-router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 import { formatQuantity } from "@/features/shopping";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";

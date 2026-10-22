@@ -1,6 +1,6 @@
 import type * as React from "react";
 import { useTranslation } from "react-i18next";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
+import { GeneralFormDialog } from "./general-form-dialog";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import { contributionPlanSchema, type ContributionPlan, type JointAccount } from "../types/money";
 import { people } from "./use-money-text";

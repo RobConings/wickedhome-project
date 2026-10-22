@@ -5,7 +5,7 @@ import { PlaceStockSection } from "@/features/inventory";
 import { PlaceDetailScreen, canManagePlaces, placeDetailLoader, placesAction } from "@/features/places";
 import { PlaceShoppingSection } from "@/features/shopping";
 import { PlaceTasksSection } from "@/features/tasks";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = placeDetailLoader;
 export const action = placesAction;

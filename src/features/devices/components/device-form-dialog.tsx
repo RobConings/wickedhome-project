@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
-import type { GeneralFormField } from "@/components/shared/general-form";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
+import type { GeneralFormField } from "./general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
 import { useSelections } from "@/lib/selections";
 import { AppliancePicker, type Appliance } from "@/features/energy";
 import { PlacePicker, usePlaceSelections, type Place } from "@/features/places";

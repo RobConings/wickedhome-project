@@ -2,8 +2,7 @@
 
 Everything that makes the assistant work is in this folder: the core (how a question becomes tool calls),
 the skills (what it knows and can do, one folder per area of the app), the eval and the docs. The chat UI is
-the only part elsewhere: [`src/features/assistant`](../src/features/assistant) (browser code follows the
-app's layer rules).
+the only part elsewhere: [`src/features/assistant`](../src/features/assistant).
 
 The assistant runs on a **local model** (LM Studio on a PC in the house, OpenAI-compatible API; the target is
 a Qwen-class model with ~16k context on a 20–24 GB GPU). The conversation never leaves the house; only the web

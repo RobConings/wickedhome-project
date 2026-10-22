@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Card, CardTitle } from "@/components/shared/card";
+import { Card, CardTitle } from "../../../../src/features/tasks/components/card";
 import { PlaceTasksSection } from "@/features/tasks/components/place-tasks-section";
 import { emptyTasksOverviewFixture, jacuzziPlaceOverviewFixture, livingPlaceOverviewFixture, taskHabitants } from "../fixtures";
 

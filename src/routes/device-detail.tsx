@@ -3,7 +3,7 @@ import { useCurrentUser } from "@/features/auth";
 import { DeviceDetailScreen, canManageDevices, deviceDetailLoader, devicesAction } from "@/features/devices";
 import { HaEntityPickerDialog } from "@/features/home-assistant";
 import { NotifyMeToggle } from "@/features/notifications";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = deviceDetailLoader;
 export const action = devicesAction;

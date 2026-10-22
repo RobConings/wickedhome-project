@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 import { cn } from "@/lib/utils";
 
 /** Placeholder shaped like `HouseStatusCard`, for its Suspense fallback while `fetchHouseStatus()` loads. */

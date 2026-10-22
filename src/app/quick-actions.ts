@@ -9,15 +9,15 @@ import {
   ScanBarcodeIcon,
   ShoppingCartIcon,
 } from "lucide-react";
-import type { QuickActionItem } from "@/components/shared/quick-actions";
+import type { QuickActionItem } from "./components/quick-actions";
 import type { Role } from "@/features/auth";
-import type { SectionAccent } from "@/lib/section-accent";
+import type { SectionAccent } from "./lib/section-accent";
 
 /**
  * The quick actions: the one list behind the "+" in the phone top bar, the "+ Quick action" menu in the
  * desktop sidebar and the command palette (Ctrl/Cmd + K, "/", "N"). Each one goes to a screen that opens
  * its form from the URL (`?new=1`, `useOpenFromUrl` / `useOpenRequestFromUrl` in `@/lib/open-from-url`).
- * A feature adds one here (docs/ADDING-A-FEATURE.md → Quick actions). Keep it short: the everyday "add".
+ * A feature adds one here. Keep it short: the everyday "add".
  */
 export type QuickActionDefinition = {
   id: string;

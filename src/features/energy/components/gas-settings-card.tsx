@@ -1,8 +1,8 @@
 import { FlameIcon, PencilIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Card, CardFooter, CardHeader, CardTitle } from "@/components/shared/card";
-import { DescriptionItem, DescriptionList } from "@/components/shared/description-list";
+import { Card, CardFooter, CardHeader, CardTitle } from "./card";
+import { DescriptionItem, DescriptionList } from "./description-list";
 import { currentLocale } from "@/lib/i18n";
 import type { EnergySettings } from "../types/energy";
 import { formatCalorific } from "./energy-format";

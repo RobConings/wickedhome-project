@@ -1,8 +1,8 @@
 import i18n from "i18next";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { sessionLoader, type SessionUser } from "@/features/auth";
-import { ApiRequestError } from "@/lib/api-client";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { ApiRequestError } from "../lib/api-client";
+import { parseForm, toFormResult, type FormResult } from "../lib/forms";
 import { mcpOAuthAppInputSchema, mcpOAuthSettingsInputSchema, type CreatedMcpOAuthApp, type McpOAuthConsent, type McpOAuthSettings } from "../types/mcp-oauth";
 import { mcpOAuthClient } from "./mcp-oauth-client";
 

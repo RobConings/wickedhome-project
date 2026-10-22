@@ -5,7 +5,7 @@ import { ExpensesScreen, canManageExpenses, expensesAction, expensesLoader, expe
 import { MailBillSuggestions } from "@/features/integrations";
 import { ProjectFormField } from "@/features/projects";
 import { fetchLinkedHolds } from "@/features/tasks";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 /** The expenses, plus which payments are on hold (through their pay task); a missing answer only hides holds. */
 export async function loader() {

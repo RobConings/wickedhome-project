@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api } from "../lib/api-client";
 import type { Habitant, HabitantInput, HouseholdOverview } from "../types/household";
 
 export const fetchHouseholdOverview = () => api.get<HouseholdOverview>("/household");

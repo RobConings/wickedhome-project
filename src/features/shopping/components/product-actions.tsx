@@ -1,7 +1,7 @@
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { ConfirmDialog } from "./confirm-dialog";
 import type { Shop } from "@/features/shops";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import type { Product } from "../types/shopping";

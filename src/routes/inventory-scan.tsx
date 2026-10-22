@@ -1,7 +1,7 @@
 import { useLoaderData, useSearchParams } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { SCAN_MODES, ScanScreen, canManageStock, inventoryAction, scanLoader, type ScanMode } from "@/features/inventory";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = scanLoader;
 export const action = inventoryAction;

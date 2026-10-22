@@ -1,7 +1,7 @@
 import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { EnergyOverviewScreen, canManageEnergy, energyOverviewLoader } from "@/features/energy";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = energyOverviewLoader;
 export const handle = screenHandle(({ t }) => ({ kind: "energy", label: t("nav.energy") }));

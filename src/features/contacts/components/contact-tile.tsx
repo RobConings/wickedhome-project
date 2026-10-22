@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { Inline } from "@/components/layout/inline";
-import { Card } from "@/components/shared/card";
-import { FavoriteToggle } from "@/components/shared/favorite-toggle";
+import { Inline } from "./inline";
+import { Card } from "./card";
+import { FavoriteToggle } from "./favorite-toggle";
 import { contactSubtitle, type Contact } from "../types/contacts";
 import { ContactAvatar } from "./contact-avatar";
 import { ContactLinks } from "./contact-links";

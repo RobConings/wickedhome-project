@@ -1,9 +1,9 @@
 import { WalletIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { Card, CardTitle } from "@/components/shared/card";
+import { Card, CardTitle } from "./card";
 import { HabitantAvatar, type Habitant } from "@/features/household";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { amountFor, nextPerPayer } from "../types/expense-calculations";

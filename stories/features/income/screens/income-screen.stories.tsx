@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { SkeletonPage } from "@/components/shared/loading-state";
+import { SkeletonPage } from "../../../../src/features/income/components/loading-state";
 import { IncomeScreen } from "@/features/income/screens/income-screen";
 import { emptyIncomeOverviewFixture, incomeHabitants, incomeOverviewFixture, septemberIncomeOverviewFixture } from "../fixtures";
 

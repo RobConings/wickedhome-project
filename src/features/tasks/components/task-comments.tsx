@@ -5,7 +5,7 @@ import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { ConfirmDialog } from "./confirm-dialog";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import type { TaskActionResult } from "../data/tasks-loaders";
 import type { TaskComment } from "../types/tasks";

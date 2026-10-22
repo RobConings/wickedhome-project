@@ -8,12 +8,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import { ErrorState } from "@/components/shared/error-state";
-import { FormField } from "@/components/shared/form-field";
-import { SkeletonList } from "@/components/shared/loading-state";
+import { ConfirmDialog } from "./confirm-dialog";
+import { ErrorState } from "./error-state";
+import { FormField } from "./form-field";
+import { SkeletonList } from "./loading-state";
 import { CategorySelect, type ExpenseCategory } from "@/features/expenses";
-import { ApiRequestError } from "@/lib/api-client";
+import { ApiRequestError } from "../lib/api-client";
 import type { GoogleClient } from "../data/google-client";
 import { mailBillRuleInputSchema, type MailBillRule, type MailBillRuleInput } from "../types/google";
 

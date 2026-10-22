@@ -1,8 +1,8 @@
 import type * as React from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
-import type { GeneralFormField } from "@/components/shared/general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
+import type { GeneralFormField } from "./general-form";
 import type { ProjectActionResult } from "../data/projects-loaders";
 import {
   PROJECT_COLORS,

@@ -26,16 +26,16 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
-import { AppShell, type AppShellNavSection } from "@/components/layout/app-shell";
-import { BrandMark } from "@/components/shared/brand-mark";
-import { CommandPalette } from "@/components/shared/command-palette";
-import { QuickActionMenu, QuickActionSheet } from "@/components/shared/quick-actions";
+import { AppShell, type AppShellNavSection } from "./components/app-shell";
+import { BrandMark } from "./components/brand-mark";
+import { CommandPalette } from "./components/command-palette";
+import { QuickActionMenu, QuickActionSheet } from "./components/quick-actions";
 import { AskButton } from "@/features/assistant";
 import { AccountMenu, type SessionUser } from "@/features/auth";
 import { NotificationBell, useUnreadNotifications } from "@/features/notifications";
-import { type CommandPaletteMode, paletteShortcutKeys, useCommandPaletteShortcuts } from "@/lib/command-palette-shortcuts";
-import { useAppBusy } from "@/lib/pending";
-import { useScreenContext } from "@/lib/screen-context";
+import { type CommandPaletteMode, paletteShortcutKeys, useCommandPaletteShortcuts } from "./lib/command-palette-shortcuts";
+import { useAppBusy } from "./lib/pending";
+import { useScreenContext } from "./lib/screen-context";
 import { quickActionsFor, toQuickActionItems } from "./quick-actions";
 import { accentForPath, withNavAccents } from "./section-accents";
 // Registers the features' renderers for the assistant's confirmation previews (plan diff…).

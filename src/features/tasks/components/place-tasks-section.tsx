@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PendingContent } from "@/components/shared/loading-state";
+import { PendingContent } from "./loading-state";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
 import { fetchTasksOverview } from "../data/tasks-requests";
 import { compareTasks, type TasksOverview } from "../types/tasks";

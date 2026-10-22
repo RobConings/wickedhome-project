@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Stack } from "@/components/layout/stack";
+import { Stack } from "./stack";
 import type { LinkKind } from "../types/accounts";
 import { ShareLinkPanel } from "./share-link-panel";
 

@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { EntityPicker, type EntityPickerItem } from "@/components/shared/entity-picker";
-import { FormField } from "@/components/shared/form-field";
+import { EntityPicker, type EntityPickerItem } from "./entity-picker";
+import { FormField } from "./form-field";
 import { useSelections, type UseSelectionsOptions } from "@/lib/selections";
 import { fetchProjects } from "../data/projects-requests";
 import { isRunning, type Project } from "../types/projects";

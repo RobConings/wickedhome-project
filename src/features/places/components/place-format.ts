@@ -1,4 +1,4 @@
-import { intlLocale } from "@/lib/format";
+import { intlLocale } from "../lib/format";
 import type { Locale } from "@/types/common";
 
 /** `12,5 m²` (or `12,65 m²` with two digits, to compare with the architect's areas) */

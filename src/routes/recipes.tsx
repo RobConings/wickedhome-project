@@ -1,7 +1,7 @@
 import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { RecipesScreen, canManageRecipes, recipesAction, recipesLoader } from "@/features/recipes";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = recipesLoader;
 export const action = recipesAction;

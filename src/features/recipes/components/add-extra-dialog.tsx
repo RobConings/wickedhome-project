@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
-import type { GeneralFormField, GeneralFormValues } from "@/components/shared/general-form";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
+import type { GeneralFormField, GeneralFormValues } from "./general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
 import { ProductPicker, useProductSelections, type Product } from "@/features/shopping";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import type { RecipeActionResult } from "../data/recipes-loaders";

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { BellIcon, CalendarDaysIcon, ChevronRightIcon, MapPinIcon, RepeatIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { EmptyState } from "@/components/shared/empty-state";
+import { EmptyState } from "./empty-state";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import { ShopLogo } from "@/features/shops";
 import { currentLocale } from "@/lib/i18n";

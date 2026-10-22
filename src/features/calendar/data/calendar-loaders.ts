@@ -2,8 +2,8 @@ import i18n from "i18next";
 import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type ShouldRevalidateFunctionArgs } from "react-router";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
 import { fetchShops, type Shop } from "@/features/shops";
-import { formDataToObject, toFormResult, type FormResult } from "@/lib/forms";
-import { NEW_FORM_PARAM } from "@/lib/open-from-url";
+import { formDataToObject, toFormResult, type FormResult } from "../lib/forms";
+import { NEW_FORM_PARAM } from "../lib/open-from-url";
 import { isoDateSchema } from "@/types/common";
 import { todayIn } from "@/types/dates";
 import {

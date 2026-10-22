@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
-import { FormField } from "@/components/shared/form-field";
-import { MoneyInput } from "@/components/shared/money-input";
-import { formatCurrency } from "@/lib/format";
+import { FormField } from "./form-field";
+import { MoneyInput } from "./money-input";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/types/date-format";

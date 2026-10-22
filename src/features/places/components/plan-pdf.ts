@@ -1,4 +1,4 @@
-import { loadPdfJs, type PDFDocumentProxy, type PDFPageProxy, type RenderTask } from "@/lib/pdf";
+import { loadPdfJs, type PDFDocumentProxy, type PDFPageProxy, type RenderTask } from "../lib/pdf";
 import type { UnderlayRect } from "../types/places";
 import type { PlanTextItem } from "./plan-labels";
 

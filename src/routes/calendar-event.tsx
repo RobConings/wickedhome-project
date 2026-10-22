@@ -2,7 +2,7 @@ import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { CalendarEventScreen, calendarEventAction, calendarEventLoader, canManageCalendar } from "@/features/calendar";
 import { ShopShoppingList } from "@/features/shopping";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = calendarEventLoader;
 export const action = calendarEventAction;

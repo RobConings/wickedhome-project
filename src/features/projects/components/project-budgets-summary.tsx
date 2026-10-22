@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PendingContent } from "@/components/shared/loading-state";
+import { PendingContent } from "./loading-state";
 import { fetchProjectBudgetsSummary } from "../data/projects-requests";
 import { projectPath, type ProjectBudgetsSummaryData } from "../types/projects";
 import { ProjectBudgetBadge } from "./project-badges";

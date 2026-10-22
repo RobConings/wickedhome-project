@@ -1,5 +1,5 @@
-import { api } from "@/lib/api-client";
-import { uploadBlob, type UploadProgress } from "@/lib/upload";
+import { api } from "../lib/api-client";
+import { uploadBlob, type UploadProgress } from "../lib/upload";
 import {
   FALLBACK_MIME_TYPE,
   normalizeMimeType,

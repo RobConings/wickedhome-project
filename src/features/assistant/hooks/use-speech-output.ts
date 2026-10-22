@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ApiRequestError } from "@/lib/api-client";
+import { ApiRequestError } from "../lib/api-client";
 import { todayIn } from "@/types/dates";
 import { assistantClient, type AssistantClient } from "../data/assistant-client";
 import { createAnswerSpeech, type AnswerSpeech, type SpeechSession } from "../data/answer-speech";

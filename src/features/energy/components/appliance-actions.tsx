@@ -5,7 +5,7 @@ import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { ConfirmDialog } from "./confirm-dialog";
 import { cn } from "@/lib/utils";
 import type { Place } from "@/features/places";
 import type { EnergyActionResult } from "../data/energy-loaders";

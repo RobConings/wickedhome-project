@@ -1,7 +1,7 @@
 import { BanknoteIcon, UserIcon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { PageGrid } from "@/components/layout/page-grid";
-import { StatTile } from "@/components/shared/stat-tile";
+import { PageGrid } from "./page-grid";
+import { StatTile } from "./stat-tile";
 import type { Habitant } from "@/features/household";
 import { JOINT, type IncomeMonthTotals } from "../types/income";
 import { money, useWhoName } from "./use-income-text";

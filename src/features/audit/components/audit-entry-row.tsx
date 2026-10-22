@@ -1,7 +1,7 @@
 import { BotIcon, MonitorSmartphoneIcon, PlugIcon, WorkflowIcon, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 import { currentLocale } from "@/lib/i18n";
 import { formatDateTime } from "@/types/date-format";
 import type { AuditChannel, AuditEntry } from "../types/audit";

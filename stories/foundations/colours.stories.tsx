@@ -16,10 +16,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Card } from "@/components/shared/card";
-import { IconChip } from "@/components/shared/icon-chip";
-import { StatTile } from "@/components/shared/stat-tile";
-import { SECTION_ACCENTS, type SectionAccent } from "@/lib/section-accent";
+import { Card } from "../../src/app/components/card";
+import { IconChip } from "../../src/app/components/icon-chip";
+import { StatTile } from "../../src/app/components/stat-tile";
+import { SECTION_ACCENTS, type SectionAccent } from "../../src/app/lib/section-accent";
 
 /**
  * The colour system (docs/BRANDING.md): surfaces, the one call-to-action colour, the peach highlight,

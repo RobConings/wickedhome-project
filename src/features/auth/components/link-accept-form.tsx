@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigation } from "react-router";
 import { z } from "zod";
-import { Stack } from "@/components/layout/stack";
-import { GeneralForm, type GeneralFormField } from "@/components/shared/general-form";
-import { SegmentedControl } from "@/components/shared/segmented-control";
-import type { FormResult } from "@/lib/forms";
+import { Stack } from "./stack";
+import { GeneralForm, type GeneralFormField } from "./general-form";
+import { SegmentedControl } from "./segmented-control";
+import type { FormResult } from "../lib/forms";
 import { setLocale } from "@/lib/i18n";
 import { LOCALES, type Locale } from "@/types/common";
 import { LINK_ACCEPT_INTENT } from "../data/link-loaders";

@@ -1,6 +1,6 @@
 import i18n from "i18next";
 import type { ActionFunctionArgs } from "react-router";
-import { toFormResult, type FormResult } from "@/lib/forms";
+import { toFormResult, type FormResult } from "../lib/forms";
 import { fetchAppliances, type Appliance } from "@/features/energy";
 import { haApplianceLinksInputSchema, haSettingsInputSchema } from "../types/home-assistant";
 import {

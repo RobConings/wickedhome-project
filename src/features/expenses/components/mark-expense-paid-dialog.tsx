@@ -13,11 +13,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Stack } from "@/components/layout/stack";
-import { FormField } from "@/components/shared/form-field";
-import { InlineAlert } from "@/components/shared/inline-alert";
+import { Stack } from "./stack";
+import { FormField } from "./form-field";
+import { InlineAlert } from "./inline-alert";
 import { HabitantPicker, type Habitant } from "@/features/household";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { useSelections } from "@/lib/selections";
 import { formatDate } from "@/types/date-format";

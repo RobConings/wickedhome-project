@@ -4,15 +4,15 @@ import { useTranslation } from "react-i18next";
 import { Link, useRevalidator } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { PageContainer } from "@/components/layout/page-container";
-import { PageGrid } from "@/components/layout/page-grid";
-import { Stack } from "@/components/layout/stack";
-import { BarcodeScanner } from "@/components/shared/barcode-scanner";
-import { Card, CardDescription, CardTitle } from "@/components/shared/card";
-import { InlineAlert } from "@/components/shared/inline-alert";
-import { LoadingState } from "@/components/shared/loading-state";
-import { PageHeader } from "@/components/shared/page-header";
-import { SegmentedControl } from "@/components/shared/segmented-control";
+import { PageContainer } from "../components/page-container";
+import { PageGrid } from "../components/page-grid";
+import { Stack } from "../components/stack";
+import { BarcodeScanner } from "../components/barcode-scanner";
+import { Card, CardDescription, CardTitle } from "../components/card";
+import { InlineAlert } from "../components/inline-alert";
+import { LoadingState } from "../components/loading-state";
+import { PageHeader } from "../components/page-header";
+import { SegmentedControl } from "../components/segmented-control";
 import {
   LinkAlternativeDialog,
   ProductCategoryIcon,

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Progress } from "@/components/ui/progress";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/types/date-format";

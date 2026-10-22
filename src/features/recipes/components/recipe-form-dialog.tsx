@@ -1,8 +1,8 @@
 import type * as React from "react";
 import { Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { GeneralFormField } from "@/components/shared/general-form";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
+import type { GeneralFormField } from "./general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
 import type { Product } from "@/features/shopping";
 import type { Shop } from "@/features/shops";
 import type { UseSelectionsOptions } from "@/lib/selections";

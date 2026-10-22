@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { EntityPicker, type EntityPickerItem } from "@/components/shared/entity-picker";
+import { EntityPicker, type EntityPickerItem } from "./entity-picker";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import { useShopSelections } from "../data/use-shop-selections";
 import type { Shop } from "../types/shops";

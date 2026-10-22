@@ -1,4 +1,4 @@
-import { matchesSearch } from "@/components/shared/general-list-helpers";
+import { matchesSearch } from "./general-list-helpers";
 import type { Shop, ShopRef } from "@/features/shops";
 import { NO_SHOP, PRODUCT_CATEGORIES, type ProductCategory, type ShoppingItem } from "../types/shopping";
 

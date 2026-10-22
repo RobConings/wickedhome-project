@@ -2,7 +2,7 @@ import * as React from "react";
 import { RotateCwIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { SkeletonList } from "@/components/shared/loading-state";
+import { SkeletonList } from "./loading-state";
 import { cn } from "@/lib/utils";
 
 /** Placeholder rows while an embedded shopping list loads its items for the first time. */

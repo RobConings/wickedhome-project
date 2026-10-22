@@ -4,7 +4,7 @@ import { NextToPay, fetchUnpaidExpenses, type Expense } from "@/features/expense
 import { VoucherBalances } from "@/features/income";
 import { MoneyFlowScreen, canManageMoney, fetchMoneyLoans, fetchMoneyTimeline, moneyAction, moneyLoader } from "@/features/money";
 import { ProjectBudgetsCard, fetchProjectBudgetsSummary } from "@/features/projects";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 /**
  * The money flow plus "Next to pay" from the expenses feature; a failing request there only hides that card.

@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next";
-import { PageContainer } from "@/components/layout/page-container";
-import { PageGrid } from "@/components/layout/page-grid";
-import { Stack } from "@/components/layout/stack";
-import { PendingContent } from "@/components/shared/loading-state";
-import { PageHeader } from "@/components/shared/page-header";
-import { useSamePagePending } from "@/lib/pending";
+import { PageContainer } from "../components/page-container";
+import { PageGrid } from "../components/page-grid";
+import { Stack } from "../components/stack";
+import { PendingContent } from "../components/loading-state";
+import { PageHeader } from "../components/page-header";
+import { useSamePagePending } from "../lib/pending";
 import { EnergyMeterList } from "../components/energy-meter-list";
 import { EnergyNav } from "../components/energy-nav";
 import { FluviusImport, type FluviusImportState } from "../components/fluvius-import";

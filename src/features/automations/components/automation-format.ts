@@ -1,5 +1,5 @@
 import type { TFunction } from "i18next";
-import { intlLocale } from "@/lib/format";
+import { intlLocale } from "../lib/format";
 import type { Locale } from "@/types/common";
 import { formatDate, formatDateTime } from "@/types/date-format";
 import { describeSchedule } from "../types/schedule-description";

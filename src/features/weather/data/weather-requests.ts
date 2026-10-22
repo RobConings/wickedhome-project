@@ -1,6 +1,6 @@
 import i18n from "i18next";
-import { api } from "@/lib/api-client";
-import { toFormResult, type FormResult } from "@/lib/forms";
+import { api } from "../lib/api-client";
+import { toFormResult, type FormResult } from "../lib/forms";
 import { weatherSettingsInputSchema, type WeatherResponse, type WeatherSettings, type WeatherSettingsInput } from "../types/weather";
 
 /** The home's forecast; `{ status: "no_location" }` until the address is set in Settings. */

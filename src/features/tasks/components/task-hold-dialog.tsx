@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Stack } from "@/components/layout/stack";
-import { FormField } from "@/components/shared/form-field";
+import { Stack } from "./stack";
+import { FormField } from "./form-field";
 import type { Task } from "../types/tasks";
 
 type TaskHoldDialogProps = {

@@ -22,19 +22,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { PageContainer } from "@/components/layout/page-container";
-import { BreadcrumbTrail } from "@/components/shared/breadcrumb-trail";
-import { Card } from "@/components/shared/card";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import { EmptyState } from "@/components/shared/empty-state";
-import { ErrorState } from "@/components/shared/error-state";
-import { FileTypeIcon } from "@/components/shared/file-type-icon";
-import { GeneralList } from "@/components/shared/general-list";
-import { SkeletonList } from "@/components/shared/loading-state";
-import { PageHeader } from "@/components/shared/page-header";
-import { formatBytes } from "@/lib/format-bytes";
+import { PageContainer } from "../components/page-container";
+import { BreadcrumbTrail } from "../components/breadcrumb-trail";
+import { Card } from "../components/card";
+import { ConfirmDialog } from "../components/confirm-dialog";
+import { EmptyState } from "../components/empty-state";
+import { ErrorState } from "../components/error-state";
+import { FileTypeIcon } from "../components/file-type-icon";
+import { GeneralList } from "../components/general-list";
+import { SkeletonList } from "../components/loading-state";
+import { PageHeader } from "../components/page-header";
+import { formatBytes } from "../lib/format-bytes";
 import { currentLocale } from "@/lib/i18n";
-import { useSamePagePending } from "@/lib/pending";
+import { useSamePagePending } from "../lib/pending";
 import { formatDate } from "@/types/date-format";
 import { DocumentPreviewDialog } from "@/features/documents";
 import { DRIVE_FOLDER_PARAM } from "../data/drive-loaders";

@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { ConfirmDialog } from "./confirm-dialog";
 import type { Shop } from "@/features/shops";
 import { currentLocale } from "@/lib/i18n";
 import type { UseSelectionsOptions } from "@/lib/selections";

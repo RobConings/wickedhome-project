@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Await, Link } from "react-router";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardTitle } from "@/components/shared/card";
+import { Card, CardTitle } from "./card";
 import { TotalOpenProgressBar, totalOpenPaidPercent } from "@/features/expenses";
 import { cn } from "@/lib/utils";
 import type { MoneyLoans } from "../types/money";

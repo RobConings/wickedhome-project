@@ -3,8 +3,8 @@ import { data, redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type 
 import type { z } from "zod";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
 import { fetchPlaces, type Place } from "@/features/places";
-import { ApiRequestError } from "@/lib/api-client";
-import { formDataToObject, toFormResult, type FormResult } from "@/lib/forms";
+import { ApiRequestError } from "../lib/api-client";
+import { formDataToObject, toFormResult, type FormResult } from "../lib/forms";
 import {
   checklistToggleInputSchema,
   taskCommentInputSchema,

@@ -9,8 +9,8 @@ import {
 import type { z } from "zod";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
 import { fetchShops, type Shop } from "@/features/shops";
-import { ApiRequestError } from "@/lib/api-client";
-import { formDataToObject, toFormResult, type FormResult } from "@/lib/forms";
+import { ApiRequestError } from "../lib/api-client";
+import { formDataToObject, toFormResult, type FormResult } from "../lib/forms";
 import {
   expenseCreateInputSchema,
   expenseInputSchema,

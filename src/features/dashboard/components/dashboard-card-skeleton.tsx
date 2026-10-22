@@ -1,8 +1,8 @@
 import type { LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardHeader, CardTitle } from "@/components/shared/card";
-import { IconChip, type IconChipTone } from "@/components/shared/icon-chip";
+import { Card, CardHeader, CardTitle } from "./card";
+import { IconChip, type IconChipTone } from "./icon-chip";
 
 type DashboardCardSkeletonProps = {
   /** The card's real title, so the layout doesn't change when the content arrives. */

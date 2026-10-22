@@ -1,4 +1,4 @@
-import { api, ApiRequestError } from "@/lib/api-client";
+import { api, ApiRequestError } from "../lib/api-client";
 import type { LoginInput, SessionUser, SetupInput, SetupStatus, UpdateAccountInput } from "../types/auth";
 
 export const fetchSetupStatus = () => api.get<SetupStatus>("/auth/setup/status");

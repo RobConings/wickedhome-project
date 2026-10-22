@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Card } from "@/components/shared/card";
+import { Card } from "../../../../src/features/income/components/card";
 import { IncomeRow } from "@/features/income/components/income-row";
 import { incomeAccounts, incomeFixtures, incomeHabitants, incomeSources, incomeToday } from "../fixtures";
 

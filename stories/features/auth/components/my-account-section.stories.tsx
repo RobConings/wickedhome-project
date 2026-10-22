@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MyAccountSection } from "@/features/auth/components/my-account-section";
-import { ApiRequestError } from "@/lib/api-client";
+import { ApiRequestError } from "../../../../src/features/auth/lib/api-client";
 import { fakeMyAccountClient, myAccountFixture, sessionUserFixture } from "../fixtures";
 
 const meta = {

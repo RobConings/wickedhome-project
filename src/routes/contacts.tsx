@@ -1,7 +1,7 @@
 import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { ContactsScreen, canManageContacts, contactsAction, contactsLoader } from "@/features/contacts";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = contactsLoader;
 export const action = contactsAction;

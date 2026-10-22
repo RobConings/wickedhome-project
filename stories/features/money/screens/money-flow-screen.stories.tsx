@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { SkeletonPage } from "@/components/shared/loading-state";
+import { SkeletonPage } from "../../../../src/features/money/components/loading-state";
 import { NextToPay } from "@/features/expenses/components/next-to-pay";
 import { VoucherBalances } from "@/features/income/components/voucher-balances";
 import { MoneyFlowScreen } from "@/features/money/screens/money-flow-screen";

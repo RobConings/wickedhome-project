@@ -7,7 +7,7 @@ import {
   recurringExpenseDetailLoader,
 } from "@/features/expenses";
 import { ProjectFormField } from "@/features/projects";
-import { screenHandle } from "@/lib/screen-context";
+import { screenHandle } from "./lib/screen-context";
 
 export const loader = recurringExpenseDetailLoader;
 export const action = expensesAction;

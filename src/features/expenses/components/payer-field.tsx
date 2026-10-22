@@ -1,11 +1,11 @@
 import * as React from "react";
 import { UserIcon, UsersIcon, WalletIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Stack } from "@/components/layout/stack";
-import { MoneyInput } from "@/components/shared/money-input";
-import { SegmentedControl } from "@/components/shared/segmented-control";
+import { Stack } from "./stack";
+import { MoneyInput } from "./money-input";
+import { SegmentedControl } from "./segmented-control";
 import { HabitantAvatar, HabitantPicker, type Habitant } from "@/features/household";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { isEqualSplit, splitEqually } from "../types/expense-calculations";

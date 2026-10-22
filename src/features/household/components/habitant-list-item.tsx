@@ -1,6 +1,6 @@
 import { CakeIcon, KeyRoundIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Inline } from "@/components/layout/inline";
+import { Inline } from "./inline";
 import { currentLocale } from "@/lib/i18n";
 import { formatDate } from "@/types/date-format";
 import type { Habitant } from "../types/household";

@@ -1,4 +1,4 @@
-import { api } from "@/lib/api-client";
+import { api } from "../lib/api-client";
 import type { Contact, ContactInput, ContactListQuery, ContactProjectLinkInput } from "../types/contacts";
 
 const path = (id: string) => `/contacts/${encodeURIComponent(id)}`;

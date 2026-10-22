@@ -5,12 +5,12 @@ import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardFooter } from "@/components/shared/card";
-import { FormField } from "@/components/shared/form-field";
-import { IconChip } from "@/components/shared/icon-chip";
-import { InlineAlert } from "@/components/shared/inline-alert";
-import { SegmentedControl } from "@/components/shared/segmented-control";
-import { intlLocale } from "@/lib/format";
+import { Card, CardFooter } from "./card";
+import { FormField } from "./form-field";
+import { IconChip } from "./icon-chip";
+import { InlineAlert } from "./inline-alert";
+import { SegmentedControl } from "./segmented-control";
+import { intlLocale } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { HOUSEHOLD_SETTINGS_INTENT, type HouseholdSettingsActionResult } from "../data/household-settings-requests";
 import {

@@ -3,7 +3,7 @@ import { BoxIcon, RotateCwIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
-import { SkeletonList } from "@/components/shared/loading-state";
+import { SkeletonList } from "./loading-state";
 import { fetchStock } from "../data/inventory-requests";
 import { useStockActions } from "../data/use-stock-actions";
 import type { StockItem } from "../types/inventory";

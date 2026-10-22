@@ -4,13 +4,13 @@ import { useTranslation } from "react-i18next";
 import { Link, useFetcher, useLocation, useNavigate, useNavigation, useRevalidator, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { PageContainer } from "@/components/layout/page-container";
-import { Stack } from "@/components/layout/stack";
-import { BreadcrumbTrail, type BreadcrumbItem } from "@/components/shared/breadcrumb-trail";
-import { EmptyState } from "@/components/shared/empty-state";
-import { FileDropArea, FileDropZone } from "@/components/shared/file-drop-zone";
-import { GeneralList, type ListView } from "@/components/shared/general-list";
-import { PageHeader } from "@/components/shared/page-header";
+import { PageContainer } from "../components/page-container";
+import { Stack } from "../components/stack";
+import { BreadcrumbTrail, type BreadcrumbItem } from "../components/breadcrumb-trail";
+import { EmptyState } from "../components/empty-state";
+import { FileDropArea, FileDropZone } from "../components/file-drop-zone";
+import { GeneralList, type ListView } from "../components/general-list";
+import { PageHeader } from "../components/page-header";
 import { sortDocuments } from "../components/document-format";
 import {
   folderHref,

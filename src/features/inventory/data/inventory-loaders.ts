@@ -3,8 +3,8 @@ import { data, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from
 import { fetchPlaces, type Place } from "@/features/places";
 import { fetchProduct, fetchProducts, handleProductAlternativeForm, handleProductForm, type Product } from "@/features/shopping";
 import { fetchShops, type Shop } from "@/features/shops";
-import { ApiRequestError } from "@/lib/api-client";
-import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
+import { ApiRequestError } from "../lib/api-client";
+import { parseForm, toFormResult, type FormResult } from "../lib/forms";
 import { stockItemInputSchema, stockItemUpdateFormSchema, type ProductStock, type StockItem } from "../types/inventory";
 import { createStockItem, deleteStockItem, fetchProductStock, fetchStock, updateStockItem } from "./inventory-requests";
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import type { ListView } from "@/components/shared/general-list";
+import type { ListView } from "../components/general-list";
 
 export type DocumentSortKey = "name" | "modified" | "size";
 export type DocumentSort = { key: DocumentSortKey; direction: "asc" | "desc" };

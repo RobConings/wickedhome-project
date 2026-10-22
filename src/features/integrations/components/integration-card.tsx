@@ -2,9 +2,9 @@ import type * as React from "react";
 import type { LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/shared/card";
-import { IconChip, type IconChipTone } from "@/components/shared/icon-chip";
-import { SkeletonList } from "@/components/shared/loading-state";
+import { Card } from "./card";
+import { IconChip, type IconChipTone } from "./icon-chip";
+import { SkeletonList } from "./loading-state";
 import { cn } from "@/lib/utils";
 import type { IntegrationStatus } from "../types/integrations";
 

@@ -103,7 +103,7 @@ embed a `ProjectRef` (`@/types/projects`) for a chip:
   `projectId`; an empty value removes the project. A form without the field leaves the project alone (the API
   treats a missing `projectId` as "keep").
 - **Chips**: task rows and the task page, expense rows and pages, recurring expense rows and pages, and shopping
-  items show the project (`TagChip` from `components/shared`), linking to it.
+  items show the project, linking to it.
 - **Panels**: `ProjectTasksPanel` (tasks) and `ProjectMaterialsPanel` (shopping) load their own data; the project
   route composes them with `DocumentAttachments` (entity type `project`) and `LogExpenseDialog` (posting to the
   `/expenses` action).

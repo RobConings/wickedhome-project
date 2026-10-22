@@ -1,8 +1,8 @@
 import { GaugeIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
-import { StackedBarChart } from "@/components/shared/stacked-bar-chart";
-import { intlLocale } from "@/lib/format";
+import { Card, CardDescription, CardHeader, CardTitle } from "./card";
+import { StackedBarChart } from "./stacked-bar-chart";
+import { intlLocale } from "../lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { formatDate, formatMonthName } from "@/types/date-format";
 import { CAPACITY_MINIMUM_KW, type EnergyPeak } from "../types/energy";

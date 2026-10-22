@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { SkeletonPage } from "@/components/shared/loading-state";
+import { SkeletonPage } from "../../../../src/features/expenses/components/loading-state";
 import { ExpensesScreen } from "@/features/expenses/screens/expenses-screen";
 import { emptyExpensesOverviewFixture, expenseHabitants, expenseShops, expensesOverviewFixture } from "../fixtures";
 

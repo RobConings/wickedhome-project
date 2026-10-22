@@ -1,8 +1,8 @@
 import type * as React from "react";
 import { useTranslation } from "react-i18next";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
-import type { GeneralFormField } from "@/components/shared/general-form";
-import { InlineAlert } from "@/components/shared/inline-alert";
+import { GeneralFormDialog } from "./general-form-dialog";
+import type { GeneralFormField } from "./general-form";
+import { InlineAlert } from "./inline-alert";
 import type { ShopActionResult } from "../data/shops-loaders";
 import { SHOP_TYPES, shopFormSchema, type Shop, type ShopType } from "../types/shops";
 import { ShopLogo } from "./shop-logo";

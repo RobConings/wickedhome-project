@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
-import type { GeneralFormField, GeneralFormValues } from "@/components/shared/general-form";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
-import { SegmentedControl } from "@/components/shared/segmented-control";
+import type { GeneralFormField, GeneralFormValues } from "./general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
+import { SegmentedControl } from "./segmented-control";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Habitant } from "@/features/household";
 import { PlacePicker, usePlaceSelections, type Place } from "@/features/places";

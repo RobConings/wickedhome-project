@@ -2,7 +2,7 @@ import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Spinner } from "@/components/ui/spinner";
-import { FileTypeIcon } from "@/components/shared/file-type-icon";
+import { FileTypeIcon } from "./file-type-icon";
 import { fileModified, fileSize, shortDate } from "./document-format";
 import { folderHref, type DocumentListEntry, type OnDocumentAction } from "./document-item";
 import { DocumentItemMenu } from "./document-item-menu";

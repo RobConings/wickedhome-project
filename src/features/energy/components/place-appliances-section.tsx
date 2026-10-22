@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SkeletonList } from "@/components/shared/loading-state";
+import { SkeletonList } from "./loading-state";
 import { currentLocale } from "@/lib/i18n";
 import { fetchAppliances } from "../data/energy-requests";
 import type { Appliance } from "../types/energy";

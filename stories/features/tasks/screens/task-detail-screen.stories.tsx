@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { userEvent, within } from "storybook/test";
 import { PackageIcon } from "lucide-react";
-import { Card, CardDescription, CardTitle } from "@/components/shared/card";
+import { Card, CardDescription, CardTitle } from "../../../../src/features/tasks/components/card";
 import { DocumentAttachments } from "@/features/documents/components/document-attachments";
 import { TaskDetailScreen } from "@/features/tasks/screens/task-detail-screen";
 import { billAttachments, searchFilesFixture } from "../../documents/fixtures";

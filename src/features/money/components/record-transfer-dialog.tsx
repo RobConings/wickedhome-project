@@ -1,9 +1,9 @@
 import type * as React from "react";
 import { LandmarkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { GeneralFormValues } from "@/components/shared/general-form";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
-import { InlineAlert } from "@/components/shared/inline-alert";
+import type { GeneralFormValues } from "./general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
+import { InlineAlert } from "./inline-alert";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import { recordTransferSchema, type JointAccount } from "../types/money";
 import { dateText, people } from "./use-money-text";

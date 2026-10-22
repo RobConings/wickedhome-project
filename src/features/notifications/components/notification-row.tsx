@@ -1,7 +1,7 @@
 import { BanknoteIcon, BellIcon, CpuIcon, ListChecksIcon, MailIcon, ShieldAlertIcon, Trash2Icon, UserPlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/shared/card";
+import { Card } from "./card";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { NotificationItem } from "../types/notifications";

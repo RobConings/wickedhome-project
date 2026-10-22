@@ -30,7 +30,7 @@ How the places editor works and what it takes from the user's earlier garden zon
 | Create / Select / Plant | **Select · Room (Zone outside) · Fill · Wall · Door · Window**, in the same segmented switch. |
 | Create flow | Identical, plus: close by clicking the first point, double-clicking or pressing Enter. The draft survives a tool switch. |
 | Vertex handles | Same, plus: drag a whole shape, drag an edge's midpoint dot to insert a corner, delete a corner. |
-| Floating panel | Same behaviour, as the generic `components/shared/floating-panel.tsx`. Position and compact state are also remembered per device. |
+| Floating panel | Same behaviour, as the generic floating panel component. Position and compact state are also remembered per device. |
 | Auto-fit | Fits on load and on resize until the user zooms or pans. Added: wheel zoom at the cursor, pinch, and pan by dragging empty space (also Space+drag or the middle button). The shared `ZoomControl` gives − / % / + / fit. Zoom runs from 5 to 500 % (100 % = 1 px/cm). |
 | `gridSizeCm` | `Floor.gridSize` (5, 10, 25, 50 or 100), set in the panel. Points also snap to existing corners within 10 px (drawing rooms and face-aligned walls also to the corners of wall faces); **Alt** turns snapping off. |
 | Hidden below `xl` | Below `lg`, and for children, the plan is **read-only**: tap a place to open it. Places are list-first, so drawing is never required. |

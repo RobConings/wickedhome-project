@@ -1,6 +1,6 @@
 import { AlarmClockIcon, CircleUserRoundIcon, ListTodoIcon, PackageIcon, PlayIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { StatTile } from "@/components/shared/stat-tile";
+import { StatTile } from "./stat-tile";
 import { dueState, onDutyIds, type Task } from "../types/tasks";
 
 type TaskStatsProps = {

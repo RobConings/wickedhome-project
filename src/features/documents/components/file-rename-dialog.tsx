@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
-import { FileTypeIcon } from "@/components/shared/file-type-icon";
-import type { GeneralFormField } from "@/components/shared/general-form";
-import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
+import { FileTypeIcon } from "./file-type-icon";
+import type { GeneralFormField } from "./general-form";
+import { GeneralFormDialog } from "./general-form-dialog";
 import { fileRenameFormSchema, type DocumentActionResult } from "../data/documents-loaders";
 import type { DocumentFile } from "../types/documents";
 

@@ -1,4 +1,4 @@
-import { intlLocale } from "@/lib/format";
+import { intlLocale } from "../lib/format";
 import type { Locale } from "@/types/common";
 import { formatDateTime as formatDateTimeIn } from "@/types/date-format";
 
