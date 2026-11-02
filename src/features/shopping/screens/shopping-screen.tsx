@@ -1,5 +1,5 @@
 import * as React from "react";
-import { PackageIcon, PencilIcon, PlusIcon, ShoppingCartIcon, StoreIcon, Trash2Icon } from "lucide-react";
+import { PackageIcon, PencilIcon, PlusIcon, SearchXIcon, ShoppingCartIcon, StoreIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher, useRevalidator, useSearchParams } from "react-router";
 import { toast } from "sonner";
@@ -14,14 +14,20 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionHeader } from "@/components/shared/section-header";
+import { SearchField } from "@/components/shared/search-field";
 import { useShopSelections } from "@/features/shops";
 import { useOpenRequestFromUrl } from "@/lib/open-from-url";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import { cn } from "@/lib/utils";
-import { AddShoppingItemForm, type AddShoppingItemInput } from "../components/add-shopping-item-form";
+import type { AddShoppingItemInput } from "../components/add-shopping-item-form";
+import { AddShoppingItemDialog } from "../components/add-shopping-item-dialog";
 import { ShopSummaryList } from "../components/shop-summary-list";
 import { ShoppingItemList } from "../components/shopping-item-list";
 import { ShoppingGuidance } from "../components/shopping-guidance";
+import { filterShopViewItems, NO_SHOP_VIEW_FILTERS, parseStockFilter } from "../components/shopping-grouping";
+import { shoppingListViews } from "../types/shopping-list-views";
+import { shoppingItemListIds } from "../types/shopping-product-rows";
+import { ShoppingStockFilterField } from "../components/shopping-stock-filter";
 import { ShoppingItemFormDialog } from "../components/shopping-item-form-dialog";
 import { ShoppingListFormDialog } from "../components/shopping-list-form-dialog";
 import { StapleFormDialog } from "../components/staple-form-dialog";
@@ -65,13 +71,32 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
   const actions = useShoppingItemActions({ items: overview.items, onChanged: revalidate });
   const [editing, setEditing] = React.useState<ShoppingItem | null>(null);
 
-  // `?new=1` (the "Add shopping item" quick action) puts the cursor in "Add an item"; the param is removed at
-  // once. Each request remounts the form (a new key), so it also focuses when this page is already showing.
+  // The quick action opens a fresh dialog, including when this page is already showing.
   const addRequest = useOpenRequestFromUrl();
 
   const activeListId = searchParams.get("list");
-  const activeList = overview.lists.find((list) => list.id === activeListId) ?? null;
+  const listViews = shoppingListViews(overview.lists, t("listKinds.groceries")).map((list) => ({
+    ...list, openCount: actions.items.filter((item) => item.status === "open" && shoppingItemListIds(item).some((id) => list.listIds.includes(id))).length,
+  }));
+  const activeView = listViews.find((list) => list.listIds.includes(activeListId ?? "")) ?? null;
+  const activeList = activeView?.editableList ?? null;
+  const query = searchParams.get("q") ?? "";
+  const searching = query.trim() !== "";
+  const stockFilter = parseStockFilter(searchParams.get("stock"));
+  const filtering = searching || stockFilter !== "all";
+  const visibleItems = filterShopViewItems(actions.items, { ...NO_SHOP_VIEW_FILTERS, query, stock: stockFilter })
+    .filter((item) => !activeView || shoppingItemListIds(item).some((id) => activeView.listIds.includes(id)));
   const totalOpen = actions.items.filter((item) => item.status === "open").length;
+
+  const search = (value: string) =>
+    setSearchParams(
+      (params) => {
+        if (value.trim()) params.set("q", value);
+        else params.delete("q");
+        return params;
+      },
+      { replace: true, preventScrollReset: true },
+    );
 
   const selectList = (id: string | null) =>
     setSearchParams(
@@ -85,7 +110,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
 
   async function add(input: AddShoppingItemInput) {
     try {
-      await createShoppingItem({ ...input, listId: activeList?.id, source: "manual" });
+      await createShoppingItem({ ...input, listId: activeView?.id, source: "manual" });
       if (input.productId) void productSelections.recordUse(input.productId);
       if (input.shopId) void shopSelections.recordUse(input.shopId);
       revalidate();
@@ -95,8 +120,10 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
     }
   }
 
-  const listsToShow = activeList ? [activeList] : overview.lists;
-  const itemsOf = (listId: string) => actions.items.filter((item) => item.listId === listId);
+  const listsToShow = activeView ? [activeView] : listViews;
+  const itemsOf = (listIds: string[]) => visibleItems.filter((item) => activeView
+    ? shoppingItemListIds(item).some((id) => listIds.includes(id))
+    : listIds.includes(item.listId));
 
   const headerActions = (
     <>
@@ -116,12 +143,21 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
           }
         />
       )}
-      <Button asChild>
+      <Button asChild variant="outline">
         <Link to="/shopping/shops">
           <StoreIcon />
           {t("actions.shopView")}
         </Link>
       </Button>
+      <AddShoppingItemDialog
+        key={addRequest ?? "idle"}
+        defaultOpen={addRequest !== null}
+        products={products}
+        shops={shops}
+        onAdd={add}
+        previewLink={previewLink}
+        initialSelections={initialSelections}
+      />
     </>
   );
 
@@ -129,11 +165,11 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
     <button
       key={id ?? "all"}
       type="button"
-      aria-pressed={activeListId === id || (!activeList && id === null)}
+      aria-pressed={activeView?.id === id || (!activeView && id === null)}
       onClick={() => selectList(id)}
       className={cn(
         "inline-flex min-h-9 shrink-0 items-center gap-2 rounded-full border px-3.5 text-sm whitespace-nowrap transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
-        (id === null ? !activeList : activeList?.id === id)
+        (id === null ? !activeView : activeView?.id === id)
           ? "border-primary bg-primary text-primary-foreground"
           : "bg-card hover:bg-accent",
       )}
@@ -144,42 +180,55 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
   );
 
   return (
-    <PageContainer>
+    <PageContainer className="gap-4 px-3 py-4 sm:gap-6 sm:px-6 sm:py-8 lg:px-8">
+      {actions.confirmation}
       <PageHeader title={t("page.title")} description={t("page.description")} actions={headerActions} />
 
       <PageGrid columns="main-sidebar" className="items-start">
-        <Stack gap="lg">
-          {overview.lists.length > 1 && (
+        <Stack gap="lg" className="gap-3 sm:gap-6">
+          {listViews.length > 1 && (
             <ScrollRow label={t("lists.filterLabel")} focusable={false}>
               {chip(null, t("lists.all"), totalOpen)}
-              {overview.lists.map((list) => chip(list.id, list.name, list.openCount))}
+              {listViews.map((list) => chip(list.id, list.name, list.openCount))}
             </ScrollRow>
           )}
 
-          <Card className="gap-3 p-4">
-            <AddShoppingItemForm
-              key={addRequest ?? "idle"}
-              products={products}
-              shops={shops}
-              onAdd={add}
-              previewLink={previewLink}
-              initialSelections={initialSelections}
-              autoFocus={addRequest !== null}
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <SearchField className="flex-1" value={query} onValueChange={search} label={t("lists.searchLabel")} placeholder={t("lists.search")} />
+            <ShoppingStockFilterField value={stockFilter} onChange={(value) => setSearchParams((params) => {
+              if (value === "all") params.delete("stock"); else params.set("stock", value);
+              return params;
+            }, { replace: true, preventScrollReset: true })} />
+          </div>
+
+          {filtering && (
+            <p role="status" className="text-sm text-muted-foreground">
+              {tCommon("list.results", { count: visibleItems.length })}
+            </p>
+          )}
+
+          {totalOpen > 0 && !filtering && <ShoppingGuidance />}
+
+          {filtering && visibleItems.length === 0 ? (
+            <EmptyState
+              icon={SearchXIcon}
+              title={searching ? tCommon("list.noResultsTitle", { query: query.trim() }) : tCommon("list.noResultsFilteredTitle")}
+              description={tCommon("list.noResultsDescription")}
+              action={<Button variant="outline" onClick={() => setSearchParams((params) => {
+                params.delete("q"); params.delete("stock"); return params;
+              }, { replace: true, preventScrollReset: true })}>{t("shopView.filters.clear")}</Button>}
             />
-          </Card>
-
-          {totalOpen > 0 && <ShoppingGuidance />}
-
-          {overview.lists.length === 0 || (totalOpen === 0 && actions.items.length === 0) ? (
+          ) : overview.lists.length === 0 || (totalOpen === 0 && actions.items.length === 0) ? (
             <EmptyState icon={ShoppingCartIcon} title={t("lists.emptyAll")} />
           ) : (
             listsToShow.map((list) => {
-              const items = itemsOf(list.id);
-              if (!activeList && items.length === 0) return null;
+              const items = itemsOf(list.listIds);
+              if ((!activeView || filtering) && items.length === 0) return null;
               return (
-                <PageSection key={list.id} aria-labelledby={`list-${list.id}`}>
+                <PageSection key={list.id} aria-labelledby={`list-${list.id}`} className="gap-2">
                   <SectionHeader
                     id={`list-${list.id}`}
+                    className="[&_h2]:text-sm sm:[&_h2]:text-base"
                     title={
                       <span className="flex items-baseline gap-2">
                         {list.name}
@@ -193,7 +242,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
                       activeList && (
                         <>
                           <ShoppingListFormDialog
-                            list={list}
+                            list={activeList}
                             trigger={
                               <Button variant="ghost" size="icon-sm" aria-label={t("actions.editList")} title={t("actions.editList")}>
                                 <PencilIcon />
@@ -234,7 +283,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
           )}
         </Stack>
 
-        <Stack gap="lg">
+        <Stack gap="lg" className="gap-3 sm:gap-6">
           <Card>
             <CardHeader>
               <div className="flex flex-col gap-1">
@@ -243,7 +292,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
               </div>
             </CardHeader>
             {totalOpen > 0 ? (
-              <ShopSummaryList items={actions.items} shops={shops} className="-mx-2" />
+              <ShopSummaryList items={actions.items} shops={shops} savedGroups={data.shopGroups} className="-mx-2" />
             ) : (
               <p className="text-sm text-muted-foreground">{t("shopView.nothingAnywhere")}</p>
             )}

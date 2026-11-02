@@ -88,7 +88,7 @@ describe("web skill", () => {
       title: "T".repeat(200),
       siteName: null,
       description: "D".repeat(400),
-      imageUrl: null,
+      imageUrl: "https://shop.example/verified-product.jpg",
       product: { name: "N".repeat(200), brand: "B", price: 9.99, highPrice: null, currency: "EUR", availability: "in stock", sku: "1", ean: "2", shop: null, imageUrl: null, unitPrice: { price: 3.33, unit: "m²" }, description: null },
       recipe: null,
       text: "Zin.\n".repeat(560),
@@ -98,6 +98,7 @@ describe("web skill", () => {
     });
     assert.ok(JSON.stringify(prune(result)).length <= 3900, `${JSON.stringify(prune(result)).length} chars`);
     assert.equal(result.product?.price, "€ 9,99");
+    assert.equal(result.product?.imageUrl, "https://shop.example/verified-product.jpg");
     assert.equal(result.product?.perUnit, "€ 3,33 per m²");
     assert.equal(result.product?.shop, "shop.example");
     assert.equal(result.more, true);

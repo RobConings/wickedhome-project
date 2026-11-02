@@ -183,6 +183,7 @@ export function ProjectMaterialsPanel({
 
   return (
     <div className="flex flex-col gap-3">
+      {actions.confirmation}
       {visible.length > 0 && (
         <p className="text-sm text-muted-foreground tabular-nums">
           {t("task.progress", { bought, total: visible.length })}

@@ -36,6 +36,7 @@ export const ENTITY_TYPES = [
   "place",
   "floor",
   "shop",
+  "shop_group",
   "payee",
   "recurring_expense",
   "expense",
@@ -178,9 +179,9 @@ export function pickCandidate(type: EntityType, noun: string, query: string, can
   const exact = scored.filter((entry) => entry.score >= 100);
   const winner = exact.length === 1 ? exact[0] : close.length === 1 ? best : null;
   if (!winner) {
-    const options = close.slice(0, MAX_OPTIONS).map((entry) => `"${label(entry.candidate)}"`);
+    const options = close.slice(0, MAX_OPTIONS).map((entry) => `"${label(entry.candidate)}" [id: ${entry.candidate.id}]`);
     const more = close.length > MAX_OPTIONS ? ` (and ${close.length - MAX_OPTIONS} more)` : "";
-    return { ok: false, error: `Which ${noun} do you mean by "${query}": ${options.join(" or ")}${more}? Ask the person, or call again with the exact name or id.` };
+    return { ok: false, error: `Which ${noun} do you mean by "${query}": ${options.join(" or ")}${more}? These are separate records, even if their names are identical. Use the chosen record's id as the argument; do not retry an ambiguous name. Ask the person when the intended record is unclear.` };
   }
   const { candidate } = winner;
   return { ok: true, entity: { type, id: candidate.id, name: candidate.name, ...(candidate.hint && { hint: candidate.hint }), ...(candidate.data && { data: candidate.data }) } };

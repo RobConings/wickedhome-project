@@ -12,6 +12,7 @@ import { fetchLinkPreview } from "../data/shopping-requests";
 import { PRODUCT_CATEGORIES, shoppingItemEditSchema, type LinkPreview, type Product, type ShoppingItem } from "../types/shopping";
 import { ProductCategoryIcon } from "./product-category-icon";
 import { ProductPicker } from "./product-picker";
+import { shoppingProductDetails } from "../types/shopping-product-details";
 
 type ShoppingItemFormDialogProps = {
   /** The item to edit; `null` closes the dialog. */
@@ -58,11 +59,20 @@ export function ShoppingItemFormDialog({ item, onOpenChange, products, shops, pr
     if (!product) return next;
     // A product chosen for a loose item: take its name (unless typed differently), unit and shop when empty.
     const name = text(previous.name);
+    const link = linkValue(previous.url);
+    const details = shoppingProductDetails(product, {
+      unit: text(previous.unit) || null,
+      shopId: typeof previous.shopId === "string" ? previous.shopId : null,
+      url: link.url || null, imageUrl: link.imageUrl || null,
+      priceCents: typeof previous.priceCents === "number" ? previous.priceCents : null,
+    });
     return {
       ...next,
       name: !name || name === productName(previous.productId) ? product.name : name,
-      unit: text(previous.unit) || product.unit || "",
-      shopId: previous.shopId || product.defaultShopId || null,
+      unit: details.unit ?? "",
+      shopId: details.shopId,
+      url: { ...link, url: details.url ?? "", imageUrl: details.imageUrl ?? "" },
+      priceCents: previous.priceCents === undefined || previous.priceCents === null || previous.priceCents === "" ? details.priceCents : previous.priceCents,
     };
   };
 

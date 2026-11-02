@@ -1,5 +1,6 @@
 import { useLoaderData, useParams } from "react-router";
-import { ShopViewScreen, shoppingAction, shoppingLoader, shoppingShouldRevalidate } from "@/features/shopping";
+import { ShopViewScreen, canManageShopping, shoppingAction, shoppingLoader, shoppingShouldRevalidate } from "@/features/shopping";
+import { useCurrentUser } from "@/features/auth";
 import { screenHandle } from "@/lib/screen-context";
 
 export const loader = shoppingLoader;
@@ -9,5 +10,6 @@ export const shouldRevalidate = shoppingShouldRevalidate;
 
 export function Component() {
   const { shopId } = useParams();
-  return <ShopViewScreen data={useLoaderData<typeof shoppingLoader>()} shopKey={shopId ?? null} />;
+  const user = useCurrentUser();
+  return <ShopViewScreen data={useLoaderData<typeof shoppingLoader>()} shopKey={shopId ?? null} canManage={canManageShopping(user.role)} />;
 }

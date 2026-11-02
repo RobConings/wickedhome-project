@@ -1,7 +1,7 @@
-import { ChevronRightIcon, CircleHelpIcon } from "lucide-react";
+import { ChevronRightIcon, CircleHelpIcon, LayersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { ShopLogo, type Shop } from "@/features/shops";
+import { ShopLogo, type Shop, type SavedShopGroup } from "@/features/shops";
 import { formatCurrency } from "@/lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -13,11 +13,13 @@ type ShopSummaryListProps = {
   shops: Shop[];
   /** Highlights the shop that is open in the shop view. */
   activeKey?: string;
+  savedGroups?: SavedShopGroup[];
+  activeGroupId?: string;
   className?: string;
 };
 
 /** "Colruyt 8 · Gamma 2 · No shop chosen 1": where to go (with an estimate of the cost), linking to each shop view. */
-export function ShopSummaryList({ items, shops, activeKey, className }: ShopSummaryListProps) {
+export function ShopSummaryList({ items, shops, activeKey, savedGroups = [], activeGroupId, className }: ShopSummaryListProps) {
   const { t } = useTranslation("shopping");
   const open = items.filter((item) => item.status === "open");
   const groups = groupItemsByShop(open, shops);
@@ -26,6 +28,18 @@ export function ShopSummaryList({ items, shops, activeKey, className }: ShopSumm
 
   return (
     <ul className={cn("flex flex-col gap-1", className)}>
+      {savedGroups.map((group) => {
+        const count = open.filter((item) => item.shopId && group.shopIds.includes(item.shopId)).length;
+        if (!count && activeGroupId !== group.id) return null;
+        return <li key={`group-${group.id}`}>
+          <Link to={`/shopping/shops?group=${encodeURIComponent(group.id)}`} aria-current={activeGroupId === group.id ? "page" : undefined} className={cn("flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-accent", activeGroupId === group.id && "bg-accent font-medium")}>
+            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-section-soft text-section"><LayersIcon className="size-4" /></span>
+            <span className="min-w-0 flex-1 truncate">{group.name}</span>
+            <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground tabular-nums">{count}</span>
+            <ChevronRightIcon className="size-4 text-muted-foreground" />
+          </Link>
+        </li>;
+      })}
       {groups.map((group) => {
         const name = group.key === NO_SHOP ? t("shops.noShop") : (group.shop?.name ?? group.name ?? "");
         return (

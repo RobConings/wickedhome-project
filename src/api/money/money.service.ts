@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { jointCostsOfMonth } from "@/features/money/types/contribution-settlement";
+import { groupContributionHistory } from "@/features/money/types/contribution-history";
 import {
   absorbedKeys,
   accountForJointExpense,
@@ -296,6 +297,16 @@ export async function getMoneyMonth(householdId: string, month: string): Promise
     jointCosts: jointCostsOfMonth(jointFlow, month),
     vouchers,
   };
+}
+
+/** Read stored payments directly so balance corrections never erase contribution history. */
+export async function getContributionHistory(householdId: string) {
+  const now = today();
+  const entries = await db.accountEntry.findMany({
+    where: { householdId, type: "CONTRIBUTION", date: { lte: toDate(now) }, account: { householdId, kind: { in: [...JOINT_KINDS] } } },
+    select: { date: true, accountId: true, habitantId: true, amountCents: true },
+  });
+  return groupContributionHistory(entries.map((entry) => ({ ...entry, date: fromDate(entry.date) })), now);
 }
 
 /** The dashboard's money card: this month in and out, and the joint balances. */

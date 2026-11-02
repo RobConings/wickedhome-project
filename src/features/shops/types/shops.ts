@@ -49,6 +49,13 @@ export const shopListQuerySchema = z.object({
 });
 export type ShopListQuery = z.infer<typeof shopListQuerySchema>;
 
+export const shopGroupInputSchema = z.object({
+  name: z.string().trim().min(1).max(80),
+  shopIds: z.array(z.string().trim().min(1).max(160)).min(2).max(50).refine((ids) => new Set(ids).size === ids.length, "Choose each shop once"),
+});
+export type ShopGroupInput = z.infer<typeof shopGroupInputSchema>;
+export type SavedShopGroup = ShopGroupInput & { id: string };
+
 export type Shop = {
   id: string;
   name: string;

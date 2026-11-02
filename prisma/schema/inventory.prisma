@@ -26,6 +26,7 @@ model StockItem {
   /// Earliest expiry date of what is here.
   expiresOn   DateTime?       @db.Date
   movements   StockMovement[]
+  lastCountedAt DateTime?
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
 
@@ -58,4 +59,43 @@ model StockMovement {
   @@index([stockItemId, createdAt])
   @@index([mealPlanEntryId])
   @@map("stock_movements")
+}
+
+/// One actual acquisition, independent of scans, shopping ticks and receipt evidence.
+/// Soft product/place/shop references preserve its identity after catalogue/list changes.
+model StockPurchase {
+  id             String @id @default(cuid())
+  householdId    String
+  household      Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  stockItemId    String
+  productId      String
+  shopId         String?
+  shopConfirmed  Boolean @default(false)
+  quantity       Decimal @db.Decimal(12, 3)
+  unit           String?
+  purchasedAt    DateTime
+  stockAdded     Boolean
+  shoppingItemId String?
+  userId         String
+  createdAt      DateTime @default(now())
+
+  @@index([householdId, productId, purchasedAt])
+  @@index([householdId, shoppingItemId])
+  @@map("stock_purchases")
+}
+
+/// Stable source identities make retries and uploading the same receipt idempotent.
+model StockPurchaseEvidence {
+  id          String @id @default(cuid())
+  householdId String
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  sourceKey   String
+  purchaseIds String[]
+  stockItemId String
+  quantity    Decimal @db.Decimal(12, 3)
+  createdAt   DateTime @default(now())
+
+  @@unique([householdId, sourceKey])
+  @@index([householdId])
+  @@map("stock_purchase_evidence")
 }

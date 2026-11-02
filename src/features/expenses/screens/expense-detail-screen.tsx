@@ -153,7 +153,7 @@ export function ExpenseDetailScreen({
       </Button>
 
       <PageHeader
-        eyebrow={recurring ? t(`kinds.${recurring.kind}`) : t(`categories.${expense.category}`)}
+        eyebrow={expense.earlyRepayment ? t("repayment.title") : recurring ? t(`kinds.${recurring.kind}`) : t(`categories.${expense.category}`)}
         title={expense.payee}
         description={
           expense.project ? (
@@ -312,7 +312,7 @@ export function HistoryList({ items, habitants }: { items: ExpenseDetail["histor
             <span className="flex flex-col">
               <span>{formatDate(item.dueDate, locale)}</span>
               <span className="text-xs text-muted-foreground">
-                {item.autoPaid
+                {item.earlyRepayment ? t("repayment.title") : item.autoPaid
                   ? t("row.autoPaid")
                   : item.paidOn
                     ? (habitants.find((habitant) => habitant.id === item.paidById)?.name ?? t(`status.${item.status}`))

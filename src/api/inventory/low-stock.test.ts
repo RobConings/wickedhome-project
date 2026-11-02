@@ -24,13 +24,21 @@ function setup(t: TestContext, quantity = 1, minimum: number | null = 2) {
     unit: null as string | null, expiresOn: null, updatedAt: new Date(),
     product: { name: "Milk", unit: "pack" }, place: { name: "Fridge" },
   };
-  const items: { productId: string | null; status: string; quantity?: number; unit?: string; source?: string }[] = [];
+  const items: { productId: string | null; status: string; quantity?: number; unit?: string; source?: string; stapleId?: string }[] = [];
   const movements: unknown[] = [];
   const product = {
     id: "milk", name: "Milk", stockProductId: null, unit: "pack", defaultShopId: null, shopLinks: [], imageUrl: null,
     category: "DAIRY", isEssential: false, alternatives: [], notes: null, barcode: null, qrCode: null,
     packageAmount: null, packageUnit: null,
+    shoppingRestockState: "ACTIVE" as "ACTIVE" | "DISMISSED" | "RESTOCKED",
   };
+  stock.product = product;
+  stub(t, db, "$queryRaw", async () => [{ shoppingRestockState: product.shoppingRestockState }]);
+  stub(t, db.product, "updateMany", async ({ where, data }: { where: { shoppingRestockState: string }; data: { shoppingRestockState: typeof product.shoppingRestockState } }) => {
+    if (product.shoppingRestockState !== where.shoppingRestockState) return { count: 0 };
+    product.shoppingRestockState = data.shoppingRestockState;
+    return { count: 1 };
+  });
   stub(t, db.product, "findFirst", async () => product);
   stub(t, db.product, "findMany", async () => [{ id: "other-brand", name: "Other milk", stockProductId: "milk", shopLinks: [] }]);
   stub(t, db.product, "create", async ({ data }: { data: { isEssential?: boolean } }) => {
@@ -43,6 +51,7 @@ function setup(t: TestContext, quantity = 1, minimum: number | null = 2) {
   });
   stub(t, db.place, "count", async () => 1);
   stub(t, db.stockItem, "findFirst", async () => stock);
+  stub(t, db.stockItem, "findFirstOrThrow", async () => stock);
   stub(t, db.stockItem, "findUnique", async () => null);
   const reads = stub(t, db.stockItem, "findMany", async ({ where }: { where: { householdId: string; quantity: { lte: unknown } } }) => {
     assert.equal(where.householdId, actor.householdId);
@@ -59,6 +68,7 @@ function setup(t: TestContext, quantity = 1, minimum: number | null = 2) {
   };
   stub(t, db.stockItem, "create", save);
   stub(t, db.stockItem, "update", save);
+  stub(t, db.stockItem, "updateMany", async ({ data }: { data: { quantity: number } }) => { await save({ data }); return { count: 1 }; });
   stub(t, db.stockMovement, "create", async ({ data }: { data: unknown }) => {
     movements.push(data);
     return { id: "movement" };
@@ -84,8 +94,9 @@ function setup(t: TestContext, quantity = 1, minimum: number | null = 2) {
       stockProduct: item.productId === "other-brand" ? { stockItems: [stock] } : null,
     } : null,
   })));
-  stub(t, db.shoppingItem, "count", async ({ where }: { where: { productId: { in: string[] }; status: string } }) =>
-    items.filter((item) => item.productId !== null && where.productId.in.includes(item.productId) && item.status === where.status).length);
+  stub(t, db.shoppingItem, "count", async ({ where }: { where: { productId?: { in: string[] }; stapleId?: string; status: string } }) =>
+    items.filter((item) => (!where.productId || (item.productId !== null && where.productId.in.includes(item.productId)))
+      && (!where.stapleId || item.stapleId === where.stapleId) && item.status === where.status).length);
   stub(t, db.shoppingItem, "create", async ({ data }: { data: typeof items[number] }) => {
     items.push({ ...data, status: "OPEN" });
     return {};
@@ -94,6 +105,59 @@ function setup(t: TestContext, quantity = 1, minimum: number | null = 2) {
 }
 
 describe("low stock groceries", () => {
+  it("pauses due staples for dismissed and restocked products until the stock cycle completes", async (t) => {
+    const { product, items } = setup(t);
+    const staple = { id: "weekly", householdId: actor.householdId, productId: "milk", listId: "weekly-list", name: "Milk",
+      quantity: decimal(2), unit: "pack", shopId: null, rrule: "FREQ=WEEKLY", startDate: new Date("2026-10-01"), nextDueOn: new Date("2026-10-01") };
+    stub(t, db.shoppingStaple, "findMany", async () => [staple]);
+    const claim = stub(t, db.shoppingStaple, "updateMany", async () => ({ count: 1 }));
+    for (const state of ["DISMISSED", "RESTOCKED"] as const) {
+      product.shoppingRestockState = state;
+      await getShoppingOverview(actor.householdId);
+      assert.equal(items.length, 0);
+      assert.equal(claim.mock.callCount(), 0);
+    }
+    product.shoppingRestockState = "ACTIVE";
+    await getShoppingOverview(actor.householdId);
+    assert.equal(items.length, 1);
+    assert.equal(items[0]?.source, "STAPLE");
+    assert.equal(claim.mock.callCount(), 1);
+  });
+
+  it("keeps a dismissed product off the list through reads and consumption until restocked and consumed again", async (t) => {
+    const { product, items } = setup(t, 0, 2);
+    product.shoppingRestockState = "DISMISSED";
+    await listItems(actor.householdId);
+    await getShoppingOverview(actor.householdId);
+    await addMovement(actor, "stock", { delta: -1, reason: "scan_use" });
+    assert.equal(items.length, 0);
+    assert.equal(product.shoppingRestockState, "DISMISSED");
+    await addMovement(actor, "stock", { delta: 1, reason: "bought" });
+    assert.equal(product.shoppingRestockState, "RESTOCKED");
+    assert.equal(items.length, 0, "restocking below minimum must not immediately put it back");
+    await listItems(actor.householdId);
+    await updateStockItem(actor, "stock", { quantity: 1, minQuantity: 3 });
+    assert.equal(items.length, 0, "reads and minimum-only edits do not rearm it");
+    await addMovement(actor, "stock", { delta: -1, reason: "scan_use" });
+    assert.equal(product.shoppingRestockState, "ACTIVE");
+    assert.equal(items.length, 1);
+    await listItems(actor.householdId);
+    assert.equal(items.length, 1);
+  });
+
+  it("does not rearm a dismissed product through a decrease that happened before restocking", async (t) => {
+    const { product, items } = setup(t, 2, 2);
+    product.shoppingRestockState = "DISMISSED";
+    await addMovement(actor, "stock", { delta: -1, reason: "cooked" });
+    assert.equal(product.shoppingRestockState, "DISMISSED");
+    assert.equal(items.length, 0);
+    await updateStockItem(actor, "stock", { quantity: 2, minQuantity: 2 });
+    assert.equal(product.shoppingRestockState, "RESTOCKED");
+    assert.equal(items.length, 0);
+    await addMovement(actor, "stock", { delta: -1, reason: "cooked" });
+    assert.equal(items.length, 1);
+  });
+
   it("includes equality and a zero minimum, but excludes above minimum and unset minima", () => {
     assert.equal(isBelowMinimum(2, 2), true);
     assert.equal(isBelowMinimum(1, 2), true);

@@ -32,6 +32,9 @@ type AddShoppingItemFormProps = {
   /** Seed picker favourites (stories). */
   initialSelections?: { products?: UseSelectionsOptions["initial"]; shops?: UseSelectionsOptions["initial"] };
   autoFocus?: boolean;
+  /** Dialogs put the existing-product picker first and the submit action at the bottom. */
+  layout?: "inline" | "dialog";
+  onCancel?: () => void;
   className?: string;
 };
 
@@ -50,9 +53,13 @@ export function AddShoppingItemForm({
   previewLink = fetchLinkPreview,
   initialSelections,
   autoFocus,
+  layout = "inline",
+  onCancel,
   className,
 }: AddShoppingItemFormProps) {
   const { t } = useTranslation("shopping");
+  const { t: common } = useTranslation();
+  const inDialog = layout === "dialog";
   const locale = currentLocale();
   const idPrefix = React.useId();
   const [text, setText] = React.useState("");
@@ -91,12 +98,13 @@ export function AddShoppingItemForm({
   }, [isUrl, trimmed, preview?.url, previewLink, shopTouched, fixedShopId]);
 
   function chooseProduct(id: string | null) {
+    const previous = products.find((candidate) => candidate.id === productId);
     setProductId(id);
     const product = products.find((candidate) => candidate.id === id);
     if (!product) return;
-    if (!trimmed || products.some((candidate) => candidate.name === trimmed)) setText(product.name);
-    if (!unit && product.unit) setUnit(product.unit);
-    if (!shopTouched && !fixedShopId && product.defaultShopId) setShopId(product.defaultShopId);
+    if (inDialog || !trimmed || products.some((candidate) => candidate.name === trimmed)) setText(product.name);
+    if (!unit || (inDialog && unit === previous?.unit)) setUnit(product.unit ?? "");
+    if (!shopTouched && !fixedShopId && (inDialog || product.defaultShopId)) setShopId(product.defaultShopId);
   }
 
   function reset() {
@@ -112,7 +120,7 @@ export function AddShoppingItemForm({
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    if (!trimmed && !productId) return;
+    if (submitting || (!trimmed && !productId)) return;
     const parsedQuantity = Number(quantity.replace(",", "."));
     const input: AddShoppingItemInput = {
       name: isUrl ? (preview?.title ?? undefined) : trimmed || undefined,
@@ -126,40 +134,73 @@ export function AddShoppingItemForm({
     try {
       await onAdd(input);
       reset();
+    } catch {
+      // The caller reports the error. Preserve the draft so it can be corrected or retried.
     } finally {
       setSubmitting(false);
     }
   }
 
+  const productPicker = (
+    <ProductPicker
+      id={`${idPrefix}-product`}
+      products={products}
+      value={productId}
+      onChange={chooseProduct}
+      clearable
+      loading={catalogLoading}
+      disabled={submitting}
+      initialSelections={initialSelections?.products}
+      placeholder={t("add.fromCatalogue")}
+    />
+  );
+  const field = (id: string, label: string, control: React.ReactNode, fullWidth = false) => inDialog ? (
+    <div className={cn("flex flex-col gap-2", fullWidth && "sm:col-span-2")}>
+      <label htmlFor={id} className="text-sm font-medium">{label}</label>
+      {control}
+    </div>
+  ) : control;
+
   return (
     <form
       onSubmit={(event) => void handleSubmit(event)}
       aria-busy={submitting || undefined}
-      className={cn("flex flex-col gap-2", className)}
+      className={cn("flex flex-col", inDialog ? "gap-4" : "gap-2", className)}
       noValidate
     >
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          {isUrl && (
-            <Link2Icon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-          )}
-          <Input
-            value={text}
-            onChange={(event) => setText(event.target.value)}
-            placeholder={t("add.placeholder")}
-            aria-label={t("add.label")}
-            autoComplete="off"
-            autoFocus={autoFocus}
-            // Read-only rather than disabled while saving, so the keyboard stays open for the next item.
-            readOnly={submitting}
-            enterKeyHint="done"
-            className={cn("pointer-coarse:h-11 pointer-coarse:text-base", isUrl && "pl-9")}
-          />
+      {inDialog && (
+        <div className="flex flex-col gap-2">
+          <label htmlFor={`${idPrefix}-product`} className="text-sm font-medium">{t("add.existingProduct")}</label>
+          {productPicker}
+          <p className="text-xs text-muted-foreground">{t("add.productHint")}</p>
         </div>
-        <Button type="submit" loading={submitting} disabled={!trimmed && !productId} className="pointer-coarse:h-11">
+      )}
+      <div className="flex gap-2">
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          {inDialog && <label htmlFor={`${idPrefix}-name`} className="text-sm font-medium">{t("add.nameOrLink")}</label>}
+          <div className="relative">
+            {isUrl && (
+              <Link2Icon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+            )}
+            <Input
+              id={`${idPrefix}-name`}
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              placeholder={t("add.placeholder")}
+              aria-label={t("add.label")}
+              autoComplete="off"
+              autoFocus={autoFocus}
+              // Read-only rather than disabled while saving, so the keyboard stays open for the next item.
+              readOnly={submitting}
+              enterKeyHint="done"
+              className={cn("pointer-coarse:h-11 pointer-coarse:text-base", isUrl && "pl-9")}
+            />
+          </div>
+        </div>
+        {!inDialog && <Button type="submit" loading={submitting} disabled={!trimmed && !productId} className="pointer-coarse:h-11">
           <PlusIcon />
           <span className="max-sm:sr-only">{submitting ? t("add.adding") : t("add.submit")}</span>
-        </Button>
+        </Button>}
       </div>
 
       {isUrl && (previewing || preview) && (
@@ -180,7 +221,7 @@ export function AddShoppingItemForm({
                   <span className="text-muted-foreground tabular-nums">{formatCurrency(preview.priceCents, locale)}</span>
                 )}
               </span>
-              <Button type="button" variant="ghost" size="icon-sm" aria-label={t("add.clearLink")} onClick={reset}>
+              <Button type="button" variant="ghost" size="icon-sm" aria-label={t("add.clearLink")} disabled={submitting} onClick={reset}>
                 <XIcon />
               </Button>
             </>
@@ -190,20 +231,12 @@ export function AddShoppingItemForm({
 
       <div
         key={formKey}
-        className={cn("grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_5rem_5rem]", fixedShopId && "sm:grid-cols-[minmax(0,1fr)_5rem_5rem]")}
+        className={cn("grid gap-2", inDialog ? "sm:grid-cols-2" : fixedShopId ? "sm:grid-cols-[minmax(0,1fr)_5rem_5rem]" : "sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_5rem_5rem]")}
       >
-        <ProductPicker
-          products={products}
-          value={productId}
-          onChange={chooseProduct}
-          clearable
-          loading={catalogLoading}
-          disabled={submitting}
-          initialSelections={initialSelections?.products}
-          placeholder={t("add.fromCatalogue")}
-        />
-        {!fixedShopId && (
+        {!inDialog && productPicker}
+        {!fixedShopId && field(`${idPrefix}-shop`, t("fields.shop"), (
           <ShopPicker
+            id={`${idPrefix}-shop`}
             shops={shops}
             value={shopId}
             onChange={(id) => {
@@ -216,8 +249,8 @@ export function AddShoppingItemForm({
             initialSelections={initialSelections?.shops}
             placeholder={t("add.shop")}
           />
-        )}
-        <Input
+        ), true)}
+        {field(`${idPrefix}-quantity`, t("fields.quantity"), <Input
           id={`${idPrefix}-quantity`}
           value={quantity}
           onChange={(event) => setQuantity(event.target.value)}
@@ -226,8 +259,8 @@ export function AddShoppingItemForm({
           placeholder="1"
           aria-label={t("fields.quantity")}
           className="tabular-nums"
-        />
-        <Input
+        />)}
+        {field(`${idPrefix}-unit`, t("fields.unit"), <Input
           id={`${idPrefix}-unit`}
           value={unit}
           onChange={(event) => setUnit(event.target.value)}
@@ -235,8 +268,12 @@ export function AddShoppingItemForm({
           disabled={submitting}
           aria-label={t("fields.unit")}
           autoComplete="off"
-        />
+        />)}
       </div>
+      {inDialog && <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
+        {onCancel && <Button type="button" variant="outline" disabled={submitting} onClick={onCancel}>{common("actions.cancel")}</Button>}
+        <Button type="submit" loading={submitting} disabled={!trimmed && !productId}><PlusIcon />{submitting ? t("add.adding") : t("add.submit")}</Button>
+      </div>}
     </form>
   );
 }

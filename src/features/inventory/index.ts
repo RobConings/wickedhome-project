@@ -23,3 +23,7 @@ export {
   type StockItem,
   type StockMovement,
 } from "./types/inventory";
+
+export { StocktakeScreen } from "./components/stocktake-dialog";
+
+export { usePurchaseReconciliation } from "./data/use-stock-actions";

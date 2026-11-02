@@ -5,6 +5,15 @@ household's products, plus steps. Putting it on **To cook** checks the stock and
 the shopping list. **Cooking** is flexible: nothing is taken from stock for the whole recipe; the cook taps
 what she actually used, can add extra ingredients, and "Done cooking" only marks the meal made.
 
+MCP recipe writes (`recipes_save`, new recipes in `recipes_import_batch`, and `recipes_add_ingredient`)
+check the household catalogue themselves. Exact unique names, including alternative-brand names, link
+automatically to the existing product/stock owner. Plausible candidates or duplicate exact names require
+an explicit product choice before any recipe or offer product is written. Missing matches remain explicit
+in the result; `unlinkedReason` documents a deliberate exception. Existing ingredient links and original
+amounts, units, notes and optional flags are preserved. Save previews show automatic matches too. Offers
+reuse catalogue products by barcode/name before creating a product. Existing batch URLs only receive
+category changes, so ignored content does not trigger matching or replace stored ingredients.
+
 Files: `prisma/schema/recipes.prisma`, `src/api/recipes/recipes.{routes,service,test}.ts`,
 `src/features/recipes/**`, `src/routes/recipes.tsx`, `recipe-detail.tsx`, `recipe-cooking.tsx`,
 `stories/features/recipes/**`.

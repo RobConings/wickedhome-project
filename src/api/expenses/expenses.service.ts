@@ -21,6 +21,7 @@ import {
 import { normalizeIban, normalizeStructuredCommunication } from "@/features/expenses/types/payment-references";
 import { baseRuleOf, planTotalOpen, scaleShares, withUntil } from "@/features/expenses/types/total-open";
 import { addDays, addMonthsClamped, todayIn } from "@/types/dates";
+import { formatDate } from "@/types/date-format";
 import { expandRRule, nextOccurrence, parseRRule } from "@/types/recurrence";
 import { forgetDocumentLinks, moveDocumentLinks } from "../documents/documents.service";
 import { db, type Prisma } from "../lib/db";
@@ -42,6 +43,7 @@ import {
   toKind,
   toMethod,
   toRecurring,
+  type RecurringRow,
 } from "./expense-rows";
 
 /** Documents attach to expenses under the entity type "bill" (the table's original name; existing links keep working). */
@@ -153,6 +155,7 @@ export async function getExpensesSummary(householdId: string): Promise<ExpensesS
     }),
     db.recurringExpense.findMany({ where: { householdId }, include: recurringInclude }),
   ]);
+  const loanInstances = await loadInstancesForProgress(recurringRows);
   const upcoming = unpaidRows.map((row) => toExpense(row, now));
   const sum = (list: Expense[]) => ({ count: list.length, totalCents: list.reduce((total, item) => total + item.amountCents, 0) });
   const weekEnd = addDays(now, DUE_SOON_DAYS);
@@ -161,23 +164,24 @@ export async function getExpensesSummary(householdId: string): Promise<ExpensesS
     upcoming,
     dueThisWeek: sum(upcoming.filter((expense) => expense.dueDate >= now && expense.dueDate <= weekEnd)),
     overdue: sum(upcoming.filter((expense) => expense.status === "overdue")),
-    recurring: computeRecurringTotals(recurringRows.map((row) => toRecurring(row, now))),
+    recurring: computeRecurringTotals(recurringRows.map((row) => toRecurring(row, now, loanInstances.get(row.id)))),
   };
 }
 
 export async function getExpenseDetail(householdId: string, id: string): Promise<ExpenseDetail> {
   const now = today();
   const row = await findOwnExpense(householdId, id);
+  const loanId = row.recurringExpenseId ?? row.earlyRepaymentForId;
   const [recurringRow, historyRows] = await Promise.all([
-    row.recurringExpenseId
-      ? db.recurringExpense.findFirst({ where: { id: row.recurringExpenseId, householdId }, include: recurringInclude })
+    loanId
+      ? db.recurringExpense.findFirst({ where: { id: loanId, householdId }, include: recurringInclude })
       : null,
     db.expense.findMany({
       where: {
         householdId,
         id: { not: row.id },
-        dueDate: { lte: toDate(now) },
-        ...(row.recurringExpenseId ? { recurringExpenseId: row.recurringExpenseId } : { payee: row.payee }),
+        AND: [{ OR: [{ dueDate: { lte: toDate(now) } }, { earlyRepaymentForId: { not: null }, paidOn: { lte: toDate(now) } }] }],
+        ...(loanId ? { OR: [{ recurringExpenseId: loanId }, { earlyRepaymentForId: loanId }] } : { payee: row.payee }),
       },
       include: expenseInclude,
       orderBy: { dueDate: "desc" },
@@ -199,13 +203,13 @@ export async function getRecurringExpenseDetail(householdId: string, id: string)
   const row = await findOwnRecurring(householdId, id);
   const [upcomingRows, historyRows] = await Promise.all([
     db.expense.findMany({
-      where: { householdId, recurringExpenseId: id, paidOn: null },
+      where: { householdId, OR: [{ recurringExpenseId: id }, { earlyRepaymentForId: id }], paidOn: null },
       include: expenseInclude,
       orderBy: { dueDate: "asc" },
       take: 6,
     }),
     db.expense.findMany({
-      where: { householdId, recurringExpenseId: id, NOT: { paidOn: null } },
+      where: { householdId, OR: [{ recurringExpenseId: id }, { earlyRepaymentForId: id }], NOT: { paidOn: null } },
       include: expenseInclude,
       orderBy: { dueDate: "desc" },
       take: HISTORY_LIMIT,
@@ -398,7 +402,7 @@ export async function listExpenseFlow(householdId: string, from: string, to: str
   await topUpRecurring(householdId, now);
   const notVouchers = { OR: [{ paymentMethod: null }, { paymentMethod: { not: "MEAL_VOUCHER" as const } }] };
   const payer = options.payer === "joint" ? { payerType: "JOINT" as const } : {};
-  const select = { amountCents: true, dueDate: true, paidOn: true, recurringExpenseId: true, recurringExpense: { select: { kind: true } } } as const;
+  const select = { amountCents: true, dueDate: true, paidOn: true, recurringExpenseId: true, recurringExpense: { select: { kind: true } }, earlyRepaymentForId: true, earlyRepaymentFor: { select: { kind: true } } } as const;
   const [paidRows, unpaidRows, templates] = await Promise.all([
     db.expense.findMany({ where: { householdId, ...payer, ...notVouchers, paidOn: { gte: toDate(from), lte: toDate(to) } }, select }),
     db.expense.findMany({ where: { householdId, ...payer, ...notVouchers, paidOn: null, dueDate: { lte: toDate(to) } }, select }),
@@ -409,8 +413,8 @@ export async function listExpenseFlow(householdId: string, from: string, to: str
     date: fromDate(row.paidOn ?? row.dueDate),
     amountCents: row.amountCents,
     paid: row.paidOn !== null,
-    recurring: row.recurringExpenseId !== null,
-    kind: row.recurringExpense ? toKind(row.recurringExpense.kind) : null,
+    recurring: row.recurringExpenseId !== null || row.earlyRepaymentForId !== null,
+    kind: row.recurringExpense ? toKind(row.recurringExpense.kind) : row.earlyRepaymentFor ? toKind(row.earlyRepaymentFor.kind) : null,
     virtual: false,
   });
   const virtual = templates.flatMap((row) =>
@@ -447,6 +451,8 @@ export async function listExpenseFlow(householdId: string, from: string, to: str
 export async function createExpense(householdId: string, input: ExpenseCreateInput): Promise<Expense> {
   await assertPayer(householdId, input);
   const now = today();
+
+  if (input.earlyRepaymentForId) return createLoanRepayment(householdId, input);
 
   if (!input.rrule) {
     await assertShop(householdId, input.shopId);
@@ -504,24 +510,137 @@ export async function createExpense(householdId: string, input: ExpenseCreateInp
   return toExpense(row, now);
 }
 
+/** Lock the loan before checking its balance or changing its schedule. */
+async function lockRepaymentLoan(tx: Prisma.TransactionClient, householdId: string, id: string) {
+  const found = await tx.recurringExpense.updateMany({ where: { id, householdId }, data: { updatedAt: new Date() } });
+  if (!found.count) throw notFound("Recurring expense not found");
+  return tx.recurringExpense.findFirstOrThrow({ where: { id, householdId }, include: recurringInclude });
+}
+
+/**
+ * An early payment can precede the first tracked instalment. Its due date places it in the tracked balance
+ * window; paidOn always keeps the real payment date for history, account balances and the money timeline.
+ */
+function repaymentDueDate(loan: RecurringRow, paidOn: string, previous?: { dueDate: Date; paidOn: Date | null }): Date {
+  const asOf = loan.totalOpenAsOf ? fromDate(loan.totalOpenAsOf) : paidOn;
+  // Editing old history after the balance was reset must not deduct that payment from the new balance.
+  const from = previous?.paidOn && fromDate(previous.dueDate) < asOf ? fromDate(previous.dueDate) : asOf;
+  return toDate(paidOn < from ? from : paidOn);
+}
+
+/** Paid extra repayments may only consume the tracked balance and must already have been made. */
+async function validateLoanRepayment(
+  tx: Prisma.TransactionClient,
+  loan: RecurringRow,
+  amountCents: number,
+  paidOn: string,
+  exceptId?: string,
+  countedOn: Date = repaymentDueDate(loan, paidOn),
+) {
+  if (!loan.totalOpenCents || !loan.totalOpenAsOf) {
+    throw badRequest("Validation failed", { earlyRepaymentForId: ["Set the loan's total still open before recording a repayment"] });
+  }
+  if (paidOn > today()) {
+    const message = `Payment date cannot be in the future. Enter the day you actually paid (on or before ${formatDate(today(), "en")}).`;
+    throw badRequest("Validation failed", { dueDate: [message], paidOn: [message] });
+  }
+  if (countedOn < loan.totalOpenAsOf) return;
+  const paid = await tx.expense.aggregate({
+    where: {
+      householdId: loan.householdId,
+      ...(exceptId && { id: { not: exceptId } }),
+      paidOn: { not: null },
+      dueDate: { gte: loan.totalOpenAsOf },
+      OR: [{ recurringExpenseId: loan.id }, { earlyRepaymentForId: loan.id }],
+    },
+    _sum: { amountCents: true },
+  });
+  const remaining = Math.max(0, loan.totalOpenCents - (paid._sum.amountCents ?? 0));
+  if (amountCents > remaining) throw badRequest("Validation failed", { amountCents: ["The repayment exceeds the loan's remaining balance"] });
+}
+
+/** Replan unpaid instalments; paid history and extra repayment rows keep their identities. */
+async function replanLoanRepayments(tx: Prisma.TransactionClient, loan: RecurringRow) {
+  const where = { recurringExpenseId: loan.id, paidOn: null, dueDate: { gte: loan.totalOpenAsOf ?? loan.startDate } };
+  const replaced = await tx.expense.findMany({ where, select: { id: true, dueDate: true }, orderBy: { dueDate: "asc" } });
+  await tx.expense.deleteMany({ where });
+  if (loan.status !== "ENDED") {
+    const asOf = fromDate(loan.totalOpenAsOf ?? loan.startDate);
+    const from = replaced[0] ? fromDate(replaced[0].dueDate) : asOf;
+    const pausedUntil = loan.generatedUntil ? fromDate(loan.generatedUntil) : today();
+    await generateInstances(tx, loan, from, loan.status === "ACTIVE" ? horizon(today()) : pausedUntil);
+  }
+  const regenerated = await tx.expense.findMany({ where, select: { id: true, dueDate: true } });
+  return { replaced, regenerated };
+}
+
+type ReplannedLoan = Awaited<ReturnType<typeof replanLoanRepayments>>;
+async function announceReplannedLoan(householdId: string, changes: ReplannedLoan | null) {
+  if (!changes) return;
+  await followDocuments(changes.replaced, changes.regenerated);
+  await emitExpenseChanged(householdId, changes.replaced.map((row) => row.id), "deleted");
+  await emitExpenseChanged(householdId, changes.regenerated.map((row) => row.id), "created");
+}
+
+/** The normal create-expense flow, with a loan selected: one paid expense and a recalculated schedule. */
+async function createLoanRepayment(householdId: string, input: ExpenseCreateInput): Promise<Expense> {
+  const id = input.earlyRepaymentForId!;
+  const paidOn = input.paidOn ?? input.dueDate;
+  if (input.rrule || input.paymentMethod === "meal_voucher") {
+    throw badRequest("Validation failed", { earlyRepaymentForId: ["A loan repayment cannot repeat or use meal vouchers"] });
+  }
+  const { row, changes } = await db.$transaction(async (tx) => {
+    const loan = await lockRepaymentLoan(tx, householdId, id);
+    if (loan.status === "ENDED") throw badRequest("Validation failed", { earlyRepaymentForId: ["This loan has ended"] });
+    await validateLoanRepayment(tx, loan, input.amountCents, paidOn);
+    const row = await tx.expense.create({
+      data: {
+        householdId,
+        ...paymentData(input),
+        payee: loan.payee,
+        category: loan.category,
+        projectId: input.projectId === undefined ? loan.projectId : input.projectId,
+        paymentAccountId: input.payerType === "joint" ? loan.paymentAccountId : null,
+        earlyRepaymentForId: id,
+        dueDate: repaymentDueDate(loan, paidOn),
+        paidOn: toDate(paidOn),
+        shares: sharesCreate(input.shares),
+      },
+      include: expenseInclude,
+    });
+    return { row, changes: await replanLoanRepayments(tx, loan) };
+  });
+  await announceReplannedLoan(householdId, changes);
+  await emitExpenseChanged(householdId, row.id, "created");
+  return toExpense(row, today());
+}
+
 /** Edits one expense only; its recurring template (if any) is unchanged. */
 export async function updateExpense(householdId: string, id: string, input: ExpenseInput): Promise<Expense> {
-  await findOwnExpense(householdId, id);
+  const existing = await findOwnExpense(householdId, id);
   await assertPayer(householdId, input);
   await assertShop(householdId, input.shopId);
-  const row = await db.$transaction(async (tx) => {
+  const { row, changes } = await db.$transaction(async (tx) => {
+    const loan = existing.earlyRepaymentForId ? await lockRepaymentLoan(tx, householdId, existing.earlyRepaymentForId) : null;
+    if (loan && existing.paidOn) {
+      if (input.paymentMethod === "meal_voucher") throw badRequest("Validation failed", { paymentMethod: ["A loan cannot be repaid with meal vouchers"] });
+      await validateLoanRepayment(tx, loan, input.amountCents, input.dueDate, id, repaymentDueDate(loan, input.dueDate, existing));
+    }
     await tx.expenseShare.deleteMany({ where: { expenseId: id } });
-    return tx.expense.update({
+    const row = await tx.expense.update({
       where: { id },
       data: {
         ...paymentData(input),
-        dueDate: toDate(input.dueDate),
+        dueDate: loan && existing.paidOn ? repaymentDueDate(loan, input.dueDate, existing) : toDate(input.dueDate),
+        ...(loan && existing.paidOn && { paidOn: toDate(input.dueDate) }),
         shopId: input.shopId ?? null,
         shares: sharesCreate(input.shares),
       },
       include: expenseInclude,
     });
+    return { row, changes: loan ? await replanLoanRepayments(tx, loan) : null };
   });
+  await announceReplannedLoan(householdId, changes);
   await emitExpenseChanged(householdId, id, "updated");
   return toExpense(row, today());
 }
@@ -571,8 +690,8 @@ async function resolveTotalOpen(
       cutoff;
   }
   const settled = await tx.expense.findMany({
-    where: { recurringExpenseId: id, dueDate: { gte: toDate(asOf) } },
-    select: { dueDate: true, amountCents: true },
+    where: { OR: [{ recurringExpenseId: id }, { earlyRepaymentForId: id, paidOn: { not: null } }], dueDate: { gte: toDate(asOf) } },
+    select: { dueDate: true, amountCents: true, earlyRepaymentForId: true },
   });
   const plan = planTotalOpen({
     amountCents: input.amountCents,
@@ -581,7 +700,7 @@ async function resolveTotalOpen(
     rrule: input.rrule,
     startDate: input.startDate,
     from: cutoff,
-    settled: settled.map((row) => ({ dueDate: fromDate(row.dueDate), amountCents: row.amountCents })),
+    settled: settled.map((row) => ({ dueDate: fromDate(row.dueDate), amountCents: row.amountCents, earlyRepayment: Boolean(row.earlyRepaymentForId) })),
   });
   return { rrule: withUntil(input.rrule, plan.lastDate), totalOpenCents, asOf };
 }
@@ -665,28 +784,47 @@ export async function setRecurringStatus(householdId: string, id: string, input:
 }
 
 export async function markExpensePaid(householdId: string, id: string, input: ExpensePaymentInput): Promise<Expense> {
-  await findOwnExpense(householdId, id);
+  const existing = await findOwnExpense(householdId, id);
   await assertOwnHabitants(householdId, [input.paidById], "paidById");
-  const row = await db.expense.update({
-    where: { id },
-    data: { paidOn: toDate(input.paidOn), paidById: input.paidById || null },
-    include: expenseInclude,
+  const { row, changes } = await db.$transaction(async (tx) => {
+    const loan = existing.earlyRepaymentForId ? await lockRepaymentLoan(tx, householdId, existing.earlyRepaymentForId) : null;
+    if (loan) {
+      if (existing.paymentMethod === "MEAL_VOUCHER") throw badRequest("Validation failed", { paymentMethod: ["A loan cannot be repaid with meal vouchers"] });
+      await validateLoanRepayment(tx, loan, existing.amountCents, input.paidOn, id, repaymentDueDate(loan, input.paidOn, existing));
+    }
+    const row = await tx.expense.update({
+      where: { id },
+      data: { paidOn: toDate(input.paidOn), paidById: input.paidById || null, ...(loan && { dueDate: repaymentDueDate(loan, input.paidOn, existing) }) },
+      include: expenseInclude,
+    });
+    return { row, changes: loan ? await replanLoanRepayments(tx, loan) : null };
   });
+  await announceReplannedLoan(householdId, changes);
   await emitExpenseChanged(householdId, id, "paid");
   return toExpense(row, today());
 }
 
-/** Undo a payment. An automatic (direct debit) payment keeps `autoPaidAt`, so the job doesn't mark it again. */
+/** Undoing an extra repayment also restores the loan's unpaid instalments. */
 export async function markExpenseUnpaid(householdId: string, id: string): Promise<Expense> {
-  await findOwnExpense(householdId, id);
-  const row = await db.expense.update({ where: { id }, data: { paidOn: null, paidById: null }, include: expenseInclude });
+  const existing = await findOwnExpense(householdId, id);
+  const { row, changes } = await db.$transaction(async (tx) => {
+    const loan = existing.earlyRepaymentForId ? await lockRepaymentLoan(tx, householdId, existing.earlyRepaymentForId) : null;
+    const row = await tx.expense.update({ where: { id }, data: { paidOn: null, paidById: null }, include: expenseInclude });
+    return { row, changes: loan ? await replanLoanRepayments(tx, loan) : null };
+  });
+  await announceReplannedLoan(householdId, changes);
   await emitExpenseChanged(householdId, id, "unpaid");
   return toExpense(row, today());
 }
 
 export async function deleteExpense(householdId: string, id: string): Promise<void> {
-  await findOwnExpense(householdId, id);
-  await db.expense.delete({ where: { id } });
+  const existing = await findOwnExpense(householdId, id);
+  const changes = await db.$transaction(async (tx) => {
+    const loan = existing.earlyRepaymentForId ? await lockRepaymentLoan(tx, householdId, existing.earlyRepaymentForId) : null;
+    await tx.expense.delete({ where: { id } });
+    return loan ? replanLoanRepayments(tx, loan) : null;
+  });
+  await announceReplannedLoan(householdId, changes);
   await forgetDocumentLinks(EXPENSE_DOCUMENT_TYPE, id);
   await emitExpenseChanged(householdId, id, "deleted");
 }
@@ -816,12 +954,15 @@ export async function getPaymentTarget(householdId: string, id: string): Promise
 export async function listRecurringExpenses(householdId: string): Promise<RecurringExpense[]> {
   const now = today();
   const rows = await db.recurringExpense.findMany({ where: { householdId }, include: recurringInclude, orderBy: { payee: "asc" } });
-  return rows.map((row) => toRecurring(row, now));
+  const instances = await loadInstancesForProgress(rows);
+  return rows.map((row) => toRecurring(row, now, instances.get(row.id)));
 }
 
 /** One recurring expense (household-scoped). */
 export async function getRecurringExpense(householdId: string, id: string): Promise<RecurringExpense> {
-  return toRecurring(await findOwnRecurring(householdId, id), today());
+  const row = await findOwnRecurring(householdId, id);
+  const instances = await loadInstancesForProgress([row]);
+  return toRecurring(row, today(), instances.get(row.id));
 }
 
 const ruleDates = (row: RecurringRowForTarget, from: string, to: string) => {
@@ -952,15 +1093,20 @@ export async function patchExpenseDetails(
   const rescale = patch.amountCents !== undefined && row.payerType === "SPLIT" && row.shares.length > 0;
   let updated;
   try {
-    updated = await db.$transaction(async (tx) => {
+    const result = await db.$transaction(async (tx) => {
+      const loan = row.earlyRepaymentForId ? await lockRepaymentLoan(tx, householdId, row.earlyRepaymentForId) : null;
+      if (loan && row.paidOn) await validateLoanRepayment(tx, loan, patch.amountCents ?? row.amountCents, patch.dueDate ?? fromDate(row.paidOn), id, repaymentDueDate(loan, patch.dueDate ?? fromDate(row.paidOn), row));
       if (rescale) {
         await tx.expenseShare.deleteMany({ where: { expenseId: id } });
         await tx.expenseShare.createMany({
           data: scaleShares(row.shares, row.amountCents, patch.amountCents ?? row.amountCents).map((share) => ({ expenseId: id, habitantId: share.habitantId, amountCents: share.amountCents })),
         });
       }
-      return tx.expense.update({ where: { id }, data, include: expenseInclude });
+      const updated = await tx.expense.update({ where: { id }, data: { ...data, ...(loan && row.paidOn && patch.dueDate && { paidOn: toDate(patch.dueDate), dueDate: repaymentDueDate(loan, patch.dueDate, row) }) }, include: expenseInclude });
+      return { updated, changes: loan ? await replanLoanRepayments(tx, loan) : null };
     });
+    updated = result.updated;
+    await announceReplannedLoan(householdId, result.changes);
   } catch (error) {
     // One instance per recurring expense per due date.
     if ((error as { code?: string }).code === "P2002") {

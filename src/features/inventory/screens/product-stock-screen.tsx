@@ -38,7 +38,7 @@ export function ProductStockScreen({ data, canManage, initialSelections }: Produ
   const locale = currentLocale();
   const revalidator = useRevalidator();
   const onChanged = React.useCallback(() => revalidator.revalidate(), [revalidator]);
-  const { adjust, isPending, show } = useStockActions({ onChanged });
+  const { adjust, isPending, show, confirmation } = useStockActions({ onChanged });
   // Quick −1 / +1 show at once (also in the total) while they are saved.
   const stockItems = stock.stockItems.map(show);
   const total = stockItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -48,6 +48,7 @@ export function ProductStockScreen({ data, canManage, initialSelections }: Produ
 
   return (
     <PageContainer>
+      {confirmation}
       <PageHeader
         eyebrow={
           <Link to="/inventory" className="inline-flex items-center gap-1 hover:underline">

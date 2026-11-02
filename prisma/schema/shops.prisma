@@ -42,6 +42,7 @@ model Shop {
   icon               ShopIcon?
   /// The household's own settings for this shop (catalogue shops are shared, so they can't hold them).
   householdSettings  HouseholdShopSetting[]
+  groupMemberships   ShopGroupMember[]
   /// Contacts (suppliers) linked to this shop (contacts feature).
   contacts           Contact[]
   createdAt         DateTime          @default(now())
@@ -49,6 +50,31 @@ model Shop {
 
   @@index([householdId])
   @@map("shops")
+}
+
+/// A household's saved combination of shops for one shopping view. Shops retain their own products/prices.
+model ShopGroup {
+  id          String            @id @default(cuid())
+  householdId String
+  household   Household         @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name        String
+  members     ShopGroupMember[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@unique([householdId, name])
+  @@map("shop_groups")
+}
+
+model ShopGroupMember {
+  groupId String
+  group   ShopGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  shopId  String
+  shop    Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@id([groupId, shopId])
+  @@index([shopId])
+  @@map("shop_group_members")
 }
 
 /// Logo/favicon found automatically on the shop's website (src/api/shops/shop-icon.ts). The row is created on

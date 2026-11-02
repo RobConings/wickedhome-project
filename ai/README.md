@@ -83,6 +83,9 @@ ai/
 
 Other assistants on the LAN (Claude Desktop, LM Studio's MCP client) get the same tools over **MCP**
 (`POST /api/mcp`, `core/mcp.routes.ts`): read-only tokens by default, writes need `confirm: true`.
+MCP initialization and write-tool descriptions direct clients to the workflow guides: `skills_load`
+returns the actual guides, and `app_help skill` includes the guide and callable tool names. Groceries
+normally require catalogue links; recipe planning checks linked stock and adds missing groceries by default.
 
 ## The core, file by file
 

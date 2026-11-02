@@ -1,9 +1,10 @@
 {
   "page": {
     "title": "Boodschappen",
-    "description": "Boodschappen, materiaal voor klussen en wat bijna op is, allemaal op dezelfde lijsten."
+    "description": "Alles wat je wilt kopen, met aparte filters voor je lijsten en voorraad."
   },
   "actions": {
+    "addItem": "Boodschap toevoegen",
     "shopView": "Winkelweergave",
     "products": "Producten",
     "newList": "Nieuwe lijst",
@@ -62,7 +63,8 @@
     "above_minimum": "De voorraad is boven je minimum."
   },
   "guidance": {
-    "choice": "Waarschuwingen en wat je moet bijkopen blijven op de lijst. Jij beslist wat je koopt op basis van belang en voorraad."
+    "label": "Hoe werkt deze lijst?",
+    "choice": "Je gewone boodschappen en voorraadaanvullingen staan samen. Filter apart op voorraad; essentieel of extraatje geeft het belang aan."
   },
   "fields": {
     "isEssential": "Essentieel product",
@@ -103,6 +105,10 @@
     "custom": "Aangepast ({{rule}})"
   },
   "add": {
+    "description": "Kies een bestaand product, vul zelf een naam in of plak een webshoplink.",
+    "existingProduct": "Bestaand product",
+    "productHint": "Zoek in je producten. Naam, eenheid en standaardwinkel worden overgenomen.",
+    "nameOrLink": "Naam of webshoplink",
     "label": "Nieuw item",
     "placeholder": "Voeg iets toe of plak een link uit een webshop…",
     "submit": "Toevoegen",
@@ -115,6 +121,10 @@
     "adding": "Toevoegen…"
   },
   "item": {
+    "details": "Details",
+    "hideDetails": "Details verbergen",
+    "showDetails": "Details van {{name}} tonen",
+    "actions": "Acties voor {{name}}",
     "tick": "{{name}} afvinken als gekocht",
     "untick": "{{name}} terugzetten als niet gekocht",
     "delete": "{{name}} verwijderen",
@@ -137,6 +147,8 @@
     "unlinkInvoiceShort": "Loskoppelen van factuur"
   },
   "lists": {
+    "search": "Zoek op naam, winkel of notitie…",
+    "searchLabel": "Boodschappen doorzoeken",
     "all": "Alle lijsten",
     "filterLabel": "Lijst tonen",
     "openCount_one": "{{count}} op de lijst",
@@ -179,11 +191,11 @@
   },
   "shopView": {
     "title": "Winkelweergave",
-    "description": "Alles op de lijst voor één winkel. Kies wat je koopt en vink af wat in je kar ligt.",
-    "chooseShop": "Kies een winkel",
+    "description": "Combineer één of meerdere winkels in één overzicht. Vink af wat in je kar ligt.",
+    "chooseShop": "Kies een winkel of winkelgroep",
     "noShopDescription": "Items zonder voorkeurswinkel. Koop ze waar je wilt.",
     "empty": "Hier niets te kopen.",
-    "emptyDescription": "Alles voor deze winkel ligt in je kar.",
+    "emptyDescription": "Alles voor deze winkelronde ligt in je kar.",
     "nothingAnywhere": "Je lijsten zijn leeg.",
     "progress": "{{bought}} van {{total}} in de kar",
     "liveHint": "Wordt vanzelf bijgewerkt terwijl je winkelt.",
@@ -201,18 +213,20 @@
       "price": "Duurste eerst"
     },
     "tiers": {
-      "urgent": "Te kopen · onder minimum",
-      "warning": "Waarschuwing · op minimum",
+      "urgent": "Aanvullen",
+      "warning": "Bijna op",
       "essential": "Essentieel",
       "normal": "Overige",
       "extra": "Extraatjes"
     },
     "filters": {
+      "viewOptions": "Weergave en filters",
+      "viewOptionsDescription": "Kies de volgorde en wat je op de lijst wilt zien.",
       "label": "Zoeken en filteren",
       "search": "Zoeken op de lijst…",
-      "priority": "Prioriteit",
+      "priority": "Belang",
       "priorities": {
-        "all": "Alle prioriteiten",
+        "all": "Essentieel en extraatjes",
         "needed": "Onder of op minimum",
         "essential": "Alleen essentieel",
         "extra": "Alleen extraatjes"
@@ -273,7 +287,11 @@
   "restock": {
     "prompt": "{{name}} in de voorraad zetten bij {{place}}?",
     "add": "{{quantity}} {{unit}} toevoegen",
-    "done": "{{name}} toegevoegd aan {{place}}"
+    "done": "{{name}} toegevoegd aan {{place}}",
+    "addedAutomatically": "{{quantity}} {{unit}} {{name}} bijgeteld in {{place}}.",
+    "notAdded": "Gekocht gemarkeerd. Geen voorraad bijgeboekt: controleer de bewaarlocatie en eenheid.",
+    "unticked": "Terug op de lijst. De voorraad blijft behouden; corrigeer een vergissing bij Voorraad.",
+    "alreadyProcessed": "Al meegeteld in je voorraad."
   },
   "picker": {
     "product": "Kies een product…",
@@ -363,5 +381,32 @@
     "removing": "Bij bewaren verdwijnt de link van {{shop}}.",
     "keep": "Link houden",
     "invalidUrl": "Dit is geen weblink (https://…)."
+  },
+  "stockFilter": {
+    "label": "Voorraadfilter",
+    "all": "Alle voorraadniveaus",
+    "low": "Bijna op (op of onder minimum)",
+    "below_minimum": "Onder minimum",
+    "at_minimum": "Op minimum",
+    "above_minimum": "Boven minimum",
+    "untracked": "Zonder voorraadstatus"
+  },
+  "shopGroups": {
+    "choose": "Winkels kiezen",
+    "title": "Winkels combineren en groepen",
+    "combine": "Winkels combineren",
+    "description": "Kies meerdere winkels voor deze ronde, of bewaar een combinatie als vaste groep.",
+    "name": "Naam van de winkelgroep",
+    "namePlaceholder": "Bijvoorbeeld Colruyt-groep",
+    "saveHint": "Bewaar minstens twee winkels. Items zonder winkel kun je voor een losse winkelronde toevoegen.",
+    "search": "Winkels zoeken…",
+    "apply": "Deze ronde tonen",
+    "saveNew": "Bewaren als groep",
+    "save": "Groep opslaan",
+    "edit": "Winkelgroep “{{name}}” bewerken",
+    "remove": "Winkelgroep “{{name}}” verwijderen",
+    "removeDescription": "Alleen de groep wordt verwijderd. De winkels en boodschappen blijven bestaan.",
+    "combinedHint": "Eén overzicht voor deze winkels. Per product blijven de oorspronkelijke winkel, link en prijs zichtbaar.",
+    "duplicateName": "Er bestaat al een winkelgroep met deze naam."
   }
 }

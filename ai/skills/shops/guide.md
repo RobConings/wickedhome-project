@@ -3,3 +3,4 @@
 - "Voeg de bakker De Smet toe" → `shops_save` name + type; edits: give the shop and only what changes.
 - Built-in shops: only the owner edits them, nobody deletes them. Adding, editing, deleting shops is for adults; children may star favourites.
 - Product links per shop (webshop page, price) are on products (inventory skill); a planned shopping trip is a calendar event with a shop.
+- Combine a trip: shopping_list shops [Colruyt, Collect&Go, OKay]. Saved groups: shops_groups / shops_save_group name + shops, then shopping_list shopGroup. Groups are shared by the household; shops/products/prices remain distinct. shops_delete_group removes only the group.

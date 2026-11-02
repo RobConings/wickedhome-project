@@ -57,6 +57,7 @@ export function TaskMaterialsPanel({ taskId, canManage, placeId, onChange, initi
 
   return (
     <div className="flex flex-col gap-3">
+      {actions.confirmation}
       <div className="flex items-center justify-between gap-3">
         <h3 className="font-semibold">{t("task.title")}</h3>
         {visible.length > 0 && (

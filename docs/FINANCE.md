@@ -324,6 +324,32 @@ date, for a new one the first due date). The maths is pure and shared by API and
   ("After 12 payments, on …", via `RecurrenceFields lockedEnd`) with "12 payments: 11 × € 853,17 + last
   € 615,13"; clearing it gives the end settings back (the posted rule then applies as is).
 
+### Extra and early repayments
+
+Create or log an expense in the Loans category and select the loan or down payment it repays. The same
+expense dialog opens preselected from **Record repayment** on the loan page. Enter a partial amount or
+choose **Pay remaining balance**. A tracked total still open is required, and the repayment cannot exceed
+what remains. Selecting a loan records the expense as paid on the entered payment date. Early repayments may predate
+the first tracked instalment: `paidOn` keeps the actual date, while the stored `dueDate` is the later of
+that date and the balance's first included instalment. This counts the repayment against the right balance
+without consuming an instalment. Expense views, account outgoings and the calendar show the actual payment
+date. A future payment is refused with the latest permitted date written as dd/mm/yyyy.
+
+The expense links through `bills.earlyRepaymentForId`, separately from scheduled instances, so several
+repayments and a regular instalment may share a date. It appears in expense and loan history, account
+outgoings, project spending and the money timeline. Paid extra repayments count against the tracked balance
+without fulfilling a regular instalment date. Unpaid scheduled instances are recalculated atomically;
+paid instances keep their amounts and identities. The regular instalment stays the same, the last payment
+may shrink, and the loan finishes sooner. A full payoff removes all remaining tracked instalments and
+shows zero monthly cost. Editing, undoing, re-paying or deleting the expense recalculates the schedule.
+
+The assistant and MCP use the same flow: `expenses_log` takes an optional `loan` name or id and the exact
+`amount` paid in euros. Payee and category then come from the loan. For full payoff, first read
+`expenses_details` with `recurring`: `remainingAmount` gives the exact amount in euros. The confirmation
+names the loan, amount, date and payer. Repayment ids appear in loan details and paid history, for
+`expenses_edit`, `expenses_delete`, or `expenses_mark_paid` with `paid: false`. Every write still requires
+confirmation and an owner/adult with write access.
+
 ## Money flow: loans and income/expenses timeline
 
 Two cards on `/money`, loaded un-awaited by the route (skeleton while loading; a failure only empties that

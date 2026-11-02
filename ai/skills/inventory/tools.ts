@@ -1,9 +1,11 @@
 import { z } from "zod";
+import { stockPurchaseInputSchema } from "@/features/inventory/types/purchases";
+import { purchaseReview, recordStockPurchase } from "@/api/inventory/purchases.service";
 import type { StockItem } from "@/features/inventory/types/inventory";
 import { PACKAGE_UNITS, PRODUCT_CATEGORIES, formatQuantity, productInputSchema, shoppingStockStatus, type Product } from "@/features/shopping/types/shopping";
 import { addDays, todayIn } from "@/types/dates";
 import { badRequest, forbidden } from "@/api/lib/http";
-import { addMovement, createStockItem, deleteStockItem, getProductStock, listStock, updateStockItem } from "@/api/inventory/inventory.service";
+import { addMovement, createStockItem, deleteStockItem, getProductStock, listStock, setStockCount, updateStockItem } from "@/api/inventory/inventory.service";
 import { lookupBarcode } from "@/api/shopping/barcode-lookup.service";
 import { planStockMerge } from "@/api/shopping/product-alternatives";
 import {
@@ -41,13 +43,16 @@ import {
 import { linkOffer, withOffer } from "../recipes/offer-products";
 import { getOffer } from "../recipes/offers";
 import { stockPriority } from "../shopping/stock-priority";
+import { fold } from "@ai/core/text-match";
+import { productSetup } from "./product-setup";
+import "./prepare-product";
 
 /** Skill "inventory": household stock and the product catalogue (guide: guide.md next to this file). */
 
 registerAssistantSkill({
   id: "inventory",
   title: { en: "Stock", nl: "Voorraad" },
-  summary: "Household stock and products: below-minimum buying needs, at-minimum warnings, essential or nice-to-have settings, expiry, use/add stock, minimums, barcodes and shop links.",
+  summary: "Stock and product setup: proactive photos, shop links, package facts and shared-stock alternatives; below-minimum buying needs, at-minimum warnings, importance, expiry, use/add and barcodes.",
   keywords: {
     nl: ["voorraad", "voorraadkast", "bijna op", "vervalt", "vervaldatum", "houdbaar", "diepvries", "koelkast", "kelder", "product", "producten", "hebben we nog", "barcode", "streepjescode", "opgebruikt", "minimum", "nog over", "essentieel", "essentiele", "extraatje"],
     en: ["stock", "inventory", "pantry", "running low", "run out", "expire", "expiry", "freezer", "fridge", "product", "do we have", "barcode", "used up", "minimum", "left over", "essential", "nice to have"],
@@ -177,7 +182,7 @@ const linkText = (product: Product) =>
 
 registerAssistantTool({
   name: "inventory.products",
-  description: "Product catalogue: name, unit, category, essential flag and importance (essential or nice_to_have), default shop, barcode and shop links. Lists are paginated: pass nextOffset as offset with the same q/limit until hasMore is false to review every product. Set importance with inventory_save_product isEssential true/false. Give a barcode to identify a product.",
+  description: "Search the existing product catalogue before groceries or creating products; try relevant names and alternatives. Returns ids, shared-stock relationships, package sizes and importance; give product for stock and actual webshop links. Check inventory_stock and shopping_list, then pass product to shopping_add_item (or shopping_update_item to repair an existing item). Paginated: follow nextOffset with the same q/limit until hasMore is false. Barcode identifies a product.",
   input: z.object({
     product: entityRef("product", "One product's details").optional(),
     q: z.string().trim().max(80).optional().describe("Part of a product name"),
@@ -191,15 +196,23 @@ registerAssistantTool({
   run: async (ctx, input) => {
     const shopNames = await entityNames(ctx, "shop");
     const detail = (product: Product, stock?: StockItem[]) => ({
+      id: product.id,
       name: product.name,
+      imageUrl: product.imageUrl,
       unit: product.unit,
+      packageAmount: product.packageAmount,
+      packageUnit: product.packageUnit,
+      sharesStockWith: product.stockProductId,
+      alternatives: product.alternatives.map(({ id, name }) => ({ id, name })),
       category: product.category,
       ...stockPriority(null, product.isEssential),
       defaultShop: product.defaultShopId ? (shopNames.get(product.defaultShopId) ?? null) : null,
       barcode: product.barcode,
       notes: product.notes,
       shops: linkText(product),
+      links: product.shopLinks.map((link) => ({ shop: link.shop.name, url: link.url, price: money(link.priceCents) })),
       stock: stock?.length ? stock.map((item) => `${item.placeName} ${amount(item.quantity, item.unit, ctx.locale)}`) : null,
+      setup: productSetup(product),
     });
     if (input.barcode) {
       const known = await findProductByCode(ctx.householdId, input.barcode);
@@ -217,7 +230,12 @@ registerAssistantTool({
       return detail(product, stock);
     }
     const products = await listProducts(ctx.householdId, { q: input.q });
-    const page = capList(products.slice(input.offset), input.limit, (product) => ({ name: product.name, category: product.category, ...stockPriority(null, product.isEssential), unit: product.unit, shops: linkText(product) }));
+    const page = capList(products.slice(input.offset), input.limit, (product) => ({
+      id: product.id, name: product.name, category: product.category, ...stockPriority(null, product.isEssential),
+      unit: product.unit, packageAmount: product.packageAmount, packageUnit: product.packageUnit,
+      sharesStockWith: product.stockProductId, alternatives: product.alternatives.map(({ id, name }) => ({ id, name })),
+      shops: linkText(product),
+    }));
     const hasMore = (page.more ?? 0) > 0;
     return {
       count: products.length,
@@ -241,6 +259,7 @@ registerAssistantTool({
     action: z.enum(["use", "add", "set"]).describe("set = the quantity that is there now (a count)"),
     amount: z.number().min(0).max(100_000),
     note: z.string().trim().max(200).optional(),
+    purchase: stockPurchaseInputSchema.omit({ quantity: true }).optional().describe("Required for add: identify scan/manual operation or uploaded receipt line; link an existing purchase instead of adding it twice. Ask before separatePurchaseConfirmed or countDisposition."),
   }),
   permission: "write",
   confirm: "first-time",
@@ -259,12 +278,43 @@ registerAssistantTool({
     const item = await stockItemOf(ctx, input.product, input.place);
     if (input.action !== "set" && input.amount <= 0) throw badRequest("Give an amount above 0");
     const delta = input.action === "use" ? -input.amount : input.action === "add" ? input.amount : input.amount - item.quantity;
-    if (delta === 0) return done(`${item.productName} in ${item.placeName} is already ${amount(item.quantity, item.unit, ctx.locale)}.`);
+    if (delta === 0 && input.action !== "set") return done(`${item.productName} in ${item.placeName} is already ${amount(item.quantity, item.unit, ctx.locale)}.`);
     const reason = input.action === "use" ? "scan_use" : input.action === "add" ? "scan_add" : "manual_correction";
-    const result = await addMovement(ctx.user, item.id, { delta, reason, note: input.note ?? null });
+    const result = input.action === "set"
+      ? await setStockCount(ctx.user, item.id, { quantity: input.amount, expectedUpdatedAt: item.updatedAt, note: input.note })
+      : input.action === "add"
+        ? await recordStockPurchase(ctx.user, item.id, { ...(() => { if (!input.purchase) throw badRequest("For additions, use inventory_record_purchase with a stable source. Check existing purchases first; never add a receipt again after a shopping tick or scan."); return input.purchase; })(), quantity: input.amount, note: input.note })
+        : await addMovement(ctx.user, item.id, { delta, reason, note: input.note ?? null });
     const left = amount(result.stockItem.quantity, result.stockItem.unit, ctx.locale);
     const low = result.addedToShoppingList ? " Running low: it is on the shopping list now." : result.stockItem.isLow ? " Running low." : "";
-    return done(`${result.stockItem.productName} in ${result.stockItem.placeName}: ${left} now.${low}`);
+    return done(`${result.stockItem.productName} in ${result.stockItem.placeName}: ${left} now.${low}`, { stock: result.stockItem, purchase: result.purchase });
+  },
+});
+
+registerAssistantTool({
+  name: "inventory.purchases",
+  description: "Before recording scans or receipt lines, inspect recent acquisitions and the last physical count. Purchase ids identify already recorded goods; a barcode identifies a product, not an acquisition. Link a receipt to one or more matching acquisitions, or ask whether it is extra. Dates/shops alone do not prove identity.",
+  input: z.object({ product: entityRef("product"), place: entityRef("place").optional() }),
+  permission: "read", confirm: "never", roles: ["owner", "adult", "child"],
+  activity: { en: "Checked purchases", nl: "Aankopen bekeken" },
+  run: async (ctx, input) => {
+    const item = await stockItemOf(ctx, input.product, input.place);
+    const review = await purchaseReview(ctx.householdId, item.id);
+    return done(`${item.productName}: ${review.purchases.length} recent acquisitions.`, { stockItemId: item.id, product: item.productName, place: item.placeName, ...review });
+  },
+});
+
+registerAssistantTool({
+  name: "inventory.record_purchase",
+  description: "Record actual purchased goods once, or attach later scan/receipt evidence to existingPurchaseIds without adding stock. quantity is in the stock location's unit, NOT an unverified receipt weight. Use the uploaded document and its printed line number for receipts, actual purchasedAt date and shop. Reuse source.reference on retries. The server rejects ambiguous additions and receipts older than a physical count until the person confirms same/extra or already counted. Never set separatePurchaseConfirmed/countDisposition on your own. Independent purchases at two shops get separate acquisitions; identical receipt uploads are detected by content hash. A linked receipt quantity must equal the sum of its purchases; report discrepancies for correction instead of guessing.",
+  input: stockPurchaseInputSchema.extend({ product: entityRef("product"), place: entityRef("place").optional() }),
+  permission: "write", confirm: "first-time", roles: ["owner", "adult", "child"],
+  activity: { en: "Checked purchased stock", nl: "Gekochte voorraad gecontroleerd" },
+  describe: (ctx, input) => say(ctx.locale, `Check ${input.quantity} ${input.product.name} in stock`, `${input.quantity} ${input.product.name} in de voorraad controleren`),
+  run: async (ctx, input) => {
+    const item = await stockItemOf(ctx, input.product, input.place);
+    const result = await recordStockPurchase(ctx.user, item.id, input);
+    return done(say(ctx.locale, `${result.purchase?.added ?? 0} added; ${result.stockItem.quantity} now in ${result.stockItem.placeName}.`, `${result.purchase?.added ?? 0} bijgeteld; nu ${result.stockItem.quantity} in ${result.stockItem.placeName}.`), { stock: result.stockItem, purchase: result.purchase, linkedWithoutAddingStock: result.purchase?.added === 0 });
   },
 });
 
@@ -319,7 +369,8 @@ registerAssistantTool({
 
 const saveProductInput = z.object({
   product: entityRef("product", "The product to change; leave out to add one").optional(),
-  offer: z.string().trim().max(20).optional().describe("The `offer` from recipes_find_product: stores its webshop link, price, photo and package size"),
+  offer: z.string().trim().max(20).optional().describe("The offer from inventory_prepare_product or recipes_find_product: copies its verified shop link, price, photo, barcode and package size"),
+  imageUrl: productInputSchema.shape.imageUrl.describe("Verified product photo URL from inventory_prepare_product, web_read or the person. Omitted preserves it; null explicitly removes it"),
   name: z.string().trim().min(1).max(120).optional().describe("Required for a new product (default: the offer's name)"),
   unit: z.string().trim().max(20).optional().describe("How stock is counted, e.g. 'pak', 'st.'"),
   packageAmount: z.number().positive().max(1_000_000).optional().describe("Content of one package, e.g. 200 (with packageUnit 'g'); a 6 x 33 cl pack is 198 cl"),
@@ -340,14 +391,14 @@ type SaveProductArgs = z.output<typeof saveProductInput>;
 function offerOf(ctx: { householdId: string }, input: SaveProductArgs) {
   if (!input.offer) return null;
   const offer = getOffer(ctx.householdId, input.offer);
-  if (!offer) throw badRequest(`Offer ${input.offer} is unknown or expired: run recipes_find_product again and use its offer.`);
+  if (!offer) throw badRequest(`Offer ${input.offer} is unknown or expired: run inventory_prepare_product again (or recipes_find_product for ingredients) and use its offer.`);
   return offer;
 }
 
 registerAssistantTool({
   name: "inventory.save_product",
   description:
-    "Add a product to the catalogue or change one (name, unit, content per package, category, essential setting, default shop, barcode, notes); set or remove its link at a shop (webshop page, price). Found online (recipes_find_product)? Pass its `offer`: link, price and photo are stored.",
+    "Create or enrich a product. First inventory_prepare_product: reuse existing products, inspect relevant alternatives, proactively find photo, product link, shop, package size, barcode and price where available. Pass offer to copy verified online facts; or imageUrl/linkShop/linkUrl/defaultShop directly. Create missing retailers with shops_save; link confirmed alternatives with inventory_link_alternative. Ask about important ambiguity, not permission for routine research. Missing online data is allowed and must be disclosed. Returns stored setup gaps; re-read and confirm filled/linked/missing details to the person.",
   input: saveProductInput,
   permission: "write",
   confirm: "always",
@@ -365,9 +416,19 @@ registerAssistantTool({
     const essential = input.isEssential === undefined ? "" : say(ctx.locale,
       input.isEssential ? " (essential)" : " (nice to have)",
       input.isEssential ? " (essentieel)" : " (extraatje)");
+    const details = [
+      input.imageUrl === null ? say(ctx.locale, "remove photo", "foto verwijderen") : input.imageUrl || offer?.imageUrl ? say(ctx.locale, "product photo", "productfoto") : null,
+      input.defaultShop?.name ?? (!input.removeLink ? input.linkShop?.name : null) ?? offer?.shopName,
+      input.packageAmount && input.packageUnit ? `${input.packageAmount} ${input.packageUnit}` : offer?.packageAmount ? `${offer.packageAmount} ${offer.packageUnit}` : null,
+      input.category,
+      input.unit && say(ctx.locale, `stock unit ${input.unit}`, `voorraadeenheid ${input.unit}`),
+      input.name && input.product && input.name !== input.product.name ? say(ctx.locale, `rename to ${input.name}`, `hernoemen naar ${input.name}`) : null,
+      input.barcode && say(ctx.locale, `barcode ${input.barcode}`, `barcode ${input.barcode}`),
+    ].filter(Boolean);
+    const extra = details.length ? ` (${details.join(", ")})` : "";
     return input.product
-      ? say(ctx.locale, `Change the product ${name}${link}${essential}`, `Product ${name} aanpassen${link}${essential}`)
-      : say(ctx.locale, `Add the product ${name}${link}${essential}`, `Product ${name} toevoegen${link}${essential}`);
+      ? say(ctx.locale, `Change the product ${name}${link}${essential}${extra}`, `Product ${name} aanpassen${link}${essential}${extra}`)
+      : say(ctx.locale, `Add the product ${name}${link}${essential}${extra}`, `Product ${name} toevoegen${link}${essential}${extra}`);
   },
   // The card shows the webshop link and price (and the photo and package size) that will be stored.
   preview: (ctx, input): AssistantPreview | null => {
@@ -375,21 +436,30 @@ registerAssistantTool({
     const url = input.linkUrl ?? offer?.url;
     const price = input.linkPrice !== undefined ? toCents(input.linkPrice) : (offer?.priceCents ?? null);
     const shop = input.linkShop?.name ?? offer?.shopName;
+    const image = input.imageUrl !== undefined ? input.imageUrl : offer?.imageUrl;
     const size = input.packageAmount && input.packageUnit ? `${input.packageAmount} ${input.packageUnit}` : offer?.packageAmount ? `${offer.packageAmount} ${offer.packageUnit}` : null;
     const items = [
       url && shop && { label: say(ctx.locale, `Webshop (${shop})`, `Webshop (${shop})`), detail: [price !== null ? money(price) : null, url].filter(Boolean).join(" · "), tone: "add" as const },
-      offer?.imageUrl && { label: say(ctx.locale, "Photo", "Foto"), detail: say(ctx.locale, "from the shop's page", "van de pagina van de winkel"), tone: "add" as const },
+      image && { label: say(ctx.locale, "Photo", "Foto"), detail: image, tone: "add" as const },
+      input.imageUrl === null && { label: say(ctx.locale, "Photo", "Foto"), detail: say(ctx.locale, "Remove the stored photo", "Opgeslagen foto verwijderen"), tone: "remove" as const },
       size && { label: say(ctx.locale, "Content per package", "Inhoud per verpakking"), detail: size, tone: "add" as const },
-    ].filter((item): item is { label: string; detail: string; tone: "add" } => Boolean(item));
+    ].filter((item): item is { label: string; detail: string; tone: "add" | "remove" } => Boolean(item));
     return items.length ? { kind: "list", title: input.offer || input.product ? say(ctx.locale, "Stored with the product", "Bewaard bij het product") : say(ctx.locale, "Product", "Product"), data: { items } } : null;
   },
   run: async (ctx, input) => {
     const offer = offerOf(ctx, input);
     const current = input.product ? await getProduct(ctx.householdId, input.product.id) : null;
+    if ((input.linkUrl !== undefined || input.linkPrice !== undefined || input.removeLink) && !input.linkShop) throw badRequest("Give linkShop with linkUrl, linkPrice or removeLink, or pass the verified offer alone. No product was changed.");
+    if (!current) {
+      const name = input.name ?? offer?.name;
+      const barcode = input.barcode ?? offer?.barcode;
+      const duplicate = (await listProducts(ctx.householdId)).find((product) => (name && fold(product.name) === fold(name)) || (barcode && product.barcode === barcode));
+      if (duplicate) throw badRequest(`Product "${duplicate.name}" already exists (id: ${duplicate.id}). Reuse it or call inventory_save_product with product to enrich it, instead of creating a duplicate.`);
+    }
     const changesProduct =
       !current ||
       Boolean(offer) ||
-      ["name", "unit", "packageAmount", "packageUnit", "category", "isEssential", "defaultShop", "barcode", "notes"].some((key) => input[key as keyof typeof input] !== undefined);
+      ["name", "unit", "packageAmount", "packageUnit", "category", "isEssential", "defaultShop", "barcode", "notes", "imageUrl", "linkShop"].some((key) => input[key as keyof typeof input] !== undefined);
     let product = current;
     if (changesProduct) {
       const base = productInputSchema.parse({
@@ -400,13 +470,14 @@ registerAssistantTool({
         packageUnit: input.packageUnit ?? (input.packageAmount ? null : current?.packageUnit) ?? null,
         category: input.category ?? current?.category ?? "other",
         isEssential: input.isEssential ?? current?.isEssential ?? false,
-        defaultShopId: input.defaultShop?.id ?? current?.defaultShopId ?? null,
+        defaultShopId: input.defaultShop?.id ?? current?.defaultShopId ?? (!input.removeLink ? input.linkShop?.id : null) ?? null,
         barcode: input.barcode ?? current?.barcode ?? null,
         qrCode: current?.qrCode ?? null,
-        imageUrl: current?.imageUrl ?? null,
+        imageUrl: input.imageUrl !== undefined ? input.imageUrl : current?.imageUrl ?? null,
         notes: input.notes ?? current?.notes ?? null,
       });
       const data = offer ? withOffer(base, offer) : base;
+      if (input.imageUrl !== undefined) data.imageUrl = input.imageUrl;
       product = current ? await updateProduct(ctx.householdId, current.id, data) : await createProduct(ctx.householdId, data);
     }
     if (!product) throw badRequest("Which product?");
@@ -423,8 +494,13 @@ registerAssistantTool({
       }
     }
     if (offer && input.linkShop?.id !== offer.shopId) product = await linkOffer(ctx.householdId, product.id, offer);
-    const stored = offer ? ` with its ${offer.shopName} link${offer.priceCents !== null ? ` (${money(offer.priceCents)})` : ""}${offer.imageUrl ? " and photo" : ""}` : "";
-    return done(`${current ? "Saved" : "Added"} the product ${product.name}${stored}.`, { id: product.id, ...stockPriority(null, product.isEssential) });
+    const saved = await getProduct(ctx.householdId, product.id).catch(() => null);
+    if (!saved) return done(`Saved the product ${product.name}, but the final read-back failed. Do not create it again: use inventory_products with this id to verify the stored setup before confirming completion.`, { id: product.id, verification: "pending" });
+    return done(`${current ? "Saved" : "Added"} the product ${saved.name}. Stored fields checked; summarise the setup and disclose any unresolved gaps.`, {
+      id: saved.id, name: saved.name, imageUrl: saved.imageUrl, defaultShopId: saved.defaultShopId,
+      links: saved.shopLinks.map((link) => ({ shop: link.shop.name, url: link.url, price: money(link.priceCents) })),
+      verification: "stored_fields_checked", setup: productSetup(saved), ...stockPriority(null, saved.isEssential),
+    });
   },
 });
 

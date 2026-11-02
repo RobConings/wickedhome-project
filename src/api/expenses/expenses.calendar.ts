@@ -1,7 +1,7 @@
 import type { CalendarOverlayItem } from "@/features/calendar/types/calendar";
 import { expenseStatus } from "@/features/expenses/types/expense-calculations";
 import { EXPENSE_MONTH_END, EXPENSE_RRULE_SUPPORT } from "@/features/expenses/types/expenses";
-import { baseRuleOf, planTotalOpen, type DatedAmount } from "@/features/expenses/types/total-open";
+import { planTotalOpen, type DatedAmount } from "@/features/expenses/types/total-open";
 import { addDays, todayIn } from "@/types/dates";
 import { expandRRule, parseRRule } from "@/types/recurrence";
 import type { CalendarSource } from "../calendar/calendar-sources";
@@ -75,13 +75,7 @@ export function virtualOccurrences(item: Omit<RecurringForCalendar, "payee" | "p
       from: afterHorizon,
       settled: item.totalOpen.settled,
     });
-    const last = plan.lastDate ?? addDays(start, -1);
-    const amounts = new Map(plan.payments.map((payment) => [payment.dueDate, payment.amountCents]));
-    const rule = baseRuleOf(item.rrule);
-    if (!rule) return [];
-    return expandRRule(rule, item.startDate, { from: start, to: last < end ? last : end, limit: 400, monthEnd: EXPENSE_MONTH_END }).map(
-      (dueDate) => ({ dueDate, amountCents: amounts.get(dueDate) ?? item.amountCents }),
-    );
+    return plan.payments.filter((payment) => payment.dueDate >= start && payment.dueDate <= end);
   }
   const rule = parseRRule(item.rrule, EXPENSE_RRULE_SUPPORT);
   if (!rule) return [];
@@ -171,13 +165,21 @@ export const expensesCalendarSource: CalendarSource = {
       today,
     );
     const rows = await db.expense.findMany({
-      where: { householdId, dueDate: { gte: toDate(from), lte: toDate(to) } },
+      where: {
+        householdId,
+        OR: [
+          { earlyRepaymentForId: null, dueDate: { gte: toDate(from), lte: toDate(to) } },
+          { earlyRepaymentForId: { not: null }, paidOn: { gte: toDate(from), lte: toDate(to) } },
+          { earlyRepaymentForId: { not: null }, paidOn: null, dueDate: { gte: toDate(from), lte: toDate(to) } },
+        ],
+      },
       select: {
         id: true,
         payee: true,
         amountCents: true,
         dueDate: true,
         paidOn: true,
+        earlyRepaymentForId: true,
         payerType: true,
         payerHabitantId: true,
         shares: { select: { habitantId: true } },
@@ -189,7 +191,7 @@ export const expensesCalendarSource: CalendarSource = {
         id: row.id,
         payee: row.payee,
         amountCents: row.amountCents,
-        dueDate: fromDate(row.dueDate),
+        dueDate: fromDate(row.earlyRepaymentForId && row.paidOn ? row.paidOn : row.dueDate),
         paidOn: row.paidOn ? fromDate(row.paidOn) : null,
         payerHabitantId: row.payerType === "PERSON" ? row.payerHabitantId : null,
         shares: row.payerType === "SPLIT" ? row.shares : [],

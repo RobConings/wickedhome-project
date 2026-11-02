@@ -1,6 +1,7 @@
 import { matchesSearch } from "@/components/shared/general-list-helpers";
 import type { Shop, ShopRef } from "@/features/shops";
 import { NO_SHOP, PRODUCT_CATEGORIES, type ProductCategory, type ShoppingItem } from "../types/shopping";
+import { shoppingItemListIds } from "../types/shopping-product-rows";
 
 export type ShopGroup = {
   /** A shop id, or `NO_SHOP` for items without a preferred shop. */
@@ -83,8 +84,9 @@ export function groupShopViewItems(items: ShoppingItem[], sort: ShopViewSort): {
   return items.length ? [{ key: "all", items: [...items].sort(sort === "price" ? compareByPrice : byName) }] : [];
 }
 
-export const SHOP_VIEW_PRIORITY_FILTERS = ["all", "needed", "essential", "extra"] as const;
-export type ShopViewPriorityFilter = (typeof SHOP_VIEW_PRIORITY_FILTERS)[number];
+export const SHOP_VIEW_PRIORITY_FILTERS = ["all", "essential", "extra"] as const;
+/** `needed` remains accepted for existing callers; the UI uses the independent stock filter. */
+export type ShopViewPriorityFilter = (typeof SHOP_VIEW_PRIORITY_FILTERS)[number] | "needed";
 
 export type ShopViewFilters = {
   query: string;
@@ -93,9 +95,17 @@ export type ShopViewFilters = {
   /** A list id, or `all`. */
   listId: string;
   priority: ShopViewPriorityFilter;
+  stock?: ShoppingStockFilter;
 };
 
-export const NO_SHOP_VIEW_FILTERS: ShopViewFilters = { query: "", category: "all", listId: "all", priority: "all" };
+export const SHOPPING_STOCK_FILTERS = ["all", "low", "below_minimum", "at_minimum", "above_minimum", "untracked"] as const;
+export type ShoppingStockFilter = (typeof SHOPPING_STOCK_FILTERS)[number];
+export const parseStockFilter = (value: string | null): ShoppingStockFilter =>
+  SHOPPING_STOCK_FILTERS.find((option) => option === value) ?? "all";
+export const matchesStockFilter = (item: Pick<ShoppingItem, "stockStatus">, filter: ShoppingStockFilter = "all") =>
+  filter === "all" || (filter === "low" ? item.stockStatus === "below_minimum" || item.stockStatus === "at_minimum" : filter === "untracked" ? item.stockStatus === null : item.stockStatus === filter);
+
+export const NO_SHOP_VIEW_FILTERS: ShopViewFilters = { query: "", category: "all", listId: "all", priority: "all", stock: "all" };
 
 const matchesPriority = (item: ShoppingItem, filter: ShopViewPriorityFilter) => {
   if (filter === "needed") return item.stockStatus === "below_minimum" || item.stockStatus === "at_minimum";
@@ -104,18 +114,26 @@ const matchesPriority = (item: ShoppingItem, filter: ShopViewPriorityFilter) => 
   return true;
 };
 
-/** The items that match the search (name, note, list, alternatives) and every chosen filter. */
+/** Shopping overview and shop view: search name, note, list, shop and alternatives, with optional filters. */
 export function filterShopViewItems(items: ShoppingItem[], filters: ShopViewFilters): ShoppingItem[] {
   return items.filter(
     (item) =>
       (filters.category === "all" || (item.category ?? "other") === filters.category) &&
-      (filters.listId === "all" || item.listId === filters.listId) &&
+      (filters.listId === "all" || shoppingItemListIds(item).includes(filters.listId)) &&
       matchesPriority(item, filters.priority) &&
-      matchesSearch([item.name, item.note, item.listName, ...item.alternatives.map((alternative) => alternative.name)], filters.query),
+      matchesStockFilter(item, filters.stock) &&
+      matchesSearch([item.name, item.note, item.listName, item.shop?.name, ...item.alternatives.map((alternative) => alternative.name),
+        ...(item.requirements ?? []).flatMap((part) => [part.listName, part.recipe?.name, part.project?.name, part.placeName])], filters.query),
   );
 }
 
 export const isShopViewFiltered = (filters: ShopViewFilters) =>
-  filters.query.trim() !== "" || filters.category !== "all" || filters.listId !== "all" || filters.priority !== "all";
+  filters.query.trim() !== "" || filters.category !== "all" || filters.listId !== "all" || filters.priority !== "all" || (filters.stock ?? "all") !== "all";
 
 export const isShopKey =(key: string, item: ShoppingItem) => (key === NO_SHOP ? item.shopId === null : item.shopId === key);
+
+/** One union of selected shops: a row is included once, without changing its shop, product or price. */
+export const itemsForShops = (items: ShoppingItem[], keys: readonly string[]) => {
+  const selected = new Set(keys);
+  return items.filter((item) => selected.has(item.shopId ?? NO_SHOP));
+};

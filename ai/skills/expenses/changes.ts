@@ -43,7 +43,7 @@ import {
   type AssistantToolContext,
   type ResolvedEntity,
 } from "@ai/core/kit";
-import { MONEY_ROLES, REPEATS, communicationFields, fieldsPreview, methodText, payerArgs, payerFields, payerText, rhythm, rruleFor, type Repeat } from "./shared";
+import { MONEY_ROLES, REPEATS, communicationFields, fieldsPreview, methodText, payerArgs, payerFields, payerText, paymentTargetFromDetail, rhythm, rruleFor, type Repeat } from "./shared";
 
 /**
  * Changes to expenses (skill "expenses"): add a bill or recurring expense, edit, mark paid or not, delete,
@@ -248,7 +248,7 @@ const editTarget = (input: EditInput) => input.expense?.name ?? input.recurring?
 registerAssistantTool({
   name: "expenses.edit",
   description:
-    "Change a bill (expense) or a recurring expense from now on (recurring): amount, due date, payee, category, payment details, who pays, project; pause, resume or end a recurring one. Only pass what changes.",
+    "Change a bill (expense) or a recurring expense from now on (recurring): amount, due date, payee, category, payment details, who pays, project; pause, resume or end a recurring one. Extra repayments use expense; editing one also recalculates its loan. Only pass what changes.",
   input: editInput,
   permission: "sensitive",
   confirm: "always",
@@ -313,13 +313,7 @@ registerAssistantTool({
  * latest paid one of the same recurring expense (or payee).
  */
 async function paymentTarget(ctx: AssistantToolContext, ref: ResolvedEntity, paid: boolean): Promise<Expense> {
-  const detail = await getExpenseDetail(ctx.householdId, ref.id);
-  const expense = detail.expense;
-  if (paid && expense.paidOn) throw badRequest(`${expense.payee} (due ${day(expense.dueDate)}) was already paid on ${day(expense.paidOn)}`);
-  if (paid || expense.paidOn) return expense;
-  const latestPaid = detail.history.filter((item) => item.paidOn).sort((a, b) => (b.paidOn ?? "").localeCompare(a.paidOn ?? ""))[0];
-  if (!latestPaid) throw badRequest(`${expense.payee} (due ${day(expense.dueDate)}) is not paid`);
-  return latestPaid;
+  return paymentTargetFromDetail(await getExpenseDetail(ctx.householdId, ref.id), paid);
 }
 
 const markInput = z.object({
@@ -331,7 +325,7 @@ const markInput = z.object({
 
 registerAssistantTool({
   name: "expenses.mark_paid",
-  description: "Mark a bill as paid (with the day), or as not paid after all (paid: false).",
+  description: "Mark a bill as paid (with the day), or as not paid after all (paid: false). For an extra loan repayment, use its expense id; undoing it restores the loan balance and instalments.",
   input: markInput,
   permission: "sensitive",
   confirm: "always",
@@ -383,7 +377,7 @@ async function upcomingOf(ctx: AssistantToolContext, recurringId: string) {
 
 registerAssistantTool({
   name: "expenses.delete",
-  description: "Delete one bill (expense), or a whole recurring expense with its unpaid upcoming payments (paid ones stay). To stop a subscription but keep it, prefer expenses_edit status ended.",
+  description: "Delete one bill (expense), or a whole recurring expense with its unpaid upcoming payments (paid ones stay). Deleting an extra repayment also restores the loan balance and recalculates instalments. To stop a subscription but keep it, prefer expenses_edit status ended.",
   input: deleteInput,
   permission: "sensitive",
   confirm: "always",

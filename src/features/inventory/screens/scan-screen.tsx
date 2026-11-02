@@ -94,7 +94,7 @@ export function ScanScreen({
       ),
     [],
   );
-  const { adjust, isPending, show } = useStockActions({ onChanged: replaceStock });
+  const { adjust, isPending, show, confirmation, confirmationPending } = useStockActions({ onChanged: replaceStock });
 
   // `product` holds the stock (the main product for an alternative); `scanned` is the brand that was scanned.
   const product = result?.productId ? products.find((candidate) => candidate.id === result.productId) : undefined;
@@ -110,7 +110,7 @@ export function ScanScreen({
       // Optimistic: the amount changes and the choice closes at once; a failure is taken back with a toast.
       setNeedsChoice(false);
       const outcome = await adjust(item, change, change < 0 ? "scan_use" : "scan_add");
-      if (!outcome) return;
+      if (!outcome || outcome.purchase?.added === 0) return;
       const left = `${formatQuantity(outcome.stockItem.quantity, locale)}${outcome.stockItem.unit ? ` ${outcome.stockItem.unit}` : ""}`;
       toast.success(
         t(change < 0 ? "scan.used" : "scan.added", { name: item.productName, place: item.placeName, quantity: left }),
@@ -192,6 +192,7 @@ export function ScanScreen({
 
   return (
     <PageContainer>
+      {confirmation}
       <PageHeader
         eyebrow={
           <Link to="/inventory" className="inline-flex items-center gap-1 hover:underline">
@@ -206,7 +207,7 @@ export function ScanScreen({
       <PageGrid columns="2" className="items-start">
         <Stack gap="md">
           <SegmentedControl options={modeOptions} value={mode} onChange={setMode} label={t("scan.modeLabel")} className="self-start" />
-          <BarcodeScanner onDetect={(code) => void handleCode(code)} paused={paused} busy={busy} />
+          <BarcodeScanner onDetect={(code) => void handleCode(code)} paused={paused || confirmationPending} busy={busy} />
         </Stack>
 
         <Card aria-live="polite" aria-busy={busy || undefined}>

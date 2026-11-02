@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { isEqualSplit, splitEqually } from "@/features/expenses/types/expense-calculations";
-import { EXPENSE_RRULE_SUPPORT, type Expense, type ExpenseShare, type PayerType, type PaymentMethod } from "@/features/expenses/types/expenses";
+import { EXPENSE_RRULE_SUPPORT, type Expense, type ExpenseDetail, type ExpenseShare, type PayerType, type PaymentMethod } from "@/features/expenses/types/expenses";
 import {
   formatIban,
   formatStructuredCommunication,
@@ -173,8 +173,20 @@ export function expenseCandidates(expenses: readonly Expense[]): EntityCandidate
   for (const group of groups.values()) {
     const unpaid = group.filter((expense) => !expense.paidOn).sort((a, b) => a.dueDate.localeCompare(b.dueDate));
     const paid = group.filter((expense) => expense.paidOn).sort((a, b) => (b.paidOn ?? "").localeCompare(a.paidOn ?? "") || b.dueDate.localeCompare(a.dueDate));
-    const primary = unpaid[0] ?? paid[0];
+    const primary = unpaid.find((expense) => !expense.earlyRepayment) ?? paid.find((expense) => !expense.earlyRepayment);
     for (const expense of [...unpaid, ...paid]) {
+      if (expense.earlyRepayment) {
+        const amount = money(expense.amountCents);
+        const date = day(expense.dueDate);
+        candidates.push({
+          id: expense.id,
+          name: `${expenseName(expense)} extra repayment ${amount} ${date}`,
+          aliases: [`${expense.payee} repayment ${date}`, `${expense.payee} extra aflossing ${date}`, `${expense.payee} terugbetaling ${date}`],
+          hint: `${amount}, ${expense.paidOn ? `paid ${day(expense.paidOn)}` : `due ${date}`}`,
+          date: expense.dueDate,
+        });
+        continue;
+      }
       const plain = expense === primary;
       const suffix = plain ? "" : ` ${day(expense.dueDate)}`;
       candidates.push({
@@ -187,6 +199,18 @@ export function expenseCandidates(expenses: readonly Expense[]): EntityCandidate
     }
   }
   return candidates;
+}
+
+/** Resolve "not paid after all" without silently undoing an extra loan repayment instead of an instalment. */
+export function paymentTargetFromDetail(detail: ExpenseDetail, paid: boolean): Expense {
+  const expense = detail.expense;
+  if (paid && expense.paidOn) throw badRequest(`${expense.payee} (due ${day(expense.dueDate)}) was already paid on ${day(expense.paidOn)}`);
+  if (paid || expense.paidOn) return expense;
+  if (expense.earlyRepayment) throw badRequest(`${expense.payee} extra repayment is not paid`);
+  const latestPaid = detail.history.filter((item) => item.paidOn && !item.earlyRepayment)
+    .sort((a, b) => (b.paidOn ?? "").localeCompare(a.paidOn ?? ""))[0];
+  if (!latestPaid) throw badRequest(`${expense.payee} (due ${day(expense.dueDate)}) is not paid`);
+  return latestPaid;
 }
 
 // ── Confirmation cards ──────────────────────────────────────────────────────────────────────────────

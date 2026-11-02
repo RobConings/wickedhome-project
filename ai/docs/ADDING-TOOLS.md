@@ -59,6 +59,16 @@ area, so write what a smart newcomer must know to use the tools well:
   `expenses_log` amount 45, payee Delhaize, category groceries";
 - pitfalls: "direct debits are paid automatically", "children only complete their own tasks".
 
+The same guide is returned to MCP clients by `skills_load` and `app_help skill`. Explain which existing
+records to look up and link, which dedicated workflow to use, what it updates automatically, and what must
+happen separately. Tool descriptions must mention critical prerequisites too: clients may select a tool
+before reading the guide. Where omitting a link would bypass core behavior, validate it in the write
+tool before calling the service and return actionable recovery steps. Test the shortcut through MCP.
+For setup workflows, make routine research proactive and provide a concrete confirmation summary. Ask
+targeted questions about consequential uncertainty, then return what was actually saved plus unresolved
+gaps. Distinguish "not found", unavailable lookup and an incomplete final verification; a successful write
+followed by a failed read must not encourage creating the record again.
+
 Not in the guide: the tool list or argument docs (the model already gets the schemas), UI instructions,
 anything longer than a line.
 
@@ -203,6 +213,8 @@ What `run` returns is read by a small local model with a ~16k context. Use the h
 - `done("Added “Dakgoot kuisen” for Clara, due 11/10/2026.", { id })` for writes: one sentence + the id.
 - Only fields a follow-up needs; ids only where the model may act on the item next; `null`/`undefined` are
   dropped automatically, so `field: value || null` is a cheap way to omit defaults.
+- Reads that support later updates or deletes must return each record's unique id, even when names are
+  identical. Document that the write's entity argument accepts that id; never force selection by name alone.
 - Prefer short strings to nested objects when the model only reads them (`"14:00 18° rain 20%"`).
 - Results are cut at 4000 characters (600 for earlier turns).
 

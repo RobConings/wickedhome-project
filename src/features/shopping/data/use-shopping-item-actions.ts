@@ -1,9 +1,11 @@
+import { usePurchaseReconciliation } from "@/features/inventory";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { currentLocale } from "@/lib/i18n";
 import { formatQuantity, type ShoppingItem, type ShoppingItemStatus } from "../types/shopping";
-import { deleteShoppingItem, restockShoppingItem, updateShoppingItem } from "./shopping-requests";
+import { deleteShoppingItem, updateShoppingItem } from "./shopping-requests";
+import { combineShoppingItems } from "../types/shopping-product-rows";
 
 type Options = {
   /** The items on screen; a new array (fresh data) drops optimistic ticks. */
@@ -14,9 +16,12 @@ type Options = {
 
 /**
  * Tick off, untick and delete items straight against the API, with the tick shown immediately. When a
- * bought item's product is kept in stock, a toast offers to add it there.
+ * bought product has a known stock location/unit, the server credits its acquisition once.
  */
-export function useShoppingItemActions({ items, onChanged }: Options) {
+export function useShoppingItemActions({ items: suppliedItems, onChanged }: Options) {
+  const { reconcile, confirmation } = usePurchaseReconciliation();
+  const active = React.useRef(new Set<string>());
+  const items = React.useMemo(() => combineShoppingItems(suppliedItems), [suppliedItems]);
   const { t } = useTranslation("shopping");
   const [overrides, setOverrides] = React.useState<Record<string, ShoppingItemStatus>>({});
   const [removed, setRemoved] = React.useState<string[]>([]);
@@ -44,40 +49,33 @@ export function useShoppingItemActions({ items, onChanged }: Options) {
     }
   }, []);
 
-  const offerRestock = React.useCallback(
-    (item: ShoppingItem, restock: NonNullable<Awaited<ReturnType<typeof updateShoppingItem>>["restock"]>) => {
-      const quantity = formatQuantity(restock.quantity, currentLocale());
-      toast(t("restock.prompt", { name: item.name, place: restock.placeName }), {
-        duration: 10_000,
-        action: {
-          label: t("restock.add", { quantity, unit: restock.unit ?? "" }).trim(),
-          onClick: () =>
-            void restockShoppingItem(item.id, { stockItemId: restock.stockItemId, quantity: restock.quantity })
-              .then(() => toast.success(t("restock.done", { name: item.name, place: restock.placeName })))
-              .catch(() => toast.error(t("errors.generic"))),
-        },
-      });
-    },
-    [t],
-  );
-
   const toggle = React.useCallback(
     async (item: ShoppingItem) => {
+      if (active.current.size) return;
+      active.current.add(item.id);
       const current = overrides[item.id] ?? item.status;
       const next: ShoppingItemStatus = current === "open" ? "bought" : "open";
       setOverrides((previous) => ({ ...previous, [item.id]: next }));
       await track(item.id, async () => {
         try {
-          const result = await updateShoppingItem(item.id, { status: next });
-          if (result.restock) offerRestock(item, result.restock);
+          const result = next === "bought"
+            ? await reconcile(item.name, item.quantity, (purchaseDecision) => updateShoppingItem(item.id, { status: next, purchaseDecision }))
+            : await updateShoppingItem(item.id, { status: next });
+          if (!result) { await updateShoppingItem(item.id, { status: "open" }); onChanged?.(); return; }
+          if (result.restock && result.stock?.added) toast.success(t("restock.addedAutomatically", { name: item.name, quantity: formatQuantity(result.stock.added, currentLocale()), unit: result.restock.unit ?? "", place: result.restock.placeName }));
+          else if (result.stock?.added === 0) toast.success(t("restock.alreadyProcessed"));
+          else if (next === "bought" && item.productId && !result.restock) toast(t("restock.notAdded"));
+          else if (next === "open") toast(t("restock.unticked"));
           onChanged?.();
         } catch {
           setOverrides((previous) => ({ ...previous, [item.id]: current }));
           toast.error(t("errors.generic"));
+          onChanged?.();
         }
       });
+      active.current.delete(item.id);
     },
-    [overrides, offerRestock, onChanged, t, track],
+    [reconcile, overrides, onChanged, t, track],
   );
 
   const remove = React.useCallback(
@@ -105,5 +103,5 @@ export function useShoppingItemActions({ items, onChanged }: Options) {
   );
 
   /** `saving`: ids of items with a change on its way to the server (already shown optimistically). */
-  return { items: visible, toggle, remove, saving };
+  return { items: visible, toggle, remove, saving, confirmation };
 }

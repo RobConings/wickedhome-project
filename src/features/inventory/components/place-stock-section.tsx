@@ -57,7 +57,7 @@ export function PlaceStockSection({ placeId, initialItems }: PlaceStockSectionPr
       setItems((previous) => previous?.map((item) => (item.id === stockItem.id ? stockItem : item)) ?? null),
     [],
   );
-  const { adjust, isPending, show } = useStockActions({ onChanged: replace });
+  const { adjust, isPending, show, confirmation } = useStockActions({ onChanged: replace });
 
   async function retry() {
     setRetrying(true);
@@ -92,6 +92,7 @@ export function PlaceStockSection({ placeId, initialItems }: PlaceStockSectionPr
 
   return (
     <div className="flex flex-col gap-2">
+      {confirmation}
       {items.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t("place.empty")}</p>
       ) : (

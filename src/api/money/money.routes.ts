@@ -28,6 +28,7 @@ import {
   deleteEntry,
   deletePlan,
   getMoneyLoans,
+  getContributionHistory,
   getMoneyMonth,
   getMoneySummary,
   getMoneyTimeline,
@@ -59,6 +60,10 @@ moneyRouter.get("/", async (req, res) => {
 
 moneyRouter.get("/summary", async (req, res) => {
   res.json(await getMoneySummary(currentUser(req).householdId));
+});
+
+moneyRouter.get("/contributions/history", async (req, res) => {
+  res.json(await getContributionHistory(currentUser(req).householdId));
 });
 
 moneyRouter.get("/loans", async (req, res) => {

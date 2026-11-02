@@ -20,8 +20,12 @@ type Story = StoryObj<typeof meta>;
 
 export const AllLists: Story = {};
 export const OneList: Story = { parameters: { router: { initialEntries: ["/shopping?list=l-weekly"] } } };
+export const Search: Story = { parameters: { router: { initialEntries: ["/shopping?q=melk"] } } };
+export const SearchWithinList: Story = { parameters: { router: { initialEntries: ["/shopping?list=l-weekly&q=melk"] } } };
+export const NoSearchResults: Story = { parameters: { router: { initialEntries: ["/shopping?q=onbestaand"] } } };
+export const GroceriesRunningLow: Story = { parameters: { router: { initialEntries: ["/shopping?list=l-weekly&stock=low"] } } };
 export const AsChild: Story = { args: { canManage: false } };
 export const Empty: Story = { args: { data: emptyShoppingPageFixture } };
-/** From the dashboard's quick action (`?new=1`): the cursor is in "Add an item"; the param is removed. */
+/** The dashboard's quick action (`?new=1`) opens the add dialog; the param is removed. */
 export const AddFromDashboard: Story = { parameters: { router: { initialEntries: ["/shopping?new=1"] } } };
 export const Mobile: Story = { globals: { viewport: { value: "mobile1" } } };

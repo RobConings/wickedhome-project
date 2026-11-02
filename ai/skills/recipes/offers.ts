@@ -19,6 +19,7 @@ export type Offer = {
   /** Content of one package read from the name ("200 g"), when there is one. */
   packageAmount: number | null;
   packageUnit: string | null;
+  barcode?: string | null;
 };
 
 const TTL_MS = 2 * 60 * 60 * 1000;

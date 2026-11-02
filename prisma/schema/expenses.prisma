@@ -188,7 +188,8 @@ model RecurringExpense {
   /// Project it counts towards (Finance phase 3); copied onto every generated instance.
   projectId               String?
   project                 Project?                @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  expenses                Expense[]
+  expenses                Expense[]               @relation("ScheduledExpenses")
+  earlyRepayments         Expense[]               @relation("EarlyRepayments")
   shares                  RecurringExpenseShare[]
   createdAt               DateTime                @default(now())
   updatedAt               DateTime                @updatedAt
@@ -205,7 +206,10 @@ model Expense {
   householdId             String
   household               Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
   recurringExpenseId      String?          @map("seriesId")
-  recurringExpense        RecurringExpense? @relation(fields: [recurringExpenseId], references: [id], onDelete: SetNull)
+  recurringExpense        RecurringExpense? @relation("ScheduledExpenses", fields: [recurringExpenseId], references: [id], onDelete: SetNull)
+  /// Extra payment against a loan's balance, independent of its scheduled instalments.
+  earlyRepaymentForId     String?
+  earlyRepaymentFor       RecurringExpense? @relation("EarlyRepayments", fields: [earlyRepaymentForId], references: [id], onDelete: SetNull)
   payee                   String
   description             String?
   amountCents             Int
@@ -245,6 +249,7 @@ model Expense {
   @@unique([recurringExpenseId, dueDate])
   @@index([householdId, dueDate])
   @@index([paymentAccountId])
+  @@index([earlyRepaymentForId])
   @@index([projectId])
   @@map("bills")
 }

@@ -25,9 +25,11 @@ import {
   type RecurringExpense,
 } from "../types/expenses";
 import { formatIban } from "../types/payment-references";
-import { totalOpenPreviewFor } from "../types/total-open";
+import { scaleShares, totalOpenPreviewFor } from "../types/total-open";
 import { CategorySelect } from "./category-select";
 import { PayeeField } from "./payee-field";
+import { LoanRepaymentField } from "./loan-repayment-field";
+import { useRepaymentLoans } from "../data/use-repayment-loans";
 import { PayerField } from "./payer-field";
 import { PaymentDetailsFields, type PaymentDetailsValues } from "./payment-details-fields";
 import { RecurringExtraFields, RecurringKindField } from "./recurring-extra-fields";
@@ -56,6 +58,7 @@ type ExpenseFormDialogProps = {
   defaults?: ExpenseFormDefaults;
   /** Route that saves it; defaults to the current one (use "/expenses" from other pages). */
   action?: string;
+  loans?: RecurringExpense[];
   /** After creating, with the new expense's id. */
   onSaved?: (expenseId: string) => void;
 };
@@ -115,17 +118,22 @@ export function ExpenseFormDialog({
   projectField,
   defaults,
   action,
+  loans: providedLoans,
   onSaved,
 }: ExpenseFormDialogProps) {
   const { t } = useTranslation("expenses");
   const locale = currentLocale();
   const [open, setOpen] = React.useState(defaultOpen);
+  const loans = useRepaymentLoans(open && !expense && !recurring, providedLoans);
+  const [loanId, setLoanId] = React.useState<string | null>(null);
+  const selectedLoan = loans.find((loan) => loan.id === loanId);
+  const [amountVersion, setAmountVersion] = React.useState(0);
   const { recordUse } = useSelections("payee");
   const meHabitantId = useOptionalCurrentUser()?.habitantId ?? null;
 
   const editsTemplateOnly = !expense && Boolean(recurring);
   const isEdit = Boolean(expense) || editsTemplateOnly;
-  const inRecurring = Boolean(expense?.recurringExpenseId && recurring);
+  const inRecurring = Boolean(expense?.recurringExpenseId && !expense.earlyRepayment && recurring);
   const initialScope: Scope = editsTemplateOnly ? "recurring" : "expense";
   const sourceFor = (forScope: Scope) =>
     (forScope === "recurring" && recurring ? recurring : expense) ?? (isEdit ? undefined : (defaults as Expense | undefined));
@@ -151,6 +159,7 @@ export function ExpenseFormDialog({
     const fresh = sourceFor(initialScope);
     setScope(initialScope);
     setRepeats(false);
+    setLoanId(null);
     setAmountCents(fresh?.amountCents ?? null);
     setCategory(fresh?.category ?? "energy");
     setPayment(initialPayment(fresh));
@@ -234,9 +243,10 @@ export function ExpenseFormDialog({
           }}
         >
           <PayeeField
+            key={loanId ?? "payee"}
             id={id}
             name={name}
-            defaultValue={source?.payee}
+            defaultValue={selectedLoan?.payee ?? source?.payee}
             payees={payees}
             onPick={pickPayee}
             aria-invalid={invalid || undefined}
@@ -252,13 +262,14 @@ export function ExpenseFormDialog({
       span: "half",
       bare: true,
       render: ({ id, name, errors }) => (
-        <FormField label={t("fields.amount")} htmlFor={id} errors={errors ? [t("errors.amount")] : undefined}>
+        <FormField label={t("fields.amount")} htmlFor={id} errors={errors ? [errors.some((message) => message.includes("exceeds")) ? t("repayment.exceedsBalance") : t("errors.amount")] : undefined}>
           <MoneyInput
+            key={amountVersion}
             id={id}
             name={name}
             placeholder="0,00"
             inputMode="decimal"
-            defaultValueCents={source?.amountCents}
+            defaultValueCents={amountVersion ? amountCents : source?.amountCents}
             onValueChange={setAmountCents}
             required
           />
@@ -268,13 +279,14 @@ export function ExpenseFormDialog({
     {
       name: "dueDate",
       type: "custom",
-      label: recurringFields ? t("fields.firstDueDate") : t("fields.dueDate"),
+      label: loanId || expense?.earlyRepayment ? t("fields.paidOn") : recurringFields ? t("fields.firstDueDate") : t("fields.dueDate"),
       span: "half",
       render: ({ id, name, invalid, describedBy }) => (
         <Input
           id={id}
           name={name}
           type="date"
+          max={loanId || expense?.earlyRepayment ? today : undefined}
           value={dueDate}
           onChange={(event) => setDueDate(event.target.value)}
           required
@@ -288,15 +300,28 @@ export function ExpenseFormDialog({
       type: "custom",
       label: t("fields.category"),
       render: ({ id, name, invalid, describedBy }) => (
-        <CategorySelect id={id} name={name} value={category} onChange={setCategory} aria-invalid={invalid || undefined} aria-describedby={describedBy} />
+        <CategorySelect id={id} name={name} value={category} onChange={(next) => { setCategory(next); if (next !== "loans") setLoanId(null); }} aria-invalid={invalid || undefined} aria-describedby={describedBy} />
       ),
+    },
+    {
+      name: "earlyRepaymentForId",
+      type: "custom",
+      label: t("repayment.label"),
+      hidden: isEdit || recurringFields || category !== "loans",
+      render: ({ id }) => <LoanRepaymentField id={id} loans={loans} value={loanId} onChange={(next) => {
+        setLoanId(next);
+        const loan = loans.find((candidate) => candidate.id === next);
+        if (loan) typedPayee.current = loan.payee;
+        if (next && payment.paymentMethod === "meal_voucher") setPayment((current) => ({ ...current, paymentMethod: "wire_transfer" }));
+      }}
+        onPayAll={(amount) => { setAmountCents(amount); setAmountVersion((version) => version + 1); }} />,
     },
     {
       name: "repeats",
       type: "custom",
       label: t("fields.repeats"),
       bare: true,
-      hidden: isEdit,
+      hidden: isEdit || Boolean(loanId),
       // Not posted: a new expense repeats when it has a rule.
       render: () => (
         <label className="flex min-h-10 cursor-pointer items-center justify-between gap-3 rounded-lg border p-3 text-sm">
@@ -408,11 +433,12 @@ export function ExpenseFormDialog({
         <FormField label={t("payer.label")} htmlFor={id}>
           <div id={id}>
             <PayerField
+              key={loanId ?? "payer"}
               amountCents={amountCents}
               habitants={habitants}
-              defaultPayerType={source?.payerType}
-              defaultHabitantId={source?.payerHabitantId}
-              defaultShares={source?.shares}
+              defaultPayerType={selectedLoan?.payerType ?? source?.payerType}
+              defaultHabitantId={selectedLoan?.payerHabitantId ?? source?.payerHabitantId}
+              defaultShares={selectedLoan ? scaleShares(selectedLoan.shares, selectedLoan.amountCents, amountCents ?? 0) : source?.shares}
               personOnly={payment.paymentMethod === "meal_voucher"}
               meHabitantId={meHabitantId}
               error={

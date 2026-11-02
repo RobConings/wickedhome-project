@@ -42,6 +42,7 @@ export const router = createBrowserRouter([
           { path: "shopping/shops/:shopId", lazy: () => import("@/routes/shopping-shop-view") },
           { path: "shopping/products", lazy: () => import("@/routes/shopping-products") },
           { path: "inventory", lazy: () => import("@/routes/inventory") },
+          { path: "inventory/count", lazy: () => import("@/routes/inventory-count") },
           { path: "inventory/scan", lazy: () => import("@/routes/inventory-scan") },
           { path: "inventory/products/:productId", lazy: () => import("@/routes/inventory-product") },
           // Recipes (docs/RECIPES.md): "To cook" + all recipes, one recipe, the cooking view of a meal.

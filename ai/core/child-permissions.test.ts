@@ -43,6 +43,7 @@ type ChildCase = { args: Record<string, unknown>; allowed: boolean; reason?: Reg
  * "Allowed" means the tool lets it through to its service, which still checks (e.g. only their own tasks).
  */
 const CHILD_CASES: Record<string, ChildCase[]> = {
+  "inventory.record_purchase": [{ args: { product: "Rijst", quantity: 2, source: { kind: "scan", reference: "child-scan-1" } }, allowed: true }],
   "inventory.change_stock": [
     { args: { product: "Rijst", action: "use", amount: 1 }, allowed: true },
     { args: { product: "Rijst", action: "add", amount: 2 }, allowed: true },
@@ -60,7 +61,7 @@ const CHILD_CASES: Record<string, ChildCase[]> = {
   ],
   "recipes.go_to_step": [{ args: { move: "next" }, allowed: true }],
   "recipes.done": [{ args: {}, allowed: true }],
-  "shopping.add_item": [{ args: { name: "Chocomelk" }, allowed: true }],
+  "shopping.add_item": [{ args: { name: "Chocomelk", product: "Chocomelk" }, allowed: true }],
   "shopping.update_item": [{ args: { item: "Brood", bought: true }, allowed: true }],
   "shopping.remove": [
     { args: { item: "Brood" }, allowed: true },

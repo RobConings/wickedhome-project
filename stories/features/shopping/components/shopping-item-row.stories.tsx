@@ -37,3 +37,7 @@ export const LargeInTheShop: Story = { args: { item: itemFixtures.bananas, size:
 /** Alternatives: other brands that share the product's stock, with their webshop links. */
 export const WithAlternatives: Story = { args: { item: itemFixtures.bacon, showList: true } };
 export const WithAlternativesMobile: Story = { ...WithAlternatives, globals: { viewport: { value: "mobile1" } } };
+export const CompactMobileWithAllActions: Story = {
+  args: { item: { ...itemFixtures.tablets, name: "Boni Selection Green tea 330 ml — een lange productnaam", note: "Aanvullende informatie en alternatieven staan achter Details.", isEssential: true }, size: "large", showList: true, onEdit: fn(), onDelete: fn() },
+  globals: { viewport: { value: "mobile1" } },
+};

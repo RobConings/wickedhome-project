@@ -134,6 +134,7 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
         key={request ?? "idle"}
         habitants={habitants}
         shops={shops}
+        loans={overview.recurring}
         payees={overview.payees}
         today={overview.today}
         defaultOpen={request !== null}
@@ -152,6 +153,7 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
         key={request ?? "idle"}
         habitants={habitants}
         shops={shops}
+        loans={overview.recurring}
         today={overview.today}
         defaultOpen={request !== null}
         projectField={projectField}

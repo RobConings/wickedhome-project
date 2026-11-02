@@ -1,9 +1,7 @@
-- Lists have items, quantity, shop, note and price. All products at or below minimum auto-list, essential or not.
-- `shopping_list` returns `stockStatus`, `buyingAdvice`, `essential`, `importance`: below minimum = to buy; at minimum = warning. False essential = nice to have. Keep urgency and importance separate; the person chooses what to buy. Optional `stockStatus`/`isEssential` read filters never change the list.
-- Essential settings → `inventory_save_product` `isEssential` true/false; don't infer or change a flag from stock level.
-- "Zet melk en eieren op de lijst" = one `shopping_add_item` per item. For catalogue items also pass `product` to retain stock and importance labels. "1,5 kg gehakt" → quantity 1.5, unit kg.
-- "Wat moet ik bij de Colruyt halen" → `shopping_list` shop Colruyt; `perShop` tells where to go. Task materials → `shopping_list` task, or `shopping_add_item` with task.
-- "Ik heb de melk gekocht" / "vink af" → `shopping_update_item` bought true (one call per item); "zet terug" → bought false. "Koop dat bij Aldi" → shop. If the result says it is kept in stock, offer addToStock.
-- Removing an item, list or staple always asks. Children add, tick off and remove their own items; lists and staples are for adults.
-- "Elke week melk" → `shopping_save_staple` (unit week).
-- Shops themselves (opening hours, webshops, favourites) → shops skill; stock → inventory.
+- Groceries: inventory_products → inventory_stock → shopping_list. Reuse products/alternatives and row ids. Explicit extra purchases still apply with enough stock.
+- Add with product; inventory_save_product creates missing ones. Repair via shopping_update_item item=<id from shopping_list> product=<product>: fills missing shop/photo/link, keeps meal amounts/references. unlinkedReason only for genuine one-offs. task links materials.
+- Cooking: recipes_list for servings → match/save product links → recipes_plan (default missing). It adds groceries; don't copy ingredients manually.
+- UI combines groceries/replenishments. Stock is a separate filter: all at/below minimum auto-list, below = to buy, at minimum = warning. stockStatus/buyingAdvice describe urgency; essential/importance describe importance. Both stay visible; the person chooses what to buy. Read filters never change items.
+- Product setup: inventory_prepare_product → save verified photo/link/shop/package facts; re-read, disclose gaps and ask about important uncertainty. isEssential is never inferred from stock.
+- shopping_list shop for one store; shops combines a trip, shopGroup uses a saved group (shops_groups/shops_save_group). Combined views retain original shops/prices.
+- "Gekocht" → shopping_update_item bought true; false puts it back. Known location/unit: stock added once automatically; uncheck/re-tick never adds again. Scans/receipts → inventory_purchases then inventory_record_purchase; link existing goods, ask same/extra on review. shopping_save_staple recurs. Deletes always ask. Children add/tick/remove their own items; adults manage lists/staples.

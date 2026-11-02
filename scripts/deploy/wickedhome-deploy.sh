@@ -17,7 +17,7 @@ SHARED="$STATE/shared"
 # Keep the long-lived development/Storybook checkout at /var/www/WickedHome
 # completely untouched. Production switches releases through a separate link.
 ROOT=/var/www/wickedhome-live
-REPO=git@github.com:RobConings/WickedHome.git
+REPO=https://github.com/RobConings/wickedhome-project.git
 
 [[ -L "$ROOT" && -d "$RELEASES" && -f "$SHARED/.env" && -d /var/www/WickedHome ]] || {
   echo "Release symlink/shared .env not configured; deployment disabled" >&2; exit 1;

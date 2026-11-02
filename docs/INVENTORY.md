@@ -1,5 +1,63 @@
 # Inventory — scanning and barcode auto-fill
 
+The stock overview opens `/inventory/count`, a full-page physical-count round for adults/owners with
+room progress, product photos, encouragement and a completion trophy: choose all locations or one
+location, enter each product's actual count, save and continue, confirm the recorded count, or skip.
+Each confirmed count is saved immediately. Empty input never means zero; an explicit zero is valid.
+`PUT /api/inventory/stock/:id/count` replaces only the quantity and requires the displayed `updatedAt`.
+It preserves unit, minimum and expiry, records the difference as a manual correction, and rejects a
+concurrent change with 409. The screen refreshes that record and keeps the typed count for review.
+Retrying an already-applied count adds no extra movement. MCP `inventory_change_stock action=set` uses
+the same count operation. Even an unchanged confirmed count updates `lastCountedAt`, so an older
+receipt must not silently add goods that were already counted.
+
+Shopping ticks automatically credit tracked goods only with a known stock location and safely
+converted unit. `stock_purchases` records actual acquisitions; `stock_purchase_evidence` gives each
+shopping position, scan operation or uploaded receipt line a unique household-scoped source identity.
+The evidence, acquisition and stock movement commit together, with source/product advisory locks and
+a stock-row lock. Retrying or unticking/re-ticking reuses the acquisition. Unticking does not reverse
+stock; correct an actual mistake with a count. Old positive stock movements are backfilled as credited
+acquisitions by the additive migration; existing quantities are not rewritten.
+
+`GET /api/inventory/stock/:id/purchases` and MCP `inventory_purchases` show recent acquisitions and the
+last physical count. `POST /api/inventory/stock/:id/purchases` and MCP `inventory_record_purchase`
+either add new goods or link later evidence to `existingPurchaseIds` without adding stock. Receipts
+require a household-owned uploaded document, stable physical line reference, actual purchase date,
+and a quantity converted to the stock unit. Identical uploads share the content hash. A receipt line
+can link several earlier acquisitions if its total matches; discrepancies require review. Different
+photos are not assumed identical. A second receipt cannot silently reuse goods covered by another
+receipt. Planned shopping shops can be replaced by the confirmed actual retailer from the receipt.
+
+Earlier acquisitions (the latest 50 per product are offered for review) produce `purchase_review`; the UI asks in ordinary language
+whether these are already counted goods or extra. MCP must ask the person before setting
+`separatePurchaseConfirmed`. An older acquisition after a count produces `purchase_count_review`
+until the person says whether those goods were included. Source retries remain idempotent regardless
+of age. Product names, barcodes and dates are never sufficient evidence of purchase identity.
+Generic positive scan/bought movement requests require purchase information; MCP additions use the
+same purchase service. Using stock and absolute counts retain their existing behavior. The app does
+not OCR receipts or book expenses as part of this flow; the connected AI interprets each receipt and
+uses these tools. Quantities that cannot be reconciled need an explicit correction/count.
+
+Shopping exposes one open buying position per catalogue product across all lists and sources, in the app
+and MCP. Stored shopping records retain individual meal/task/staple/stock requirements, so cancelling a
+meal leaves the other reasons intact. Recipe/manual needs add together; recurring and minimum-stock
+targets are covered by those purchases (3 leeks for a meal plus a minimum target of 1 means 3 to buy).
+Ticking, editing or deleting the position affects all its requirements. Old unlinked rows are linked only
+when their full name has one exact catalogue match. Incompatible amounts stay explicit on the same row.
+
+Linking a product to an existing ingredient also fills missing retailer, photo, URL and price, preserving
+its amount, unit and meal reference. Exact-name repair does the same. A sole known retailer can be used
+when no default is set; multiple retailers are never guessed. Shopping converts amounts using verified
+package content: a 250 g ingredient of a product in 500 g packs means one pack to buy, with 250 g retained
+on the requirement. Unknown conversions are flagged and excluded from price estimates and automatic
+restock suggestions.
+
+Deleting an open product position also dismisses its automatic low-stock and staple additions. This is
+stored on the stock owner's product, so it survives refreshes, restarts, places and alternative brands.
+An actual stock increase marks it restocked; a later actual decrease rearms automatic groceries. Merely
+reading the list, changing a minimum or scanning an already-empty product does not rearm it. Manual and
+recipe additions are still allowed. Deleting bought history does not dismiss current shopping needs.
+
 Stock is "product P at place X" (`StockItem`, `src/api/inventory`); products are the household's
 catalogue, owned by the shopping feature (`Product` in `prisma/schema/shopping.prisma`) and shared by
 shopping lists, staples and stock. The scan screen (`/inventory/scan`) finds a product by its barcode or
@@ -48,6 +106,14 @@ that point at it (`stockProductId` → main). Only the main product has `StockIt
   created or edited, including minimum-only edits and additions that leave stock low. The "Running low"
   item is for the main product; it isn't added when an open item for any
   product of the group is on a list (`ensureLowStockItem` → `groupProductIds`).
+- **Shopping views**: default groceries and automatic replenishments appear in one grocery view, including
+  legacy default lists. Stock level is a separate filter and can apply to any list; it is not an exclusive
+  shopping category. Custom lists retain their own identity and can still be managed independently.
+- **Shop combinations**: select multiple shops for one trip, or save a household-wide group (for example
+  Colruyt, Collect&Go and OKay). A row appears once in the union of selected shops and retains its original
+  product, shop links and price. Groups do not imply shared stock; product alternatives still determine that.
+  `GET/POST /api/shops/groups` and `PUT/DELETE /api/shops/groups/:id` manage groups; children can read,
+  adults/owners can manage. `shopping_list shops` / `shopGroup` offer the same combined reads over MCP.
 - **Shopping labels**: "Below minimum", "At minimum" and "Above minimum" use current stock, including
   shared stock for alternatives. A shopping item's place wins when stock is kept there; otherwise the
   lowest stock level across the product's places wins (below takes precedence over at minimum).

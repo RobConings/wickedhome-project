@@ -1,3 +1,4 @@
+import type { StockPurchaseReview, StockPurchaseInput } from "../types/purchases";
 import { api } from "@/lib/api-client";
 import type {
   ProductStock,
@@ -7,6 +8,7 @@ import type {
   StockItemInput,
   StockItemUpdateInput,
   StockMovementInput,
+  StockCountInput,
 } from "../types/inventory";
 
 const enc = encodeURIComponent;
@@ -26,5 +28,10 @@ export const updateStockItem = (id: string, input: StockItemUpdateInput) =>
 export const deleteStockItem = (id: string) => api.delete(`/inventory/stock/${enc(id)}`);
 export const addStockMovement = (id: string, input: StockMovementInput) =>
   api.post<StockChangeResult>(`/inventory/stock/${enc(id)}/movements`, input);
+export const saveStockCount = (id: string, input: StockCountInput) =>
+  api.put<StockChangeResult>(`/inventory/stock/${enc(id)}/count`, input);
 export const fetchProductStock = (productId: string) => api.get<ProductStock>(`/inventory/products/${enc(productId)}`);
 export const scanCode = (code: string) => api.get<ScanResult>(`/inventory/scan?code=${enc(code)}`);
+
+export const fetchPurchaseReview = (id: string) => api.get<StockPurchaseReview>(`/inventory/stock/${enc(id)}/purchases`);
+export const recordStockPurchase = (id: string, input: StockPurchaseInput) => api.post<StockChangeResult>(`/inventory/stock/${enc(id)}/purchases`, input);

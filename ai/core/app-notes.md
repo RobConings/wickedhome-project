@@ -27,15 +27,19 @@ Read at runtime by ai/core/app-map.ts; never part of the system prompt.
 - Children complete their own tasks.
 
 ## Shopping | boodschappen, boodschappenlijst, winkel, shopping list, groceries, product, producten, vaste producten, staples
-- One household list; items can have a shop, quantity and project. The shop view groups the list per shop.
-- Products are the household catalogue (shared with stock); staples come back on a list on a schedule (milk every week).
+- Groceries and automatic replenishments appear together. Low stock is a separate filter (at minimum = warning, below = to buy). Items link to catalogue products and shared stock; reuse links and existing entries.
+- Buying and restocking are separate. Staples recur. Custom lists remain available.
+
+## Recipes and cooking | recept, recepten, koken, ingredient, recipe, recipes, cooking, meal, to cook
+- Ingredients link to catalogue products and their shared stock. Match and save these links before planning; package sizes convert recipe amounts to stock packs.
+- Planning for servings adds missing groceries by default, skipping in-stock, optional and already-listed items. Cooking use consumes stock and may trigger low-stock groceries; done finishes the meal.
 
 ## Shops | winkels, winkel, shop, store, supermarkt
-- The household's shops with type, address and opening details; used to group the shopping list.
+- Shops have type, address and opening details. Combine several shops for a shopping trip, or save a household-wide group (e.g. Colruyt, Collect&Go, OKay). The combined view keeps each item's original shop, product links and price.
 
 ## Inventory | voorraad, stock, inventaris, scannen, barcode, houdbaar, vervaldatum, expiry, pantry, op
 - Stock is "product at a place" with quantity, minimum and expiry date. Scan a barcode or the app's own QR label to use, add or look up stock; unknown barcodes are filled in automatically when known.
-- Below the minimum, an item can go onto the shopping list.
+- At or below minimum, stock auto-lists for groceries. Alternative brands may share one stock. A catalogue product without stock records has unknown supply.
 
 ## Calendar | agenda, kalender, afspraak, event, appointment, calendar, google agenda
 - Household events with participants and categories, plus birthdays, waste collections, project dates and synced Google calendars.
@@ -50,8 +54,8 @@ Read at runtime by ai/core/app-map.ts; never part of the system prompt.
 - Google Drive folders can be linked in (read-only), and bill documents can be stored in a Drive folder (Integrations).
 
 ## Expenses and bills | uitgave, uitgaven, rekening, factuur, betalen, domiciliering, abonnement, lening, expense, bill, invoice, subscription, loan, recurring, terugkerend
-- One kind of expense: a one-off bill, or a recurring one (subscription, loan, insurance) that creates instances. Each has a payee, amount, due date, payment method and who pays (joint account, one person, or split).
-- Direct debits are marked paid automatically on their due date. Bills found in Gmail appear as "Suggested from mail" to accept, link or dismiss.
+- One-off bills or recurring expenses that create instances. Each has a payee, amount, due date, payment method and payer (joint account, person, or split).
+- Direct debits are paid automatically. Extra loan repayments link to the loan, reducing its balance and schedule. Gmail bills appear as "Suggested from mail"; reuse their links when recording payment.
 
 ## Income | inkomen, inkomsten, loon, salaris, maaltijdcheques, income, salary, wage, meal vouchers
 - Incomes per person (salary, benefits, meal vouchers) with their dates and amounts; meal vouchers belong to a person.

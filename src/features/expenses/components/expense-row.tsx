@@ -52,7 +52,7 @@ export function ExpenseRow({
 }: ExpenseRowProps) {
   const { t } = useTranslation("expenses");
   const dueLabel = useDueLabel();
-  const recurrence = useRecurrenceSummary()(expense.rrule);
+  const recurrence = useRecurrenceSummary()(expense.earlyRepayment ? null : expense.rrule);
   const shown = useOptimisticExpense(expense, today);
   const tile = variant === "tile";
 

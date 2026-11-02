@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Button } from "@/components/ui/button";
 import { LogExpenseDialog } from "@/features/expenses/components/log-expense-dialog";
-import { expenseHabitants, expenseShops, expensesToday } from "../fixtures";
+import { expenseHabitants, expenseShops, expensesToday, recurringFixtures } from "../fixtures";
 
 const meta = {
   title: "Features/Expenses/Components/LogExpenseDialog",
@@ -11,6 +11,7 @@ const meta = {
     shops: expenseShops,
     today: expensesToday,
     defaultOpen: true,
+    loans: Object.values(recurringFixtures),
     trigger: <Button>Log an expense</Button>,
   },
 } satisfies Meta<typeof LogExpenseDialog>;
@@ -21,3 +22,8 @@ type Story = StoryObj<typeof meta>;
 /** Groceries paid by card from the joint account: amount, shop, save. */
 export const Default: Story = {};
 export const Mobile: Story = { globals: { viewport: { value: "mobile1" } } };
+
+/** The normal expense form with a down payment preselected for an extra repayment. */
+export const LoanRepayment: Story = {
+  args: { defaultLoanId: recurringFixtures.brackevaWithTotal.id, defaultAmountCents: 30000 },
+};

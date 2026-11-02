@@ -1,16 +1,31 @@
 import { Router } from "express";
-import { shopIngredientSearchInputSchema, shopInputSchema, shopListQuerySchema } from "@/features/shops/types/shops";
+import { shopGroupInputSchema, shopIngredientSearchInputSchema, shopInputSchema, shopListQuerySchema } from "@/features/shops/types/shops";
 import { idSchema } from "@/types/common";
 import { parse } from "../lib/http";
 import { currentUser, requireRole, requireUser } from "../lib/session";
 import { createShop, deleteShop, getShop, getShopIcon, listShops, refreshShopIcon, setIngredientSearch, updateShop } from "./shops.service";
 import "./shops.jobs";
+import { deleteShopGroup, listShopGroups, saveShopGroup } from "./shop-groups.service";
 
 export const shopsRouter = Router();
 
 shopsRouter.use(requireUser);
 
 const canManage = requireRole("owner", "adult");
+
+shopsRouter.get("/groups", async (req, res) => {
+  res.json(await listShopGroups(currentUser(req).householdId));
+});
+shopsRouter.post("/groups", canManage, async (req, res) => {
+  res.status(201).json(await saveShopGroup(currentUser(req).householdId, parse(shopGroupInputSchema, req.body)));
+});
+shopsRouter.put("/groups/:id", canManage, async (req, res) => {
+  res.json(await saveShopGroup(currentUser(req).householdId, parse(shopGroupInputSchema, req.body), parse(idSchema, req.params.id)));
+});
+shopsRouter.delete("/groups/:id", canManage, async (req, res) => {
+  await deleteShopGroup(currentUser(req).householdId, parse(idSchema, req.params.id));
+  res.status(204).end();
+});
 
 shopsRouter.get("/", async (req, res) => {
   const query = parse(shopListQuerySchema, req.query);

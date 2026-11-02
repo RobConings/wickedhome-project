@@ -31,6 +31,7 @@ export function PlaceShoppingSection({ placeId, initialItems }: PlaceShoppingSec
 
   return (
     <div className="flex flex-col gap-2">
+      {actions.confirmation}
       {actions.items.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t("place.empty")}</p>
       ) : (

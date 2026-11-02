@@ -9,7 +9,7 @@
  */
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { recurringExpenseInputSchema } from "@/features/expenses/types/expenses";
+import { expenseCreateInputSchema, recurringExpenseInputSchema } from "@/features/expenses/types/expenses";
 import {
   planTotalOpen,
   previewTotalOpen,
@@ -354,5 +354,61 @@ describe("total open: generating instances", () => {
     const last = list().at(-1);
     assert.equal(last?.amountCents, 8000);
     assert.deepEqual(last?.shares, [{ habitantId: "a", amountCents: 4000 }, { habitantId: "b", amountCents: 4000 }]);
+  });
+});
+
+describe("early repayments", () => {
+  const loan = { amountCents: 23000, totalOpenCents: 100_000, asOf: "2026-10-05", rrule: "FREQ=MONTHLY", startDate: "2026-10-05" };
+
+  it("reduces the balance without replacing an instalment on the same date", () => {
+    const plan = planTotalOpen({ ...loan, settled: [{ dueDate: "2026-10-05", amountCents: 30_000, earlyRepayment: true }] });
+    assert.equal(plan.remainingCents, 70_000);
+    assert.deepEqual(plan.payments, [
+      { dueDate: "2026-10-05", amountCents: 23000 },
+      { dueDate: "2026-11-05", amountCents: 23000 },
+      { dueDate: "2026-12-05", amountCents: 23000 },
+      { dueDate: "2027-01-05", amountCents: 1000 },
+    ]);
+  });
+
+  it("counts several extra repayments on one date alongside paid regular instalments", () => {
+    const settled = [
+      { dueDate: "2026-10-05", amountCents: 23000 },
+      { dueDate: "2026-10-28", amountCents: 20_000, earlyRepayment: true },
+      { dueDate: "2026-10-28", amountCents: 15_000, earlyRepayment: true },
+    ];
+    const progress = totalOpenProgress({ ...loan, generatedUntil: "2026-10-31", status: "active", instances: settled.map((item) => ({ ...item, paid: true })) });
+    assert.equal(progress.paidCents, 58_000);
+    assert.equal(progress.remainingCents, 42_000);
+    assert.equal(progress.paymentsLeft, 2);
+    assert.equal(progress.lastAmountCents, 19000);
+  });
+
+  it("stops all projected instalments after a full payoff", () => {
+    const settled = [{ dueDate: "2026-10-28", amountCents: 100_000, earlyRepayment: true }];
+    const progress = totalOpenProgress({ ...loan, generatedUntil: "2026-10-31", status: "active", instances: settled.map((item) => ({ ...item, paid: true })) });
+    assert.equal(progress.remainingCents, 0);
+    assert.equal(progress.paymentsLeft, 0);
+    assert.deepEqual(virtualOccurrences({ amountCents: loan.amountCents, rrule: loan.rrule, startDate: loan.startDate, endDate: null, generatedUntil: "2026-10-01", totalOpen: { ...loan, settled } }, "2026-10-01", "2027-12-31"), []);
+  });
+
+  it("generates no regular instalment on a fully repaid loan", async () => {
+    const recurring = template({ totalOpenCents: 100_000 });
+    const { tx, rows, list } = fakeTx(recurring);
+    rows.push({ id: "early", recurringExpenseId: "r1", dueDate: date("2026-11-28"), amountCents: 100_000, paidOn: date("2026-11-28"), shares: [] });
+    await generateInstances(tx, recurring, "2026-11-05", "2027-11-05");
+    assert.equal(list().length, 1);
+    assert.equal(list()[0]?.id, "early");
+  });
+});
+
+describe("expense repayment input", () => {
+  const input = { payee: "Loan", category: "loans", amountCents: 30_000, dueDate: "2026-10-28", earlyRepaymentForId: "loan-1" };
+  it("keeps the selected loan on a normal expense", () => {
+    assert.equal(expenseCreateInputSchema.parse(input).earlyRepaymentForId, "loan-1");
+  });
+  it("rejects repeating repayments and meal voucher repayments", () => {
+    assert.equal(expenseCreateInputSchema.safeParse({ ...input, rrule: "FREQ=MONTHLY" }).success, false);
+    assert.equal(expenseCreateInputSchema.safeParse({ ...input, paymentMethod: "meal_voucher", payerType: "person", payerHabitantId: "person-1" }).success, false);
   });
 });

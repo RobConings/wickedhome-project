@@ -7,6 +7,8 @@ import {
   type ShouldRevalidateFunctionArgs,
 } from "react-router";
 import type { z } from "zod";
+import { todayIn } from "@/types/dates";
+import { formatDate } from "@/types/date-format";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
 import { fetchShops, type Shop } from "@/features/shops";
 import { ApiRequestError } from "@/lib/api-client";
@@ -235,6 +237,12 @@ export async function expensesAction({ request }: ActionFunctionArgs): Promise<E
     }
   } catch (error) {
     const result = toFormResult(error, { not_found: i18n.t("expenses:errors.notFound") });
-    return { ...result, errors: result.errors && renameKey(result.errors, "startDate", "dueDate"), intent };
+    const errors = result.errors && renameKey(result.errors, "startDate", "dueDate");
+    for (const [field, messages] of Object.entries(errors ?? {})) {
+      errors![field] = messages.map((message) => message.startsWith("Payment date cannot be in the future")
+        ? i18n.t("expenses:repayment.futureDate", { date: formatDate(todayIn(), "en") })
+        : message);
+    }
+    return { ...result, errors, intent };
   }
 }

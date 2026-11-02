@@ -9,7 +9,7 @@ import { after, describe, it } from "node:test";
 import { z } from "zod";
 import type { SessionUser } from "@/features/auth/types/auth";
 import { prepareInput } from "./assistant-loop";
-import { entityRef, invalidateEntityCache, registerEntityResolver, resolveEntity, resolveRefs, scoreCandidates, unregisterEntityResolver, type ResolvedEntity } from "./resolve";
+import { entityRef, invalidateEntityCache, pickCandidate, registerEntityResolver, resolveEntity, resolveRefs, scoreCandidates, unregisterEntityResolver, type ResolvedEntity } from "./resolve";
 import { searchEverything } from "./search";
 import { closeWords, fold, nameScore, splitDate, stem } from "./text-match";
 import { registerAssistantTool, unregisterAssistantTool, type AssistantToolContext } from "./tools";
@@ -92,7 +92,7 @@ describe("resolveEntity", () => {
   it("asks which one when a name is ambiguous, and lists the known names when nothing matches", async () => {
     const ambiguous = await resolveEntity(ctx, "habitant", "Jan");
     assert.equal(ambiguous.ok, false);
-    assert.match((ambiguous as { error: string }).error, /Which person do you mean by "Jan": "Jan De Smet \(child\)" or "Jan Peeters \(adult\)"/);
+    assert.match((ambiguous as { error: string }).error, /Which person do you mean by "Jan": "Jan De Smet \(child\)" \[id: jan2\] or "Jan Peeters \(adult\)" \[id: jan1\]/);
     const unknown = await resolveEntity(ctx, "habitant", "Bart");
     assert.match((unknown as { error: string }).error, /No person matches "Bart"\. Known: Rob Coppens/);
   });
@@ -131,6 +131,18 @@ describe("resolveEntity", () => {
       { id: "2", name: "Clara Peeters" },
     ]);
     assert.deepEqual(scored.map((entry) => entry.candidate.id), ["1", "2"]);
+  });
+
+  it("exposes both ids for identical product names and resolves the selected id", () => {
+    const products = [{ id: "eggs-a", name: "Eieren" }, { id: "eggs-b", name: "Eieren" }];
+    const ambiguous = pickCandidate("product", "product", "Eieren", products, true);
+    assert.equal(ambiguous.ok, false);
+    if (ambiguous.ok) return;
+    assert.match(ambiguous.error, /id: eggs-a/);
+    assert.match(ambiguous.error, /id: eggs-b/);
+    assert.deepEqual(pickCandidate("product", "product", "eggs-b", products, true), {
+      ok: true, entity: { type: "product", id: "eggs-b", name: "Eieren" },
+    });
   });
 });
 

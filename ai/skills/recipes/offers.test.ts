@@ -59,4 +59,10 @@ describe("offers", () => {
   it("skips a photo the product contract wouldn't accept", () => {
     assert.equal(withOffer(input(), { ...offer, imageUrl: "data:image/png;base64,AAA" }).imageUrl, null);
   });
+
+  it("fills a valid barcode from a product page, preserving a barcode already recorded", () => {
+    assert.equal(withOffer(input(), { ...offer, barcode: "5400000000017" }).barcode, "5400000000017");
+    assert.equal(withOffer(input({ barcode: "5400000000024" }), { ...offer, barcode: "5400000000017" }).barcode, "5400000000024");
+    assert.equal(withOffer(input(), { ...offer, barcode: "not-a-barcode" }).barcode, null);
+  });
 });

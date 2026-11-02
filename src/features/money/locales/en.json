@@ -280,5 +280,26 @@
     "estimateHint": "Variable income at its estimate.",
     "summaryNow": "This month: {{income}} in, {{expenses}} out.",
     "summaryLower": "Projected expenses drop from {{from}} to {{to}} a month in {{month}}."
+  },
+  "tabs": {
+    "label": "Money views",
+    "overview": "Overview",
+    "contributions": "Contributions",
+    "history": "Account history",
+    "settlement": "Monthly settlement"
+  },
+  "history": {
+    "title": "Contributions by month",
+    "description": "Compare what each person contributed each month.",
+    "account": "Account",
+    "allJoint": "All joint accounts",
+    "year": "Year",
+    "total": "Total contributed",
+    "allTime": "All recorded contributions through today",
+    "monthTotal": "Total {{amount}}",
+    "unknownPerson": "Former member",
+    "empty": "No contributions yet",
+    "emptyDescription": "Record a transfer from a person to start tracking contributions.",
+    "note": "Net contributions include withdrawals and direct settlements between people. Savings are shown when you select a savings account."
   }
 }
