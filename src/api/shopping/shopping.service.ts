@@ -977,7 +977,7 @@ const toMergeable = (row: MergeRow) => ({
  */
 async function joinGroup(tx: Prisma.TransactionClient, actor: Actor, memberId: string, mainId: string) {
   const { householdId } = actor;
-  for (const productId of [memberId, mainId].sort()) await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${householdId + ":product:" + productId}, 0))`;
+  for (const productId of [memberId, mainId].sort()) await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${householdId + ":product:" + productId}, 0))`;
   const member = await tx.product.findFirstOrThrow({ where: { id: memberId, householdId }, select: { name: true, stockProductId: true } });
   await tx.product.update({ where: { id: memberId }, data: { stockProductId: mainId } });
   if (member.stockProductId) return;

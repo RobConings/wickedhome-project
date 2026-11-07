@@ -114,9 +114,9 @@ async function applyChangeLogged(
   let purchaseResult: { purchaseIds: string[]; repeated: boolean } | undefined;
   const updated = await db.$transaction(async (tx) => {
     if (extra.purchase) {
-      await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${actor.householdId + ":" + extra.purchase.sourceKey}, 0))`;
+      await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${actor.householdId + ":" + extra.purchase.sourceKey}, 0))`;
       // Scans/receipts of a shared product at different locations must see each other's acquisitions.
-      await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${actor.householdId + ":product:" + row.productId}, 0))`;
+      await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${actor.householdId + ":product:" + row.productId}, 0))`;
     }
     if (!extra.expectedUpdatedAt) {
       // A scan arriving during a count must add to the latest total, not overwrite it from an old read.
