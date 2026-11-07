@@ -70,8 +70,8 @@ De waarnemingen uit de winkel dateren van vóór merge `bdc1a96`. Producten, Sho
 | --- | --- |
 | `npm run typecheck` | Geslaagd |
 | `npm run lint` | Geslaagd |
-| `npm test` | 1.600 geslaagd; 21 database-integratietests bewust overgeslagen in deze unitrun |
-| `npm run test:shopping-integration` | Alle 21 tests geslaagd op echte PostgreSQL, inclusief MCP |
+| `npm test` | 1.600 geslaagd; 22 database-integratietests bewust overgeslagen in deze unitrun |
+| `npm run test:shopping-integration` | Alle 22 tests geslaagd op echte PostgreSQL, inclusief MCP |
 | `npm run test:shopping-migrations` | 103 oude tabellen vergeleken; alle 14 representatieve bestaande records exact behouden |
 | `npm run test:shopping-browser` | Geslaagd met twee onafhankelijke mobiele Chrome-contexten van 390 × 844 |
 | `npm run build` | Client en API gebouwd |
@@ -124,3 +124,19 @@ Uitrol gebeurt via het bestaande deployproces: backup behouden, dependencies ins
 - Oude bulkafronding markeert lijstregels gekocht zonder fictieve voorraad te verzinnen. Individueel kopen en sessie-aankopen registreren bekende voorraad via de bestaande aankoopadministratie.
 - Verouderde edits leveren een conflict op en laden de actuele stand. Hoeveelheidsverschillen op bonnen vragen beoordeling; bestaande voorraad wordt niet automatisch verlaagd.
 - Productmatching is een conservatieve uitsluiting van bekende conflicten, geen volledige productontologie of bewijs van gelijkwaardigheid. Bestaande productkoppelingen zijn niet automatisch herschreven.
+
+## MCP en AI: operationele uitleg
+
+De AI leest deze regels via `skills_load` voor shopping, inventory, recipes en expenses. De uitleg staat ook in de werkelijk gepubliceerde toolbeschrijvingen en JSON Schema-velden; dit rapport is geen vereiste om de tools correct te gebruiken.
+
+- **Eerst lezen:** `shopping_sessions` en `shopping_session` leveren sessie-/regel-ID's, de aparte revisies, cumulatief gekochte hoeveelheden, aankoopregels en voorraadlocaties. Productidentiteit en eenheden komen uit de bestaande catalogus/voorraad.
+- **Gewoon kopen:** `shopping_session_update_item` met `status: bought`, huidige regelrevisie en een vaste `operationId` koopt de geplande hoeveelheid. `purchasedQuantity` mag dan wegblijven. Eén potje heeft geen gramgewicht nodig.
+- **Deelkoop:** eerder 1 gekocht en nu nog 1 betekent `purchasedQuantity: 2`, niet 1. Een nieuwe actie krijgt een nieuwe actie-ID. Een netwerkretry gebruikt dezelfde ID en ongewijzigde inhoud. Bij revisieconflict eerst opnieuw lezen.
+- **Nieuwe planning:** `shopping_plan_visit` start een nieuwe beoordeling van behoeften; `shopping_start_session` neemt uitsluitend geselecteerde behoefte-ID's over. `includeLowStock: false` sluit de automatische hoeveelheidsbijdrage uit. Dat wijzigt geen minimumvoorraad.
+- **Nu niet:** `skipped` koopt niets en wijzigt geen voorraad. `open` neemt opnieuw op. Afsluiten registreert geen ontbrekende aankopen of uitgaven.
+- **Voorraad:** `stockAdded: false` betekent dat de aankoop wel geregistreerd is, maar geen bijgehouden voorraad verhoogde. De AI mag dan geen voorraadverhoging claimen. Bij verschillende locaties vraagt de AI om een herkenbare locatie, niet om een intern ID.
+- **Bon na aankoop:** document uploaden, `shopping_session_attach_receipt`, daarna `shopping_session_match_receipt`. Gebruik steeds hetzelfde gedrukte regelnummer voor dezelfde bonregel. Bestaande aankoop-ID's betekenen dezelfde goederen; die krijgen geen tweede voorraadboeking. Verschillen of een latere voorraadtelling vragen beoordeling.
+- **Betaling:** de nieuwe alleen-lezen tool `shopping_payment_options` geeft beschikbare betaalrekening-, betaler- en recente betaalde uitgave-ID's met namen. De AI vertaalt namen naar die ID's. Daarna koppelt `shopping_session_record_payment` een bestaande uitgave of maakt één nieuwe; nooit daarnaast `expenses_log` voor dezelfde betaling. Een vaste referentie identificeert één betaling; afzonderlijke betalingen krijgen eigen referenties.
+- **Veilig gedeeld:** web en MCP gebruiken dezelfde transacties en events. De bestaande MCP-bevestiging voor schrijfacties blijft gelden. Kinderen kunnen geen financiële opties lezen of betalingen vastleggen.
+
+Aanvullend gecontroleerd: alle 31 bestaande MCP-/toolcontracttests slagen, inclusief echte JSON Schema-generatie en het maximale formaat van de AI-handleidingen. Een extra PostgreSQL/MCP-test controleert het uitlezen van betaalrekening-ID's, household-isolatie en het weigeren van toegang voor kinderen.

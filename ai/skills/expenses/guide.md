@@ -9,3 +9,4 @@
 - Price change or pause/end → `expenses_edit` recurring; one expense → expense. Disputed → `expenses_hold` + reason.
 - `expenses_list`: recurring costs/loan balances or monthly paid history by category.
 - Every change requires confirmation; owners/adults only.
+- Shopping visit payment: shopping_session_record_payment links an existing expense or creates one once. Do not also expenses_log the same payment. Bon/stock alone never proves an amount paid.

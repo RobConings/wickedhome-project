@@ -50,9 +50,9 @@ import { productSetup } from "../inventory/product-setup";
 registerAssistantSkill({
   id: "shopping",
   title: { en: "Shopping", nl: "Boodschappen" },
-  summary: "Shopping lists: essential or nice-to-have items, below-minimum buying needs and at-minimum warnings; the person chooses what to buy. Add, tick off, move, remove; recurring staples and materials.",
+  summary: "Shopping needs and shared visits: select products, buy or skip, match receipts and payments once; realtime with web. Household counts, optional automatic replenishments, staples and materials.",
   keywords: {
-    nl: ["boodschap", "boodschappen", "boodschappenlijst", "kopen", "halen", "op de lijst", "supermarkt", "delhaize", "colruyt", "aldi", "lidl", "nodig", "gekocht", "vaste boodschap", "lijstje"],
+    nl: ["winkelsessie", "winkelbeurt", "kassabon", "nu niet", "boodschap", "boodschappen", "boodschappenlijst", "kopen", "halen", "op de lijst", "supermarkt", "delhaize", "colruyt", "aldi", "lidl", "nodig", "gekocht", "vaste boodschap", "lijstje"],
     en: ["shopping visit", "shopping session", "shopping", "shopping list", "groceries", "buy", "on the list", "supermarket", "we need", "bought", "staple", "grocery list"],
   },
 });

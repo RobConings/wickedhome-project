@@ -1,5 +1,8 @@
 import { shoppingPaymentSchema } from "@/features/expenses/types/shopping-payment";
-import { recordShoppingPayment } from "@/api/shopping/session-payments.service";
+import {
+  getShoppingFinanceOptions,
+  recordShoppingPayment,
+} from "@/api/shopping/session-payments.service";
 import { z } from "zod";
 import { idSchema } from "@/types/common";
 import {
@@ -42,7 +45,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "shopping.session",
   description:
-    "Read a shopping visit with item ids/revisions, bought quantities, participants, receipts, acquisitions and known stock locations. Read before writing; a conflict requires a fresh read.",
+    "Read a shopping visit with item ids/revisions, bought quantities, participants, receipts, acquisitions and known stock locations. Read before writing; a conflict requires a fresh read. Item revision is distinct from session revision (used for closing). stockAdded false means goods were logged without changing tracked stock; report that accurately.",
   input: z.object({ sessionId: idSchema }),
   permission: "read",
   confirm: "never",
@@ -64,7 +67,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "shopping.start_session",
   description:
-    "Start a visit with only explicitly selected requirementIds; an empty selection starts an empty visit. Shops or a saved shop group. Never silently add every below-minimum product.",
+    "Start a visit with only explicitly selected requirementIds; an empty selection starts an empty visit. Shops or a saved shop group. Never silently add every below-minimum product. Reuse operationId and unchanged payload when retrying; includeLowStock false removes automatic contributions.",
   input: sessionCreateSchema,
   permission: "write",
   confirm: "always",
@@ -86,7 +89,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "shopping.session_add_item",
   description:
-    "Add a selected requirement, catalogue product or one-off to a visit. Duplicate product additions reuse its existing row. Name does not imply a product identity/category.",
+    "Add a selected requirement, catalogue product or one-off to a visit. Duplicate product additions reuse its existing row. Name does not imply a product identity/category. Omit unit to use the known household stock unit; 1 potje needs no gram weight.",
   input: sessionAddItemSchema.safeExtend({ sessionId: idSchema }),
   permission: "write",
   confirm: "first-time",
@@ -97,7 +100,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "shopping.session_update_item",
   description:
-    "Update one visit item using its latest revision. operationId is a stable unique action id reused on retry. purchasedQuantity is TOTAL actually bought, including earlier partial purchases, in the item's unit. Bought goods credit known stock once; skipped/remove never credit stock. Unticking never removes real goods. Specify stockItemId if locations are ambiguous.",
+    "Update one visit item using its latest revision. operationId is a stable unique action id reused on retry. purchasedQuantity is TOTAL actually bought, including earlier partial purchases, in the item's unit. Bought goods credit known stock once; skipped/remove never credit stock. Unticking never removes real goods. Specify stockItemId if locations are ambiguous. Normal full buy: status bought with purchasedQuantity omitted. For 1 bought earlier + 1 now, purchasedQuantity is 2. No gram weight is required for household counts.",
   input: sessionItemUpdateSchema.extend({
     sessionId: idSchema,
     itemId: idSchema,
@@ -151,9 +154,21 @@ registerAssistantTool({
 });
 
 registerAssistantTool({
+  name: "shopping.payment_options",
+  description:
+    "Read recent paid expenses, active payment accounts and household payers with ids for shopping_session_record_payment. Match the person's named account/payer, reuse existing expenses, and ask only if their choice is ambiguous. Does not change data. Adults only.",
+  input: z.object({}),
+  permission: "read",
+  confirm: "never",
+  activity: { en: "Read shopping payment options", nl: "Betaalopties bekeken" },
+  roles: adults,
+  run: (ctx) => getShoppingFinanceOptions(ctx.user),
+});
+
+registerAssistantTool({
   name: "shopping.session_record_payment",
   description:
-    "Link an existing paid expenseId or atomically create a one-off paid expense for this visit. receiptId links a specific receipt. reference identifies ONE payment (card-1, vouchers-1); reuse on retries. Multiple references support split payments. Existing expense payer/share validation applies. Give paymentAccountId and paidByHabitantId when known. Never infer paid totals from stock or create an expense merely by attaching a receipt.",
+    "Link an existing paid expenseId or atomically create a one-off paid expense for this visit. receiptId links a specific receipt. reference identifies ONE payment (card-1, vouchers-1); reuse on retries. Multiple references support split payments. Existing expense payer/share validation applies. Give paymentAccountId and paidByHabitantId when known. Use shopping_payment_options to resolve existing expense, payment account and payer ids; never ask the person to supply internal ids; never also expenses_log the same payment. Never infer paid totals from stock or create an expense merely by attaching a receipt.",
   input: shoppingPaymentSchema.safeExtend({ sessionId: idSchema }),
   permission: "write",
   confirm: "always",

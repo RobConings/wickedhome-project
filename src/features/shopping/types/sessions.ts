@@ -4,12 +4,31 @@ import { productCategorySchema } from "./shopping";
 
 const amount = z.number().min(0.001).max(100_000).multipleOf(0.001);
 export const sessionCreateSchema = z.object({
-  operationId: z.string().trim().min(1).max(160).optional(),
+  operationId: z
+    .string()
+    .trim()
+    .min(1)
+    .max(160)
+    .optional()
+    .describe(
+      "Stable session-start action id; reuse with unchanged input on retry",
+    ),
   name: z.string().trim().min(1).max(100),
   shopIds: z.array(idSchema).max(30).default([]),
   shopGroupId: idSchema.optional(),
-  requirementIds: z.array(idSchema).max(300).default([]),
-  includeLowStock: z.boolean().default(true),
+  requirementIds: z
+    .array(idSchema)
+    .max(300)
+    .default([])
+    .describe(
+      "Selected shopping_list requirement ids; empty creates an empty visit",
+    ),
+  includeLowStock: z
+    .boolean()
+    .default(true)
+    .describe(
+      "False excludes automatic minimum-stock quantities, including in mixed recipe rows; does not change minima",
+    ),
 });
 export const sessionAddItemSchema = z
   .object({
@@ -17,7 +36,15 @@ export const sessionAddItemSchema = z
     productId: idSchema.optional(),
     name: z.string().trim().min(1).max(120).optional(),
     quantity: amount.default(1),
-    unit: z.string().trim().max(20).nullable().optional(),
+    unit: z
+      .string()
+      .trim()
+      .max(20)
+      .nullable()
+      .optional()
+      .describe(
+        "Omit to use known household stock unit. One potje counts as one; no gram weight required",
+      ),
     category: productCategorySchema.optional(),
     stockItemId: idSchema.optional(),
   })
@@ -26,11 +53,30 @@ export const sessionAddItemSchema = z
     "Choose a product or requirement, or give its name",
   );
 export const sessionItemUpdateSchema = z.object({
-  revision: z.number().int().min(0),
-  operationId: z.string().trim().min(1).max(160),
+  revision: z
+    .number()
+    .int()
+    .min(0)
+    .describe(
+      "Current ITEM revision from shopping_session, not session revision; reread after conflict",
+    ),
+  operationId: z
+    .string()
+    .trim()
+    .min(1)
+    .max(160)
+    .describe(
+      "Unique id for this action; retry with SAME id and payload; new action needs a new id",
+    ),
   status: z.enum(["open", "bought", "skipped"]).optional(),
-  quantity: amount.optional(),
-  purchasedQuantity: amount.optional(),
+  quantity: amount
+    .optional()
+    .describe("Planned total; changing it alone does not buy goods"),
+  purchasedQuantity: amount
+    .optional()
+    .describe(
+      "Cumulative TOTAL bought in item units: 1 earlier + 1 now = 2. Omit with status bought to buy the planned total",
+    ),
   stockItemId: idSchema.optional(),
   remove: z.boolean().optional(),
 });
@@ -41,13 +87,34 @@ export const receiptAttachSchema = z.object({
   totalCents: z.number().int().min(0).max(100_000_000).optional(),
 });
 export const receiptLineSchema = z.object({
-  reference: z.string().trim().min(1).max(100),
+  reference: z
+    .string()
+    .trim()
+    .min(1)
+    .max(100)
+    .describe(
+      "Stable printed receipt line number; reuse for the same real line, never randomize on retry",
+    ),
   sessionItemId: idSchema,
-  quantity: amount,
+  quantity: amount.describe(
+    "Total on this receipt line in the selected session item unit; do not infer gram weights",
+  ),
   stockItemId: idSchema.optional(),
   acceptDifference: z.boolean().default(false),
-  existingPurchaseIds: z.array(idSchema).min(1).max(50).optional(),
-  countDisposition: z.enum(["already_counted", "add_after_count"]).optional(),
+  existingPurchaseIds: z
+    .array(idSchema)
+    .min(1)
+    .max(50)
+    .optional()
+    .describe(
+      "Existing acquisition ids for these same goods, not product ids; linking prevents double stock",
+    ),
+  countDisposition: z
+    .enum(["already_counted", "add_after_count"])
+    .optional()
+    .describe(
+      "Only after the person confirms how goods relate to a later physical stock count",
+    ),
 });
 export type SessionCreateInput = z.infer<typeof sessionCreateSchema>;
 export type SessionAddItemInput = z.infer<typeof sessionAddItemSchema>;

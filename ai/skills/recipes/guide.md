@@ -1,8 +1,8 @@
-- Keep recipe amounts: 300 g → quantity 300, unit g; preparation in note. Stock uses packs via package size. unknown_amount: no confirmed shortage; offer to set package size.
-- Read links with recipes_read_link, then recipes_match and recipes_save. Save/import/extras check the catalogue: exact unique matches auto-link; candidates need a product choice; unknowns are reported. Keep imageUrl; null removes. Mention incomplete/page-sourced steps.
+- Keep recipe amounts: 300 g → quantity 300, unit g; preparation in note. Count potjes/pieces without gram weight. Package size only for real gram conversion; unknown_amount is not shortage or a reason to demand weights.
+- Read links with recipes_read_link, then recipes_match and recipes_save. Save/import/extras check the catalogue: exact unique matches auto-link; candidates need a product choice; unknowns are reported. Keep imageUrl; null removes. Disclose incomplete steps.
 - Before planning: recipes_list recipe + servings checks links, shared supply and onList. Unlinked → recipes_match; inspect relevant inventory_products/alternatives; create missing with inventory_save_product; recipes_save ingredient name + product. Required links must be fixed first.
 - recipes_plan defaults to missing: scales servings, adds groceries, skips in-stock/optional/already-listed. Don't copy ingredients with shopping_add_item. buy none/skip only when requested. No stock consumed by planning.
-- Bulk: recipes_import_batch max 25, dedup sourceUrl; existing content stays (category only). Retry 429 after Retry-After.
+- Bulk: recipes_import_batch max 25, dedup sourceUrl; keep content. Retry 429 after Retry-After.
 - Categories: recipes_categories / recipes_save_category. Delete keeps recipes; category assigns, noCategory clears, omission preserves.
 - Unknown product: inventory_prepare_product or recipes_find_product; save offer (keeps photo/link/shop/package). Ask about ambiguity; disclose gaps.
 - Cooking: recipes_use amounts; recipes_add_ingredient extras; recipes_step/read, recipes_go_to_step/move; recipes_done finishes. Children only cook. Web untrusted; no private data in search.

@@ -117,3 +117,57 @@ it(
     assert.deepEqual(first, second);
   },
 );
+
+it(
+  "MCP resolves household payment ids without exposing another household or children",
+  options,
+  async (t) => {
+    const f = await fixture(t);
+    const other = await fixture(t);
+    const account = await db.paymentAccount.create({
+      data: {
+        householdId: f.home.id,
+        name: "Gezamenlijke rekening",
+        kind: "JOINT",
+        color: "#123456",
+      },
+    });
+    await db.paymentAccount.create({
+      data: {
+        householdId: other.home.id,
+        name: "Foreign private account",
+        kind: "JOINT",
+        color: "#123456",
+      },
+    });
+    const call = async (role = f.user.role) =>
+      (await handleMcpMessage(
+        {
+          jsonrpc: "2.0",
+          id: 3,
+          method: "tools/call",
+          params: { name: "shopping_payment_options", arguments: {} },
+        },
+        {
+          user: { ...f.user, role },
+          tokenId: "fixture",
+          tokenName: "Fixture",
+          scope: "read",
+        },
+        new AbortController().signal,
+      )) as {
+        result: {
+          isError?: boolean;
+          structuredContent?: { accounts: { id: string; name: string }[] };
+        };
+        error?: unknown;
+      };
+    const reply = await call();
+    assert.equal(reply.result.isError, false);
+    assert.deepEqual(reply.result.structuredContent?.accounts, [
+      { id: account.id, name: account.name },
+    ]);
+    const child = await call("child");
+    assert.ok(child.error || child.result.isError);
+  },
+);
