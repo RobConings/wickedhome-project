@@ -142,7 +142,7 @@ async function rpc(method: string, params?: Record<string, unknown>) {
   return handleMcpMessage({ jsonrpc: "2.0", id: 1, method, params }, identity, signal);
 }
 
-type Priority = { name?: string; product?: string; stockStatus: string; buyingAdvice?: string | null; essential: boolean; importance: string };
+type Priority = { name?: string; product?: string; stockStatus: string; stockNeed?: string | null; buyingAdvice?: string | null; essential: boolean; importance: string };
 type CallResponse = { result: { isError: boolean; content: { text: string }[]; structuredContent?: unknown } };
 async function callMcp(name: string, args: Record<string, unknown> = {}) {
   return await rpc("tools/call", { name, arguments: args }) as CallResponse;
@@ -150,11 +150,11 @@ async function callMcp(name: string, args: Record<string, unknown> = {}) {
 
 function assertAllPriorities(items: Priority[]) {
   assert.equal(items.length, 4);
-  assert.deepEqual(items.map((item) => [item.stockStatus, item.buyingAdvice, item.essential, item.importance]), [
-    ["below_minimum", "to_buy", true, "essential"],
-    ["at_minimum", "warning", true, "essential"],
-    ["below_minimum", "to_buy", false, "nice_to_have"],
-    ["at_minimum", "warning", false, "nice_to_have"],
+  assert.deepEqual(items.map((item) => [item.stockStatus, item.stockNeed, item.buyingAdvice, item.essential, item.importance]), [
+    ["below_minimum", "out", "to_buy", true, "essential"],
+    ["at_minimum", "out", "to_buy", true, "essential"],
+    ["below_minimum", "out", "to_buy", false, "nice_to_have"],
+    ["at_minimum", "nearly_out", "warning", false, "nice_to_have"],
   ]);
 }
 
@@ -170,7 +170,8 @@ describe("shopping priority over MCP and the assistant", () => {
     assert.ok(list);
     assert.equal(list.inputSchema.properties.isEssential?.type, "boolean");
     assert.deepEqual(list.inputSchema.properties.stockStatus?.enum, ["below_minimum", "at_minimum", "above_minimum"]);
-    assert.match(list.description, /at_minimum = warning/);
+    assert.match(list.description, /essential at minimum/);
+    assert.deepEqual(list.inputSchema.properties.stockNeed?.enum, ["out", "nearly_out"]);
     const add = advertised.result.tools.find((tool) => tool.name === "shopping_add_item");
     assert.equal(add?.inputSchema.properties.product?.type, "string");
     const assistantSave = getAssistantTool("inventory.save_product");
@@ -258,7 +259,7 @@ describe("shopping priority over MCP and the assistant", () => {
     const data = stock.result.structuredContent as { essential: boolean; stock: Priority[] };
     assert.equal(data.essential, true);
     assert.equal(data.stock[0]?.stockStatus, "at_minimum");
-    assert.equal(data.stock[0]?.buyingAdvice, "warning");
+    assert.equal(data.stock[0]?.buyingAdvice, "to_buy");
     const products = await callMcp("inventory_products");
     assert.equal(products.result.isError, false);
     const catalogue = products.result.structuredContent as { items: { name: string; essential: boolean; importance: string }[] };
@@ -465,7 +466,7 @@ describe("shopping priority over MCP and the assistant", () => {
     assert.equal(result.essential, true);
     assert.equal(result.importance, "essential");
     assert.equal(result.stockStatus, "at_minimum");
-    assert.equal(result.buyingAdvice, "warning");
+    assert.equal(result.buyingAdvice, "to_buy");
     assert.equal(rows.at(-1)?.productId, "bread");
     assert.equal(rows.at(-1)?.source, "MANUAL");
   });
@@ -684,7 +685,8 @@ describe("shopping priority over MCP and the assistant", () => {
     }
     for (const id of ["shopping", "inventory"]) {
       const guide = getAssistantSkill(id)?.guide ?? "";
-      assert.match(guide, /at minimum = warning|at = warning/);
+      assert.match(guide, /essential at minimum = out/);
+      assert.match(guide, /nonessential at minimum = (nearly_out|out.*nearly_out)/);
       assert.match(guide, /person (chooses|decides) what to buy/);
     }
   });
@@ -713,4 +715,16 @@ it("MCP shopping ticks automatically restock verified goods once, including lega
     assert.equal(result.result.isError, false, result.result.content[0]?.text);
   }
   assert.equal(item.quantity.toNumber(), 3); assert.equal(movements.mock.callCount(), 1); assert.equal(purchases.length, 1);
+});
+
+it("MCP filters forecasts separately from raw stock comparisons", async (t) => {
+  setup(t);
+  const out = await callMcp("shopping_list", { stockNeed: "out" });
+  assert.equal(out.result.isError, false);
+  const data = out.result.structuredContent as { items: Priority[] };
+  assert.deepEqual(data.items.map((item) => item.name), ["Milk", "Bread", "Chocolate"]);
+  assert.ok(data.items.every((item) => item.stockNeed === "out" && item.buyingAdvice === "to_buy"));
+  const near = await callMcp("shopping_list", { stockNeed: "nearly_out" });
+  assert.equal(near.result.isError, false);
+  assert.deepEqual((near.result.structuredContent as { items: Priority[] }).items.map((item) => item.name), ["Coffee"]);
 });

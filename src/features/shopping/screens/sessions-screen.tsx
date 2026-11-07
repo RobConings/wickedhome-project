@@ -1,3 +1,5 @@
+import { ShoppingNeedSections } from "../components/shopping-need-sections";
+import { ShoppingStockFilterField } from "../components/shopping-stock-filter";
 import { visitRequirements } from "../types/shopping-product-rows";
 import { SessionPayments } from "../components/session-payments";
 import { useLiveEventsStatus } from "@/lib/live-events";
@@ -25,7 +27,11 @@ import {
   AutomaticShoppingFilter,
   CategoryOrder,
 } from "../components/shopping-preferences";
-import { groupItemsByCategory } from "../components/shopping-grouping";
+import {
+  groupItemsByCategory,
+  matchesStockFilter,
+  type ShoppingStockFilter,
+} from "../components/shopping-grouping";
 import {
   addSessionItem,
   attachReceipt,
@@ -63,6 +69,8 @@ export function SessionsScreen({
   useLiveRevalidation();
   const liveStatus = useLiveEventsStatus();
   const [busy, setBusy] = React.useState(false);
+  const [stockFilter, setStockFilter] =
+    React.useState<ShoppingStockFilter>("all");
   const [includeLowStock, setIncludeLowStock] = React.useState(true);
   const [selected, setSelected] = React.useState<string[]>([]);
   const [shopIds, setShopIds] = React.useState<string[]>([]);
@@ -82,7 +90,7 @@ export function SessionsScreen({
     shopping.overview.items.filter((item) => item.status === "open"),
     includeLowStock,
     new Map(shopping.products.map((product) => [product.id, product])),
-  );
+  ).filter((item) => matchesStockFilter(item, stockFilter));
   const active = session?.status === "active";
   const title = session?.name ?? t("sessions.title");
   const renderItem = (item: SessionItem) =>
@@ -127,6 +135,24 @@ export function SessionsScreen({
       <p role="status" className="text-xs text-muted-foreground">
         {t(`sessions.live_${liveStatus}`)}
       </p>
+      {(!session || active) && (
+        <ShoppingStockFilterField
+          value={stockFilter}
+          onChange={setStockFilter}
+        />
+      )}
+      {stockFilter !== "all" &&
+        (!session
+          ? open.length === 0
+          : active &&
+            !session.items.some(
+              (item) =>
+                item.status === "open" && matchesStockFilter(item, stockFilter),
+            )) && (
+          <p role="status" className="text-sm text-muted-foreground">
+            {t("shopView.filters.noResults")}
+          </p>
+        )}
       {!session ? (
         <>
           {canManage && (
@@ -228,37 +254,41 @@ export function SessionsScreen({
                       <legend className="font-medium">
                         {t(`categories.${group.category}`)}
                       </legend>
-                      {group.items.map((item) => (
-                        <label
-                          key={item.id}
-                          className="flex min-h-12 items-center gap-3 border-b text-sm"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selected.includes(item.id)}
-                            onChange={(event) =>
-                              setSelected((ids) =>
-                                event.target.checked
-                                  ? [...ids, item.id]
-                                  : ids.filter((id) => id !== item.id),
-                              )
-                            }
-                          />
-                          <span>
-                            {item.name}{" "}
-                            <span className="text-muted-foreground">
-                              {item.quantity} {item.unit} ·{" "}
-                              {[
-                                ...new Set(
-                                  (item.requirements ?? [item]).map((part) =>
-                                    t(`sources.${part.source}`),
-                                  ),
-                                ),
-                              ].join(", ")}
-                            </span>
-                          </span>
-                        </label>
-                      ))}
+                      <ShoppingNeedSections items={group.items}>
+                        {(items) =>
+                          items.map((item) => (
+                            <label
+                              key={item.id}
+                              className="flex min-h-12 items-center gap-3 border-b text-sm"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selected.includes(item.id)}
+                                onChange={(event) =>
+                                  setSelected((ids) =>
+                                    event.target.checked
+                                      ? [...ids, item.id]
+                                      : ids.filter((id) => id !== item.id),
+                                  )
+                                }
+                              />
+                              <span>
+                                {item.name}{" "}
+                                <span className="text-muted-foreground">
+                                  {item.quantity} {item.unit} ·{" "}
+                                  {[
+                                    ...new Set(
+                                      (item.requirements ?? [item]).map(
+                                        (part) => t(`source.${part.source}`),
+                                      ),
+                                    ),
+                                  ].join(", ")}
+                                </span>
+                              </span>
+                            </label>
+                          ))
+                        }
+                      </ShoppingNeedSections>
                     </fieldset>
                   ))}
                 </div>
@@ -319,19 +349,27 @@ export function SessionsScreen({
           {order
             .filter((category) =>
               session.items.some(
-                (item) => item.category === category && item.status === "open",
+                (item) =>
+                  item.category === category &&
+                  item.status === "open" &&
+                  matchesStockFilter(item, stockFilter),
               ),
             )
             .map((category) => (
               <Card className="space-y-3" key={category}>
                 <CardTitle>{t(`categories.${category}`)}</CardTitle>
-                {session.items
-                  .filter(
-                    (item) =>
-                      item.category === category && item.status === "open",
-                  )
-                  .sort((a, b) => a.name.localeCompare(b.name, "nl"))
-                  .map(renderItem)}
+                <ShoppingNeedSections
+                  items={session.items
+                    .filter(
+                      (item) =>
+                        item.category === category &&
+                        item.status === "open" &&
+                        matchesStockFilter(item, stockFilter),
+                    )
+                    .sort((a, b) => a.name.localeCompare(b.name, "nl"))}
+                >
+                  {(items) => items.map(renderItem)}
+                </ShoppingNeedSections>
               </Card>
             ))}
           {(["bought", "skipped"] as const).map((status) => {

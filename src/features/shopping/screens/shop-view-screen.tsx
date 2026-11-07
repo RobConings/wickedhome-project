@@ -216,6 +216,7 @@ export function ShopViewScreen({
               const list = (
                 <ShoppingItemList
                   groupByCategory={false}
+                  groupByNeed={sort !== "priority"}
                   items={group.items}
                   shops={shops}
                   size="large"

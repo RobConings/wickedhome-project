@@ -45,7 +45,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "shopping.session",
   description:
-    "Read a shopping visit with item ids/revisions, bought quantities, participants, receipts, acquisitions and known stock locations. Read before writing; a conflict requires a fresh read. Item revision is distinct from session revision (used for closing). stockAdded false means goods were logged without changing tracked stock; report that accurately.",
+    "Read a shopping visit with item ids/revisions, bought quantities, participants, receipts, acquisitions and known stock locations. stockNeed out (Op) means below minimum or essential at minimum; nearly_out (Bijna op) means nonessential at minimum. Forecast, not zero stock. Read before writing; a conflict requires a fresh read. Item revision is distinct from session revision (used for closing). stockAdded false means goods were logged without changing tracked stock; report that accurately.",
   input: z.object({ sessionId: idSchema }),
   permission: "read",
   confirm: "never",

@@ -202,11 +202,11 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
             <SearchField className="flex-1" value={query} onValueChange={search} label={t("lists.searchLabel")} placeholder={t("lists.search")} />
             <AutomaticShoppingFilter included={includeLowStock} onChange={setIncludeLowStock} />
             <CategoryOrder order={order} onChange={change} />
-            <ShoppingStockFilterField value={stockFilter} onChange={(value) => setSearchParams((params) => {
+          </div>
+          <ShoppingStockFilterField value={stockFilter} onChange={(value) => setSearchParams((params) => {
               if (value === "all") params.delete("stock"); else params.set("stock", value);
               return params;
             }, { replace: true, preventScrollReset: true })} />
-          </div>
 
           {filtering && (
             <p role="status" className="text-sm text-muted-foreground">

@@ -590,12 +590,11 @@ it(
     });
     assert.equal(visit.items[0]?.quantity, 1);
     assert.deepEqual(visit.items[0]?.requirementIds, [recipe.id]);
-    await updateShoppingSessionItem(
-      f.user,
-      visit.id,
-      visit.items[0]!.id,
-      { revision: 0, operationId: "recipe-buy", status: "bought" },
-    );
+    await updateShoppingSessionItem(f.user, visit.id, visit.items[0]!.id, {
+      revision: 0,
+      operationId: "recipe-buy",
+      status: "bought",
+    });
     assert.equal(await f.quantity(), 1);
     assert.equal(
       (await listItems(f.home.id, { status: "open" })).length,
@@ -719,5 +718,33 @@ it(
       quantity: 1,
     });
     assert.equal(extra.items[0]?.unit, "potje");
+  },
+);
+
+it(
+  "session forecasts distinguish essential at minimum without changing actual stock",
+  options,
+  async (t) => {
+    const f = await fixture(t);
+    await db.stockItem.update({
+      where: { id: f.stock.id },
+      data: { quantity: 2, minQuantity: 2 },
+    });
+    const visit = await f.start();
+    assert.equal(visit.items[0]?.stockStatus, "at_minimum");
+    assert.equal(visit.items[0]?.stockNeed, "out");
+    await db.product.update({
+      where: { id: f.product.id },
+      data: { isEssential: false },
+    });
+    const next = await getShoppingSession(f.user, visit.id);
+    assert.equal(next.items[0]?.stockStatus, "at_minimum");
+    assert.equal(next.items[0]?.stockNeed, "nearly_out");
+    assert.equal(next.items[0]?.isEssential, false);
+    assert.equal(await f.quantity(), 2);
+    assert.equal(
+      await db.stockPurchase.count({ where: { householdId: f.home.id } }),
+      0,
+    );
   },
 );

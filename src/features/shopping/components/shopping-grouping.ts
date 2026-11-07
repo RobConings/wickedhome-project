@@ -1,6 +1,6 @@
 import { matchesSearch } from "@/components/shared/general-list-helpers";
 import type { Shop, ShopRef } from "@/features/shops";
-import { NO_SHOP, PRODUCT_CATEGORIES, type ProductCategory, type ShoppingItem } from "../types/shopping";
+import { NO_SHOP, PRODUCT_CATEGORIES, shoppingStockNeed, type ProductCategory, type ShoppingItem } from "../types/shopping";
 import { shoppingItemListIds } from "../types/shopping-product-rows";
 
 export type ShopGroup = {
@@ -45,15 +45,14 @@ export function groupItemsByCategory(items: ShoppingItem[], order: readonly Prod
 
 // Shop view: priority, sort and filters -----------------------------------------------------------------
 
-/** How urgent an item is, most urgent first: stock below minimum, at minimum, then essential, other, extras. */
-export const PRIORITY_TIERS = ["urgent", "warning", "essential", "normal", "extra"] as const;
+/** How urgent an item is, most urgent first: Op, Bijna op, then other explicit groceries. */
+export const PRIORITY_TIERS = ["urgent", "warning", "normal"] as const;
 export type PriorityTier = (typeof PRIORITY_TIERS)[number];
 
 export function priorityTier(item: Pick<ShoppingItem, "stockStatus" | "isEssential">): PriorityTier {
-  if (item.stockStatus === "below_minimum") return "urgent";
-  if (item.stockStatus === "at_minimum") return "warning";
-  if (item.isEssential === true) return "essential";
-  if (item.isEssential === false) return "extra";
+  const need = shoppingStockNeed(item.stockStatus, item.isEssential);
+  if (need === "out") return "urgent";
+  if (need === "nearly_out") return "warning";
   return "normal";
 }
 
@@ -100,12 +99,12 @@ export type ShopViewFilters = {
   includeLowStock?: boolean;
 };
 
-export const SHOPPING_STOCK_FILTERS = ["all", "low", "below_minimum", "at_minimum", "above_minimum", "untracked"] as const;
+export const SHOPPING_STOCK_FILTERS = ["all", "out", "nearly_out", "low", "below_minimum", "at_minimum", "above_minimum", "untracked"] as const;
 export type ShoppingStockFilter = (typeof SHOPPING_STOCK_FILTERS)[number];
 export const parseStockFilter = (value: string | null): ShoppingStockFilter =>
   SHOPPING_STOCK_FILTERS.find((option) => option === value) ?? "all";
-export const matchesStockFilter = (item: Pick<ShoppingItem, "stockStatus">, filter: ShoppingStockFilter = "all") =>
-  filter === "all" || (filter === "low" ? item.stockStatus === "below_minimum" || item.stockStatus === "at_minimum" : filter === "untracked" ? item.stockStatus === null : item.stockStatus === filter);
+export const matchesStockFilter = (item: Pick<ShoppingItem, "stockStatus" | "isEssential">, filter: ShoppingStockFilter = "all") =>
+  filter === "all" || (filter === "out" || filter === "nearly_out" ? shoppingStockNeed(item.stockStatus, item.isEssential) === filter : filter === "low" ? item.stockStatus === "below_minimum" || item.stockStatus === "at_minimum" : filter === "untracked" ? item.stockStatus === null : item.stockStatus === filter);
 
 export const NO_SHOP_VIEW_FILTERS: ShopViewFilters = { query: "", category: "all", listId: "all", priority: "all", stock: "all" };
 

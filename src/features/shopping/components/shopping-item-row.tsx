@@ -1,5 +1,6 @@
+import { shoppingStockNeed } from "../types/shopping";
 import * as React from "react";
-import { CheckIcon, ChevronDownIcon, ExternalLinkIcon, MapPinIcon, MoreHorizontalIcon, PackageIcon, PencilIcon, Trash2Icon, TriangleAlertIcon } from "lucide-react";
+import { CheckIcon, ChevronDownIcon, ExternalLinkIcon, MapPinIcon, MoreHorizontalIcon, PackageIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,6 @@ import type { ShoppingItem } from "../types/shopping";
 import { shoppingItemQuantity } from "../types/shopping-product-rows";
 import { ShoppingSourceBadge } from "./shopping-source-badge";
 import { ShoppingStockBadge } from "./shopping-stock-badge";
-import { ProductEssentialBadge } from "./product-essential-badge";
 
 type ShoppingItemRowProps = {
   item: ShoppingItem;
@@ -70,6 +70,7 @@ export function ShoppingItemRow({
   const detailsId = React.useId();
   const tickId = React.useId();
   const bought = item.status === "bought";
+  const stockNeed = shoppingStockNeed(item.stockStatus, item.isEssential);
   const large = size === "large";
   // The item's shop reference carries the type and logo too; `shop` (the full shop) wins when given.
   const shopForBadge = shop ?? item.shop;
@@ -82,8 +83,7 @@ export function ShoppingItemRow({
     // A project's own materials show the project chip instead of "For a task".
     ...reasons.filter((part) => showSource && part.source !== "manual" && !(part.source === "task" && !part.taskId && part.project) && !(part.source === "low_stock" && item.stockStatus))
       .map((part) => <ShoppingSourceBadge key={`source-${part.source}-${part.recipe?.entryId ?? part.taskId ?? ""}`} source={part.source} taskTitle={taskTitle} recipeName={part.recipe?.name} />),
-    item.stockStatus && <ShoppingStockBadge key="stock" status={item.stockStatus} showAdvice={!bought} />,
-    item.isEssential !== null && <ProductEssentialBadge key="essential" isEssential={item.isEssential} />,
+    item.stockStatus && <ShoppingStockBadge key="stock" status={item.stockStatus} isEssential={item.isEssential} showAdvice={!bought} />,
     showShop && shopForBadge && <ShopBadge key="shop" shop={shopForBadge} />,
     showList && (
       <Badge key="list" variant="secondary" className="max-w-40 font-normal">
@@ -108,7 +108,6 @@ export function ShoppingItemRow({
     extraBadges && <React.Fragment key="extra">{extraBadges}</React.Fragment>,
   ].filter(Boolean);
 
-  const stockWarning = !bought && item.stockStatus && item.stockStatus !== "above_minimum";
 
   return (
     <li className={cn("grid min-w-0 grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] items-center gap-x-1", large ? "py-2.5" : "py-2", className)}>
@@ -145,7 +144,7 @@ export function ShoppingItemRow({
             <span className={cn("tabular-nums", !item.amounts && "shrink-0", item.amounts && "truncate")}>{quantity}</span>
             {showShop && shopForBadge && <><span aria-hidden="true">·</span><span className="truncate">{shopForBadge.name}</span></>}
             {item.priceCents !== null && <span className="ml-auto shrink-0 tabular-nums">{formatCurrency(item.priceCents, locale)}</span>}
-            {showStockStatus && stockWarning && <TriangleAlertIcon className={cn("size-3 shrink-0", item.stockStatus === "below_minimum" ? "text-danger" : "text-warning")} aria-label={t(`stockHelp.${item.stockStatus}`)}><title>{t(`stockHelp.${item.stockStatus}`)}</title></TriangleAlertIcon>}
+            {showStockStatus && !bought && stockNeed && <span className={cn("shrink-0 font-medium", stockNeed === "out" ? "text-danger" : "text-warning")} title={t(`stockNeedHelp.${stockNeed}`)}>{t(`stockNeed.${stockNeed}`)}</span>}
             <ChevronDownIcon aria-hidden="true" className={cn("size-3 shrink-0 transition-transform", detailsOpen && "rotate-180")} />
           </span>
         </span>

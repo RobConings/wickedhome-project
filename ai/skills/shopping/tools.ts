@@ -2,7 +2,7 @@ import "./sessions";
 import { updateShoppingItem } from "@/api/shopping/shopping-actions";
 import { z } from "zod";
 import { stockPurchaseInputSchema } from "@/features/inventory/types/purchases";
-import { SHOPPING_LIST_KINDS, formatQuantity, type ShoppingItem } from "@/features/shopping/types/shopping";
+import { SHOPPING_LIST_KINDS, formatQuantity, shoppingStockNeed, type ShoppingItem } from "@/features/shopping/types/shopping";
 import { shoppingListViews } from "@/features/shopping/types/shopping-list-views";
 import { shoppingItemListIds, shoppingItemQuantity } from "@/features/shopping/types/shopping-product-rows";
 import { formatStapleRRule } from "@/features/shopping/types/staple-recurrence";
@@ -141,7 +141,7 @@ async function checkProductLink(ctx: AssistantToolContext, input: { name: string
 registerAssistantTool({
   name: "shopping.list",
   description:
-    "One open buying row per catalogue product, across lists and sources. requirements retains all meal/task/manual/stock reasons; replenishment targets are not added on top of recipe needs. Updates, ticks and removal affect the complete row by id. amountNeedsReview means incompatible amounts remain explicit: do not invent a conversion. Combine stores with shops or shopGroup (shops_groups lists groups). Use q to search. stockStatus/buyingAdvice: below_minimum = to_buy; at_minimum = warning. Essential/nice_to_have is separate. Filter by shop, list, task, stockStatus or isEssential; bought shows recent purchases.",
+    "One open buying row per catalogue product, across lists and sources. requirements retains all meal/task/manual/stock reasons; replenishment targets are not added on top of recipe needs. Updates, ticks and removal affect the complete row by id. amountNeedsReview means incompatible amounts remain explicit: do not invent a conversion. Combine stores with shops or shopGroup (shops_groups lists groups). Use q to search. stockNeed out (Op) = below minimum OR essential at minimum; nearly_out (Bijna op) = nonessential at minimum. This is a forecast, not zero stock. buyingAdvice is to_buy for out, warning for nearly_out. Filter by stockNeed, raw stockStatus, shop, list, task or isEssential; bought shows recent purchases.",
   input: z.object({
     q: z.string().trim().min(1).max(120).optional().describe("Part of the item name; use to retrieve all copies of a suspected duplicate, including their unique ids"),
     shop: entityRef("shop", "Only items for this shop").optional(),
@@ -151,7 +151,8 @@ registerAssistantTool({
     task: entityRef("task", "The materials of this task").optional(),
     bought: z.boolean().optional().describe("Show what was ticked off in the last day (a question). 'Ik heb X gekocht' is shopping_update_item bought true"),
     isEssential: z.boolean().optional().describe("Optional read filter: true for essentials, false for nice-to-haves; omitted returns both"),
-    stockStatus: z.enum(["below_minimum", "at_minimum", "above_minimum"]).optional().describe("Optional read filter: below minimum needs buying; at minimum is a warning"),
+    stockStatus: z.enum(["below_minimum", "at_minimum", "above_minimum"]).optional().describe("Raw quantity comparison; use stockNeed for Op/Bijna op, which also considers essential"),
+    stockNeed: z.enum(["out", "nearly_out"]).optional().describe("out = below minimum or essential at minimum; nearly_out = nonessential at minimum; forecast, not an exact count"),
   }),
   permission: "read",
   confirm: "never",
@@ -174,7 +175,8 @@ registerAssistantTool({
         (!hasShopFilter || (item.shopId !== null && shopIds.has(item.shopId))) &&
         (!selectedListIds || shoppingItemListIds(item).some((id) => selectedListIds.includes(id))) &&
         (input.isEssential === undefined || item.isEssential === input.isEssential) &&
-        (!input.stockStatus || item.stockStatus === input.stockStatus),
+        (!input.stockStatus || item.stockStatus === input.stockStatus) &&
+        (!input.stockNeed || shoppingStockNeed(item.stockStatus, item.isEssential) === input.stockNeed),
     );
     const open = overview.items.filter((item) => item.status === "open");
     const manyLists = views.length > 1;

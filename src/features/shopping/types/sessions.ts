@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { idSchema } from "@/types/common";
-import { productCategorySchema } from "./shopping";
+import {
+  type ShoppingStockStatus,
+  type ShoppingStockNeed,
+  productCategorySchema,
+} from "./shopping";
 
 const amount = z.number().min(0.001).max(100_000).multipleOf(0.001);
 export const sessionCreateSchema = z.object({
@@ -123,6 +127,9 @@ export type ReceiptAttachInput = z.infer<typeof receiptAttachSchema>;
 export type ReceiptLineInput = z.infer<typeof receiptLineSchema>;
 
 export type SessionItem = {
+  stockNeed: ShoppingStockNeed | null;
+  stockStatus: ShoppingStockStatus | null;
+  isEssential: boolean | null;
   id: string;
   productId: string | null;
   name: string;

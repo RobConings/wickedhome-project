@@ -70,8 +70,8 @@ De waarnemingen uit de winkel dateren van vóór merge `bdc1a96`. Producten, Sho
 | --- | --- |
 | `npm run typecheck` | Geslaagd |
 | `npm run lint` | Geslaagd |
-| `npm test` | 1.600 geslaagd; 22 database-integratietests bewust overgeslagen in deze unitrun |
-| `npm run test:shopping-integration` | Alle 22 tests geslaagd op echte PostgreSQL, inclusief MCP |
+| `npm test` | 1.603 geslaagd; 23 database-integratietests bewust overgeslagen in deze unitrun |
+| `npm run test:shopping-integration` | Alle 23 tests geslaagd op echte PostgreSQL, inclusief MCP |
 | `npm run test:shopping-migrations` | 103 oude tabellen vergeleken; alle 14 representatieve bestaande records exact behouden |
 | `npm run test:shopping-browser` | Geslaagd met twee onafhankelijke mobiele Chrome-contexten van 390 × 844 |
 | `npm run build` | Client en API gebouwd |
@@ -140,3 +140,29 @@ De AI leest deze regels via `skills_load` voor shopping, inventory, recipes en e
 - **Veilig gedeeld:** web en MCP gebruiken dezelfde transacties en events. De bestaande MCP-bevestiging voor schrijfacties blijft gelden. Kinderen kunnen geen financiële opties lezen of betalingen vastleggen.
 
 Aanvullend gecontroleerd: alle 31 bestaande MCP-/toolcontracttests slagen, inclusief echte JSON Schema-generatie en het maximale formaat van de AI-handleidingen. Een extra PostgreSQL/MCP-test controleert het uitlezen van betaalrekening-ID's, household-isolatie en het weigeren van toegang voor kinderen.
+
+
+## Aanpassing: Op en Bijna op
+
+De losse essentieel/extraatjes-filter in de winkelweergave is vervangen door direct zichtbare
+**Alles / Op / Bijna op**-knoppen. Opnieuw op de actieve knop drukken toont Alles. Binnen elke
+categorie staan Op en Bijna op gescheiden door een divider; overige expliciete/receptboodschappen
+blijven in Alles zichtbaar. Dit geldt voor de gewone lijst, winkelweergave, sessieselectie en actieve
+sessies.
+
+| Voorraad | Essentieel | Advies |
+| --- | --- | --- |
+| Onder minimum | Ja of nee | Op |
+| Precies op minimum | Ja | Op |
+| Precies op minimum | Nee | Bijna op |
+| Boven minimum of zonder bekende minimumvoorraad | Ja of nee | Geen van beide; expliciete behoeften blijven zichtbaar |
+
+Op is een voorspelling dat aanvullen nodig kan zijn, geen uitspraak dat de fysieke voorraad nul is.
+De minimumvoorraad, essential-instelling en aankoopadministratie blijven behouden. Eén gedeelde
+functie bepaalt dit advies voor web en MCP. De ruwe `stockStatus` blijft bestaan; `stockNeed` geeft
+`out` of `nearly_out` terug en is ook een MCP-leesfilter. Sessie-reads halen actuele voorraadcontext
+op; daarvoor is geen datamigratie nodig. De AI-handleidingen en toolbeschrijvingen beschrijven de nieuwe grensregel.
+
+Validatie: 1.603 unittests en 23 PostgreSQL/MCP-integratietests geslaagd. De uitgebreide mobiele
+browsertest controleert scheidingen, beide filters en het terugschakelen naar Alles in de gewone
+lijst, winkelweergave en sessieselectie, gevolgd door de bestaande aankoop-/bon-/betalingsworkflow.

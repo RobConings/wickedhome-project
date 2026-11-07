@@ -64,11 +64,11 @@
   },
   "guidance": {
     "label": "How does this list work?",
-    "choice": "Your regular groceries and stock replenishments appear together. Filter stock levels separately; essential or nice to have indicates importance."
+    "choice": "Each category separates Out, Nearly out and other groceries. Below minimum is Out. Essential at minimum is also Out; nonessential at minimum is Nearly out. This is a replenishment forecast, not an exact count. You choose what to buy."
   },
   "fields": {
     "isEssential": "Essential product",
-    "isEssentialDescription": "Mark household essentials. Other products appear as nice to have on shopping lists.",
+    "isEssentialDescription": "An essential product is Out at or below minimum. Other products at minimum are Nearly out.",
     "packageSize": "Content per package",
     "packageSizeDescription": "What one package holds, e.g. 200 g; a 6 x 33 cl pack is 198 cl. Lets recipes in grams or litres check the stock.",
     "packageUnit": "Unit of the content",
@@ -213,10 +213,10 @@
       "price": "Most expensive first"
     },
     "tiers": {
-      "urgent": "To buy · below minimum",
-      "warning": "Warning · at minimum",
+      "urgent": "Out",
+      "warning": "Nearly out",
       "essential": "Essential",
-      "normal": "Other",
+      "normal": "Other groceries",
       "extra": "Extras"
     },
     "filters": {
@@ -384,12 +384,14 @@
   },
   "stockFilter": {
     "label": "Stock filter",
-    "all": "All stock levels",
-    "low": "Running low (at or below minimum)",
+    "all": "All",
+    "low": "Out and nearly out",
     "below_minimum": "Below minimum",
     "at_minimum": "At minimum",
     "above_minimum": "Above minimum",
-    "untracked": "Without stock status"
+    "untracked": "Without stock status",
+    "out": "Out",
+    "nearly_out": "Nearly out"
   },
   "shopGroups": {
     "choose": "Choose shops",
@@ -503,5 +505,15 @@
     "save": "Save payment",
     "loading": "Loading payment details…",
     "manage": "Add or link payment"
+  },
+  "stockNeed": {
+    "out": "Out",
+    "nearly_out": "Nearly out",
+    "other": "Other groceries"
+  },
+  "stockNeedHelp": {
+    "out": "Replenishment forecast: below minimum, or essential and exactly at minimum. This does not necessarily mean zero stock.",
+    "nearly_out": "Not essential and exactly at minimum: consider picking it up already.",
+    "other": "Explicitly added or needed for a recipe, without this stock forecast."
   }
 }

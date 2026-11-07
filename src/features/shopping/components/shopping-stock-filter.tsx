@@ -1,15 +1,35 @@
 import { useTranslation } from "react-i18next";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SHOPPING_STOCK_FILTERS, type ShoppingStockFilter } from "./shopping-grouping";
+import { Button } from "@/components/ui/button";
+import type { ShoppingStockFilter } from "./shopping-grouping";
 
-export function ShoppingStockFilterField({ value, onChange }: { value: ShoppingStockFilter; onChange: (value: ShoppingStockFilter) => void }) {
+/** Always visible toggle buttons, including on a phone; pressing an active filter clears it. */
+export function ShoppingStockFilterField({
+  value,
+  onChange,
+}: {
+  value: ShoppingStockFilter;
+  onChange: (value: ShoppingStockFilter) => void;
+}) {
   const { t } = useTranslation("shopping");
   return (
-    <Select value={value} onValueChange={(next) => onChange(next as ShoppingStockFilter)}>
-      <SelectTrigger className="w-full sm:w-56" aria-label={t("stockFilter.label")}><SelectValue /></SelectTrigger>
-      <SelectContent>
-        {SHOPPING_STOCK_FILTERS.map((option) => <SelectItem key={option} value={option}>{t(`stockFilter.${option}`)}</SelectItem>)}
-      </SelectContent>
-    </Select>
+    <div
+      className="flex flex-wrap gap-1"
+      role="group"
+      aria-label={t("stockFilter.label")}
+    >
+      {(["all", "out", "nearly_out"] as const).map((option) => (
+        <Button
+          key={option}
+          type="button"
+          size="sm"
+          className="min-h-11"
+          variant={value === option ? "secondary" : "ghost"}
+          aria-pressed={value === option}
+          onClick={() => onChange(value === option ? "all" : option)}
+        >
+          {t(`stockFilter.${option}`)}
+        </Button>
+      ))}
+    </div>
   );
 }

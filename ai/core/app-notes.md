@@ -26,9 +26,9 @@ Read at runtime by ai/core/app-map.ts; never part of the system prompt.
 - Some tasks come from other areas (put the bins out, pay a bill, meal vouchers) and link back to them.
 - Children complete their own tasks.
 
-## Shopping | boodschappen, boodschappenlijst, winkel, shopping list, groceries, product, producten, vaste producten, staples
-- Groceries and automatic replenishments appear together. Low stock is a separate filter (at minimum = warning, below = to buy). Items link to catalogue products and shared stock; reuse links and existing entries.
-- Buying and restocking are separate. Staples recur. Custom lists remain available.
+## Shopping | winkelsessie, winkelbeurt, kassabon, boodschappen, boodschappenlijst, winkel, shopping list, groceries, product, producten, vaste producten, staples
+- Shared visits select needs. Op/out = below minimum or essential at minimum; Bijna op/nearly_out = nonessential at minimum. Forecasts, not zero stock; use toggles and category dividers.
+- Reuse catalogue/shared-stock links. Buying credits known stock once; later receipts reuse it. Staples and custom lists remain.
 
 ## Recipes and cooking | recept, recepten, koken, ingredient, recipe, recipes, cooking, meal, to cook
 - Ingredients link to catalogue products and their shared stock. Match and save these links before planning; package sizes convert recipe amounts to stock packs.

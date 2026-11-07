@@ -64,11 +64,11 @@
   },
   "guidance": {
     "label": "Hoe werkt deze lijst?",
-    "choice": "Je gewone boodschappen en voorraadaanvullingen staan samen. Filter apart op voorraad; essentieel of extraatje geeft het belang aan."
+    "choice": "Elke categorie is verdeeld in Op, Bijna op en overige boodschappen. Onder minimum is Op. Essentieel en op minimum is ook Op; niet essentieel en op minimum is Bijna op. Het is een aanvuladvies, geen exacte telling. Je kiest zelf wat je meeneemt."
   },
   "fields": {
     "isEssential": "Essentieel product",
-    "isEssentialDescription": "Markeer essentiële producten. Andere producten staan als extraatje op je boodschappenlijsten.",
+    "isEssentialDescription": "Een essentieel product staat bij Op zodra het op of onder minimum komt. Andere producten op minimum staan bij Bijna op.",
     "packageSize": "Inhoud per verpakking",
     "packageSizeDescription": "Wat één verpakking bevat, bv. 200 g; een pak 6 x 33 cl is 198 cl. Zo kunnen recepten in gram of liter de voorraad checken.",
     "packageUnit": "Eenheid van de inhoud",
@@ -213,10 +213,10 @@
       "price": "Duurste eerst"
     },
     "tiers": {
-      "urgent": "Aanvullen",
+      "urgent": "Op",
       "warning": "Bijna op",
       "essential": "Essentieel",
-      "normal": "Overige",
+      "normal": "Overige boodschappen",
       "extra": "Extraatjes"
     },
     "filters": {
@@ -384,12 +384,14 @@
   },
   "stockFilter": {
     "label": "Voorraadfilter",
-    "all": "Alle voorraadniveaus",
-    "low": "Bijna op (op of onder minimum)",
+    "all": "Alles",
+    "low": "Op en bijna op",
     "below_minimum": "Onder minimum",
     "at_minimum": "Op minimum",
     "above_minimum": "Boven minimum",
-    "untracked": "Zonder voorraadstatus"
+    "untracked": "Zonder voorraadstatus",
+    "out": "Op",
+    "nearly_out": "Bijna op"
   },
   "shopGroups": {
     "choose": "Winkels kiezen",
@@ -503,5 +505,15 @@
     "save": "Betaling opslaan",
     "loading": "Betaalgegevens laden…",
     "manage": "Betaling toevoegen of koppelen"
+  },
+  "stockNeed": {
+    "out": "Op",
+    "nearly_out": "Bijna op",
+    "other": "Overige boodschappen"
+  },
+  "stockNeedHelp": {
+    "out": "Aanvuladvies: onder minimum, of essentieel en precies op minimum. Dit betekent niet noodzakelijk dat de voorraad nul is.",
+    "nearly_out": "Niet essentieel en precies op minimum: misschien alvast meenemen.",
+    "other": "Zelf toegevoegd of nodig voor een recept, zonder dit voorraadadvies."
   }
 }

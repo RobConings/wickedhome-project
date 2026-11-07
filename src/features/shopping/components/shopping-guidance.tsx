@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import { ProductEssentialBadge } from "./product-essential-badge";
 import { ShoppingStockBadge } from "./shopping-stock-badge";
 
 /** Both stock levels stay on the list; importance and urgency help the person choose what to buy. */
@@ -12,8 +11,6 @@ export function ShoppingGuidance() {
       <div className="flex flex-wrap gap-2 pb-2">
         <ShoppingStockBadge status="below_minimum" />
         <ShoppingStockBadge status="at_minimum" />
-        <ProductEssentialBadge isEssential />
-        <ProductEssentialBadge isEssential={false} />
       </div>
     </details>
   );

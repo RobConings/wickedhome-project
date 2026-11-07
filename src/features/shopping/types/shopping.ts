@@ -371,6 +371,13 @@ export type ShoppingItemAlternative = {
 
 export type ShoppingStockStatus = "below_minimum" | "at_minimum" | "above_minimum";
 
+/** Forecast for replenishment, separate from the actual stock comparison ("out" need not mean zero). */
+export type ShoppingStockNeed = "out" | "nearly_out";
+export function shoppingStockNeed(status: ShoppingStockStatus | null | undefined, essential: boolean | null | undefined): ShoppingStockNeed | null {
+  if (status === "below_minimum" || (status === "at_minimum" && essential === true)) return "out";
+  return status === "at_minimum" ? "nearly_out" : null;
+}
+
 /** Current stock labels, with a place-specific item using that place whenever stock is kept there. */
 export function shoppingStockStatus(stock: readonly { placeId: string; quantity: number; minQuantity: number | null }[], placeId: string | null): ShoppingStockStatus | null {
   const atPlace = placeId ? stock.filter((item) => item.placeId === placeId) : [];

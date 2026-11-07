@@ -1,3 +1,7 @@
+import {
+  shoppingStockStatus,
+  shoppingStockNeed,
+} from "@/features/shopping/types/shopping";
 import { householdStockUnit } from "@/types/units";
 import { createHash } from "node:crypto";
 import type { SessionUser } from "@/features/auth/types/auth";
@@ -104,15 +108,40 @@ export async function getShoppingSession(
     select: { id: true, email: true, habitant: { select: { name: true } } },
   });
   const stock = await listStock(user.householdId);
+  const products = await db.product.findMany({
+    where: {
+      householdId: user.householdId,
+      id: {
+        in: row.items.flatMap((item) =>
+          item.productId ? [item.productId] : [],
+        ),
+      },
+    },
+    select: { id: true, isEssential: true, stockProductId: true },
+  });
+  const byProduct = new Map(products.map((product) => [product.id, product]));
   return {
     ...summary(row),
-    items: row.items.map((item) => ({
-      ...item,
-      category: item.category.toLowerCase(),
-      quantity: item.quantity.toNumber(),
-      purchasedQuantity: item.purchasedQuantity.toNumber(),
-      status: item.status.toLowerCase() as "open" | "bought" | "skipped",
-    })),
+    items: row.items.map((item) => {
+      const product = item.productId ? byProduct.get(item.productId) : null;
+      const stockStatus = shoppingStockStatus(
+        stock.filter(
+          (entry) =>
+            entry.productId === (product?.stockProductId ?? item.productId),
+        ),
+        null,
+      );
+      return {
+        ...item,
+        stockNeed: shoppingStockNeed(stockStatus, product?.isEssential),
+        isEssential: product?.isEssential ?? null,
+        stockStatus,
+        category: item.category.toLowerCase(),
+        quantity: item.quantity.toNumber(),
+        purchasedQuantity: item.purchasedQuantity.toNumber(),
+        status: item.status.toLowerCase() as "open" | "bought" | "skipped",
+      };
+    }),
     participants: row.participants.map((part) => ({
       userId: part.userId,
       name:

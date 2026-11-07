@@ -7,11 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { ProductCategory } from "../types/shopping";
 import {
   NO_SHOP_VIEW_FILTERS,
-  SHOP_VIEW_PRIORITY_FILTERS,
   SHOP_VIEW_SORTS,
   isShopViewFiltered,
   type ShopViewFilters,
-  type ShopViewPriorityFilter,
   type ShopViewSort,
 } from "./shopping-grouping";
 import { ShoppingStockFilterField } from "./shopping-stock-filter";
@@ -45,19 +43,6 @@ export function ShopViewToolbar({ sort, onSortChange, filters, onFiltersChange, 
             {SHOP_VIEW_SORTS.map((option) => (
               <SelectItem key={option} value={option}>
                 {t(`shopView.sort.${option}`)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <ShoppingStockFilterField value={filters.stock ?? "all"} onChange={(stock) => set({ stock })} />
-        <Select value={filters.priority} onValueChange={(value) => set({ priority: value as ShopViewPriorityFilter })}>
-          <SelectTrigger className="w-full min-w-0 sm:w-48" aria-label={t("shopView.filters.priority")}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {SHOP_VIEW_PRIORITY_FILTERS.map((option) => (
-              <SelectItem key={option} value={option}>
-                {t(`shopView.filters.priorities.${option}`)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -114,6 +99,7 @@ export function ShopViewToolbar({ sort, onSortChange, filters, onFiltersChange, 
           </DialogContent>
         </Dialog>
       </div>
+      <ShoppingStockFilterField value={filters.stock ?? "all"} onChange={(stock) => set({ stock })} />
       <div className="hidden sm:block">{controls}</div>
     </div>
   );

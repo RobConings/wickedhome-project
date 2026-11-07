@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { productInputSchema, shoppingStockStatus } from "./shopping";
+import { productInputSchema, shoppingStockStatus, shoppingStockNeed } from "./shopping";
 
 describe("shopping stock status", () => {
   const stock = (quantity: number, minQuantity: number | null = 2, placeId = "pantry") => ({ quantity, minQuantity, placeId });
@@ -55,4 +55,14 @@ describe("essential product input", () => {
       assert.equal(productInputSchema.safeParse({ name: "Milk", isEssential }).success, false);
     }
   });
+});
+
+it("uses essential only at the minimum boundary for the Op/Bijna op forecast", () => {
+  for (const essential of [false, true, null]) {
+    for (const [quantity, expected] of [[0, "out"], [1.999, "out"], [2, essential === true ? "out" : "nearly_out"], [2.001, null]] as const) {
+      const raw = shoppingStockStatus([{ placeId: "pantry", quantity, minQuantity: 2 }], null);
+      assert.equal(shoppingStockNeed(raw, essential), expected, `${quantity}/2 essential=${essential}`);
+    }
+    assert.equal(shoppingStockNeed(null, essential), null, "no forecast without a configured stock threshold");
+  }
 });

@@ -1,19 +1,39 @@
 import { CheckIcon, ShoppingCartIcon, TriangleAlertIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
-import type { ShoppingStockStatus } from "../types/shopping";
+import { shoppingStockNeed, type ShoppingStockStatus } from "../types/shopping";
 
-export function ShoppingStockBadge({ status, showAdvice = true }: { status: ShoppingStockStatus; showAdvice?: boolean }) {
+export function ShoppingStockBadge({
+  status,
+  isEssential = null,
+  showAdvice = true,
+}: {
+  status: ShoppingStockStatus;
+  isEssential?: boolean | null;
+  showAdvice?: boolean;
+}) {
   const { t } = useTranslation("shopping");
-  const Icon = status === "below_minimum" ? ShoppingCartIcon : status === "at_minimum" ? TriangleAlertIcon : CheckIcon;
+  const need = showAdvice ? shoppingStockNeed(status, isEssential) : null;
+  const Icon =
+    need === "out"
+      ? ShoppingCartIcon
+      : need === "nearly_out"
+        ? TriangleAlertIcon
+        : CheckIcon;
   return (
     <Badge
-      variant={status === "below_minimum" ? "danger" : status === "at_minimum" ? "warning" : "neutral"}
+      variant={
+        need === "out"
+          ? "danger"
+          : need === "nearly_out"
+            ? "warning"
+            : "neutral"
+      }
       className="gap-1"
-      title={t(`stockHelp.${status}`)}
+      title={t(need ? `stockNeedHelp.${need}` : `stockHelp.${status}`)}
     >
       <Icon aria-hidden="true" />
-      {t(`${showAdvice && status !== "above_minimum" ? "stockAdvice" : "stockStatus"}.${status}`)}
+      {t(need ? `stockNeed.${need}` : `stockStatus.${status}`)}
     </Badge>
   );
 }

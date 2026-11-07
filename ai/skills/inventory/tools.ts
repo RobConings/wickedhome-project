@@ -52,7 +52,7 @@ import "./prepare-product";
 registerAssistantSkill({
   id: "inventory",
   title: { en: "Stock", nl: "Voorraad" },
-  summary: "Stock and product setup: proactive photos, shop links, package facts and shared-stock alternatives; below-minimum buying needs, at-minimum warnings, importance, expiry, use/add and barcodes.",
+  summary: "Stock and product setup: proactive photos, shop links, package facts and shared-stock alternatives; Op/near-empty forecasts using minima and essential setting, expiry, use/add and barcodes.",
   keywords: {
     nl: ["voorraad", "voorraadkast", "bijna op", "vervalt", "vervaldatum", "houdbaar", "diepvries", "koelkast", "kelder", "product", "producten", "hebben we nog", "barcode", "streepjescode", "opgebruikt", "minimum", "nog over", "essentieel", "essentiele", "extraatje"],
     en: ["stock", "inventory", "pantry", "running low", "run out", "expire", "expiry", "freezer", "fridge", "product", "do we have", "barcode", "used up", "minimum", "left over", "essential", "nice to have"],
@@ -111,7 +111,7 @@ const noChildren = (ctx: AssistantToolContext) => {
 
 registerAssistantTool({
   name: "inventory.low_stock",
-  description: "Stock at or below minimum and expiring soon. Returns stockStatus, buyingAdvice (below = to_buy, at = warning), essential and importance, place and shopping-list presence. All at-or-below stock auto-lists regardless of importance; the person decides what to buy.",
+  description: "Stock at or below minimum and expiring soon. Returns stockStatus, stockNeed (out = below minimum OR essential at minimum; nearly_out = nonessential at minimum), buyingAdvice (out = to_buy, nearly_out = warning), essential and importance, place and shopping-list presence. All at-or-below stock auto-lists regardless of importance; the person decides what to buy.",
   input: z.object({
     expiringWithinDays: z.number().int().min(0).max(60).default(7).describe("Also list items expiring within this many days"),
   }),
@@ -145,7 +145,7 @@ registerAssistantTool({
 
 registerAssistantTool({
   name: "inventory.stock",
-  description: "Stock per product/place: quantity, minimum, expiry, stockStatus, buyingAdvice (below = to_buy; at = warning) and essential/nice-to-have importance. Give a product for shared stock and recent changes. Importance never excludes a product from groceries; the person chooses what to buy.",
+  description: "Stock per product/place: quantity, minimum, expiry, stockStatus, stockNeed (out = below minimum OR essential at minimum; nearly_out = nonessential at minimum) and buyingAdvice (out = to_buy; nearly_out = warning). Give a product for shared stock and recent changes. Importance never excludes a product from groceries; the person chooses what to buy.",
   input: z.object({
     product: entityRef("product").optional(),
     place: entityRef("place", "Only what is kept in this room").optional(),
@@ -350,7 +350,7 @@ registerAssistantTool({
 
 registerAssistantTool({
   name: "inventory.change_stock",
-  description: "Use up or add stock of a product, or set its counted quantity (adults only). At or below minimum it goes on groceries: at = warning, below = to buy, regardless of essential setting. Not for changing the minimum.",
+  description: "Use up or add stock of a product, or set its counted quantity (adults only). At or below minimum it goes on groceries: below = Op/to_buy; essential at minimum = Op/to_buy; nonessential at minimum = Bijna op/warning. These are forecasts, not necessarily zero stock. Not for changing the minimum.",
   input: z.object({
     product: entityRef("product"),
     place: entityRef("place", "Where it is kept, when it is kept in several places").optional(),
@@ -474,7 +474,7 @@ const saveProductInput = z.object({
   packageAmount: z.number().positive().max(1_000_000).optional().describe("Content of one package, e.g. 200 (with packageUnit 'g'); a 6 x 33 cl pack is 198 cl"),
   packageUnit: z.enum(PACKAGE_UNITS).optional(),
   category: z.enum(PRODUCT_CATEGORIES).optional(),
-  isEssential: z.boolean().optional().describe("True = essential; false = nice to have. Omitted keeps the setting. Both auto-list at or below minimum"),
+  isEssential: z.boolean().optional().describe("Essential at minimum is Op/out; nonessential at minimum is Bijna op/nearly_out. Below minimum both are Op/out. Omitted keeps the setting"),
   defaultShop: entityRef("shop").optional(),
   barcode: z.string().trim().regex(/^\d{6,14}$/).optional(),
   notes: z.string().trim().max(1000).optional(),

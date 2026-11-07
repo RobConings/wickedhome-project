@@ -119,6 +119,31 @@ try {
       unit: "potje",
     },
   });
+  for (const [name, isEssential] of [
+    ["Test essentieel op minimum", true],
+    ["Test niet essentieel op minimum", false],
+  ]) {
+    const thresholdProduct = await db.product.create({
+      data: {
+        householdId: home.id,
+        name,
+        unit: "potje",
+        category: "DAIRY",
+        isEssential,
+        defaultShopId: shop.id,
+      },
+    });
+    await db.stockItem.create({
+      data: {
+        householdId: home.id,
+        productId: thresholdProduct.id,
+        placeId: place.id,
+        quantity: 2,
+        minQuantity: 2,
+        unit: "potje",
+      },
+    });
+  }
   const account = await db.paymentAccount.create({
     data: {
       householdId: home.id,
@@ -202,6 +227,52 @@ try {
   );
   for (const page of [one, two])
     page.on("pageerror", (error) => errors.push(error.message));
+  // Verify the same forecast and visible toggles in ordinary groceries, shop view and visit selection.
+  for (const screen of [
+    "/shopping",
+    `/shopping/shops/${fixture.shopId}`,
+    "/shopping/sessions",
+  ]) {
+    await one.goto(`${base}${screen}`);
+    const essential = one.getByText(/^Test essentieel op minimum(?:\s|$)/);
+    const optional = one.getByText(/^Test niet essentieel op minimum(?:\s|$)/);
+    await essential.first().waitFor();
+    await optional.first().waitFor();
+    assert.ok(
+      await one
+        .locator('[data-stock-need="out"]')
+        .filter({ has: essential })
+        .count(),
+    );
+    assert.ok(
+      await one
+        .locator('[data-stock-need="nearly_out"]')
+        .filter({ has: optional })
+        .count(),
+    );
+    await one.getByRole("button", { name: "Op", exact: true }).click();
+    await optional.first().waitFor({ state: "hidden" });
+    await essential.first().waitFor();
+    await one.getByRole("button", { name: "Op", exact: true }).click();
+    await optional.first().waitFor();
+    await one.getByRole("button", { name: "Bijna op", exact: true }).click();
+    await essential.first().waitFor({ state: "hidden" });
+    await optional.first().waitFor();
+    await one.getByRole("button", { name: "Alles", exact: true }).click();
+    await essential.first().waitFor();
+    assert.equal(
+      await one.evaluate(
+        () => document.documentElement.scrollWidth > window.innerWidth,
+      ),
+      false,
+      screen + " should fit mobile width",
+    );
+    if (screen === "/shopping")
+      await one.screenshot({
+        path: "/tmp/wh-shopping-need.png",
+        fullPage: true,
+      });
+  }
   await one.goto(`${base}/shopping/sessions`);
   await one
     .getByRole("heading", { name: "Winkelsessies", exact: true })
@@ -348,7 +419,7 @@ try {
   });
   assert.deepEqual(errors, []);
   console.log(
-    "Browser smoke passed: two mobile browsers, SSE collaboration, exactly-once buy, skip, close, PDF receipt, receipt replay, payment replay, reconnect and mobile layout.",
+    "Browser smoke passed: Op/Bijna op dividers and toggles across three shopping views, two mobile browsers, SSE collaboration, exactly-once buy, skip, close, PDF receipt, receipt replay, payment replay, reconnect and mobile layout.",
   );
 } catch (error) {
   const pages = browser?.contexts().flatMap((context) => context.pages()) ?? [];

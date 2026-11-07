@@ -21,12 +21,13 @@ const item = (name: string, patch: Partial<ShoppingItem> = {}) =>
   }) as ShoppingItem;
 
 describe("shop view priority", () => {
-  it("puts stock below minimum first, then at minimum, essentials, others and extras", () => {
+  it("puts stock Op first, then Bijna op, followed by other groceries", () => {
     assert.equal(priorityTier(item("a", { stockStatus: "below_minimum", isEssential: false })), "urgent");
     assert.equal(priorityTier(item("a", { stockStatus: "at_minimum" })), "warning");
-    assert.equal(priorityTier(item("a", { isEssential: true, stockStatus: "above_minimum" })), "essential");
+    assert.equal(priorityTier(item("a", { isEssential: true, stockStatus: "above_minimum" })), "normal");
+    assert.equal(priorityTier(item("a", { isEssential: true, stockStatus: "at_minimum" })), "urgent");
     assert.equal(priorityTier(item("a")), "normal");
-    assert.equal(priorityTier(item("a", { isEssential: false })), "extra");
+    assert.equal(priorityTier(item("a", { isEssential: false })), "normal");
   });
 
   it("groups by tier and keeps essentials first within a tier", () => {
@@ -43,8 +44,7 @@ describe("shop view priority", () => {
       groups.map((group) => [group.key, group.items.map((entry) => entry.name)]),
       [
         ["urgent", ["Melk", "Zout"]],
-        ["essential", ["Brood"]],
-        ["extra", ["Chips"]],
+        ["normal", ["Brood", "Chips"]],
       ],
     );
   });
@@ -122,4 +122,13 @@ describe("planning without automatic replenishments", () => {
     const groups = groupShopViewItems([item("Olive oil", { category: "pantry" }), item("Bertolli with olive oil", { category: "dairy" }), item("Unknown")], "category", ["dairy", "pantry"]);
     assert.deepEqual(groups.map((group) => group.key), ["dairy", "pantry", "other"]);
   });
+});
+
+it("filters Op and Bijna op using both stock and essential, preserving explicit items in Alles", () => {
+  const entries = [item("Below", {stockStatus: "below_minimum", isEssential: false}), item("Essential at", {stockStatus: "at_minimum", isEssential: true}), item("Optional at", {stockStatus: "at_minimum", isEssential: false}), item("Explicit", {isEssential: true})];
+  const filtered = (stock: "all" | "out" | "nearly_out") => filterShopViewItems(entries, {...NO_SHOP_VIEW_FILTERS, stock}).map((entry) => entry.name);
+  assert.deepEqual(filtered("out"), ["Below", "Essential at"]);
+  assert.deepEqual(filtered("nearly_out"), ["Optional at"]);
+  assert.equal(filtered("all").length, 4);
+  assert.equal(entries.length, 4);
 });

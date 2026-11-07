@@ -1,3 +1,4 @@
+import { ShoppingNeedSections } from "./shopping-need-sections";
 import * as React from "react";
 import { ChevronDownIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -22,6 +23,7 @@ type ShoppingItemListProps = {
   showList?: boolean;
   showStockStatus?: boolean;
   groupByCategory?: boolean;
+  groupByNeed?: boolean;
   size?: "default" | "large";
   /** Text when there is nothing open. */
   emptyText?: string;
@@ -41,6 +43,7 @@ export function ShoppingItemList({
   showList = false,
   showStockStatus = true,
   groupByCategory = true,
+  groupByNeed = true,
   size = "default",
   emptyText,
   className,
@@ -49,7 +52,10 @@ export function ShoppingItemList({
   const { order } = useCategoryOrder();
   const skipped = items.filter((item) => item.status === "skipped");
   const [showBought, setShowBought] = React.useState(false);
-  const shopsById = React.useMemo(() => new Map(shops.map((shop) => [shop.id, shop])), [shops]);
+  const shopsById = React.useMemo(
+    () => new Map(shops.map((shop) => [shop.id, shop])),
+    [shops],
+  );
   const open = items.filter((item) => item.status === "open");
   const bought = items.filter((item) => item.status === "bought");
 
@@ -69,14 +75,53 @@ export function ShoppingItemList({
     />
   );
 
+  const renderOpen = (items: ShoppingItem[]) =>
+    !groupByNeed ? (
+      <ul className="divide-y rounded-xl border bg-card px-1 shadow-xs sm:px-2">
+        {items.map(renderRow)}
+      </ul>
+    ) : (
+      <ShoppingNeedSections items={items}>
+        {(group) => (
+          <ul className="divide-y rounded-xl border bg-card px-1 shadow-xs sm:px-2">
+            {group.map(renderRow)}
+          </ul>
+        )}
+      </ShoppingNeedSections>
+    );
+
   return (
     <div className={cn("flex flex-col gap-2", className)}>
-      {open.length > 0 && !groupByCategory ? <ul className="divide-y rounded-xl border bg-card px-1 shadow-xs sm:px-2">{open.map(renderRow)}</ul> : open.length > 0 ? (
-        <div className="space-y-3">{groupItemsByCategory(open, order).map((group) => <section key={group.category}><h3 className="mb-1 text-sm font-medium">{t(`categories.${group.category}`)}</h3><ul className="divide-y rounded-xl border bg-card px-1 shadow-xs sm:px-2">{group.items.map(renderRow)}</ul></section>)}</div>
+      {open.length > 0 && !groupByCategory ? (
+        renderOpen(open)
+      ) : open.length > 0 ? (
+        <div className="space-y-3">
+          {groupItemsByCategory(open, order).map((group) => (
+            <section key={group.category}>
+              <h3 className="mb-1 text-sm font-medium">
+                {t(`categories.${group.category}`)}
+              </h3>
+              {renderOpen(group.items)}
+            </section>
+          ))}
+        </div>
       ) : (
-        emptyText && <p className="rounded-xl border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">{emptyText}</p>
+        emptyText && (
+          <p className="rounded-xl border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">
+            {emptyText}
+          </p>
+        )
       )}
-      {skipped.length > 0 && <details><summary className="cursor-pointer text-sm text-muted-foreground">{t("planning.skipped")} ({skipped.length})</summary><ul className="divide-y rounded-xl border px-2">{skipped.map(renderRow)}</ul></details>}
+      {skipped.length > 0 && (
+        <details>
+          <summary className="cursor-pointer text-sm text-muted-foreground">
+            {t("planning.skipped")} ({skipped.length})
+          </summary>
+          <ul className="divide-y rounded-xl border px-2">
+            {skipped.map(renderRow)}
+          </ul>
+        </details>
+      )}
       {bought.length > 0 && (
         <div className="flex flex-col gap-1">
           <button
@@ -85,10 +130,20 @@ export function ShoppingItemList({
             onClick={() => setShowBought((value) => !value)}
             className="flex min-h-9 items-center gap-1.5 self-start rounded-md px-2 text-sm text-muted-foreground hover:text-foreground"
           >
-            <ChevronDownIcon className={cn("size-4 transition-transform", !showBought && "-rotate-90")} aria-hidden="true" />
+            <ChevronDownIcon
+              className={cn(
+                "size-4 transition-transform",
+                !showBought && "-rotate-90",
+              )}
+              aria-hidden="true"
+            />
             {t("lists.recentlyBought")} ({bought.length})
           </button>
-          {showBought && <ul className="divide-y rounded-xl border bg-muted/30 px-1 sm:px-2">{bought.map(renderRow)}</ul>}
+          {showBought && (
+            <ul className="divide-y rounded-xl border bg-muted/30 px-1 sm:px-2">
+              {bought.map(renderRow)}
+            </ul>
+          )}
         </div>
       )}
     </div>

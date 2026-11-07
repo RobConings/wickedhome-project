@@ -117,18 +117,18 @@ that point at it (`stockProductId` → main). Only the main product has `StockIt
 - **Shopping labels**: "Below minimum", "At minimum" and "Above minimum" use current stock, including
   shared stock for alternatives. A shopping item's place wins when stock is kept there; otherwise the
   lowest stock level across the product's places wins (below takes precedence over at minimum).
-- **Essential products**: the catalogue product has an `isEssential` flag, editable in the product form
-  and through `inventory.save_product`. Product-linked shopping items show "Essential" or "Nice to have";
-  free-text items have no essential label. Stock at
-  minimum is an amber warning, and stock below minimum is marked "To buy" in red. Both remain visible;
-  the person decides what to buy. This setting identifies products; all stock at or below minimum
-  still qualifies for automatic replenishment. Existing products start as non-essential.
-- **Assistant and MCP**: `shopping_list`, `inventory_stock` and `inventory_low_stock` expose current
-  `stockStatus`, `buyingAdvice` (`to_buy` or `warning`), `essential` and `importance` (`essential` or
-  `nice_to_have`). `inventory_products` also reports importance, and `inventory_save_product` edits
-  `isEssential` without resetting it when omitted. `shopping_list` can filter by `stockStatus` and
-  `isEssential` for a question; those read filters never change which products are kept on the list.
-  `shopping_add_item` accepts `product` to link a catalogue product and retain its stock and importance labels.
+- **Shopping forecasts**: below minimum is **Op** (`out`) for every product. An essential product exactly
+  at minimum is also **Op**. A nonessential product exactly at minimum is **Bijna op** (`nearly_out`).
+  These are replenishment forecasts; **Op does not necessarily mean zero stock**. Ordinary groceries,
+  the shop view and visit selection use visible All/Op/Bijna op toggles and the same dividers within each
+  category. Other explicit/recipe needs remain visible in All. The essential setting stays editable on
+  the product, without a separate essential/nice-to-have shopping filter.
+- **Assistant and MCP**: `shopping_list`, `inventory_stock` and `inventory_low_stock` expose raw
+  `stockStatus`, derived `stockNeed`, `buyingAdvice` (`to_buy` for out, `warning` for nearly_out),
+  `essential` and compatibility `importance` metadata. `shopping_session` includes the same live
+  stock/essential context. `shopping_list stockNeed` filters the forecast; `stockStatus` still filters
+  the actual quantity comparison. Neither read filter changes minima, purchases or list membership.
+  `inventory_save_product` edits `isEssential` without resetting it when omitted.
 - **UI**: the product page has an *Alternatives* card (linked products with unlink, "Link an alternative"
   with the product picker); an alternative's page redirects to its main product's page with that brand
   highlighted (`?from=`). The products page's edit dialog shows the same section and grouped products get
