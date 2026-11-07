@@ -1,3 +1,4 @@
+import { compatibleProductType } from "@/features/shopping/types/product-identity";
 import { z } from "zod";
 import { productImageUrlSchema, type Product } from "@/features/shopping/types/shopping";
 import { shopForUrl } from "@/features/shopping/types/shop-links";
@@ -44,7 +45,7 @@ registerAssistantTool({
       sharesStockWith: product.stockProductId, imageUrl: product.imageUrl,
       stockUnit: product.unit, packageAmount: product.packageAmount, packageUnit: product.packageUnit,
     });
-    const existing = scoreCandidates(input.name, catalogue).slice(0, 5).map(({ candidate }) => {
+    const existing = scoreCandidates(input.name, catalogue.filter((product) => compatibleProductType(input.name, product.name))).slice(0, 5).map(({ candidate }) => {
       const product = catalogue.find((product) => product.id === candidate.id)!;
       return describeExisting(product, "name");
     });

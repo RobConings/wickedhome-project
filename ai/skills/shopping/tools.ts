@@ -53,7 +53,7 @@ registerAssistantSkill({
   summary: "Shopping lists: essential or nice-to-have items, below-minimum buying needs and at-minimum warnings; the person chooses what to buy. Add, tick off, move, remove; recurring staples and materials.",
   keywords: {
     nl: ["boodschap", "boodschappen", "boodschappenlijst", "kopen", "halen", "op de lijst", "supermarkt", "delhaize", "colruyt", "aldi", "lidl", "nodig", "gekocht", "vaste boodschap", "lijstje"],
-    en: ["shopping", "shopping list", "groceries", "buy", "on the list", "supermarket", "we need", "bought", "staple", "grocery list"],
+    en: ["shopping visit", "shopping session", "shopping", "shopping list", "groceries", "buy", "on the list", "supermarket", "we need", "bought", "staple", "grocery list"],
   },
 });
 
@@ -191,6 +191,7 @@ registerAssistantTool({
         taskId: item.taskId,
         project: item.project,
         recipe: item.recipe,
+        updatedAt: item.updatedAt,
         requirements: item.requirements?.map((part) => ({ source: part.source, qty: qty(part, ctx.locale), taskId: part.taskId, project: part.project, recipe: part.recipe, listId: part.listId })),
         amountNeedsReview: item.amounts ? true : undefined,
         qty: qty(item, ctx.locale),
@@ -306,6 +307,7 @@ registerAssistantTool({
     item: entityRef("shopping_item", "Unique row id from shopping_list (preferred for duplicate names), or an unambiguous item name"),
     product: entityRef("product", "Link this catalogue product to the existing item; use to repair unlinked groceries").optional(),
     bought: z.boolean().optional().describe("true = ticked off (bought), false = back on the list"),
+    expectedUpdatedAt: z.iso.datetime().optional().describe("From shopping_list: reject a stale edit instead of overwriting another participant"),
     status: z.enum(["open", "bought", "skipped"]).optional().describe("skipped = not now: hide from active shopping, preserve catalogue/stock/minimum; open restores it"),
     shop: entityRef("shop", "Move to this shop").optional(),
     noShop: z.boolean().optional().describe("Remove the shop"),
@@ -340,6 +342,7 @@ registerAssistantTool({
   run: async (ctx, input) => {
     const { item, restock, stock } = await updateShoppingItem(ctx.user, input.item.id, {
       purchaseDecision: input.purchaseDecision,
+      expectedUpdatedAt: input.expectedUpdatedAt,
       ...(input.product && { productId: input.product.id }),
       ...(input.status ? { status: input.status } : input.bought !== undefined ? { status: input.bought ? ("bought" as const) : ("open" as const) } : {}),
       ...(input.shop && { shopId: input.shop.id }),

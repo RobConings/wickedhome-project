@@ -100,5 +100,13 @@ export function combineShoppingItems(items: ShoppingItem[], products: ReadonlyMa
 
 export const shoppingItemListIds = (item: ShoppingItem) => [...new Set((item.requirements ?? [item]).map((part) => part.listId))];
 
+/** Visit selection can omit automatic contributions without changing stored recipe/minimum requirements. */
+export function visitRequirements(items: ShoppingItem[], includeAutomatic: boolean, products: ReadonlyMap<string, StockUnitInfo> = new Map()): ShoppingItem[] {
+  if (includeAutomatic) return items;
+  return combineShoppingItems(items.flatMap((item) => (item.requirements ?? [item])
+    .filter((part) => part.source !== "low_stock")
+    .map((part) => ({ ...item, ...part, requirements: undefined, amounts: undefined }))), products);
+}
+
 export const shoppingItemQuantity = (item: Pick<ShoppingItem, "quantity" | "unit" | "amounts">, locale: "en" | "nl") =>
   (item.amounts ?? [item]).map(({ quantity, unit }) => `${formatQuantity(quantity, locale)}${unit ? ` ${unit}` : ""}`).join(" + ");

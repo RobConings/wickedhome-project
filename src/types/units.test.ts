@@ -94,3 +94,26 @@ describe("compareNeed", () => {
     assert.equal(result.shortfall, 0.3);
   });
 });
+
+describe("physical packaging variants", () => {
+  it("does not equate a jar with a tube, bottle or can", () => {
+    assert.equal(convertAmount(10, "potje", "tube"), null);
+    assert.equal(convertAmount(10, "potjes", "fles"), null);
+    assert.equal(toStockUnits(1, "fles", pack(70, "g", "potje")), null);
+    assert.equal(compareNeed({ quantity: 1, unit: "tube" }, 1, 10, pack(null, null, "potje")).status, "unknown_amount");
+    assert.equal(compareNeed({ quantity: 70, unit: "g" }, 1, 10, pack(70, "g", "potje")).status, "in_stock");
+    assert.equal(convertAmount(10, "potjes", "jars"), 10);
+  });
+});
+
+it("prefers one known household stock unit as a default without inventing a conversion", async () => {
+  const { householdStockUnit } = await import("./units");
+  assert.equal(householdStockUnit("tube", [{ unit: "potje" }]), "potje");
+  assert.equal(householdStockUnit("tube", [{ unit: "potje" }, { unit: "potje" }]), "potje");
+  assert.equal(householdStockUnit("tube", [{ unit: "potje" }, { unit: "tube" }]), "tube");
+  assert.equal(householdStockUnit("tube", []), "tube");
+  assert.equal(householdStockUnit("potje", [{ unit: null }]), "potje");
+  assert.equal(stockUnitsPer("tube", pack(null, null, "tube")), 1);
+  assert.equal(stockUnitsPer("potje", pack(null, null, "potje")), 1);
+  assert.equal(stockUnitsPer("g", pack(null, null, "potje")), null);
+});

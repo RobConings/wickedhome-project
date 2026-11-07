@@ -12,6 +12,18 @@
  */
 
 import type { Locale } from "@/types/common";
+import { convertAmount, incompatiblePackages, normalizeUnit, unitInfo } from "@/types/units";
+import { compatibleProductType } from "@/features/shopping/types/product-identity";
+
+export function stockCompatibilityProblem(a: { name?: string; unit?: string | null; category?: string; packageAmount?: number | null; packageUnit?: string | null }, b: typeof a): string | null {
+  if (a.name && b.name && !compatibleProductType(a.name, b.name)) return "These are different product types, not interchangeable stock";
+  if (a.category && b.category && a.category.toUpperCase() !== "OTHER" && b.category.toUpperCase() !== "OTHER" && a.category.toUpperCase() !== b.category.toUpperCase()) return "Verify product types/categories before sharing stock";
+  if (incompatiblePackages(a.unit, b.unit)) return "Keep distinct containers as separate product variants; compare verified package content instead";
+  const sameUnit = normalizeUnit(a.unit) === normalizeUnit(b.unit);
+  if (!sameUnit && convertAmount(1, a.unit, b.unit) !== 1) return "Stock units differ; quantities cannot be added without a verified conversion";
+  if ((unitInfo(a.unit)?.dimension === "count" || unitInfo(b.unit)?.dimension === "count") && a.packageAmount && b.packageAmount && convertAmount(a.packageAmount, a.packageUnit, b.packageUnit) !== b.packageAmount) return "Different package sizes cannot share one package count";
+  return null;
+}
 
 export type GroupedProduct = { id: string; stockProductId: string | null };
 
@@ -60,6 +72,7 @@ const earlier = (a: string | null, b: string | null) => (a === null ? b : b === 
 
 /** Combines two stock items at the same place: summed quantity, higher minimum, earliest expiry. */
 export function mergeStockValues(target: Omit<MergeableStock, "id" | "placeId">, source: Omit<MergeableStock, "id" | "placeId">) {
+  if (target.quantity > 0 && source.quantity > 0 && normalizeUnit(target.unit) !== normalizeUnit(source.unit) && convertAmount(1, source.unit, target.unit) !== 1) throw new Error("Cannot merge incompatible stock quantities");
   return {
     quantity: round(target.quantity + source.quantity),
     unit: target.unit ?? source.unit,

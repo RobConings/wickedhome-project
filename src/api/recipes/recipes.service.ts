@@ -1,3 +1,4 @@
+import { householdStockUnit } from "@/types/units";
 import type { SessionUser } from "@/features/auth/types/auth";
 import {
   servingsScale,
@@ -65,7 +66,8 @@ const productSelect = {
   packageUnit: true,
   defaultShopId: true,
   shopLinks: { select: { shopId: true, url: true, shop: { select: { name: true } } }, orderBy: { createdAt: "asc" } },
-  stockProduct: { select: { unit: true, packageAmount: true, packageUnit: true } },
+  stockItems: { select: { unit: true } },
+  stockProduct: { select: { unit: true, packageAmount: true, packageUnit: true, stockItems: { select: { unit: true } } } },
 } satisfies Prisma.ProductSelect;
 type ProductRow = Prisma.ProductGetPayload<{ select: typeof productSelect }>;
 
@@ -78,7 +80,7 @@ export function toIngredientProduct(row: ProductRow): IngredientProduct {
     name: row.name,
     imageUrl: row.imageUrl,
     shopLink: link?.url ? { url: link.url, shopName: link.shop.name } : null,
-    unit: row.unit ?? row.stockProduct?.unit ?? null,
+    unit: householdStockUnit(row.unit ?? row.stockProduct?.unit ?? null, row.stockProduct?.stockItems ?? row.stockItems),
     packageAmount: sized.packageAmount?.toNumber() ?? null,
     packageUnit: sized.packageAmount ? sized.packageUnit : null,
   };

@@ -62,14 +62,18 @@ const COUNT = new Set([
   "blikken",
   "fles",
   "flesje",
+  "flesjes",
   "flessen",
   "bottle",
   "bottles",
   "pot",
   "potje",
+  "potjes",
   "potten",
   "jar",
   "jars",
+  "tube",
+  "tubes",
   "zak",
   "zakje",
   "zakjes",
@@ -100,6 +104,24 @@ export const normalizeUnit = (unit: string | null | undefined) =>
     .replace(/\.$/, "")
     .replace(/\s+/g, " ");
 
+/** Container aliases describe a physical variant; a jar is never silently a tube or bottle. */
+export function packageForm(unit: string | null | undefined): string | null {
+  const key = normalizeUnit(unit);
+  for (const [form, names] of Object.entries({
+    jar: ["pot", "potje", "potjes", "potten", "jar", "jars"],
+    tube: ["tube", "tubes"],
+    bottle: ["fles", "flesje", "flesjes", "flessen", "bottle", "bottles"],
+    can: ["blik", "blikje", "blikjes", "blikken", "can", "cans"],
+    bag: ["zak", "zakje", "zakjes", "zakken", "bag", "bags"],
+  })) if (names.includes(key)) return form;
+  return null;
+}
+
+export const incompatiblePackages = (a: string | null | undefined, b: string | null | undefined) => {
+  const first = packageForm(a); const second = packageForm(b);
+  return Boolean(first && second && first !== second);
+};
+
 /** The dimension and factor of a unit; null for units that don't convert (el, tl, teentje, snuifje…). */
 export function unitInfo(unit: string | null | undefined): UnitInfo | null {
   const key = normalizeUnit(unit);
@@ -115,6 +137,7 @@ export const isCountUnit = (unit: string | null | undefined) => ["count", "bundl
 
 /** Converts between two units of the same dimension; null when they don't convert. */
 export function convertAmount(amount: number, from: string | null | undefined, to: string | null | undefined): number | null {
+  if (incompatiblePackages(from, to)) return null;
   const a = unitInfo(from);
   const b = unitInfo(to);
   if (!a || !b || a.dimension !== b.dimension) return null;
@@ -141,6 +164,7 @@ export type StockUnitInfo = {
  * - The amount is mass/volume and the product has a package size of that dimension: via the package size.
  */
 export function stockUnitsPer(unit: string | null | undefined, product: StockUnitInfo): number | null {
+  if (incompatiblePackages(unit, product.unit)) return null;
   const amount = unitInfo(unit);
   const stock = unitInfo(product.unit);
   if (!amount) return null;
@@ -219,4 +243,13 @@ export function compareNeed(
 function roundUpWhole(scaled: number, unit: string | null): number {
   if (!isCountUnit(unit)) return round3(scaled);
   return Math.max(1, Math.ceil(round3(scaled) - EPSILON));
+}
+
+/** Use the household's one known stock unit as the default for a new count.
+ * This chooses a label; it never converts explicit recipe or purchase amounts.
+ * No package weight is required to count jars, bottles or pieces.
+ */
+export function householdStockUnit(catalogueUnit: string | null, stock: readonly { unit: string | null }[] = []): string | null {
+  const units = new Map(stock.filter(({ unit }) => typeof unit === "string" && unit.trim() !== "").map(({ unit }) => [normalizeUnit(unit), unit]));
+  return units.size === 1 ? units.values().next().value! : catalogueUnit;
 }

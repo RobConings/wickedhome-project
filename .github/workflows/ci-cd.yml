@@ -53,6 +53,16 @@ jobs:
         run: npm run lint
       - name: Unit tests
         run: npm test
+      - name: Shopping database and MCP integration
+        run: npm run test:shopping-integration
+      - name: Preserve existing data across shopping migrations
+        env:
+          MIGRATION_TEST_DATABASE_URL: ${{ env.DATABASE_URL }}
+        run: npm run test:shopping-migrations
+      - name: Install browser for shopping checks
+        run: npx playwright install --with-deps chromium
+      - name: Shopping collaboration in two mobile browsers
+        run: npm run test:shopping-browser
       - name: Compile server and client
         run: npm run build
 

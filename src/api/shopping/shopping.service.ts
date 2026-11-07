@@ -1,3 +1,4 @@
+import { householdStockUnit } from "@/types/units";
 import { withShoppingEvents, publishShoppingChanged } from "./shopping-events";
 import type { SessionUser } from "@/features/auth/types/auth";
 import { restockAmount } from "@/features/inventory/types/inventory";
@@ -44,7 +45,7 @@ import { badRequest, conflict, forbidden, notFound } from "../lib/http";
 import { forgetEntity } from "../selections/selections.service";
 import { listShops, shopRefSelect, toShopRef } from "../shops/shops.service";
 import { UnsafeUrlError, bareHost, fetchPage, parsePageMetadata } from "./link-preview";
-import { linkProblem, mergeNote, planStockMerge, promotionCandidate, stockOwnerOf } from "./product-alternatives";
+import { linkProblem, mergeNote, stockCompatibilityProblem, planStockMerge, promotionCandidate, stockOwnerOf } from "./product-alternatives";
 import { lockStock } from "../inventory/stock-lock";
 
 // Mapping ------------------------------------------------------------------------------------------------
@@ -59,7 +60,7 @@ const toDate = (date: string) => new Date(`${date}T00:00:00Z`);
 const fromDate = (date: Date) => date.toISOString().slice(0, 10);
 const today = () => todayIn();
 
-const shoppingStockSelect = { placeId: true, quantity: true, minQuantity: true } as const;
+const shoppingStockSelect = { placeId: true, quantity: true, minQuantity: true, unit: true } as const;
 
 const itemInclude = {
   list: { select: { name: true } },
@@ -83,6 +84,8 @@ const itemInclude = {
 type ItemRow = Prisma.ShoppingItemGetPayload<{ include: typeof itemInclude }>;
 
 const productInclude = {
+  stockItems: { select: { unit: true } },
+  stockProduct: { select: { stockItems: { select: { unit: true } } } },
   shopLinks: { include: { shop: { select: shopRefSelect } } },
   alternatives: { select: { id: true, name: true, imageUrl: true }, orderBy: { name: "asc" } },
 } as const;
@@ -185,7 +188,7 @@ async function boughtByNames(householdId: string, rows: ItemRow[]) {
 async function toItems(householdId: string, rows: ItemRow[], roundPackages = true) {
   const [names, groups, recipes] = await Promise.all([boughtByNames(householdId, rows), itemGroups(householdId, rows), itemRecipes(householdId, rows)]);
   const products = new Map(rows.flatMap((row) => row.productId && row.product ? [[row.productId, {
-    unit: row.product.unit, packageAmount: row.product.packageAmount?.toNumber() ?? null, packageUnit: row.product.packageUnit,
+    unit: householdStockUnit(row.product.unit, row.product.stockProduct?.stockItems ?? row.product.stockItems), packageAmount: row.product.packageAmount?.toNumber() ?? null, packageUnit: row.product.packageUnit,
   }] as const] : []));
   return combineShoppingItems(rows.map((row) => toItem(row, names, groups, recipes)), products, roundPackages);
 }
@@ -236,7 +239,7 @@ function toProduct(row: ProductRow): Product {
   return {
     id: row.id,
     name: row.name,
-    unit: row.unit,
+    unit: householdStockUnit(row.unit, row.stockProduct?.stockItems ?? row.stockItems),
     category: toCategory(row.category),
     isEssential: row.isEssential,
     defaultShopId: row.defaultShopId,
@@ -537,6 +540,13 @@ async function deleteListImpl(householdId: string, id: string): Promise<void> {
   await db.shoppingList.delete({ where: { id } });
 }
 
+/** Pause only automatic needs for this stock group; explicit/recipe needs and minima remain intact. */
+export async function suppressShoppingRestock(tx: Prisma.TransactionClient, householdId: string, ownerIds: string[], selectedIds: string[] = [], state: "RESTOCKED" | "DISMISSED" = "RESTOCKED") {
+  if (!ownerIds.length) return;
+  await tx.product.updateMany({ where: { householdId, id: { in: ownerIds } }, data: { shoppingRestockState: state } });
+  await tx.shoppingItem.updateMany({ where: { householdId, source: "LOW_STOCK", status: "OPEN", id: { notIn: selectedIds }, product: { is: { OR: [{ id: { in: ownerIds } }, { stockProductId: { in: ownerIds } }] } } }, data: { status: "SKIPPED" } });
+}
+
 // Items --------------------------------------------------------------------------------------------------
 
 export async function listItems(householdId: string, query: ShoppingItemQuery = {}, locale: Locale = "en"): Promise<ShoppingItem[]> {
@@ -582,7 +592,7 @@ async function createItemImpl(user: Pick<SessionUser, "id" | "householdId" | "lo
       productId: product?.id ?? null,
       name: input.name ?? product?.name ?? preview?.title ?? input.url ?? "",
       quantity: input.quantity ?? 1,
-      unit: input.unit ?? product?.unit ?? null,
+      unit: input.unit ?? (product ? householdStockUnit(product.unit, product.stockProduct?.stockItems ?? product.stockItems) : null),
       shopId,
       url: input.url ?? link?.url ?? null,
       imageUrl: preview?.imageUrl ?? product?.imageUrl ?? null,
@@ -658,7 +668,7 @@ async function updateItemImpl(user: SessionUser, id: string, input: ShoppingItem
     for (const part of rows) {
       const quantity = unitChanged
         ? shoppingAmount(part.quantity.toNumber(), part.unit, position.unit, part.product ? {
-          unit: part.product.unit, packageAmount: part.product.packageAmount?.toNumber() ?? null, packageUnit: part.product.packageUnit,
+          unit: householdStockUnit(part.product.unit, part.product.stockProduct?.stockItems ?? part.product.stockItems), packageAmount: part.product.packageAmount?.toNumber() ?? null, packageUnit: part.product.packageUnit,
         } : undefined)!
         : part.quantity.toNumber();
       const saved = await tx.shoppingItem.update({
@@ -678,6 +688,7 @@ async function updateItemImpl(user: SessionUser, id: string, input: ShoppingItem
       if (owners.length) await tx.product.updateMany({
         where: { householdId, id: { in: owners } }, data: { shoppingRestockState: input.status === "bought" ? "RESTOCKED" : "DISMISSED" },
       });
+      if (rows.some((part) => part.product?.stockProductId || (part.product?._count.alternatives ?? 0) > 0)) await suppressShoppingRestock(tx, householdId, owners, rows.map((part) => part.id), input.status === "bought" ? "RESTOCKED" : "DISMISSED");
     }
     return updated;
   });
@@ -693,9 +704,15 @@ async function markOpenItemsBoughtImpl(user: SessionUser, listIds: string[]): Pr
   });
   if (lists.length !== new Set(listIds).size) throw badRequest("One or more shopping lists are no longer available.");
 
-  const result = await db.shoppingItem.updateMany({
-    where: { householdId: user.householdId, listId: { in: listIds }, status: "OPEN" },
-    data: { status: "BOUGHT", boughtAt: new Date(), boughtByUserId: user.id },
+  const result = await db.$transaction(async (tx) => {
+    await lockStock(tx, user.householdId);
+    const open = await tx.shoppingItem.findMany({ where: { householdId: user.householdId, listId: { in: listIds }, status: "OPEN" }, select: { id: true, productId: true, product: { select: { stockProductId: true } } } });
+    const result = await tx.shoppingItem.updateMany({
+      where: { householdId: user.householdId, listId: { in: listIds }, status: "OPEN" },
+      data: { status: "BOUGHT", boughtAt: new Date(), boughtByUserId: user.id },
+    });
+    await suppressShoppingRestock(tx, user.householdId, [...new Set(open.flatMap((row) => row.productId ? [row.product?.stockProductId ?? row.productId] : []))], open.map((row) => row.id));
+    return result;
   });
   return result.count;
 }
@@ -859,7 +876,7 @@ async function addRecipeItemImpl(
       productId: existing?.productId ?? product?.id ?? null,
       name: product?.name ?? input.name.trim(),
       quantity,
-      unit: input.unit ?? product?.unit ?? null,
+      unit: input.unit ?? (product ? householdStockUnit(product.unit, product.stockProduct?.stockItems ?? product.stockItems) : null),
       ...details,
       note: input.note || null,
       source: "RECIPE",
@@ -1057,7 +1074,7 @@ async function joinGroup(tx: Prisma.TransactionClient, actor: Actor, memberId: s
  */
 async function linkAlternativeImpl(user: Actor, productId: string, input: ProductAlternativeInput): Promise<Product> {
   const { householdId } = user;
-  const select = { id: true, stockProductId: true, unit: true, category: true, defaultShopId: true } as const;
+  const select = { id: true, name: true, stockProductId: true, unit: true, category: true, defaultShopId: true, packageAmount: true, packageUnit: true } as const;
   await db.$transaction(async (tx) => {
     await lockStock(tx, householdId);
     const [product, chosen] = await Promise.all([
@@ -1070,11 +1087,15 @@ async function linkAlternativeImpl(user: Actor, productId: string, input: Produc
     if (problem === "same_product") throw invalid("mainProductId", "Choose another product");
     if (problem === "already_linked") throw invalid("mainProductId", "These products already share stock");
 
+    const sourceOwner = product.stockProductId ? await tx.product.findFirstOrThrow({ where: { id: product.stockProductId, householdId }, select }) : product;
+    const chosenOwner = chosen.stockProductId ? await tx.product.findFirstOrThrow({ where: { id: chosen.stockProductId, householdId }, select }) : chosen;
+    const compatibility = stockCompatibilityProblem({ ...sourceOwner, packageAmount: sourceOwner.packageAmount?.toNumber() }, { ...chosenOwner, packageAmount: chosenOwner.packageAmount?.toNumber() });
+    if (compatibility) throw invalid("mainProductId", compatibility);
     let mainId = stockOwnerOf(chosen);
     if (input.newMainName) {
       const owner = await tx.product.findFirstOrThrow({ where: { id: mainId, householdId }, select });
       const main = await tx.product.create({
-        data: { householdId, name: input.newMainName, unit: owner.unit, category: owner.category, defaultShopId: owner.defaultShopId },
+        data: { householdId, name: input.newMainName, unit: owner.unit, category: owner.category, defaultShopId: owner.defaultShopId, packageAmount: owner.packageAmount, packageUnit: owner.packageUnit },
       });
       await joinGroup(tx, user, owner.id, main.id);
       mainId = main.id;

@@ -1,17 +1,48 @@
 import type { ShoppingPaymentInput } from "@/features/expenses";
 import { api } from "@/lib/api-client";
-import type { ReceiptAttachInput, ReceiptLineInput, SessionAddItemInput, SessionCreateInput, SessionItemUpdateInput, SessionSummary, SessionView } from "../types/sessions";
+import type {
+  ReceiptAttachInput,
+  ReceiptLineInput,
+  SessionAddItemInput,
+  SessionCreateInput,
+  SessionItemUpdateInput,
+  SessionSummary,
+  SessionView,
+} from "../types/sessions";
 const base = "/shopping/sessions";
 const path = (id: string) => `${base}/${encodeURIComponent(id)}`;
 export const fetchShoppingSessions = () => api.get<SessionSummary[]>(base);
-export const fetchShoppingSession = (id: string) => api.get<SessionView>(path(id));
+export const fetchShoppingSession = (id: string) =>
+  api.get<SessionView>(path(id));
 export const planShoppingVisit = () => api.post(`${base}/plan`);
-export const startShoppingSession = (input: SessionCreateInput) => api.post<SessionView>(base, input);
-export const addSessionItem = (id: string, input: SessionAddItemInput) => api.post<SessionView>(`${path(id)}/items`, input);
-export const updateSessionItem = (id: string, itemId: string, input: SessionItemUpdateInput) => api.patch<SessionView>(`${path(id)}/items/${encodeURIComponent(itemId)}`, input);
-export const joinSession = (id: string) => api.post<SessionView>(`${path(id)}/join`);
-export const closeSession = (id: string, revision: number) => api.post<SessionView>(`${path(id)}/close`, { revision });
-export const attachReceipt = (id: string, input: ReceiptAttachInput) => api.post<SessionView>(`${path(id)}/receipts`, input);
-export const reconcileReceipt = (id: string, receiptId: string, input: ReceiptLineInput) => api.post<SessionView>(`${path(id)}/receipts/${encodeURIComponent(receiptId)}/lines`, input);
+export const startShoppingSession = (input: SessionCreateInput) =>
+  api.post<SessionView>(base, input);
+export const addSessionItem = (id: string, input: SessionAddItemInput) =>
+  api.post<SessionView>(`${path(id)}/items`, input);
+export const updateSessionItem = (
+  id: string,
+  itemId: string,
+  input: SessionItemUpdateInput,
+) =>
+  api.patch<SessionView>(
+    `${path(id)}/items/${encodeURIComponent(itemId)}`,
+    input,
+  );
+export const joinSession = (id: string) =>
+  api.post<SessionView>(`${path(id)}/join`);
+export const closeSession = (id: string, revision: number) =>
+  api.post<SessionView>(`${path(id)}/close`, { revision });
+export const attachReceipt = (id: string, input: ReceiptAttachInput) =>
+  api.post<SessionView>(`${path(id)}/receipts`, input);
+export const reconcileReceipt = (
+  id: string,
+  receiptId: string,
+  input: ReceiptLineInput,
+) =>
+  api.post<SessionView>(
+    `${path(id)}/receipts/${encodeURIComponent(receiptId)}/lines`,
+    input,
+  );
 
-export const recordSessionPayment = (id: string, input: ShoppingPaymentInput) => api.post<SessionView>(`${path(id)}/payments`, input);
+export const recordSessionPayment = (id: string, input: ShoppingPaymentInput) =>
+  api.post<SessionView>(`${path(id)}/payments`, input);

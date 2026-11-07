@@ -215,6 +215,7 @@ export function ShopViewScreen({
             groupShopViewItems(visibleOpen, sort, order).map((group) => {
               const list = (
                 <ShoppingItemList
+                  groupByCategory={false}
                   items={group.items}
                   shops={shops}
                   size="large"

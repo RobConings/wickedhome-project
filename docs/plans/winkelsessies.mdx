@@ -16,17 +16,17 @@ flowchart TD
   A --> E[SSE naar alle gezinsleden]
 ```
 
-<Phase title="1. Bestaande fouten herstellen" status="active">
+<Phase title="1. Bestaande fouten herstellen" status="done">
 
 <Checklist>
-- [ ] Aankopen onderdrukken onmiddellijke automatische herhaling
-- [ ] Historische aankopen blokkeren geen onafhankelijke aankoop
-- [ ] Bronidentiteiten blijven idempotent
+- [x] Aankopen onderdrukken onmiddellijke automatische herhaling
+- [x] Historische aankopen blokkeren geen onafhankelijke aankoop
+- [x] Bronidentiteiten blijven idempotent
 </Checklist>
 
 </Phase>
 
-<Phase title="2. Boodschappen overzichtelijk maken" status="planned">
+<Phase title="2. Boodschappen overzichtelijk maken" status="done">
 
 <FileTree>
 - modify src/features/shopping/components/ -- categorieën, volgorde, herkomstfilter en overslaan
@@ -35,7 +35,7 @@ flowchart TD
 
 </Phase>
 
-<Phase title="3. Winkelsessies en kassabonnen" status="planned">
+<Phase title="3. Winkelsessies en kassabonnen" status="done">
 
 <FileTree>
 - add prisma/schema/shopping-sessions.prisma -- sessies, deelnemers, aankopen en bonkoppelingen
@@ -45,17 +45,17 @@ flowchart TD
 
 </Phase>
 
-<Phase title="4. Realtime en gelijktijdige acties" status="planned">
+<Phase title="4. Realtime en gelijktijdige acties" status="done">
 
 <Checklist>
-- [ ] Bestaande SSE uitbreiden vanuit de servicelaag
-- [ ] Revisiecontrole voorkomt verloren wijzigingen
-- [ ] Opnieuw verbinden haalt actuele gegevens op
+- [x] Bestaande SSE uitbreiden vanuit de servicelaag
+- [x] Revisiecontrole voorkomt verloren wijzigingen
+- [x] Opnieuw verbinden haalt actuele gegevens op
 </Checklist>
 
 </Phase>
 
-<Phase title="5. Financiële koppeling" status="planned">
+<Phase title="5. Financiële koppeling" status="done">
 
 <FileTree>
 - modify src/api/shopping/sessions.service.ts -- bestaande uitgaven en gesplitste betalingen koppelen
@@ -64,13 +64,15 @@ flowchart TD
 
 </Phase>
 
-<Phase title="6. Consistentie en oplevering" status="planned">
+<Phase title="6. Consistentie en oplevering" status="done">
 
 <Checklist>
-- [ ] Verpakkingen alleen via verifieerbare hoeveelheden vergelijken
-- [ ] Migratie op wegwerpdatabase met bestaande gegevens controleren
-- [ ] API, MCP, concurrentie, bonherhaling en realtime testen
-- [ ] Rapport per fase met bestanden, migraties, resultaten en beperkingen
+- [x] Potjes tellen zonder verplicht gewicht; expliciete verpakkingen veilig vergelijken
+- [x] Migratie op wegwerpdatabase met bestaande gegevens controleren
+- [x] API, MCP, concurrentie, bonherhaling en realtime testen
+- [x] Rapport per fase met bestanden, migraties, resultaten en beperkingen
 </Checklist>
 
 </Phase>
+
+Uitgevoerd en gevalideerd: 1.600 unittests, 21 PostgreSQL/MCP-integratietests, twee mobiele browsers en behoud van bestaande migratiegegevens. Details staan in `docs/SHOPPING-SESSIONS.md`.

@@ -453,7 +453,7 @@
     "boughtQuantity": "Total bought",
     "stockLocation": "Stock location",
     "chooseLocation": "Choose location",
-    "buy": "Record bought goods",
+    "buy": "Bought",
     "saveQuantity": "Save quantity",
     "remove": "Remove from visit",
     "item_open": "To buy",
@@ -468,7 +468,9 @@
     "live_connecting": "Connecting…",
     "live_open": "Live updates connected",
     "live_reconnecting": "Reconnecting…",
-    "live_offline": "Offline: current data will reload after reconnecting"
+    "live_offline": "Offline: current data will reload after reconnecting",
+    "pendingReceipt": "Receipt item awaiting review",
+    "adjust": "Adjust"
   },
   "payments": {
     "title": "Payments and expenses",
@@ -499,6 +501,7 @@
     "unspecified": "Unspecified",
     "splitHint": "Record split payments separately with their own references. Linking an existing expense never creates another one.",
     "save": "Save payment",
-    "loading": "Loading payment details…"
+    "loading": "Loading payment details…",
+    "manage": "Add or link payment"
   }
 }

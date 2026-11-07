@@ -453,7 +453,7 @@
     "boughtQuantity": "Totaal gekocht",
     "stockLocation": "Voorraadlocatie",
     "chooseLocation": "Kies de locatie",
-    "buy": "Gekocht registreren",
+    "buy": "Gekocht",
     "saveQuantity": "Hoeveelheid bewaren",
     "remove": "Verwijderen uit sessie",
     "item_open": "Te kopen",
@@ -468,7 +468,9 @@
     "live_connecting": "Live verbinding maken…",
     "live_open": "Live bijgewerkt",
     "live_reconnecting": "Verbinding herstellen…",
-    "live_offline": "Offline: wijzigingen worden na herstel opnieuw opgehaald"
+    "live_offline": "Offline: wijzigingen worden na herstel opnieuw opgehaald",
+    "pendingReceipt": "Bonregel nog te beoordelen",
+    "adjust": "Aanpassen"
   },
   "payments": {
     "title": "Betalingen en uitgaven",
@@ -499,6 +501,7 @@
     "unspecified": "Niet opgegeven",
     "splitHint": "Registreer gesplitste betalingen afzonderlijk met een eigen referentie. Een bestaande uitgave koppelen maakt geen nieuwe uitgave aan.",
     "save": "Betaling opslaan",
-    "loading": "Betaalgegevens laden…"
+    "loading": "Betaalgegevens laden…",
+    "manage": "Betaling toevoegen of koppelen"
   }
 }

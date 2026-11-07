@@ -86,3 +86,14 @@ describe("pickByName", () => {
     assert.equal(pickByName(items, "basilicum"), null);
   });
 });
+
+it("does not identify olive-oil spread as liquid olive oil just because its name contains olijfolie", () => {
+  const spread: MatchProduct = { id: "bertolli", name: "BERTOLLI smeerboter met olijfolie 250 g", unit: "potje", packageAmount: 250, packageUnit: "g", stockProductId: null };
+  const [missing] = matchIngredients([{ name: "olijfolie", quantity: 1, unit: "l" }], [spread], new Map([[spread.id, 2]]));
+  assert.equal(missing?.product, null);
+  const oil: MatchProduct = { id: "oil", name: "Olijfolie", unit: "fles", packageAmount: 1, packageUnit: "l", stockProductId: null };
+  const [found] = matchIngredients([{ name: "olijfolie", quantity: 1, unit: "l" }], [spread, oil], new Map([[oil.id, 1]]));
+  assert.equal(found?.product?.id, oil.id);
+  const [butter] = matchIngredients([{ name: spread.name }], [spread, oil], new Map());
+  assert.equal(butter?.product?.id, spread.id);
+});

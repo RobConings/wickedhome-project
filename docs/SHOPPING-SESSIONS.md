@@ -53,3 +53,74 @@ De waarnemingen uit de winkel dateren van vóór merge `bdc1a96`. Producten, Sho
 - Betalingsreferenties zijn idempotent; gewijzigde retries worden geweigerd. Een uitgave kan niet dubbel worden gekoppeld. Bekende bontotalen bewaken overregistratie. Links lopen van sessie naar uitgave en terug.
 - Vijf echte PostgreSQL-financetests geslaagd: parallelle retries, rekening/betaler, gesplitste betalingen/aandelen, bestaande uitgave hergebruiken, overbetaling en toegang voor kinderen. Voorraad blijft bij financiële acties ongewijzigd.
 - De bestaande uitgavenfunctie accepteert een transactionele context voor eenmalige betalingen; meldingen volgen pas na commit. Periodieke uitgaven en leningen blijven hun bestaande route volgen.
+
+## Fase 6 – Consistentie en eindvalidatie
+
+- Bestanden: `src/features/shopping/types/product-identity.ts`, `src/types/units.ts`, `src/api/shopping/product-alternatives.ts`, shopping-/receptservices, MCP-productvoorbereiding en receptmatching; aanvullende sessie-/betalingstests, `scripts/verify-shopping-migration.mjs`, `scripts/shopping-browser-smoke.mjs`, npm-scripts en CI.
+- Productmatching sluit bekende conflicterende producttypen uit. Bertolli smeerboter wordt niet aan vloeibare olijfolie gekoppeld omdat ‘olijfolie’ in de naam staat. De opgeslagen categorie blijft leidend. Gedeelde voorraad weigert bekende conflicterende typen, verpakkingen, eenheden of verpakkingsinhouden; generieke voorraadgroepen behouden verpakkingsmetadata.
+- Huishoudelijk tellen blijft eenvoudig: één potje is één voorraadeenheid, zonder verplicht gramgewicht. Nieuwe boodschappen en sessieregels gebruiken de ene bekende huishoudelijke voorraadeenheid als standaard, ook bij een verouderd cataloguslabel. Expliciet ingevoerde recept-/aankoopeenheden worden niet stilzwijgend omgerekend. Gramomrekening is alleen beschikbaar als de inhoud al bekend is; onbekende inhoud blokkeert gewoon potjes tellen niet.
+- De actuele catalogus is alleen gelezen: Bertolli staat al onder zuivel, tomatenpuree heeft 10 potjes voorraad en geen bekend gewicht. Geen echte voorraad, recepten, productkoppelingen of financiën aangepast. Een echte PostgreSQL-test controleert juist die verouderde tube/potje-situatie: één potje erbij geeft 11, zonder verpakkingsgewicht.
+- Winkelen toont primair Gekocht en Nu niet. Hoeveelheden, voorraadlocaties en verwijderen zitten onder Aanpassen. Gekochte en overgeslagen producten staan buiten de actieve categorieën in inklapbare overzichten. Bon- en betalingsformulieren zijn optioneel uitklapbaar.
+- Aanvullend hersteld: onderdrukking van automatische regels bij gedeelde voorraad en bulkafvinken, receptselectie zonder verborgen minimumhoeveelheden, later voorraad boeken bij een oorspronkelijk niet bijgehouden aankoop, veilige herhaling van sessiestart en betalingen, en behoud van aankoopnamen na verwijderen uit een sessie.
+- Geen extra datamigratie boven de vier hierboven beschreven additieve migraties. Bestaande entiteiten en rollen blijven behouden.
+
+### Definitieve controles
+
+| Controle | Resultaat |
+| --- | --- |
+| `npm run typecheck` | Geslaagd |
+| `npm run lint` | Geslaagd |
+| `npm test` | 1.600 geslaagd; 21 database-integratietests bewust overgeslagen in deze unitrun |
+| `npm run test:shopping-integration` | Alle 21 tests geslaagd op echte PostgreSQL, inclusief MCP |
+| `npm run test:shopping-migrations` | 103 oude tabellen vergeleken; alle 14 representatieve bestaande records exact behouden |
+| `npm run test:shopping-browser` | Geslaagd met twee onafhankelijke mobiele Chrome-contexten van 390 × 844 |
+| `npm run build` | Client en API gebouwd |
+| `git diff --check` | Geslaagd |
+
+De browsercontrole gebruikt echte login, API, SSE en PostgreSQL: selectie, deelnemen, gelijktijdig afvinken, Nu niet, afsluiten, PDF-upload, bonregelherhaling, betalingsherhaling, offline/reconnect en mobiele breedte. API/MCP-integratietests controleren dezelfde service-events naar beide subscribers. De migratietest start van het schema vóór deze wijzigingen en vergelijkt alle bestaande kolomwaarden, inclusief voorraadmutatie, aankoopbewijs, receptbehoefte en betaalde uitgave. Dit is een wegwerpdataset, geen wijziging aan of volledige kopie van de huishoudelijke productiedatabase.
+
+### Acceptatietests 1–16
+
+| Nr. | Geautomatiseerd gecontroleerd |
+| --- | --- |
+| 1–2 | Essentieel/minimum afvinken: één aankoop en mutatie, geen dubbele actieve regel (`sessions.integration.test.ts`) |
+| 3 | Nu niet wijzigt geen voorraad en keert niet terug in dezelfde beurt (sessie- en shopping-regressies) |
+| 4 | Alleen geselecteerde producten, idempotente sessiestart (sessie-integratie en browser) |
+| 5 | Gedeeltelijke aankoop, cumulatieve hoeveelheid, veilige retry (sessie-integratie) |
+| 6–7 | Zonder bon kopen, later dezelfde goederen aan bon koppelen zonder extra voorraad (sessie-integratie en browser) |
+| 8 | Identieke upload en herhaalde gedrukte bonregel boeken niet opnieuw (sessie-integratie en browser) |
+| 9 | Oude onafhankelijke aankoop blokkeert nieuwe beurt niet; oude bronherhaling blijft idempotent (purchase-unit- en sessie-integratie) |
+| 10 | Gelijktijdig afvinken: twee deelnemers en MCP/web, één mutatie (database-integratie en twee browsers) |
+| 11 | MCP-publicatie vanuit gedeelde service naar twee household-subscribers; echte browser ontvangt dezelfde SSE-stream (MCP-integratie en browser) |
+| 12 | Verbindingsherstel haalt actuele status op (EventSource-test en offline/reconnect in browser) |
+| 13 | Recept/minimum combineren zonder dubbel optellen; automatische bijdrage uitsluiten bij selectie (shopping-regressies en sessie-integratie) |
+| 14 | Potje/tube blijven verschillende expliciete verpakkingen; potjes tellen zonder gewicht; verifieerbare gramomrekening werkt (units en database-integratie) |
+| 15 | Aankoop, voorraad, bon, bestaande/nieuwe uitgave, rekening, betaler en gesplitste betaling (financiële integratie en browser) |
+| 16 | Migratie behoudt oude gegevens en relaties (`verify-shopping-migration.mjs`) |
+
+### Gebruik en uitrol
+
+Open **Boodschappen → Winkelsessies**, kies de winkels en gewenste producten en start de beurt. Andere gezinsleden openen dezelfde sessie en kiezen Deelnemen. Gekocht registreert de geplande hoeveelheid; Aanpassen ondersteunt deelhoeveelheden en locatiekeuze. Nu niet verplaatst de regel uit de actieve lijst. Sluit de sessie af wanneer geen te kopen regels overblijven. Bonnen en betalingen kunnen later worden toegevoegd; bij een bonregel verwijst het gedrukte regelnummer steeds naar dezelfde echte bonregel.
+
+Voor opnieuw testen is een expliciete wegwerpdatabase nodig waarvan de naam op `test` of `ci` eindigt:
+
+```sh
+export DATABASE_URL=postgresql://USER@127.0.0.1:5432/wickedhome_test
+npx prisma migrate deploy
+npm run test:shopping-integration
+MIGRATION_TEST_DATABASE_URL="$DATABASE_URL" npm run test:shopping-migrations
+npm run test:shopping-browser
+```
+
+De browsertest start en stopt zelf zijn lokale API/Vite-proces, gebruikt tijdelijke documentopslag en ruimt uitsluitend zijn eigen testhuishouden op. Chrome/Chromium moet geïnstalleerd zijn; desgewenst via `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. CI voert de database-, migratie- en browsertests ook uit.
+
+Uitrol gebeurt via het bestaande deployproces: backup behouden, dependencies installeren, `prisma migrate deploy`, client/API bouwen en API herstarten. De nieuwe functies zijn pas op de server beschikbaar na die uitrol. Deze werkzaamheden hebben de serverapplicatie en productiedatabase niet bijgewerkt.
+
+### Grenzen en invloed op bestaande functies
+
+- Bonnen worden opgeslagen en gecontroleerd gekoppeld; er is geen nieuwe automatische OCR-parser toegevoegd. De bestaande document- en MCP-workflows blijven bruikbaar.
+- De categorievolgorde is een voorkeur per apparaat; productstatussen, aankopen en sessies zijn household-breed gedeeld.
+- De huidige SSE-infrastructuur vereist één API-proces voor directe broadcasts. Meerdere workers vereisen gedeelde pub/sub.
+- Oude bulkafronding markeert lijstregels gekocht zonder fictieve voorraad te verzinnen. Individueel kopen en sessie-aankopen registreren bekende voorraad via de bestaande aankoopadministratie.
+- Verouderde edits leveren een conflict op en laden de actuele stand. Hoeveelheidsverschillen op bonnen vragen beoordeling; bestaande voorraad wordt niet automatisch verlaagd.
+- Productmatching is een conservatieve uitsluiting van bekende conflicten, geen volledige productontologie of bewijs van gelijkwaardigheid. Bestaande productkoppelingen zijn niet automatisch herschreven.

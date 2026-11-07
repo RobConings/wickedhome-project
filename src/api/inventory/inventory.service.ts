@@ -91,6 +91,7 @@ async function assertRefs(householdId: string, productId: string, placeId: strin
 type Actor = Pick<SessionUser, "id" | "householdId" | "locale">;
 
 type ChangeExtra = {
+  stockPurchaseId?: string;
   expectedUpdatedAt?: Date;
   counted?: boolean;
   purchase?: PurchaseContext;
@@ -167,7 +168,7 @@ async function applyChangeLogged(
           note: extra.note || null,
           shoppingItemId: extra.shoppingItemId ?? null,
           mealPlanEntryId: extra.mealPlanEntryId ?? null,
-          stockPurchaseId: purchaseResult?.purchaseIds[0] ?? null,
+          stockPurchaseId: purchaseResult?.purchaseIds[0] ?? extra.stockPurchaseId ?? null,
         },
       });
       movementId = movement.id;
@@ -492,6 +493,13 @@ async function recordPurchasesImpl(actor: Actor, lines: RecordPurchaseLine[], re
   const checked = await Promise.all(stockItems.map((item) => checkLowStock(actor, item)));
   const byId = new Map(checked.map(({ stockItem }) => [stockItem.id, stockItem]));
   return saved.map(({ stockItemId }) => byId.get(stockItemId)!).filter(Boolean);
+}
+
+/** Session callers keep purchase evidence, stock and the session tick in the SAME transaction. */
+export async function creditRecordedPurchaseInTransaction(tx: Prisma.TransactionClient, actor: Actor, id: string, quantity: number, purchaseId: string) {
+  const row = await tx.stockItem.findFirst({ where: { id, householdId: actor.householdId }, include: stockInclude });
+  if (!row) throw notFound("Stock item not found");
+  return applyChangeLogged(actor, row, quantity, "bought", { stockPurchaseId: purchaseId }, tx);
 }
 
 /** Session callers keep purchase evidence, stock and the session tick in the SAME transaction. */

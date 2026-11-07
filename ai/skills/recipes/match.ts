@@ -1,3 +1,4 @@
+import { compatibleProductType } from "@/features/shopping/types/product-identity";
 import { compareNeed, type NeedComparison } from "@/types/units";
 import { scoreCandidates, type EntityCandidate } from "@ai/core/resolve";
 import { fold } from "@ai/core/text-match";
@@ -90,7 +91,8 @@ export function matchIngredients(
   const candidates = productCandidates(products);
   return lines.map((line) => {
     const name = line.name.trim();
-    const scored = scoreCandidates(ingredientName(name), candidates);
+    const query = ingredientName(name);
+    const scored = scoreCandidates(query, candidates.filter((candidate) => [candidate.name, ...(candidate.aliases ?? [])].every((name) => compatibleProductType(query, name))));
     const best = scored[0];
     // Clear: good enough, and exact or well ahead of the next candidate (as the entity resolver decides).
     const clear = best && best.score >= SURE && (!scored[1] || scored[1].score < best.score - 5);

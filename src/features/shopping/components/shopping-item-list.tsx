@@ -21,6 +21,7 @@ type ShoppingItemListProps = {
   showShop?: boolean;
   showList?: boolean;
   showStockStatus?: boolean;
+  groupByCategory?: boolean;
   size?: "default" | "large";
   /** Text when there is nothing open. */
   emptyText?: string;
@@ -39,6 +40,7 @@ export function ShoppingItemList({
   showShop = true,
   showList = false,
   showStockStatus = true,
+  groupByCategory = true,
   size = "default",
   emptyText,
   className,
@@ -69,7 +71,7 @@ export function ShoppingItemList({
 
   return (
     <div className={cn("flex flex-col gap-2", className)}>
-      {open.length > 0 ? (
+      {open.length > 0 && !groupByCategory ? <ul className="divide-y rounded-xl border bg-card px-1 shadow-xs sm:px-2">{open.map(renderRow)}</ul> : open.length > 0 ? (
         <div className="space-y-3">{groupItemsByCategory(open, order).map((group) => <section key={group.category}><h3 className="mb-1 text-sm font-medium">{t(`categories.${group.category}`)}</h3><ul className="divide-y rounded-xl border bg-card px-1 shadow-xs sm:px-2">{group.items.map(renderRow)}</ul></section>)}</div>
       ) : (
         emptyText && <p className="rounded-xl border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">{emptyText}</p>
