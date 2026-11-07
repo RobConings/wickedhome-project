@@ -62,6 +62,9 @@ const CHILD_CASES: Record<string, ChildCase[]> = {
   "recipes.go_to_step": [{ args: { move: "next" }, allowed: true }],
   "recipes.done": [{ args: {}, allowed: true }],
   "shopping.add_item": [{ args: { name: "Chocomelk", product: "Chocomelk" }, allowed: true }],
+  "shopping.join_session": [{ args: { sessionId: "visit" }, allowed: true }],
+  "shopping.session_add_item": [{ args: { sessionId: "visit", name: "Melk" }, allowed: true }],
+  "shopping.session_update_item": [{ args: { sessionId: "visit", itemId: "item", revision: 0, operationId: "skip", status: "skipped" }, allowed: true }],
   "shopping.update_item": [{ args: { item: "Brood", bought: true }, allowed: true }],
   "shopping.remove": [
     { args: { item: "Brood" }, allowed: true },

@@ -1,4 +1,5 @@
-import { AutomaticShoppingFilter, CategoryOrder, useCategoryOrder } from "../components/shopping-preferences";
+import { useCategoryOrder } from "../data/use-category-order";
+import { AutomaticShoppingFilter, CategoryOrder } from "../components/shopping-preferences";
 import * as React from "react";
 import { PackageIcon, PencilIcon, PlusIcon, SearchXIcon, ShoppingCartIcon, StoreIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -184,6 +185,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
 
   return (
     <PageContainer className="gap-4 px-3 py-4 sm:gap-6 sm:px-6 sm:py-8 lg:px-8">
+      <Link className="text-sm font-medium underline" to="/shopping/sessions">{t("sessions.title")}</Link>
       {actions.confirmation}
       <PageHeader title={t("page.title")} description={t("page.description")} actions={headerActions} />
 

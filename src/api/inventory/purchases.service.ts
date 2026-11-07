@@ -5,7 +5,7 @@ import { badRequest, HttpError, notFound } from "../lib/http";
 import { applyPurchaseChange } from "./inventory.service";
 
 type Actor = Pick<SessionUser, "id" | "householdId" | "locale">;
-export type PurchaseContext = StockPurchaseInput & { sourceKey: string; shoppingItemId?: string; trustedShopping?: boolean; shoppingMemberIds?: string[] };
+export type PurchaseContext = StockPurchaseInput & { sourceKey: string; shoppingItemId?: string; trustedShopping?: boolean; shoppingMemberIds?: string[]; shoppingPurchaseId?: string; sessionItemId?: string };
 const round = (value: number) => Math.round(value * 1000) / 1000;
 const summary = (row: { id: string; quantity: Prisma.Decimal; unit: string | null; shopId: string | null; purchasedAt: Date; stockAdded: boolean }): StockPurchaseSummary => ({ id: row.id, quantity: row.quantity.toNumber(), unit: row.unit, shopId: row.shopId, stockAdded: row.stockAdded, purchasedAt: row.purchasedAt.toISOString() });
 
@@ -63,13 +63,13 @@ export async function preparePurchase(tx: Prisma.TransactionClient, actor: Actor
   if (purchasedAt.getTime() > Date.now() + 300_000) throw badRequest("A purchase cannot be in the future");
   // Source identity is checked forever above. Only recent, potentially overlapping acquisitions need review.
   // A processed purchase from a prior shopping visit must not block an independent acquisition.
-  const candidates = await tx.stockPurchase.findMany({ where: { householdId, productId: row.productId, purchasedAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } }, orderBy: { purchasedAt: "desc" }, take: 50 });
+  const candidates = await tx.stockPurchase.findMany({ where: { householdId, productId: row.productId, ...(input.shoppingPurchaseId ? { shoppingPurchaseId: input.shoppingPurchaseId } : { shoppingPurchaseId: null, purchasedAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } }) }, orderBy: { purchasedAt: "desc" }, take: 50 });
   if (candidates.length && !input.separatePurchaseConfirmed) {
     throw new HttpError(409, "purchase_review", `Was this already added, or is it an extra purchase? Link the matching purchase ids or ask the person before confirming an extra purchase. Candidates: ${JSON.stringify(candidates.map(summary))}`, { stockItemId: [row.id] });
   }
   if (row.lastCountedAt && purchasedAt <= row.lastCountedAt && !input.countDisposition) throw new HttpError(409, "purchase_count_review", "Were these products already included in the stock count? Confirm already_counted or add_after_count before continuing.", { stockItemId: [row.id] });
   const stockAdded = input.countDisposition !== "already_counted";
-  const purchase = await tx.stockPurchase.create({ data: { householdId, stockItemId: row.id, productId: row.productId, shopId: input.shopId ?? null, shopConfirmed: Boolean(input.shopId && !input.trustedShopping), quantity: input.quantity, unit: row.unit, purchasedAt, stockAdded, shoppingItemId: input.shoppingItemId ?? null, userId: actor.id } });
+  const purchase = await tx.stockPurchase.create({ data: { householdId, stockItemId: row.id, productId: row.productId, shoppingPurchaseId: input.shoppingPurchaseId ?? null, sessionItemId: input.sessionItemId ?? null, shopId: input.shopId ?? null, shopConfirmed: Boolean(input.shopId && !input.trustedShopping), quantity: input.quantity, unit: row.unit, purchasedAt, stockAdded, shoppingItemId: input.shoppingItemId ?? null, userId: actor.id } });
   await tx.stockPurchaseEvidence.create({ data: { householdId, sourceKey: input.sourceKey, stockItemId: row.id, quantity: input.quantity, purchaseIds: [purchase.id] } });
   return { delta: stockAdded ? input.quantity : 0, purchaseIds: [purchase.id], repeated: false };
 }

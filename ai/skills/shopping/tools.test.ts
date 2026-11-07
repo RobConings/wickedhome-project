@@ -38,7 +38,7 @@ describe("shopping, shops and inventory skills", () => {
       .filter((tool) => ["shopping", "shops", "inventory"].includes(tool.skill) && tool.permission !== "read" && tool.roles.includes("child"))
       .map((tool) => tool.name)
       .sort();
-    assert.deepEqual(childTools, ["inventory.change_stock", "inventory.record_purchase", "shopping.add_item", "shopping.remove", "shopping.update_item", "shops.favorite"]);
+    assert.deepEqual(childTools, ["inventory.change_stock", "inventory.record_purchase", "shopping.add_item", "shopping.join_session", "shopping.remove", "shopping.session_add_item", "shopping.session_update_item", "shopping.update_item", "shops.favorite"]);
   });
 
   it("supports confirming a whole grocery trip in one action", () => {

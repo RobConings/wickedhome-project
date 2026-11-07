@@ -1,0 +1,112 @@
+// A visit snapshots selected requirements. It never owns or replaces the household catalogue.
+enum ShoppingSessionStatus {
+  ACTIVE
+  CLOSED
+}
+
+enum ShoppingSessionItemStatus {
+  OPEN
+  BOUGHT
+  SKIPPED
+}
+
+model ShoppingSession {
+  id String @id @default(cuid())
+  householdId String
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name String
+  shopIds String[]
+  shopGroupId String?
+  status ShoppingSessionStatus @default(ACTIVE)
+  createdByUserId String
+  startedAt DateTime @default(now())
+  closedAt DateTime?
+  revision Int @default(0)
+  operations ShoppingSessionOperation[]
+  items ShoppingSessionItem[]
+  participants ShoppingSessionParticipant[]
+  purchases ShoppingPurchase[]
+  @@index([householdId, startedAt])
+  @@map("shopping_sessions")
+}
+
+model ShoppingSessionParticipant {
+  id String @id @default(cuid())
+  sessionId String
+  session ShoppingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  userId String
+  joinedAt DateTime @default(now())
+  @@unique([sessionId, userId])
+  @@map("shopping_session_participants")
+}
+
+model ShoppingSessionItem {
+  id String @id @default(cuid())
+  sessionId String
+  session ShoppingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  // Soft references and snapshots preserve the visit when old requirements or catalogue rows are deleted.
+  productId String?
+  itemKey String
+  requirementIds String[]
+  name String
+  category ProductCategory @default(OTHER)
+  quantity Decimal @db.Decimal(12, 3)
+  purchasedQuantity Decimal @default(0) @db.Decimal(12, 3)
+  unit String?
+  shopId String?
+  stockItemId String?
+  status ShoppingSessionItemStatus @default(OPEN)
+  revision Int @default(0)
+  removedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  stockPurchases StockPurchase[]
+  @@unique([sessionId, itemKey])
+  @@map("shopping_session_items")
+}
+
+// Purchase header; existing StockPurchase rows are its acquisition lines.
+model ShoppingPurchase {
+  id String @id @default(cuid())
+  householdId String
+  sessionId String
+  session ShoppingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sourceKey String
+  shopId String?
+  purchasedAt DateTime @default(now())
+  totalCents Int?
+  stockPurchases StockPurchase[]
+  receipts ShoppingReceipt[]
+  @@unique([householdId, sourceKey])
+  @@index([sessionId])
+  @@map("shopping_purchases")
+}
+
+model ShoppingReceipt {
+  shopId String?
+  id String @id @default(cuid())
+  householdId String
+  purchaseId String
+  purchase ShoppingPurchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  documentId String?
+  // Keep original file identity and metadata even if the document is later removed.
+  contentHash String
+  filename String
+  totalCents Int?
+  purchasedAt DateTime
+  createdAt DateTime @default(now())
+  @@unique([householdId, contentHash])
+  @@map("shopping_receipts")
+}
+
+model ShoppingSessionOperation {
+  id String @id @default(cuid())
+  sessionId String
+  session ShoppingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  key String
+  payloadHash String
+  userId String
+  createdAt DateTime @default(now())
+  @@unique([sessionId, key])
+  @@map("shopping_session_operations")
+}

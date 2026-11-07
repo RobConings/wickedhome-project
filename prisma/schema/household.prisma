@@ -18,6 +18,7 @@ enum HouseholdLocationSource {
 }
 
 model Household {
+  shoppingSessions ShoppingSession[]
   id                  String                   @id @default(cuid())
   name                String
   /// The home address (Belgian structure). All optional: a household can exist without one.

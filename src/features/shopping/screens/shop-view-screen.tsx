@@ -1,4 +1,5 @@
-import { AutomaticShoppingFilter, CategoryOrder, useCategoryOrder } from "../components/shopping-preferences";
+import { useCategoryOrder } from "../data/use-category-order";
+import { AutomaticShoppingFilter, CategoryOrder } from "../components/shopping-preferences";
 import * as React from "react";
 import { ArrowLeftIcon, CircleHelpIcon, PartyPopperIcon, RefreshCwIcon, SearchXIcon, StoreIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";

@@ -66,3 +66,6 @@ export {
   type ShoppingItemSource,
   type ShoppingSummary,
 } from "./types/shopping";
+
+export { SessionsScreen } from "./screens/sessions-screen";
+export { fetchShoppingSession, fetchShoppingSessions } from "./data/sessions-requests";

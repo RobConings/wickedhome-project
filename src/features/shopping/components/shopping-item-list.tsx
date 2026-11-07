@@ -5,7 +5,7 @@ import type { Shop } from "@/features/shops";
 import { cn } from "@/lib/utils";
 import type { ShoppingItem } from "../types/shopping";
 import { groupItemsByCategory } from "./shopping-grouping";
-import { useCategoryOrder } from "./shopping-preferences";
+import { useCategoryOrder } from "../data/use-category-order";
 import { ShoppingItemRow } from "./shopping-item-row";
 
 type ShoppingItemListProps = {

@@ -112,11 +112,12 @@ async function applyChangeLogged(
   delta: number,
   reason: StockMovementReason,
   extra: ChangeExtra = {},
+  transaction?: Prisma.TransactionClient,
 ): Promise<StockChangeResult & { movementId: string | null; applied: number; purchase?: { purchaseIds: string[]; repeated: boolean; added: number } }> {
   let applied = 0;
   let movementId: string | null = null;
   let purchaseResult: { purchaseIds: string[]; repeated: boolean } | undefined;
-  const updated = await db.$transaction(async (tx) => {
+  const change = async (tx: Prisma.TransactionClient) => {
     await lockStock(tx, actor.householdId);
     if (extra.purchase) {
       await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${actor.householdId + ":" + extra.purchase.sourceKey}, 0))`;
@@ -165,14 +166,16 @@ async function applyChangeLogged(
           note: extra.note || null,
           shoppingItemId: extra.shoppingItemId ?? null,
           mealPlanEntryId: extra.mealPlanEntryId ?? null,
+          stockPurchaseId: purchaseResult?.purchaseIds[0] ?? null,
         },
       });
       movementId = movement.id;
     }
     return next;
-  });
+  };
+  const updated = transaction ? await change(transaction) : await db.$transaction(change);
 
-  return { ...(await checkLowStock(actor, updated)), movementId, applied, ...(purchaseResult && { purchase: { ...purchaseResult, added: applied } }) };
+  return { ...(transaction ? { stockItem: toStockItem(updated), addedToShoppingList: false } : await checkLowStock(actor, updated)), movementId, applied, ...(purchaseResult && { purchase: { ...purchaseResult, added: applied } }) };
 }
 
 /** Checks the current stock, including creation and edits that only change the minimum. */
@@ -472,6 +475,7 @@ export async function recordPurchases(actor: Actor, lines: RecordPurchaseLine[],
           reason: "BOUGHT",
           userId: actor.id,
           assistantImageId: receiptImageId ?? null,
+          stockPurchaseId: purchase.purchaseIds[0] ?? null,
           note: note || null,
         },
       });
@@ -487,6 +491,13 @@ export async function recordPurchases(actor: Actor, lines: RecordPurchaseLine[],
   const checked = await Promise.all(stockItems.map((item) => checkLowStock(actor, item)));
   const byId = new Map(checked.map(({ stockItem }) => [stockItem.id, stockItem]));
   return saved.map(({ stockItemId }) => byId.get(stockItemId)!).filter(Boolean);
+}
+
+/** Session callers keep purchase evidence, stock and the session tick in the SAME transaction. */
+export async function applyPurchaseInTransaction(tx: Prisma.TransactionClient, actor: Actor, id: string, purchase: PurchaseContext) {
+  const row = await tx.stockItem.findFirst({ where: { id, householdId: actor.householdId }, include: stockInclude });
+  if (!row) throw notFound("Stock item not found");
+  return applyChangeLogged(actor, row, purchase.quantity, "bought", { shoppingItemId: purchase.shoppingItemId, note: purchase.note, purchase }, tx);
 }
 
 /** Acquisition and evidence are committed atomically with the stock movement. */

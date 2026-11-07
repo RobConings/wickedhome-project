@@ -38,6 +38,8 @@ model StockItem {
 
 /// Every change to a stock quantity, with who did it and why.
 model StockMovement {
+  stockPurchaseId String?
+  stockPurchase StockPurchase? @relation(fields: [stockPurchaseId], references: [id], onDelete: SetNull)
   id             String              @id @default(cuid())
   householdId    String
   household      Household           @relation(fields: [householdId], references: [id], onDelete: Cascade)
@@ -68,6 +70,11 @@ model StockMovement {
 /// One actual acquisition, independent of scans, shopping ticks and receipt evidence.
 /// Soft product/place/shop references preserve its identity after catalogue/list changes.
 model StockPurchase {
+  shoppingPurchaseId String?
+  shoppingPurchase ShoppingPurchase? @relation(fields: [shoppingPurchaseId], references: [id], onDelete: SetNull)
+  sessionItemId String?
+  sessionItem ShoppingSessionItem? @relation(fields: [sessionItemId], references: [id], onDelete: SetNull)
+  movements StockMovement[]
   id             String @id @default(cuid())
   householdId    String
   household      Household @relation(fields: [householdId], references: [id], onDelete: Cascade)

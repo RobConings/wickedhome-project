@@ -44,7 +44,10 @@ import {
 import "./shopping.jobs";
 import { updateShoppingItem } from "./shopping-actions";
 
+import { shoppingSessionsRouter } from "./sessions.routes";
+
 export const shoppingRouter = Router();
+shoppingRouter.use("/sessions", shoppingSessionsRouter);
 
 shoppingRouter.use(requireUser);
 
