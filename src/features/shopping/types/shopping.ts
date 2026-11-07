@@ -160,6 +160,7 @@ export type ShoppingItemCreateInput = z.infer<typeof shoppingItemCreateSchema>;
 
 /** Body of `PATCH /api/shopping/items/:id`: only the given fields change. */
 export const shoppingItemUpdateSchema = z.object({
+  expectedUpdatedAt: z.iso.datetime().optional(),
   purchaseDecision: purchaseDecisionSchema.optional(),
   name: nameSchema.optional(),
   productId: idSchema.nullable().optional(),
@@ -193,6 +194,7 @@ export type ShoppingItemEditInput = z.infer<typeof shoppingItemEditSchema>;
 /** The edit form's values as an update: what is left empty is cleared. */
 export function editToUpdate(input: ShoppingItemEditInput): ShoppingItemUpdateInput {
   return {
+    ...(input.expectedUpdatedAt && { expectedUpdatedAt: input.expectedUpdatedAt }),
     name: input.name,
     productId: input.productId ?? null,
     quantity: input.quantity ?? 1,
@@ -312,6 +314,7 @@ export type ShoppingList = {
 };
 
 export type ShoppingItem = {
+  updatedAt?: string;
   id: string;
   listId: string;
   listName: string;

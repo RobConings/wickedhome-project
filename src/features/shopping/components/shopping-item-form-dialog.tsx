@@ -161,7 +161,7 @@ export function ShoppingItemFormDialog({ item, onOpenChange, products, shops, pr
       adjustValues={adjustValues}
       action="/shopping"
       intent="update-item"
-      hiddenFields={{ id: item?.id }}
+      hiddenFields={{ id: item?.id, expectedUpdatedAt: item?.updatedAt }}
       onSuccess={() => onSaved?.()}
       defaultValues={{
         name: item?.name ?? "",

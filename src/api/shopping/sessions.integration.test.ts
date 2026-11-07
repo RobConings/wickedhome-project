@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { after, it } from "node:test";
 import { db } from "../lib/db";
-import { listItems } from "./shopping.service";
+import { getItem, listItems, updateItem } from "./shopping.service";
 import { addShoppingSessionItem, attachShoppingReceipt, closeShoppingSession, createShoppingSession, getShoppingSession, joinShoppingSession, reconcileShoppingReceiptLine, updateShoppingSessionItem } from "./sessions.service";
 
 import { shoppingSessionFixture as fixture } from "./sessions-test-helpers";
+
+import { updateShoppingItem } from "./shopping-actions";
 
 const enabled = process.env.SHOPPING_INTEGRATION_TESTS === "1";
 const options = { skip: !enabled };
@@ -102,4 +104,16 @@ it("two receipts can match two partial acquisitions of the same product without 
   }
   assert.equal(await f.quantity(), 2);
   assert.equal(await db.stockMovement.count({ where: { householdId: f.home.id, stockPurchaseId: { not: null } } }), 2);
+});
+
+
+it("legacy shared lists reject stale quantity edits and concurrent ticks still credit one acquisition", options, async (t) => {
+  const f = await fixture(t);
+  const item = await getItem(f.home.id, f.requirement.id);
+  await updateItem(f.user, item.id, { quantity: 3, expectedUpdatedAt: item.updatedAt });
+  await assert.rejects(updateItem(f.user, item.id, { quantity: 4, expectedUpdatedAt: item.updatedAt }), /Someone changed/);
+  const fresh = await getItem(f.home.id, item.id);
+  await Promise.all([updateShoppingItem(f.user, item.id, { status: "bought", expectedUpdatedAt: fresh.updatedAt }), updateShoppingItem(f.user, item.id, { status: "bought", expectedUpdatedAt: fresh.updatedAt })]);
+  assert.equal(await f.quantity(), 3);
+  assert.equal(await db.stockPurchase.count({ where: { householdId: f.home.id } }), 1);
 });

@@ -20,7 +20,7 @@ const MAX_RETRY_MS = 60_000;
 /** After this many failed reconnects in a row the status says offline (it keeps retrying). */
 const OFFLINE_AFTER_FAILURES = 3;
 
-class LiveEventsConnection {
+export class LiveEventsConnection {
   private source: EventSource | null = null;
   private handlers = new Map<string, Set<Handler>>();
   /** Event types the current EventSource already forwards. */

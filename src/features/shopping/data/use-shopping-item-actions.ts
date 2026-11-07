@@ -59,8 +59,8 @@ export function useShoppingItemActions({ items: suppliedItems, onChanged }: Opti
       await track(item.id, async () => {
         try {
           const result = next === "bought"
-            ? await reconcile(item.name, item.quantity, (purchaseDecision) => updateShoppingItem(item.id, { status: next, purchaseDecision }))
-            : await updateShoppingItem(item.id, { status: next });
+            ? await reconcile(item.name, item.quantity, (purchaseDecision) => updateShoppingItem(item.id, { status: next, purchaseDecision, expectedUpdatedAt: item.updatedAt }))
+            : await updateShoppingItem(item.id, { status: next, expectedUpdatedAt: item.updatedAt });
           if (!result) { await updateShoppingItem(item.id, { status: "open" }); onChanged?.(); return; }
           if (result.restock && result.stock?.added) toast.success(t("restock.addedAutomatically", { name: item.name, quantity: formatQuantity(result.stock.added, currentLocale()), unit: result.restock.unit ?? "", place: result.restock.placeName }));
           else if (result.stock?.added === 0) toast.success(t("restock.alreadyProcessed"));

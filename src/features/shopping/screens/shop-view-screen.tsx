@@ -56,7 +56,7 @@ type ShopViewScreenProps = {
 
 /**
  * In the shop: everything to buy here from every list, most urgent first (or by category, name or price),
- * with search, filters and big tick targets. Refreshes every ~10 s and on focus, so two phones shopping together stay in sync.
+ * with search, filters and big tick targets. SSE invalidates committed data; polling/focus are fallbacks.
  */
 export function ShopViewScreen({
   data,

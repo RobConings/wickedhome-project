@@ -21,3 +21,13 @@ it("MCP and web service actions broadcast the same household-scoped visit event"
   assert.equal(await f.quantity(), 2);
   await assert.rejects(getShoppingSession({ ...f.user, householdId: "another-home" }, visit.id), /not found/);
 });
+
+
+it("MCP additions to the ordinary shopping list notify both subscribers from the service layer", options, async (t) => {
+  const f = await fixture(t); const first: string[] = []; const second: string[] = [];
+  const stopFirst = subscribe(f.home.id, (event) => { first.push(event.type); }); const stopSecond = subscribe(f.home.id, (event) => { second.push(event.type); });
+  t.after(stopFirst); t.after(stopSecond);
+  const result = await handleMcpMessage({ jsonrpc: "2.0", id: 2, method: "tools/call", params: { name: "shopping_add_item", arguments: { name: f.product.name, product: f.product.id, quantity: 1, confirm: true } } }, { user: f.user, tokenId: "fixture", tokenName: "Fixture", scope: "write" }, new AbortController().signal) as { result: { isError: boolean; content: { text: string }[] } };
+  assert.equal(result.result.isError, false, result.result.content[0]?.text);
+  assert.ok(first.includes("shopping.changed")); assert.deepEqual(first, second);
+});

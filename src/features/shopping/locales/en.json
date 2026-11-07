@@ -198,7 +198,7 @@
     "emptyDescription": "Everything for this trip is in your cart.",
     "nothingAnywhere": "Your lists are empty.",
     "progress": "{{bought}} of {{total}} in the basket",
-    "liveHint": "Updates automatically while you shop.",
+    "liveHint": "Updated live. Current data reloads after the connection is restored.",
     "planVisit": "Plan a visit",
     "otherItems": "Other",
     "estimate": "About {{total}} to go",
@@ -463,6 +463,11 @@
     "countDisposition": "Prior stock count",
     "countUnknown": "Not yet reviewed",
     "alreadyCounted": "Goods were already counted",
-    "addAfterCount": "Goods arrived after the count"
+    "addAfterCount": "Goods arrived after the count",
+    "live_idle": "Live connection inactive",
+    "live_connecting": "Connecting…",
+    "live_open": "Live updates connected",
+    "live_reconnecting": "Reconnecting…",
+    "live_offline": "Offline: current data will reload after reconnecting"
   }
 }

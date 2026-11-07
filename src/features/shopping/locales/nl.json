@@ -198,7 +198,7 @@
     "emptyDescription": "Alles voor deze winkelronde ligt in je kar.",
     "nothingAnywhere": "Je lijsten zijn leeg.",
     "progress": "{{bought}} van {{total}} in de kar",
-    "liveHint": "Wordt vanzelf bijgewerkt terwijl je winkelt.",
+    "liveHint": "Live bijgewerkt. Na verbindingsherstel wordt de actuele stand opnieuw geladen.",
     "planVisit": "Winkelbezoek plannen",
     "otherItems": "Overige",
     "estimate": "Nog ongeveer {{total}}",
@@ -463,6 +463,11 @@
     "countDisposition": "Eerdere voorraadtelling",
     "countUnknown": "Nog niet beoordeeld",
     "alreadyCounted": "Goederen zaten al in de telling",
-    "addAfterCount": "Goederen kwamen na de telling"
+    "addAfterCount": "Goederen kwamen na de telling",
+    "live_idle": "Live verbinding niet actief",
+    "live_connecting": "Live verbinding maken…",
+    "live_open": "Live bijgewerkt",
+    "live_reconnecting": "Verbinding herstellen…",
+    "live_offline": "Offline: wijzigingen worden na herstel opnieuw opgehaald"
   }
 }

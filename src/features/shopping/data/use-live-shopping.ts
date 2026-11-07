@@ -1,10 +1,11 @@
+import { useLiveEvents } from "@/lib/live-events";
 import * as React from "react";
 import { useRevalidator } from "react-router";
 import { fetchShops, type Shop } from "@/features/shops";
 import type { Product, ShoppingItem, ShoppingItemQuery } from "../types/shopping";
 import { fetchProducts, fetchShoppingItems } from "./shopping-requests";
 
-/** How often lists refresh while someone is shopping (no websockets: polling plus refresh on focus). */
+/** Fallback refresh interval; service events arrive immediately through the shared SSE stream. */
 export const LIVE_REFRESH_MS = 10_000;
 
 /**
@@ -40,9 +41,17 @@ export function useLiveRevalidation(intervalMs: number | null = LIVE_REFRESH_MS)
   React.useEffect(() => {
     stateRef.current = revalidator.state;
   });
-  useRefreshWhileVisible(() => {
+  const pending = React.useRef(false);
+  const refresh = React.useCallback(() => {
     if (stateRef.current === "idle") void revalidator.revalidate();
-  }, intervalMs);
+    else pending.current = true;
+  }, [revalidator]);
+  React.useEffect(() => {
+    if (revalidator.state === "idle" && pending.current) { pending.current = false; void revalidator.revalidate(); }
+  }, [revalidator]);
+  useLiveEvents("shopping.changed", refresh, { enabled: intervalMs !== null });
+  useLiveEvents("ready", refresh, { enabled: intervalMs !== null });
+  useRefreshWhileVisible(refresh, intervalMs);
 }
 
 /**
@@ -57,13 +66,15 @@ export function useLiveShoppingItems(
   const [items, setItems] = React.useState<ShoppingItem[] | null>(initial ?? null);
   const [failed, setFailed] = React.useState(false);
   const key = JSON.stringify(query);
+  const requestSequence = React.useRef(0);
 
   const refresh = React.useCallback(async () => {
+    const sequence = ++requestSequence.current;
     try {
-      setItems(await fetchShoppingItems(JSON.parse(key) as ShoppingItemQuery));
-      setFailed(false);
+      const next = await fetchShoppingItems(JSON.parse(key) as ShoppingItemQuery);
+      if (sequence === requestSequence.current) { setItems(next); setFailed(false); }
     } catch {
-      setFailed(true);
+      if (sequence === requestSequence.current) setFailed(true);
     }
   }, [key]);
 
@@ -72,6 +83,8 @@ export function useLiveShoppingItems(
     // `initial` only seeds the first render, so it is not a dependency.
   }, [refresh]);
 
+  useLiveEvents("shopping.changed", () => void refresh(), { enabled: !initial });
+  useLiveEvents("ready", () => void refresh(), { enabled: !initial });
   useRefreshWhileVisible(() => void refresh(), intervalMs, !initial);
 
   return { items, setItems, failed, refresh };

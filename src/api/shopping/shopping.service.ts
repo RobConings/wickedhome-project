@@ -1,3 +1,4 @@
+import { withShoppingEvents, publishShoppingChanged } from "./shopping-events";
 import type { SessionUser } from "@/features/auth/types/auth";
 import { restockAmount } from "@/features/inventory/types/inventory";
 import {
@@ -39,7 +40,7 @@ import {
   type ShoppingItemSource as SourceRow,
   type ShoppingListKind as ListKindRow,
 } from "../lib/db";
-import { badRequest, forbidden, notFound } from "../lib/http";
+import { badRequest, conflict, forbidden, notFound } from "../lib/http";
 import { forgetEntity } from "../selections/selections.service";
 import { listShops, shopRefSelect, toShopRef } from "../shops/shops.service";
 import { UnsafeUrlError, bareHost, fetchPage, parsePageMetadata } from "./link-preview";
@@ -125,6 +126,7 @@ function toItem(row: ItemRow, names: Map<string, string>, groups: Map<string, Sh
     source: toSource(row.source),
     taskId: row.taskId,
     status: row.status.toLowerCase() as ShoppingItemStatus,
+    updatedAt: row.updatedAt?.toISOString(),
     boughtAt: row.boughtAt?.toISOString() ?? null,
     boughtByName: row.boughtByUserId ? (names.get(row.boughtByUserId) ?? null) : null,
     createdAt: row.createdAt.toISOString(),
@@ -413,7 +415,7 @@ async function topUpStaples(householdId: string) {
     const rule = parseStapleRRule(staple.rrule);
     const details = product ? shoppingProductDetails(product, { unit: staple.unit, shopId: staple.shopId, url: null, imageUrl: null, priceCents: null }) : {};
     const next = rule ? nextStapleOccurrence(rule, fromDate(staple.startDate), day) : addDays(day, 7);
-    await db.$transaction(async (tx) => {
+    const added = await db.$transaction(async (tx) => {
       if (ownerId && !(await automaticShoppingAllowed(tx, householdId, ownerId))) return;
       // Claim the staple first, so concurrent reads don't add it twice.
       const claimed = await tx.shoppingStaple.updateMany({
@@ -437,7 +439,9 @@ async function topUpStaples(householdId: string) {
           ...details,
         },
       });
+      return true;
     });
+    if (added) publishShoppingChanged(householdId);
   }
 }
 
@@ -460,19 +464,19 @@ function stapleData(input: StapleInput) {
   };
 }
 
-export async function createStaple(householdId: string, input: StapleInput): Promise<ShoppingStaple> {
+async function createStapleImpl(householdId: string, input: StapleInput): Promise<ShoppingStaple> {
   await assertRefs(householdId, input);
   return toStaple(await db.shoppingStaple.create({ data: { householdId, ...stapleData(input) } }));
 }
 
-export async function updateStaple(householdId: string, id: string, input: StapleInput): Promise<ShoppingStaple> {
+async function updateStapleImpl(householdId: string, id: string, input: StapleInput): Promise<ShoppingStaple> {
   const found = await db.shoppingStaple.count({ where: { id, householdId } });
   if (!found) throw notFound("Staple not found");
   await assertRefs(householdId, input);
   return toStaple(await db.shoppingStaple.update({ where: { id }, data: stapleData(input) }));
 }
 
-export async function deleteStaple(householdId: string, id: string): Promise<void> {
+async function deleteStapleImpl(householdId: string, id: string): Promise<void> {
   const { count } = await db.shoppingStaple.deleteMany({ where: { id, householdId } });
   if (!count) throw notFound("Staple not found");
 }
@@ -516,19 +520,19 @@ export async function getShoppingOverview(householdId: string, locale: Locale = 
 
 // Lists --------------------------------------------------------------------------------------------------
 
-export async function createList(householdId: string, input: ShoppingListInput) {
+async function createListImpl(householdId: string, input: ShoppingListInput) {
   const row = await db.shoppingList.create({ data: { householdId, name: input.name, kind: fromKind(input.kind) } });
   return { id: row.id };
 }
 
-export async function updateList(householdId: string, id: string, input: ShoppingListInput) {
+async function updateListImpl(householdId: string, id: string, input: ShoppingListInput) {
   await findOwnList(householdId, id);
   await db.shoppingList.update({ where: { id }, data: { name: input.name, kind: fromKind(input.kind) } });
   return { id };
 }
 
 /** Deletes a list with its items and staples. */
-export async function deleteList(householdId: string, id: string): Promise<void> {
+async function deleteListImpl(householdId: string, id: string): Promise<void> {
   await findOwnList(householdId, id);
   await db.shoppingList.delete({ where: { id } });
 }
@@ -561,7 +565,7 @@ export async function listItems(householdId: string, query: ShoppingItemQuery = 
   });
 }
 
-export async function createItem(user: Pick<SessionUser, "id" | "householdId" | "locale">, input: ShoppingItemCreateInput) {
+async function createItemImpl(user: Pick<SessionUser, "id" | "householdId" | "locale">, input: ShoppingItemCreateInput) {
   const { householdId } = user;
   await assertRefs(householdId, input);
   const product = input.productId ? await findOwnProduct(householdId, input.productId) : null;
@@ -599,10 +603,10 @@ export async function createItem(user: Pick<SessionUser, "id" | "householdId" | 
  * Updates an item. Children may tick items off and change items they added themselves; anything else is
  * for adults and owners. `justBought` says the item went from open to bought in this call.
  */
-export async function updateItem(user: SessionUser, id: string, input: ShoppingItemUpdateInput) {
+async function updateItemImpl(user: SessionUser, id: string, input: ShoppingItemUpdateInput) {
   const { householdId } = user;
   const existing = await findOwnItem(householdId, id);
-  const editsMoreThanStatus = Object.keys(input).some((key) => key !== "status" && key !== "purchaseDecision");
+  const editsMoreThanStatus = Object.keys(input).some((key) => key !== "status" && key !== "purchaseDecision" && key !== "expectedUpdatedAt");
   if (user.role === "child" && editsMoreThanStatus && existing.createdByUserId !== user.id) {
     throw forbidden("Children can only tick items off");
   }
@@ -610,11 +614,17 @@ export async function updateItem(user: SessionUser, id: string, input: ShoppingI
 
   const linkedProduct = input.productId ? await findOwnProduct(householdId, input.productId)
     : input.shopId !== undefined && existing.productId ? await findOwnProduct(householdId, existing.productId) : null;
-  const becomesBought = input.status === "bought" && existing.status !== "BOUGHT";
-  const becomesOpen = input.status === "open" && existing.status !== "OPEN";
+  let becomesBought = false;
+  let becomesOpen = false;
   const boughtAt = new Date();
   const row = await db.$transaction(async (tx) => {
-    const rows = await positionRows(householdId, existing, tx);
+    await lockStock(tx, householdId);
+    const current = await tx.shoppingItem.findFirst({ where: { id, householdId }, include: itemInclude });
+    if (!current) throw notFound("Shopping item not found");
+    if (input.expectedUpdatedAt && current.updatedAt.toISOString() !== input.expectedUpdatedAt && (editsMoreThanStatus || current.status.toLowerCase() !== input.status)) throw conflict("Someone changed this shopping item; refresh before editing it");
+    const rows = await positionRows(householdId, current, tx);
+    becomesBought = input.status === "bought" && rows.some((part) => part.status !== "BOUGHT");
+    becomesOpen = input.status === "open" && rows.some((part) => part.status !== "OPEN");
     if (user.role === "child" && editsMoreThanStatus && rows.some((row) => row.createdByUserId !== user.id)) {
       throw forbidden("Children can only edit their own items");
     }
@@ -675,7 +685,7 @@ export async function updateItem(user: SessionUser, id: string, input: ShoppingI
 }
 
 /** Marks every open item on the selected household shopping lists as bought in one operation. */
-export async function markOpenItemsBought(user: SessionUser, listIds: string[]): Promise<number> {
+async function markOpenItemsBoughtImpl(user: SessionUser, listIds: string[]): Promise<number> {
   if (!listIds.length) return 0;
   const lists = await db.shoppingList.findMany({
     where: { householdId: user.householdId, id: { in: listIds } },
@@ -690,7 +700,7 @@ export async function markOpenItemsBought(user: SessionUser, listIds: string[]):
   return result.count;
 }
 
-export async function deleteItem(user: SessionUser, id: string): Promise<void> {
+async function deleteItemImpl(user: SessionUser, id: string): Promise<void> {
   const existing = await findOwnItem(user.householdId, id);
   await db.$transaction(async (tx) => {
     const rows = await positionRows(user.householdId, existing, tx);
@@ -733,7 +743,7 @@ export async function getMaterialStatusForTasks(
 }
 
 /** For the Tasks feature: deletes a task's items when the task is deleted (no FK). Returns how many. */
-export async function deleteItemsForTask(householdId: string, taskId: string): Promise<number> {
+async function deleteItemsForTaskImpl(householdId: string, taskId: string): Promise<number> {
   const { count } = await db.shoppingItem.deleteMany({ where: { householdId, taskId } });
   return count;
 }
@@ -743,7 +753,7 @@ export async function deleteItemsForTask(householdId: string, taskId: string): P
  * shop, unless an open item for that product, or any product sharing its stock (alternatives), is already
  * on a list. Returns whether an item was added.
  */
-export async function ensureLowStockItem(
+async function ensureLowStockItemImpl(
   householdId: string,
   input: { productId: string; placeId: string | null; quantity: number; unit: string | null },
   locale: Locale = "en",
@@ -821,7 +831,7 @@ async function topUpLowStock(householdId: string, locale: Locale): Promise<void>
  * sharing its stock, is reused as one buying position. Each meal retains its own requirement, so removing
  * it leaves other purchases intact. Free-text ingredients are still reused by name.
  */
-export async function addRecipeItem(
+async function addRecipeItemImpl(
   user: Pick<SessionUser, "id" | "householdId" | "locale">,
   input: { productId: string | null; name: string; quantity: number; unit: string | null; mealPlanEntryId: string; note?: string | null },
 ): Promise<{ itemId: string; merged: boolean }> {
@@ -873,7 +883,7 @@ export async function countRecipeItems(householdId: string, mealPlanEntryId: str
 }
 
 /** For Recipes: removes a meal's open items when it leaves the "To cook" list (bought ones stay). Returns how many. */
-export async function deleteRecipeItems(householdId: string, mealPlanEntryId: string): Promise<number> {
+async function deleteRecipeItemsImpl(householdId: string, mealPlanEntryId: string): Promise<number> {
   const { count } = await db.shoppingItem.deleteMany({ where: { householdId, mealPlanEntryId, status: "OPEN" } });
   return count;
 }
@@ -928,13 +938,13 @@ export async function findProductByCode(householdId: string, code: string): Prom
   return row ? toProduct(row) : null;
 }
 
-export async function createProduct(householdId: string, input: ProductInput): Promise<Product> {
+async function createProductImpl(householdId: string, input: ProductInput): Promise<Product> {
   await assertRefs(householdId, { shopId: input.defaultShopId });
   await assertUniqueCodes(householdId, input);
   return toProduct(await db.product.create({ data: { householdId, ...productData(input) }, include: productInclude }));
 }
 
-export async function updateProduct(householdId: string, id: string, input: ProductInput): Promise<Product> {
+async function updateProductImpl(householdId: string, id: string, input: ProductInput): Promise<Product> {
   await findOwnProduct(householdId, id);
   await assertRefs(householdId, { shopId: input.defaultShopId });
   await assertUniqueCodes(householdId, input, id);
@@ -942,7 +952,7 @@ export async function updateProduct(householdId: string, id: string, input: Prod
 }
 
 /** Deletes a product. A main product's oldest alternative takes over the group and its stock. */
-export async function deleteProduct(householdId: string, id: string): Promise<void> {
+async function deleteProductImpl(householdId: string, id: string): Promise<void> {
   await findOwnProduct(householdId, id);
   await db.$transaction(async (tx) => {
     const heir = promotionCandidate(
@@ -1045,7 +1055,7 @@ async function joinGroup(tx: Prisma.TransactionClient, actor: Actor, memberId: s
  * alternative itself): they then share one stock. With `newMainName`, a new generic product (no barcode,
  * the chosen product's unit, category and shop) becomes the main product of both groups.
  */
-export async function linkAlternative(user: Actor, productId: string, input: ProductAlternativeInput): Promise<Product> {
+async function linkAlternativeImpl(user: Actor, productId: string, input: ProductAlternativeInput): Promise<Product> {
   const { householdId } = user;
   const select = { id: true, stockProductId: true, unit: true, category: true, defaultShopId: true } as const;
   await db.$transaction(async (tx) => {
@@ -1075,7 +1085,7 @@ export async function linkAlternative(user: Actor, productId: string, input: Pro
 }
 
 /** Takes an alternative out of its group. The shared stock stays with the main product. */
-export async function unlinkAlternative(householdId: string, productId: string): Promise<Product> {
+async function unlinkAlternativeImpl(householdId: string, productId: string): Promise<Product> {
   const product = await findOwnProduct(householdId, productId);
   if (!product.stockProductId) throw invalid("productId", "This product doesn't share another product's stock");
   await db.product.update({ where: { id: productId }, data: { stockProductId: null } });
@@ -1083,7 +1093,7 @@ export async function unlinkAlternative(householdId: string, productId: string):
 }
 
 /** Adds or replaces the product's link for one shop. */
-export async function upsertProductLink(householdId: string, productId: string, input: ProductShopLinkInput): Promise<Product> {
+async function upsertProductLinkImpl(householdId: string, productId: string, input: ProductShopLinkInput): Promise<Product> {
   await findOwnProduct(householdId, productId);
   await assertRefs(householdId, { shopId: input.shopId });
   const data = { url: input.url || null, priceCents: input.priceCents ?? null, articleNumber: input.articleNumber || null };
@@ -1095,8 +1105,32 @@ export async function upsertProductLink(householdId: string, productId: string, 
   return getProduct(householdId, productId);
 }
 
-export async function deleteProductLink(householdId: string, productId: string, shopId: string): Promise<Product> {
+async function deleteProductLinkImpl(householdId: string, productId: string, shopId: string): Promise<Product> {
   await findOwnProduct(householdId, productId);
   await db.productShopLink.deleteMany({ where: { productId, shopId } });
   return getProduct(householdId, productId);
 }
+
+// Shared mutation boundary for web, MCP, jobs and cross-feature callers.
+export const createItem = withShoppingEvents(createItemImpl);
+export const updateItem = withShoppingEvents(updateItemImpl);
+export const deleteItem = withShoppingEvents(deleteItemImpl);
+export const markOpenItemsBought = withShoppingEvents(markOpenItemsBoughtImpl);
+export const createList = withShoppingEvents(createListImpl);
+export const updateList = withShoppingEvents(updateListImpl);
+export const deleteList = withShoppingEvents(deleteListImpl);
+export const createStaple = withShoppingEvents(createStapleImpl);
+export const updateStaple = withShoppingEvents(updateStapleImpl);
+export const deleteStaple = withShoppingEvents(deleteStapleImpl);
+export const createProduct = withShoppingEvents(createProductImpl);
+export const updateProduct = withShoppingEvents(updateProductImpl);
+export const deleteProduct = withShoppingEvents(deleteProductImpl);
+export const linkAlternative = withShoppingEvents(linkAlternativeImpl);
+export const unlinkAlternative = withShoppingEvents(unlinkAlternativeImpl);
+export const upsertProductLink = withShoppingEvents(upsertProductLinkImpl);
+export const deleteProductLink = withShoppingEvents(deleteProductLinkImpl);
+export const addRecipeItem = withShoppingEvents(addRecipeItemImpl);
+export const deleteRecipeItems = withShoppingEvents(deleteRecipeItemsImpl);
+export const ensureLowStockItem = withShoppingEvents(ensureLowStockItemImpl);
+
+export const deleteItemsForTask = withShoppingEvents(deleteItemsForTaskImpl);

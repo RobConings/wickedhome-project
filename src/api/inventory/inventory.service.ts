@@ -1,3 +1,4 @@
+import { withShoppingEvents } from "../shopping/shopping-events";
 import { randomUUID } from "node:crypto";
 import type { SessionUser } from "@/features/auth/types/auth";
 import {
@@ -302,7 +303,7 @@ export async function scanCode(householdId: string, code: string): Promise<ScanR
 
 // Changes ------------------------------------------------------------------------------------------------
 
-export async function createStockItem(actor: Actor, input: StockItemInput): Promise<StockItem> {
+async function createStockItemImpl(actor: Actor, input: StockItemInput): Promise<StockItem> {
   // An alternative is kept as its main product (the stock they share).
   const productId = await assertRefs(actor.householdId, input.productId, input.placeId);
   const existing = await db.stockItem.findUnique({
@@ -326,7 +327,7 @@ export async function createStockItem(actor: Actor, input: StockItemInput): Prom
   return (await checkLowStock(actor, row)).stockItem;
 }
 
-export async function updateStockItem(actor: Actor, id: string, input: StockItemUpdateInput): Promise<StockChangeResult> {
+async function updateStockItemImpl(actor: Actor, id: string, input: StockItemUpdateInput): Promise<StockChangeResult> {
   await findOwnStock(actor.householdId, id);
   const updated = await db.stockItem.update({
     where: { id },
@@ -342,7 +343,7 @@ export async function updateStockItem(actor: Actor, id: string, input: StockItem
 }
 
 /** Replace only the actual quantity. Retrying the same count never adds it a second time. */
-export async function setStockCount(actor: Actor, id: string, input: StockCountInput): Promise<StockChangeResult> {
+async function setStockCountImpl(actor: Actor, id: string, input: StockCountInput): Promise<StockChangeResult> {
   const row = await findOwnStock(actor.householdId, id);
   if (row.quantity.toNumber() !== input.quantity && row.updatedAt.toISOString() !== input.expectedUpdatedAt) throw conflict("Stock changed during counting. Refresh and check the counted quantity again.");
   return applyChange(actor, row, round(input.quantity - row.quantity.toNumber()), "manual_correction", {
@@ -351,12 +352,12 @@ export async function setStockCount(actor: Actor, id: string, input: StockCountI
   });
 }
 
-export async function deleteStockItem(householdId: string, id: string): Promise<void> {
+async function deleteStockItemImpl(householdId: string, id: string): Promise<void> {
   await findOwnStock(householdId, id);
   await db.stockItem.delete({ where: { id } });
 }
 
-export async function addMovement(actor: Actor, id: string, input: StockMovementInput): Promise<StockChangeResult> {
+async function addMovementImpl(actor: Actor, id: string, input: StockMovementInput): Promise<StockChangeResult> {
   const row = await findOwnStock(actor.householdId, id);
   return applyChange(actor, row, input.delta, input.reason, { note: input.note });
 }
@@ -373,7 +374,7 @@ export type RecordPurchaseLine = {
  * Adds receipt lines to stock and creates missing catalogue products in one transaction. Each purchase is
  * retained as a BOUGHT movement; a unit that conflicts with the product's existing stock unit is refused.
  */
-export async function recordPurchases(actor: Actor, lines: RecordPurchaseLine[], receiptImageId?: string, note?: string): Promise<StockItem[]> {
+async function recordPurchasesImpl(actor: Actor, lines: RecordPurchaseLine[], receiptImageId?: string, note?: string): Promise<StockItem[]> {
   const batchId = randomUUID();
   const saved = await db.$transaction(async (tx) => {
     await lockStock(tx, actor.householdId);
@@ -501,7 +502,7 @@ export async function applyPurchaseInTransaction(tx: Prisma.TransactionClient, a
 }
 
 /** Acquisition and evidence are committed atomically with the stock movement. */
-export async function applyPurchaseChange(actor: Actor, id: string, purchase: PurchaseContext) {
+async function applyPurchaseChangeImpl(actor: Actor, id: string, purchase: PurchaseContext) {
   const row = await findOwnStock(actor.householdId, id);
   return applyChangeLogged(actor, row, purchase.quantity, "bought", { shoppingItemId: purchase.shoppingItemId, note: purchase.note, purchase });
 }
@@ -525,7 +526,7 @@ export async function findRestockTarget(householdId: string, item: ShoppingItem)
   return { stockItemId: target.id, placeId: target.placeId, placeName: target.placeName, quantity, unit: target.unit };
 }
 
-export async function restockFromShoppingItem(actor: Actor, shoppingItemId: string, input: RestockInput) {
+async function restockFromShoppingItemImpl(actor: Actor, shoppingItemId: string, input: RestockInput) {
   const item = await getItem(actor.householdId, shoppingItemId);
   if (item.status !== "bought" || !item.productId || item.amounts) throw badRequest("Mark a linked product with a verified amount as bought first");
   const row = await findOwnStock(actor.householdId, input.stockItemId);
@@ -556,7 +557,7 @@ export type CookedStockChange = { movementId: string | null; applied: number; st
  * An alternative uses its group's shared stock. With several places, the place that covers the amount with the
  * least left over is used, else the fullest one. Low stock goes on the shopping list as with every change.
  */
-export async function useStockForCooking(actor: Actor, productId: string, quantity: number, mealPlanEntryId: string, note?: string | null): Promise<CookedStockChange> {
+async function useStockForCookingImpl(actor: Actor, productId: string, quantity: number, mealPlanEntryId: string, note?: string | null): Promise<CookedStockChange> {
   const owner = await stockOwnerId(actor.householdId, productId);
   const rows = await db.stockItem.findMany({ where: { householdId: actor.householdId, productId: owner }, include: stockInclude });
   if (rows.length === 0) return { movementId: null, applied: 0, stockItem: null, addedToShoppingList: false };
@@ -568,10 +569,22 @@ export async function useStockForCooking(actor: Actor, productId: string, quanti
 }
 
 /** For Recipes: undoes a `cooked` movement with a correcting one (puts back what it took). Unknown ids do nothing. */
-export async function revertCookedMovement(actor: Actor, movementId: string, note?: string | null): Promise<void> {
+async function revertCookedMovementImpl(actor: Actor, movementId: string, note?: string | null): Promise<void> {
   const movement = await db.stockMovement.findFirst({ where: { id: movementId, householdId: actor.householdId, reason: "COOKED" } });
   if (!movement) return;
   const row = await db.stockItem.findFirst({ where: { id: movement.stockItemId, householdId: actor.householdId }, include: stockInclude });
   if (!row) return;
   await applyChange(actor, row, -movement.delta.toNumber(), "cooked", { mealPlanEntryId: movement.mealPlanEntryId ?? undefined, note });
 }
+
+// Shared mutation boundary for web, MCP, jobs and cross-feature callers.
+export const addMovement = withShoppingEvents(addMovementImpl);
+export const recordPurchases = withShoppingEvents(recordPurchasesImpl);
+export const createStockItem = withShoppingEvents(createStockItemImpl);
+export const updateStockItem = withShoppingEvents(updateStockItemImpl);
+export const setStockCount = withShoppingEvents(setStockCountImpl);
+export const deleteStockItem = withShoppingEvents(deleteStockItemImpl);
+export const restockFromShoppingItem = withShoppingEvents(restockFromShoppingItemImpl);
+export const applyPurchaseChange = withShoppingEvents(applyPurchaseChangeImpl);
+export const useStockForCooking = withShoppingEvents(useStockForCookingImpl);
+export const revertCookedMovement = withShoppingEvents(revertCookedMovementImpl);

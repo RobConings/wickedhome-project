@@ -1,3 +1,4 @@
+import { useLiveEventsStatus } from "@/lib/live-events";
 import { useCategoryOrder } from "../data/use-category-order";
 import * as React from "react";
 import { Link, useNavigate, useRevalidator } from "react-router";
@@ -30,6 +31,7 @@ export function SessionsScreen({ shopping, sessions, session, canManage }: Props
   const navigate = useNavigate();
   const revalidator = useRevalidator();
   useLiveRevalidation();
+  const liveStatus = useLiveEventsStatus();
   const [busy, setBusy] = React.useState(false);
   const [includeLowStock, setIncludeLowStock] = React.useState(true);
   const [selected, setSelected] = React.useState<string[]>([]);
@@ -47,6 +49,7 @@ export function SessionsScreen({ shopping, sessions, session, canManage }: Props
   return <PageContainer>
     <PageHeader title={title} description={session ? `${formatDate(session.startedAt, locale)} · ${session.participants.map((part) => part.name).join(", ")}` : t("sessions.description")} />
     <div className="flex flex-wrap gap-3 text-sm"><Link to="/shopping" className="underline">{t("actions.backToShopping")}</Link>{session && <Link to="/shopping/sessions" className="underline">{t("sessions.history")}</Link>}</div>
+    <p role="status" className="text-xs text-muted-foreground">{t(`sessions.live_${liveStatus}`)}</p>
     {!session ? <>
       {canManage && <Card className="space-y-4"><CardTitle>{t("sessions.plan")}</CardTitle>
         <Button disabled={busy} variant="outline" onClick={() => void perform(planShoppingVisit)}>{t("sessions.refreshNeeds")}</Button>

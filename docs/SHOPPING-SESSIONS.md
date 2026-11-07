@@ -33,3 +33,13 @@ De waarnemingen uit de winkel dateren van vóór merge `bdc1a96`. Producten, Sho
 - Ontbrekende bonproducten kunnen worden toegevoegd, ook bij een afgesloten sessie. Niet bijgehouden producten krijgen een aankoopregel zonder fictieve voorraadverhoging.
 - Acht echte PostgreSQL-integratietests geslaagd, waaronder gelijktijdige MCP/web-acties, twee deelnemers, gedeeltelijke aankopen, bronherhaling, conflicterende revisies, meerdere bonnen en household-isolatie.
 - Geen automatische OCR toegevoegd: bonregels worden gecontroleerd gekoppeld via web of MCP. Uitgaven/betalingen volgen in fase 5.
+
+## Fase 4 – Realtime en concurrentie
+
+- Bestanden: `shopping-events.ts`, shopping/inventory-services, `use-live-shopping.ts`, de bestaande SSE-client, `live-events.test.ts`, gewone editformulieren, MCP en aanvullende integratietests.
+- Centrale servicegrenzen publiceren na geslaagde wijzigingen: ook MCP, recepten, voorraad en achtergrondaanvullingen. Boodschappen en sessies gebruiken de bestaande household-SSE-stream; focus/polling blijven fallback.
+- Op iedere ready/reconnect wordt actuele serverdata geladen. Verouderde fetch-antwoorden worden genegeerd; events tijdens revalidatie worden nogmaals verwerkt zodra die klaar is.
+- Bestaande lijstbewerkingen ondersteunen expectedUpdatedAt; sessies gebruiken revisies en vaste actie-ID's. Een verouderde hoeveelheid overschrijft geen wijziging van iemand anders. Gelijktijdig afvinken blijft idempotent.
+- Geen nieuwe migratie in deze fase. De actiehistoriek uit fase 3 ondersteunt de concurrencycontrole.
+- Gerichte tests: 20 geslaagd, inclusief echte reconnect met een nagebootste EventSource. PostgreSQL: 10 integratietests geslaagd, inclusief gelijktijdige MCP/web-aankoop en MCP-toevoeging naar twee subscribers.
+- De bestaande SSE-bus werkt in één API-proces, conform de huidige PM2-configuratie. Voor meerdere API-workers is gedeelde pub/sub nodig; polling blijft ook dan een herstelpad, geen onmiddellijke cross-worker-broadcast.
