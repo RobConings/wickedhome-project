@@ -243,6 +243,7 @@ describe("shopping product positions through the service", () => {
     assert.ok(rows.every((row) => row.status === "BOUGHT"));
     assert.equal(rows[0]?.boughtAt?.getTime(), rows[1]?.boughtAt?.getTime());
     assert.equal((await listItems("home", { status: "bought" })).length, 1);
+    assert.equal((await listItems("home", { status: "open" })).length, 0, "essential/minimum rules cannot resurrect bought goods during this visit");
     await updateItem(user, result.item.id, { status: "open" });
     assert.ok(rows.every((row) => row.status === "OPEN"));
     assert.equal((await listItems("home", { status: "open" })).length, 1);

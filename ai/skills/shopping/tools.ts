@@ -1,3 +1,4 @@
+import { updateShoppingItem } from "@/api/shopping/shopping-actions";
 import { z } from "zod";
 import { stockPurchaseInputSchema } from "@/features/inventory/types/purchases";
 import { SHOPPING_LIST_KINDS, formatQuantity, type ShoppingItem } from "@/features/shopping/types/shopping";
@@ -6,7 +7,6 @@ import { shoppingItemListIds, shoppingItemQuantity } from "@/features/shopping/t
 import { formatStapleRRule } from "@/features/shopping/types/staple-recurrence";
 import { todayIn } from "@/types/dates";
 import { badRequest, forbidden } from "@/api/lib/http";
-import { findRestockTarget, restockFromShoppingItem } from "@/api/inventory/inventory.service";
 import {
   createItem,
   createList,
@@ -20,7 +20,6 @@ import {
   listItems,
   markOpenItemsBought,
   listProducts,
-  updateItem,
   updateList,
   updateStaple,
 } from "@/api/shopping/shopping.service";
@@ -301,7 +300,7 @@ registerAssistantTool({
 
 registerAssistantTool({
   name: "shopping.update_item",
-  description: "Update an existing shopping position by its id from shopping_list; duplicate names never require deleting/recreating recipe rows. Link product to fill missing shop/photo/URL/price while preserving original ingredient quantities, units and meal references. Passing product again also enriches an already-linked row. Never claim availability without a verified retailer link. addToStock replenishes existing stock after buying; ticking alone does not update supply.",
+  description: "Update an existing shopping position by its id from shopping_list; duplicate names never require deleting/recreating recipe rows. Link product to fill missing shop/photo/URL/price while preserving original ingredient quantities, units and meal references. Passing product again also enriches an already-linked row. Never claim availability without a verified retailer link. Buying credits a known stock location exactly once; retries and later receipt evidence reuse the acquisition.",
   input: z.object({
     item: entityRef("shopping_item", "Unique row id from shopping_list (preferred for duplicate names), or an unambiguous item name"),
     product: entityRef("product", "Link this catalogue product to the existing item; use to repair unlinked groceries").optional(),
@@ -337,7 +336,8 @@ registerAssistantTool({
     return say(ctx.locale, `Change ${name}: ${changes.join(", ")}`, `${name} aanpassen: ${changes.join(", ")}`);
   },
   run: async (ctx, input) => {
-    const { item } = await updateItem(ctx.user, input.item.id, {
+    const { item, restock, stock } = await updateShoppingItem(ctx.user, input.item.id, {
+      purchaseDecision: input.purchaseDecision,
       ...(input.product && { productId: input.product.id }),
       ...(input.bought !== undefined && { status: input.bought ? ("bought" as const) : ("open" as const) }),
       ...(input.shop && { shopId: input.shop.id }),
@@ -348,14 +348,12 @@ registerAssistantTool({
       ...(input.unit !== undefined && { unit: input.unit || null }),
       ...(input.note !== undefined && { note: input.note || null }),
     });
-    const restock = input.bought === true || (input.addToStock && item.status === "bought") ? await findRestockTarget(ctx.householdId, item) : null;
-    const stocked = restock ? await restockFromShoppingItem(ctx.user, item.id, { stockItemId: restock.stockItemId, quantity: restock.quantity, purchaseDecision: input.purchaseDecision }) : null;
-    const hint = stocked
-      ? ` Stock added: ${stocked.purchase?.added ?? 0} in ${restock!.placeName}; purchase ids: ${stocked.purchase?.purchaseIds.join(", ")}. Later scans/receipts must link these goods, not add them again.`
-      : item.status === "bought" ? " No stock added: product must be tracked with a known location and convertible unit. Resolve with the person; do not claim it was restocked." : " Stock is unchanged when unticking; a re-tick cannot add it again.";
+    const hint = stock
+      ? ` Stock added: ${stock.added} in ${restock!.placeName}; purchase ids: ${stock.purchaseIds.join(", ")}. Later scans/receipts must link these goods, not add them again.`
+      : item.status === "bought" ? "No stock added: verify its stock location and unit." : "Stock is unchanged when unticking.";
     const state = item.status === "bought" ? `Ticked off ${item.name}.` : `${item.name} is on “${item.listName}”${item.shop ? ` (${item.shop.name})` : ""}.`;
     return done(`${state}${hint}`, {
-      purchase: stocked?.purchase ?? null, id: item.id, productId: item.productId, quantity: qty(item, ctx.locale), shopId: item.shopId,
+      purchase: stock, id: item.id, productId: item.productId, quantity: qty(item, ctx.locale), shopId: item.shopId,
       shop: item.shop?.name ?? null, url: item.url, imageUrl: item.imageUrl,
       amountNeedsReview: Boolean(item.amounts), requirements: item.requirements,
     });

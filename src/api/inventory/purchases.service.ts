@@ -61,8 +61,9 @@ export async function preparePurchase(tx: Prisma.TransactionClient, actor: Actor
   }
   const purchasedAt = input.purchasedAt ? new Date(input.purchasedAt) : new Date();
   if (purchasedAt.getTime() > Date.now() + 300_000) throw badRequest("A purchase cannot be in the future");
-  // Receipts, scans and manual additions may describe an earlier tick. Never dedupe by EAN/name alone.
-  const candidates = await tx.stockPurchase.findMany({ where: { householdId, productId: row.productId }, orderBy: { purchasedAt: "desc" }, take: 50 });
+  // Source identity is checked forever above. Only recent, potentially overlapping acquisitions need review.
+  // A processed purchase from a prior shopping visit must not block an independent acquisition.
+  const candidates = await tx.stockPurchase.findMany({ where: { householdId, productId: row.productId, purchasedAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } }, orderBy: { purchasedAt: "desc" }, take: 50 });
   if (candidates.length && !input.separatePurchaseConfirmed) {
     throw new HttpError(409, "purchase_review", `Was this already added, or is it an extra purchase? Link the matching purchase ids or ask the person before confirming an extra purchase. Candidates: ${JSON.stringify(candidates.map(summary))}`, { stockItemId: [row.id] });
   }

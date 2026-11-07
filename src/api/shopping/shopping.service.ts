@@ -661,6 +661,12 @@ export async function updateItem(user: SessionUser, id: string, input: ShoppingI
       if (part.id === id) updated = saved;
     }
     if (!updated) throw notFound("Shopping item not found");
+    if (input.status === "bought") {
+      const owners = [...new Set(rows.flatMap((part) => part.productId ? [part.product?.stockProductId ?? part.productId] : []))];
+      if (owners.length) await tx.product.updateMany({
+        where: { householdId, id: { in: owners } }, data: { shoppingRestockState: "RESTOCKED" },
+      });
+    }
     return updated;
   });
   return { item: await toPosition(householdId, row), justBought: becomesBought };

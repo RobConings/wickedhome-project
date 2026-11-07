@@ -109,7 +109,7 @@ describe("low stock groceries", () => {
     const { lock, save, movements } = setup(t, 1, null);
     lock.mock.mockImplementation(async () => {
       await save({ data: { quantity: 5 } });
-      return [{ locked: 1 }];
+      return [{ locked: 1, shoppingRestockState: "ACTIVE" }];
     });
     const result = await addMovement(actor, "stock", { delta: 2, reason: "bought" });
     assert.equal(result.stockItem.quantity, 7, "preserves the change made while waiting for the lock");

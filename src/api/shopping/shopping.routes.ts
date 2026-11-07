@@ -15,7 +15,7 @@ import {
   type ShoppingItemUpdateResult,
 } from "@/features/shopping/types/shopping";
 import { idSchema } from "@/types/common";
-import { findRestockTarget, restockFromShoppingItem } from "../inventory/inventory.service";
+import { restockFromShoppingItem } from "../inventory/inventory.service";
 import { parse } from "../lib/http";
 import { currentUser, requireRole, requireUser } from "../lib/session";
 import { loadBarcodeImage, lookupBarcode } from "./barcode-lookup.service";
@@ -36,13 +36,13 @@ import {
   listItems,
   listProducts,
   unlinkAlternative,
-  updateItem,
   updateList,
   updateProduct,
   updateStaple,
   upsertProductLink,
 } from "./shopping.service";
 import "./shopping.jobs";
+import { updateShoppingItem } from "./shopping-actions";
 
 export const shoppingRouter = Router();
 
@@ -76,10 +76,8 @@ shoppingRouter.patch("/items/:id", async (req, res) => {
   const id = parse(idSchema, req.params.id);
   const input = parse(shoppingItemUpdateSchema, req.body);
   const user = currentUser(req);
-  const { item } = await updateItem(user, id, input);
-  const restock = input.status === "bought" ? await findRestockTarget(user.householdId, item) : null;
-  const stockResult = restock ? await restockFromShoppingItem(user, item.id, { ...restock, purchaseDecision: input.purchaseDecision }) : null;
-  res.json({ item, restock, stock: stockResult?.purchase ?? null } satisfies ShoppingItemUpdateResult);
+  const { item, restock, stock } = await updateShoppingItem(user, id, input);
+  res.json({ item, restock, stock } satisfies ShoppingItemUpdateResult);
 });
 
 shoppingRouter.delete("/items/:id", async (req, res) => {

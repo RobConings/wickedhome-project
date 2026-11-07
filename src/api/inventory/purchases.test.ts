@@ -139,10 +139,12 @@ it("validates purchase sources and refuses a future receipt date", async (t) => 
 });
 
 
-it("does not assume goods are new merely because the prior acquisition is older than a week", async (t) => {
+it("allows an independent purchase after a historical acquisition while keeping old source retries idempotent", async (t) => {
   const { read } = setup(t);
   await recordStockPurchase(actor, "stock", scan("old"));
   read().purchases[0]!.purchasedAt = new Date(Date.now() - 30 * 86_400_000);
-  await assert.rejects(recordStockPurchase(actor, "stock", scan("later-scan")), reviewError);
-  assert.equal(read().stock.quantity.toNumber(), 3);
+  await recordStockPurchase(actor, "stock", scan("later-scan"));
+  assert.equal(read().stock.quantity.toNumber(), 4);
+  await recordStockPurchase(actor, "stock", scan("old"));
+  assert.equal(read().stock.quantity.toNumber(), 4, "the historical source is still idempotent");
 });
