@@ -93,7 +93,7 @@ export function matchIngredients(
     const scored = scoreCandidates(ingredientName(name), candidates);
     const best = scored[0];
     // Clear: good enough, and exact or well ahead of the next candidate (as the entity resolver decides).
-    const clear = best && best.score >= SURE && (best.score >= 100 || !scored[1] || scored[1].score < best.score - 5);
+    const clear = best && best.score >= SURE && (!scored[1] || scored[1].score < best.score - 5);
     const base = { name, amount: line.amount?.trim() || null };
     if (!best || !clear) {
       return {

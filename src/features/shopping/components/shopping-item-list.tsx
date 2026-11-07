@@ -17,6 +17,7 @@ type ShoppingItemListProps = {
   onEdit?: (item: ShoppingItem) => void;
   showShop?: boolean;
   showList?: boolean;
+  showStockStatus?: boolean;
   size?: "default" | "large";
   /** Text when there is nothing open. */
   emptyText?: string;
@@ -33,6 +34,7 @@ export function ShoppingItemList({
   onEdit,
   showShop = true,
   showList = false,
+  showStockStatus = true,
   size = "default",
   emptyText,
   className,
@@ -50,6 +52,7 @@ export function ShoppingItemList({
       shop={item.shopId ? shopsById.get(item.shopId) : null}
       showShop={showShop}
       showList={showList}
+      showStockStatus={showStockStatus}
       size={size}
       onToggle={onToggle}
       onDelete={onDelete && (canDelete?.(item) ?? true) ? onDelete : undefined}
@@ -60,7 +63,7 @@ export function ShoppingItemList({
   return (
     <div className={cn("flex flex-col gap-2", className)}>
       {open.length > 0 ? (
-        <ul className={cn("divide-y rounded-xl border bg-card shadow-xs", size === "large" ? "px-4" : "px-3")}>{open.map(renderRow)}</ul>
+        <ul className="divide-y rounded-xl border bg-card px-1 shadow-xs sm:px-2">{open.map(renderRow)}</ul>
       ) : (
         emptyText && <p className="rounded-xl border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">{emptyText}</p>
       )}
@@ -75,7 +78,7 @@ export function ShoppingItemList({
             <ChevronDownIcon className={cn("size-4 transition-transform", !showBought && "-rotate-90")} aria-hidden="true" />
             {t("lists.recentlyBought")} ({bought.length})
           </button>
-          {showBought && <ul className={cn("divide-y rounded-xl border bg-muted/30", size === "large" ? "px-4" : "px-3")}>{bought.map(renderRow)}</ul>}
+          {showBought && <ul className="divide-y rounded-xl border bg-muted/30 px-1 sm:px-2">{bought.map(renderRow)}</ul>}
         </div>
       )}
     </div>

@@ -19,6 +19,7 @@ export function withOffer(input: ProductInput, offer: Offer): ProductInput {
     defaultShopId: input.defaultShopId || offer.shopId,
     packageAmount: hasPackage ? input.packageAmount : offer.packageAmount,
     packageUnit: hasPackage ? input.packageUnit : (offer.packageUnit as ProductInput["packageUnit"]),
+    barcode: input.barcode || (offer.barcode && /^\d{6,14}$/.test(offer.barcode) ? offer.barcode : null),
   };
 }
 
@@ -46,7 +47,7 @@ export async function createProductFromOffer(
 /** An existing product gets the offer's link, and its photo and package size when it has none. */
 export async function applyOfferTo(householdId: string, productId: string, offer: Offer): Promise<Product> {
   const current = await getProduct(householdId, productId);
-  if (!current.imageUrl || !current.packageAmount) {
+  if (!current.imageUrl || !current.packageAmount || !current.defaultShopId || (!current.barcode && offer.barcode)) {
     await updateProduct(householdId, productId, withOffer(productInputOf(current), offer));
   }
   return linkOffer(householdId, productId, offer);

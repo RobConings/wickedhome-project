@@ -6,14 +6,15 @@ import { ShoppingStockBadge } from "./shopping-stock-badge";
 export function ShoppingGuidance() {
   const { t } = useTranslation("shopping");
   return (
-    <div className="flex flex-col gap-2 rounded-xl bg-muted/40 p-3">
-      <p className="text-sm text-muted-foreground">{t("guidance.choice")}</p>
-      <div className="flex flex-wrap gap-2">
+    <details className="min-w-0 text-xs text-muted-foreground">
+      <summary className="w-fit cursor-pointer rounded py-1.5 outline-none focus-visible:ring-2 focus-visible:ring-ring">{t("guidance.label")}</summary>
+      <p className="max-w-prose py-2">{t("guidance.choice")}</p>
+      <div className="flex flex-wrap gap-2 pb-2">
         <ShoppingStockBadge status="below_minimum" />
         <ShoppingStockBadge status="at_minimum" />
         <ProductEssentialBadge isEssential />
         <ProductEssentialBadge isEssential={false} />
       </div>
-    </div>
+    </details>
   );
 }

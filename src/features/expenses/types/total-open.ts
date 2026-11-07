@@ -22,7 +22,7 @@ import { EXPENSE_MONTH_END, EXPENSE_RRULE_SUPPORT, type ExpenseShare } from "./e
 /** A loan longer than this many payments is refused (same cap as an RRULE COUNT). */
 export const MAX_TOTAL_OPEN_PAYMENTS = MAX_COUNT;
 
-export type DatedAmount = { dueDate: string; amountCents: number };
+export type DatedAmount = { dueDate: string; amountCents: number; earlyRepayment?: boolean };
 
 /** N payments of `amountCents`, the last one for what is left. `null` for amounts that can't be planned. */
 export function splitTotalOpen(amountCents: number, totalOpenCents: number): { count: number; lastCents: number } | null {
@@ -85,7 +85,8 @@ export function planTotalOpen({ amountCents, totalOpenCents, asOf, rrule, startD
   const tooMany = needed > MAX_TOTAL_OPEN_PAYMENTS;
   const wanted = Math.min(needed, MAX_TOTAL_OPEN_PAYMENTS);
   const start = from && from > asOf ? from : asOf;
-  const skip = new Set(counted.map((item) => item.dueDate));
+  // Extra repayments reduce the balance without fulfilling a scheduled instalment on that date.
+  const skip = new Set(counted.filter((item) => !item.earlyRepayment).map((item) => item.dueDate));
   const dates = expandRRule(rule, startDate, {
     from: start,
     to: "2999-12-31",
@@ -141,7 +142,7 @@ export type TotalOpenProgress = {
   lastAmountCents: number | null;
 };
 
-export type InstanceForProgress = { dueDate: string; amountCents: number; paid: boolean };
+export type InstanceForProgress = DatedAmount & { paid: boolean };
 
 /**
  * Progress from the template and its instances. Generated instances count with their own amounts; beyond

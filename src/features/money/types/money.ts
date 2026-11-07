@@ -364,6 +364,12 @@ export type MoneyMonth = {
   vouchers: MoneyVoucherBalance[];
 };
 
+/** Recorded net contributions through today, grouped by month, account and person. */
+export type ContributionHistory = {
+  today: string;
+  rows: { month: string; accountId: string; habitantId: string | null; amountCents: number }[];
+};
+
 /** `GET /api/money/summary`: the dashboard's money card. */
 export type MoneySummary = {
   today: string;

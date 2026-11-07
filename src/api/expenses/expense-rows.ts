@@ -51,6 +51,7 @@ const projectRefSelect = { select: { id: true, name: true, color: true } } as co
 export const expenseInclude = {
   shares: true,
   recurringExpense: { select: { rrule: true, kind: true } },
+  earlyRepaymentFor: { select: { rrule: true, kind: true } },
   project: projectRefSelect,
 } as const;
 export type ExpenseRow = Prisma.ExpenseGetPayload<{ include: typeof expenseInclude }>;
@@ -103,14 +104,16 @@ function toPaymentDetails(row: PaymentColumns) {
 }
 
 export function toExpense(row: ExpenseRow, today: string): Expense {
-  const dueDate = fromDate(row.dueDate);
   const paidOn = optionalDate(row.paidOn);
+  // A paid extra repayment is displayed/edited on the day it happened, not its balance-accounting date.
+  const dueDate = row.earlyRepaymentForId && paidOn ? paidOn : fromDate(row.dueDate);
   return {
     id: row.id,
     ...toPaymentDetails(row),
-    recurringExpenseId: row.recurringExpenseId,
-    rrule: row.recurringExpense?.rrule ?? null,
-    kind: row.recurringExpense ? toKind(row.recurringExpense.kind) : null,
+    recurringExpenseId: row.recurringExpenseId ?? row.earlyRepaymentForId,
+    earlyRepayment: Boolean(row.earlyRepaymentForId),
+    rrule: row.recurringExpense?.rrule ?? row.earlyRepaymentFor?.rrule ?? null,
+    kind: row.recurringExpense ? toKind(row.recurringExpense.kind) : row.earlyRepaymentFor ? toKind(row.earlyRepaymentFor.kind) : null,
     dueDate,
     status: expenseStatus({ dueDate, paidOn }, today),
     shopId: row.shopId,
@@ -150,8 +153,10 @@ export function totalOpenOf(row: RecurringRow, instances: readonly InstanceForPr
 export function toRecurring(row: RecurringRow, today: string, instances?: readonly InstanceForProgress[]): RecurringExpense {
   const status = toStatus(row.status);
   const trialEndsOn = optionalDate(row.trialEndsOn);
-  const nextDueDate = nextDueDateOf(row, today);
-  const yearly = exactYearlyCents(row.amountCents, row.rrule);
+  const totalOpen = totalOpenOf(row, instances);
+  const paidOff = totalOpen?.remainingCents === 0;
+  const nextDueDate = paidOff ? null : nextDueDateOf(row, today);
+  const yearly = paidOff ? 0 : exactYearlyCents(row.amountCents, row.rrule);
   return {
     id: row.id,
     ...toPaymentDetails(row),
@@ -169,7 +174,7 @@ export function toRecurring(row: RecurringRow, today: string, instances?: readon
     nextDueDate,
     monthlyCents: Math.round(yearly / 12),
     yearlyCents: Math.round(yearly),
-    totalOpen: totalOpenOf(row, instances),
+    totalOpen,
   };
 }
 

@@ -37,7 +37,7 @@ registerAssistantSkill({
 
 registerAssistantTool({
   name: LOAD_SKILLS_TOOL,
-  description: "Load one or more skills (areas of the app) so their tools and guide are available in your next step. Use when the request needs an area that is not loaded yet.",
+  description: "Read the workflow guides for one or more areas before changing data or using an unfamiliar feature. Explains relationships, prerequisites and automatic behavior. In built-in chat also activates their tools. For groceries or cooking load shopping, inventory and recipes together.",
   input: z.object({ skills: z.array(z.string().min(1).max(40)).min(1).max(3).describe("Skill ids from the Areas list, e.g. ['projects']") }),
   permission: "read",
   confirm: "never",
@@ -49,7 +49,12 @@ registerAssistantTool({
     const unknown = input.skills.filter((id) => !available.has(id));
     if (unknown.length) throw badRequest(`Unknown skill(s): ${unknown.join(", ")}. Available: ${[...available.keys()].join(", ")}`);
     const tools = toolsFor(ctx.user.role).filter((tool) => input.skills.includes(tool.skill) && !tool.core);
-    return { loaded: input.skills, tools: tools.map((tool) => tool.wireName), note: "The tools and guide are available now." };
+    return {
+      loaded: input.skills,
+      guides: input.skills.map((id) => ({ skill: id, guide: available.get(id)!.guide })),
+      tools: tools.map((tool) => tool.wireName),
+      note: ctx.channel === "mcp" ? "Follow these workflows using the tools available to your connection." : "The tools and guides are available now.",
+    };
   },
 });
 
@@ -87,7 +92,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "app.help",
   description:
-    "What the assistant can do (every area, or one skill's tools), and with `topic` where something is in the app (page and path) and how it works. Use for 'what can you do' / 'wat kan je', 'waar vind ik…' / 'where is…', 'hoe werkt…' / 'how does … work'.",
+    "What the assistant can do; with skill, returns its workflow guide and tools. Read before using an unfamiliar feature. With topic, explains where something is in the app (page and path) and how it works.",
   input: z.object({
     skill: z.string().max(40).optional().describe("One skill id for details"),
     topic: z.string().trim().max(80).optional().describe("A thing or page, e.g. 'meldingen', 'mail bills', 'automations'"),
@@ -116,9 +121,10 @@ registerAssistantTool({
       return {
         skill: skill.title[ctx.locale],
         about: skill.summary,
+        guide: skill.guide,
         tools: permitted
           .filter((tool) => tool.skill === skill.id)
-          .map((tool) => ({ does: activityOf(tool, ctx.locale), asks: tool.confirm === "never" ? "no" : tool.confirm === "always" ? "always" : "first time" })),
+          .map((tool) => ({ name: tool.wireName, does: activityOf(tool, ctx.locale), asks: tool.confirm === "never" ? "no" : tool.confirm === "always" ? "always" : "first time" })),
       };
     }
     const skills = skillsForRole(ctx.user.role).filter((skill) => permitted.some((tool) => tool.skill === skill.id));

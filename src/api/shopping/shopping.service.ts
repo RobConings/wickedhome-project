@@ -27,6 +27,8 @@ import {
 } from "@/features/shopping/types/shopping";
 import { shopForUrl } from "@/features/shopping/types/shop-links";
 import { nextStapleOccurrence, parseStapleRRule } from "@/features/shopping/types/staple-recurrence";
+import { combineShoppingItems, shoppingAmount, shoppingItemListIds } from "@/features/shopping/types/shopping-product-rows";
+import { shoppingProductDetails } from "@/features/shopping/types/shopping-product-details";
 import type { Locale } from "@/types/common";
 import { addDays, todayIn } from "@/types/dates";
 import {
@@ -63,6 +65,9 @@ const itemInclude = {
   place: { select: { name: true } },
   // The category, and whether the product shares stock with others (alternatives: "or: …" on the row).
   product: { select: {
+    unit: true,
+    packageAmount: true,
+    packageUnit: true,
     category: true,
     isEssential: true,
     stockProductId: true,
@@ -174,9 +179,54 @@ async function boughtByNames(householdId: string, rows: ItemRow[]) {
   return new Map(users.map((user) => [user.id, user.habitant?.name ?? user.email]));
 }
 
-async function toItems(householdId: string, rows: ItemRow[]) {
+async function toItems(householdId: string, rows: ItemRow[], roundPackages = true) {
   const [names, groups, recipes] = await Promise.all([boughtByNames(householdId, rows), itemGroups(householdId, rows), itemRecipes(householdId, rows)]);
-  return rows.map((row) => toItem(row, names, groups, recipes));
+  const products = new Map(rows.flatMap((row) => row.productId && row.product ? [[row.productId, {
+    unit: row.product.unit, packageAmount: row.product.packageAmount?.toNumber() ?? null, packageUnit: row.product.packageUnit,
+  }] as const] : []));
+  return combineShoppingItems(rows.map((row) => toItem(row, names, groups, recipes)), products, roundPackages);
+}
+
+/** Repair old free-text copies only when their full name has one exact catalogue match. */
+async function linkExactUnlinkedRows(householdId: string, tx: Prisma.TransactionClient = db): Promise<boolean> {
+  const rows = (await tx.shoppingItem.findMany({
+    where: { householdId, status: "OPEN", productId: null },
+    select: { id: true, name: true, productId: true, unit: true, shopId: true, url: true, imageUrl: true, priceCents: true },
+  })).filter((row) => row.productId === null);
+  if (!rows.length) return false;
+  const products = await tx.product.findMany({ where: { householdId }, select: {
+    id: true, name: true, unit: true, defaultShopId: true, imageUrl: true,
+    shopLinks: { select: { shopId: true, url: true, priceCents: true } },
+  } });
+  const key = (name: string) => name.trim().normalize("NFC").toLowerCase();
+  let changed = false;
+  for (const row of rows) {
+    const matches = products.filter((product) => key(product.name) === key(row.name));
+    if (matches.length !== 1) continue;
+    const result = await tx.shoppingItem.updateMany({
+      where: { id: row.id, householdId, status: "OPEN", productId: null },
+      data: { productId: matches[0]!.id, ...shoppingProductDetails(matches[0]!, row) },
+    });
+    changed ||= result.count > 0;
+  }
+  return changed;
+}
+
+/** Stored records are requirements; all open requirements of one product form one buying position. */
+async function positionRows(householdId: string, row: ItemRow, tx: Prisma.TransactionClient = db): Promise<ItemRow[]> {
+  const repaired = await linkExactUnlinkedRows(householdId, tx);
+  if (repaired && !row.productId) row = await tx.shoppingItem.findFirstOrThrow({ where: { id: row.id, householdId }, include: itemInclude });
+  if (!row.productId || (row.status === "BOUGHT" && !row.boughtAt)) return [row];
+  return tx.shoppingItem.findMany({
+    where: { householdId, productId: row.productId, status: row.status, ...(row.status === "BOUGHT" && { boughtAt: row.boughtAt }) },
+    include: itemInclude,
+    orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+  });
+}
+
+async function toPosition(householdId: string, row: ItemRow) {
+  const [item] = await toItems(householdId, await positionRows(householdId, row));
+  return item as ShoppingItem;
 }
 
 function toProduct(row: ProductRow): Product {
@@ -352,9 +402,18 @@ async function topUpStaples(householdId: string) {
   const day = today();
   const due = await db.shoppingStaple.findMany({ where: { householdId, nextDueOn: { lte: toDate(day) } } });
   for (const staple of due) {
+    let ownerId: string | null = null;
+    const product = staple.productId ? await findOwnProduct(householdId, staple.productId) : null;
+    if (product) {
+      const owner = product.stockProductId ? await findOwnProduct(householdId, product.stockProductId) : product;
+      if (owner.shoppingRestockState && owner.shoppingRestockState !== "ACTIVE") continue;
+      ownerId = owner.id;
+    }
     const rule = parseStapleRRule(staple.rrule);
+    const details = product ? shoppingProductDetails(product, { unit: staple.unit, shopId: staple.shopId, url: null, imageUrl: null, priceCents: null }) : {};
     const next = rule ? nextStapleOccurrence(rule, fromDate(staple.startDate), day) : addDays(day, 7);
     await db.$transaction(async (tx) => {
+      if (ownerId && !(await automaticShoppingAllowed(tx, householdId, ownerId))) return;
       // Claim the staple first, so concurrent reads don't add it twice.
       const claimed = await tx.shoppingStaple.updateMany({
         where: { id: staple.id, nextDueOn: staple.nextDueOn },
@@ -374,6 +433,7 @@ async function topUpStaples(householdId: string) {
           shopId: staple.shopId,
           source: "STAPLE",
           stapleId: staple.id,
+          ...details,
         },
       });
     });
@@ -423,11 +483,11 @@ const RECENTLY_BOUGHT_HOURS = 24;
 
 export async function getShoppingOverview(householdId: string, locale: Locale = "en"): Promise<ShoppingOverview> {
   await topUpStaples(householdId);
+  await linkExactUnlinkedRows(householdId);
   await topUpLowStock(householdId, locale);
   const since = new Date(Date.now() - RECENTLY_BOUGHT_HOURS * 3_600_000);
-  const [lists, counts, rows, staples] = await Promise.all([
+  const [lists, rows, staples] = await Promise.all([
     db.shoppingList.findMany({ where: { householdId }, orderBy: { createdAt: "asc" } }),
-    db.shoppingItem.groupBy({ by: ["listId"], where: { householdId, status: "OPEN" }, _count: { _all: true } }),
     db.shoppingItem.findMany({
       where: { householdId, OR: [{ status: "OPEN" }, { boughtAt: { gte: since } }] },
       include: itemInclude,
@@ -435,7 +495,9 @@ export async function getShoppingOverview(householdId: string, locale: Locale = 
     }),
     db.shoppingStaple.findMany({ where: { householdId }, orderBy: { name: "asc" } }),
   ]);
-  const openByList = new Map(counts.map((count) => [count.listId, count._count._all]));
+  const items = await toItems(householdId, rows);
+  const openByList = new Map<string, number>();
+  for (const item of items) if (item.status === "open") openByList.set(item.listId, (openByList.get(item.listId) ?? 0) + 1);
   return {
     lists: lists.map(
       (list): ShoppingList => ({
@@ -446,7 +508,7 @@ export async function getShoppingOverview(householdId: string, locale: Locale = 
         openCount: openByList.get(list.id) ?? 0,
       }),
     ),
-    items: await toItems(householdId, rows),
+    items,
     staples: staples.map(toStaple),
   };
 }
@@ -473,6 +535,7 @@ export async function deleteList(householdId: string, id: string): Promise<void>
 // Items --------------------------------------------------------------------------------------------------
 
 export async function listItems(householdId: string, query: ShoppingItemQuery = {}, locale: Locale = "en"): Promise<ShoppingItem[]> {
+  await linkExactUnlinkedRows(householdId);
   await topUpLowStock(householdId, locale);
   // A project's materials: its own items and those of its tasks (an item's own project wins).
   const projectTaskIds = query.projectId
@@ -481,19 +544,20 @@ export async function listItems(householdId: string, query: ShoppingItemQuery = 
   const rows = await db.shoppingItem.findMany({
     where: {
       householdId,
-      ...(query.projectId && {
-        OR: [{ projectId: query.projectId }, { projectId: null, taskId: { in: projectTaskIds } }],
-      }),
-      ...(query.taskId && { taskId: query.taskId }),
-      ...(query.listId && { listId: query.listId }),
-      ...(query.placeId && { placeId: query.placeId }),
-      ...(query.shopId && { shopId: query.shopId === NO_SHOP ? null : query.shopId }),
       ...(query.status && { status: query.status === "bought" ? ("BOUGHT" as const) : ("OPEN" as const) }),
     },
     include: itemInclude,
     orderBy: [{ status: "asc" }, { createdAt: "asc" }],
   });
-  return toItems(householdId, rows);
+  const items = await toItems(householdId, rows);
+  return items.filter((item) => {
+    const requirements = item.requirements ?? [item];
+    return (!query.projectId || requirements.some((part) => part.project?.id === query.projectId || (!part.project && part.taskId && projectTaskIds.includes(part.taskId))))
+      && (!query.taskId || requirements.some((part) => part.taskId === query.taskId))
+      && (!query.listId || shoppingItemListIds(item).includes(query.listId))
+      && (!query.placeId || requirements.some((part) => part.placeId === query.placeId))
+      && (!query.shopId || item.shopId === (query.shopId === NO_SHOP ? null : query.shopId));
+  });
 }
 
 export async function createItem(user: Pick<SessionUser, "id" | "householdId" | "locale">, input: ShoppingItemCreateInput) {
@@ -502,7 +566,7 @@ export async function createItem(user: Pick<SessionUser, "id" | "householdId" | 
   const product = input.productId ? await findOwnProduct(householdId, input.productId) : null;
   // A pasted link is read for its price, photo and shop, also when the form sent its title as the name.
   const preview = input.url && !product ? await getLinkPreview(householdId, input.url) : null;
-  const shopId = input.shopId ?? product?.defaultShopId ?? preview?.shopId ?? null;
+  const shopId = input.shopId ?? product?.defaultShopId ?? (product?.shopLinks.length === 1 ? product.shopLinks[0]!.shopId : null) ?? preview?.shopId ?? null;
   const link = product && shopId ? product.shopLinks.find((candidate) => candidate.shopId === shopId) : undefined;
   const listId = input.listId ?? (await getDefaultList(householdId, input.source, user.locale)).id;
 
@@ -527,8 +591,7 @@ export async function createItem(user: Pick<SessionUser, "id" | "householdId" | 
     },
     include: itemInclude,
   });
-  const [item] = await toItems(householdId, [row]);
-  return item as ShoppingItem;
+  return toPosition(householdId, row);
 }
 
 /**
@@ -538,21 +601,35 @@ export async function createItem(user: Pick<SessionUser, "id" | "householdId" | 
 export async function updateItem(user: SessionUser, id: string, input: ShoppingItemUpdateInput) {
   const { householdId } = user;
   const existing = await findOwnItem(householdId, id);
-  const editsMoreThanStatus = Object.keys(input).some((key) => key !== "status");
+  const editsMoreThanStatus = Object.keys(input).some((key) => key !== "status" && key !== "purchaseDecision");
   if (user.role === "child" && editsMoreThanStatus && existing.createdByUserId !== user.id) {
     throw forbidden("Children can only tick items off");
   }
   await assertRefs(householdId, input);
 
+  const linkedProduct = input.productId ? await findOwnProduct(householdId, input.productId)
+    : input.shopId !== undefined && existing.productId ? await findOwnProduct(householdId, existing.productId) : null;
   const becomesBought = input.status === "bought" && existing.status !== "BOUGHT";
   const becomesOpen = input.status === "open" && existing.status !== "OPEN";
-  const row = await db.shoppingItem.update({
-    where: { id },
-    data: {
+  const boughtAt = new Date();
+  const row = await db.$transaction(async (tx) => {
+    const rows = await positionRows(householdId, existing, tx);
+    if (user.role === "child" && editsMoreThanStatus && rows.some((row) => row.createdByUserId !== user.id)) {
+      throw forbidden("Children can only edit their own items");
+    }
+    const [position] = await toItems(householdId, rows);
+    if (!position) throw notFound("Shopping item not found");
+    const quantityChanged = input.quantity !== undefined && input.quantity !== position.quantity;
+    const unitChanged = input.unit !== undefined && (input.unit || null) !== position.unit;
+    if (rows.length > 1 && position.amounts && (quantityChanged || unitChanged)) {
+      throw invalid("unit", "Set the product's package size so these amounts can be converted before changing their total");
+    }
+    const [unrounded] = quantityChanged || unitChanged ? await toItems(householdId, rows, false) : [position];
+    const ratio = quantityChanged || unitChanged ? (input.quantity ?? position.quantity) / unrounded!.quantity : 1;
+    const data: Prisma.ShoppingItemUncheckedUpdateInput = {
       ...(input.name !== undefined && { name: input.name }),
       ...(input.productId !== undefined && { productId: input.productId }),
-      ...(input.quantity !== undefined && { quantity: input.quantity }),
-      ...(input.unit !== undefined && { unit: input.unit || null }),
+      ...(unitChanged && { unit: input.unit || null }),
       ...(input.shopId !== undefined && { shopId: input.shopId }),
       ...(input.url !== undefined && { url: input.url }),
       ...(input.note !== undefined && { note: input.note || null }),
@@ -562,13 +639,31 @@ export async function updateItem(user: SessionUser, id: string, input: ShoppingI
       ...(input.priceCents !== undefined && { priceCents: input.priceCents }),
       ...(input.category !== undefined && { category: input.category ? fromCategory(input.category) : null }),
       ...(input.imageUrl !== undefined && { imageUrl: input.imageUrl }),
-      ...(becomesBought && { status: "BOUGHT", boughtAt: new Date(), boughtByUserId: user.id }),
+      ...(becomesBought && { status: "BOUGHT", boughtAt, boughtByUserId: user.id }),
       ...(becomesOpen && { status: "OPEN", boughtAt: null, boughtByUserId: null }),
-    },
-    include: itemInclude,
+    };
+    let updated: ItemRow | undefined;
+    for (const part of rows) {
+      const quantity = unitChanged
+        ? shoppingAmount(part.quantity.toNumber(), part.unit, position.unit, part.product ? {
+          unit: part.product.unit, packageAmount: part.product.packageAmount?.toNumber() ?? null, packageUnit: part.product.packageUnit,
+        } : undefined)!
+        : part.quantity.toNumber();
+      const saved = await tx.shoppingItem.update({
+        where: { id: part.id },
+        data: {
+          ...(linkedProduct && shoppingProductDetails(linkedProduct, part, input.shopId)),
+          ...data,
+          ...((quantityChanged || unitChanged) && { quantity: Math.round(quantity * ratio * 1000) / 1000 }),
+        },
+        include: itemInclude,
+      });
+      if (part.id === id) updated = saved;
+    }
+    if (!updated) throw notFound("Shopping item not found");
+    return updated;
   });
-  const [item] = await toItems(householdId, [row]);
-  return { item: item as ShoppingItem, justBought: becomesBought };
+  return { item: await toPosition(householdId, row), justBought: becomesBought };
 }
 
 /** Marks every open item on the selected household shopping lists as bought in one operation. */
@@ -589,14 +684,20 @@ export async function markOpenItemsBought(user: SessionUser, listIds: string[]):
 
 export async function deleteItem(user: SessionUser, id: string): Promise<void> {
   const existing = await findOwnItem(user.householdId, id);
-  if (user.role === "child" && existing.createdByUserId !== user.id) throw forbidden("Children can only delete their own items");
-  await db.shoppingItem.delete({ where: { id } });
+  await db.$transaction(async (tx) => {
+    const rows = await positionRows(user.householdId, existing, tx);
+    if (user.role === "child" && rows.some((row) => row.createdByUserId !== user.id)) throw forbidden("Children can only delete their own items");
+    const owners = [...new Set(rows.filter((row) => row.status === "OPEN" && row.productId).map((row) => row.product?.stockProductId ?? row.productId!))];
+    if (owners.length) await tx.product.updateMany({
+      where: { householdId: user.householdId, id: { in: owners } }, data: { shoppingRestockState: "DISMISSED" },
+    });
+    await tx.shoppingItem.deleteMany({ where: { householdId: user.householdId, id: { in: rows.map((row) => row.id) } } });
+  });
 }
 
 /** Loads one item (for other services, e.g. restocking after it was bought). */
 export async function getItem(householdId: string, id: string): Promise<ShoppingItem> {
-  const [item] = await toItems(householdId, [await findOwnItem(householdId, id)]);
-  return item as ShoppingItem;
+  return toPosition(householdId, await findOwnItem(householdId, id));
 }
 
 /**
@@ -639,29 +740,40 @@ export async function ensureLowStockItem(
   input: { productId: string; placeId: string | null; quantity: number; unit: string | null },
   locale: Locale = "en",
 ): Promise<boolean> {
-  const group = await groupProductIds(householdId, await stockOwnerId(householdId, input.productId));
-  const open = await db.shoppingItem.count({ where: { householdId, productId: { in: group }, status: "OPEN" } });
-  if (open > 0) return false;
   const product = await findOwnProduct(householdId, input.productId);
+  const owner = product.stockProductId ? await findOwnProduct(householdId, product.stockProductId) : product;
+  if (owner.shoppingRestockState && owner.shoppingRestockState !== "ACTIVE") return false;
+  const group = await groupProductIds(householdId, owner.id);
+  if (await db.shoppingItem.count({ where: { householdId, productId: { in: group }, status: "OPEN" } })) return false;
   const list = await getDefaultList(householdId, "low_stock", locale);
-  const link = product.defaultShopId ? product.shopLinks.find((candidate) => candidate.shopId === product.defaultShopId) : undefined;
-  await db.shoppingItem.create({
-    data: {
-      householdId,
-      listId: list.id,
-      productId: product.id,
-      name: product.name,
-      quantity: input.quantity > 0 ? input.quantity : 1,
-      unit: input.unit ?? product.unit,
-      shopId: product.defaultShopId,
-      url: link?.url ?? null,
-      priceCents: link?.priceCents ?? null,
-      imageUrl: product.imageUrl,
-      placeId: input.placeId,
-      source: "LOW_STOCK",
-    },
+  const details = shoppingProductDetails(product, { unit: input.unit, shopId: null, url: null, imageUrl: null, priceCents: null });
+  return db.$transaction(async (tx) => {
+    // The product lock also serializes deletion: a stale background read cannot undo a dismissal.
+    if (!(await automaticShoppingAllowed(tx, householdId, owner.id))) return false;
+    const open = await tx.shoppingItem.count({ where: { householdId, productId: { in: group }, status: "OPEN" } });
+    if (open > 0) return false;
+    await tx.shoppingItem.create({
+      data: {
+        householdId,
+        listId: list.id,
+        productId: product.id,
+        name: product.name,
+        quantity: input.quantity > 0 ? input.quantity : 1,
+        ...details,
+        placeId: input.placeId,
+        source: "LOW_STOCK",
+      },
+    });
+    return true;
   });
-  return true;
+}
+
+async function automaticShoppingAllowed(tx: Prisma.TransactionClient, householdId: string, ownerId: string): Promise<boolean> {
+  const rows = await tx.$queryRaw<{ shoppingRestockState: string }[]>`
+    SELECT "shoppingRestockState" FROM "products"
+    WHERE "id" = ${ownerId} AND "householdId" = ${householdId} FOR UPDATE
+  `;
+  return rows[0]?.shoppingRestockState === "ACTIVE";
 }
 
 // Concurrent shopping reads share the same reconciliation so they cannot add the same stock twice.
@@ -698,8 +810,8 @@ async function topUpLowStock(householdId: string, locale: Locale): Promise<void>
 /**
  * For Recipes: puts an ingredient of a meal on the "To cook" list on the shopping list (source `recipe`, on the
  * everyday groceries list: the default list for `manual`, so there is no second "Groceries"). Like `ensureLowStockItem`, an open item for the same product, or any product
- * sharing its stock, is reused: its quantity goes up by `quantity` instead of adding a second line. An
- * ingredient without a product is a free-text item, reused by name. Returns the item and whether it was merged.
+ * sharing its stock, is reused as one buying position. Each meal retains its own requirement, so removing
+ * it leaves other purchases intact. Free-text ingredients are still reused by name.
  */
 export async function addRecipeItem(
   user: Pick<SessionUser, "id" | "householdId" | "locale">,
@@ -715,35 +827,39 @@ export async function addRecipeItem(
       : { householdId, status: "OPEN", productId: null, name: { equals: input.name.trim(), mode: "insensitive" } },
     orderBy: { createdAt: "asc" },
   });
-  if (existing) {
+  if (existing && !product) {
     await db.shoppingItem.update({ where: { id: existing.id }, data: { quantity: { increment: quantity } } });
     return { itemId: existing.id, merged: true };
   }
   // The everyday groceries list, not a second "Groceries" list of its own.
   const list = await getDefaultList(householdId, "manual", user.locale);
-  const link = product?.defaultShopId ? product.shopLinks.find((candidate) => candidate.shopId === product.defaultShopId) : undefined;
+  const details = product ? shoppingProductDetails(product, { unit: input.unit, shopId: null, url: null, imageUrl: null, priceCents: null }) : {};
   const row = await db.shoppingItem.create({
     data: {
       householdId,
       listId: list.id,
-      productId: product?.id ?? null,
+      productId: existing?.productId ?? product?.id ?? null,
       name: product?.name ?? input.name.trim(),
       quantity,
       unit: input.unit ?? product?.unit ?? null,
-      shopId: product?.defaultShopId ?? null,
-      url: link?.url ?? null,
-      priceCents: link?.priceCents ?? null,
-      imageUrl: product?.imageUrl ?? null,
+      ...details,
       note: input.note || null,
       source: "RECIPE",
       mealPlanEntryId: input.mealPlanEntryId,
       createdByUserId: user.id,
     },
+    include: itemInclude,
   });
+  // A recipe requirement is independent of a minimum-stock target: 3 needed and a target of 1 means 3.
+  // Keep the meal reference even when another meal or a manual purchase is already on the list.
+  if (product) {
+    const position = await toPosition(householdId, row);
+    return { itemId: position.id, merged: Boolean(existing) };
+  }
   return { itemId: row.id, merged: false };
 }
 
-/** For Recipes: the open items added for a meal (not the ones merged into existing items). */
+/** For Recipes: the meal's open requirements, including those sharing a buying position. */
 export async function countRecipeItems(householdId: string, mealPlanEntryId: string): Promise<number> {
   return db.shoppingItem.count({ where: { householdId, mealPlanEntryId, status: "OPEN" } });
 }
@@ -829,6 +945,7 @@ export async function deleteProduct(householdId: string, id: string): Promise<vo
       await tx.product.updateMany({ where: { householdId, stockProductId: id }, data: { stockProductId: heir.id } });
       // The heir had no stock of its own (only main products do), so the items simply move over.
       await tx.stockItem.updateMany({ where: { householdId, productId: id }, data: { productId: heir.id } });
+      await tx.stockPurchase.updateMany({ where: { householdId, productId: id }, data: { productId: heir.id } });
     }
     await tx.product.delete({ where: { id } });
   });
@@ -859,7 +976,7 @@ export async function groupProductIds(householdId: string, ownerId: string): Pro
 
 type Actor = Pick<SessionUser, "id" | "householdId" | "locale">;
 
-const mergeSelect = { id: true, placeId: true, quantity: true, unit: true, minQuantity: true, expiresOn: true } as const;
+const mergeSelect = { id: true, placeId: true, quantity: true, unit: true, minQuantity: true, expiresOn: true, lastCountedAt: true } as const;
 type MergeRow = Prisma.StockItemGetPayload<{ select: typeof mergeSelect }>;
 const toMergeable = (row: MergeRow) => ({
   id: row.id,
@@ -877,6 +994,7 @@ const toMergeable = (row: MergeRow) => ({
  */
 async function joinGroup(tx: Prisma.TransactionClient, actor: Actor, memberId: string, mainId: string) {
   const { householdId } = actor;
+  for (const productId of [memberId, mainId].sort()) await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${householdId + ":product:" + productId}, 0))`;
   const member = await tx.product.findFirstOrThrow({ where: { id: memberId, householdId }, select: { name: true, stockProductId: true } });
   await tx.product.update({ where: { id: memberId }, data: { stockProductId: mainId } });
   if (member.stockProductId) return;
@@ -886,6 +1004,7 @@ async function joinGroup(tx: Prisma.TransactionClient, actor: Actor, memberId: s
     tx.stockItem.findMany({ where: { householdId, productId: memberId }, select: mergeSelect }),
     tx.stockItem.findMany({ where: { householdId, productId: mainId }, select: mergeSelect }),
   ]);
+  await tx.stockPurchase.updateMany({ where: { householdId, productId: memberId }, data: { productId: mainId } });
   const note = mergeNote(member.name, actor.locale);
   for (const step of planStockMerge(source.map(toMergeable), target.map(toMergeable))) {
     const log = { householdId, reason: "MANUAL_CORRECTION" as const, userId: actor.id, note };
@@ -894,11 +1013,15 @@ async function joinGroup(tx: Prisma.TransactionClient, actor: Actor, memberId: s
       await tx.stockMovement.create({ data: { ...log, stockItemId: step.sourceId, delta: 0, quantityAfter: step.quantity } });
       continue;
     }
+    await tx.stockPurchase.updateMany({ where: { householdId, stockItemId: step.sourceId }, data: { stockItemId: step.targetId } });
+    await tx.stockPurchaseEvidence.updateMany({ where: { householdId, stockItemId: step.sourceId }, data: { stockItemId: step.targetId } });
     await tx.stockMovement.updateMany({ where: { stockItemId: step.sourceId }, data: { stockItemId: step.targetId } });
     await tx.stockItem.update({
       where: { id: step.targetId },
       data: {
         quantity: step.quantity,
+        // Conservatively review receipts before either confirmed count after the locations merge.
+        lastCountedAt: [...source, ...target].filter((row) => row.id === step.sourceId || row.id === step.targetId).reduce<Date | null>((latest, row) => row.lastCountedAt && (!latest || row.lastCountedAt > latest) ? row.lastCountedAt : latest, null),
         unit: step.unit,
         minQuantity: step.minQuantity,
         expiresOn: step.expiresOn ? toDate(step.expiresOn) : null,

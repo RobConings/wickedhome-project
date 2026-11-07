@@ -6,8 +6,8 @@ import "@ai/skills";
 describe("inventory purchase tools", () => {
   it("exposes purchase history as a read and purchases with an optional receipt as a confirmed write", () => {
     const tools = listAssistantTools();
-    const purchases = tools.find((tool) => tool.name === "inventory.purchases");
-    const record = tools.find((tool) => tool.name === "inventory.record_purchase");
+    const purchases = tools.find((tool) => tool.name === "inventory.purchase_history");
+    const record = tools.find((tool) => tool.name === "inventory.record_purchase_batch");
 
     assert.ok(purchases);
     assert.equal(purchases.permission, "read");
@@ -16,6 +16,8 @@ describe("inventory purchase tools", () => {
     assert.equal(record.confirm, "always");
     assert.deepEqual(Object.keys(toolInputJsonSchema(record).properties ?? {}).sort(), ["items", "note", "receiptImageIndex"]);
     assert.match(record.description, /with or without a receipt/);
+    assert.ok(tools.some((tool) => tool.name === "inventory.record_purchase"), "the source-aware single-purchase workflow remains available");
+    assert.ok(tools.some((tool) => tool.name === "inventory.purchases"), "purchase reconciliation remains available alongside movement history");
     const parsed = record.input.safeParse({ items: [{ product: "Bananen", quantity: "1" }] });
     assert.equal(parsed.success, true, "quantities can use the existing/default household count unit");
     if (parsed.success) assert.deepEqual(parsed.data, { items: [{ product: "Bananen", quantity: 1 }] });

@@ -280,5 +280,26 @@
     "estimateHint": "Variabel inkomen aan de schatting.",
     "summaryNow": "Deze maand: {{income}} in, {{expenses}} uit.",
     "summaryLower": "De verwachte uitgaven dalen van {{from}} naar {{to}} per maand in {{month}}."
+  },
+  "tabs": {
+    "label": "Geldweergaven",
+    "overview": "Overzicht",
+    "contributions": "Bijdragen",
+    "history": "Rekeninghistoriek",
+    "settlement": "Maandafrekening"
+  },
+  "history": {
+    "title": "Bijdragen per maand",
+    "description": "Vergelijk hoeveel elke persoon elke maand bijdroeg.",
+    "account": "Rekening",
+    "allJoint": "Alle gezamenlijke rekeningen",
+    "year": "Jaar",
+    "total": "Totaal bijgedragen",
+    "allTime": "Alle geregistreerde bijdragen tot vandaag",
+    "monthTotal": "Totaal {{amount}}",
+    "unknownPerson": "Voormalig gezinslid",
+    "empty": "Nog geen bijdragen",
+    "emptyDescription": "Registreer een overschrijving van een persoon om bijdragen bij te houden.",
+    "note": "Netto bijdragen houden rekening met terugnames en rechtstreekse verrekeningen tussen personen. Kies een spaarrekening om spaarbijdragen te zien."
   }
 }

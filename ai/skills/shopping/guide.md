@@ -1,10 +1,7 @@
-- Items have quantity, shop, note, price. At/below minimum all products auto-list, essential or not.
-- `shopping_list` returns `stockStatus`, `buyingAdvice`, `essential`, `importance`: below minimum = to buy; at minimum = warning. False essential = nice to have. Keep urgency and importance separate; the person chooses what to buy. Optional `stockStatus`/`isEssential` read filters never change the list.
-- Essential settings → `inventory_save_product` `isEssential` true/false; don't infer or change a flag from stock level.
-- Add → `shopping_add_item` per item; pass catalogue `product` for stock/importance labels. "1,5 kg gehakt" → quantity 1.5, unit kg.
-- By shop → `shopping_list` shop; `perShop` tells where to go. Task materials → list/add with task.
-- "Ik heb de melk gekocht" / "vink af" → `shopping_update_item` bought true (one call per item); "zet terug" → bought false. "Koop dat bij Aldi" → shop. If the result says it is kept in stock, offer addToStock.
-- Everything bought → `shopping_complete_trip`: one confirmation for open grocery items, or name a list. Paid total → `expenses_log` once; known quantities → `inventory_record_purchase`. Separate confirmations; never infer quantities from the total.
-- Removing an item, list or staple always asks. Children add, tick off and remove their own items; lists and staples are for adults.
-- "Elke week melk" → `shopping_save_staple` (unit week).
-- Shops themselves (opening hours, webshops, favourites) → shops skill; stock → inventory.
+- Groceries: inventory_products → inventory_stock → shopping_list. Reuse products/alternatives and row ids. Explicit extras apply even with enough stock.
+- Add with product; missing catalogue entry → inventory_save_product. Repair via shopping_update_item item=<row id> product=<product>: fills missing shop/photo/link, preserves ingredient amounts/meal references. unlinkedReason only for real one-offs; task links materials.
+- Cooking: recipes_list for servings → match/save product links → recipes_plan (default missing). Don't copy ingredients manually.
+- At/below minimum all products auto-list: below = buy, at = warning. stockStatus/buyingAdvice = urgency; essential/importance = importance. Both stay visible; person chooses what to buy. Read filters don't change items; never infer isEssential from stock.
+- Product setup: inventory_prepare_product, save verified facts, re-read/disclose gaps. shopping_list shop/shops combines stores; shopGroup uses shops_groups/shops_save_group. Keep original prices/shops.
+- Bought → shopping_update_item bought true; false restores. Check purchase/stock results before adding again. Receipts/scans → inventory_purchases then inventory_record_purchase; link same goods, ask extra/count decisions. shopping_save_staple recurs. Deletes ask; children add/tick/remove own items, adults manage.
+- Whole trip → shopping_complete_trip: confirms bulk check-off only. Paid total → expenses_log once; known quantities → purchase workflow separately. Never infer quantities from paid total.

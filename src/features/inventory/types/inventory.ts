@@ -32,6 +32,14 @@ export const stockItemUpdateSchema = z.object({
 });
 export type StockItemUpdateInput = z.infer<typeof stockItemUpdateSchema>;
 
+/** An absolute physical count, protected against changes since the count screen was opened. */
+export const stockCountInputSchema = z.object({
+  quantity: z.preprocess((value) => typeof value === "number" || (typeof value === "string" && value.trim() !== "") ? value : undefined, amountSchema),
+  expectedUpdatedAt: z.iso.datetime(),
+  note: z.string().trim().max(200).optional(),
+});
+export type StockCountInput = z.infer<typeof stockCountInputSchema>;
+
 /** The edit form as posted (browser validation and the route action): an empty quantity means 0. */
 export const stockItemUpdateFormSchema = stockItemUpdateSchema.extend({
   quantity: z.preprocess((value) => value ?? 0, stockItemUpdateSchema.shape.quantity),
@@ -114,6 +122,7 @@ export type StockChangeResult = {
   stockItem: StockItem;
   /** Stock is at or below the minimum and a shopping item was added. */
   addedToShoppingList: boolean;
+  purchase?: { purchaseIds: string[]; repeated: boolean; added: number };
 };
 
 // Helpers shared by the API and the UI -------------------------------------------------------------------

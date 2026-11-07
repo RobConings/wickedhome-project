@@ -1,3 +1,4 @@
+import { groupContributionHistory } from "@/features/money/types/contribution-history";
 import type { Habitant } from "@/features/household";
 import {
   balanceAt,
@@ -59,6 +60,7 @@ const savingsItems: LedgerItem[] = [
 
 export const jointLedger = runLedger(jointItems, moneyToday);
 export const savingsLedger = runLedger(savingsItems, moneyToday);
+export const contributionHistoryFixture = groupContributionHistory([...jointItems, ...savingsItems].filter((item) => item.type === "contribution"), moneyToday);
 
 const account = (fields: Omit<JointAccount, "balanceCents" | "lastCorrection">, lines: typeof jointLedger): JointAccount => ({
   ...fields,

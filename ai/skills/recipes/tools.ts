@@ -33,7 +33,7 @@ import {
 } from "@/api/recipes/recipes.service";
 import { listProducts } from "@/api/shopping/shopping.service";
 import { deleteRecipeCategory, listRecipeCategories, saveRecipeCategory } from "@/api/recipes/recipe-categories.service";
-import { importRecipes } from "@/api/recipes/recipe-import.service";
+import { importRecipes, recipeSourceKey } from "@/api/recipes/recipe-import.service";
 import { packageSizeFromName } from "@/api/shopping/barcode-lookup";
 import { listIngredientSearchShops } from "@/api/shops/shops.service";
 import { isWebSearchConfigured, readPage, searchWeb, WebPageError, WebSearchError, type WebPage } from "@/api/web/web.service";
@@ -57,6 +57,8 @@ import { UNTRUSTED_NOTE } from "../web/tools";
 import { ingredientName, matchIngredients, pickByName } from "./match";
 import { applyOfferTo, createProductFromOffer } from "./offer-products";
 import { getOffer, rememberOffer, type Offer } from "./offers";
+import { productSetup } from "../inventory/product-setup";
+import { linkRecipeIngredients } from "./link-ingredients";
 
 /**
  * Skill "recipes": recipes from a link, pasted text or a photo, matched to the household's products; the "To
@@ -229,7 +231,7 @@ const ingredientLines = z
 registerAssistantTool({
   name: "recipes.match",
   description:
-    "Match recipe ingredients to the household's products: per line the product, its stock and what's short; 'unknown' = no product yet (recipes_find_product, then inventory_save_product).",
+    "Check ingredients against existing catalogue products, alternative brands and shared stock before saving or planning. Persist matched product links with recipes_save. For unknown ingredients check maybe candidates or inventory_products before creating with inventory_save_product (recipes_find_product can find webshop offers). unknown_amount means units/package size cannot be compared, not a confirmed shortage.",
   input: z.object({ ingredients: ingredientLines }),
   permission: "read",
   confirm: "never",
@@ -242,6 +244,7 @@ registerAssistantTool({
         name: match.name,
         amount: match.amount,
         product: match.product?.name ?? null,
+        productId: match.product?.id ?? null,
         maybe: match.maybe.length ? match.maybe : null,
         stock: match.stock === null ? null : amountText(match.stock, match.unit, ctx.locale),
         status: match.status,
@@ -267,7 +270,7 @@ type Found = { offer: string; shop: string; name: string; price: string | null; 
  */
 function foundFrom(householdId: string, page: WebPage, shop: { id: string; name: string }): Found | null {
   if (!page.product?.name) return null;
-  const priceCents = page.product.price === null ? null : Math.round(page.product.price * 100);
+  const priceCents = page.product.currency === "EUR" && page.product.price !== null ? Math.round(page.product.price * 100) : null;
   const size = packageSizeFromName(page.product.name);
   const offer = rememberOffer(householdId, {
     shopId: shop.id,
@@ -275,7 +278,8 @@ function foundFrom(householdId: string, page: WebPage, shop: { id: string; name:
     name: page.product.name.slice(0, 120),
     url: page.url,
     priceCents,
-    imageUrl: page.product.imageUrl,
+    imageUrl: page.product.imageUrl ?? page.imageUrl,
+    barcode: page.product.ean && /^\d{6,14}$/.test(page.product.ean) ? page.product.ean : null,
     packageAmount: size?.amount ?? null,
     packageUnit: size?.unit ?? null,
   });
@@ -395,7 +399,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "recipes.list",
   description:
-    "The household's recipes and the To cook list (meals planned and being cooked). Give a recipe for its ingredients with stock (in stock / short / unknown) and steps.",
+    "The household's recipes and To cook list. Before planning/cooking, give recipe and servings to check ingredient product links, shared stock, shortages and existing groceries (onList). Unlinked ingredients: recipes_match then recipes_save with product links. Plan with recipes_plan to add missing groceries automatically.",
   input: z.object({
     recipe: entityRef("recipe", "One recipe's details; leave out for the list (on a recipe's page: that one)").optional(),
     q: z.string().trim().max(80).optional().describe("Part of a recipe name or ingredient"),
@@ -443,7 +447,8 @@ registerAssistantTool({
 
 const saveIngredient = z.object({
   name: z.string().trim().min(1).max(120).describe("The ingredient, e.g. 'look'"),
-  product: entityRef("product", "The household product it is (from recipes_match); leave out when unknown").optional(),
+  product: entityRef("product", "Existing household product from recipes_match/inventory_products; unique exact matches are also linked automatically at save time").optional(),
+  unlinkedReason: z.string().trim().min(5).max(300).optional().describe("Only for a deliberate exception after checking catalogue candidates; saved as an unlinked ingredient and disclosed"),
   offer: z.string().trim().max(20).optional().describe("An `offer` from recipes_find_product: makes (or links) the product with its webshop link, price and photo"),
   quantity: z.number().positive().max(100_000).optional().describe("The recipe's own amount for its servings, e.g. 300 for '300 g'"),
   unit: z.string().trim().max(20).optional().describe("The recipe's unit as written: 'g', 'ml', 'stuk', 'el', 'teentjes'"),
@@ -452,9 +457,25 @@ const saveIngredient = z.object({
 });
 type SaveIngredient = z.output<typeof saveIngredient>;
 
+async function prepareIngredientLinks(ctx: AssistantToolContext, ingredients: SaveIngredient[], current: Recipe | null = null, catalogue?: Awaited<ReturnType<typeof listProducts>>) {
+  const existing = new Map((current?.ingredients ?? []).flatMap((item) => item.productId ? [[fold(item.name), {
+    type: "product" as const, id: item.productId, name: item.productName ?? item.name,
+  }] as const] : []));
+  const needsLookup = ingredients.some((item) => !item.product && !existing.has(fold(item.name)));
+  const products = needsLookup ? catalogue ?? await listProducts(ctx.householdId) : [];
+  const withExistingOffers = ingredients.map((item) => {
+    if (!item.offer || item.product || item.unlinkedReason) return item;
+    const offer = getOffer(ctx.householdId, item.offer);
+    if (!offer) return item;
+    const matches = products.filter((product) => offer.barcode ? product.barcode === offer.barcode : fold(product.name) === fold(offer.name));
+    return matches.length === 1 ? { ...item, product: { type: "product" as const, id: matches[0]!.id, name: matches[0]!.name } } : item;
+  });
+  return linkRecipeIngredients(withExistingOffers, products, existing);
+}
+
 registerAssistantTool({
   name: "recipes.import_batch",
-  description: "Import up to 25 recipes atomically, deduplicated by sourceUrl. Send name, imageUrl, servings, ingredients and steps ({text,timerMinutes?}) for new recipes. An existing sourceUrl only gets the supplied category; its content is preserved even if content is sent. A sourceUrl alone can categorize an existing recipe. Safe to retry. Create categories with recipes_save_category first; category on an item overrides the batch category.",
+  description: "Import up to 25 recipes atomically, deduplicated by sourceUrl. New ingredients are checked against the catalogue: exact unique matches link automatically; plausible alternatives require a product choice before any import write. Unknowns are reported. Send name, imageUrl, servings, ingredients and steps ({text,timerMinutes?}). Existing sourceUrl only gets category; content stays unchanged. A sourceUrl alone can categorize an existing recipe. Create categories with recipes_save_category first; item category overrides batch category.",
   input: z.object({
     category: entityRef("recipe_category", "Category for the batch; omit to preserve existing categories").optional(),
     recipes: z.array(recipeImportItemSchema.omit({ categoryId: true, ingredients: true }).extend({
@@ -468,14 +489,31 @@ registerAssistantTool({
   describe: (ctx, input) => say(ctx.locale,
     `Import ${input.recipes.length} recipe(s)${input.category ? ` into ${input.category.name}` : ""}; existing recipe content is preserved`,
     `${input.recipes.length} recept(en) importeren${input.category ? ` in ${input.category.name}` : ""}; de inhoud van bestaande recepten blijft behouden`),
-  run: async (ctx, input) => importRecipes(ctx.user, {
-    categoryId: input.category?.id,
-    recipes: input.recipes.map(({ category, ingredients, ...recipe }) => ({
-      ...recipe,
-      categoryId: category?.id,
-      ingredients: ingredients?.map(({ product, ...ingredient }) => ({ ...ingredient, productId: product?.id, optional: ingredient.optional ?? false })),
-    })),
-  }, ctx.signal),
+  run: async (ctx, input) => {
+    const [saved, catalogue] = await Promise.all([listRecipes(ctx.householdId), listProducts(ctx.householdId)]);
+    const known = new Set(saved.flatMap((recipe) => {
+      try { return recipe.sourceUrl ? [recipeSourceKey(recipe.sourceUrl)] : []; } catch { return []; }
+    }));
+    // Existing URLs and repeated URLs only receive categories; do not reinterpret their ignored content.
+    const recipes = [];
+    const unlinked: { recipe: string; ingredient: string }[] = [];
+    for (const recipe of input.recipes) {
+      const key = recipeSourceKey(recipe.sourceUrl);
+      const ingredients = known.has(key) ? recipe.ingredients : await prepareIngredientLinks(ctx, recipe.ingredients ?? [], null, catalogue);
+      if (!known.has(key)) unlinked.push(...(ingredients ?? []).filter((item) => !item.product).map((item) => ({ recipe: recipe.name ?? recipe.sourceUrl, ingredient: item.name })));
+      recipes.push({ ...recipe, ingredients });
+      known.add(key);
+    }
+    const result = await importRecipes(ctx.user, {
+      categoryId: input.category?.id,
+      recipes: recipes.map(({ category, ingredients, ...recipe }) => ({
+        ...recipe,
+        categoryId: category?.id,
+        ingredients: ingredients?.map(({ product, unlinkedReason: _unlinkedReason, ...ingredient }) => ({ ...ingredient, productId: product?.id, optional: ingredient.optional ?? false })),
+      })),
+    }, ctx.signal);
+    return { ...result, unlinkedIngredients: capList(unlinked, 20) };
+  },
 });
 
 const saveInput = z.object({
@@ -547,7 +585,7 @@ const ingredientDetail = (item: SaveIngredient, offer: Offer | null, locale: "en
 registerAssistantTool({
   name: "recipes.save",
   description:
-    "Save a recipe (new, or change one): name, servings, source link, imageUrl (the original recipe photo), ingredients (each linked to a product from recipes_match where known) and steps. On an existing recipe, ingredients are added or update the one of the same name (e.g. link a product).",
+    "Save a recipe. Always check existing products first with recipes_match. Save also searches the catalogue: unique exact matches link automatically; plausible alternatives require a product choice before any write. Reuse existing products before creating from offers. Unmatched ingredients are reported; unlinkedReason is only for deliberate exceptions. Amounts/units stay as written. Existing ingredients update by name; omitted links are preserved. Product links enable stock checks and groceries.",
   input: saveInput,
   permission: "write",
   confirm: "always",
@@ -559,13 +597,15 @@ registerAssistantTool({
       ? say(ctx.locale, `Change the recipe ${name}${count ? ` (${count} ingredients)` : ""}`, `Recept ${name} aanpassen${count ? ` (${count} ingrediënten)` : ""}`)
       : say(ctx.locale, `Save the recipe ${name} (${count} ingredients, ${input.steps?.length ?? 0} steps)`, `Recept ${name} bewaren (${count} ingrediënten, ${input.steps?.length ?? 0} stappen)`);
   },
-  preview: (ctx, input): AssistantPreview | null => {
+  preview: async (ctx, input): Promise<AssistantPreview | null> => {
     if (!input.ingredients?.length) return null;
+    const current = input.recipe ? await getRecipe(ctx.householdId, input.recipe.id) : null;
+    const ingredients = await prepareIngredientLinks(ctx, input.ingredients, current);
     return {
       kind: "list",
       title: say(ctx.locale, "Ingredients", "Ingrediënten"),
       data: {
-        items: input.ingredients.map((item) => {
+        items: ingredients.map((item) => {
           const offer = item.offer ? getOffer(ctx.householdId, item.offer) : null;
           return { label: item.name, detail: ingredientDetail(item, offer, ctx.locale), tone: item.product || offer ? ("add" as const) : ("change" as const) };
         }),
@@ -579,21 +619,28 @@ registerAssistantTool({
     // Offers from recipes_find_product: a new product (or the given one) gets the link, price and photo, copied here.
     const offers = (input.ingredients ?? []).map((item) => (item.offer ? (getOffer(ctx.householdId, item.offer) ?? item.offer) : null));
     const expired = offers.find((offer): offer is string => typeof offer === "string");
-    if (expired) throw badRequest(`Offer ${expired} is unknown or expired: run recipes_find_product again and use its offer.`);
-    const ingredients = await Promise.all(
-      (input.ingredients ?? []).map(async (item, index) => {
-        const offer = offers[index] as Offer | null;
-        if (!offer) return item;
-        const product = item.product ? await applyOfferTo(ctx.householdId, item.product.id, offer) : await createProductFromOffer(ctx.householdId, offer);
-        return { ...item, product: { id: product.id, name: product.name } as ResolvedEntity };
-      }),
-    );
+    if (expired) throw badRequest(`Offer ${expired} is unknown or expired: run inventory_prepare_product or recipes_find_product again and use its offer.`);
+    const prepared = await prepareIngredientLinks(ctx, input.ingredients ?? [], current);
+    const enriched: { id: string; name: string; missing: string[] }[] = [];
+    const ingredients: SaveIngredient[] = [];
+    const createdOffers = new Map<string, Awaited<ReturnType<typeof createProductFromOffer>>>();
+    for (const [index, item] of prepared.entries()) {
+      const offer = offers[index] as Offer | null;
+      if (!offer) { ingredients.push(item); continue; }
+      const product = item.product ? await applyOfferTo(ctx.householdId, item.product.id, offer)
+        : createdOffers.get(item.offer!) ?? await createProductFromOffer(ctx.householdId, offer);
+      if (!item.product) createdOffers.set(item.offer!, product);
+      enriched.push({ id: product.id, name: product.name, missing: productSetup(product).missing });
+      ingredients.push({ ...item, product: { type: "product", id: product.id, name: product.name } });
+    }
     const data = recipeInputFor({ ...input, ingredients: input.ingredients ? ingredients : undefined }, current);
     const recipe = current ? await updateRecipe(ctx.householdId, current.id, data) : await createRecipe(ctx.user, data);
     const free = recipe.ingredients.filter((item) => !item.productId).length;
     return done(
       `${current ? "Saved" : "Added"} the recipe ${recipe.name}: ${recipe.ingredients.length} ingredients${free ? ` (${free} without a product)` : ""}, ${recipe.steps.length} steps.`,
-      { id: recipe.id },
+      { id: recipe.id, linkedIngredients: recipe.ingredients.length - free,
+        unlinkedIngredients: recipe.ingredients.filter((item) => !item.productId).map((item) => ({ name: item.name, reason: prepared.find((line) => fold(line.name) === fold(item.name))?.unlinkedReason ?? "No catalogue match; check synonyms or create a product before planning groceries" })),
+        ...(enriched.length && { productSetups: capList(enriched, 8), productSetupNote: "These products were saved with online offers. Check inventory_products for any remaining gaps or stock-sharing links, and report the final setup to the person." }) },
     );
   },
 });
@@ -601,7 +648,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "recipes.plan",
   description:
-    "Put a recipe on the To cook list for a number of people and the missing ingredients on the shopping list (in stock or already on the list: skipped).",
+    "Plan a recipe for servings and automatically add missing groceries (buy defaults to missing). First recipes_list to inspect stock and links; repair unlinked required ingredients with recipes_match and recipes_save, creating missing products first. Checks shared stock and package sizes, skips in-stock, optional and already-listed ingredients. Do not manually copy ingredients to shopping_add_item. Does not consume stock; use recipes_use when actually cooking.",
   input: z.object({
     recipe: entityRef("recipe", "The recipe; leave out on its page").optional(),
     servings: z.number().int().min(1).max(100).optional().describe("For how many people (default the recipe's)"),
@@ -622,12 +669,12 @@ registerAssistantTool({
     const items = await toBuy(ctx, input);
     return {
       kind: "list",
-      title: say(ctx.locale, items.length ? "On the shopping list" : "Everything is in stock", items.length ? "Op de boodschappenlijst" : "Alles is in voorraad"),
+      title: say(ctx.locale, items.length ? "On the shopping list" : "No new shopping items", items.length ? "Op de boodschappenlijst" : "Geen nieuwe boodschappen"),
       data: {
         items: items.map((item) => ({
           label: item.productName ?? item.name,
           detail: item.product
-            ? amountText(Math.ceil(item.shortfallPackages || item.neededInStockUnits || 1), item.product.unit, ctx.locale)
+            ? `${amountText(Math.ceil(item.shortfallPackages || item.neededInStockUnits || 1), item.product.unit, ctx.locale)}${item.status === "unknown" || item.status === "unknown_amount" ? say(ctx.locale, " (stock amount unverified)", " (voorraadhoeveelheid niet geverifieerd)") : ""}`
             : amountText(item.needed, item.unit, ctx.locale),
           tone: "add" as const,
         })),
@@ -640,9 +687,10 @@ registerAssistantTool({
     const items = input.buy === "none" ? [] : await toBuy(ctx, input);
     const result = await planRecipe(ctx.user, { recipeId: id, servings: check.servings, items: items.map((item) => ({ ingredientId: item.ingredientId })) });
     const listed = result.added + result.merged;
+    const unverified = items.filter((item) => item.status === "unknown" || item.status === "unknown_amount").map((item) => item.name);
     return done(
-      `${result.entry.recipeName} is on To cook for ${result.entry.servings}.${listed ? ` ${listed} ingredient(s) on the shopping list${result.merged ? ` (${result.merged} added to an item already there)` : ""}.` : " Nothing needed buying."}`,
-      { id: result.entry.id },
+      `${result.entry.recipeName} is on To cook for ${result.entry.servings}.${listed ? ` ${listed} ingredient(s) on the shopping list${result.merged ? ` (${result.merged} added to an item already there)` : ""}.` : " No new shopping items added."}${unverified.length ? ` Stock amounts could not be verified for: ${unverified.join(", ")}; these are not confirmed shortages.` : ""}`,
+      { id: result.entry.id, ...(unverified.length && { unverified }) },
     );
   },
 });
@@ -651,13 +699,16 @@ registerAssistantTool({
 async function toBuy(ctx: AssistantToolContext, input: { recipe?: ResolvedEntity; servings?: number; skip?: string[] }) {
   const check = await checkRecipe(ctx.householdId, await recipeId(ctx, input.recipe), input.servings);
   const skipped = (input.skip ?? []).map((name) => fold(ingredientName(name)));
-  return check.ingredients.filter(
+  const required = check.ingredients.filter(
     (item) =>
-      item.status !== "in_stock" &&
       !item.optional &&
-      !item.onList &&
       !skipped.some((name) => fold(item.name).includes(name) || (item.productName && fold(item.productName).includes(name))),
   );
+  const unlinked = required.filter((item) => !item.productId);
+  if (unlinked.length) {
+    throw badRequest(`Link these recipe ingredients to catalogue products before planning groceries: ${unlinked.map((item) => item.name).join(", ")}. Use recipes_match, check relevant inventory_products, create missing products with inventory_save_product, then recipes_save with ingredient product links. Retry recipes_plan afterwards. Use skip only for ingredients the person does not want to buy; buy none only when they want no groceries.`);
+  }
+  return required.filter((item) => item.status !== "in_stock" && !item.onList);
 }
 
 // ── Cooking ─────────────────────────────────────────────────────────────────────────────────────────
@@ -730,9 +781,10 @@ const CHILD_RECIPE_RULE = "Only adults change recipes; children can add an ingre
 registerAssistantTool({
   name: "recipes.add_ingredient",
   description:
-    "While cooking: add an ingredient that isn't in the recipe (a product or free text), used right away by default; saveToRecipe also adds it to the recipe for next time.",
+    "While cooking: add an ingredient, used right away by default; saveToRecipe also saves it for next time. Always checks existing catalogue products: unique exact matches link automatically, plausible alternatives require a product choice. Unknown ingredients stay explicitly unlinked; do not create duplicate products. Original amounts and units are preserved.",
   input: z.object({
     product: entityRef("product", "The household product, when it is one").optional(),
+    unlinkedReason: saveIngredient.shape.unlinkedReason,
     name: z.string().trim().min(1).max(120).optional().describe("Free text when it is no product"),
     quantity: z.number().positive().max(1000).optional(),
     unit: z.string().trim().max(20).optional(),
@@ -753,17 +805,21 @@ registerAssistantTool({
   run: async (ctx, input) => {
     if (input.saveToRecipe && ctx.user.role === "child") throw forbidden(CHILD_RECIPE_RULE);
     if (!input.product && !input.name) throw badRequest("Give a product or a name.");
+    const [ingredient] = await prepareIngredientLinks(ctx, [{ name: input.name ?? input.product!.name, product: input.product, unlinkedReason: input.unlinkedReason }]);
     const id = await mealId(ctx, input.meal);
     const state = await addExtra(ctx.user, id, {
-      productId: input.product?.id ?? null,
+      productId: ingredient!.product?.id ?? null,
       name: input.name ?? null,
       quantity: input.quantity ?? null,
       unit: input.unit ?? null,
       saveToRecipe: input.saveToRecipe,
       use: input.use,
     });
-    const name = input.product?.name ?? input.name ?? "";
-    return done(`Added ${name} to ${state.recipe.name}${input.use ? " and recorded it as used" : ""}${input.saveToRecipe ? "; it is in the recipe now" : ""}.`);
+    const name = input.name ?? ingredient!.product?.name ?? "";
+    return done(`Added ${name} to ${state.recipe.name}${input.use ? " and recorded it as used" : ""}${input.saveToRecipe ? "; it is in the recipe now" : ""}.`, {
+      productId: ingredient!.product?.id ?? null,
+      unlinkedReason: ingredient!.product ? undefined : input.unlinkedReason ?? "No catalogue match found",
+    });
   },
 });
 

@@ -1,6 +1,6 @@
 import i18n from "i18next";
 import type { ActionFunctionArgs, ShouldRevalidateFunctionArgs } from "react-router";
-import { fetchShops, type Shop } from "@/features/shops";
+import { fetchShops, fetchShopGroups, type Shop, type SavedShopGroup } from "@/features/shops";
 import { ApiRequestError } from "@/lib/api-client";
 import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
 import {
@@ -35,15 +35,15 @@ import {
   upsertProductLink,
 } from "./shopping-requests";
 
-export type ShoppingPageData = { overview: ShoppingOverview; shops: Shop[]; products: Product[] };
+export type ShoppingPageData = { overview: ShoppingOverview; shops: Shop[]; products: Product[]; shopGroups?: SavedShopGroup[] };
 export type ProductsPageData = { products: Product[]; shops: Shop[] };
 
 export type ShoppingActionResult = FormResult & { intent?: string; id?: string };
 
 /** Shopping page and shop view: lists, items and staples, with shops and products for the pickers. */
 export async function shoppingLoader(): Promise<ShoppingPageData> {
-  const [overview, shops, products] = await Promise.all([fetchShoppingOverview(), fetchShops(), fetchProducts()]);
-  return { overview, shops, products };
+  const [overview, shops, products, shopGroups] = await Promise.all([fetchShoppingOverview(), fetchShops(), fetchProducts(), fetchShopGroups()]);
+  return { overview, shops, products, shopGroups };
 }
 
 /**

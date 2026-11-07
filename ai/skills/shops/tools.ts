@@ -5,18 +5,59 @@ import { listStoreVisits } from "@/api/calendar/calendar.service";
 import { addFavorite, getSelections, removeFavorite } from "@/api/selections/selections.service";
 import { listItems } from "@/api/shopping/shopping.service";
 import { createShop, deleteShop, getShop, listShops, updateShop } from "@/api/shops/shops.service";
-import { capList, day, done, entityRef, registerAssistantSkill, registerAssistantTool, registerScreenContext, say } from "@ai/core/kit";
+import { deleteShopGroup, listShopGroups, saveShopGroup } from "@/api/shops/shop-groups.service";
+import { capList, day, done, entityRef, entityNames, registerEntityResolver, registerAssistantSkill, registerAssistantTool, registerScreenContext, say } from "@ai/core/kit";
 
 /** Skill "shops": the shops the household buys at (guide: guide.md next to this file). The `shop` resolver lives in shopping. */
 
 registerAssistantSkill({
   id: "shops",
   title: { en: "Shops", nl: "Winkels" },
-  summary: "Shops: favourites, address, opening hours, website and webshop; add, edit, delete shops.",
+  summary: "Shops and saved shop groups: combine stores for groceries, favourites, address, opening hours, websites; add, edit, delete.",
   keywords: {
     nl: ["winkel", "winkels", "webshop", "webwinkel", "openingsuren", "openingstijden", "favoriete winkel", "bouwmarkt", "doe-het-zelfzaak"],
     en: ["shop", "shops", "store", "stores", "webshop", "online shop", "opening hours", "favourite shop", "favorite shop", "diy store"],
   },
+});
+
+registerEntityResolver({
+  type: "shop_group", label: "shop group", skill: "shops",
+  list: async (ctx) => (await listShopGroups(ctx.householdId)).map((group) => ({
+    id: group.id, name: group.name, data: { shopIds: group.shopIds },
+  })),
+});
+
+registerAssistantTool({
+  name: "shops.groups",
+  description: "List saved household shop groups with ids and member shops. shopping_list shopGroup combines their groceries. A group combines views; each product retains its own shop links, price and stock relationships.",
+  input: z.object({}), permission: "read", confirm: "never",
+  activity: { en: "Checked shop groups", nl: "Winkelgroepen bekeken" },
+  run: async (ctx) => {
+    const [groups, names] = await Promise.all([listShopGroups(ctx.householdId), entityNames(ctx, "shop")]);
+    return capList(groups, 40, (group) => ({ ...group, shops: group.shopIds.map((id) => names.get(id) ?? id) }));
+  },
+});
+
+registerAssistantTool({
+  name: "shops.save_group",
+  description: "Save a household-wide group of at least two existing shops (e.g. Colruyt, Collect&Go and OKay), or replace the members/name of a group. Does not merge shops, products, stock or prices. For a single trip shopping_list shops accepts an ad-hoc combination without saving a group.",
+  input: z.object({ group: entityRef("shop_group").optional(), name: z.string().trim().min(1).max(80), shops: z.array(entityRef("shop")).min(2).max(50) }),
+  permission: "write", confirm: "always",
+  activity: { en: "Saved a shop group", nl: "Winkelgroep bewaard" },
+  describe: (ctx, input) => say(ctx.locale, `Save shop group ${input.name}: ${input.shops.map((shop) => shop.name).join(", ")}`, `Winkelgroep ${input.name} bewaren: ${input.shops.map((shop) => shop.name).join(", ")}`),
+  run: async (ctx, input) => {
+    const group = await saveShopGroup(ctx.householdId, { name: input.name, shopIds: [...new Set(input.shops.map((shop) => shop.id))] }, input.group?.id);
+    return done(`Saved shop group ${group.name}.`, { id: group.id, shopIds: group.shopIds });
+  },
+});
+
+registerAssistantTool({
+  name: "shops.delete_group",
+  description: "Delete a saved shop group; its shops, products and shopping items stay.",
+  input: z.object({ group: entityRef("shop_group") }), permission: "sensitive", confirm: "always",
+  activity: { en: "Deleted a shop group", nl: "Winkelgroep verwijderd" },
+  describe: (ctx, input) => say(ctx.locale, `Delete shop group ${input.group.name}`, `Winkelgroep ${input.group.name} verwijderen`),
+  run: async (ctx, input) => { await deleteShopGroup(ctx.householdId, input.group.id); return done(`Deleted shop group ${input.group.name}.`); },
 });
 
 const LIST_LIMIT = 25;

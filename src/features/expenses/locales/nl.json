@@ -315,8 +315,8 @@
   },
   "totalOpen": {
     "label": "Totaal nog open",
-    "asOf": "Vanaf",
-    "asOfHint": "Eerste betaling die meetelt. Leeg: de volgende betaling.",
+    "asOf": "Vanaf welke termijn",
+    "asOfHint": "Eerste gewone termijn die bij dit saldo hoort. Leeg: de volgende termijn.",
     "hint": "Iets aan het afbetalen? Vul in wat er nog open staat: het aantal betalingen volgt daaruit, en de laatste is voor wat overblijft.",
     "more": "Iets aan het afbetalen? Totaal nog open",
     "needAmount": "Vul het bedrag per betaling in om de betalingen te zien.",
@@ -349,5 +349,18 @@
       "title": "Domiciliëringen",
       "description": "Markeert domiciliëringen als betaald op hun vervaldag."
     }
+  },
+  "repayment": {
+    "label": "Terugbetaling van een lening of afbetaling",
+    "none": "Geen terugbetaling",
+    "remaining": "Nog open: {{amount}}",
+    "payAll": "Resterend saldo afbetalen",
+    "hint": "Wordt als betaald geboekt. Dit verlaagt het openstaande saldo en verkort de looptijd; het gewone termijnbedrag blijft gelijk.",
+    "needsTotal": "Vul eerst het totaal nog open op de lening in voordat je een terugbetaling boekt.",
+    "record": "Terugbetaling boeken",
+    "title": "Terugbetaling lening",
+    "exceedsBalance": "De terugbetaling is hoger dan het resterende saldo.",
+    "paymentDateHint": "Vul de dag in waarop je echt betaalde. Dat mag vóór de eerste termijn zijn.",
+    "futureDate": "Vul de dag in waarop je echt betaalde, op of vóór {{date}}."
   }
 }

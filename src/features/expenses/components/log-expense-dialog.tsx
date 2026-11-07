@@ -23,8 +23,11 @@ import type { Habitant } from "@/features/household";
 import { ShopPicker, useShopSelections, type Shop } from "@/features/shops";
 import type { ExpenseActionResult } from "../data/expenses-loaders";
 import type { ExpenseProjectField } from "./expense-form-dialog";
-import { PAYMENT_METHODS, type ExpenseCategory, type PaymentMethod } from "../types/expenses";
+import { PAYMENT_METHODS, type ExpenseCategory, type PaymentMethod, type RecurringExpense } from "../types/expenses";
+import { scaleShares } from "../types/total-open";
 import { CategorySelect } from "./category-select";
+import { LoanRepaymentField } from "./loan-repayment-field";
+import { useRepaymentLoans } from "../data/use-repayment-loans";
 import { PayerField } from "./payer-field";
 
 type LogExpenseDialogProps = {
@@ -34,6 +37,8 @@ type LogExpenseDialogProps = {
   today: string;
   trigger: React.ReactElement;
   defaultOpen?: boolean;
+  loans?: RecurringExpense[];
+  defaultLoanId?: string;
   /** Optional "Project" field, composed by the route (see `ExpenseProjectField`). */
   projectField?: ExpenseProjectField;
   /** Log it for this project (e.g. from the project's page); preselected in `projectField`, else posted as is. */
@@ -63,6 +68,8 @@ export function LogExpenseDialog({
   today,
   trigger,
   defaultOpen = false,
+  loans: providedLoans,
+  defaultLoanId,
   projectField,
   projectId = null,
   defaultAmountCents,
@@ -76,12 +83,16 @@ export function LogExpenseDialog({
   const [session, setSession] = React.useState(0);
   const fetcher = useFetcher<ExpenseActionResult>({ key: `expense-log-${session}` });
   const { recordUse } = useShopSelections();
-  const [amountCents, setAmountCents] = React.useState<number | null>(null);
-  const [category, setCategory] = React.useState<ExpenseCategory>("groceries");
+  const [amountCents, setAmountCents] = React.useState<number | null>(defaultAmountCents ?? null);
+  const [category, setCategory] = React.useState<ExpenseCategory>(defaultLoanId ? "loans" : "groceries");
   const [shopId, setShopId] = React.useState<string | null>(null);
   const [what, setWhat] = React.useState("");
   const [date, setDate] = React.useState(today);
-  const [method, setMethod] = React.useState<PaymentMethod>("card");
+  const [method, setMethod] = React.useState<PaymentMethod>(defaultLoanId ? "wire_transfer" : "card");
+  const [loanId, setLoanId] = React.useState<string | null>(defaultLoanId ?? null);
+  const [amountVersion, setAmountVersion] = React.useState(0);
+  const loans = useRepaymentLoans(open, providedLoans);
+  const loan = loans.find((candidate) => candidate.id === loanId);
   const meHabitantId = useOptionalCurrentUser()?.habitantId ?? null;
 
   const submitting = fetcher.state !== "idle";
@@ -90,7 +101,7 @@ export function LogExpenseDialog({
   const saved = fetcher.state === "idle" && result?.ok === true;
   const shop = shops.find((candidate) => candidate.id === shopId);
   // The payee is what was typed, else the shop, else the category: logging stays a few taps.
-  const payee = what.trim() || shop?.name || t(`categories.${category}`);
+  const payee = loan?.payee || what.trim() || shop?.name || t(`categories.${category}`);
 
   const savedCallback = React.useRef(onSaved);
   React.useEffect(() => {
@@ -112,6 +123,9 @@ export function LogExpenseDialog({
       setWhat(defaultDescription);
       setShopId(null);
       setDate(today);
+      setLoanId(defaultLoanId ?? null);
+      setCategory(defaultLoanId ? "loans" : "groceries");
+      setMethod(defaultLoanId ? "wire_transfer" : "card");
     }
     setOpen(next);
   }
@@ -123,6 +137,7 @@ export function LogExpenseDialog({
         <fetcher.Form method="post" action={action} noValidate>
           <input type="hidden" name="intent" value="create" />
           <input type="hidden" name="payee" value={payee} />
+          {loanId && <input type="hidden" name="description" value={what} />}
           {!projectField && projectId && <input type="hidden" name="projectId" value={projectId} />}
           <input type="hidden" name="paidOn" value={date} />
           <input type="hidden" name="paymentMethod" value={method} />
@@ -135,11 +150,12 @@ export function LogExpenseDialog({
 
               {result?.formError && <InlineAlert tone="error">{result.formError}</InlineAlert>}
 
-              <FormField label={t("fields.amount")} htmlFor="log-amount" errors={errors?.amountCents ? [t("errors.amount")] : undefined}>
+              <FormField label={t("fields.amount")} htmlFor="log-amount" errors={errors?.amountCents ? [errors.amountCents.some((message) => message.includes("exceeds")) ? t("repayment.exceedsBalance") : t("errors.amount")] : undefined}>
                 <MoneyInput
+                  key={`${session}-${amountVersion}`}
                   id="log-amount"
                   name="amountCents"
-                  defaultValueCents={defaultAmountCents ?? null}
+                  defaultValueCents={amountCents}
                   placeholder="0,00"
                   inputMode="decimal"
                   autoFocus
@@ -151,9 +167,9 @@ export function LogExpenseDialog({
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <FormField label={t("fields.category")} htmlFor="log-category" errors={errors?.category}>
-                  <CategorySelect id="log-category" value={category} onChange={setCategory} first="everyday" />
+                  <CategorySelect id="log-category" value={category} onChange={(next) => { setCategory(next); if (next !== "loans") setLoanId(null); }} first="everyday" />
                 </FormField>
-                <FormField label={t("fields.date")} htmlFor="log-date" errors={errors?.dueDate}>
+                <FormField label={t(loanId ? "fields.paidOn" : "fields.date")} htmlFor="log-date" errors={errors?.dueDate}>
                   <Input
                     id="log-date"
                     name="dueDate"
@@ -165,6 +181,13 @@ export function LogExpenseDialog({
                   />
                 </FormField>
               </div>
+
+              {category === "loans" && (
+                <FormField label={t("repayment.label")} htmlFor="log-loan" errors={errors?.earlyRepaymentForId}>
+                  <LoanRepaymentField id="log-loan" loans={loans} value={loanId} onChange={(next) => { setLoanId(next); if (next && method === "meal_voucher") setMethod("wire_transfer"); }}
+                    onPayAll={(amount) => { setAmountCents(amount); setAmountVersion((version) => version + 1); }} />
+                </FormField>
+              )}
 
               <FormField label={t("fields.shop")} htmlFor="log-shop" optionalLabel={tCommon("form.optional")} errors={errors?.shopId}>
                 <ShopPicker
@@ -200,7 +223,7 @@ export function LogExpenseDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {PAYMENT_METHODS.filter((value) => value !== "direct_debit").map((value) => (
+                    {PAYMENT_METHODS.filter((value) => value !== "direct_debit" && (!loanId || value !== "meal_voucher")).map((value) => (
                       <SelectItem key={value} value={value}>
                         {t(`methods.${value}`)}
                       </SelectItem>
@@ -215,7 +238,11 @@ export function LogExpenseDialog({
                 <div id="log-payer">
                   <PayerField
                     amountCents={amountCents}
+                    key={loanId ?? "none"}
                     habitants={habitants}
+                    defaultPayerType={loan?.payerType}
+                    defaultHabitantId={loan?.payerHabitantId}
+                    defaultShares={loan ? scaleShares(loan.shares, loan.amountCents, amountCents ?? 0) : undefined}
                     personOnly={method === "meal_voucher"}
                     meHabitantId={meHabitantId}
                     error={

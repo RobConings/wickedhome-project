@@ -309,6 +309,41 @@ request per POST, one JSON response (`GET`/`DELETE` answer 405). Methods: `initi
 2025-11-25, 2025-06-18, 2025-03-26; the instructions list the skills), `ping`, `tools/list` (every tool the
 token may use: MCP clients manage their own context), `tools/call`.
 
+- **Workflow knowledge**: `initialize` explains the app's relationships and the product → stock → recipe →
+  groceries flow. Write-tool descriptions point to their workflow guide. `skills_load` returns the actual
+  guides (up to three areas), and `app_help skill` returns a guide with callable tool names. These are the
+  same guides used by built-in chat, so MCP clients can learn every area's prerequisites and automatic effects.
+- **Groceries and cooking**: look up existing/relevant catalogue products and shared-stock alternatives,
+  check supply and existing groceries, then link the product. Missing products are created first.
+  `shopping_add_item` refuses unlinked additions by default; `unlinkedReason` allows a deliberate one-off
+  only when no matching catalogue product is found. `shopping_list` exposes product links and source
+  relationships; `shopping_update_item product` repairs an existing unlinked item. Catalogue reads expose
+  package sizes, stock-sharing alternatives and (in product details) actual webshop links.
+  For duplicate names, `shopping_list q` narrows the results and supplies unique row ids; pass the chosen
+  id as `item` to update/remove one row. Ambiguous entity errors also show candidate ids across all areas.
+  The UI combines default groceries and automatic replenishments; stock level is an independent filter,
+  not a mutually exclusive category. Custom lists keep their own identity.
+  Combine shops with `shopping_list shops`, or use a saved `shopGroup`. `shops_groups`,
+  `shops_save_group` and `shops_delete_group` manage household-wide combinations. Groups combine views;
+  product links, preferred shops, prices and stock remain attached to the original records.
+- **Product setup**: every addition should first use `inventory_prepare_product` to compare catalogue
+  matches and proactively search/read product pages. It returns exact source URLs, photo, known retailer,
+  euro price, barcode, package size and an `offer` token where possible. A supplied `url` works even when
+  server search is unavailable; a connected assistant can use its own search to find that URL. Offline
+  products and unsuccessful lookups are valid and explicitly reported. Research needs no extra permission.
+  `inventory_save_product` accepts `imageUrl` directly or copies verified metadata from `offer`, preserves
+  omitted fields, and checks the saved record again. Exact-name duplicate creations and link arguments
+  without a shop are refused. Results expose stored-field presence and missing details, including on
+  grocery additions and products created from recipe offers. A failed final read-back returns
+  `verification: pending`, so the assistant verifies the existing id instead of creating another record.
+  Ask grouped, targeted questions about uncertain identities, variants, package/unit, retailer or shared
+  stock. Use `inventory_link_alternative` for verified shared stock and `shops_save` for missing real
+  retailers. After the normal confirmation/write flow, read back and summarise filled fields, links and
+  unresolved gaps; never promise completeness by inventing optional online data.
+  `recipes_plan` defaults to adding missing groceries,
+  and refuses required unlinked ingredients until their product links are saved (explicitly skipped
+  ingredients and `buy: none` remain supported). Planning never consumes stock; actual cooking use does.
+
 - **Auth**, two equal ways: `Authorization: Bearer wh_mcp_…`, a personal token made on the Assistant card
   (stored as SHA-256, shown once, revocable), or an **OAuth 2.1** access token for ChatGPT/Claude connectors
   (dynamic registration or an owner's OAuth app, consent page, PKCE, rotating refresh tokens): see

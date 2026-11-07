@@ -18,6 +18,7 @@ import { addDays, todayIn } from "@/types/dates";
 import { StockItemFormDialog } from "../components/stock-item-form-dialog";
 import { StockItemRow } from "../components/stock-item-row";
 import { StockItemTile } from "../components/stock-item-tile";
+import { StocktakeDialog } from "../components/stocktake-dialog";
 import type { InventoryPageData } from "../data/inventory-loaders";
 import { useStockActions } from "../data/use-stock-actions";
 import { compareStock, type StockItem } from "../types/inventory";
@@ -39,7 +40,7 @@ export function InventoryScreen({ data, canManage, initialSelections, today = to
   const { products, places } = data;
   const revalidator = useRevalidator();
   const onChanged = React.useCallback(() => revalidator.revalidate(), [revalidator]);
-  const { adjust, isPending, show } = useStockActions({ onChanged });
+  const { adjust, isPending, show, confirmation } = useStockActions({ onChanged });
   // Quick −1 / +1 show at once (also in the counts and the "low" section) while they are saved.
   const stock = data.stock.map(show).sort(compareStock);
 
@@ -81,6 +82,7 @@ export function InventoryScreen({ data, canManage, initialSelections, today = to
 
   return (
     <PageContainer>
+      {confirmation}
       <PageHeader
         title={t("page.title")}
         description={t("page.description")}
@@ -93,6 +95,7 @@ export function InventoryScreen({ data, canManage, initialSelections, today = to
               </Link>
             </Button>
             {addButton}
+            {canManage && <StocktakeDialog items={stock} onChanged={onChanged} />}
             <Button asChild>
               <Link to="/inventory/scan">
                 <ScanBarcodeIcon />

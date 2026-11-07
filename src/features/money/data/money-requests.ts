@@ -3,6 +3,7 @@ import type {
   AccountCreateInput,
   AccountUpdateInput,
   ContributionPlan,
+  ContributionHistory,
   ContributionPlanInput,
   DirectPaymentInput,
   JointAccount,
@@ -23,6 +24,7 @@ const planPath = (id: string) => `/money/plans/${encodeURIComponent(id)}`;
 
 export const fetchMoneyMonth = (month?: string | null) => api.get<MoneyMonth>(month ? `/money?month=${encodeURIComponent(month)}` : "/money");
 export const fetchMoneySummary = () => api.get<MoneySummary>("/money/summary");
+export const fetchContributionHistory = () => api.get<ContributionHistory>("/money/contributions/history");
 export const fetchMoneyLoans = () => api.get<MoneyLoans>("/money/loans");
 /** Default range: 12 months back to 24 ahead (`YYYY-MM` bounds otherwise). */
 export const fetchMoneyTimeline = (range?: { from: string; to: string }) =>

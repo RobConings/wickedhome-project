@@ -37,6 +37,7 @@ export function ShopShoppingList({ shopId, limit, initialItems }: ShopShoppingLi
 
   return (
     <div className="flex flex-col gap-2">
+      {actions.confirmation}
       {visible.length === 0 ? (
         <p className="rounded-xl border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">{t("storeVisit.empty")}</p>
       ) : (

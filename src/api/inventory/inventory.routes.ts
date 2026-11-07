@@ -5,9 +5,10 @@ import {
   stockItemInputSchema,
   stockItemUpdateSchema,
   stockMovementInputSchema,
+  stockCountInputSchema,
 } from "@/features/inventory/types/inventory";
 import { idSchema } from "@/types/common";
-import { parse } from "../lib/http";
+import { badRequest, parse } from "../lib/http";
 import { currentUser, requireRole, requireUser } from "../lib/session";
 import {
   addMovement,
@@ -17,7 +18,11 @@ import {
   listStock,
   scanCode,
   updateStockItem,
+  setStockCount,
 } from "./inventory.service";
+
+import { stockPurchaseInputSchema } from "@/features/inventory/types/purchases";
+import { recordStockPurchase, purchaseReview } from "./purchases.service";
 
 export const inventoryRouter = Router();
 
@@ -44,6 +49,11 @@ inventoryRouter.put("/stock/:id", canManage, async (req, res) => {
   res.json(await updateStockItem(currentUser(req), id, input));
 });
 
+inventoryRouter.put("/stock/:id/count", canManage, async (req, res) => {
+  const id = parse(idSchema, req.params.id);
+  res.json(await setStockCount(currentUser(req), id, parse(stockCountInputSchema, req.body)));
+});
+
 inventoryRouter.delete("/stock/:id", canManage, async (req, res) => {
   const id = parse(idSchema, req.params.id);
   await deleteStockItem(currentUser(req).householdId, id);
@@ -53,7 +63,11 @@ inventoryRouter.delete("/stock/:id", canManage, async (req, res) => {
 inventoryRouter.post("/stock/:id/movements", async (req, res) => {
   const id = parse(idSchema, req.params.id);
   const input = parse(stockMovementInputSchema, req.body);
-  res.status(201).json(await addMovement(currentUser(req), id, input));
+  if (input.delta > 0 && (input.reason === "scan_add" || input.reason === "bought")) {
+    const purchase = parse(stockPurchaseInputSchema, req.body.purchase);
+    if (purchase.quantity !== input.delta) throw badRequest("Purchase amount must match the movement");
+    res.json(await recordStockPurchase(currentUser(req), id, purchase));
+  } else res.status(201).json(await addMovement(currentUser(req), id, input));
 });
 
 inventoryRouter.get("/products/:productId", async (req, res) => {
@@ -64,4 +78,11 @@ inventoryRouter.get("/products/:productId", async (req, res) => {
 inventoryRouter.get("/scan", async (req, res) => {
   const { code } = parse(scanQuerySchema, req.query);
   res.json(await scanCode(currentUser(req).householdId, code));
+});
+
+inventoryRouter.get("/stock/:id/purchases", async (req, res) => {
+  res.json(await purchaseReview(currentUser(req).householdId, parse(idSchema, req.params.id)));
+});
+inventoryRouter.post("/stock/:id/purchases", async (req, res) => {
+  res.json(await recordStockPurchase(currentUser(req), parse(idSchema, req.params.id), parse(stockPurchaseInputSchema, req.body)));
 });

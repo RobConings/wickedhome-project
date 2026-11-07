@@ -74,6 +74,10 @@ export async function generateInstances(
   from: string,
   to: string,
 ): Promise<string[]> {
+  // Top-ups and extra repayments must read the balance and generate under the same loan lock.
+  if (recurring.totalOpenCents) {
+    await tx.recurringExpense.update({ where: { id: recurring.id }, data: { updatedAt: new Date() } });
+  }
   const end = recurring.endDate ? fromDate(recurring.endDate) : null;
   let until = end && end < to ? end : to;
   const plan = await totalOpenPlanFor(tx, recurring, from);
@@ -83,11 +87,11 @@ export async function generateInstances(
     until = !last ? addDays(from, -1) : last < until ? last : until;
   }
   const rule = plan ? baseRuleOf(recurring.rrule) : parseRRule(recurring.rrule, EXPENSE_RRULE_SUPPORT);
-  const dates =
-    rule && from <= until
-      ? expandRRule(rule, fromDate(recurring.startDate), { from, to: until, limit: 500, monthEnd: EXPENSE_MONTH_END })
-      : [];
   const amountOn = new Map(plan?.payments.map((payment) => [payment.dueDate, payment.amountCents]));
+  const dates = rule && from <= until
+    ? expandRRule(rule, fromDate(recurring.startDate), { from, to: until, limit: 500, monthEnd: EXPENSE_MONTH_END })
+      .filter((date) => !plan || (recurring.totalOpenAsOf && date < fromDate(recurring.totalOpenAsOf)) || amountOn.has(date))
+    : [];
   let createdIds: string[] = [];
 
   if (dates.length > 0) {
@@ -142,8 +146,8 @@ async function totalOpenPlanFor(tx: Prisma.TransactionClient, recurring: Recurri
   if (!recurring.totalOpenCents || !recurring.totalOpenAsOf) return null;
   const asOf = fromDate(recurring.totalOpenAsOf);
   const settled = await tx.expense.findMany({
-    where: { recurringExpenseId: recurring.id, dueDate: { gte: recurring.totalOpenAsOf } },
-    select: { dueDate: true, amountCents: true },
+    where: { OR: [{ recurringExpenseId: recurring.id }, { earlyRepaymentForId: recurring.id, paidOn: { not: null } }], dueDate: { gte: recurring.totalOpenAsOf } },
+    select: { dueDate: true, amountCents: true, earlyRepaymentForId: true },
   });
   return planTotalOpen({
     amountCents: recurring.amountCents,
@@ -152,7 +156,7 @@ async function totalOpenPlanFor(tx: Prisma.TransactionClient, recurring: Recurri
     rrule: recurring.rrule,
     startDate: fromDate(recurring.startDate),
     from,
-    settled: settled.map((row) => ({ dueDate: fromDate(row.dueDate), amountCents: row.amountCents })),
+    settled: settled.map((row) => ({ dueDate: fromDate(row.dueDate), amountCents: row.amountCents, earlyRepayment: Boolean(row.earlyRepaymentForId) })),
   });
 }
 
@@ -167,12 +171,14 @@ export async function loadInstancesForProgress(
   const result = new Map<string, InstanceForProgress[]>(loans.map((row) => [row.id, []]));
   if (loans.length === 0) return result;
   const instances = await db.expense.findMany({
-    where: { recurringExpenseId: { in: loans.map((row) => row.id) } },
-    select: { recurringExpenseId: true, dueDate: true, amountCents: true, paidOn: true },
+    where: { OR: [{ recurringExpenseId: { in: loans.map((row) => row.id) } }, { earlyRepaymentForId: { in: loans.map((row) => row.id) }, paidOn: { not: null } }] },
+    select: { recurringExpenseId: true, earlyRepaymentForId: true, dueDate: true, amountCents: true, paidOn: true },
   });
   for (const instance of instances) {
-    if (!instance.recurringExpenseId) continue;
-    result.get(instance.recurringExpenseId)?.push({
+    const id = instance.recurringExpenseId ?? instance.earlyRepaymentForId;
+    if (!id) continue;
+    result.get(id)?.push({
+      earlyRepayment: Boolean(instance.earlyRepaymentForId),
       dueDate: fromDate(instance.dueDate),
       amountCents: instance.amountCents,
       paid: instance.paidOn !== null,

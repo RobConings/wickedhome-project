@@ -205,7 +205,7 @@ function errorMessage(error: unknown, toolName: string): string {
   }
   console.error(`Assistant tool "${toolName}" failed`, error);
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    const cause: Record<string, string> = {
+    const causes: Record<string, string> = {
       P2002: "A record with the same unique value already exists",
       P2003: "A referenced record is missing or still in use",
       P2025: "A required record no longer exists",
@@ -213,7 +213,7 @@ function errorMessage(error: unknown, toolName: string): string {
       P2028: "The database transaction could not complete",
       P2034: "The database transaction conflicted with another change",
     };
-    return `${cause[error.code] ?? "A database operation failed"} (Prisma ${error.code}, tool ${toolName}). Check the current data before retrying; the server logs contain the technical cause.`;
+    return `${causes[error.code] ?? "A database operation failed"} (Prisma ${error.code}, tool ${toolName}). Check the current data before retrying; the server logs contain the technical cause.`;
   }
   return "The action failed because of an error in the app";
 }

@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { stockPurchaseInputSchema } from "@/types/stock-purchase";
+const purchaseDecisionSchema = stockPurchaseInputSchema.pick({ existingPurchaseIds: true, separatePurchaseConfirmed: true, countDisposition: true });
 import { idSchema, isoDateSchema } from "@/types/common";
 import type { ProjectRef } from "@/types/projects";
 import type { ShopRef } from "@/types/shops";
@@ -158,6 +160,7 @@ export type ShoppingItemCreateInput = z.infer<typeof shoppingItemCreateSchema>;
 
 /** Body of `PATCH /api/shopping/items/:id`: only the given fields change. */
 export const shoppingItemUpdateSchema = z.object({
+  purchaseDecision: purchaseDecisionSchema.optional(),
   name: nameSchema.optional(),
   productId: idSchema.nullable().optional(),
   quantity: quantitySchema.optional(),
@@ -204,11 +207,11 @@ export function editToUpdate(input: ShoppingItemEditInput): ShoppingItemUpdateIn
 }
 
 /** Estimated cost of items: price × quantity of those with a price, and how many have none. */
-export function estimateTotal(items: readonly Pick<ShoppingItem, "priceCents" | "quantity">[]): { cents: number; priced: number; unpriced: number } {
+export function estimateTotal(items: readonly Pick<ShoppingItem, "priceCents" | "quantity" | "amounts">[]): { cents: number; priced: number; unpriced: number } {
   let cents = 0;
   let priced = 0;
   for (const item of items) {
-    if (item.priceCents === null) continue;
+    if (item.priceCents === null || item.amounts) continue;
     cents += Math.round(item.priceCents * item.quantity);
     priced += 1;
   }
@@ -346,7 +349,15 @@ export type ShoppingItem = {
   alternatives: ShoppingItemAlternative[];
   /** The meal on the "To cook" list it was added for (source `recipe`, recipes feature), while that meal exists. */
   recipe?: { entryId: string; recipeId: string; name: string } | null;
+  /** Independent reasons for this one buying position. Actions on any member id affect the whole position. */
+  requirements?: ShoppingRequirement[];
+  /** Present when old amounts cannot be converted safely; show all amounts on the same row. */
+  amounts?: { quantity: number; unit: string | null }[];
 };
+
+export type ShoppingRequirement = Pick<ShoppingItem,
+  "id" | "listId" | "listName" | "source" | "quantity" | "unit" | "taskId" | "project" | "recipe" | "placeId" | "placeName" | "note"
+>;
 
 /** Another product of the item's group: buying that one does as well. */
 export type ShoppingItemAlternative = {
@@ -412,6 +423,7 @@ export type RestockSuggestion = {
 
 /** Body of `POST /api/shopping/items/:id/restock`. */
 export const restockInputSchema = z.object({
+  purchaseDecision: purchaseDecisionSchema.optional(),
   stockItemId: idSchema,
   quantity: quantitySchema,
 });
@@ -422,6 +434,7 @@ export type ShoppingItemUpdateResult = {
   item: ShoppingItem;
   /** Set when the item was just marked bought and its product is kept in stock somewhere. */
   restock: RestockSuggestion | null;
+  stock?: { purchaseIds: string[]; repeated: boolean; added: number } | null;
 };
 
 // Helpers shared by the API and the UI -------------------------------------------------------------------

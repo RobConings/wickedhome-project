@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ArrowLeftIcon, ExternalLinkIcon, PauseIcon, PencilIcon, PlayIcon, SquareIcon, Trash2Icon } from "lucide-react";
+import { ArrowLeftIcon, ExternalLinkIcon, HandCoinsIcon, PauseIcon, PencilIcon, PlayIcon, SquareIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher } from "react-router";
 import { toast } from "sonner";
@@ -22,6 +22,7 @@ import { ExpenseFormDialog, type ExpenseProjectField } from "../components/expen
 import { ExpenseProjectChip } from "../components/expense-project-chip";
 import { RecurringStatusBadge } from "../components/expense-status-badge";
 import { CopyableValue, PaymentQrCard } from "../components/payment-qr-card";
+import { LogExpenseDialog } from "../components/log-expense-dialog";
 import { TotalOpenProgressBar } from "../components/total-open-progress";
 import { useRecurrenceSummary } from "../components/use-expense-text";
 import type { ExpenseActionResult } from "../data/expenses-loaders";
@@ -65,6 +66,10 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
 
   const actions = canManage && (
     <>
+      {recurring.status !== "ended" && (recurring.kind === "loan" || recurring.kind === "down_payment" || recurring.totalOpen) && recurring.totalOpen?.remainingCents !== 0 && (
+        <LogExpenseDialog habitants={habitants} shops={shops} today={today} loans={[recurring]} defaultLoanId={recurring.id}
+          projectId={recurring.project?.id} trigger={<Button><HandCoinsIcon />{t("repayment.record")}</Button>} />
+      )}
       <ExpenseFormDialog
         recurring={recurring}
         habitants={habitants}

@@ -1,12 +1,11 @@
-- One kind of expense: a one-off bill, or a payment of a recurring expense (subscription, loan, afbetaling, insurance).
-- Payer: joint account (default), one person, or split equally. Meal vouchers are always the person's own.
-- Domiciliëring = direct_debit: paid automatically on the due date, never tell people to pay it. Overschrijving = wire_transfer.
-- "Wat moeten we deze week betalen?" → `expenses_due` (person or joint to filter). Snapshot line "Bills due" answers simple cases.
-- "Hoe betaal ik Fluvius?" → `expenses_details`: give IBAN and gestructureerde mededeling (OGM) exactly as returned. "not recorded" means unknown: say so, never invent one.
-- "Ik heb 45 euro uitgegeven bij Delhaize" → `expenses_log` (already paid). A bill still to pay → `expenses_add`; recurring: repeat + kind; "via domiciliëring" → paymentMethod direct_debit; a loan with "nog 10.000 open" → totalOpen (the last payment is the rest).
-- "Fluvius is betaald" → `expenses_mark_paid`; "toch niet betaald" → paid false.
-- Price change "from now on" → `expenses_edit` with recurring; one bill → expense. Pause/stop a subscription: edit status paused/ended.
-- Disputed bill: `expenses_hold` with a reason.
-- Names: a payee names its next unpaid bill; add a date (dd/mm) for another payment.
-- `expenses_list`: recurring (with loan progress, monthly totals) or a month's paid history per category.
-- Every change shows a confirmation card; owners and adults only.
+- Expenses are one-off bills or recurring payments (subscriptions, loans, afbetalingen).
+- Payer: joint account or a person; splits are supported by add/edit. Meal vouchers belong to a person.
+- Domiciliëring = direct_debit: paid automatically; never tell people to pay it. Overschrijving = wire_transfer.
+- Bills due → `expenses_due`, optionally person/joint. Payment instructions → `expenses_details`: use recorded IBAN/OGM only; "not recorded" means unknown.
+- Already spent → `expenses_log`; unpaid bill → `expenses_add`. Recurring: repeat + kind; loan balance: totalOpen.
+- Extra aflossing/early repayment → `expenses_log` with loan + exact amount paid. Full payoff: read `expenses_details` recurring, then use remainingAmount. Never edit totalOpen to record payment.
+- Repayments are expenses: history/details give their ids. Correct/delete/undo via `expenses_edit`, `expenses_delete`, `expenses_mark_paid` paid false with that expense id; the loan recalculates.
+- Regular bill paid → `expenses_mark_paid`; bounced → paid false. Payee alone means its next unpaid bill; add a date for another.
+- Price change or pause/end → `expenses_edit` recurring; one expense → expense. Disputed → `expenses_hold` + reason.
+- `expenses_list`: recurring costs/loan balances or monthly paid history by category.
+- Every change requires confirmation; owners/adults only.

@@ -6,5 +6,5 @@
 - Someone transferred too much → `money_settle` take_back or keep_extra; paying each other directly → direct_payment.
 - New monthly amount "vanaf november 1.600" → `money_plan`.
 - Interest or bank costs → `money_add_entry`. A wrong line → `money_history` for its id, then `money_delete_entry`.
-- Loans: `money_loans` (still open, payments to go). Months ahead or past: `money_timeline`.
+- Loans: `money_loans` (still open, payments to go); repayments: `expenses_log` loan + amount. Months ahead or past: `money_timeline`.
 - Meal vouchers never count here. Changes always ask for confirmation; adults only.

@@ -76,9 +76,10 @@ shoppingRouter.patch("/items/:id", async (req, res) => {
   const id = parse(idSchema, req.params.id);
   const input = parse(shoppingItemUpdateSchema, req.body);
   const user = currentUser(req);
-  const { item, justBought } = await updateItem(user, id, input);
-  const restock = justBought ? await findRestockTarget(user.householdId, item) : null;
-  res.json({ item, restock } satisfies ShoppingItemUpdateResult);
+  const { item } = await updateItem(user, id, input);
+  const restock = input.status === "bought" ? await findRestockTarget(user.householdId, item) : null;
+  const stockResult = restock ? await restockFromShoppingItem(user, item.id, { ...restock, purchaseDecision: input.purchaseDecision }) : null;
+  res.json({ item, restock, stock: stockResult?.purchase ?? null } satisfies ShoppingItemUpdateResult);
 });
 
 shoppingRouter.delete("/items/:id", async (req, res) => {

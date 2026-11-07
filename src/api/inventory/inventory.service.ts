@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import type { SessionUser } from "@/features/auth/types/auth";
 import {
   compareStock,
@@ -12,10 +13,14 @@ import {
   type StockMovement,
   type StockMovementInput,
   type StockMovementReason,
+  type StockCountInput,
 } from "@/features/inventory/types/inventory";
 import type { ProductCategory, RestockInput, RestockSuggestion, ShoppingItem } from "@/features/shopping/types/shopping";
 import { convertAmount, normalizeUnit } from "@/types/units";
 import { db, type ProductCategory as ProductCategoryRow, type Prisma, type StockMovementReason as ReasonRow } from "../lib/db";
+import { shoppingAmount } from "@/features/shopping/types/shopping-product-rows";
+import { preparePurchase, recordShoppingPurchase, type PurchaseContext } from "./purchases.service";
+import { nextShoppingRestockState } from "@/features/shopping/types/shopping-restock";
 import { badRequest, conflict, notFound } from "../lib/http";
 import { ensureLowStockItem, findProductByCode, getItem, stockOwnerId } from "../shopping/shopping.service";
 import { lockStock } from "./stock-lock";
@@ -40,7 +45,7 @@ const round = (value: number) => Math.round(value * 1000) / 1000;
 const fromCategory = (category: ProductCategory) => category.toUpperCase() as ProductCategoryRow;
 
 const stockInclude = {
-  product: { select: { name: true, unit: true } },
+  product: { select: { name: true, unit: true, shoppingRestockState: true } },
   place: { select: { name: true } },
 } as const;
 type StockRow = Prisma.StockItemGetPayload<{ include: typeof stockInclude }>;
@@ -85,6 +90,9 @@ async function assertRefs(householdId: string, productId: string, placeId: strin
 type Actor = Pick<SessionUser, "id" | "householdId" | "locale">;
 
 type ChangeExtra = {
+  expectedUpdatedAt?: Date;
+  counted?: boolean;
+  purchase?: PurchaseContext;
   note?: string | null;
   shoppingItemId?: string;
   /** The meal being cooked, for `cooked` movements (recipes feature). */
@@ -104,17 +112,47 @@ async function applyChangeLogged(
   delta: number,
   reason: StockMovementReason,
   extra: ChangeExtra = {},
-): Promise<StockChangeResult & { movementId: string | null; applied: number }> {
-  let movementId: string | null = null;
+): Promise<StockChangeResult & { movementId: string | null; applied: number; purchase?: { purchaseIds: string[]; repeated: boolean; added: number } }> {
   let applied = 0;
+  let movementId: string | null = null;
+  let purchaseResult: { purchaseIds: string[]; repeated: boolean } | undefined;
   const updated = await db.$transaction(async (tx) => {
     await lockStock(tx, actor.householdId);
-    const current = await tx.stockItem.findFirst({ where: { id: row.id, householdId: actor.householdId } });
-    if (!current) throw notFound("Stock item not found");
-    const before = current.quantity.toNumber();
+    if (extra.purchase) {
+      await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${actor.householdId + ":" + extra.purchase.sourceKey}, 0))`;
+      // Scans/receipts of a shared product at different locations must see each other's acquisitions.
+      await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${actor.householdId + ":product:" + row.productId}, 0))`;
+    }
+    if (!extra.expectedUpdatedAt) {
+      // A scan arriving during a count must add to the latest total, not overwrite it from an old read.
+      await tx.$queryRaw`SELECT "id" FROM "stock_items" WHERE "id" = ${row.id} AND "householdId" = ${actor.householdId} FOR UPDATE`;
+      row = await tx.stockItem.findFirstOrThrow({ where: { id: row.id, householdId: actor.householdId }, include: stockInclude });
+    }
+    if (extra.purchase) {
+      const prepared = await preparePurchase(tx, actor, { ...row, unit: row.unit ?? row.product.unit }, extra.purchase);
+      delta = prepared.delta;
+      purchaseResult = prepared;
+      if (delta === 0) return row;
+    }
+    const before = row.quantity.toNumber();
     const after = round(Math.max(0, before + delta));
     applied = round(after - before);
-    const next = await tx.stockItem.update({ where: { id: row.id }, data: { quantity: after }, include: stockInclude });
+    let next: StockRow;
+    if (extra.expectedUpdatedAt) {
+      const saved = await tx.stockItem.updateMany({
+        where: { id: row.id, householdId: actor.householdId, updatedAt: extra.expectedUpdatedAt }, data: { quantity: after, ...(extra.counted && { lastCountedAt: new Date() }) },
+      });
+      if (!saved.count) throw conflict("Stock changed during counting. Refresh and check the counted quantity again.");
+      next = await tx.stockItem.findFirstOrThrow({ where: { id: row.id, householdId: actor.householdId }, include: stockInclude });
+    } else next = await tx.stockItem.update({ where: { id: row.id }, data: { quantity: after }, include: stockInclude });
+    const state = row.product.shoppingRestockState ?? "ACTIVE";
+    const nextState = nextShoppingRestockState(state, applied);
+    if (nextState !== state) {
+      await tx.product.updateMany({
+        where: { id: row.productId, householdId: actor.householdId, shoppingRestockState: state },
+        data: { shoppingRestockState: nextState },
+      });
+    }
     if (applied !== 0) {
       const movement = await tx.stockMovement.create({
         data: {
@@ -134,7 +172,7 @@ async function applyChangeLogged(
     return next;
   });
 
-  return { ...(await checkLowStock(actor, updated)), movementId, applied };
+  return { ...(await checkLowStock(actor, updated)), movementId, applied, ...(purchaseResult && { purchase: { ...purchaseResult, added: applied } }) };
 }
 
 /** Checks the current stock, including creation and edits that only change the minimum. */
@@ -274,6 +312,7 @@ export async function createStockItem(actor: Actor, input: StockItemInput): Prom
       productId,
       placeId: input.placeId,
       quantity: 0,
+      lastCountedAt: new Date(),
       unit: input.unit || null,
       minQuantity: input.minQuantity ?? null,
       expiresOn: input.expiresOn ? toDate(input.expiresOn) : null,
@@ -285,7 +324,7 @@ export async function createStockItem(actor: Actor, input: StockItemInput): Prom
 }
 
 export async function updateStockItem(actor: Actor, id: string, input: StockItemUpdateInput): Promise<StockChangeResult> {
-  const row = await findOwnStock(actor.householdId, id);
+  await findOwnStock(actor.householdId, id);
   const updated = await db.stockItem.update({
     where: { id },
     data: {
@@ -295,9 +334,18 @@ export async function updateStockItem(actor: Actor, id: string, input: StockItem
     },
     include: stockInclude,
   });
-  const delta = round(input.quantity - row.quantity.toNumber());
-  if (delta !== 0) return applyChange(actor, updated, delta, "manual_correction");
+  if (input.quantity !== updated.quantity.toNumber()) return setStockCount(actor, id, { quantity: input.quantity, expectedUpdatedAt: updated.updatedAt.toISOString() });
   return checkLowStock(actor, updated);
+}
+
+/** Replace only the actual quantity. Retrying the same count never adds it a second time. */
+export async function setStockCount(actor: Actor, id: string, input: StockCountInput): Promise<StockChangeResult> {
+  const row = await findOwnStock(actor.householdId, id);
+  if (row.quantity.toNumber() !== input.quantity && row.updatedAt.toISOString() !== input.expectedUpdatedAt) throw conflict("Stock changed during counting. Refresh and check the counted quantity again.");
+  return applyChange(actor, row, round(input.quantity - row.quantity.toNumber()), "manual_correction", {
+    expectedUpdatedAt: row.updatedAt, counted: true,
+    note: input.note ?? (actor.locale === "nl" ? "Voorraadtelling" : "Stock count"),
+  });
 }
 
 export async function deleteStockItem(householdId: string, id: string): Promise<void> {
@@ -323,6 +371,7 @@ export type RecordPurchaseLine = {
  * retained as a BOUGHT movement; a unit that conflicts with the product's existing stock unit is refused.
  */
 export async function recordPurchases(actor: Actor, lines: RecordPurchaseLine[], receiptImageId?: string, note?: string): Promise<StockItem[]> {
+  const batchId = randomUUID();
   const saved = await db.$transaction(async (tx) => {
     await lockStock(tx, actor.householdId);
     if (receiptImageId) {
@@ -338,7 +387,7 @@ export async function recordPurchases(actor: Actor, lines: RecordPurchaseLine[],
     }
 
     const changed: { stockItemId: string; product: string }[] = [];
-    for (const line of lines) {
+    for (const [index, line] of lines.entries()) {
       const place = await tx.place.findFirst({
         where: { id: line.placeId, householdId: actor.householdId },
         select: { id: true },
@@ -396,16 +445,29 @@ export async function recordPurchases(actor: Actor, lines: RecordPurchaseLine[],
         });
       }
 
+      const reference = `${batchId}:${index}`;
+      const purchase = await preparePurchase(tx, actor, { ...stockItem, unit: stockItem.unit ?? stockItem.product.unit }, {
+        quantity,
+        source: { kind: "manual", reference },
+        sourceKey: `manual:${reference}`,
+        note,
+      });
       const updated = await tx.stockItem.update({
         where: { id: stockItem.id },
-        data: { quantity: { increment: quantity } },
+        data: { quantity: round(stockItem.quantity.toNumber() + purchase.delta) },
         include: stockInclude,
+      });
+      const state = stockItem.product.shoppingRestockState ?? "ACTIVE";
+      const nextState = nextShoppingRestockState(state, purchase.delta);
+      if (nextState !== state) await tx.product.updateMany({
+        where: { id: stockItem.productId, householdId: actor.householdId, shoppingRestockState: state },
+        data: { shoppingRestockState: nextState },
       });
       await tx.stockMovement.create({
         data: {
           householdId: actor.householdId,
           stockItemId: updated.id,
-          delta: quantity,
+          delta: purchase.delta,
           quantityAfter: updated.quantity,
           reason: "BOUGHT",
           userId: actor.id,
@@ -427,6 +489,12 @@ export async function recordPurchases(actor: Actor, lines: RecordPurchaseLine[],
   return saved.map(({ stockItemId }) => byId.get(stockItemId)!).filter(Boolean);
 }
 
+/** Acquisition and evidence are committed atomically with the stock movement. */
+export async function applyPurchaseChange(actor: Actor, id: string, purchase: PurchaseContext) {
+  const row = await findOwnStock(actor.householdId, id);
+  return applyChangeLogged(actor, row, purchase.quantity, "bought", { shoppingItemId: purchase.shoppingItemId, note: purchase.note, purchase });
+}
+
 // Shopping → stock ---------------------------------------------------------------------------------------
 
 /**
@@ -435,30 +503,30 @@ export async function recordPurchases(actor: Actor, lines: RecordPurchaseLine[],
  * stock it shares (listStock resolves the owner).
  */
 export async function findRestockTarget(householdId: string, item: ShoppingItem): Promise<RestockSuggestion | null> {
-  if (!item.productId) return null;
+  if (!item.productId || item.amounts) return null;
   const stock = await listStock(householdId, { productId: item.productId });
-  const target =
-    stock.find((candidate) => candidate.placeId === item.placeId) ??
-    [...stock].sort((a, b) => a.quantity - (a.minQuantity ?? 0) - (b.quantity - (b.minQuantity ?? 0)))[0];
+  // A guessed location silently puts goods in the wrong cupboard. Only a known/sole location is automatic.
+  const target = stock.find((candidate) => candidate.placeId === item.placeId) ?? (stock.length === 1 ? stock[0] : undefined);
   if (!target) return null;
-  return {
-    stockItemId: target.id,
-    placeId: target.placeId,
-    placeName: target.placeName,
-    quantity: item.quantity,
-    unit: item.unit ?? target.unit,
-  };
+  const product = await db.product.findFirst({ where: { id: item.productId, householdId }, select: { unit: true, packageAmount: true, packageUnit: true } });
+  const quantity = shoppingAmount(item.quantity, item.unit, target.unit, product ? { ...product, packageAmount: product.packageAmount?.toNumber() ?? null } : undefined);
+  if (quantity === null) return null;
+  return { stockItemId: target.id, placeId: target.placeId, placeName: target.placeName, quantity, unit: target.unit };
 }
 
 export async function restockFromShoppingItem(actor: Actor, shoppingItemId: string, input: RestockInput) {
   const item = await getItem(actor.householdId, shoppingItemId);
+  if (item.status !== "bought" || !item.productId || item.amounts) throw badRequest("Mark a linked product with a verified amount as bought first");
   const row = await findOwnStock(actor.householdId, input.stockItemId);
   // Any product of the group may restock the shared stock: compare stock owners.
   const owner = item.productId ? await ownerOrNull(actor.householdId, item.productId) : null;
   if (item.productId && owner !== row.productId) {
     throw badRequest("Validation failed", { stockItemId: ["This stock item holds another product"] });
   }
-  return applyChange(actor, row, input.quantity, "bought", { shoppingItemId });
+  const product = await db.product.findFirst({ where: { id: item.productId, householdId: actor.householdId }, select: { unit: true, packageAmount: true, packageUnit: true } });
+  const verified = shoppingAmount(item.quantity, item.unit, row.unit ?? row.product.unit, product ? { ...product, packageAmount: product.packageAmount?.toNumber() ?? null } : undefined);
+  if (verified === null || verified !== input.quantity) throw badRequest("Verify the purchased quantity in the stock location's unit before adding it");
+  return recordShoppingPurchase(actor, shoppingItemId, row.id, input.quantity, item.shopId, item.boughtAt ?? undefined, input.purchaseDecision);
 }
 
 // Recipes → stock ----------------------------------------------------------------------------------------

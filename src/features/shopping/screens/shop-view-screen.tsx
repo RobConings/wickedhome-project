@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ArrowLeftIcon, CircleHelpIcon, PartyPopperIcon, RefreshCwIcon, SearchXIcon, StoreIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useRevalidator } from "react-router";
+import { Link, useNavigate, useRevalidator, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
@@ -15,14 +15,15 @@ import { ShopLogo } from "@/features/shops";
 import { formatCurrency } from "@/lib/format";
 import { currentLocale } from "@/lib/i18n";
 import type { UseSelectionsOptions } from "@/lib/selections";
-import { AddShoppingItemForm, type AddShoppingItemInput } from "../components/add-shopping-item-form";
+import type { AddShoppingItemInput } from "../components/add-shopping-item-form";
+import { AddShoppingItemDialog } from "../components/add-shopping-item-dialog";
 import { ProductCategoryIcon } from "../components/product-category-icon";
 import {
   NO_SHOP_VIEW_FILTERS,
   SHOP_VIEW_SORTS,
   filterShopViewItems,
   groupShopViewItems,
-  isShopKey,
+  itemsForShops,
   type ShopViewFilters,
   type ShopViewSort,
 } from "../components/shopping-grouping";
@@ -31,6 +32,9 @@ import { ShopSummaryList } from "../components/shop-summary-list";
 import { ShoppingItemFormDialog } from "../components/shopping-item-form-dialog";
 import { ShoppingItemList } from "../components/shopping-item-list";
 import { ShoppingGuidance } from "../components/shopping-guidance";
+import { ShopViewSelection } from "../components/shop-view-selection";
+import { shoppingListViews } from "../types/shopping-list-views";
+import { shoppingItemListIds } from "../types/shopping-product-rows";
 import type { ShoppingPageData } from "../data/shopping-loaders";
 import { createShoppingItem } from "../data/shopping-requests";
 import { LIVE_REFRESH_MS, useLiveRevalidation } from "../data/use-live-shopping";
@@ -41,6 +45,7 @@ type ShopViewScreenProps = {
   data: ShoppingPageData;
   /** A shop id, `none` for items without a shop, or null to choose a shop first. */
   shopKey: string | null;
+  canManage?: boolean;
   initialSelections?: { products?: UseSelectionsOptions["initial"]; shops?: UseSelectionsOptions["initial"] };
   previewLink?: (url: string) => Promise<LinkPreview>;
   /** Refresh interval in ms; `null` turns polling off (stories). */
@@ -54,12 +59,21 @@ type ShopViewScreenProps = {
 export function ShopViewScreen({
   data,
   shopKey,
+  canManage = false,
   initialSelections,
   previewLink,
   refreshIntervalMs = LIVE_REFRESH_MS,
 }: ShopViewScreenProps) {
   const { t } = useTranslation("shopping");
   const { overview, shops, products } = data;
+  const groups = data.shopGroups ?? [];
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const activeGroup = groups.find((group) => group.id === searchParams.get("group"));
+  const availableKeys = new Set([NO_SHOP, ...shops.map((shop) => shop.id)]);
+  const selectedKeys = [...new Set(activeGroup?.shopIds ?? [...(shopKey ? [shopKey] : []), ...searchParams.getAll("shop")])].filter((key) => availableKeys.has(key));
+  const hasSelection = selectedKeys.length > 0;
+  const combined = selectedKeys.length > 1;
   const revalidator = useRevalidator();
   useLiveRevalidation(refreshIntervalMs);
   const revalidate = React.useCallback(() => void revalidator.revalidate(), [revalidator]);
@@ -73,20 +87,31 @@ export function ShopViewScreen({
     storeSort(next);
   };
 
-  const shop = shopKey && shopKey !== NO_SHOP ? (shops.find((candidate) => candidate.id === shopKey) ?? null) : null;
-  const here = shopKey ? actions.items.filter((item) => isShopKey(shopKey, item)) : [];
+  const shop = selectedKeys.length === 1 && selectedKeys[0] !== NO_SHOP ? (shops.find((candidate) => candidate.id === selectedKeys[0]) ?? null) : null;
+  const here = itemsForShops(actions.items, selectedKeys);
   const open = here.filter((item) => item.status === "open");
   const bought = here.filter((item) => item.status === "bought");
   const fallbackName = here.find((item) => item.shop)?.shop?.name;
   // What is still to buy here would cost about this much (items without a price are counted apart).
   const estimate = estimateTotal(open);
   const categories = PRODUCT_CATEGORIES.filter((category) => open.some((item) => (item.category ?? "other") === category));
-  const lists = [...new Map(open.map((item) => [item.listId, { id: item.listId, name: item.listName }])).values()].sort((a, b) =>
-    a.name.localeCompare(b.name),
-  );
-  const visibleOpen = filterShopViewItems(open, filters);
-  const visibleBought = filterShopViewItems(bought, filters);
-  const title = shopKey === NO_SHOP ? t("shops.noShop") : (shop?.name ?? fallbackName ?? t("shopView.title"));
+  const lists = shoppingListViews(overview.lists, t("listKinds.groceries")).filter((list) => open.some((item) => shoppingItemListIds(item).some((id) => list.listIds.includes(id))));
+  const activeList = lists.find((list) => list.id === filters.listId);
+  const filterItems = (items: ShoppingItem[]) => filterShopViewItems(items, { ...filters, listId: "all" })
+    .filter((item) => !activeList || shoppingItemListIds(item).some((id) => activeList.listIds.includes(id)));
+  const visibleOpen = filterItems(open);
+  const visibleBought = filterItems(bought);
+  const title = activeGroup?.name ?? (combined
+    ? selectedKeys.map((key) => shops.find((candidate) => candidate.id === key)?.name ?? t("shops.noShop")).join(" + ")
+    : selectedKeys[0] === NO_SHOP ? t("shops.noShop") : (shop?.name ?? fallbackName ?? t("shopView.title")));
+
+  const selectShops = (keys: string[]) => {
+    const params = new URLSearchParams();
+    keys.forEach((key) => params.append("shop", key));
+    void navigate(`/shopping/shops?${params}`);
+  };
+  const selectGroup = (id: string) => void navigate(`/shopping/shops?group=${encodeURIComponent(id)}`);
+  const selection = <ShopViewSelection compact={hasSelection} shops={shops} groups={groups} selectedKeys={selectedKeys} activeGroupId={activeGroup?.id} canManage={canManage} onSelect={selectShops} onSelectGroup={selectGroup} onSaved={async () => { await revalidator.revalidate(); }} />;
 
   async function add(input: AddShoppingItemInput) {
     try {
@@ -98,22 +123,34 @@ export function ShopViewScreen({
     }
   }
 
+  const addAction = <AddShoppingItemDialog
+    key={selectedKeys.join("|")}
+    products={products}
+    shops={shops}
+    onAdd={add}
+    fixedShopId={shop?.id}
+    previewLink={previewLink}
+    initialSelections={initialSelections}
+  />;
+
   const back = (
-    <Link to={shopKey ? "/shopping/shops" : "/shopping"} className="inline-flex items-center gap-1 hover:underline">
+    <Link to={hasSelection ? "/shopping/shops" : "/shopping"} className="inline-flex items-center gap-1 hover:underline">
       <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-      {shopKey ? t("shopView.title") : t("actions.backToShopping")}
+      {hasSelection ? t("shopView.title") : t("actions.backToShopping")}
     </Link>
   );
 
-  if (!shopKey) {
+  if (!hasSelection) {
     const anything = actions.items.some((item) => item.status === "open");
     return (
-      <PageContainer>
-        <PageHeader eyebrow={back} title={t("shopView.title")} description={t("shopView.description")} />
+      <PageContainer className="gap-4 px-3 py-4 sm:gap-6 sm:px-6 sm:py-8 lg:px-8">
+      {actions.confirmation}
+        <PageHeader eyebrow={back} title={t("shopView.title")} description={t("shopView.description")} actions={addAction} />
+        <div className="mb-6 max-w-xl">{selection}</div>
         {anything ? (
           <Card className="max-w-xl">
             <CardTitle>{t("shopView.chooseShop")}</CardTitle>
-            <ShopSummaryList items={actions.items} shops={shops} className="-mx-2" />
+            <ShopSummaryList items={actions.items} shops={shops} savedGroups={groups} className="-mx-2" />
           </Card>
         ) : (
           <EmptyState icon={StoreIcon} title={t("shopView.nothingAnywhere")} />
@@ -123,13 +160,15 @@ export function ShopViewScreen({
   }
 
   return (
-    <PageContainer>
+    <PageContainer className="gap-4 px-3 py-4 sm:gap-6 sm:px-6 sm:py-8 lg:px-8">
+      {actions.confirmation}
       <PageHeader
         eyebrow={back}
+        actions={addAction}
         title={
           <span className="flex items-center gap-3">
             {shop ? (
-              <ShopLogo shop={shop} size="lg" className="size-11" />
+              <ShopLogo shop={shop} size="lg" className="size-8 sm:size-11" />
             ) : (
               <span className="grid size-11 shrink-0 place-items-center rounded-full bg-section-soft text-section">
                 <CircleHelpIcon className="size-6" aria-hidden="true" />
@@ -138,34 +177,19 @@ export function ShopViewScreen({
             <span className="min-w-0 break-words">{title}</span>
           </span>
         }
+        className="[&_h1]:text-xl sm:[&_h1]:text-2xl"
         description={
-          <span className="flex flex-col gap-1 pt-1">
-            {shopKey === NO_SHOP && <span>{t("shopView.noShopDescription")}</span>}
-            {here.length > 0 && (
-              <span className="font-medium text-foreground tabular-nums">
-                {t("shopView.progress", { bought: bought.length, total: here.length })}
-              </span>
-            )}
-            {open.length > 0 && (
-              <span className="text-foreground tabular-nums">
-                {estimate.priced > 0
-                  ? t("shopView.estimate", { total: formatCurrency(estimate.cents, locale) })
-                  : t("shopView.noPrices")}
-                {estimate.priced > 0 && estimate.unpriced > 0 && (
-                  <span className="text-muted-foreground"> · {t("shopView.unpriced", { count: estimate.unpriced })}</span>
-                )}
-              </span>
-            )}
-            <span className="flex items-center gap-1.5 text-xs">
-              <RefreshCwIcon className="size-3" aria-hidden="true" />
-              {t("shopView.liveHint")}
-            </span>
+          <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+            {here.length > 0 && <span className="tabular-nums">{t("shopView.progress", { bought: bought.length, total: here.length })}</span>}
+            {estimate.priced > 0 && <span className="tabular-nums">{t("shopView.estimate", { total: formatCurrency(estimate.cents, locale) })}</span>}
+            <span title={t("shopView.liveHint")}><RefreshCwIcon className="size-3" aria-label={t("shopView.liveHint")} /></span>
           </span>
         }
       />
 
       <PageGrid columns="main-sidebar" className="items-start">
-        <Stack gap="lg">
+        <Stack gap="lg" className="gap-3 sm:gap-6">
+          {selection}
           {open.length > 0 && <ShoppingGuidance />}
           {open.length > 0 && (
             <ShopViewToolbar
@@ -188,17 +212,19 @@ export function ShopViewScreen({
                   items={group.items}
                   shops={shops}
                   size="large"
-                  showShop={false}
-                  showList
+                  showShop={combined}
+                  showStockStatus={sort !== "priority"}
                   onToggle={(item) => void actions.toggle(item)}
+                  onDelete={canManage ? (item) => void actions.remove(item) : undefined}
                   onEdit={setEditing}
                 />
               );
               if (group.key === "all") return <React.Fragment key="all">{list}</React.Fragment>;
               return (
-                <PageSection key={group.key} aria-labelledby={`aisle-${group.key}`}>
+                <PageSection key={group.key} aria-labelledby={`aisle-${group.key}`} className="gap-2">
                   <SectionHeader
                     id={`aisle-${group.key}`}
+                    className="[&_h2]:text-sm sm:[&_h2]:text-base"
                     title={
                       <span className="flex items-center gap-2">
                         {sort === "category" ? (
@@ -219,23 +245,20 @@ export function ShopViewScreen({
             })
           )}
           {visibleBought.length > 0 && (
-            <ShoppingItemList items={visibleBought} shops={shops} size="large" showShop={false} showList onToggle={(item) => void actions.toggle(item)} />
-          )}
-          <Card className="p-4">
-            <AddShoppingItemForm
-              products={products}
+            <ShoppingItemList
+              items={visibleBought}
               shops={shops}
-              onAdd={add}
-              fixedShopId={shop?.id}
-              previewLink={previewLink}
-              initialSelections={initialSelections}
+              size="large"
+              showShop={combined}
+              onToggle={(item) => void actions.toggle(item)}
+              onDelete={canManage ? (item) => void actions.remove(item) : undefined}
             />
-          </Card>
+          )}
         </Stack>
 
         <Card className="max-lg:hidden">
           <CardTitle>{t("shopView.chooseShop")}</CardTitle>
-          <ShopSummaryList items={actions.items} shops={shops} activeKey={shopKey} className="-mx-2" />
+          <ShopSummaryList items={actions.items} shops={shops} activeKey={shop?.id ?? (selectedKeys[0] === NO_SHOP && !combined ? NO_SHOP : undefined)} savedGroups={groups} activeGroupId={activeGroup?.id} className="-mx-2" />
         </Card>
       </PageGrid>
       <ShoppingItemFormDialog
@@ -252,13 +275,13 @@ export function ShopViewScreen({
 
 const SORT_STORAGE_KEY = "wh-shop-view-sort";
 
-/** The sort picked before on this device; priority until then (or when storage is unavailable). */
+/** The sort picked before on this device; name until then (or when storage is unavailable). */
 function readStoredSort(): ShopViewSort {
   try {
     const stored = globalThis.localStorage?.getItem(SORT_STORAGE_KEY);
-    return (SHOP_VIEW_SORTS as readonly string[]).includes(stored ?? "") ? (stored as ShopViewSort) : "priority";
+    return (SHOP_VIEW_SORTS as readonly string[]).includes(stored ?? "") ? (stored as ShopViewSort) : "name";
   } catch {
-    return "priority";
+    return "name";
   }
 }
 

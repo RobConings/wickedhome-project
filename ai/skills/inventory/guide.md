@@ -1,10 +1,6 @@
-- Stock per product/place: quantity, unit, minimum, expiry. At/below minimum auto-lists essential AND nice-to-have: at = warning, below = to buy. The person decides what to buy.
-- Almost gone/expiring → `inventory_low_stock`: stockStatus, buyingAdvice, essential, importance, onShoppingList. Don't duplicate items.
-- Have/where/history → `inventory_stock` product, `recent` for who changed it. Use/add/count → `inventory_change_stock` use/add/set; specify place if several.
-- Bought, with/without receipt → `inventory_record_purchase`. First match receipt labels to `inventory_products`; use existing stock units (packs/tros/fles, weight only if normally tracked that way). Ask unclear counts/places. Receipt image optional; `receiptImageIndex` selects among several.
-- On app/database errors, check `inventory_purchases` and stock before retrying. Never recreate/rename products as a workaround.
-- Minimum/expiry/place → `inventory_save_stock_item`. Product/package/shop link → `inventory_save_product`; isEssential omitted keeps it, false = nice-to-have. Online product: pass offer.
-- Catalogue: `inventory_products` limit 100; follow nextOffset while hasMore, keeping q/limit, before classifying all.
-- Shared brands → `inventory_link_alternative` only when requested; sharedName names generic stock. Linking adds no purchase.
-- Barcode → `inventory_products` barcode; suggest adding if missing. Don't name lookup sources.
-- Children use/add stock; settings/products/deletes are adults only. Say dates dd/mm/yyyy.
+- Add products: inventory_prepare_product first; research photo, exact page, shop, price, barcode/package. Reuse/enrich catalogue matches; inspect alternatives. Missing retailer → shops_save. Save verified offer or imageUrl/linkShop/linkUrl/defaultShop; re-read and disclose setup.missing. Never invent details; ask uncertain identity/unit/shop.
+- Shared stock: inventory_link_alternative only for verified same goods; linking adds no purchase. inventory_products paginates: follow nextOffset while hasMore. Hide barcode sources.
+- Stock: inventory_stock for supply/history, inventory_low_stock for low/expiry. At/below minimum all products auto-list; below = buy, at = warning. Importance stays separate; person decides what to buy. inventory_change_stock use/set; inventory_save_stock_item for minimum/expiry. Children use/add, adults count/manage.
+- Add goods: inventory_purchases → inventory_record_purchase with stable source. Receipts need uploaded document, printed line, actual date/shop. Link existing acquisitions; ask same/extra or already counted, never infer. Shopping ticks may already have added stock.
+- New batches/manual reports or chat images → inventory_record_purchase_batch, existing names/stock units, ask unclear counts/places. Review conflicts via single-purchase workflow; never recreate products or retry blind. All movement history → inventory_purchase_history.
+- Recipe units use packageAmount/packageUnit; unknown_amount isn't shortage. recipes_plan adds groceries; recipes_use consumes. Dates dd/mm/yyyy.

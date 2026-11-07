@@ -255,11 +255,21 @@ export const expenseCreateInputSchema = z
     ...recurringFields,
     dueDate: isoDateSchema,
     shopId: idSchema.optional().nullable(),
+    /** This expense is an extra repayment of the selected loan, rather than a scheduled instalment. */
+    earlyRepaymentForId: idSchema.optional().nullable(),
     rrule: rruleSchema.optional().nullable(),
     paidOn: isoDateSchema.optional().nullable(),
   })
   .superRefine(checkPayment)
   .superRefine(checkTotalOpen)
+  .superRefine((value, ctx) => {
+    if (value.earlyRepaymentForId && value.rrule) {
+      ctx.addIssue({ code: "custom", path: ["earlyRepaymentForId"], message: "A repayment cannot repeat" });
+    }
+    if (value.earlyRepaymentForId && value.paymentMethod === "meal_voucher") {
+      ctx.addIssue({ code: "custom", path: ["paymentMethod"], message: "A loan cannot be repaid with meal vouchers" });
+    }
+  })
   .transform(normalizePayer);
 export type ExpenseCreateInput = z.infer<typeof expenseCreateInputSchema>;
 
@@ -316,6 +326,8 @@ type PaymentDetails = {
 
 export type Expense = PaymentDetails & {
   id: string;
+  /** Extra repayment, independent of the regular instalment on the same date. */
+  earlyRepayment?: boolean;
   /** Set when the expense is an instance of a recurring expense. */
   recurringExpenseId: string | null;
   /** RRULE of the recurring expense, for display. */

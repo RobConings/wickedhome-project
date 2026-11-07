@@ -1,9 +1,10 @@
 {
   "page": {
     "title": "Shopping",
-    "description": "Groceries, materials for jobs and stock running low, all on the same lists."
+    "description": "Everything you want to buy, with separate filters for your lists and stock levels."
   },
   "actions": {
+    "addItem": "Add shopping item",
     "shopView": "Shop view",
     "products": "Products",
     "newList": "New list",
@@ -62,7 +63,8 @@
     "above_minimum": "Stock is above your minimum."
   },
   "guidance": {
-    "choice": "Both stock warnings and items to buy stay on the list. Use importance and stock level to decide what to buy."
+    "label": "How does this list work?",
+    "choice": "Your regular groceries and stock replenishments appear together. Filter stock levels separately; essential or nice to have indicates importance."
   },
   "fields": {
     "isEssential": "Essential product",
@@ -103,6 +105,10 @@
     "custom": "Custom ({{rule}})"
   },
   "add": {
+    "description": "Choose an existing product, enter a name or paste a webshop link.",
+    "existingProduct": "Existing product",
+    "productHint": "Search your products. The name, unit and default shop are filled in for you.",
+    "nameOrLink": "Name or webshop link",
     "label": "New item",
     "placeholder": "Add an item or paste a webshop link…",
     "submit": "Add",
@@ -115,6 +121,10 @@
     "adding": "Adding…"
   },
   "item": {
+    "details": "Details",
+    "hideDetails": "Hide details",
+    "showDetails": "Show details for {{name}}",
+    "actions": "Actions for {{name}}",
     "tick": "Mark {{name}} as bought",
     "untick": "Mark {{name}} as not bought",
     "delete": "Remove {{name}}",
@@ -137,6 +147,8 @@
     "unlinkInvoiceShort": "Take off invoice"
   },
   "lists": {
+    "search": "Search by name, shop or note…",
+    "searchLabel": "Search shopping items",
     "all": "All lists",
     "filterLabel": "Show list",
     "openCount_one": "{{count}} on the list",
@@ -179,11 +191,11 @@
   },
   "shopView": {
     "title": "Shop view",
-    "description": "Everything on the list for one shop. Choose what to buy and tick things off as they go in the basket.",
-    "chooseShop": "Choose a shop",
+    "description": "Combine one or more shops in one view. Tick off what is in your cart.",
+    "chooseShop": "Choose a shop or shop group",
     "noShopDescription": "Items without a preferred shop. Buy them anywhere.",
     "empty": "Nothing to buy here.",
-    "emptyDescription": "Everything on the list for this shop is in the basket.",
+    "emptyDescription": "Everything for this trip is in your cart.",
     "nothingAnywhere": "Your lists are empty.",
     "progress": "{{bought}} of {{total}} in the basket",
     "liveHint": "Updates automatically while you shop.",
@@ -208,11 +220,13 @@
       "extra": "Extras"
     },
     "filters": {
+      "viewOptions": "View and filters",
+      "viewOptionsDescription": "Choose the order and what to show on the list.",
       "label": "Search and filter",
       "search": "Search the list…",
-      "priority": "Priority",
+      "priority": "Importance",
       "priorities": {
-        "all": "All priorities",
+        "all": "Essential and nice to have",
         "needed": "Below or at minimum",
         "essential": "Essentials only",
         "extra": "Extras only"
@@ -273,7 +287,11 @@
   "restock": {
     "prompt": "Put {{name}} in stock at {{place}}?",
     "add": "Add {{quantity}} {{unit}}",
-    "done": "{{name}} added to {{place}}"
+    "done": "{{name}} added to {{place}}",
+    "addedAutomatically": "Added {{quantity}} {{unit}} {{name}} to {{place}}.",
+    "notAdded": "Marked as bought. Stock was not added: check the storage location and unit.",
+    "unticked": "Back on the list. Stock is unchanged; correct a mistaken purchase in Inventory.",
+    "alreadyProcessed": "Already counted in your stock."
   },
   "picker": {
     "product": "Choose a product…",
@@ -363,5 +381,32 @@
     "removing": "Saving removes the {{shop}} link.",
     "keep": "Keep the link",
     "invalidUrl": "This isn't a web link (https://…)."
+  },
+  "stockFilter": {
+    "label": "Stock filter",
+    "all": "All stock levels",
+    "low": "Running low (at or below minimum)",
+    "below_minimum": "Below minimum",
+    "at_minimum": "At minimum",
+    "above_minimum": "Above minimum",
+    "untracked": "Without stock status"
+  },
+  "shopGroups": {
+    "choose": "Choose shops",
+    "title": "Combine shops and groups",
+    "combine": "Combine shops",
+    "description": "Choose multiple shops for this trip, or save a combination as a reusable group.",
+    "name": "Shop group name",
+    "namePlaceholder": "For example Colruyt group",
+    "saveHint": "Save at least two shops. Items without a shop can be included for a single trip.",
+    "search": "Search shops…",
+    "apply": "Show this trip",
+    "saveNew": "Save as group",
+    "save": "Save group",
+    "edit": "Edit shop group “{{name}}”",
+    "remove": "Delete shop group “{{name}}”",
+    "removeDescription": "Only the group is deleted. Its shops and shopping items stay.",
+    "combinedHint": "One view for these shops. Each product keeps its original shop, link and price.",
+    "duplicateName": "A shop group with this name already exists."
   }
 }

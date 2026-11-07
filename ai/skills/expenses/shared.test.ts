@@ -6,14 +6,14 @@
  */
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import type { Expense } from "@/features/expenses/types/expenses";
+import type { Expense, ExpenseDetail } from "@/features/expenses/types/expenses";
 import type { ContributionRow, MoneyMonth } from "@/features/money/types/money";
 import { pickCandidate } from "@ai/core/resolve";
 import { getAssistantSkill } from "@ai/core/skills";
 import { listAssistantTools } from "@ai/core/tools";
 import "@ai/skills";
 import { balanceOn, defaultAccount, monthCoverage } from "../money/coverage";
-import { communicationFields, expenseCandidates, payerFields, paymentInfo, repeatOf, rhythm, rruleFor } from "./shared";
+import { communicationFields, expenseCandidates, payerFields, paymentInfo, paymentTargetFromDetail, repeatOf, rhythm, rruleFor } from "./shared";
 
 const expense = (over: Partial<Expense>): Expense =>
   ({
@@ -102,6 +102,34 @@ describe("finance helpers", () => {
     assert.equal(pick("fluvius 2026-09-07"), "paid");
     assert.equal(pick("Delhaize"), "groceries");
   });
+  it("distinguishes early repayments from same-day scheduled instalments and names their ids", () => {
+    const candidates = expenseCandidates([
+      expense({ id: "next", recurringExpenseId: "r", dueDate: "2026-11-07" }),
+      expense({ id: "regular", recurringExpenseId: "r", dueDate: "2026-10-07", paidOn: "2026-10-07" }),
+      expense({ id: "extra-a", recurringExpenseId: "r", earlyRepayment: true, amountCents: 10_000, dueDate: "2026-10-07", paidOn: "2026-10-07" }),
+      expense({ id: "extra-b", recurringExpenseId: "r", earlyRepayment: true, amountCents: 20_000, dueDate: "2026-10-07", paidOn: "2026-10-07" }),
+    ]);
+    const next = pickCandidate("expense", "expense", "Fluvius", candidates, false);
+    assert.equal(next.ok && next.entity.id, "next");
+    const early = candidates.filter((candidate) => candidate.id.startsWith("extra"));
+    assert.equal(new Set(early.map((candidate) => candidate.name)).size, 2);
+    assert.ok(early.every((candidate) => candidate.name.includes("extra repayment")));
+    for (const id of ["regular", "extra-a", "extra-b"]) {
+      const picked = pickCandidate("expense", "expense", id, candidates, false);
+      assert.equal(picked.ok && picked.entity.id, id);
+    }
+  });
+
+  it("undoes the intended payment without confusing an instalment and an extra repayment", () => {
+    const regular = expense({ id: "regular", paidOn: "2026-10-07" });
+    const extra = expense({ id: "extra", earlyRepayment: true, paidOn: "2026-10-28" });
+    const detail: ExpenseDetail = { today: "2026-10-28", expense: expense({}), recurring: null, history: [extra, regular] };
+    assert.equal(paymentTargetFromDetail(detail, false).id, "regular");
+    assert.equal(paymentTargetFromDetail({ ...detail, expense: extra }, false).id, "extra");
+    assert.throws(() => paymentTargetFromDetail({ ...detail, expense: { ...extra, paidOn: null } }, false), /extra repayment is not paid/);
+    assert.throws(() => paymentTargetFromDetail({ ...detail, history: [extra] }, false), /is not paid/);
+  });
+
 });
 
 describe("money coverage", () => {

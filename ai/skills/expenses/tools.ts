@@ -4,7 +4,6 @@ import {
   EXPENSE_CATEGORIES,
   EXPENSE_KINDS,
   RECURRING_STATUSES,
-  expenseCreateInputSchema,
   type Expense,
   type RecurringExpense,
 } from "@/features/expenses/types/expenses";
@@ -30,10 +29,8 @@ import {
   done,
   entityNames,
   entityRef,
-  eurosSchema,
   money,
   monthSchema,
-  optionalDateSchema,
   registerAssistantContext,
   registerAssistantSkill,
   registerAssistantTool,
@@ -41,9 +38,11 @@ import {
   registerScreenContext,
   say,
   toCents,
+  toEuros,
   type AssistantToolContext,
 } from "@ai/core/kit";
 import { MONEY_ROLES, expenseCandidates, methodText, payerText, paymentInfo, rhythm } from "./shared";
+import { expenseLogInput, loggedExpenseInput } from "./logging";
 import "./changes";
 
 /**
@@ -55,10 +54,10 @@ import "./changes";
 registerAssistantSkill({
   id: "expenses",
   title: { en: "Expenses and bills", nl: "Uitgaven en rekeningen" },
-  summary: "Bills and recurring payments (energy, loans, insurance, subscriptions): due, history, payment details (IBAN, OGM), add, edit, mark paid, log spending.",
+  summary: "Bills and recurring payments (energy, loans, insurance, subscriptions): due, history, payment details (IBAN, OGM), add, edit, mark paid, log spending and early loan repayments.",
   keywords: {
-    nl: ["betalen", "betaald", "betaling", "factuur", "facturen", "rekening", "uitgave", "uitgegeven", "kost", "kosten", "abonnement", "domiciliering", "domiciliëring", "overschrijving", "lening", "afbetaling", "verzekering", "te betalen", "euro", "gestructureerde mededeling", "mededeling", "iban", "ogm"],
-    en: ["pay", "paid", "payment", "bill", "invoice", "expense", "spent", "cost", "subscription", "direct debit", "wire transfer", "loan", "insurance", "due", "structured communication"],
+    nl: ["betalen", "betaald", "betaling", "factuur", "facturen", "rekening", "uitgave", "uitgegeven", "kost", "kosten", "abonnement", "domiciliering", "domiciliëring", "overschrijving", "lening", "afbetaling", "aflossen", "aflossing", "terugbetaling", "verzekering", "te betalen", "euro", "gestructureerde mededeling", "mededeling", "iban", "ogm"],
+    en: ["pay", "paid", "payment", "bill", "invoice", "expense", "spent", "cost", "subscription", "direct debit", "wire transfer", "loan", "repayment", "repay", "payoff", "pay back", "down payment", "insurance", "due", "structured communication"],
   },
 });
 
@@ -183,6 +182,8 @@ registerAssistantTool({
 function recurringSummary(recurring: RecurringExpense, names: Map<string, string>) {
   const open = recurring.totalOpen;
   return {
+    id: recurring.id,
+    remainingAmount: open ? toEuros(open.remainingCents) : null,
     name: recurring.description ? `${recurring.payee} – ${recurring.description}` : recurring.payee,
     kind: recurring.kind,
     status: recurring.status === "active" ? null : recurring.status,
@@ -254,6 +255,7 @@ registerAssistantTool({
         category: expense.category,
         payer: filter === "all" ? payerText(expense, names) : null,
         method: expense.paymentMethod,
+        repaysLoan: expense.earlyRepayment ? expense.recurringExpenseId : null,
       })),
     };
   },
@@ -288,6 +290,7 @@ registerAssistantTool({
         status: expense.status,
         paidOn: expense.paidOn,
         autoPaid: expense.autoPaid || null,
+        repaysLoan: expense.earlyRepayment ? expense.recurringExpenseId : null,
         category: expense.category,
         payer: payerText(expense, names),
         ...paymentInfo(expense),
@@ -302,7 +305,6 @@ registerAssistantTool({
     if (!input.recurring) throw badRequest("Name a bill (expense) or a recurring expense (recurring)");
     const detail = await getRecurringExpenseDetail(ctx.householdId, input.recurring.id);
     return {
-      id: detail.recurring.id,
       ...recurringSummary(detail.recurring, names),
       ...paymentInfo(detail.recurring),
       category: detail.recurring.category,
@@ -311,26 +313,19 @@ registerAssistantTool({
       notes: detail.recurring.notes,
       upcoming: detail.upcoming.slice(0, 3).map((item) => `${money(item.amountCents)} ${day(item.dueDate)}`),
       paid: detail.history.slice(0, 3).map((item) => `${money(item.amountCents)} ${day(item.paidOn ?? item.dueDate)}`),
+      repayments: detail.history.filter((item) => item.earlyRepayment).map((item) => ({ id: item.id, amount: money(item.amountCents), paidOn: item.paidOn })),
     };
   },
 });
 
 /** Meal vouchers belong to a person (docs/FINANCE.md): paying with them always means "paid by me". */
-const paidByMe = (input: { paidBy: "joint" | "me"; paymentMethod: string }) => input.paidBy === "me" || input.paymentMethod === "meal_voucher";
+const paidByMe = (input: { paidBy: "joint" | "me"; paymentMethod?: string }) => input.paidBy === "me" || input.paymentMethod === "meal_voucher";
 
 registerAssistantTool({
   name: "expenses.log",
   description:
-    "Log an expense that was already paid (everyday spending: groceries, eating out…), e.g. 'I spent 45 euro at Delhaize'. Paid from the joint account unless the person says they paid it themselves.",
-  input: z.object({
-    payee: z.string().trim().min(1).max(64).describe("Shop or payee, e.g. 'Delhaize'"),
-    amount: eurosSchema,
-    category: z.enum(EXPENSE_CATEGORIES).describe("Best matching category; 'groceries' for supermarkets"),
-    date: optionalDateSchema("Day it was paid, YYYY-MM-DD (default today)"),
-    paymentMethod: z.enum(["card", "cash", "meal_voucher", "wire_transfer", "other"]).default("card"),
-    paidBy: z.enum(["joint", "me"]).default("joint").describe("joint account, or the person asking paid it personally (always the person for meal vouchers)"),
-    description: z.string().trim().max(200).optional(),
-  }),
+    "Log an expense already paid, including a partial or full early repayment: select loan and give the exact amount paid. Full payoff: use remainingAmount from expenses_details. Repayments reduce the balance and shorten the schedule. Defaults to the joint account; paidBy me for personal spending.",
+  input: expenseLogInput,
   permission: "sensitive",
   confirm: "always",
   roles: MONEY_ROLES,
@@ -339,41 +334,37 @@ registerAssistantTool({
     const amount = money(toCents(input.amount));
     const when = day(input.date ?? todayIn(), ctx.locale, true);
     const who = paidByMe(input) ? say(ctx.locale, "paid by you", "door jou betaald") : say(ctx.locale, "joint account", "gemeenschappelijke rekening");
-    return say(ctx.locale, `Log ${amount} at ${input.payee} on ${when} (${who})`, `${amount} bij ${input.payee} noteren op ${when} (${who})`);
+    return input.loan
+      ? say(ctx.locale, `Record an extra repayment of ${amount} on ${input.loan.name} on ${when} (${who}); reduce the loan balance and recalculate its instalments`, `Extra aflossing van ${amount} op ${input.loan.name} boeken op ${when} (${who}); saldo verlagen en termijnen herberekenen`)
+      : say(ctx.locale, `Log ${amount} at ${input.payee} on ${when} (${who})`, `${amount} bij ${input.payee} noteren op ${when} (${who})`);
   },
-  preview: (ctx, input) => ({
-    kind: "fields",
-    title: say(ctx.locale, "Expense (paid)", "Uitgave (betaald)"),
-    data: {
-      fields: [
-        { label: say(ctx.locale, "Amount", "Bedrag"), value: money(toCents(input.amount)) ?? "" },
-        { label: say(ctx.locale, "Payee", "Begunstigde"), value: input.payee },
-        { label: say(ctx.locale, "Paid on", "Betaald op"), value: day(input.date ?? todayIn(), ctx.locale) ?? "" },
-        { label: say(ctx.locale, "Paid by", "Betaald door"), value: paidByMe(input) ? ctx.user.name : say(ctx.locale, "Joint account", "Gemeenschappelijke rekening") },
-        { label: say(ctx.locale, "Method", "Betaalwijze"), value: input.paymentMethod },
-        { label: say(ctx.locale, "Category", "Categorie"), value: input.category },
-      ],
-    },
-  }),
+  preview: async (ctx, input) => {
+    const loan = input.loan ? (await getRecurringExpenseDetail(ctx.householdId, input.loan.id)).recurring : undefined;
+    const data = loggedExpenseInput(ctx, input, loan);
+    const open = loan?.totalOpen;
+    return {
+      kind: "fields",
+      title: input.loan ? say(ctx.locale, "Loan repayment (paid)", "Aflossing (betaald)") : say(ctx.locale, "Expense (paid)", "Uitgave (betaald)"),
+      data: {
+        fields: [
+          { label: say(ctx.locale, "Amount", "Bedrag"), value: money(data.amountCents) ?? "" },
+          { label: say(ctx.locale, "Payee", "Begunstigde"), value: data.payee },
+          ...(loan ? [{ label: say(ctx.locale, "Repays loan", "Aflossing lening"), value: input.loan!.name }] : []),
+          ...(open ? [{ label: say(ctx.locale, "Remaining balance", "Resterend saldo"), value: `${money(open.remainingCents)} → ${money(Math.max(0, open.remainingCents - data.amountCents))}` }] : []),
+          { label: say(ctx.locale, "Paid on", "Betaald op"), value: day(data.paidOn, ctx.locale) ?? "" },
+          { label: say(ctx.locale, "Paid by", "Betaald door"), value: paidByMe(input) ? ctx.user.name : say(ctx.locale, "Joint account", "Gemeenschappelijke rekening") },
+          { label: say(ctx.locale, "Method", "Betaalwijze"), value: data.paymentMethod ?? "" },
+          { label: say(ctx.locale, "Category", "Categorie"), value: data.category },
+        ],
+      },
+    };
+  },
   run: async (ctx, input) => {
-    const me = paidByMe(input);
-    if (me && !ctx.user.habitantId) throw badRequest("This account has no habitant to pay personally");
-    const date = input.date ?? todayIn();
-    const expense = await createExpense(
-      ctx.householdId,
-      expenseCreateInputSchema.parse({
-        payee: input.payee,
-        amountCents: toCents(input.amount),
-        category: input.category,
-        description: input.description ?? null,
-        dueDate: date,
-        paidOn: date,
-        paymentMethod: input.paymentMethod,
-        payerType: me ? "person" : "joint",
-        payerHabitantId: me ? ctx.user.habitantId : null,
-      }),
-    );
-    return done(`Logged ${money(expense.amountCents)} at ${expense.payee} on ${day(expense.paidOn ?? date)}.`, { id: expense.id });
+    const loan = input.loan ? (await getRecurringExpenseDetail(ctx.householdId, input.loan.id)).recurring : undefined;
+    const expense = await createExpense(ctx.householdId, loggedExpenseInput(ctx, input, loan));
+    return input.loan
+      ? done(`Recorded ${money(expense.amountCents)} repaid on ${expense.payee} on ${day(expense.paidOn)}; its balance and instalments were recalculated.`, { id: expense.id, loanId: input.loan.id })
+      : done(`Logged ${money(expense.amountCents)} at ${expense.payee} on ${day(expense.paidOn)}.`, { id: expense.id });
   },
 });
 

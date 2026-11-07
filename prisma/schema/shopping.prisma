@@ -40,6 +40,13 @@ enum ShoppingItemStatus {
   BOUGHT
 }
 
+/// Automatic shopping after a user dismisses a product: first restock, then consume it again.
+enum ShoppingRestockState {
+  ACTIVE
+  DISMISSED
+  RESTOCKED
+}
+
 /// The household's product catalogue: things it buys more than once, keeps in stock or scans.
 model Product {
   id            String            @id @default(cuid())
@@ -51,6 +58,8 @@ model Product {
   category      ProductCategory   @default(OTHER)
   /// Marks a household essential; shown alongside its stock level on shopping lists.
   isEssential   Boolean           @default(false)
+  /// Owned by the stock owner; alternatives share this dismissal. Explicit purchases are still allowed.
+  shoppingRestockState ShoppingRestockState @default(ACTIVE)
   defaultShopId String?
   defaultShop   Shop?             @relation("ProductDefaultShop", fields: [defaultShopId], references: [id], onDelete: SetNull)
   /// EAN/UPC barcode printed on the packaging.

@@ -315,8 +315,8 @@
   },
   "totalOpen": {
     "label": "Total still open",
-    "asOf": "As of",
-    "asOfHint": "First payment that counts. Empty: the next payment.",
+    "asOf": "First instalment included",
+    "asOfHint": "First regular instalment covered by this balance. Empty: the next instalment.",
     "hint": "Paying something off? Enter what's left: the number of payments follows from it, and the last one is for what remains.",
     "more": "Paying something off? Total still open",
     "needAmount": "Enter the amount per payment to see the payments.",
@@ -349,5 +349,18 @@
       "title": "Direct debits",
       "description": "Marks direct debits paid on their due date."
     }
+  },
+  "repayment": {
+    "label": "Repays a loan or down payment",
+    "none": "No loan repayment",
+    "remaining": "Still open: {{amount}}",
+    "payAll": "Pay remaining balance",
+    "hint": "Recorded as paid. This reduces the balance and shortens the repayment schedule; the regular instalment stays the same.",
+    "needsTotal": "Add the total still open on the loan before recording a repayment.",
+    "record": "Record repayment",
+    "title": "Loan repayment",
+    "exceedsBalance": "The repayment exceeds the remaining balance.",
+    "paymentDateHint": "Use the day you actually paid. It can be before the first instalment.",
+    "futureDate": "Enter the day you actually paid, on or before {{date}}."
   }
 }

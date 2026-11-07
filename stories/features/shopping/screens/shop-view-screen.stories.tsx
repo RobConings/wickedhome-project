@@ -9,6 +9,7 @@ const meta = {
   args: {
     data: shoppingPageFixture,
     shopKey: "s-colruyt",
+    canManage: true,
     previewLink: fakeLinkPreview,
     refreshIntervalMs: null,
     initialSelections: { products: productSelectionsFixture, shops: shopSelectionsFixture },
@@ -24,5 +25,13 @@ export const Colruyt: Story = {};
 export const Gamma: Story = { args: { shopKey: "s-gamma" } };
 export const NoShopChosen: Story = { args: { shopKey: "none" } };
 export const ChooseShop: Story = { args: { shopKey: null } };
+export const CombinedTrip: Story = {
+  args: { shopKey: null },
+  parameters: { router: { initialEntries: ["/shopping/shops?shop=s-colruyt&shop=s-gamma"] } },
+};
+export const SavedShopGroup: Story = {
+  args: { shopKey: null, data: { ...shoppingPageFixture, shopGroups: [{ id: "weekend", name: "Weekendronde", shopIds: ["s-colruyt", "s-gamma"] }] } },
+  parameters: { router: { initialEntries: ["/shopping/shops?group=weekend"] } },
+};
 export const NothingToBuy: Story = { args: { data: emptyShoppingPageFixture, shopKey: null } };
 export const Mobile: Story = { globals: { viewport: { value: "mobile1" } } };
