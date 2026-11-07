@@ -33,12 +33,13 @@ export function groupItemsByShop(items: ShoppingItem[], shops: Shop[]): ShopGrou
 }
 
 /** Items per product category in a sensible walking order through a shop; uncategorised items last. */
-export function groupItemsByCategory(items: ShoppingItem[]): { category: ProductCategory; items: ShoppingItem[] }[] {
-  return PRODUCT_CATEGORIES.map((category) => ({
+export function groupItemsByCategory(items: ShoppingItem[], order: readonly ProductCategory[] = PRODUCT_CATEGORIES): { category: ProductCategory; items: ShoppingItem[] }[] {
+  const categories = [...new Set([...order.filter((category) => PRODUCT_CATEGORIES.includes(category)), ...PRODUCT_CATEGORIES])];
+  return categories.map((category) => ({
     category,
     items: items
       .filter((item) => (item.category ?? "other") === category)
-      .sort((a, b) => a.name.localeCompare(b.name)),
+      .sort((a, b) => a.name.localeCompare(b.name, "nl") || a.id.localeCompare(b.id)),
   })).filter((group) => group.items.length > 0);
 }
 
@@ -73,8 +74,8 @@ export const SHOP_VIEW_SORTS = ["priority", "category", "name", "price"] as cons
 export type ShopViewSort = (typeof SHOP_VIEW_SORTS)[number];
 
 /** Sections of the shop view: priority tiers, categories (walking order), or one unnamed group (`all`). */
-export function groupShopViewItems(items: ShoppingItem[], sort: ShopViewSort): { key: string; items: ShoppingItem[] }[] {
-  if (sort === "category") return groupItemsByCategory(items).map((group) => ({ key: group.category, items: group.items }));
+export function groupShopViewItems(items: ShoppingItem[], sort: ShopViewSort, order?: readonly ProductCategory[]): { key: string; items: ShoppingItem[] }[] {
+  if (sort === "category") return groupItemsByCategory(items, order).map((group) => ({ key: group.category, items: group.items }));
   if (sort === "priority") {
     return PRIORITY_TIERS.map((tier) => ({
       key: tier,
@@ -96,6 +97,7 @@ export type ShopViewFilters = {
   listId: string;
   priority: ShopViewPriorityFilter;
   stock?: ShoppingStockFilter;
+  includeLowStock?: boolean;
 };
 
 export const SHOPPING_STOCK_FILTERS = ["all", "low", "below_minimum", "at_minimum", "above_minimum", "untracked"] as const;
@@ -118,6 +120,7 @@ const matchesPriority = (item: ShoppingItem, filter: ShopViewPriorityFilter) => 
 export function filterShopViewItems(items: ShoppingItem[], filters: ShopViewFilters): ShoppingItem[] {
   return items.filter(
     (item) =>
+      (filters.includeLowStock !== false || (item.requirements ?? [item]).some((part) => part.source !== "low_stock")) &&
       (filters.category === "all" || (item.category ?? "other") === filters.category) &&
       (filters.listId === "all" || shoppingItemListIds(item).includes(filters.listId)) &&
       matchesPriority(item, filters.priority) &&

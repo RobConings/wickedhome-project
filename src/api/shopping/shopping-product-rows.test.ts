@@ -111,6 +111,16 @@ function setup(t: TestContext, initial: Row[]) {
 }
 
 describe("shopping product positions through the service", () => {
+  it("temporarily skips a requirement without changing stock, minimum or catalogue and can restore it", async (t) => {
+    const { rows } = setup(t, [row("skip", 2, "LOW_STOCK")]);
+    await updateItem(user, "skip", { status: "skipped" });
+    assert.equal(rows[0]?.status, "SKIPPED");
+    assert.equal((await listItems("home", { status: "open" })).length, 0);
+    assert.equal(rows[0]?.product.stockItems[0]?.quantity.toNumber(), 0);
+    assert.equal(rows[0]?.product.stockItems[0]?.minQuantity?.toNumber(), 1);
+    await updateItem(user, "skip", { status: "open" });
+    assert.equal((await listItems("home", { status: "open" })).length, 1);
+  });
   it("preserves recipe grams during ordinary edits and applies an explicit edit to the number of packages", async (t) => {
     const ingredient = row("grams", 250, "RECIPE");
     Object.assign(ingredient, { unit: "g", mealPlanEntryId: "meal-a", product: { ...product, packageAmount: decimal(500), packageUnit: "g" } });

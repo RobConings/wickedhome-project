@@ -408,5 +408,14 @@
     "removeDescription": "Only the group is deleted. Its shops and shopping items stay.",
     "combinedHint": "One view for these shops. Each product keeps its original shop, link and price.",
     "duplicateName": "A shop group with this name already exists."
+  },
+  "planning": {
+    "includeAutomatic": "Show automatic stock replenishments",
+    "categoryOrder": "Category order",
+    "moveUp": "Move {{name}} up",
+    "moveDown": "Move {{name}} down",
+    "skipped": "Not now",
+    "skip": "Not now",
+    "restore": "Include again"
   }
 }

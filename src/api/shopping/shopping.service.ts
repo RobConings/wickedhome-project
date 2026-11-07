@@ -17,6 +17,7 @@ import {
   type ShoppingItemCreateInput,
   type ShoppingItemQuery,
   type ShoppingItemSource,
+  type ShoppingItemStatus,
   type ShoppingItemUpdateInput,
   type ShoppingList,
   type ShoppingListInput,
@@ -123,7 +124,7 @@ function toItem(row: ItemRow, names: Map<string, string>, groups: Map<string, Sh
     })), row.placeId),
     source: toSource(row.source),
     taskId: row.taskId,
-    status: row.status === "BOUGHT" ? "bought" : "open",
+    status: row.status.toLowerCase() as ShoppingItemStatus,
     boughtAt: row.boughtAt?.toISOString() ?? null,
     boughtByName: row.boughtByUserId ? (names.get(row.boughtByUserId) ?? null) : null,
     createdAt: row.createdAt.toISOString(),
@@ -489,7 +490,7 @@ export async function getShoppingOverview(householdId: string, locale: Locale = 
   const [lists, rows, staples] = await Promise.all([
     db.shoppingList.findMany({ where: { householdId }, orderBy: { createdAt: "asc" } }),
     db.shoppingItem.findMany({
-      where: { householdId, OR: [{ status: "OPEN" }, { boughtAt: { gte: since } }] },
+      where: { householdId, OR: [{ status: "OPEN" }, { status: "SKIPPED" }, { boughtAt: { gte: since } }] },
       include: itemInclude,
       orderBy: { createdAt: "asc" },
     }),
@@ -544,7 +545,7 @@ export async function listItems(householdId: string, query: ShoppingItemQuery = 
   const rows = await db.shoppingItem.findMany({
     where: {
       householdId,
-      ...(query.status && { status: query.status === "bought" ? ("BOUGHT" as const) : ("OPEN" as const) }),
+      ...(query.status && { status: query.status.toUpperCase() as "OPEN" | "BOUGHT" | "SKIPPED" }),
     },
     include: itemInclude,
     orderBy: [{ status: "asc" }, { createdAt: "asc" }],
@@ -641,6 +642,7 @@ export async function updateItem(user: SessionUser, id: string, input: ShoppingI
       ...(input.imageUrl !== undefined && { imageUrl: input.imageUrl }),
       ...(becomesBought && { status: "BOUGHT", boughtAt, boughtByUserId: user.id }),
       ...(becomesOpen && { status: "OPEN", boughtAt: null, boughtByUserId: null }),
+      ...(input.status === "skipped" && { status: "SKIPPED", boughtAt: null, boughtByUserId: null }),
     };
     let updated: ItemRow | undefined;
     for (const part of rows) {
@@ -661,10 +663,10 @@ export async function updateItem(user: SessionUser, id: string, input: ShoppingI
       if (part.id === id) updated = saved;
     }
     if (!updated) throw notFound("Shopping item not found");
-    if (input.status === "bought") {
+    if (input.status === "bought" || input.status === "skipped") {
       const owners = [...new Set(rows.flatMap((part) => part.productId ? [part.product?.stockProductId ?? part.productId] : []))];
       if (owners.length) await tx.product.updateMany({
-        where: { householdId, id: { in: owners } }, data: { shoppingRestockState: "RESTOCKED" },
+        where: { householdId, id: { in: owners } }, data: { shoppingRestockState: input.status === "bought" ? "RESTOCKED" : "DISMISSED" },
       });
     }
     return updated;

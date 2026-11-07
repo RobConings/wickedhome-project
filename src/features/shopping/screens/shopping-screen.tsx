@@ -1,3 +1,4 @@
+import { AutomaticShoppingFilter, CategoryOrder, useCategoryOrder } from "../components/shopping-preferences";
 import * as React from "react";
 import { PackageIcon, PencilIcon, PlusIcon, SearchXIcon, ShoppingCartIcon, StoreIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -56,6 +57,8 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
   const { t } = useTranslation("shopping");
   const { t: tCommon } = useTranslation();
   const { overview, shops, products } = data;
+  const { order, change } = useCategoryOrder();
+  const [includeLowStock, setIncludeLowStock] = React.useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const revalidator = useRevalidator();
   const fetcher = useFetcher<ShoppingActionResult>();
@@ -84,7 +87,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
   const searching = query.trim() !== "";
   const stockFilter = parseStockFilter(searchParams.get("stock"));
   const filtering = searching || stockFilter !== "all";
-  const visibleItems = filterShopViewItems(actions.items, { ...NO_SHOP_VIEW_FILTERS, query, stock: stockFilter })
+  const visibleItems = filterShopViewItems(actions.items, { ...NO_SHOP_VIEW_FILTERS, query, stock: stockFilter, includeLowStock })
     .filter((item) => !activeView || shoppingItemListIds(item).some((id) => activeView.listIds.includes(id)));
   const totalOpen = actions.items.filter((item) => item.status === "open").length;
 
@@ -195,6 +198,8 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
 
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <SearchField className="flex-1" value={query} onValueChange={search} label={t("lists.searchLabel")} placeholder={t("lists.search")} />
+            <AutomaticShoppingFilter included={includeLowStock} onChange={setIncludeLowStock} />
+            <CategoryOrder order={order} onChange={change} />
             <ShoppingStockFilterField value={stockFilter} onChange={(value) => setSearchParams((params) => {
               if (value === "all") params.delete("stock"); else params.set("stock", value);
               return params;
@@ -273,6 +278,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
                     items={items}
                     shops={shops}
                     onToggle={(item) => void actions.toggle(item)}
+                    onSkip={(item) => void actions.skip(item)}
                     onDelete={canManage ? (item) => void actions.remove(item) : undefined}
                     onEdit={canManage ? setEditing : undefined}
                     emptyText={t("lists.empty")}

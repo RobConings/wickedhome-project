@@ -12,3 +12,12 @@ De waarnemingen uit de winkel dateren van vóór merge `bdc1a96`. Producten, Sho
 - Geen migratie. Bestaande aankopen en voorraad blijven behouden.
 - Gerichte regressies: 69 tests geslaagd. Inclusief recept/minimum-combinaties, herhaalde aankopen, oude bronherhaling en essentieel afvinken.
 - Verdere sessiegebonden isolatie, werkelijk transactionele sessie-afhandeling en realtime volgen in fases 3–4.
+
+## Fase 2 – Boodschappen-UX
+
+- Bestanden: shopping-types, shopping-service, MCP-shoppingtools, `shopping-item-list`, `shopping-item-row`, `shopping-grouping`, `shopping-preferences`, beide shopping-schermen en EN/NL-teksten.
+- Categorieën gebruiken opgeslagen productcategorieën, nooit zoekwoorden. De gewone lijst groepeert standaard; de winkelweergave start op categorie. De volgorde is op dit apparaat instelbaar en wordt tussen tabbladen bijgewerkt.
+- Automatische minimumvoorraadregels kunnen uit beeld worden gefilterd zonder instellingen te wijzigen. Gemengde recept/expliciete regels blijven zichtbaar.
+- Nu niet bewaart de regel als SKIPPED, onderdrukt automatische herhaling en laat voorraad/product/minimum ongemoeid. Opnieuw opnemen herstelt OPEN.
+- Migratie `20261107170000_shopping_skip`: uitsluitend extra enumwaarde; geen bestaande rijen gewijzigd of verwijderd.
+- Gerichte UX/service-regressies: 29 tests geslaagd. Bestaande brede categorieën hergebruikt; geen extra subcategorietabellen.

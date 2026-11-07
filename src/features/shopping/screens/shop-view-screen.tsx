@@ -1,3 +1,4 @@
+import { AutomaticShoppingFilter, CategoryOrder, useCategoryOrder } from "../components/shopping-preferences";
 import * as React from "react";
 import { ArrowLeftIcon, CircleHelpIcon, PartyPopperIcon, RefreshCwIcon, SearchXIcon, StoreIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -66,6 +67,8 @@ export function ShopViewScreen({
 }: ShopViewScreenProps) {
   const { t } = useTranslation("shopping");
   const { overview, shops, products } = data;
+  const { order, change } = useCategoryOrder();
+  const [includeLowStock, setIncludeLowStock] = React.useState(true);
   const groups = data.shopGroups ?? [];
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -97,7 +100,7 @@ export function ShopViewScreen({
   const categories = PRODUCT_CATEGORIES.filter((category) => open.some((item) => (item.category ?? "other") === category));
   const lists = shoppingListViews(overview.lists, t("listKinds.groceries")).filter((list) => open.some((item) => shoppingItemListIds(item).some((id) => list.listIds.includes(id))));
   const activeList = lists.find((list) => list.id === filters.listId);
-  const filterItems = (items: ShoppingItem[]) => filterShopViewItems(items, { ...filters, listId: "all" })
+  const filterItems = (items: ShoppingItem[]) => filterShopViewItems(items, { ...filters, listId: "all", includeLowStock })
     .filter((item) => !activeList || shoppingItemListIds(item).some((id) => activeList.listIds.includes(id)));
   const visibleOpen = filterItems(open);
   const visibleBought = filterItems(bought);
@@ -190,6 +193,8 @@ export function ShopViewScreen({
       <PageGrid columns="main-sidebar" className="items-start">
         <Stack gap="lg" className="gap-3 sm:gap-6">
           {selection}
+          <AutomaticShoppingFilter included={includeLowStock} onChange={setIncludeLowStock} />
+          <CategoryOrder order={order} onChange={change} />
           {open.length > 0 && <ShoppingGuidance />}
           {open.length > 0 && (
             <ShopViewToolbar
@@ -206,7 +211,7 @@ export function ShopViewScreen({
           ) : visibleOpen.length === 0 ? (
             <EmptyState icon={SearchXIcon} title={t("shopView.filters.noResults")} description={t("shopView.filters.noResultsDescription")} />
           ) : (
-            groupShopViewItems(visibleOpen, sort).map((group) => {
+            groupShopViewItems(visibleOpen, sort, order).map((group) => {
               const list = (
                 <ShoppingItemList
                   items={group.items}
@@ -215,6 +220,7 @@ export function ShopViewScreen({
                   showShop={combined}
                   showStockStatus={sort !== "priority"}
                   onToggle={(item) => void actions.toggle(item)}
+                    onSkip={(item) => void actions.skip(item)}
                   onDelete={canManage ? (item) => void actions.remove(item) : undefined}
                   onEdit={setEditing}
                 />
@@ -251,6 +257,7 @@ export function ShopViewScreen({
               size="large"
               showShop={combined}
               onToggle={(item) => void actions.toggle(item)}
+                    onSkip={(item) => void actions.skip(item)}
               onDelete={canManage ? (item) => void actions.remove(item) : undefined}
             />
           )}
@@ -279,9 +286,9 @@ const SORT_STORAGE_KEY = "wh-shop-view-sort";
 function readStoredSort(): ShopViewSort {
   try {
     const stored = globalThis.localStorage?.getItem(SORT_STORAGE_KEY);
-    return (SHOP_VIEW_SORTS as readonly string[]).includes(stored ?? "") ? (stored as ShopViewSort) : "name";
+    return (SHOP_VIEW_SORTS as readonly string[]).includes(stored ?? "") ? (stored as ShopViewSort) : "category";
   } catch {
-    return "name";
+    return "category";
   }
 }
 

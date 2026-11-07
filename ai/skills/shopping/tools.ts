@@ -305,6 +305,7 @@ registerAssistantTool({
     item: entityRef("shopping_item", "Unique row id from shopping_list (preferred for duplicate names), or an unambiguous item name"),
     product: entityRef("product", "Link this catalogue product to the existing item; use to repair unlinked groceries").optional(),
     bought: z.boolean().optional().describe("true = ticked off (bought), false = back on the list"),
+    status: z.enum(["open", "bought", "skipped"]).optional().describe("skipped = not now: hide from active shopping, preserve catalogue/stock/minimum; open restores it"),
     shop: entityRef("shop", "Move to this shop").optional(),
     noShop: z.boolean().optional().describe("Remove the shop"),
     list: entityRef("shopping_list", "Move to this list").optional(),
@@ -339,7 +340,7 @@ registerAssistantTool({
     const { item, restock, stock } = await updateShoppingItem(ctx.user, input.item.id, {
       purchaseDecision: input.purchaseDecision,
       ...(input.product && { productId: input.product.id }),
-      ...(input.bought !== undefined && { status: input.bought ? ("bought" as const) : ("open" as const) }),
+      ...(input.status ? { status: input.status } : input.bought !== undefined ? { status: input.bought ? ("bought" as const) : ("open" as const) } : {}),
       ...(input.shop && { shopId: input.shop.id }),
       ...(input.noShop && { shopId: null }),
       ...(input.list && { listId: input.list.id }),

@@ -32,6 +32,7 @@ type ShoppingItemRowProps = {
   onToggle: (item: ShoppingItem) => void;
   /** Shows a delete button when given. */
   onDelete?: (item: ShoppingItem) => void;
+  onSkip?: (item: ShoppingItem) => void;
   /** Shows an edit button when given (name, product, category, price, link…). */
   onEdit?: (item: ShoppingItem) => void;
   /** The project chip (projects feature); off on the project's own page. */
@@ -55,6 +56,7 @@ export function ShoppingItemRow({
   taskTitle,
   onToggle,
   onDelete,
+  onSkip,
   onEdit,
   showProject = true,
   actions,
@@ -156,6 +158,8 @@ export function ShoppingItemRow({
         <DropdownMenuContent align="end" className="max-w-[calc(100vw-2rem)]">
           <DropdownMenuLabel className="max-w-64 truncate">{item.name}</DropdownMenuLabel>
           <DropdownMenuItem onSelect={() => setDetailsOpen((open) => !open)}><ChevronDownIcon />{t(detailsOpen ? "item.hideDetails" : "item.details")}</DropdownMenuItem>
+          {onSkip && item.status === "open" && <DropdownMenuItem onSelect={() => onSkip(item)}>{t("planning.skip")}</DropdownMenuItem>}
+          {item.status === "skipped" && <DropdownMenuItem onSelect={() => onToggle(item)}>{t("planning.restore")}</DropdownMenuItem>}
           {onEdit && <DropdownMenuItem onSelect={() => onEdit(item)}><PencilIcon />{common("actions.edit")}</DropdownMenuItem>}
           {item.url && <DropdownMenuItem asChild><a href={item.url} target="_blank" rel="noopener noreferrer"><ExternalLinkIcon />{t("item.openLink")}</a></DropdownMenuItem>}
           {onDelete && <><DropdownMenuSeparator /><DropdownMenuItem variant="destructive" onSelect={() => onDelete(item)}><Trash2Icon />{common("actions.delete")}</DropdownMenuItem></>}

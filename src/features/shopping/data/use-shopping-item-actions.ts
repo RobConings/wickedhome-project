@@ -78,6 +78,11 @@ export function useShoppingItemActions({ items: suppliedItems, onChanged }: Opti
     [reconcile, overrides, onChanged, t, track],
   );
 
+  const skip = React.useCallback(async (item: ShoppingItem) => {
+    try { await updateShoppingItem(item.id, { status: "skipped" }); onChanged?.(); }
+    catch { toast.error(t("errors.generic")); }
+  }, [onChanged, t]);
+
   const remove = React.useCallback(
     async (item: ShoppingItem) => {
       setRemoved((previous) => [...previous, item.id]);
@@ -103,5 +108,5 @@ export function useShoppingItemActions({ items: suppliedItems, onChanged }: Opti
   );
 
   /** `saving`: ids of items with a change on its way to the server (already shown optimistically). */
-  return { items: visible, toggle, remove, saving, confirmation };
+  return { items: visible, toggle, skip, remove, saving, confirmation };
 }

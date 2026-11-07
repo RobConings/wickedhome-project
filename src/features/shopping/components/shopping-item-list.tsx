@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import type { Shop } from "@/features/shops";
 import { cn } from "@/lib/utils";
 import type { ShoppingItem } from "../types/shopping";
+import { groupItemsByCategory } from "./shopping-grouping";
+import { useCategoryOrder } from "./shopping-preferences";
 import { ShoppingItemRow } from "./shopping-item-row";
 
 type ShoppingItemListProps = {
@@ -11,6 +13,7 @@ type ShoppingItemListProps = {
   shops: Shop[];
   onToggle: (item: ShoppingItem) => void;
   onDelete?: (item: ShoppingItem) => void;
+  onSkip?: (item: ShoppingItem) => void;
   /** Whether a given item may be deleted (e.g. children only their own). Defaults to all when `onDelete` is set. */
   canDelete?: (item: ShoppingItem) => boolean;
   /** Opens the item's edit dialog (an edit button per row). */
@@ -30,6 +33,7 @@ export function ShoppingItemList({
   shops,
   onToggle,
   onDelete,
+  onSkip,
   canDelete,
   onEdit,
   showShop = true,
@@ -40,6 +44,8 @@ export function ShoppingItemList({
   className,
 }: ShoppingItemListProps) {
   const { t } = useTranslation("shopping");
+  const { order } = useCategoryOrder();
+  const skipped = items.filter((item) => item.status === "skipped");
   const [showBought, setShowBought] = React.useState(false);
   const shopsById = React.useMemo(() => new Map(shops.map((shop) => [shop.id, shop])), [shops]);
   const open = items.filter((item) => item.status === "open");
@@ -55,6 +61,7 @@ export function ShoppingItemList({
       showStockStatus={showStockStatus}
       size={size}
       onToggle={onToggle}
+      onSkip={onSkip}
       onDelete={onDelete && (canDelete?.(item) ?? true) ? onDelete : undefined}
       onEdit={onEdit && (canDelete?.(item) ?? true) ? onEdit : undefined}
     />
@@ -63,10 +70,11 @@ export function ShoppingItemList({
   return (
     <div className={cn("flex flex-col gap-2", className)}>
       {open.length > 0 ? (
-        <ul className="divide-y rounded-xl border bg-card px-1 shadow-xs sm:px-2">{open.map(renderRow)}</ul>
+        <div className="space-y-3">{groupItemsByCategory(open, order).map((group) => <section key={group.category}><h3 className="mb-1 text-sm font-medium">{t(`categories.${group.category}`)}</h3><ul className="divide-y rounded-xl border bg-card px-1 shadow-xs sm:px-2">{group.items.map(renderRow)}</ul></section>)}</div>
       ) : (
         emptyText && <p className="rounded-xl border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">{emptyText}</p>
       )}
+      {skipped.length > 0 && <details><summary className="cursor-pointer text-sm text-muted-foreground">{t("planning.skipped")} ({skipped.length})</summary><ul className="divide-y rounded-xl border px-2">{skipped.map(renderRow)}</ul></details>}
       {bought.length > 0 && (
         <div className="flex flex-col gap-1">
           <button

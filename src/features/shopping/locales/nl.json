@@ -408,5 +408,14 @@
     "removeDescription": "Alleen de groep wordt verwijderd. De winkels en boodschappen blijven bestaan.",
     "combinedHint": "Eén overzicht voor deze winkels. Per product blijven de oorspronkelijke winkel, link en prijs zichtbaar.",
     "duplicateName": "Er bestaat al een winkelgroep met deze naam."
+  },
+  "planning": {
+    "includeAutomatic": "Minimumvoorraadaanvullingen tonen",
+    "categoryOrder": "Categorievolgorde",
+    "moveUp": "{{name}} omhoog",
+    "moveDown": "{{name}} omlaag",
+    "skipped": "Nu niet",
+    "skip": "Nu niet",
+    "restore": "Opnieuw opnemen"
   }
 }

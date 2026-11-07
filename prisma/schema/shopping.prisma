@@ -38,6 +38,7 @@ enum ShoppingItemSource {
 enum ShoppingItemStatus {
   OPEN
   BOUGHT
+  SKIPPED
 }
 
 /// Automatic shopping after a user dismisses a product: first restock, then consume it again.

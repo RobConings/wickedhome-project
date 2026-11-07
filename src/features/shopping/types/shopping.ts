@@ -37,7 +37,7 @@ export const SHOPPING_ITEM_SOURCES = ["manual", "staple", "task", "low_stock", "
 export const shoppingItemSourceSchema = z.enum(SHOPPING_ITEM_SOURCES);
 export type ShoppingItemSource = z.infer<typeof shoppingItemSourceSchema>;
 
-export const SHOPPING_ITEM_STATUSES = ["open", "bought"] as const;
+export const SHOPPING_ITEM_STATUSES = ["open", "bought", "skipped"] as const;
 export const shoppingItemStatusSchema = z.enum(SHOPPING_ITEM_STATUSES);
 export type ShoppingItemStatus = z.infer<typeof shoppingItemStatusSchema>;
 

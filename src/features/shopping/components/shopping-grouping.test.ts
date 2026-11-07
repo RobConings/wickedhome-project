@@ -109,3 +109,17 @@ describe("combined shopping views", () => {
     assert.deepEqual(itemsForShops(entries, ["none"]).map((entry) => entry.name), ["Salt"]);
   });
 });
+
+
+describe("planning without automatic replenishments", () => {
+  it("keeps explicit and recipe needs, including a mixed requirement, without changing minimums", () => {
+    const automatic = item("Automatic", { source: "low_stock" });
+    const explicit = item("Explicit", { source: "manual" });
+    const mixed = item("Recipe", { source: "low_stock", requirements: [{ source: "low_stock" }, { source: "recipe" }] as ShoppingItem["requirements"] });
+    assert.deepEqual(filterShopViewItems([automatic, explicit, mixed], { ...NO_SHOP_VIEW_FILTERS, includeLowStock: false }).map((entry) => entry.id), ["Explicit", "Recipe"]);
+  });
+  it("uses saved category order and catalogue categories rather than words in the name", () => {
+    const groups = groupShopViewItems([item("Olive oil", { category: "pantry" }), item("Bertolli with olive oil", { category: "dairy" }), item("Unknown")], "category", ["dairy", "pantry"]);
+    assert.deepEqual(groups.map((group) => group.key), ["dairy", "pantry", "other"]);
+  });
+});
