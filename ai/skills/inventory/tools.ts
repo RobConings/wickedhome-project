@@ -3,7 +3,7 @@ import type { StockItem } from "@/features/inventory/types/inventory";
 import { PACKAGE_UNITS, PRODUCT_CATEGORIES, formatQuantity, productInputSchema, shoppingStockStatus, type Product } from "@/features/shopping/types/shopping";
 import { addDays, todayIn } from "@/types/dates";
 import { badRequest, forbidden } from "@/api/lib/http";
-import { addMovement, createStockItem, deleteStockItem, getProductStock, listStock, updateStockItem } from "@/api/inventory/inventory.service";
+import { addMovement, createStockItem, deleteStockItem, getProductStock, listPurchases, listStock, recordPurchases, updateStockItem } from "@/api/inventory/inventory.service";
 import { lookupBarcode } from "@/api/shopping/barcode-lookup.service";
 import { planStockMerge } from "@/api/shopping/product-alternatives";
 import {
@@ -170,6 +170,24 @@ registerAssistantTool({
   },
 });
 
+registerAssistantTool({
+  name: "inventory.purchases",
+  description: "Recent items added to household stock as purchases, with quantity, unit, place, date, note and who recorded them. This is purchase movement history, not expenses or prices.",
+  input: z.object({
+    withinDays: z.number().int().min(1).max(365).default(30).describe("How far back to look"),
+    limit: z.number().int().min(1).max(100).default(50),
+  }),
+  permission: "read",
+  confirm: "never",
+  activity: { en: "Checked purchase history", nl: "Aankopen bekeken" },
+  run: async (ctx, input) => ({
+    purchases: await listPurchases(ctx.householdId, {
+      since: new Date(Date.now() - input.withinDays * 24 * 60 * 60 * 1000),
+      limit: input.limit,
+    }),
+  }),
+});
+
 const linkText = (product: Product) =>
   product.shopLinks.length
     ? product.shopLinks.map((link) => [link.shop.name, money(link.priceCents), link.url ? "webshop link" : null].filter(Boolean).join(" "))
@@ -231,6 +249,86 @@ registerAssistantTool({
 });
 
 // ── Writes ────────────────────────────────────────────────────────────────────────────────────────────
+
+const purchaseInput = z.object({
+  items: z.array(z.object({
+    product: z.string().trim().min(1).max(120).describe("The household product name; use the existing catalogue name when available"),
+    quantity: z.coerce.number().positive().max(100_000).describe("How many household stock units were bought, not the receipt weight unless this product is normally tracked by weight"),
+    unit: z.string().trim().min(1).max(20).optional().describe("Household stock unit, not automatically the receipt unit. Prefer the existing product's unit; omit for its existing/default count unit. Use weight/volume only when that product is normally tracked that way."),
+    place: entityRef("place", "Where this product is stored; omit only when it has exactly one known stock location").optional(),
+    category: z.enum(PRODUCT_CATEGORIES).optional().describe("Used only when a new catalogue product must be created"),
+  })).min(1).max(50),
+  receiptImageIndex: z.number().int().min(0).optional().describe("Optional zero-based image index when this purchase should be linked to one of several images attached to this message"),
+  note: z.string().trim().max(200).optional().describe("Optional receipt or shop note"),
+});
+
+registerAssistantTool({
+  name: "inventory.record_purchase",
+  description: "Record items bought as purchases in household stock, with or without a receipt. First check inventory_products for existing catalogue names and stock units; map abbreviated receipt labels to those names instead of creating duplicates. If a receipt image is attached, link it when it is clearly the source; receiptImageIndex selects one of several images. Without a receipt, these are ordinary manually reported purchases, not receipt imports. Use household units (e.g. 1 bunch/tros, 2 packs/pakken, 1 bottle/fles), not shop weight by default. Existing product stock unit is authoritative; quantity counts in that unit and unit may be omitted. Use grams/ml only for products normally tracked by weight/volume. For unclear household counts or storage places, ask instead of guessing. Creates missing catalogue products and stock entries; does not record expenses or prices. On an app/database error, check inventory_purchases and inventory_stock before retrying to avoid double additions.",
+  input: purchaseInput,
+  permission: "write",
+  confirm: "always",
+  activity: { en: "Recorded purchases in stock", nl: "Aankopen in de voorraad geboekt" },
+  refuse: (ctx, input) => {
+    const images = ctx.receiptImageIds ?? [];
+    if (input.receiptImageIndex !== undefined && input.receiptImageIndex >= images.length) return "That receiptImageIndex does not match an image attached to this message.";
+    return null;
+  },
+  describe: (ctx, input) => {
+    const lines = input.items.map((item) =>
+      `${formatQuantity(item.quantity, ctx.locale)}${item.unit ? ` ${item.unit}` : ""} ${item.product}${item.place ? ` (${item.place.name})` : ""}`,
+    );
+    const source = input.receiptImageIndex !== undefined || (ctx.receiptImageIds?.length === 1)
+      ? say(ctx.locale, "purchases from the attached receipt", "aankopen van de bijgevoegde bon")
+      : say(ctx.locale, "reported purchases", "gemelde aankopen");
+    return say(ctx.locale, `Record ${source} in stock: ${lines.join("; ")}`, `${source} in de voorraad boeken: ${lines.join("; ")}`);
+  },
+  run: async (ctx, input) => {
+    const images = ctx.receiptImageIds ?? [];
+    const receiptImageId = input.receiptImageIndex !== undefined
+      ? images[input.receiptImageIndex]
+      : images.length === 1 ? images[0] : undefined;
+    if (input.receiptImageIndex !== undefined && !receiptImageId) throw badRequest("That receipt image is no longer available. Attach it again and retry.");
+    const products = await listProducts(ctx.householdId);
+    const stockByProduct = new Map<string, StockItem[]>();
+    const lines = [];
+    for (const item of input.items) {
+      const key = item.product.toLocaleLowerCase().replace(/\s+/g, " ");
+      const matches = products.filter((product) => product.name.toLocaleLowerCase().replace(/\s+/g, " ") === key);
+      if (matches.length > 1) throw badRequest(`More than one product is named "${item.product}"; choose or rename the matching catalogue product first.`);
+      const product = matches[0];
+      let place = item.place;
+      if (!place && product) {
+        let stock = stockByProduct.get(product.id);
+        if (!stock) {
+          stock = await listStock(ctx.householdId, { productId: product.id });
+          stockByProduct.set(product.id, stock);
+        }
+        if (stock.length === 1) {
+          const onlyPlace = stock[0]!;
+          place = { type: "place", id: onlyPlace.placeId, name: onlyPlace.placeName };
+        } else {
+          throw badRequest(stock.length
+            ? `Where should ${item.product} be stored? It is kept in ${stock.map((entry) => entry.placeName).join(" or ")}.`
+            : `Where should ${item.product} be stored? Give its place.`);
+        }
+      }
+      if (!place) throw badRequest(`Where should the new product ${item.product} be stored? Give its place.`);
+      lines.push({
+        product: item.product,
+        quantity: item.quantity,
+        unit: item.unit,
+        placeId: place.id,
+        category: item.category,
+      });
+    }
+    const stock = await recordPurchases(ctx.user, lines, receiptImageId, input.note);
+    return done(
+      stock.map((item) => `${item.productName} in ${item.placeName}: ${amount(item.quantity, item.unit, ctx.locale)} now`).join("; "),
+      { recorded: input.items.length, receiptAttached: Boolean(receiptImageId), stock },
+    );
+  },
+});
 
 registerAssistantTool({
   name: "inventory.change_stock",
@@ -431,7 +529,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "inventory.link_alternative",
   description:
-    "Let a product share another product's stock (alternatives: another brand of the same thing): its stock merges into the other's, per place. Optionally name the shared stock (creates a generic product, e.g. \"Bacon\"). Or unlink it from its group (the stock stays).",
+    "Let a product share another product's stock (alternatives: another brand of the same thing): its stock merges into the other's, per place. This links existing products; record bought quantities separately with inventory_record_purchase. Check inventory_products first: if they already share stock, no link is needed. Give sharesWith for linking; sharedName optionally names a new generic product for both groups (e.g. \"Bacon\"). Or unlink it from its group (the stock stays). An app/database error is not evidence of a name mismatch: check current data before retrying; do not recreate products to work around it.",
   input: z.object({
     product: entityRef("product", "The alternative, e.g. the brand that was bought"),
     sharesWith: entityRef("product", "The product whose stock it shares").optional(),

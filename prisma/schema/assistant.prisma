@@ -78,6 +78,8 @@ model AssistantImage {
   message   AssistantMessage? @relation(fields: [messageId], references: [id], onDelete: Cascade)
   mimeType  String
   data      Bytes
+  inventoryPurchaseRecordedAt DateTime?
+  stockMovements StockMovement[]
   createdAt DateTime          @default(now())
 
   @@index([messageId])

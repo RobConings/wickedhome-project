@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { AssistantStreamEvent, AssistantToolStatus, ToolResult } from "@/features/assistant/types/assistant";
 import type { ScreenRef } from "@/types/screen-context";
 import { HttpError } from "@/api/lib/http";
+import { Prisma } from "@/api/lib/db";
 import { prune } from "./compact";
 import { invalidateAssistantContext } from "./context";
 import { ModelError, type ChatMessage, type ChatModel, type ChatResult, type ToolCall } from "./llm-client";
@@ -196,13 +197,24 @@ export function resultForModel(result: ToolResult | null, limit = RESULT_LIMIT):
   return text.length > limit ? `${text.slice(0, limit)}… (cut off)` : text;
 }
 
-function errorMessage(error: unknown): string {
+function errorMessage(error: unknown, toolName: string): string {
   if (error instanceof z.ZodError) return `Invalid arguments: ${issuesOf(error)}`;
   if (error instanceof HttpError) {
     const fields = error.fields ? ` (${Object.entries(error.fields).map(([key, messages]) => `${key}: ${messages.join(", ")}`).join("; ")})` : "";
     return `${error.message}${fields}`;
   }
-  console.error("Assistant tool failed", error);
+  console.error(`Assistant tool "${toolName}" failed`, error);
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    const cause: Record<string, string> = {
+      P2002: "A record with the same unique value already exists",
+      P2003: "A referenced record is missing or still in use",
+      P2025: "A required record no longer exists",
+      P2010: "A database query failed",
+      P2028: "The database transaction could not complete",
+      P2034: "The database transaction conflicted with another change",
+    };
+    return `${cause[error.code] ?? "A database operation failed"} (Prisma ${error.code}, tool ${toolName}). Check the current data before retrying; the server logs contain the technical cause.`;
+  }
   return "The action failed because of an error in the app";
 }
 
@@ -243,7 +255,7 @@ export async function runTool(tool: RegisteredAssistantTool, ctx: AssistantToolC
     await auditToolCall(tool, ctx, input.data);
     return { ok: true, data: data ?? null };
   } catch (error) {
-    return { ok: false, error: errorMessage(error) };
+    return { ok: false, error: errorMessage(error, tool.name) };
   }
 }
 
@@ -342,7 +354,7 @@ async function handleCall(call: ToolCall, deps: LoopDeps, step: number, history:
       [summary, preview] = await Promise.all([describeCall(tool, deps.ctx, input.data), previewCall(tool, deps.ctx, input.data)]);
     } catch (error) {
       // The preview found the change impossible: tell the model, don't ask the person.
-      return failWith(errorMessage(error), args.value);
+      return failWith(errorMessage(error, tool.name), args.value);
     }
     const saved = await deps.save({ ...base, toolArgs: args.value, toolResult: null, toolStatus: "pending", toolSummary: summary });
     deps.emit(confirmEvent(saved, tool, preview, deps.ctx.locale));
@@ -608,7 +620,7 @@ export async function amendedArguments(
   try {
     await previewCall(tool, ctx, input.data);
   } catch (error) {
-    throw new InvalidConfirmationError(errorMessage(error));
+    throw new InvalidConfirmationError(errorMessage(error, tool.name));
   }
   return { args, changed };
 }

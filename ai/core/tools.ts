@@ -46,6 +46,8 @@ export type AssistantToolContext = {
   channel: AssistantToolChannel;
   /** Over MCP with an OAuth token: the connected app's name (e.g. "ChatGPT"), for the audit log. */
   via?: string;
+  /** Images attached to the current chat question, in the same order the model saw them. */
+  receiptImageIds?: readonly string[];
   /**
    * The page the current question was asked from (screen context), only when it was found for this household.
    * Read it with `screenTarget(ctx, kind)` to default an omitted target; absent over MCP.

@@ -204,12 +204,13 @@ async function loadHistory(conversationId: string): Promise<LoopMessage[]> {
   return rows.map((row) => ({ ...toLoopMessage(row), ...(row.images.length && { images: row.images.map(toDataUrl) }) }));
 }
 
-const toolContext = (user: SessionUser, signal: AbortSignal, screen: ResolvedScreen | null = null): AssistantToolContext => ({
+const toolContext = (user: SessionUser, signal: AbortSignal, screen: ResolvedScreen | null = null, receiptImageIds: readonly string[] = []): AssistantToolContext => ({
   user,
   householdId: user.householdId,
   locale: user.locale,
   signal,
   channel: "chat",
+  ...(receiptImageIds.length && { receiptImageIds }),
   // Tools see only the reference, and only for a screen that was found for this household.
   ...(screen && { screen: { kind: screen.kind, ...(screen.id && { id: screen.id }) } }),
 });
@@ -250,10 +251,17 @@ export async function planFor(user: SessionUser, ctx: AssistantToolContext, perm
 }
 
 /** `screen`: the page the current question was asked from (its note goes with the question, tools see it). */
-async function depsFor(user: SessionUser, conversationId: string, options: ChatOptions, model: ChatModel, screen: ResolvedScreen | null = null): Promise<LoopDeps> {
+async function depsFor(
+  user: SessionUser,
+  conversationId: string,
+  options: ChatOptions,
+  model: ChatModel,
+  screen: ResolvedScreen | null = null,
+  receiptImageIds: readonly string[] = [],
+): Promise<LoopDeps> {
   const remembered = await db.assistantToolPreference.findMany({ where: { userId: user.id }, select: { toolName: true } });
   const permitted = toolsFor(user.role);
-  const ctx = toolContext(user, options.signal, screen);
+  const ctx = toolContext(user, options.signal, screen, receiptImageIds);
   const settings = options.settings ?? readAssistantSettings();
   return {
     model,
@@ -327,7 +335,7 @@ export async function sendMessage(
     : await db.assistantConversation.create({ data: { userId: user.id, title } });
   // The page it was asked from: looked up for this household; anything else is silently left out.
   const screen = input.screen ? await resolveScreen(toolContext(user, options.signal), input.screen) : null;
-  const deps = await depsFor(user, conversation.id, options, model, screen);
+  const deps = await depsFor(user, conversation.id, options, model, screen, images.map((image) => image.id));
   const history = await loadHistory(conversation.id);
   // Confirmations left unanswered are answered as "not confirmed", so the history stays valid for the model.
   await cancelPending(history, deps);
@@ -365,7 +373,12 @@ export async function answerConfirmation(
   // The turn goes on with the screen of its question, looked up again (it may have changed since).
   const asked = history.findLast((message) => message.role === "user")?.screen;
   const screen = asked ? await resolveScreen(toolContext(user, options.signal), asked) : null;
-  const deps = await depsFor(user, conversation.id, options, model, screen);
+  const latestQuestion = await db.assistantMessage.findFirst({
+    where: { conversationId: conversation.id, role: "USER" },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    select: { images: { select: { id: true }, orderBy: [{ createdAt: "asc" }, { id: "asc" }] } },
+  });
+  const deps = await depsFor(user, conversation.id, options, model, screen, latestQuestion?.images.map((image) => image.id) ?? []);
   if (input.decision === "confirm" && (input.edits || input.choice !== undefined)) {
     // Edits or a choice that don't validate answer 400 before anything streams; the card stays.
     const tool = deps.tools.find((candidate) => candidate.name === pending.toolName);

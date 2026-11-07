@@ -7,6 +7,8 @@
 import assert from "node:assert/strict";
 import { after, describe, it } from "node:test";
 import { z } from "zod";
+import { Prisma } from "@/api/lib/db";
+import { badRequest } from "@/api/lib/http";
 import type { TokenIdentity } from "./assistant.service";
 import { SUPPORTED_PROTOCOL_VERSIONS, handleMcpMessage } from "./mcp.routes";
 import { registerAssistantTool, unregisterAssistantTool } from "./tools";
@@ -103,5 +105,33 @@ describe("MCP", () => {
   it("answers unknown methods with -32601", async () => {
     const response = (await handleMcpMessage(rpc("resources/list"), identity("read"), signal)) as { error?: { code: number } };
     assert.equal(response.error?.code, -32601);
+  });
+
+  it("returns validation details and database error codes for confirmed writes, without leaking SQL", async (t) => {
+    const log = t.mock.method(console, "error", () => undefined);
+    const tool = registerAssistantTool({
+      name: "mcptest.failure",
+      description: "Fail a confirmed write.",
+      input: z.object({ database: z.boolean() }),
+      permission: "write",
+      confirm: "always",
+      activity: { en: "Linked products", nl: "Producten gekoppeld" },
+      run: (_ctx, input) => {
+        if (!input.database) throw badRequest("Validation failed", { mainProductId: ["These products already share stock"] });
+        throw new Prisma.PrismaClientKnownRequestError("private SQL and connection details", { code: "P2010", clientVersion: "7.10.0" });
+      },
+    });
+    t.after(() => unregisterAssistantTool(tool.name));
+    const invoke = async (database: boolean) => (await handleMcpMessage(rpc("tools/call", {
+      name: tool.wireName, arguments: { database, confirm: true },
+    }), identity("write"), signal)) as CallResult;
+    const validation = await invoke(false);
+    assert.equal(validation.result.isError, true);
+    assert.match(validation.result.content[0]!.text, /mainProductId: These products already share stock/);
+    const database = await invoke(true);
+    assert.equal(database.result.isError, true);
+    assert.match(database.result.content[0]!.text, /database query failed.*Prisma P2010, tool mcptest.failure/);
+    assert.doesNotMatch(database.result.content[0]!.text, /private SQL/);
+    assert.equal(log.mock.calls[0]?.arguments[0], 'Assistant tool "mcptest.failure" failed');
   });
 });

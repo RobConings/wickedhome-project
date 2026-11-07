@@ -2,12 +2,12 @@
  * Units of amounts: recipe amounts ("300 g", "1 l", "2 teentjes"), stock units ("pack", "pcs", "g") and package
  * sizes ("200 g"). Pure, shared by the API, the UI and the assistant (units.test.ts).
  *
- * Three dimensions convert within themselves: mass (base g), volume (base ml) and count (pieces and packages;
- * every count unit is one "thing", so "2 pcs" against a stock of packs compares directly). Anything else (el,
- * tl, snuifje, teentje…) doesn't convert: callers then say "unknown amount", never a number in the wrong unit.
+ * Mass, volume and count units convert within their dimensions. Bundles (e.g. a tros/bunch) are a separate
+ * dimension from individual pieces and packages. Anything else (el, tl, snuifje, teentje…) doesn't convert:
+ * callers then say "unknown amount", never a number in the wrong unit.
  */
 
-export type UnitDimension = "mass" | "volume" | "count";
+export type UnitDimension = "mass" | "volume" | "count" | "bundle";
 
 type UnitInfo = { dimension: UnitDimension; /** Base units (g, ml, 1) per one of this unit. */ factor: number };
 
@@ -85,6 +85,12 @@ const COUNT = new Set([
   "roll",
   "rolls",
 ]);
+const BUNDLE = new Set([
+  "tros",
+  "trossen",
+  "bunch",
+  "bunches",
+]);
 
 /** Lower case, no trailing dot, single spaces: "St." → "st", " KG " → "kg". */
 export const normalizeUnit = (unit: string | null | undefined) =>
@@ -100,11 +106,12 @@ export function unitInfo(unit: string | null | undefined): UnitInfo | null {
   if (key in MASS) return { dimension: "mass", factor: MASS[key]! };
   if (key in VOLUME) return { dimension: "volume", factor: VOLUME[key]! };
   if (COUNT.has(key)) return { dimension: "count", factor: 1 };
+  if (BUNDLE.has(key)) return { dimension: "bundle", factor: 1 };
   return null;
 }
 
 /** Counted in whole things (empty, pcs, stuks, pack, pak, can…): needs in these units round up. */
-export const isCountUnit = (unit: string | null | undefined) => unitInfo(unit)?.dimension === "count";
+export const isCountUnit = (unit: string | null | undefined) => ["count", "bundle"].includes(unitInfo(unit)?.dimension ?? "");
 
 /** Converts between two units of the same dimension; null when they don't convert. */
 export function convertAmount(amount: number, from: string | null | undefined, to: string | null | undefined): number | null {

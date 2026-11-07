@@ -14,6 +14,7 @@ import {
   getDefaultList,
   getShoppingOverview,
   listItems,
+  markOpenItemsBought,
   updateItem,
   updateList,
   updateStaple,
@@ -208,6 +209,35 @@ registerAssistantTool({
       taskId: input.task?.id ?? null,
     });
     return done(`${item.name} is on the list “${item.listName}”${item.shop ? ` (${item.shop.name})` : ""}.`, { id: item.id, ...stockPriority(item.stockStatus, item.isEssential) });
+  },
+});
+
+registerAssistantTool({
+  name: "shopping.complete_trip",
+  description: "After a shopping trip, mark all currently open items on one named list, or on all grocery lists, as bought in one confirmed action. This only checks off list items; use inventory.record_purchase to add known quantities to stock and expenses.log to record the total paid.",
+  input: z.object({
+    list: entityRef("shopping_list", "Only this list; omit to complete all grocery lists").optional(),
+  }),
+  permission: "write",
+  confirm: "always",
+  roles: ["owner", "adult"],
+  activity: { en: "Completed a shopping trip", nl: "Boodschappentrip afgerond" },
+  describe: (ctx, input) => input.list
+    ? say(ctx.locale, `Mark all open items on “${input.list.name}” as bought`, `Alle open items op “${input.list.name}” als gekocht afvinken`)
+    : say(ctx.locale, "Mark all open grocery-list items as bought", "Alle open items op de boodschappenlijsten als gekocht afvinken"),
+  run: async (ctx, input) => {
+    const overview = await getShoppingOverview(ctx.householdId, ctx.locale);
+    const lists = input.list
+      ? overview.lists.filter((list) => list.id === input.list?.id)
+      : overview.lists.filter((list) => list.kind === "groceries");
+    if (input.list && !lists.length) throw badRequest("That shopping list is no longer available.");
+    const count = await markOpenItemsBought(ctx.user, lists.map((list) => list.id));
+    return done(
+      count
+        ? `Marked ${count} shopping-list ${count === 1 ? "item" : "items"} as bought.`
+        : "There were no open items to mark as bought.",
+      { markedBought: count },
+    );
   },
 });
 

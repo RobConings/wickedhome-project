@@ -11,14 +11,19 @@ describe("units", () => {
     assert.deepEqual(unitInfo("gr."), { dimension: "mass", factor: 1 });
     assert.deepEqual(unitInfo(" Liter "), { dimension: "volume", factor: 1000 });
     assert.equal(unitInfo("St.")?.dimension, "count");
+    assert.equal(unitInfo("tros")?.dimension, "bundle");
     assert.equal(isCountUnit(null), true);
     assert.equal(isCountUnit("pakje"), true);
+    assert.equal(isCountUnit("tros"), true);
     for (const unit of ["el", "tl", "snuifje", "teentje", "handvol"]) assert.equal(unitInfo(unit), null, unit);
   });
 
   it("converts within a dimension only", () => {
     assert.equal(convertAmount(1.5, "kg", "g"), 1500);
+    assert.equal(convertAmount(938, "g", "kg"), 0.938);
     assert.equal(convertAmount(33, "cl", "l"), 0.33);
+    assert.equal(convertAmount(1, "tros", "trossen"), 1);
+    assert.equal(convertAmount(1, "tros", "stuks"), null);
     assert.equal(convertAmount(1, "kg", "l"), null);
   });
 

@@ -64,6 +64,7 @@ function setup(t: TestContext, quantity = 1, minimum: number | null = 2) {
     return { id: "movement" };
   });
   stub(t, db, "$transaction", async (run: (tx: typeof db) => Promise<unknown>) => run(db));
+  const lock = stub(t, db, "$queryRaw", async () => [{ locked: 1 }]);
   const lists = stub(t, db.shoppingList, "upsert", async (input: { create: { name: string } }) => {
     void input;
     return { id: "low-list" };
@@ -90,10 +91,23 @@ function setup(t: TestContext, quantity = 1, minimum: number | null = 2) {
     items.push({ ...data, status: "OPEN" });
     return {};
   });
-  return { items, movements, reads, lists, product };
+  return { items, movements, reads, lists, product, lock, save };
 }
 
 describe("low stock groceries", () => {
+  it("uses the quantity read after acquiring the lock and logs only the applied change", async (t) => {
+    const { lock, save, movements } = setup(t, 1, null);
+    lock.mock.mockImplementation(async () => {
+      await save({ data: { quantity: 5 } });
+      return [{ locked: 1 }];
+    });
+    const result = await addMovement(actor, "stock", { delta: 2, reason: "bought" });
+    assert.equal(result.stockItem.quantity, 7, "preserves the change made while waiting for the lock");
+    assert.equal(lock.mock.callCount(), 1);
+    assert.equal((movements[0] as { delta: number }).delta, 2);
+    assert.equal((movements[0] as { quantityAfter: number }).quantityAfter, 7);
+  });
+
   it("includes equality and a zero minimum, but excludes above minimum and unset minima", () => {
     assert.equal(isBelowMinimum(2, 2), true);
     assert.equal(isBelowMinimum(1, 2), true);

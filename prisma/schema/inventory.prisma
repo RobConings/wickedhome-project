@@ -52,10 +52,14 @@ model StockMovement {
   shoppingItemId String?
   /// Soft reference to the meal being cooked, for COOKED movements (recipes feature).
   mealPlanEntryId String?
+  /// The chat receipt image this purchase was recorded from, if any.
+  assistantImageId String?
+  assistantImage   AssistantImage?      @relation(fields: [assistantImageId], references: [id], onDelete: SetNull)
   note           String?
   createdAt      DateTime            @default(now())
 
   @@index([stockItemId, createdAt])
   @@index([mealPlanEntryId])
+  @@index([assistantImageId])
   @@map("stock_movements")
 }

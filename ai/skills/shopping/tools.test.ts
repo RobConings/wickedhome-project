@@ -41,6 +41,16 @@ describe("shopping, shops and inventory skills", () => {
     assert.deepEqual(childTools, ["inventory.change_stock", "shopping.add_item", "shopping.remove", "shopping.update_item", "shops.favorite"]);
   });
 
+  it("supports confirming a whole grocery trip in one action", () => {
+    const tool = listAssistantTools().find((candidate) => candidate.name === "shopping.complete_trip");
+    assert.ok(tool);
+    assert.equal(tool.permission, "write");
+    assert.equal(tool.confirm, "always");
+    assert.deepEqual(tool.roles, ["owner", "adult"]);
+    assert.equal(tool.input.safeParse({}).success, true, "omitting a list targets all grocery lists");
+    assert.equal(tool.input.safeParse({ list: "Thuis" }).success, true);
+  });
+
   it("never names the external product database in anything the person or the model sees", () => {
     const source = /open\s*(food|beauty|petfood|products)\s*facts|openfoodfacts/i;
     for (const tool of listAssistantTools()) {

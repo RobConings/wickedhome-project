@@ -1,7 +1,10 @@
-import type * as React from "react";
+import * as React from "react";
 import { useTranslation } from "react-i18next";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FormField } from "@/components/shared/form-field";
 import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
-import type { GeneralFormField } from "@/components/shared/general-form";
+import type { GeneralFormCustomFieldProps, GeneralFormField } from "@/components/shared/general-form";
+import { MoneyInput } from "@/components/shared/money-input";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import {
   JOINT,
@@ -12,7 +15,50 @@ import {
   type IncomeOccurrence,
   type IncomeTargetAccount,
 } from "../types/income";
-import { dateText, earners } from "./use-income-text";
+import { dateText, earners, money } from "./use-income-text";
+
+/** A fixed amount is a default; confirming one receipt can still use a different amount. */
+function ReceiptAmountField({ id, name, value, setValue, errors, disabled, plannedCents }: GeneralFormCustomFieldProps & { plannedCents: number }) {
+  const { t } = useTranslation("income");
+  const [adjusting, setAdjusting] = React.useState(false);
+
+  return (
+    <div className="flex flex-col gap-3">
+      <Select
+        value={adjusting ? "adjust" : "keep"}
+        onValueChange={(choice) => {
+          setAdjusting(choice === "adjust");
+          if (choice === "keep") setValue(plannedCents);
+        }}
+        disabled={disabled}
+      >
+        <FormField label={t("fields.amount")} htmlFor={id} errors={adjusting ? undefined : errors}>
+          <SelectTrigger id={id} className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+        </FormField>
+        <SelectContent>
+          <SelectItem value="keep">{t("form.keepAmount", { amount: money(plannedCents) })}</SelectItem>
+          <SelectItem value="adjust">{t("form.adjustAmount")}</SelectItem>
+        </SelectContent>
+      </Select>
+      {adjusting ? (
+        <FormField label={t("fields.receivedAmount")} htmlFor={`${id}-amount`} errors={errors}>
+          <MoneyInput
+            id={`${id}-amount`}
+            name={name}
+            defaultValueCents={typeof value === "number" ? value : plannedCents}
+            onValueChange={setValue}
+            disabled={disabled}
+            autoFocus
+          />
+        </FormField>
+      ) : (
+        <input type="hidden" name={name} value={plannedCents} />
+      )}
+    </div>
+  );
+}
 
 type IncomeFormDialogProps = {
   trigger?: React.ReactElement;
@@ -50,6 +96,8 @@ export function IncomeFormDialog({
   const sourceId = occurrence?.sourceId ?? income?.sourceId ?? null;
   const periodDate = occurrence?.date ?? income?.periodDate ?? null;
   const forOccurrence = Boolean(sourceId);
+  const fixedAmountCents = !income && occurrence?.amountMode === "fixed" ? occurrence.plannedCents : null;
+  const confirmFixedAmount = fixedAmountCents !== null;
 
   const accountField: GeneralFormField[] =
     accounts.length > 0
@@ -91,7 +139,16 @@ export function IncomeFormDialog({
           },
           { name: "description", type: "text", label: t("fields.description"), placeholder: t("fields.descriptionPlaceholder"), maxLength: 120 },
         ] satisfies GeneralFormField[])),
-    { name: "amountCents", type: "money", label: t("fields.amount"), span: "half", autoFocus: forOccurrence },
+    confirmFixedAmount
+      ? {
+          name: "amountCents",
+          type: "custom",
+          label: t("fields.amount"),
+          span: "half",
+          bare: true,
+          render: (field) => <ReceiptAmountField {...field} plannedCents={fixedAmountCents} />,
+        }
+      : { name: "amountCents", type: "money", label: t("fields.amount"), span: "half", autoFocus: forOccurrence },
     { name: "date", type: "date", label: t("fields.date"), span: "half" },
     ...accountField,
     { name: "note", type: "textarea", label: t("fields.note"), rows: 2, maxLength: 2000 },
@@ -110,7 +167,7 @@ export function IncomeFormDialog({
       open={open}
       onOpenChange={onOpenChange}
       title={title}
-      description={occurrence ? t("form.enterDescription") : undefined}
+      description={occurrence ? t(confirmFixedAmount ? "form.confirmReceivedDescription" : "form.enterDescription") : undefined}
       schema={incomeInputSchema}
       intent={income ? "update-income" : "create-income"}
       hiddenFields={{
@@ -131,6 +188,7 @@ export function IncomeFormDialog({
         note: income?.note ?? "",
       }}
       fields={fields}
+      submitLabel={occurrence ? t("actions.confirmReceipt") : undefined}
       translateError={(message) => t(`errors.${message}`, { defaultValue: message })}
       successMessage={t("form.incomeSaved")}
     />

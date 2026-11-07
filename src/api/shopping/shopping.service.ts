@@ -41,6 +41,7 @@ import { forgetEntity } from "../selections/selections.service";
 import { listShops, shopRefSelect, toShopRef } from "../shops/shops.service";
 import { UnsafeUrlError, bareHost, fetchPage, parsePageMetadata } from "./link-preview";
 import { linkProblem, mergeNote, planStockMerge, promotionCandidate, stockOwnerOf } from "./product-alternatives";
+import { lockStock } from "../inventory/stock-lock";
 
 // Mapping ------------------------------------------------------------------------------------------------
 
@@ -570,6 +571,22 @@ export async function updateItem(user: SessionUser, id: string, input: ShoppingI
   return { item: item as ShoppingItem, justBought: becomesBought };
 }
 
+/** Marks every open item on the selected household shopping lists as bought in one operation. */
+export async function markOpenItemsBought(user: SessionUser, listIds: string[]): Promise<number> {
+  if (!listIds.length) return 0;
+  const lists = await db.shoppingList.findMany({
+    where: { householdId: user.householdId, id: { in: listIds } },
+    select: { id: true },
+  });
+  if (lists.length !== new Set(listIds).size) throw badRequest("One or more shopping lists are no longer available.");
+
+  const result = await db.shoppingItem.updateMany({
+    where: { householdId: user.householdId, listId: { in: listIds }, status: "OPEN" },
+    data: { status: "BOUGHT", boughtAt: new Date(), boughtByUserId: user.id },
+  });
+  return result.count;
+}
+
 export async function deleteItem(user: SessionUser, id: string): Promise<void> {
   const existing = await findOwnItem(user.householdId, id);
   if (user.role === "child" && existing.createdByUserId !== user.id) throw forbidden("Children can only delete their own items");
@@ -900,17 +917,18 @@ async function joinGroup(tx: Prisma.TransactionClient, actor: Actor, memberId: s
 export async function linkAlternative(user: Actor, productId: string, input: ProductAlternativeInput): Promise<Product> {
   const { householdId } = user;
   const select = { id: true, stockProductId: true, unit: true, category: true, defaultShopId: true } as const;
-  const [product, chosen] = await Promise.all([
-    db.product.findFirst({ where: { id: productId, householdId }, select }),
-    db.product.findFirst({ where: { id: input.mainProductId, householdId }, select }),
-  ]);
-  if (!product) throw notFound("Product not found");
-  if (!chosen) throw invalid("mainProductId", "Unknown product");
-  const problem = linkProblem(product, chosen);
-  if (problem === "same_product") throw invalid("mainProductId", "Choose another product");
-  if (problem === "already_linked") throw invalid("mainProductId", "These products already share stock");
-
   await db.$transaction(async (tx) => {
+    await lockStock(tx, householdId);
+    const [product, chosen] = await Promise.all([
+      tx.product.findFirst({ where: { id: productId, householdId }, select }),
+      tx.product.findFirst({ where: { id: input.mainProductId, householdId }, select }),
+    ]);
+    if (!product) throw notFound("Product not found");
+    if (!chosen) throw invalid("mainProductId", "Unknown product");
+    const problem = linkProblem(product, chosen);
+    if (problem === "same_product") throw invalid("mainProductId", "Choose another product");
+    if (problem === "already_linked") throw invalid("mainProductId", "These products already share stock");
+
     let mainId = stockOwnerOf(chosen);
     if (input.newMainName) {
       const owner = await tx.product.findFirstOrThrow({ where: { id: mainId, householdId }, select });
