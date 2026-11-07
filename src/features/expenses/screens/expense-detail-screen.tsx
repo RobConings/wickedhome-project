@@ -1,3 +1,4 @@
+import { RelatedShoppingSessions } from "@/features/shopping";
 import * as React from "react";
 import { ArrowLeftIcon, CheckIcon, PauseCircleIcon, PencilIcon, RepeatIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -167,6 +168,7 @@ export function ExpenseDetailScreen({
         }
         actions={actions}
       />
+      {canManage && <RelatedShoppingSessions expenseId={expense.id} />}
 
       <PageGrid columns="main-sidebar">
         <div className="flex min-w-0 flex-col gap-6">

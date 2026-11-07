@@ -202,6 +202,7 @@ model RecurringExpense {
 /// One expense: a one-off (a bill to pay, or everyday spending logged as paid), or an instance of a
 /// RecurringExpense.
 model Expense {
+  shoppingPayment ShoppingPayment?
   id                      String           @id @default(cuid())
   householdId             String
   household               Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)

@@ -69,3 +69,5 @@ export {
 
 export { SessionsScreen } from "./screens/sessions-screen";
 export { fetchShoppingSession, fetchShoppingSessions } from "./data/sessions-requests";
+
+export { RelatedShoppingSessions } from "./components/session-payments";

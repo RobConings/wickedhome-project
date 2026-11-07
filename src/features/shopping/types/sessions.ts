@@ -50,7 +50,14 @@ export type SessionView = SessionSummary & {
   items: SessionItem[]; participants: { userId: string; name: string }[];
   purchases: { id: string; shopId: string | null; purchasedAt: string; totalCents: number | null;
     receipts: { id: string; documentId: string | null; filename: string; totalCents: number | null; purchasedAt: string }[];
+    payments: { id: string; expenseId: string | null; receiptId: string | null; amountCents: number; payee: string; paidOn: string | null; paymentAccountId: string | null; payerType: string | null; payerHabitantId: string | null }[];
     lines: { id: string; sessionItemId: string | null; quantity: number; unit: string | null; stockAdded: boolean }[];
   }[];
   stockOptions: { id: string; productId: string; placeName: string; unit: string | null }[];
+};
+
+export type ShoppingFinanceOptions = {
+  accounts: { id: string; name: string }[];
+  habitants: { id: string; name: string }[];
+  expenses: { id: string; payee: string; amountCents: number; paidOn: string | null }[];
 };

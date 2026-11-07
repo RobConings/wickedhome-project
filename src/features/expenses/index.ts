@@ -50,3 +50,5 @@ export {
   type PaymentMethod,
   type RecurringExpense,
 } from "./types/expenses";
+
+export type { ShoppingPaymentInput } from "./types/shopping-payment";

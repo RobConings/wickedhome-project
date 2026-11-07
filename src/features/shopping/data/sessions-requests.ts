@@ -1,3 +1,4 @@
+import type { ShoppingPaymentInput } from "@/features/expenses";
 import { api } from "@/lib/api-client";
 import type { ReceiptAttachInput, ReceiptLineInput, SessionAddItemInput, SessionCreateInput, SessionItemUpdateInput, SessionSummary, SessionView } from "../types/sessions";
 const base = "/shopping/sessions";
@@ -12,3 +13,5 @@ export const joinSession = (id: string) => api.post<SessionView>(`${path(id)}/jo
 export const closeSession = (id: string, revision: number) => api.post<SessionView>(`${path(id)}/close`, { revision });
 export const attachReceipt = (id: string, input: ReceiptAttachInput) => api.post<SessionView>(`${path(id)}/receipts`, input);
 export const reconcileReceipt = (id: string, receiptId: string, input: ReceiptLineInput) => api.post<SessionView>(`${path(id)}/receipts/${encodeURIComponent(receiptId)}/lines`, input);
+
+export const recordSessionPayment = (id: string, input: ShoppingPaymentInput) => api.post<SessionView>(`${path(id)}/payments`, input);

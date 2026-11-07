@@ -448,7 +448,8 @@ export async function listExpenseFlow(householdId: string, from: string, to: str
 // ── Mutations ───────────────────────────────────────────────────────────────────────────────────────
 
 /** Creates a one-off expense (optionally already paid), or a recurring expense and returns its first instance. */
-export async function createExpense(householdId: string, input: ExpenseCreateInput): Promise<Expense> {
+export async function createExpense(householdId: string, input: ExpenseCreateInput, transaction?: Prisma.TransactionClient): Promise<Expense> {
+  if (transaction && (input.rrule || input.earlyRepaymentForId)) throw badRequest("A shopping payment must be a one-off expense");
   await assertPayer(householdId, input);
   const now = today();
 
@@ -456,7 +457,7 @@ export async function createExpense(householdId: string, input: ExpenseCreateInp
 
   if (!input.rrule) {
     await assertShop(householdId, input.shopId);
-    const row = await db.expense.create({
+    const row = await (transaction ?? db).expense.create({
       data: {
         householdId,
         ...paymentData(input),
@@ -467,7 +468,7 @@ export async function createExpense(householdId: string, input: ExpenseCreateInp
       },
       include: expenseInclude,
     });
-    await emitExpenseChanged(householdId, row.id, "created");
+    if (!transaction) await emitExpenseChanged(householdId, row.id, "created");
     return toExpense(row, now);
   }
 

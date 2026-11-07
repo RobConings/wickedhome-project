@@ -43,3 +43,13 @@ De waarnemingen uit de winkel dateren van vóór merge `bdc1a96`. Producten, Sho
 - Geen nieuwe migratie in deze fase. De actiehistoriek uit fase 3 ondersteunt de concurrencycontrole.
 - Gerichte tests: 20 geslaagd, inclusief echte reconnect met een nagebootste EventSource. PostgreSQL: 10 integratietests geslaagd, inclusief gelijktijdige MCP/web-aankoop en MCP-toevoeging naar twee subscribers.
 - De bestaande SSE-bus werkt in één API-proces, conform de huidige PM2-configuratie. Voor meerdere API-workers is gedeelde pub/sub nodig; polling blijft ook dan een herstelpad, geen onmiddellijke cross-worker-broadcast.
+
+## Fase 5 – Financiële koppeling
+
+- Bestanden: `session-payments.service.ts`, shopping-sessieroutes/MCP, `src/features/expenses/types/shopping-payment.ts`, de bestaande expenses-service, `session-payments.tsx`, sessie- en uitgavedetails, EN/NL.
+- Migratie `20261107183000_shopping_payments`: nieuwe koppeltabel met unieke bron-/uitgave-identiteit; bestaande uitgaven en rekeninggegevens blijven ongewijzigd.
+- Een betaling koppelt een bestaande betaalde uitgave of maakt met dezelfde uitgavenservice transactioneel één nieuwe uitgave. De bon kan later worden gekoppeld. Alleen bonnen koppelen creëert nooit een uitgave.
+- Ondersteunt meerdere betalingen per sessie/bon, gezamenlijk of persoonlijk, bestaande gesplitste aandelen via API/MCP, betaalrekening en daadwerkelijke betaler. Web ondersteunt gesplitste betalingen als afzonderlijke bedragen met een eigen referentie.
+- Betalingsreferenties zijn idempotent; gewijzigde retries worden geweigerd. Een uitgave kan niet dubbel worden gekoppeld. Bekende bontotalen bewaken overregistratie. Links lopen van sessie naar uitgave en terug.
+- Vijf echte PostgreSQL-financetests geslaagd: parallelle retries, rekening/betaler, gesplitste betalingen/aandelen, bestaande uitgave hergebruiken, overbetaling en toegang voor kinderen. Voorraad blijft bij financiële acties ongewijzigd.
+- De bestaande uitgavenfunctie accepteert een transactionele context voor eenmalige betalingen; meldingen volgen pas na commit. Periodieke uitgaven en leningen blijven hun bestaande route volgen.

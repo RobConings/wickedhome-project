@@ -1,3 +1,5 @@
+import { shoppingPaymentSchema } from "@/features/expenses/types/shopping-payment";
+import { getShoppingFinanceOptions, recordShoppingPayment, shoppingSessionsForExpense } from "./session-payments.service";
 import { Router } from "express";
 import { z } from "zod";
 import { idSchema } from "@/types/common";
@@ -18,3 +20,7 @@ shoppingSessionsRouter.post("/:id/items", async (req, res) => { res.status(201).
 shoppingSessionsRouter.patch("/:id/items/:itemId", async (req, res) => { res.json(await updateShoppingSessionItem(currentUser(req), id(req.params.id), id(req.params.itemId), parse(sessionItemUpdateSchema, req.body))); });
 shoppingSessionsRouter.post("/:id/receipts", async (req, res) => { res.json(await attachShoppingReceipt(currentUser(req), id(req.params.id), parse(receiptAttachSchema, req.body))); });
 shoppingSessionsRouter.post("/:id/receipts/:receiptId/lines", async (req, res) => { res.json(await reconcileShoppingReceiptLine(currentUser(req), id(req.params.id), id(req.params.receiptId), parse(receiptLineSchema, req.body))); });
+
+shoppingSessionsRouter.get("/:id/finance-options", async (req, res) => { res.json(await getShoppingFinanceOptions(currentUser(req))); });
+shoppingSessionsRouter.post("/:id/payments", async (req, res) => { res.json(await recordShoppingPayment(currentUser(req), id(req.params.id), parse(shoppingPaymentSchema, req.body))); });
+shoppingSessionsRouter.get("/for-expense/:expenseId", async (req, res) => { res.json(await shoppingSessionsForExpense(currentUser(req), id(req.params.expenseId))); });

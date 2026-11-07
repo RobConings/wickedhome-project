@@ -21,7 +21,7 @@ export async function listShoppingSessions(user: SessionUser) {
 export async function getShoppingSession(user: SessionUser, id: string): Promise<SessionView> {
   const row = await db.shoppingSession.findFirst({ where: { id, householdId: user.householdId }, include: {
     items: { where: { removedAt: null }, orderBy: { createdAt: "asc" } }, participants: true,
-    purchases: { include: { receipts: true, stockPurchases: true } },
+    purchases: { include: { receipts: true, stockPurchases: true, payments: { include: { expense: { select: { id: true, payee: true, amountCents: true, paidOn: true, paymentAccountId: true, payerType: true, payerHabitantId: true } } } } } },
   } });
   if (!row) throw notFound("Shopping visit not found");
   const users = await db.user.findMany({ where: { householdId: user.householdId, id: { in: row.participants.map((part) => part.userId) } }, select: { id: true, email: true, habitant: { select: { name: true } } } });
@@ -31,6 +31,7 @@ export async function getShoppingSession(user: SessionUser, id: string): Promise
     participants: row.participants.map((part) => ({ userId: part.userId, name: users.find((user) => user.id === part.userId)?.habitant?.name ?? users.find((user) => user.id === part.userId)?.email ?? "Former member" })),
     purchases: row.purchases.map((purchase) => ({ id: purchase.id, shopId: purchase.shopId, purchasedAt: purchase.purchasedAt.toISOString(), totalCents: purchase.totalCents,
       receipts: purchase.receipts.map((receipt) => ({ ...receipt, purchasedAt: receipt.purchasedAt.toISOString() })),
+      payments: user.role === "child" ? [] : purchase.payments.map((payment) => ({ id: payment.id, expenseId: payment.expenseId, receiptId: payment.receiptId, amountCents: payment.expense?.amountCents ?? payment.amountCents, payee: payment.expense?.payee ?? "Deleted expense", paidOn: payment.expense?.paidOn?.toISOString().slice(0, 10) ?? null, paymentAccountId: payment.expense?.paymentAccountId ?? null, payerType: payment.expense?.payerType.toLowerCase() ?? null, payerHabitantId: payment.expense?.payerHabitantId ?? null })),
       lines: purchase.stockPurchases.map((line) => ({ id: line.id, sessionItemId: line.sessionItemId, quantity: line.quantity.toNumber(), unit: line.unit, stockAdded: line.stockAdded })),
     })),
     stockOptions: stock.map((item) => ({ id: item.id, productId: item.productId, placeName: item.placeName, unit: item.unit })),
@@ -92,7 +93,7 @@ export async function createShoppingSession(user: SessionUser, input: SessionCre
   return getShoppingSession(user, session.id);
 }
 
-async function mutate<T>(user: SessionUser, sessionId: string, work: (tx: Prisma.TransactionClient) => Promise<T>, allowClosed = false) {
+export async function withShoppingSessionTransaction<T>(user: SessionUser, sessionId: string, work: (tx: Prisma.TransactionClient) => Promise<T>, allowClosed = false) {
   const result = await db.$transaction(async (tx) => {
     await lockStock(tx, user.householdId);
     const session = await tx.shoppingSession.findFirst({ where: { id: sessionId, householdId: user.householdId } });
@@ -108,7 +109,7 @@ async function mutate<T>(user: SessionUser, sessionId: string, work: (tx: Prisma
 
 export async function addShoppingSessionItem(user: SessionUser, sessionId: string, input: SessionAddItemInput) {
   const seed = await seedItem(user, input);
-  await mutate(user, sessionId, (tx) => addItemTx(tx, sessionId, seed), user.role !== "child");
+  await withShoppingSessionTransaction(user, sessionId, (tx) => addItemTx(tx, sessionId, seed), user.role !== "child");
   return getShoppingSession(user, sessionId);
 }
 
@@ -139,7 +140,7 @@ async function acquire(tx: Prisma.TransactionClient, user: SessionUser, sessionI
 }
 
 export async function updateShoppingSessionItem(user: SessionUser, sessionId: string, id: string, input: SessionItemUpdateInput) {
-  await mutate(user, sessionId, async (tx) => {
+  await withShoppingSessionTransaction(user, sessionId, async (tx) => {
     const item = await tx.shoppingSessionItem.findFirst({ where: { id, sessionId, removedAt: null } });
     if (!item) throw notFound("Shopping visit item not found");
     const payloadHash = createHash("sha256").update(JSON.stringify({ id, status: input.status, quantity: input.quantity, purchasedQuantity: input.purchasedQuantity, stockItemId: input.stockItemId, remove: input.remove })).digest("hex");
@@ -164,13 +165,13 @@ export async function updateShoppingSessionItem(user: SessionUser, sessionId: st
 }
 
 export async function joinShoppingSession(user: SessionUser, sessionId: string) {
-  await mutate(user, sessionId, (tx) => tx.shoppingSessionParticipant.upsert({ where: { sessionId_userId: { sessionId, userId: user.id } }, create: { sessionId, userId: user.id }, update: {} }));
+  await withShoppingSessionTransaction(user, sessionId, (tx) => tx.shoppingSessionParticipant.upsert({ where: { sessionId_userId: { sessionId, userId: user.id } }, create: { sessionId, userId: user.id }, update: {} }));
   return getShoppingSession(user, sessionId);
 }
 
 export async function closeShoppingSession(user: SessionUser, sessionId: string, revision: number) {
   manager(user);
-  await mutate(user, sessionId, async (tx) => {
+  await withShoppingSessionTransaction(user, sessionId, async (tx) => {
     const session = await tx.shoppingSession.findUniqueOrThrow({ where: { id: sessionId } });
     if (session.status === "CLOSED") return;
     if (session.revision !== revision) throw conflict("The visit changed; refresh before closing it");
@@ -182,7 +183,7 @@ export async function closeShoppingSession(user: SessionUser, sessionId: string,
 
 export async function attachShoppingReceipt(user: SessionUser, sessionId: string, input: ReceiptAttachInput) {
   manager(user);
-  await mutate(user, sessionId, async (tx) => {
+  await withShoppingSessionTransaction(user, sessionId, async (tx) => {
     const document = await tx.documentFile.findFirst({ where: { id: input.documentId, householdId: user.householdId, deletedAt: null, uploadedAt: { not: null } } });
     if (!document?.sha256) throw badRequest("Upload the receipt document first");
     if (new Date(input.purchasedAt).getTime() > Date.now() + 300_000) throw badRequest("A receipt cannot be in the future");
@@ -195,7 +196,7 @@ export async function attachShoppingReceipt(user: SessionUser, sessionId: string
     }
     const created = await tx.shoppingReceipt.create({ data: { shopId: input.shopId ?? purchase.shopId, householdId: user.householdId, purchaseId: purchase.id, documentId: document.id, contentHash: document.sha256, filename: document.name, totalCents: input.totalCents, purchasedAt: new Date(input.purchasedAt) } });
     const totals = await tx.shoppingReceipt.aggregate({ where: { purchaseId: purchase.id }, _sum: { totalCents: true } });
-    await tx.shoppingPurchase.update({ where: { id: purchase.id }, data: { totalCents: totals._sum.totalCents } });
+    await tx.shoppingPurchase.update({ where: { id: purchase.id }, data: { totalCents: await tx.shoppingReceipt.count({ where: { purchaseId: purchase.id, totalCents: null } }) ? null : totals._sum.totalCents } });
     return created;
   }, true);
   return getShoppingSession(user, sessionId);
@@ -203,7 +204,7 @@ export async function attachShoppingReceipt(user: SessionUser, sessionId: string
 
 export async function reconcileShoppingReceiptLine(user: SessionUser, sessionId: string, receiptId: string, input: ReceiptLineInput) {
   manager(user);
-  await mutate(user, sessionId, async (tx) => {
+  await withShoppingSessionTransaction(user, sessionId, async (tx) => {
     const receipt = await tx.shoppingReceipt.findFirst({ where: { id: receiptId, householdId: user.householdId, purchase: { sessionId } }, include: { purchase: true } });
     const item = await tx.shoppingSessionItem.findFirst({ where: { id: input.sessionItemId, sessionId } });
     if (!receipt || !item) throw notFound("Receipt or visit item not found");

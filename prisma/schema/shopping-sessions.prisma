@@ -77,12 +77,14 @@ model ShoppingPurchase {
   totalCents Int?
   stockPurchases StockPurchase[]
   receipts ShoppingReceipt[]
+  payments ShoppingPayment[]
   @@unique([householdId, sourceKey])
   @@index([sessionId])
   @@map("shopping_purchases")
 }
 
 model ShoppingReceipt {
+  payments ShoppingPayment[]
   shopId String?
   id String @id @default(cuid())
   householdId String
@@ -109,4 +111,23 @@ model ShoppingSessionOperation {
   createdAt DateTime @default(now())
   @@unique([sessionId, key])
   @@map("shopping_session_operations")
+}
+
+model ShoppingPayment {
+  id String @id @default(cuid())
+  householdId String
+  purchaseId String
+  purchase ShoppingPurchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  receiptId String?
+  receipt ShoppingReceipt? @relation(fields: [receiptId], references: [id], onDelete: SetNull)
+  expenseId String? @unique
+  expense Expense? @relation(fields: [expenseId], references: [id], onDelete: SetNull)
+  originalExpenseId String
+  sourceKey String
+  payloadHash String
+  amountCents Int
+  createdAt DateTime @default(now())
+  @@unique([householdId, sourceKey])
+  @@index([purchaseId])
+  @@map("shopping_payments")
 }
