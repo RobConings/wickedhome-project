@@ -6,7 +6,7 @@ import { Card } from "@/components/shared/card";
 import { ShopLogo, type Shop } from "@/features/shops";
 import { currentLocale } from "@/lib/i18n";
 import { formatDate } from "@/types/date-format";
-import type { SessionSummary } from "../types/sessions";
+import { sessionDisplayName, type SessionSummary } from "../types/sessions";
 
 /** A real, fully clickable workspace entry, with the actual shops and their saved logos. */
 export function SessionVisitCard({ visit, shops }: { visit: SessionSummary; shops: Shop[] }) {
@@ -37,7 +37,7 @@ export function SessionVisitCard({ visit, shops }: { visit: SessionSummary; shop
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="min-w-0 break-words font-semibold leading-snug group-hover:text-section">{visit.name}</h3>
+              <h3 className="min-w-0 break-words font-semibold leading-snug group-hover:text-section">{sessionDisplayName(visit.name, visit.startedAt)}</h3>
               <Badge variant={active ? "success" : "neutral"}>{t(`sessions.${visit.status}`)}</Badge>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
