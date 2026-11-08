@@ -95,7 +95,8 @@
     "startDate": "Eerste keer",
     "url": "Link naar webshop",
     "price": "Prijs",
-    "articleNumber": "Artikelnummer"
+    "articleNumber": "Artikelnummer",
+    "brand": "Merk"
   },
   "repeat": {
     "weekly": "Elke week",
