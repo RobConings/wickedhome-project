@@ -15,6 +15,10 @@ function Tabs({
   )
 }
 
+// One visual treatment for page-level tabs, shared by record and section navigation.
+export const workspaceTabListClassName = "h-auto min-h-12 w-full min-w-0 items-stretch rounded-xl bg-muted/60 p-1";
+export const workspaceTabTriggerClassName = "h-auto min-h-11 min-w-0 whitespace-normal px-2 py-2 leading-tight";
+
 function TabsList({
   className,
   ...props
