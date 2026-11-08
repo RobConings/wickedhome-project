@@ -90,6 +90,7 @@ registerAssistantTool({
       homeAssistantImport: ha?.status.linked
         ? { connection: ha.status.state, enabled: ha.enabled, lastImport: ha.lastImportAt ? formatDateTime(ha.lastImportAt, ctx.locale) : null, lastResult: ha.lastResult }
         : null,
+      equipmentLinks: [...setup.solarInstallations.map((row) => ({ id: row.id, name: row.name, url: `/energy/solar/${encodeURIComponent(row.id)}` })), ...setup.batteries.map((row) => ({ id: row.id, name: row.name, url: `/energy/batteries/${encodeURIComponent(row.id)}` }))],
       solar: setup.solarInstallations.map((solar) => `${solar.name}: ${solar.panelCount} panels, ${solar.kwp} kWp`),
       batteries: setup.batteries.map((battery) => `${battery.name}: ${kwh(battery.capacityWh)} kWh`),
     };
@@ -317,4 +318,13 @@ registerAssistantTool({
   permission: "read", confirm: "never",
   activity: { en: "Viewed energy source", nl: "Energiebron bekeken" },
   run: async (ctx, input) => ({ ...await getEnergyMeterDetail(ctx.householdId, input.id, input.page ?? 1), url: `/energy/meters/${encodeURIComponent(input.id)}` }),
+});
+
+registerScreenContext({
+  kind: "energy_meter", skills: ["energy"],
+  describe: async (ctx, id) => {
+    if (!id) return null;
+    const { meter } = await getEnergyMeterDetail(ctx.householdId, id);
+    return { label: meter.name, summary: `energy meter "${meter.name}", ${meter.carrier}, ${meter.kind}, ${meter.source}, ${meter.intervalCount} stored intervals` };
+  },
 });

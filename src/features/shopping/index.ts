@@ -76,3 +76,5 @@ export { PurchasePaymentsPanel } from "./components/purchase-payments-panel";
 
 export { shoppingItemLoader, shoppingItemAction } from "./data/shopping-loaders";
 export { ShoppingItemScreen } from "./screens/shopping-item-screen";
+
+export { useLiveRevalidation as useShoppingRecordUpdates } from "./data/use-live-shopping";

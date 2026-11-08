@@ -1,13 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
-import { ShoppingItemScreen, shoppingItemAction, shoppingItemLoader, canManageShopping } from "@/features/shopping";
+import { ShoppingItemScreen, shoppingItemAction, shoppingItemLoader, canManageShopping, useShoppingRecordUpdates } from "@/features/shopping";
 import { DocumentAttachments, canManageDocuments } from "@/features/documents";
 import { screenHandle } from "@/lib/screen-context";
 export const loader = shoppingItemLoader;
 export const action = shoppingItemAction;
 export const handle = screenHandle<typeof loader>(({ data }) => ({ kind: "shopping_item", id: data.item.id, label: data.item.name }));
 export function Component() {
+  useShoppingRecordUpdates();
   const data = useLoaderData<typeof loader>();
   const user = useCurrentUser();
   const { t } = useTranslation("documents");

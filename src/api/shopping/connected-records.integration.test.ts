@@ -86,6 +86,7 @@ it("purchase history and catalogue context reuse the same requirements, variants
   await updateShoppingSessionItem(f.user, session.id, item.id, { revision: adjusted.items.find((row) => row.id === item.id)!.revision, operationId: "acquire-once", status: "bought" });
   const purchases = await listPurchases(f.user, { productId: variant.id, projectId: project.id });
   assert.equal(purchases.length, 1);
+  assert.deepEqual((await listPurchases(f.user, { requirementId: f.requirement.id })).map((row) => row.id), purchases.map((row) => row.id));
   const purchase = await getPurchase(f.user, purchases[0]!.id);
   assert.equal(purchase.lines[0]!.productId, variant.id);
   assert.equal(purchase.lines[0]!.name, variant.name);
@@ -99,6 +100,7 @@ it("purchase history and catalogue context reuse the same requirements, variants
   await assert.rejects(getPurchase(foreign.user, purchase.id), /not found/);
   await assert.rejects(getProductContext(foreign.home.id, variant.id), /not found/);
   await assert.rejects(listPurchases(foreign.user, { projectId: project.id }), /not found/);
+  await assert.rejects(listPurchases(foreign.user, { requirementId: f.requirement.id }), /not found/i);
   const child = await getPurchase({ ...f.user, role: "child" }, purchase.id);
   assert.equal(child.canReadMoney, false); assert.equal(child.totalCents, null); assert.equal(child.linkedPaidCents, null); assert.deepEqual(child.expenses, []);
   await db.product.delete({ where: { id: variant.id } });

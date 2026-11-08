@@ -1,3 +1,4 @@
+import { getItem } from "@/api/shopping/shopping.service";
 import "./sessions";
 import { updateShoppingItem } from "@/api/shopping/shopping-actions";
 import { z } from "zod";
@@ -495,4 +496,21 @@ registerScreenContext({
   kind: "products",
   skills: ["inventory", "shopping"],
   describe: (ctx) => ({ label: say(ctx.locale, "Products", "Producten"), summary: "the household's products (catalogue for the list and the stock)" }),
+});
+
+registerAssistantTool({
+  name: "shopping.need",
+  description: "Inspect one shopping buying position by ID: every recorded reason, quantity/unit, source task/recipe/project, current status and product. A need is not a purchase or stock reservation.",
+  input: z.object({ id: z.string().min(1).max(100) }),
+  permission: "read", confirm: "never",
+  activity: { en: "Viewed shopping need", nl: "Boodschappenbehoefte bekeken" },
+  run: async (ctx, input) => ({ ...await getItem(ctx.householdId, input.id), url: `/shopping/items/${encodeURIComponent(input.id)}` }),
+});
+registerScreenContext({
+  kind: "shopping_item", skills: ["shopping", "inventory"],
+  describe: async (ctx, id) => {
+    if (!id) return null;
+    const item = await getItem(ctx.householdId, id);
+    return { label: item.name, summary: `shopping need "${item.name}", ${item.quantity} ${item.unit ?? ""}, ${item.status}, ${item.source}` };
+  },
 });

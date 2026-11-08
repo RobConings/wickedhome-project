@@ -45,7 +45,7 @@ export function ShoppingItemScreen({ item, products, shops, canManage, attachmen
       <Card><CardTitle>{t("need.reasons")}</CardTitle><ul className="divide-y">{(item.requirements ?? [item]).map((reason) => <li className="flex flex-col gap-3 py-4" key={reason.id}>
         <div className="flex flex-wrap items-center justify-between gap-2"><ShoppingSourceBadge source={reason.source} recipeName={reason.recipe?.name} /><span className="font-medium tabular-nums">{shoppingItemQuantity(reason, currentLocale())}</span></div>
         <RecordLink className="font-medium underline" to={`/shopping?list=${encodeURIComponent(reason.listId)}`}>{reason.listName}</RecordLink>
-        {reason.taskId && <RecordLink className="min-h-11 py-2 underline" to={`/tasks/${encodeURIComponent(reason.taskId)}`}>{t("sources.task")}</RecordLink>}
+        {reason.taskId && <RecordLink className="min-h-11 py-2 underline" to={`/tasks/${encodeURIComponent(reason.taskId)}`}>{t("source.task")}</RecordLink>}
         {reason.recipe && <RecordLink className="min-h-11 py-2 underline" to={`/recipes/cook/${encodeURIComponent(reason.recipe.entryId)}`}>{reason.recipe.name}</RecordLink>}
         {reason.project && <RecordLink className="min-h-11 py-2 underline" to={`/projects/${encodeURIComponent(reason.project.id)}`}>{reason.project.name}</RecordLink>}
         {reason.placeId && <RecordLink className="min-h-11 py-2 underline" to={`/places/${encodeURIComponent(reason.placeId)}`}>{reason.placeName ?? t("need.notRecorded")}</RecordLink>}
@@ -54,7 +54,7 @@ export function ShoppingItemScreen({ item, products, shops, canManage, attachmen
       <Card className="self-start"><CardTitle>{t("need.product")}</CardTitle><DescriptionList>
         <DescriptionItem wide label={t("need.quantity")}>{shoppingItemQuantity(item, currentLocale())}</DescriptionItem>
         {item.productId && <DescriptionItem wide label={t("need.product")}><RecordLink className="underline" to={`/inventory/products/${encodeURIComponent(item.productId)}`}>{product?.name ?? item.name}</RecordLink></DescriptionItem>}
-        {item.shop && <DescriptionItem wide label={t("need.list")}><RecordLink className="underline" to={`/shops/${encodeURIComponent(item.shop.id)}`}>{item.shop.name}</RecordLink></DescriptionItem>}
+        {item.shop && <DescriptionItem wide label={t("fields.shop")}><RecordLink className="underline" to={`/shops/${encodeURIComponent(item.shop.id)}`}>{item.shop.name}</RecordLink></DescriptionItem>}
       </DescriptionList><RecordLink className="min-h-11 py-2 font-medium underline" to={`/purchases?requirementId=${encodeURIComponent(item.id)}`}>{t("need.purchases")}</RecordLink></Card>
     </PageGrid>
     {attachments}

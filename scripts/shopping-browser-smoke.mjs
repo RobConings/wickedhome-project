@@ -167,9 +167,17 @@ try {
     await db.energyMeter.create({ data: { householdId: home.id, name: applianceId ?? "Grid", carrier: "ELECTRICITY", kind, source: "MANUAL", applianceId,
       intervals: { create: { startAt: zonedMidnight("2026-10-01"), endAt: zonedMidnight("2026-10-02"), energyWh, status: "MEASURED" } } } });
   }
+  const contact = await db.contact.create({ data: { householdId: home.id, name: "Long household contractor name", company: "Home repairs", emails: ["repair@example.test"], phones: ["+32 470 12 34 56"], shopId: shop.id, projects: { create: { projectId: project.id, role: "Contractor" } } } });
+  const incomeSource = await db.incomeSource.create({ data: { householdId: home.id, habitantId: people[0].id, name: "Historical household salary", kind: "SALARY", rrule: "FREQ=MONTHLY", startDate: new Date("2020-01-01"), amountMode: "FIXED", targetAccountId: account.id, amounts: { create: { effectiveFrom: new Date("2020-01-01"), amountCents: 100000 } } } });
+  const incomeReceipt = await db.income.create({ data: { householdId: home.id, habitantId: people[0].id, sourceId: incomeSource.id, kind: "SALARY", periodDate: new Date("2020-01-01"), date: new Date("2020-01-02"), amountCents: 99900, targetAccountId: account.id } });
+  const manual = await db.documentFile.create({ data: { householdId: home.id, name: "Product manual.pdf", mimeType: "application/pdf", sizeBytes: 10, sha256: crypto.randomUUID(), uploadedAt: new Date(), uploadedById: users[0].id, links: { create: { householdId: home.id, entityType: "product", entityId: product.id } } } });
   fixture = {
     householdId: home.id,
     projectId: project.id,
+    contactId: contact.id,
+    incomeSourceId: incomeSource.id,
+    incomeReceiptId: incomeReceipt.id,
+    manualId: manual.id,
     recipeId: recipe.id,
     circuitId: circuit.id,
     fridgeId: fridge.id,
@@ -327,6 +335,53 @@ try {
   await one.getByRole("link", { name: "Terug naar waar je vandaan kwam", exact: true }).click();
   await one.waitForURL((url) => url.pathname === "/energy" && url.searchParams.get("date") === "2026-10-01");
   assert.equal(await one.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
+
+  // Dedicated record owners retain exact Back chains, recorded relationships and historical IDs.
+  await one.goto(`${base}/contacts`);
+  await one.getByRole("link", { name: "Long household contractor name", exact: true }).click();
+  await one.getByRole("heading", { name: "Long household contractor name", exact: true }).waitFor();
+  assert.equal(await one.locator('a[href^="tel:"]').count(), 1);
+  await one.getByRole("link", { name: "Pantry refresh", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === `/projects/${fixture.projectId}`);
+  await one.getByRole("link", { name: "Terug naar waar je vandaan kwam", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === `/contacts/${fixture.contactId}`);
+  await one.getByRole("heading", { name: "Long household contractor name", exact: true }).waitFor();
+  await one.getByRole("button", { name: "Long household contractor name bewerken", exact: true }).click();
+  await one.getByRole("dialog").waitFor();
+  const contactEdit = one.getByRole("dialog");
+  await contactEdit.getByRole("textbox", { name: /^Bedrijf/ }).fill("Updated home repairs");
+  await contactEdit.getByRole("button", { name: "Opslaan", exact: true }).click();
+  await contactEdit.waitFor({ state: "hidden" });
+  await one.getByText("Updated home repairs", { exact: true }).first().waitFor();
+  assert.equal((await db.contact.findUniqueOrThrow({ where: { id: fixture.contactId } })).company, "Updated home repairs");
+
+  const sourceOrigin = `/income/sources/${fixture.incomeSourceId}?month=2020-01`;
+  await one.goto(`${base}${sourceOrigin}`);
+  await one.getByRole("heading", { name: "Historical household salary", exact: true }).waitFor();
+  await one.locator(`a[href^="/income/receipts/${fixture.incomeReceiptId}"]`).first().click();
+  await one.waitForURL((url) => url.pathname === `/income/receipts/${fixture.incomeReceiptId}`);
+  await one.getByRole("heading", { name: "Historical household salary", exact: true }).waitFor();
+  assert.equal(new URL(one.url()).pathname, `/income/receipts/${fixture.incomeReceiptId}`);
+  await one.getByRole("link", { name: "Gezamenlijke rekening", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === "/money" && url.searchParams.get("month") === "2020-01");
+  await one.getByRole("link", { name: "Terug naar waar je vandaan kwam", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === `/income/receipts/${fixture.incomeReceiptId}`);
+  await one.getByRole("link", { name: "Terug naar waar je vandaan kwam", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === `/income/sources/${fixture.incomeSourceId}` && url.searchParams.get("month") === "2020-01");
+
+  await one.goto(`${base}/inventory/products/${fixture.productId}?workspace=overview`);
+  await one.getByRole("link", { name: "Product manual.pdf", exact: true }).click();
+  await one.getByRole("heading", { name: "Product manual.pdf", exact: true }).waitFor();
+  assert.equal(new URL(one.url()).pathname, `/documents/files/${fixture.manualId}`);
+  await one.getByRole("link", { name: "Boni Halfvolle Melk 1 l", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === `/inventory/products/${fixture.productId}`);
+  await one.getByRole("link", { name: "Terug naar waar je vandaan kwam", exact: true }).click();
+  await one.getByRole("heading", { name: "Product manual.pdf", exact: true }).waitFor();
+  assert.equal(await one.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
+
+  await one.goto(`${base}/habitants/${fixture.robId}`);
+  await one.getByRole("heading", { name: "Rob", exact: true }).waitFor();
+  await one.getByRole("heading", { name: "Toegewezen taken", exact: true }).waitFor();
 
   // Verify the same forecast and visible toggles in ordinary groceries, shop view and visit selection.
   for (const screen of [
