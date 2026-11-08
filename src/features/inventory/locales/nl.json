@@ -207,6 +207,8 @@
     "advancedStock": "Geavanceerd voorraadbeheer",
     "expand": "Tonen",
     "collapse": "Verbergen",
-    "alreadyOnShopping": "Dit product staat al op de boodschappenlijst. De lijst wordt geopend."
+    "alreadyOnShopping": "Dit product staat al op de boodschappenlijst. De lijst wordt geopend.",
+    "qrCode": "QR-code",
+    "noLinkedShops": "Nog geen gekoppelde winkelaanbiedingen."
   }
 }
