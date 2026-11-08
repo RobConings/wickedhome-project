@@ -12,5 +12,6 @@
   "viewPurchases": "Aankopen van dit product bekijken",
   "recipes": "Gebruikt in recepten",
   "noRecipes": "Geen recepten met dit product of een alternatief met gedeelde voorraad als gekoppeld ingrediënt.",
-  "viewAllRecipes": "Toon alle {{count}} recepten"
+  "viewAllRecipes": "Toon alle {{count}} recepten",
+  "viewAllNeeds": "Toon alle {{count}} boodschappenbehoeften"
 }
