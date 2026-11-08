@@ -38,6 +38,8 @@ type ShoppingItemRowProps = {
   onEdit?: (item: ShoppingItem) => void;
   /** The project chip (projects feature); off on the project's own page. */
   showProject?: boolean;
+  /** Hide the record link when this row is already inside its own dedicated workspace. */
+  showRecordLink?: boolean;
   /** Extra buttons before the link and delete buttons (e.g. "Set price"). */
   actions?: React.ReactNode;
   /** Extra chips after the others (e.g. "On invoice Toppy · 09/10/2026" on a project's page). */
@@ -60,6 +62,7 @@ export function ShoppingItemRow({
   onSkip,
   onEdit,
   showProject = true,
+  showRecordLink = true,
   actions,
   extraBadges,
   className,
@@ -157,7 +160,7 @@ export function ShoppingItemRow({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="max-w-[calc(100vw-2rem)]">
           <DropdownMenuLabel className="max-w-64 truncate">{item.name}</DropdownMenuLabel>
-          <DropdownMenuItem asChild><RecordLink to={`/shopping/items/${encodeURIComponent(item.id)}`}>{t("need.open")}</RecordLink></DropdownMenuItem>
+          {showRecordLink && <DropdownMenuItem asChild><RecordLink to={`/shopping/items/${encodeURIComponent(item.id)}`}>{t("need.open")}</RecordLink></DropdownMenuItem>}
           <DropdownMenuItem onSelect={() => setDetailsOpen((open) => !open)}><ChevronDownIcon />{t(detailsOpen ? "item.hideDetails" : "item.details")}</DropdownMenuItem>
           {onSkip && item.status === "open" && <DropdownMenuItem onSelect={() => onSkip(item)}>{t("planning.skip")}</DropdownMenuItem>}
           {item.status === "skipped" && <DropdownMenuItem onSelect={() => onToggle(item)}>{t("planning.restore")}</DropdownMenuItem>}
