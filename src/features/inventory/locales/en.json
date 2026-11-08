@@ -209,6 +209,8 @@
     "collapse": "Hide",
     "alreadyOnShopping": "This product is already on your shopping list. Opening its list.",
     "qrCode": "QR code",
-    "noLinkedShops": "No linked shop offers yet."
+    "noLinkedShops": "No linked shop offers yet.",
+    "stockUnit": "Stock unit",
+    "mixedUnits": "Mixed units"
   }
 }
