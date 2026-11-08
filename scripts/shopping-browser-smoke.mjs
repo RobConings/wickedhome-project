@@ -754,6 +754,37 @@ try {
   assert.equal((await database.query('SELECT count(DISTINCT b.id)::int AS n FROM bills b JOIN shopping_payments p ON p."expenseId"=b.id JOIN shopping_purchases sp ON sp.id=p."purchaseId" WHERE b."householdId"=$1 AND sp."sessionId"=$2', [fixture.householdId, sessionId])).rows[0].n, 1);
   assert.equal((await database.query('SELECT quantity::text FROM stock_items WHERE id=$1', [fixture.stockId])).rows[0].quantity, "2.000");
 
+  // The shared PageHeader must obey the approved phone/desktop action layout.
+  // No automatic flex-wrap may steal title/description width to fit the CTA buttons.
+  for (const width of [320, 390, 1440]) {
+    await one.setViewportSize({ width, height: 900 });
+    await one.goto(`${base}/shopping`);
+    const pageHeader = one.locator('main [data-slot="page-heading-layout"]').first();
+    await pageHeader.waitFor({ state: "attached" });
+    const geometry = await pageHeader.evaluate((layout) => {
+      const heading = layout.querySelector('[data-slot="page-heading"]');
+      const actions = layout.querySelector('[data-slot="page-header-actions"]');
+      const description = heading?.querySelector("p");
+      const buttons = Array.from(actions?.querySelectorAll('button[data-slot="button"]') ?? []);
+      const start = buttons.find((button) => button.textContent?.includes("Start winkelen"));
+      const add = buttons.find((button) => button.textContent?.includes("Boodschap toevoegen"));
+      const rect = (node) => node?.getBoundingClientRect();
+      return { heading: rect(heading)?.toJSON(), actions: rect(actions)?.toJSON(),
+        description: rect(description)?.toJSON(), start: rect(start)?.toJSON(), add: rect(add)?.toJSON() };
+    });
+    assert.ok(geometry.heading && geometry.actions && geometry.start && geometry.add, `Shopping header has both visible CTAs at ${width}px`);
+    if (width < 640) {
+      assert.ok(geometry.actions.top >= geometry.heading.bottom - 1, `Shopping actions are below the complete phone heading at ${width}px`);
+      assert.ok(geometry.add.top >= geometry.start.bottom - 1, `Shopping CTAs stack on separate phone rows at ${width}px`);
+      assert.ok(geometry.description && geometry.description.width >= geometry.heading.width - 5,
+        `Shopping description uses full page heading width on phones at ${width}px`);
+    } else {
+      assert.ok(geometry.actions.left >= geometry.heading.right - 1, "Shopping desktop CTAs sit to the right of the title");
+    }
+    assert.equal(await one.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true,
+      `Shopping header must not cause overflow at ${width}px`);
+  }
+
   // Every top-level module keeps a working entry point under the shared shell.
   const modulePaths = ["/", "/tasks", "/projects", "/shopping", "/inventory", "/recipes", "/calendar", "/purchases", "/expenses", "/income", "/money", "/house", "/places", "/devices", "/energy", "/habitants", "/shopping/products", "/shops", "/documents", "/contacts", "/assistant", "/home-assistant", "/integrations", "/notifications", "/settings", "/devices/profiles", "/energy/appliances", "/energy/setup", "/energy/import", "/documents/trash"];
   for (const [locale, theme, width] of [["en", "light", 390], ["nl", "dark", 1440]]) {
