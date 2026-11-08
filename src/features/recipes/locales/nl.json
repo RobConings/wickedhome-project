@@ -13,7 +13,10 @@
     "all": "Alle recepten"
   },
   "filter": {
-    "search": "Zoek recepten of ingrediënten"
+    "search": "Zoek recepten of ingrediënten",
+    "linkedProduct": "Recepten met {{name}}",
+    "unknownProduct": "dit product",
+    "clearProduct": "Filter wissen"
   },
   "groups": {
     "favorites": "Favorieten",
