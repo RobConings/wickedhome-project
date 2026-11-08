@@ -12,6 +12,18 @@
 6. Use the whole content width. Two-column page grids require **two intended columns**; don't create an empty sidebar. Avoid repeating the same information in chip navigation, cards, and verbose sections. Mobile first (320/390 px); 1440 px desktop.
 7. Owner features remain functional: quantity reconciliation, duplicate-prevention, shared-stock alternatives, source provenance, recurrence/payment history, permissions, deep links, and keyboard access all require regression coverage.
 
+## Approved responsive composition: product-reference screenshot (8 November)
+
+**Never use arbitrary flex-wrap to put the title beside two main action buttons on phones.** This caused the real 320–390 CSS-pixel shopping screen to squeeze "Boodschappen" into a narrow column, with the description breaking almost word-by-word. The visual reference supplied in the review shows intentionally different mobile and desktop arrangements.
+
+- **Phone (< 640px):** back arrow and identity icon on the title line, a readable title with the description spanning the page content width below the identity row, then one centered full-width split-action **per row** (two rows for two relevant CTAs), then full-width section tabs and immediately the meaningful content. Product record hero: image, title/identity, core stats, action rows, tabs, details. No interleaved desktop action column.
+- **Tablet (640–1279px):** preserve title width by placing actions below it; actions may sit next to each other if they fit without compressing identity text. Never assume viewport CSS pixels equal physical screenshot pixels.
+- **Desktop (>= 1280px):** title and action controls share a row, title to the left and actions right, retaining a meaningful minimum content width. On product records the image can remain in its own left hero column, with stats beneath the title/action header.
+- **Shared implementation:** `PageHeader` owns headline layout, `PageBackButton` owns return context, `SplitAction` owns action-dropdown semantics, and `RecordWorkspaceTabs`/`SectionNavigation` own the appropriate tab semantics. Feature screens must not reinvent the responsive breakpoints.
+- **Executable regression checks:** `stories/shared/page-header.stories.tsx` provides the long Dutch shopping headline with two split actions; `scripts/shopping-browser-smoke.mjs` asserts mobile CTA ordering, mobile description width and desktop action placement on the shopping page, and header row placement across top-level modules at phone and desktop sizes.
+
+A screenshot showing no horizontal overflow is **not enough**: the former bad layout fit horizontally by collapsing the title and creating dozens of unwanted line breaks. Verify actual element geometry and visual appearance. Browser CI and human phone/desktop review remain required.
+
 ## Findings and implementation status
 
 | Priority | Area | Source and concrete finding | Status / acceptance |
