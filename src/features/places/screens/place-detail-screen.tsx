@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { useFetcher, useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
-import { PageGrid } from "@/components/layout/page-grid";
 import { PageSection } from "@/components/layout/page-section";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -120,9 +119,9 @@ export function PlaceDetailScreen({ detail, canManage, sections = {} }: PlaceDet
       <RelatedRecordCards label={t("detail.contentsTitle")} items={LINKED_SECTIONS.filter(({ key }) => sections[key]).map(({ key, icon }) => ({ id: key, label: t(`detail.sections.${key}.title`), icon, accent: "home", to: `#place-${key}` }))} />
       <PageSection aria-labelledby="place-contents">
           <SectionHeader id="place-contents" title={t("detail.contentsTitle")} description={t("detail.contentsDescription")} />
-          <PageGrid columns="2" className="gap-4">
+          <div className="columns-1 gap-4 md:columns-2">
             {LINKED_SECTIONS.map(({ key, icon: Icon }) => (
-              <Card key={key} id={`place-${key}`} className="scroll-mt-20 gap-2">
+              <Card key={key} id={`place-${key}`} className="mb-4 break-inside-avoid scroll-mt-20 gap-2">
                 <CardHeader className="justify-start gap-3">
                   <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-section-soft text-section">
                     <Icon className="size-4" aria-hidden="true" />
@@ -135,7 +134,7 @@ export function PlaceDetailScreen({ detail, canManage, sections = {} }: PlaceDet
                 {sections[key]}
               </Card>
             ))}
-          </PageGrid>
+          </div>
       </PageSection>
     </PageContainer>
   );
