@@ -16,7 +16,7 @@ import { StatTile } from "@/components/shared/stat-tile";
 import { PlaceBadge } from "@/features/places";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import { addDays, todayIn } from "@/types/dates";
-import { InventoryNavigation } from "../components/inventory-navigation";
+import { InventoryNavigation } from "@/components/shared/inventory-navigation";
 import { StockItemFormDialog } from "../components/stock-item-form-dialog";
 import { StockItemRow } from "../components/stock-item-row";
 import { StockItemTile } from "../components/stock-item-tile";
