@@ -141,6 +141,7 @@ export function EntityPicker({
 
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const [open, setOpen] = React.useState(false);
+  const [portalContainer, setPortalContainer] = React.useState<HTMLElement | null>(null);
   const [query, setQuery] = React.useState("");
   const [highlighted, setHighlighted] = React.useState("");
   const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue);
@@ -192,6 +193,8 @@ export function EntityPicker({
   }
 
   function handleOpenChange(next: boolean) {
+    // Resolve the owning modal on interaction, never by reading a ref during render.
+    if (next) setPortalContainer(triggerRef.current?.closest<HTMLElement>('[data-slot="dialog-content"]') ?? null);
     setOpen(next);
     if (!next) setQuery("");
   }
@@ -350,7 +353,7 @@ export function EntityPicker({
           <PopoverContent
             align="start"
             className="w-(--radix-popover-trigger-width) min-w-64 max-w-[calc(100vw-2rem)] overflow-hidden p-0"
-            portalContainer={triggerRef.current?.closest<HTMLElement>('[data-slot="dialog-content"]') ?? undefined}
+            portalContainer={portalContainer}
           >
             {list}
           </PopoverContent>
