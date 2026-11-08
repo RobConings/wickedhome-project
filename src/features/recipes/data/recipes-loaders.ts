@@ -113,8 +113,9 @@ const notFoundAs404 = (error: unknown): never => {
   throw error;
 };
 
-export async function recipesLoader(): Promise<RecipesPageData> {
-  const [recipes, mealPlan, categories, productList, shopList] = await Promise.all([fetchRecipes(), fetchMealPlan(true), fetchRecipeCategories(), products(), shops()]);
+export async function recipesLoader({ request }: LoaderFunctionArgs): Promise<RecipesPageData> {
+  const productId = new URL(request.url).searchParams.get("productId") ?? undefined;
+  const [recipes, mealPlan, categories, productList, shopList] = await Promise.all([fetchRecipes(undefined, undefined, productId), fetchMealPlan(true), fetchRecipeCategories(), products(), shops()]);
   return { recipes, mealPlan, categories, products: productList, shops: shopList };
 }
 
