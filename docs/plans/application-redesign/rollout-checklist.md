@@ -6,7 +6,9 @@ The user authorised the complete redesign. This checklist tracks completion acro
 
 **Additional wireframe review (8 November):** [model workspaces, media, quick actions and full finance coverage](wireframe-review-and-model-workspaces.md) is an explicit open design/implementation requirement. The current atlas is **not signed off**. Related counters and routes are a foundation, not proof that every user-facing business record has its own useful, deep-linkable workspace.
 
-**Design preview update (8 November):** the [complete-feature HTML atlas](preview/all-feature-wireframes.html) now has 78 illustrative screens across all 29 existing feature owners. [Coverage](preview/all-feature-coverage.json) shows the sample screens and [preview limitations](preview/all-feature-wireframes-README.md) distinguish wireframe coverage from full feature/route/dialog acceptance. **This does not complete Stage 4 or 5.**\n\n## Stage 1: capability and ownership inventory
+**Design preview update (8 November):** the [complete-feature HTML atlas](preview/all-feature-wireframes.html) now has 78 illustrative screens across all 29 existing feature owners. [Coverage](preview/all-feature-coverage.json) shows the sample screens and [preview limitations](preview/all-feature-wireframes-README.md) distinguish wireframe coverage from full feature/route/dialog acceptance. **This does not complete Stage 4 or 5.**
+
+## Stage 1: capability and ownership inventory
 
 - [ ] Inventory every first-class user-facing business model and map its overview, actions, owner-filtered related records, deep links and return context; inspect the real implementation and services, not only route/dialog names.
 - [ ] Audit complete recurring expense, income, account, contribution, transfer, voucher and money-flow capabilities against the redesigned entry points.
