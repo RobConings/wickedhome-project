@@ -10,6 +10,7 @@ All authored documentation is in English. **English is the default product langu
 - [Shopping journey at a glance](preview/wireframes/shopping-flow.png)
 - [Related-record cards: phone and desktop](related-records.md)
 - [Images, banners and view modes](visual-media.md)
+- [Latest GitHub continuation and verification boundary](github-continuation-2026-11-08.md) · [Preserved legacy HTML/screenshots](legacy-wireframe-export/README.md)
 - [Implemented slice and remaining work](implementation.md)
 - [Revised implementation phases — feature-specific workflows and acceptance gates](implementation-phases.md)
 - [Visual plan](plan.mdx)
