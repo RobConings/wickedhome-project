@@ -47,7 +47,7 @@ export function ShoppingItemScreen({ item, products, shops, canManage, attachmen
         <RecordImage src={item.imageUrl ?? product?.imageUrl} alt="" fit="contain" className="h-36 w-full sm:h-32" fallback={<ShoppingBasketIcon className="size-12 text-section" aria-hidden="true" />} />
         <div className="min-w-0">
           <p className="mb-2 text-sm text-muted-foreground">{t("need.purchasesHint")}</p>
-          <ul className="divide-y"><ShoppingItemRow item={current} onToggle={actions.toggle} showList showSource /></ul>
+          <ul className="divide-y"><ShoppingItemRow item={current} onToggle={actions.toggle} showList showSource showRecordLink={false} /></ul>
         </div>
       </div>
     </Card>
