@@ -95,7 +95,8 @@
     "startDate": "First time",
     "url": "Webshop link",
     "price": "Price",
-    "articleNumber": "Article number"
+    "articleNumber": "Article number",
+    "brand": "Brand"
   },
   "repeat": {
     "weekly": "Every week",
