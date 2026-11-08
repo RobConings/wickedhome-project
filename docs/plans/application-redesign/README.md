@@ -4,6 +4,7 @@ This dossier replaces the earlier shopping-only layout proposal. It covers the w
 
 All authored documentation is in English. **English is the default product language; Dutch is supported.** Both languages use household-friendly language and Belgian date/currency conventions. Existing technical identifiers keep their spelling.
 
+- **[Interactive mobile-first WickedHome workspaces — HTML prototype](preview/household-wireframes.html)** · [How to test and what is simulated](preview/household-wireframes-README.md) · [saved product design reference](preview/product-workspace-reference.svg)
 - [Start here: sixteen annotated wireframes](preview/walkthrough.html)
 - [Shopping journey at a glance](preview/wireframes/shopping-flow.png)
 - [Related-record cards: phone and desktop](related-records.md)
