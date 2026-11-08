@@ -39,6 +39,14 @@ The production shopping list must not stack page navigation, list chips, search,
 - **Checklist first:** after the shared page navigation and toolbar, show the shopping items and their category/need grouping. Avoid an additional row for unselected filters or generic results text; announce filtered results accessibly.
 - **Acceptance:** compare at 320 px, 390 px and desktop widths in EN/NL, including a custom list, a URL-applied stock filter, query input, a long list name, reset/selection and keyboard access. Code review alone is not screenshot or behaviour acceptance.
 
+## Shopping page actions and consistent page tabs — follow-up requirement (8 November)
+
+Production feedback clarifies two additional binding UI rules:
+
+- **Two contextual split actions in the Shopping header:** a prominent **Start shopping** action opens the existing one-destination session-start form directly in an overlay on the list page; the person does **not** first navigate to Shopping sessions. The normal backend start action still determines current matching needs and redirects to the live session. A second **Add shopping item** split action opens the established add form. Each split action keeps a dropdown for related navigation/management (shop view, session history, products and creating a list), respecting permissions. Do not introduce a third row of large actions.
+- **Consistent full-width page tabs throughout WickedHome:** the Shopping / Shop view / Sessions navigator and product Details / Overview tabs share the same layout tokens (height, surface, active indicator, spacing, responsive behaviour and focus visibility). Reuse one set of styling rules rather than per-feature handcrafted tab designs. The semantics may differ: route navigation must remain links with `aria-current`, while local panel tabs have actual tab panels and keyboard tab semantics. Search, sorting, list choice and stock filters are not tabs.
+- **Release acceptance:** verify both split actions and each dropdown, opening the session picker from Shopping, successful creation/redirect, invalid destination handling, custom lists, child permissions, EN/NL, keyboard and 320/390/1440px screens. Confirm the product and shopping tab bars are visually consistent without hiding the checklist.
+
 ## C. A real record workspace, Odoo-inspired but household-friendly
 
 ### Universal record anatomy
