@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BoxIcon, CalendarClockIcon, PackageIcon, PencilIcon, PlusIcon, ScanBarcodeIcon, TriangleAlertIcon } from "lucide-react";
+import { BoxIcon, CalendarClockIcon, PencilIcon, PlusIcon, ScanBarcodeIcon, TriangleAlertIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useRevalidator } from "react-router";
 import { RecordLink as Link } from "@/components/shared/record-link";
@@ -16,6 +16,7 @@ import { StatTile } from "@/components/shared/stat-tile";
 import { PlaceBadge } from "@/features/places";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import { addDays, todayIn } from "@/types/dates";
+import { InventoryNavigation } from "../components/inventory-navigation";
 import { StockItemFormDialog } from "../components/stock-item-form-dialog";
 import { StockItemRow } from "../components/stock-item-row";
 import { StockItemTile } from "../components/stock-item-tile";
@@ -89,12 +90,6 @@ export function InventoryScreen({ data, canManage, initialSelections, today = to
         description={t("page.description")}
         actions={
           <>
-            <Button asChild variant="outline">
-              <Link to="/shopping/products">
-                <PackageIcon />
-                {t("actions.products")}
-              </Link>
-            </Button>
             {addButton}
             {canManage && <StocktakeDialog items={stock} onChanged={onChanged} />}
             <Button asChild>
@@ -107,6 +102,7 @@ export function InventoryScreen({ data, canManage, initialSelections, today = to
         }
       />
 
+      <InventoryNavigation />
       <Stack gap="lg">
         {stock.length > 0 && (
           <>
