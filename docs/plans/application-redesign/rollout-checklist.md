@@ -1,5 +1,7 @@
 # Full implementation rollout
 
+**Current execution plan:** [revised implementation phases](implementation-phases.md). Keep the original Stage 1–5 history below as evidence, but apply the newer phase gates to the total rework. A household calendar, floor-plan editor or shopping session is **not** forced into the same record-tab layout as a product. The 78-screen wireframe is a style and flow reference, not a full feature inventory.
+
 The user authorised the complete redesign. This checklist tracks completion across the full application; an individual change does not complete a stage. Work continues until the remaining capability and workflow checks are satisfied. The existing local edits are preserved; deployment remains a separate release operation.
 
 **Required preservation gate:** follow the [feature preservation and outcome-parity contract](feature-preservation.md). The wireframes are not a complete feature specification; every existing capability must remain reachable and deliver the same result, even if the UI is substantially simpler. Capability loss requires explicit product-owner approval. In particular, recurring expenses, tasks and automations must not disappear because a mock-up omits them.
