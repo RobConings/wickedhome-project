@@ -239,6 +239,7 @@ function toProduct(row: ProductRow): Product {
   return {
     id: row.id,
     name: row.name,
+    brand: row.brand,
     unit: householdStockUnit(row.unit, row.stockProduct?.stockItems ?? row.stockItems),
     category: toCategory(row.category),
     isEssential: row.isEssential,
@@ -909,6 +910,8 @@ async function deleteRecipeItemsImpl(householdId: string, mealPlanEntryId: strin
 
 const productData = (input: ProductInput) => ({
   name: input.name,
+  // Older integrations omit brand: keep the previous value on update rather than clearing it.
+  ...(input.brand !== undefined && { brand: input.brand }),
   unit: input.unit || null,
   category: fromCategory(input.category),
   ...(input.isEssential !== undefined && { isEssential: input.isEssential }),
@@ -935,7 +938,10 @@ export async function listProducts(householdId: string, query: ProductQuery = {}
     where: {
       householdId,
       ...(query.code && { OR: [{ barcode: query.code }, { qrCode: query.code }] }),
-      ...(query.q && { name: { contains: query.q, mode: "insensitive" as const } }),
+      ...(query.q && { OR: [
+        { name: { contains: query.q, mode: "insensitive" as const } },
+        { brand: { contains: query.q, mode: "insensitive" as const } },
+      ] }),
     },
     include: productInclude,
     orderBy: [{ name: "asc" }, { id: "asc" }],
