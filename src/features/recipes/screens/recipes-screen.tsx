@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger, workspaceTabListClassName, workspaceTabTriggerClassName } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
@@ -98,9 +98,9 @@ export function RecipesScreen({ recipes, mealPlan, categories = [], products, sh
       <PageHeader title={t("page.title")} description={t("page.description")} actions={canManage ? <><RecipeCategoriesDialog categories={categories} />{addButton}</> : undefined} />
 
       <Tabs value={tab} onValueChange={setTab} className="gap-4">
-        <TabsList>
-          <TabsTrigger value="cook">{waiting.length ? t("tabs.cookCount", { count: waiting.length }) : t("tabs.cook")}</TabsTrigger>
-          <TabsTrigger value="all">{t("tabs.all")}</TabsTrigger>
+        <TabsList className={`${workspaceTabListClassName} grid grid-cols-2`}>
+          <TabsTrigger value="cook" className={workspaceTabTriggerClassName}>{waiting.length ? t("tabs.cookCount", { count: waiting.length }) : t("tabs.cook")}</TabsTrigger>
+          <TabsTrigger value="all" className={workspaceTabTriggerClassName}>{t("tabs.all")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="cook" className="flex flex-col gap-6">
