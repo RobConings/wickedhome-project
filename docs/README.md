@@ -10,6 +10,8 @@ Start with the [annotated wireframe walkthrough](plans/application-redesign/prev
 
 For interactive examples, start the [design atlas](plans/application-redesign/README.md). It contains 178 page/dialog variants, English/Dutch switching, desktop/mobile layouts and state examples. The [complete redesign plan](plans/application-redesign/plan.mdx), [ownership contracts](plans/application-redesign/architecture-contracts.md) and [AI/MCP contract](plans/application-redesign/ai-mcp-contract.md) define the target behaviour. The [feature preservation contract](plans/application-redesign/feature-preservation.md) requires all existing outcomes to remain accessible and correct even where simpler new interactions replace old screens or wireframes omit functionality. See [implementation status](plans/application-redesign/implementation.md) for the local implementation, validation and release limits; these documents do not establish deployment.
 
+**Current implementation sequence:** the [total-rework phases](plans/application-redesign/implementation-phases.md) adapt the original rollout to feature-specific household workflows. The interactive wireframes guide appearance and navigation but do not define or replace all existing capabilities.
+
 ## Implementation and development
 
 | Document | Purpose |
