@@ -11,6 +11,7 @@ All authored documentation is in English. **English is the default product langu
 - [Related-record cards: phone and desktop](related-records.md)
 - [Images, banners and view modes](visual-media.md)
 - [Implemented slice and remaining work](implementation.md)
+- [Revised implementation phases — feature-specific workflows and acceptance gates](implementation-phases.md)
 - [Visual plan](plan.mdx)
 - [Wireframe feedback and model-workspace redesign requirements (8 November)](wireframe-review-and-model-workspaces.md)
 - [Feature preservation and outcome parity (mandatory redesign and release contract)](feature-preservation.md)
