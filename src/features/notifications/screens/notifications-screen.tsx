@@ -133,7 +133,7 @@ export function NotificationsScreen({ userId, client = notificationsClient, live
         title={t("page.title")}
         description={t("page.description")}
         actions={
-          <div className="flex gap-2">
+          <div className="grid w-full min-w-0 grid-cols-1 gap-2 sm:flex sm:w-auto sm:justify-center xl:justify-end">
             <Button variant="outline" asChild>
               <Link to="/settings#notifications">
                 <SettingsIcon />
