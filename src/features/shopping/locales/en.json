@@ -5,6 +5,8 @@
   },
   "actions": {
     "addItem": "Add shopping item",
+    "shoppingMoreActions": "More shopping actions",
+    "shoppingManageActions": "More list actions",
     "shopView": "Shop view",
     "products": "Products",
     "newList": "New list",
