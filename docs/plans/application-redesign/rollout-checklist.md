@@ -4,7 +4,12 @@ The user authorised the complete redesign. This checklist tracks completion acro
 
 **Required preservation gate:** follow the [feature preservation and outcome-parity contract](feature-preservation.md). The wireframes are not a complete feature specification; every existing capability must remain reachable and deliver the same result, even if the UI is substantially simpler. Capability loss requires explicit product-owner approval. In particular, recurring expenses, tasks and automations must not disappear because a mock-up omits them.
 
+**Additional wireframe review (8 November):** [model workspaces, media, quick actions and full finance coverage](wireframe-review-and-model-workspaces.md) is an explicit open design/implementation requirement. The current atlas is **not signed off**. Related counters and routes are a foundation, not proof that every user-facing business record has its own useful, deep-linkable workspace.
+
 ## Stage 1: capability and ownership inventory
+
+- [ ] Inventory every first-class user-facing business model and map its overview, actions, owner-filtered related records, deep links and return context; inspect the real implementation and services, not only route/dialog names.
+- [ ] Audit complete recurring expense, income, account, contribution, transfer, voucher and money-flow capabilities against the redesigned entry points.
 
 - [x] Inventory current routes, dialogs and feature owners in the design catalogue.
 - [x] Document stable identities, financial meanings and owner boundaries.
