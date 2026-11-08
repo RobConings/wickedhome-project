@@ -37,7 +37,7 @@ export function PageHeader({ title, description, eyebrow, icon, breadcrumbs, bac
     ? [identity.section, { label: title }] : undefined);
   return (
     <header className={cn("flex min-w-0 flex-col gap-2.5", className)}>
-      {trail && trail.length > 0 && <BreadcrumbTrail items={trail} label={t("navigation.breadcrumbs")} />}
+      {trail && trail.length > 0 && <BreadcrumbTrail items={trail} label={t("navigation.breadcrumbs")} className="hidden sm:block" />}
       <div data-slot="page-heading-layout" className="flex min-w-0 flex-col gap-4 xl:flex-row xl:items-start xl:justify-between xl:gap-6">
         <div
           data-slot="page-heading"
