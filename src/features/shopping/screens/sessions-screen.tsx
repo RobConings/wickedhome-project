@@ -2,7 +2,7 @@ import { useShoppingSort } from "../data/use-shopping-sort";
 import { ShoppingSortField } from "../components/shopping-sort-field";
 import { ShoppingNavigation } from "../components/shopping-navigation";
 import { formatCurrency } from "@/lib/format";
-import { CheckIcon, CircleIcon, PackageIcon, PlusIcon, ShoppingBagIcon, ShoppingCartIcon, SlidersHorizontalIcon } from "lucide-react";
+import { CheckIcon, PackageIcon, PlusIcon, ShoppingBagIcon, ShoppingCartIcon, SlidersHorizontalIcon } from "lucide-react";
 import { RecordImage } from "@/components/shared/record-image";
 import { RecordProgress } from "@/components/shared/record-progress";
 import { RecordLink } from "@/components/shared/record-link";
@@ -707,6 +707,10 @@ function SessionItemForm({
   const stocks = session.stockOptions.filter(
     (stock) => stock.productId === (product?.stockProductId ?? item.productId),
   );
+  // A linked packaging variant may not have its own photo; retain its canonical product image.
+  const imageUrl = product?.imageUrl ?? shopping.products.find((candidate) =>
+    (candidate.stockProductId ?? candidate.id) === (product?.stockProductId ?? item.productId) && candidate.imageUrl,
+  )?.imageUrl;
   const values = (form: HTMLFormElement) => ({
     quantity: item.quantity,
     stockItemId: field(form, "stockItemId") || undefined,
@@ -714,7 +718,7 @@ function SessionItemForm({
   return (
     <>
     <form
-      className="space-y-3 rounded-xl border bg-card p-3"
+      className="min-w-0 border-b border-border/70 px-3 py-2.5 last:border-b-0"
       onSubmit={(event) => {
         event.preventDefault();
         const form = event.currentTarget;
@@ -725,47 +729,39 @@ function SessionItemForm({
         });
       }}
     >
-      <div className="flex items-center gap-3">
-      <RecordImage src={product?.imageUrl} alt="" shape="avatar" fit="contain" className="size-14 shrink-0 rounded-xl bg-background" />
-      <p className="min-w-0 flex-1 font-medium">
-        {item.name}{" "}
-        <span className="ml-2 text-xs text-muted-foreground">
-          {t(
-            session.status === "closed" && item.status === "open"
-              ? "sessions.pendingReceipt"
-              : `sessions.item_${item.status}`,
-          )}{" "}
-          · {item.purchasedQuantity}/{item.quantity} {item.unit}
-        </span>
-      </p>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {item.status !== "bought" && (
-          <Button disabled={disabled} type="submit">
-            <CircleIcon />{t("sessions.buy")}
-          </Button>
-        )}
-        {item.status !== "bought" && (
-          <Button
-            disabled={disabled}
-            variant="outline"
-            type="button"
-            onClick={() =>
-              void onChange({
-                status: item.status === "skipped" ? "open" : "skipped",
-              })
-            }
-          >
-            {t(
-              item.status === "skipped" ? "planning.restore" : "planning.skip",
+      <div className="flex min-w-0 flex-wrap items-center gap-2.5">
+        <RecordImage src={imageUrl} alt="" shape="avatar" fit="contain"
+          fallback={<PackageIcon className="size-5 text-section" aria-hidden="true" />}
+          className="size-11 shrink-0 rounded-lg" />
+        <div className="min-w-32 flex-1">
+          <p className="break-words text-sm font-semibold leading-snug">{item.name}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {item.purchasedQuantity}/{item.quantity} {item.unit} · {t(
+              session.status === "closed" && item.status === "open"
+                ? "sessions.pendingReceipt"
+                : "sessions.item_" + item.status,
             )}
-          </Button>
-        )}
-        {item.status === "bought" && <span className="inline-flex min-h-11 items-center gap-2 px-2 text-sm font-medium text-section"><CheckIcon className="size-5" />{t("sessions.item_bought")}</span>}
-        <Button disabled={disabled} variant="outline" className="min-h-11" type="button" onClick={() => setAdjusting(item)}>{t("sessions.adjust")}</Button>
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5 sm:ml-auto">
+          {item.status !== "bought" && (
+            <Button disabled={disabled} size="sm" className="min-h-10 sm:min-h-9" type="submit">
+              <CheckIcon />{t("sessions.buy")}
+            </Button>
+          )}
+          {item.status !== "bought" && (
+            <Button disabled={disabled} size="sm" variant="outline" className="min-h-10 sm:min-h-9"
+              type="button" onClick={() => void onChange({ status: item.status === "skipped" ? "open" : "skipped" })}>
+              {t(item.status === "skipped" ? "planning.restore" : "planning.skip")}
+            </Button>
+          )}
+          {item.status === "bought" && <Badge variant="success"><CheckIcon />{t("sessions.item_bought")}</Badge>}
+          <Button disabled={disabled} size="sm" variant="ghost" className="min-h-10 sm:min-h-9"
+            type="button" onClick={() => setAdjusting(item)}>{t("sessions.adjust")}</Button>
+        </div>
       </div>
-      <details className="space-y-3">
-        <summary className="min-h-11 cursor-pointer py-3 text-sm text-muted-foreground">
+      <details className="mt-2 rounded-lg bg-muted/30 px-2">
+        <summary className="min-h-9 cursor-pointer py-2 text-xs text-muted-foreground">
           {t("sessions.purchaseDetails")}
         </summary>
         <fieldset disabled={disabled} className="grid gap-3 sm:grid-cols-3">
