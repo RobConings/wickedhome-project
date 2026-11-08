@@ -3,6 +3,7 @@ import type { Product } from "@/features/shopping/types/shopping";
 /** Facts about what is actually stored, never a claim that unknown data was verified. */
 export function productSetup(product: Product) {
   const present = {
+    brand: Boolean(product.brand),
     photo: Boolean(product.imageUrl),
     shop: Boolean(product.defaultShopId),
     productLink: product.shopLinks.some((link) => Boolean(link.url)),
