@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { PlusIcon, WalletIcon } from "lucide-react";
+import { PlusIcon, ShoppingCartIcon, WalletIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { SplitAction } from "@/components/shared/split-action";
 import { PageHeader } from "@/components/shared/page-header";
 
 const meta = {
@@ -28,5 +30,21 @@ export const WithActions: Story = {
         Add item
       </Button>
     ),
+  },
+};
+
+/** Regression: a long NL title/description must never share a narrow column with two CTAs on phones. */
+export const ShoppingMobileTwoActions: Story = {
+  globals: { viewport: { value: "mobile1" } },
+  args: {
+    title: "Boodschappen",
+    description: "Alles wat je wilt kopen, met aparte filters voor je lijsten en voorraad.",
+    icon: ShoppingCartIcon,
+    actions: <div className="grid w-full min-w-0 grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:justify-center xl:w-auto">
+      <SplitAction icon={ShoppingCartIcon} label="Start winkelen" menuLabel="Meer winkelacties"
+        onClick={() => {}} menu={<DropdownMenuItem>Winkelsessies</DropdownMenuItem>} />
+      <SplitAction icon={PlusIcon} label="Boodschap toevoegen" menuLabel="Meer boodschappenacties"
+        onClick={() => {}} variant="outline" menu={<DropdownMenuItem>Nieuwe lijst</DropdownMenuItem>} />
+    </div>,
   },
 };
