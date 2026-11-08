@@ -1,5 +1,11 @@
 # Local redesign implementation — partial rollout
 
+## New product workspace implementation — 8 November 2026 (unverified)
+
+The `rework_features` branch now contains an **initial production implementation**, not just a design preview: opt-in shared `RecordWorkspaceTabs` and `SplitAction`, a product-first Inventory screen with a total stock summary, Details (default) and linked Overview, bilingual copy, alternative and history links, existing advanced location-level stock management, and the original owner-service actions. Catalogue's product context shows linked owner-record cards directly instead of duplicating summary cards and lists. The Add-to-shopping action preflights existing open needs from linked product variants, with a focused regression test. Storybook examples were added for both shared components.
+
+This does **not** imply feature-wide parity, a verified build, database changes or deployment. Existing product records currently lack a persisted `brand` field; the UI explicitly displays it as unrecorded rather than inferring it from names. Packaged-unit and minimum-stock semantics and the complete shopping/action flows still require review on real representative data. The repository's CI workflow runs for `main` pushes / PRs to `main`, not ordinary `rework_features` pushes. Fresh tests are still outstanding, and the revised [implementation phases](implementation-phases.md) govern acceptance.
+
 The shared foundation and main connected workflows are implemented in `/Users/robconings/WickedHome`; the complete application redesign is not finished. It has not been deployed to the household server. Existing local work, persisted identities, server configuration and the canonical `wickedhome-project` remote are preserved.
 
 The atlas remains an illustrated design reference. Its separate screen IDs often represent states or related sections, rather than requiring another production route. The production inventory contains 65 routes and 29 feature directories; the atlas covers 178 page/dialog variants and 62 dialog source components.
