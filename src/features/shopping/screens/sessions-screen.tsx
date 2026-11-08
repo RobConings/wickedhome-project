@@ -13,6 +13,7 @@ import { SessionItemAdjustDialog } from "../components/session-item-adjust-dialo
 import { ShoppingNeedSections } from "../components/shopping-need-sections";
 import { ShoppingStockFilterField } from "../components/shopping-stock-filter";
 import { visitRequirements } from "../types/shopping-product-rows";
+import { sessionDisplayName } from "../types/sessions";
 import { SessionPayments } from "../components/session-payments";
 import { useLiveEventsStatus } from "@/lib/live-events";
 import { useCategoryOrder } from "../data/use-category-order";
@@ -123,7 +124,7 @@ export function SessionsScreen({
     new Map(shopping.products.map((product) => [product.id, product])),
   ).filter((item) => matchesStockFilter(item, stockFilter));
   const active = session?.status === "active";
-  const title = session?.name ?? t("sessions.title");
+  const title = session ? sessionDisplayName(session.name, session.startedAt) : t("sessions.title");
   const sessionShops = session?.shopIds.flatMap((id) => shopping.shops.find((shop) => shop.id === id) ?? []) ?? [];
   const activeSessions = sessions.filter((visit) => visit.status === "active").sort((a, b) => b.startedAt.localeCompare(a.startedAt));
   const pastSessions = sessions.filter((visit) => visit.status === "closed").sort((a, b) => b.startedAt.localeCompare(a.startedAt));
