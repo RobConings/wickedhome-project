@@ -206,6 +206,7 @@
     "noNotes": "No notes yet.",
     "advancedStock": "Advanced stock management",
     "expand": "Show",
-    "collapse": "Hide"
+    "collapse": "Hide",
+    "alreadyOnShopping": "This product is already on your shopping list. Opening its list."
   }
 }
