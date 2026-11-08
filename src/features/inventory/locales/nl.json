@@ -209,6 +209,8 @@
     "collapse": "Verbergen",
     "alreadyOnShopping": "Dit product staat al op de boodschappenlijst. De lijst wordt geopend.",
     "qrCode": "QR-code",
-    "noLinkedShops": "Nog geen gekoppelde winkelaanbiedingen."
+    "noLinkedShops": "Nog geen gekoppelde winkelaanbiedingen.",
+    "stockUnit": "Voorraadeenheid",
+    "mixedUnits": "Verschillende eenheden"
   }
 }
