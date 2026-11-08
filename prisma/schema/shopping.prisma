@@ -54,6 +54,8 @@ model Product {
   householdId   String
   household     Household         @relation(fields: [householdId], references: [id], onDelete: Cascade)
   name          String
+  /// Explicit brand; null when the household has not recorded it (never inferred from the name).
+  brand         String?
   /// Free-form unit, e.g. "pcs", "kg", "l", "pack".
   unit          String?
   category      ProductCategory   @default(OTHER)
