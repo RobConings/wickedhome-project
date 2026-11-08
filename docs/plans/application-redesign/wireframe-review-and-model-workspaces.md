@@ -28,6 +28,17 @@ The direction is promising, but the result is **not the target experience**: gen
 
 This is a **representative review**, not an exhaustive audit of 178 atlas variants. All 27 screenshots and the HTML build are supplied as local references, and their presence does not prove production behaviour.
 
+## Shopping-list control hierarchy — acceptance rule (8 November, production feedback)
+
+The production shopping list must not stack page navigation, list chips, search, automatic replenishment, category order, sorting and stock-status pseudo-tabs as separate horizontal rows. That hides the actual checklist and makes different kinds of controls appear to do the same job.
+
+- **Section navigation:** use the established shared `SectionNavigation` component only to move between the shopping list, shop view and shopping sessions. These are distinct pages, not stock filters.
+- **List selection:** choose All lists or one saved list in a labelled selector. It must not look like a second competing navigation bar or a set of tabs.
+- **Checklist toolbar:** show search and one clear View & filters trigger alongside list selection. On desktop it is one row when space permits; on a phone it can flow into two compact rows.
+- **Inside View & filters:** preserve sorting, stock status, automatic minimum-stock inclusion, category order and explanatory guidance. The stock statuses All / Out / Out + nearly out / Nearly out are filters, **not** tabs. Changing the UI must not change existing list membership, shopping quantities, purchase flow or URL filters.
+- **Checklist first:** after the shared page navigation and toolbar, show the shopping items and their category/need grouping. Avoid an additional row for unselected filters or generic results text; announce filtered results accessibly.
+- **Acceptance:** compare at 320 px, 390 px and desktop widths in EN/NL, including a custom list, a URL-applied stock filter, query input, a long list name, reset/selection and keyboard access. Code review alone is not screenshot or behaviour acceptance.
+
 ## C. A real record workspace, Odoo-inspired but household-friendly
 
 ### Universal record anatomy
