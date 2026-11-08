@@ -28,7 +28,7 @@ type ProductFormDialogProps = {
   product?: Product;
   shops: Shop[];
   /** Prefill a new product, e.g. the barcode that was just scanned. */
-  defaults?: Partial<Pick<Product, "name" | "barcode" | "qrCode" | "category" | "unit" | "imageUrl">>;
+  defaults?: Partial<Pick<Product, "name" | "brand" | "barcode" | "qrCode" | "category" | "unit" | "imageUrl">>;
   /** What the scanned barcode turned out to be: fills in name, category and photo (the user checks them). */
   suggestion?: ProductSuggestion | null;
   /** Looks up a typed barcode; defaults to the API (stories pass a fake). */
@@ -146,6 +146,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
 
   const initialBarcode = product?.barcode ?? defaults?.barcode ?? "";
   const [name, setName] = React.useState(product?.name ?? suggestion?.productName ?? defaults?.name ?? "");
+  const [brand, setBrand] = React.useState(product?.brand ?? suggestion?.brand ?? defaults?.brand ?? "");
   const [category, setCategory] = React.useState<ProductCategory>(product?.category ?? suggestion?.category ?? defaults?.category ?? "other");
   const [imageUrl, setImageUrl] = React.useState(product?.imageUrl ?? suggestion?.imageUrl ?? defaults?.imageUrl ?? "");
   const [photoFailed, setPhotoFailed] = React.useState(false);
@@ -168,6 +169,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
 
   function applySuggestion(next: ProductSuggestion, code: string) {
     setName(next.productName);
+    if (next.brand) setBrand(next.brand);
     if (next.category) setCategory(next.category);
     if (next.imageUrl) {
       setImageUrl(next.imageUrl);
@@ -278,6 +280,9 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
 
           <FormField label={t("fields.name")} htmlFor="product-name" errors={errors?.name}>
             <Input id="product-name" name="name" value={name} onChange={(event) => setName(event.target.value)} autoComplete="off" required />
+          </FormField>
+          <FormField label={t("fields.brand")} htmlFor="product-brand" optionalLabel={optional} errors={errors?.brand}>
+            <Input id="product-brand" name="brand" value={brand} onChange={(event) => setBrand(event.target.value)} autoComplete="off" maxLength={80} />
           </FormField>
 
           <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_7rem]">
