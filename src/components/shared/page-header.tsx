@@ -36,11 +36,11 @@ export function PageHeader({ title, description, eyebrow, icon, breadcrumbs, bac
   const trail: BreadcrumbItem[] | undefined = breadcrumbs ?? (!eyebrow && identity && !identity.isSectionRoot && typeof title === "string"
     ? [identity.section, { label: title }] : undefined);
   return (
-    <header className={cn("flex min-w-0 flex-col gap-4", className)}>
-      {showBack && <PageBackButton to={backTo ?? trail?.slice().reverse().find((item) => item.to)?.to ?? (identity && !identity.isSectionRoot ? identity.section.to : undefined)} />}
-      {trail && <BreadcrumbTrail items={trail} label={t("navigation.breadcrumbs")} />}
-      <div className="flex min-w-0 flex-wrap items-start justify-between gap-x-6 gap-y-4">
-      <div className="flex min-w-[min(100%,20rem)] flex-1 items-start gap-3">
+    <header className={cn("flex min-w-0 flex-col gap-2.5", className)}>
+      {trail && trail.length > 0 && <BreadcrumbTrail items={trail} label={t("navigation.breadcrumbs")} />}
+      <div className="flex min-w-0 flex-wrap items-start justify-between gap-x-6 gap-y-3">
+      <div className="flex min-w-0 flex-1 items-start gap-2.5 sm:gap-3">
+        {showBack && <PageBackButton to={backTo ?? trail?.slice().reverse().find((item) => item.to)?.to ?? (identity && !identity.isSectionRoot ? identity.section.to : undefined)} />}
         {shownIcon && <IconChip icon={shownIcon} className="mt-1" />}
         <div className="flex min-w-0 flex-col gap-1">
           <span aria-hidden="true" data-slot="page-accent" className="mb-1 h-1 w-8 rounded-full bg-section" />
