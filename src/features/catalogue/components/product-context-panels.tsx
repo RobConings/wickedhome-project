@@ -28,8 +28,8 @@ export function ProductContextPanels({ productId, initial }: { productId: string
     <PageGrid columns="3">
       <Card id="product-needs" className="scroll-mt-20">
         <div className="flex items-center gap-2"><IconChip icon={ShoppingCartIcon} tone="shopping" size="sm" /><CardTitle>{t("needs")} ({data.needs.length})</CardTitle></div>
-        {data.needs.length ? (
-          <ul className="divide-y">{data.needs.map((need) => (
+        {data.needs.length ? <>
+          <ul className="divide-y">{data.needs.slice(0, 5).map((need) => (
             <li key={need.id}>
               <RecordLink className="flex min-h-11 items-center justify-between gap-3 rounded-lg p-2 text-sm hover:bg-accent"
                 to={`/shopping/items/${encodeURIComponent(need.id)}`}>
@@ -38,7 +38,11 @@ export function ProductContextPanels({ productId, initial }: { productId: string
               </RecordLink>
             </li>
           ))}</ul>
-        ) : <p className="text-sm text-muted-foreground">{t("noNeeds")}</p>}
+          {data.needs.length > 5 && <RecordLink to={`/shopping?productId=${productFilter}`}
+            className="inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-semibold text-section underline-offset-4 hover:underline">
+            {t("viewAllNeeds", { count: data.needs.length })}
+          </RecordLink>}
+        </> : <p className="text-sm text-muted-foreground">{t("noNeeds")}</p>}
       </Card>
       <Card id="product-tasks" className="scroll-mt-20">
         <div className="flex items-center gap-2"><IconChip icon={ListChecksIcon} tone="tasks" size="sm" /><CardTitle>{t("tasks")} ({data.tasks.length})</CardTitle></div>
