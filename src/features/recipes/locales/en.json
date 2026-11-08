@@ -13,7 +13,10 @@
     "all": "All recipes"
   },
   "filter": {
-    "search": "Search recipes or ingredients"
+    "search": "Search recipes or ingredients",
+    "linkedProduct": "Recipes using {{name}}",
+    "unknownProduct": "this product",
+    "clearProduct": "Clear filter"
   },
   "groups": {
     "favorites": "Favourites",
