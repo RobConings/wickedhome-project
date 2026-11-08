@@ -62,11 +62,17 @@ export function ProductContextPanels({ productId, initial }: { productId: string
       </Card>
       <Card id="product-recipes" className="scroll-mt-20">
         <div className="flex items-center gap-2"><IconChip icon={BookOpenIcon} tone="home" size="sm" /><CardTitle>{t("recipes")} ({data.recipes.length})</CardTitle></div>
-        {data.recipes.length ? <ul className="divide-y">{data.recipes.map((recipe) => (
-          <li key={recipe.id}><RecordLink to={`/recipes/${encodeURIComponent(recipe.id)}`} className="flex min-h-11 items-center gap-3 rounded-lg py-2 text-sm hover:bg-accent">
-            <RecordImage src={recipe.imageUrl} shape="avatar" fallback={<BookOpenIcon className="size-5" />} /><span className="min-w-0 break-words">{recipe.name}</span>
-          </RecordLink></li>
-        ))}</ul> : <p className="text-sm text-muted-foreground">{t("noRecipes")}</p>}
+        {data.recipes.length ? <>
+          <ul className="divide-y">{data.recipes.slice(0, 5).map((recipe) => (
+            <li key={recipe.id}><RecordLink to={`/recipes/${encodeURIComponent(recipe.id)}`} className="flex min-h-11 items-center gap-3 rounded-lg py-2 text-sm hover:bg-accent">
+              <RecordImage src={recipe.imageUrl} shape="avatar" fallback={<BookOpenIcon className="size-5" />} className="size-12" /><span className="min-w-0 break-words">{recipe.name}</span>
+            </RecordLink></li>
+          ))}</ul>
+          {data.recipes.length > 5 && <RecordLink to={`/recipes?tab=all&productId=${productFilter}`}
+            className="inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-semibold text-section underline-offset-4 hover:underline">
+            {t("viewAllRecipes", { count: data.recipes.length })}
+          </RecordLink>}
+        </> : <p className="text-sm text-muted-foreground">{t("noRecipes")}</p>}
       </Card>
     </PageGrid>
   );
