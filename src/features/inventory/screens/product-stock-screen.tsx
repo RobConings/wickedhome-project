@@ -234,8 +234,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
                   ...(product.qrCode ? [{ icon: QrCodeIcon, label: t("workspace.qrCode"), value: product.qrCode }] : []),
                   { icon: PackageIcon, label: t("workspace.packSize"), value: packageSize },
                   { icon: BoxesIcon, label: t("workspace.stockUnit"), value: mixedUnits ? t("workspace.mixedUnits") : unit },
-                  // Brand is not persisted in the current product model. Never infer it from its name.
-                  { icon: TagIcon, label: t("workspace.brand"), value: null },
+                  { icon: TagIcon, label: t("workspace.brand"), value: product.brand },
                   { icon: StoreIcon, label: t("workspace.preferredShop"), value: preferredShop },
                 ].map(({ icon, label, value }) => {
                   const Icon = icon;
