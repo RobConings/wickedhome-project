@@ -10,9 +10,13 @@ import { sessionStartFormSchema } from "../data/sessions-actions";
 import { requirementsForDestination } from "../types/visit-destination";
 
 /** The ordinary trip starts with one decision. The service selects current needs on submit. */
-export function SessionStartCard({ shopping, destination, onDestinationChange, initialSelections }: {
+export function SessionStartCard({ shopping, destination, onDestinationChange, initialSelections, action, compact = false }: {
   shopping: ShoppingPageData; destination: string | null; onDestinationChange: (value: string | null) => void;
   initialSelections?: ComponentProps<typeof ShopDestinationPicker>["initialSelections"];
+  /** Lets the same destination form start a session from another shopping route. */
+  action?: string;
+  /** Only the picker/form, without a second title card inside a dialog. */
+  compact?: boolean;
 }) {
   const { t } = useTranslation("shopping");
   const [operationId] = useState(() => crypto.randomUUID());
@@ -24,15 +28,19 @@ export function SessionStartCard({ shopping, destination, onDestinationChange, i
       shops={shopping.shops} groups={shopping.shopGroups ?? []} initialSelections={initialSelections} value={typeof value === "string" ? value : null}
       onChange={setValue} invalid={invalid} disabled={disabled} />,
   }];
-  return <Card className="max-w-2xl">
-    <CardHeader><div className="flex items-center gap-3"><IconChip icon={ShoppingCartIcon} tone="shopping" /><div>
-      <CardTitle>{t("sessions.simpleStart")}</CardTitle><CardDescription>{t("sessions.simpleDescription")}</CardDescription>
-    </div></div></CardHeader>
-    <GeneralForm navigate schema={sessionStartFormSchema} fields={fields} intent="start-session"
+  const content = <>
+    <GeneralForm navigate action={action} schema={sessionStartFormSchema} fields={fields} intent="start-session"
       hiddenFields={{ operationId }} defaultValues={{ destination }}
       onValuesChange={(values) => onDestinationChange(typeof values.destination === "string" ? values.destination : null)}
       submitLabel={t("sessions.startShopping")}
     />
     {destination && <p role="status" className="rounded-xl bg-section-soft p-3 text-sm text-section-foreground">{t("sessions.matchingNeeds", { count })}</p>}
+  </>;
+  if (compact) return <div className="flex min-w-0 flex-col gap-3">{content}</div>;
+  return <Card className="max-w-2xl">
+    <CardHeader><div className="flex items-center gap-3"><IconChip icon={ShoppingCartIcon} tone="shopping" /><div>
+      <CardTitle>{t("sessions.simpleStart")}</CardTitle><CardDescription>{t("sessions.simpleDescription")}</CardDescription>
+    </div></div></CardHeader>
+    {content}
   </Card>;
 }
