@@ -4,6 +4,8 @@ English is the source language for project documentation, plan filenames and pla
 
 ## See the proposed experience
 
+**Newest reviewable HTML prototype:** [20 connected mobile-first household wireframes](plans/application-redesign/preview/household-wireframes.html), with [usage notes](plans/application-redesign/preview/household-wireframes-README.md) and a [saved product workspace design reference](plans/application-redesign/preview/product-workspace-reference.svg). These are fictional design examples, not deployed screens.
+
 Start with the [annotated wireframe walkthrough](plans/application-redesign/preview/walkthrough.html): sixteen screens across shopping, projects/money, the connected home and photos/view modes. It explains what changes and what happens next, using screenshots of the actual shared React compositions.
 
 For interactive examples, start the [design atlas](plans/application-redesign/README.md). It contains 178 page/dialog variants, English/Dutch switching, desktop/mobile layouts and state examples. The [complete redesign plan](plans/application-redesign/plan.mdx), [ownership contracts](plans/application-redesign/architecture-contracts.md) and [AI/MCP contract](plans/application-redesign/ai-mcp-contract.md) define the target behaviour. The [feature preservation contract](plans/application-redesign/feature-preservation.md) requires all existing outcomes to remain accessible and correct even where simpler new interactions replace old screens or wireframes omit functionality. See [implementation status](plans/application-redesign/implementation.md) for the local implementation, validation and release limits; these documents do not establish deployment.
