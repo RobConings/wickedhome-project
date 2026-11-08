@@ -1,5 +1,7 @@
 # Related-record summary cards
 
+**Scope:** these cards are only the navigation **entry point**. They do not satisfy the requirement for every first-class user-facing business model to have a real dedicated workspace with owner-filtered related sections, contextual actions and round-trip navigation. Apply the [wireframe review and model-workspace contract](wireframe-review-and-model-workspaces.md) alongside this component contract.
+
 The related summaries remain useful navigation: Tasks 3, Materials 3, Purchases 2, Costs €460 and Documents 2. Present them as small cards with a coloured icon, readable label and summary value. The entire card opens the related records.
 
 ## Layout and interaction
