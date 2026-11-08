@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BookOpenIcon, ChefHatIcon, PlusIcon } from "lucide-react";
+import { BookOpenIcon, ChefHatIcon, PackageIcon, PlusIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
@@ -59,6 +59,8 @@ export function RecipesScreen({ recipes, mealPlan, categories = [], products, sh
   });
   const [creating, setCreating] = useOpenFromUrl(canManage);
   const pending = useSamePagePending();
+  const productId = searchParams.get("productId");
+  const linkedProduct = products.find((product) => product.id === productId);
   const requestedCategory = searchParams.get("category");
   const categoryId = requestedCategory === "none" || categories.some((category) => category.id === requestedCategory) ? requestedCategory : undefined;
   const visibleRecipes = filterRecipesByCategory(recipes, categoryId ?? undefined);
@@ -71,7 +73,7 @@ export function RecipesScreen({ recipes, mealPlan, categories = [], products, sh
   const waiting = mealPlan.filter((entry) => entry.status !== "cooked");
   const made = mealPlan.filter((entry) => entry.status === "cooked");
   const requested = searchParams.get("tab");
-  const tab: Tab = TABS.includes(requested as Tab) ? (requested as Tab) : waiting.length ? "cook" : "all";
+  const tab: Tab = TABS.includes(requested as Tab) ? (requested as Tab) : productId ? "all" : waiting.length ? "cook" : "all";
   const setTab = (next: string) =>
     setSearchParams(
       (params) => {
@@ -143,7 +145,17 @@ export function RecipesScreen({ recipes, mealPlan, categories = [], products, sh
           )}
         </TabsContent>
 
-        <TabsContent value="all">
+        <TabsContent value="all" className="flex min-w-0 flex-col gap-3">
+          {productId && <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-section-border bg-section-soft px-3 py-2">
+            <span className="inline-flex min-w-0 items-center gap-2 text-sm font-medium"><PackageIcon className="size-4 shrink-0 text-section" />
+              {t("filter.linkedProduct", { name: linkedProduct?.name ?? t("filter.unknownProduct") })}
+            </span>
+            <Button size="sm" variant="outline" onClick={() => setSearchParams((current) => {
+              const next = new URLSearchParams(current); next.delete("productId"); return next;
+            }, { replace: true, preventScrollReset: true })}>
+              <XIcon />{t("filter.clearProduct")}
+            </Button>
+          </div>}
           <GeneralList
             label={t("tabs.all")}
             items={visibleRecipes}
