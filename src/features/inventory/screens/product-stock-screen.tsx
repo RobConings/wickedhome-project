@@ -58,6 +58,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
   const stockItems = stock.stockItems.map(show);
   const total = stockItems.reduce((sum, item) => sum + item.quantity, 0);
   const unit = stockItems[0]?.unit ?? product.unit;
+  const mixedUnits = new Set(stockItems.map((item) => item.unit ?? product.unit ?? "")).size > 1;
   const availablePlaces = places.filter((place) => !stock.stockItems.some((item) => item.placeId === place.id));
   const preferredShop = shops.find((shop) => shop.id === product.defaultShopId)?.name ?? null;
 
@@ -113,10 +114,10 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
     }
   }
 
-  const count = `${formatQuantity(total, locale)}${unit ? ` ${unit}` : ""}`;
+  const count = mixedUnits ? t("workspace.mixedUnits") : `${formatQuantity(total, locale)}${unit ? ` ${unit}` : ""}`;
   const packageSize = product.packageAmount !== null && product.packageUnit
     ? `${formatQuantity(product.packageAmount, locale)} ${product.packageUnit}`
-    : (unit ?? null);
+    : null;
   const minimum = stockItems.length === 1 ? stockItems[0].minQuantity : null;
   const stockPlace = stockItems.length === 1 ? stockItems[0].placeName : null;
   const detailRows: { label: string; value: string }[] = [
@@ -224,6 +225,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
                   { icon: BarcodeIcon, label: t("workspace.barcode"), value: product.barcode },
                   ...(product.qrCode ? [{ icon: QrCodeIcon, label: t("workspace.qrCode"), value: product.qrCode }] : []),
                   { icon: PackageIcon, label: t("workspace.packSize"), value: packageSize },
+                  { icon: BoxesIcon, label: t("workspace.stockUnit"), value: unit },
                   // Brand is not persisted in the current product model. Never infer it from its name.
                   { icon: TagIcon, label: t("workspace.brand"), value: null },
                   { icon: StoreIcon, label: t("workspace.preferredShop"), value: preferredShop },
