@@ -206,6 +206,7 @@
     "noNotes": "Nog geen notities.",
     "advancedStock": "Geavanceerd voorraadbeheer",
     "expand": "Tonen",
-    "collapse": "Verbergen"
+    "collapse": "Verbergen",
+    "alreadyOnShopping": "Dit product staat al op de boodschappenlijst. De lijst wordt geopend."
   }
 }
