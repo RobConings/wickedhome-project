@@ -1,0 +1,289 @@
+{
+  "status": "design-only",
+  "generatedAt": "2026-11-08",
+  "totalFeatures": 29,
+  "totalScreens": 78,
+  "features": [
+    {
+      "feature": "dashboard",
+      "label": "Today & dashboard",
+      "group": "Daily life",
+      "screenIds": [
+        "dashboard",
+        "dashboard-activity"
+      ]
+    },
+    {
+      "feature": "tasks",
+      "label": "Tasks & maintenance",
+      "group": "Daily life",
+      "screenIds": [
+        "tasks",
+        "task",
+        "task-repeat"
+      ]
+    },
+    {
+      "feature": "shopping",
+      "label": "Shopping & trips",
+      "group": "Daily life",
+      "screenIds": [
+        "shopping",
+        "shopping-trip",
+        "trip-summary"
+      ]
+    },
+    {
+      "feature": "recipes",
+      "label": "Recipes & cooking",
+      "group": "Daily life",
+      "screenIds": [
+        "recipes",
+        "recipe",
+        "cooking"
+      ]
+    },
+    {
+      "feature": "calendar",
+      "label": "Calendar",
+      "group": "Daily life",
+      "screenIds": [
+        "calendar",
+        "event",
+        "calendar-sources"
+      ]
+    },
+    {
+      "feature": "projects",
+      "label": "Projects",
+      "group": "Daily life",
+      "screenIds": [
+        "projects",
+        "project",
+        "project-budget"
+      ]
+    },
+    {
+      "feature": "catalogue",
+      "label": "Products & variants",
+      "group": "Products & purchases",
+      "screenIds": [
+        "products",
+        "product",
+        "alternatives"
+      ]
+    },
+    {
+      "feature": "inventory",
+      "label": "Inventory & counting",
+      "group": "Products & purchases",
+      "screenIds": [
+        "inventory",
+        "stock",
+        "count-stock",
+        "inventory-scan"
+      ]
+    },
+    {
+      "feature": "shops",
+      "label": "Shops & groups",
+      "group": "Products & purchases",
+      "screenIds": [
+        "shops",
+        "shop",
+        "shop-group"
+      ]
+    },
+    {
+      "feature": "purchases",
+      "label": "Purchases & receipts",
+      "group": "Products & purchases",
+      "screenIds": [
+        "purchases",
+        "purchase",
+        "receipt"
+      ]
+    },
+    {
+      "feature": "expenses",
+      "label": "Expenses & recurring",
+      "group": "Money",
+      "screenIds": [
+        "expenses",
+        "expense",
+        "recurring",
+        "expense-occurrence"
+      ]
+    },
+    {
+      "feature": "income",
+      "label": "Income & vouchers",
+      "group": "Money",
+      "screenIds": [
+        "income",
+        "income-source",
+        "voucher"
+      ]
+    },
+    {
+      "feature": "money",
+      "label": "Accounts & money flow",
+      "group": "Money",
+      "screenIds": [
+        "money",
+        "account",
+        "contribution",
+        "transfer"
+      ]
+    },
+    {
+      "feature": "places",
+      "label": "Rooms & floor plans",
+      "group": "Home & energy",
+      "screenIds": [
+        "home",
+        "places",
+        "place",
+        "floorplan"
+      ]
+    },
+    {
+      "feature": "devices",
+      "label": "Devices & profiles",
+      "group": "Home & energy",
+      "screenIds": [
+        "devices",
+        "device",
+        "device-profile"
+      ]
+    },
+    {
+      "feature": "home-assistant",
+      "label": "Home Assistant",
+      "group": "Home & energy",
+      "screenIds": [
+        "ha",
+        "ha-entity"
+      ]
+    },
+    {
+      "feature": "energy",
+      "label": "Energy & metering",
+      "group": "Home & energy",
+      "screenIds": [
+        "energy",
+        "energy-appliance",
+        "energy-meter"
+      ]
+    },
+    {
+      "feature": "household",
+      "label": "Residents & household",
+      "group": "People & files",
+      "screenIds": [
+        "household",
+        "resident"
+      ]
+    },
+    {
+      "feature": "contacts",
+      "label": "Contacts & suppliers",
+      "group": "People & files",
+      "screenIds": [
+        "contacts",
+        "contact"
+      ]
+    },
+    {
+      "feature": "documents",
+      "label": "Documents & files",
+      "group": "People & files",
+      "screenIds": [
+        "documents",
+        "document",
+        "drive-folder"
+      ]
+    },
+    {
+      "feature": "auth",
+      "label": "Accounts & access",
+      "group": "System & connections",
+      "screenIds": [
+        "auth",
+        "invitation"
+      ]
+    },
+    {
+      "feature": "settings",
+      "label": "Settings",
+      "group": "System & connections",
+      "screenIds": [
+        "settings",
+        "settings-notification"
+      ]
+    },
+    {
+      "feature": "integrations",
+      "label": "Connections & imports",
+      "group": "System & connections",
+      "screenIds": [
+        "integrations",
+        "mail-review"
+      ]
+    },
+    {
+      "feature": "assistant",
+      "label": "Assistant & MCP",
+      "group": "System & connections",
+      "screenIds": [
+        "assistant",
+        "assistant-thread"
+      ]
+    },
+    {
+      "feature": "notifications",
+      "label": "Notifications",
+      "group": "System & connections",
+      "screenIds": [
+        "notifications",
+        "notification"
+      ]
+    },
+    {
+      "feature": "automations",
+      "label": "Automations",
+      "group": "System & connections",
+      "screenIds": [
+        "automations",
+        "automation-run"
+      ]
+    },
+    {
+      "feature": "audit",
+      "label": "Activity & audit",
+      "group": "System & connections",
+      "screenIds": [
+        "audit",
+        "audit-event"
+      ]
+    },
+    {
+      "feature": "waste",
+      "label": "Waste collection",
+      "group": "Home & energy",
+      "screenIds": [
+        "waste",
+        "waste-day"
+      ]
+    },
+    {
+      "feature": "weather",
+      "label": "Weather",
+      "group": "Home & energy",
+      "screenIds": [
+        "weather",
+        "forecast"
+      ]
+    }
+  ]
+}
