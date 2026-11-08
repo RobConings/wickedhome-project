@@ -25,6 +25,14 @@ The existing `inventory.save_product` / `inventory_save_product` tools can now a
 
 An earlier CI unit failure was traced to a shopping assistant **test double** that assumed catalogue search used only `where.name`; brand-aware Prisma search now wraps name/brand conditions in `AND` to preserve code filters. The test double was updated to match this query structure and an explicit brand-search, persistence, omission and clearing regression was added. **Passing CI for the corrected code is not assumed until GitHub reports it.**
 
+## Further shopping/record-workspace continuation
+
+The existing Shopping-owned `/shopping/items/:itemId` record route is now a more legible mobile-first **buying need** workspace, not a forced ERP details-tab template. It retains Shopping's real checklist, buy/undo and edit/delete forms, the independent list/recipe/task/project/stock reasons, and document attachments. A product packshot or item image occupies a useful visual region. The owner-link section now shows recorded product, shop, alternative-product, purchase-history and expense links. **No purchases, expenses or stock changes are manufactured from navigation.** English/Dutch UI copy and a phone-sized Storybook case cover the newly exposed links.
+
+GitHub CI previously reached the two-phone shopping smoke test after unit, integration, schema, type-check, lint and build stages passed. The browser test timed out after navigating product → shopping because it could click a *stale Back link* on the old product page immediately after the URL changed, before React Router finished loading Shopping. The test now waits for Shopping's actual page heading and a Back link whose target is the expected product before clicking. This is a test synchronization fix, not proof of a route defect.
+
+New database coverage verifies brand persisted search, update/clear, an older client omitting the field, cross-household rejection, and lack of stock/money side effects. Brand and shopping-need Storybook/browser/DB acceptance remain **pending latest CI**, not assumed passing.
+
 ## Documentation and verification
 
 - Codex's original `docs/plans/app-samenhang/` export (screenshots, built `site/`, HTML and other assets) was moved **intact** to `docs/plans/application-redesign/legacy-wireframe-export/`. This restores the English directory naming convention and keeps its internal relative paths.
