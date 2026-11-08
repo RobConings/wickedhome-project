@@ -2,7 +2,7 @@
 
 Implementation report for the shopping changes recorded on 7 November 2026. The store feedback predates merge `bdc1a96`. Existing products, `ShoppingItem` requirements, `StockPurchase` acquisitions, `StockMovement` records and `Expense` records are reused; starting a new workflow does not delete household history.
 
-This document describes implemented domain behaviour and records its original validation. The [application-wide redesign](plans/app-samenhang/README.md) proposes a simpler interface over that behaviour. Its wireframes are design artifacts, not evidence of a server deployment. The historical test counts below are not new test runs performed during documentation editing.
+This document describes implemented domain behaviour and records its original validation. The [application-wide redesign](plans/application-redesign/README.md) proposes a simpler interface over that behaviour. Its wireframes are design artifacts, not evidence of a server deployment. The historical test counts below are not new test runs performed during documentation editing.
 
 ## Phase 1 — Analysis and critical fixes
 
@@ -102,7 +102,7 @@ The browser checks use real login, API, SSE and disposable PostgreSQL: selection
 
 In the implemented interface, open **Shopping → Shopping trips**, select shops and needs, then start. Other household members open the same trip and join. Purchased records the planned quantity; Adjust supports partial quantities and location selection. Not now removes an item from the active checklist. Close after resolving open items. Receipts/payments may be attached later; the printed line number must consistently identify the same physical receipt line.
 
-The proposed interface removes this preparation burden: **start → choose one shop or saved group → automatic checklist → finish → optional receipt/expense/stock review**. See the [wireframe walkthrough](plans/app-samenhang/preview/walkthrough.html) and [redesign contracts](plans/app-samenhang/architecture-contracts.md). Those proposed screens do not change current API semantics by themselves.
+The proposed interface removes this preparation burden: **start → choose one shop or saved group → automatic checklist → finish → optional receipt/expense/stock review**. See the [wireframe walkthrough](plans/application-redesign/preview/walkthrough.html) and [redesign contracts](plans/application-redesign/architecture-contracts.md). Those proposed screens do not change current API semantics by themselves.
 
 ### Reproducing the original domain checks
 
@@ -166,7 +166,7 @@ The web checklist now opens Adjust with `GeneralFormDialog` and the existing pro
 
 `shopping_session_update_item.productId` is limited to products sharing the current canonical stock owner. The service enforces this, household scope, revisions and retry identities. Switching a variant changes future acquisitions; existing acquisition lines retain `purchasedProductId`/`purchasedProductName` snapshots. The session response exposes each acquired variant as purchase-line `productId` and `name`. Unrelated goods use `shopping_session_add_item`.
 
-This local implementation needs the additive `20261107190000_shopping_variant_history` migration as part of release. The rest of the proposed session-start simplification is tracked in the [implementation status](plans/app-samenhang/implementation.md).
+This local implementation needs the additive `20261107190000_shopping_variant_history` migration as part of release. The rest of the proposed session-start simplification is tracked in the [implementation status](plans/application-redesign/implementation.md).
 
 ## Unified session experience
 
@@ -178,4 +178,4 @@ Finishing exposes recorded goods, receipt evidence, a purchase link and the shar
 
 Date-only receipts use the start of the household's calendar day as a conservative ordering boundary, not an asserted purchase hour. This avoids future-noon timestamps and retains stock-count review when the actual ordering is uncertain. Both winter/summer time and midnight uploads are tested.
 
-The latest validation and additive migrations are listed in the [implementation report](plans/app-samenhang/implementation.md) and [Purchases guide](PURCHASES.md). Earlier phase test counts above are historical results, not current totals.
+The latest validation and additive migrations are listed in the [implementation report](plans/application-redesign/implementation.md) and [Purchases guide](PURCHASES.md). Earlier phase test counts above are historical results, not current totals.

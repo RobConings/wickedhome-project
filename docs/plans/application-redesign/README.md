@@ -22,8 +22,8 @@ All authored documentation is in English. **English is the default product langu
 From the project root:
 
 ```sh
-python3 docs/plans/app-samenhang/build_catalog.py
-node docs/plans/app-samenhang/preview.mjs
+python3 docs/plans/application-redesign/build_catalog.py
+node docs/plans/application-redesign/preview.mjs
 ```
 
 Start with **http://127.0.0.1:55450/walkthrough.html** for three annotated journeys plus a photos/view chapter, then open
@@ -42,7 +42,7 @@ Shopping starts with the real single-selection `EntityPicker`: one shop or one s
 To leave section-specific feedback on the complete plan, run:
 
 ```sh
-vplan docs/plans/app-samenhang/plan.mdx --timeout 30m
+vplan docs/plans/application-redesign/plan.mdx --timeout 30m
 ```
 
 This opens an interactive design review. Reviewing the plan does not deploy the illustrated changes.
@@ -68,8 +68,8 @@ The original brand reference informs the colourful icons, warm surfaces and prog
 With the preview running:
 
 ```sh
-node docs/plans/app-samenhang/capture-walkthrough.mjs
-node docs/plans/app-samenhang/build-walkthrough.mjs
+node docs/plans/application-redesign/capture-walkthrough.mjs
+node docs/plans/application-redesign/build-walkthrough.mjs
 ```
 
 The captures use the actual shared React compositions with fictional data. Motion is disabled for stable
@@ -80,15 +80,15 @@ The capture also produces a three-frame shopping-flow board for quick review.
 ## Verification and build
 
 ```sh
-python3 docs/plans/app-samenhang/build_catalog.py
-npx tsc -p docs/plans/app-samenhang/preview/tsconfig.json
-node docs/plans/app-samenhang/verify.mjs
-node docs/plans/app-samenhang/preview.mjs --build
-node docs/plans/app-samenhang/verify-walkthrough.mjs
-node docs/plans/app-samenhang/verify-media.mjs
-node docs/plans/app-samenhang/verify-implemented-patterns.mjs
+python3 docs/plans/application-redesign/build_catalog.py
+npx tsc -p docs/plans/application-redesign/preview/tsconfig.json
+node docs/plans/application-redesign/verify.mjs
+node docs/plans/application-redesign/preview.mjs --build
+node docs/plans/application-redesign/verify-walkthrough.mjs
+node docs/plans/application-redesign/verify-media.mjs
+node docs/plans/application-redesign/verify-implemented-patterns.mjs
 node scripts/redesign-storybook-smoke.mjs # after npm run build-storybook
-vplan check docs/plans/app-samenhang/plan.mdx
+vplan check docs/plans/application-redesign/plan.mdx
 ```
 
 Browser verification expects the atlas on port 55450 and Chrome/Chromium. It launches its own browser and does not request production credentials. Override the browser path with `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` if necessary. Atlas results are written to `verification.json`; walkthrough checks are written to

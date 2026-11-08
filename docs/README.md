@@ -1,12 +1,12 @@
 # WickedHome documentation
 
-English is the source language for project documentation and interface copy. The application supports Dutch through feature translations and bilingual search aliases. Keep technical identifiers, source-format values, user-authored record names and explicit translation examples unchanged.
+English is the source language for project documentation, plan filenames and plan directories, and interface copy. The application supports Dutch through feature translations and bilingual search aliases. Keep technical identifiers, source-format values, user-authored record names and explicit translation examples unchanged.
 
 ## See the proposed experience
 
-Start with the [annotated wireframe walkthrough](plans/app-samenhang/preview/walkthrough.html): sixteen screens across shopping, projects/money, the connected home and photos/view modes. It explains what changes and what happens next, using screenshots of the actual shared React compositions.
+Start with the [annotated wireframe walkthrough](plans/application-redesign/preview/walkthrough.html): sixteen screens across shopping, projects/money, the connected home and photos/view modes. It explains what changes and what happens next, using screenshots of the actual shared React compositions.
 
-For interactive examples, start the [design atlas](plans/app-samenhang/README.md). It contains 178 page/dialog variants, English/Dutch switching, desktop/mobile layouts and state examples. The [complete redesign plan](plans/app-samenhang/plan.mdx), [ownership contracts](plans/app-samenhang/architecture-contracts.md) and [AI/MCP contract](plans/app-samenhang/ai-mcp-contract.md) define the target behaviour. The [feature preservation contract](plans/app-samenhang/feature-preservation.md) requires all existing outcomes to remain accessible and correct even where simpler new interactions replace old screens or wireframes omit functionality. See [implementation status](plans/app-samenhang/implementation.md) for the local implementation, validation and release limits; these documents do not establish deployment.
+For interactive examples, start the [design atlas](plans/application-redesign/README.md). It contains 178 page/dialog variants, English/Dutch switching, desktop/mobile layouts and state examples. The [complete redesign plan](plans/application-redesign/plan.mdx), [ownership contracts](plans/application-redesign/architecture-contracts.md) and [AI/MCP contract](plans/application-redesign/ai-mcp-contract.md) define the target behaviour. The [feature preservation contract](plans/application-redesign/feature-preservation.md) requires all existing outcomes to remain accessible and correct even where simpler new interactions replace old screens or wireframes omit functionality. See [implementation status](plans/application-redesign/implementation.md) for the local implementation, validation and release limits; these documents do not establish deployment.
 
 ## Implementation and development
 
@@ -45,11 +45,11 @@ Development uses the local checkout at `/Users/robconings/WickedHome` with machi
 
 Start at [the AI overview](../ai/README.md). [Assistant setup and operation](../ai/docs/ASSISTANT.md), [adding tools](../ai/docs/ADDING-TOOLS.md), [MCP OAuth](../ai/docs/MCP-OAUTH.md) and [web search](../ai/docs/WEB-SEARCH.md) describe current contracts. Compact runtime guides live in `ai/skills/*/guide.md`; published tools and their schemas determine actual capabilities.
 
-The [redesign AI/MCP contract](plans/app-samenhang/ai-mcp-contract.md) adds requirements for future journey/context changes. It does not create tools or change permissions by itself.
+The [redesign AI/MCP contract](plans/application-redesign/ai-mcp-contract.md) adds requirements for future journey/context changes. It does not create tools or change permissions by itself.
 
 ## Historical implementation plans
 
-[Purchase/counting implementation](plans/aankopen-en-voorraad.mdx) and [shared shopping implementation](plans/winkelsessies.mdx) are now in English. Their existing filenames remain for compatibility. Completed phases and recorded test counts describe those deliveries, not fresh tests or the current server revision.
+[Purchase/counting implementation](plans/purchases-and-inventory.mdx) and [shared shopping implementation](plans/shopping-sessions.mdx) are now in English. Their filenames and internal links use English. Completed phases and recorded test counts describe those deliveries, not fresh tests or the current server revision.
 
 ## Documentation review
 

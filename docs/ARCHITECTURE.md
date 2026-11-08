@@ -5,9 +5,9 @@ one process.
 
 ## Application-wide design proposal
 
-The [One WickedHome design dossier](plans/app-samenhang/README.md) inventories all current routes,
+The [One WickedHome design dossier](plans/application-redesign/README.md) inventories all current routes,
 dialogs and features, with English-first bilingual wireframes and proposed ownership/composition contracts.
-Its [architecture contracts](plans/app-samenhang/architecture-contracts.md) extend the principles below;
+Its [architecture contracts](plans/application-redesign/architecture-contracts.md) extend the principles below;
 implementation is phased and the current layer rules remain authoritative. The atlas is design tooling,
 not a proposed universal production page renderer.
 

@@ -10,7 +10,7 @@ English is the documentation/source-copy language. Dutch remains intentionally p
 
 | Finding | Result |
 |---|---|
-| Shopping report and two older plans were still Dutch | Full English versions, including diagrams, phase descriptions, tables and operational MCP guidance |
+| Shopping report and two older plans were still Dutch | Full English versions, including diagrams, phase descriptions, tables and operational MCP guidance; plan filenames and redesign directory renamed to English |
 | AI runtime guides used Dutch request examples inside otherwise English text | Examples and explanations translated; tool names, arguments, permissions and workflow meanings preserved |
 | Architecture and feature instructions required all work over SMB/on the server | Local development and server deployment are now separate; machine-specific dependencies stay in their own environment |
 | Old phase reports sounded like current deployment status | Historical validation and current server revision are explicitly distinguished |
@@ -47,7 +47,7 @@ Repository source and current tool schemas remain authoritative for implemented 
 - Targeted journeys: language switching, shop-dependent checklist and shared-picker group composition pass.
 - Preview type checking, lint, production build and all three visual-plan validators pass.
 
-The [implementation status](plans/app-samenhang/implementation.md) separates the new production code from the remaining target design. The current implementation has also passed 1,603 unit tests, 25 real PostgreSQL session/MCP integration tests and the real API/mobile browser journey. Historical results in older implementation reports remain historical.
+The [implementation status](plans/application-redesign/implementation.md) separates the new production code from the remaining target design. The current implementation has also passed 1,603 unit tests, 25 real PostgreSQL session/MCP integration tests and the real API/mobile browser journey. Historical results in older implementation reports remain historical.
 
 ## Implemented room and interaction patterns
 
@@ -62,4 +62,4 @@ media-specific browser cases verify cover sizing, both view modes, retained reco
 product contain treatment and missing/failed image fallbacks. Device photo persistence remains proposed
 owner work; the example assets do not change household data.
 
-The completed local redesign has current source/English-Dutch copy, MCP guides, 65-route/29-feature coverage and a separate [implementation report](plans/app-samenhang/implementation.md). Migration preservation, actual owner/MCP workflows, component responsiveness and real browser journeys validate the contracts independently of fictional wireframes.
+The completed local redesign has current source/English-Dutch copy, MCP guides, 65-route/29-feature coverage and a separate [implementation report](plans/application-redesign/implementation.md). Migration preservation, actual owner/MCP workflows, component responsiveness and real browser journeys validate the contracts independently of fictional wireframes.

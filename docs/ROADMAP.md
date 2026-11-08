@@ -2,13 +2,13 @@
 
 WickedHome is the household hub: one place that knows and manages everything about the home.
 
-The next interface/experience work is defined by the [complete redesign plan](plans/app-samenhang/plan.mdx)
-and [annotated wireframe journeys](plans/app-samenhang/preview/walkthrough.html). Feature implementation
+The next interface/experience work is defined by the [complete redesign plan](plans/application-redesign/plan.mdx)
+and [annotated wireframe journeys](plans/application-redesign/preview/walkthrough.html). Feature implementation
 and domain rules live in the linked feature guides. The MVP/later lists and foundation phases below retain
 the original product scope; they are not a current deployment checklist or a claim that built features
 still need to be created. English is the source language; Dutch is fully supported.
 
-**Redesign requirement:** keep all existing user-facing outcomes, business rules, scheduled behaviours and data/relationships. Existing capabilities missing from a wireframe (for example recurring expenses) remain in scope. Screens and workflows may be merged, renamed or greatly simplified as long as the same outcome remains easy to reach and verifiably correct. See the [feature preservation and outcome-parity contract](plans/app-samenhang/feature-preservation.md) and [rollout checklist](plans/app-samenhang/rollout-checklist.md).
+**Redesign requirement:** keep all existing user-facing outcomes, business rules, scheduled behaviours and data/relationships. Existing capabilities missing from a wireframe (for example recurring expenses) remain in scope. Screens and workflows may be merged, renamed or greatly simplified as long as the same outcome remains easy to reach and verifiably correct. See the [feature preservation and outcome-parity contract](plans/application-redesign/feature-preservation.md) and [rollout checklist](plans/application-redesign/rollout-checklist.md).
 
 Two missions:
 
@@ -363,12 +363,12 @@ The dashboard and notifications are not a phase. Every phase adds its own widget
 4. Apply the same model to daily life, money, home, library and management modules.
 5. Maintain web/MCP help, screen context, source identities and architecture checks together.
 
-See the [complete plan](plans/app-samenhang/plan.mdx) for acceptance criteria and the
-[architecture contracts](plans/app-samenhang/architecture-contracts.md) for ownership. Catalogue and
+See the [complete plan](plans/application-redesign/plan.mdx) for acceptance criteria and the
+[architecture contracts](plans/application-redesign/architecture-contracts.md) for ownership. Catalogue and
 Purchases now expose public contracts over existing records, not additional parallel ledgers.
 
 ## Release and environment follow-up
 
-Implemented foundations and reference journeys, plus outstanding module conversion and acceptance, are recorded in the [implementation report](plans/app-samenhang/implementation.md). Goods purpose, expense shares, correction guards, shared compositions and supported HA controls are implemented and tested against their owner services. The redesign preserves existing records and capabilities.
+Implemented foundations and reference journeys, plus outstanding module conversion and acceptance, are recorded in the [implementation report](plans/application-redesign/implementation.md). Goods purpose, expense shares, correction guards, shared compositions and supported HA controls are implemented and tested against their owner services. The redesign preserves existing records and capabilities.
 
 Deployment, applying the additive migrations on the household server and testing physical HA commands against actual devices remain release/environment work. Hosting/runtime upgrades remain a separate operations decision.

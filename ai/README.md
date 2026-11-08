@@ -23,8 +23,8 @@ ai/
 
 ## Unified application design
 
-The [application-wide design dossier](../docs/plans/app-samenhang/README.md) includes a dedicated
-[AI/MCP contract](../docs/plans/app-samenhang/ai-mcp-contract.md): canonical record context, owner actions,
+The [application-wide design dossier](../docs/plans/application-redesign/README.md) includes a dedicated
+[AI/MCP contract](../docs/plans/application-redesign/ai-mcp-contract.md): canonical record context, owner actions,
 quantity and payment semantics, retries, permissions and English/Dutch workflows. It is a redesign
 proposal; current tool definitions and skill guides remain the authority for available operations.
 Implementing a redesigned journey includes updating its help, guide, tool descriptions and eval cases.

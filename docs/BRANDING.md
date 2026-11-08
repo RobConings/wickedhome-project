@@ -154,7 +154,7 @@ Inter (variable), loaded locally from `@fontsource-variable/inter`.
 
 ## Proposed visual direction
 
-The [annotated wireframes](plans/app-samenhang/preview/walkthrough.html) apply the original household-hub
+The [annotated wireframes](plans/application-redesign/preview/walkthrough.html) apply the original household-hub
 reference: warm sand/white surfaces, forest/sage branding, sunny highlights, colourful icon tiles,
 residents and meaningful progress. Warm surface overrides currently belong to the design preview only;
 the token tables above continue to describe production styling.
@@ -168,7 +168,7 @@ physical-control actions remain clear rather than rewarding extra spending or co
 
 Retain recipe/project cover banners and generous image cards during the redesign. Products and devices
 use saved photos when available; lists retain thumbnails and the shared card/list switch remembers the
-chosen view. Missing images use owner icons/colours. See the [media contract](plans/app-samenhang/visual-media.md).
+chosen view. Missing images use owner icons/colours. See the [media contract](plans/application-redesign/visual-media.md).
 
 Related-record summaries use compact icon cards with readable labels and counts/amounts. Reuse the same
 Card/IconChip treatment across features, with section colour, a visible current state and a full-card
