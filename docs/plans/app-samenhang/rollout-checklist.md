@@ -2,6 +2,8 @@
 
 The user authorised the complete redesign. This checklist tracks completion across the full application; an individual change does not complete a stage. Work continues until the remaining capability and workflow checks are satisfied. The existing local edits are preserved; deployment remains a separate release operation.
 
+**Required preservation gate:** follow the [feature preservation and outcome-parity contract](feature-preservation.md). The wireframes are not a complete feature specification; every existing capability must remain reachable and deliver the same result, even if the UI is substantially simpler. Capability loss requires explicit product-owner approval. In particular, recurring expenses, tasks and automations must not disappear because a mock-up omits them.
+
 ## Stage 1: capability and ownership inventory
 
 - [x] Inventory current routes, dialogs and feature owners in the design catalogue.
