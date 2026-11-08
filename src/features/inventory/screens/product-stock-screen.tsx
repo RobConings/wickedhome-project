@@ -1,7 +1,7 @@
 import * as React from "react";
 import {
   BarcodeIcon, BoxesIcon, HistoryIcon, LinkIcon, PackageIcon,
-  PencilIcon, PlusIcon, ShoppingCartIcon, StoreIcon, TagIcon,
+  PencilIcon, PlusIcon, QrCodeIcon, ShoppingCartIcon, StoreIcon, TagIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useRevalidator, useSearchParams } from "react-router";
@@ -12,6 +12,8 @@ import { PageContainer } from "@/components/layout/page-container";
 import { Card, CardTitle } from "@/components/shared/card";
 import { IconChip } from "@/components/shared/icon-chip";
 import { PageHeader } from "@/components/shared/page-header";
+import { RecordLink } from "@/components/shared/record-link";
+import { formatCurrency } from "@/lib/format";
 import { RecordWorkspaceTabs } from "@/components/shared/record-workspace-tabs";
 import { SplitAction } from "@/components/shared/split-action";
 import {
@@ -220,6 +222,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
               <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {[
                   { icon: BarcodeIcon, label: t("workspace.barcode"), value: product.barcode },
+                  ...(product.qrCode ? [{ icon: QrCodeIcon, label: t("workspace.qrCode"), value: product.qrCode }] : []),
                   { icon: PackageIcon, label: t("workspace.packSize"), value: packageSize },
                   // Brand is not persisted in the current product model. Never infer it from its name.
                   { icon: TagIcon, label: t("workspace.brand"), value: null },
@@ -271,6 +274,18 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
           <div className="flex min-w-0 flex-col gap-4">
             {context}
             <div className="grid gap-4 lg:grid-cols-2">
+              <Card>
+                <div className="flex items-center gap-2"><IconChip icon={StoreIcon} tone="shopping" size="sm" /><CardTitle>{t("workspace.linkedShops")} ({product.shopLinks.length})</CardTitle></div>
+                {product.shopLinks.length ? <ul className="divide-y">
+                  {product.shopLinks.map((link) => <li key={link.id}>
+                    <RecordLink to={`/shops/${encodeURIComponent(link.shopId)}`}
+                      className="flex min-h-11 items-center justify-between gap-3 py-2 text-sm hover:underline">
+                      <span className="min-w-0 truncate font-medium">{link.shop.name}</span>
+                      <span className="shrink-0 tabular-nums text-muted-foreground">{link.priceCents === null ? "" : formatCurrency(link.priceCents, locale)}</span>
+                    </RecordLink>
+                  </li>)}
+                </ul> : <p className="text-sm text-muted-foreground">{t("workspace.noLinkedShops")}</p>}
+              </Card>
               <Card>
                 <div className="flex items-center gap-2"><IconChip icon={LinkIcon} tone="info" size="sm" /><CardTitle>{tShopping("alternatives.title")}</CardTitle></div>
                 <ProductAlternatives product={product} products={products} canManage={canManage} highlightId={highlightId}
