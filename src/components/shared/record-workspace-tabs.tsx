@@ -1,6 +1,6 @@
 import type * as React from "react";
 import { useSearchParams } from "react-router";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger, workspaceTabListClassName, workspaceTabTriggerClassName } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 /**
@@ -38,9 +38,9 @@ export function RecordWorkspaceTabs({
 
   return (
     <Tabs value={section} onValueChange={select} className={cn("min-w-0", className)}>
-      <TabsList aria-label={label} className="grid h-auto min-h-12 w-full grid-cols-2 items-stretch rounded-xl bg-muted/60 p-1">
-        <TabsTrigger value="details" className="h-auto min-h-11 min-w-0 whitespace-normal px-2 py-2 leading-tight">{detailsLabel}</TabsTrigger>
-        <TabsTrigger value="overview" className="h-auto min-h-11 min-w-0 whitespace-normal px-2 py-2 leading-tight">{overviewLabel}</TabsTrigger>
+      <TabsList aria-label={label} className={cn(workspaceTabListClassName, "grid grid-cols-2")}>
+        <TabsTrigger value="details" className={workspaceTabTriggerClassName}>{detailsLabel}</TabsTrigger>
+        <TabsTrigger value="overview" className={workspaceTabTriggerClassName}>{overviewLabel}</TabsTrigger>
       </TabsList>
       <TabsContent value="details" className="min-w-0">{details}</TabsContent>
       <TabsContent value="overview" className="min-w-0">{overview}</TabsContent>
