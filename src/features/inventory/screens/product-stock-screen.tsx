@@ -24,6 +24,7 @@ import { StockItemFormDialog } from "../components/stock-item-form-dialog";
 import { StockItemRow } from "../components/stock-item-row";
 import { StockMovementList } from "../components/stock-movement-list";
 import type { ProductStockPageData } from "../data/inventory-loaders";
+import { productAlreadyOnList } from "../types/product-workspace";
 import { useStockActions } from "../data/use-stock-actions";
 
 type ProductStockScreenProps = {
@@ -91,11 +92,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
     setAdding(true);
     try {
       const existingItems = await fetchShoppingItems({ status: "open" });
-      const ownerId = product.stockProductId ?? product.id;
-      const alreadyListed = existingItems.some((item) => {
-        const listed = products.find((candidate) => candidate.id === item.productId);
-        return listed && (listed.stockProductId ?? listed.id) === ownerId;
-      });
+      const alreadyListed = productAlreadyOnList(product.id, products, existingItems);
       if (alreadyListed) {
         toast.info(t("workspace.alreadyOnShopping"));
         navigate(`/shopping?productId=${encodeURIComponent(product.id)}`);
