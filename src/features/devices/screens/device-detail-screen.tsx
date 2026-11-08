@@ -90,7 +90,7 @@ export function DeviceDetailScreen({
         description={profile.name}
         actions={
           (canManage || headerActions) && (
-            <div className="flex flex-wrap gap-2">
+            <div className="grid w-full min-w-0 grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-center xl:justify-end">
               {headerActions}
               {canManage && (
                 <>
