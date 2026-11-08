@@ -65,6 +65,8 @@ export const packageUnitSchema = z.enum(PACKAGE_UNITS);
 
 export const productInputSchema = z.object({
   name: nameSchema,
+  /** Brand is optional: unrecorded is distinct from a guessed brand in the name. */
+  brand: z.string().trim().max(80).transform((value) => value || null).optional().nullable(),
   unit: unitSchema.optional().nullable(),
   /** Content of ONE stock package (200 g; a 6 x 33 cl multipack: 198 cl), with `packageUnit`. */
   packageAmount: z.coerce
@@ -284,6 +286,8 @@ export type ProductShopLink = {
 export type Product = {
   id: string;
   name: string;
+  /** Persisted brand, if recorded; older fixture data may omit this field. */
+  brand?: string | null;
   unit: string | null;
   category: ProductCategory;
   isEssential: boolean;
