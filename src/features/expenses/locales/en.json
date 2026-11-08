@@ -382,5 +382,13 @@
     "loadError": "Could not load the cost allocation",
     "retry": "Try again",
     "conflict": "Someone changed this allocation. Your draft is kept; close and reopen to review the latest shares before saving."
+  },
+  "workspace": {
+    "navigation": "Recurring expense sections",
+    "payments": "Payments & history",
+    "editSchedule": "Edit schedule",
+    "openNextPayment": "Open next payment",
+    "manageSchedule": "Manage schedule",
+    "manageDescription": "Pause, resume or end this commitment. Existing paid payments remain in its history."
   }
 }

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ExternalLinkIcon, HandCoinsIcon, PauseIcon, PencilIcon, PlayIcon, SquareIcon, Trash2Icon } from "lucide-react";
+import { ArrowRightIcon, ExternalLinkIcon, HandCoinsIcon, PauseIcon, PencilIcon, PlayIcon, SquareIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
 import { toast } from "sonner";
@@ -11,6 +11,8 @@ import { Card, CardHeader, CardTitle } from "@/components/shared/card";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { DescriptionItem, DescriptionList } from "@/components/shared/description-list";
 import { FormField } from "@/components/shared/form-field";
+import { RecordWorkspaceTabs } from "@/components/shared/record-workspace-tabs";
+import { RecordLink } from "@/components/shared/record-link";
 import { PageHeader } from "@/components/shared/page-header";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import type { Shop } from "@/features/shops";
@@ -47,6 +49,7 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
   const fetcher = useFetcher<ExpenseActionResult>();
   const recurrenceSummary = useRecurrenceSummary();
   const { recurring, upcoming, history, today } = detail;
+  const submittedStatus = React.useRef<RecurringStatus | null>(null);
   const [endDate, setEndDate] = React.useState(today);
   const busy = fetcher.state !== "idle";
   const pendingStatus = fetcher.formData?.get("status");
@@ -57,20 +60,25 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
   React.useEffect(() => {
     if (fetcher.state !== "idle" || !fetcher.data) return;
     if (fetcher.data.formError) toast.error(fetcher.data.formError);
-  }, [fetcher.state, fetcher.data]);
+    else if (fetcher.data.errors) toast.error(Object.values(fetcher.data.errors).flat().join(" "));
+    else if (fetcher.data.ok && fetcher.data.intent === "recurring-status" && submittedStatus.current) {
+      const next = submittedStatus.current;
+      toast.success(next === "paused" ? t("end.paused") : next === "ended" ? t("end.done") : t("end.resumed"));
+      submittedStatus.current = null;
+    }
+  }, [fetcher.state, fetcher.data, t]);
 
-  const setStatus = (next: RecurringStatus, extra: Record<string, string> = {}) =>
-    fetcher
-      .submit({ intent: "recurring-status", id: recurring.id, status: next, ...extra }, { method: "post" })
-      .then(() => toast.success(next === "paused" ? t("end.paused") : next === "ended" ? t("end.done") : t("end.resumed")));
+  const setStatus = (next: RecurringStatus, extra: Record<string, string> = {}) => {
+    submittedStatus.current = next;
+    return fetcher.submit({ intent: "recurring-status", id: recurring.id, status: next, ...extra }, { method: "post" });
+  };
 
-  const actions = canManage && (
-    <>
-      {recurring.status !== "ended" && (recurring.kind === "loan" || recurring.kind === "down_payment" || recurring.totalOpen) && recurring.totalOpen?.remainingCents !== 0 && (
-        <LogExpenseDialog habitants={habitants} shops={shops} today={today} loans={[recurring]} defaultLoanId={recurring.id}
-          projectId={recurring.project?.id} trigger={<Button><HandCoinsIcon />{t("repayment.record")}</Button>} />
-      )}
-      <ExpenseFormDialog
+  const actions = (
+    <div className="grid w-full gap-2 sm:flex sm:w-auto sm:flex-wrap">
+      {upcoming[0] && <Button asChild><RecordLink to={`/expenses/${encodeURIComponent(upcoming[0].id)}`}>
+        <ArrowRightIcon />{t("workspace.openNextPayment")}
+      </RecordLink></Button>}
+      {canManage && <ExpenseFormDialog
         recurring={recurring}
         habitants={habitants}
         shops={shops}
@@ -79,10 +87,22 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
         trigger={
           <Button variant="outline">
             <PencilIcon />
-            {tCommon("actions.edit")}
+            {t("workspace.editSchedule")}
           </Button>
         }
-      />
+      />}
+    </div>
+  );
+
+  const management = canManage && (
+    <Card className="gap-3">
+      <CardTitle>{t("workspace.manageSchedule")}</CardTitle>
+      <p className="text-sm text-muted-foreground">{t("workspace.manageDescription")}</p>
+      <div className="flex flex-wrap gap-2">
+      {recurring.status !== "ended" && (recurring.kind === "loan" || recurring.kind === "down_payment" || recurring.totalOpen) && recurring.totalOpen?.remainingCents !== 0 && (
+        <LogExpenseDialog habitants={habitants} shops={shops} today={today} loans={[recurring]} defaultLoanId={recurring.id}
+          projectId={recurring.project?.id} trigger={<Button><HandCoinsIcon />{t("repayment.record")}</Button>} />
+      )}
       {status === "active" && (
         <Button variant="outline" disabled={busy} onClick={() => void setStatus("paused")}>
           <PauseIcon />
@@ -133,7 +153,8 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
           fetcher.submit({ intent: "delete-recurring", id: recurring.id, redirectTo: "/expenses?view=recurring" }, { method: "post" })
         }
       />
-    </>
+      </div>
+    </Card>
   );
 
   const payerPerson = habitant(recurring.payerHabitantId);
@@ -156,7 +177,11 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
         actions={actions}
       />
 
-      <PageGrid columns="main-sidebar">
+      <RecordWorkspaceTabs
+        label={t("workspace.navigation")}
+        detailsLabel={t("detail.details")}
+        overviewLabel={t("workspace.payments")}
+        details={<PageGrid columns="main-sidebar">
         <div className="flex min-w-0 flex-col gap-6">
           <Card>
             <CardHeader className="items-center">
@@ -179,7 +204,8 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
             )}
             <DescriptionList>
               <DescriptionItem label={t("fields.nextDue")}>
-                {status === "active" && recurring.nextDueDate ? formatDate(recurring.nextDueDate, locale) : t("detail.ended")}
+                {status === "active" && recurring.nextDueDate ? formatDate(recurring.nextDueDate, locale)
+                  : status === "paused" ? t("recurringStatus.paused") : t("detail.ended")}
               </DescriptionItem>
               <DescriptionItem label={t("totals.perMonth")}>
                 {formatCurrency(recurring.monthlyCents, locale)} · {t("row.perYear", { amount: formatCurrency(recurring.yearlyCents, locale) })}
@@ -249,6 +275,14 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
             </DescriptionList>
           </Card>
 
+        </div>
+
+        <div className="flex min-w-0 flex-col gap-6">
+          {recurring.paymentMethod === "wire_transfer" && upcoming[0] && <PaymentQrCard expense={upcoming[0]} />}
+          {management}
+        </div>
+      </PageGrid>}
+        overview={<PageGrid columns="2">
           <Card>
             <CardTitle>{t("detail.upcoming")}</CardTitle>
             {upcoming.length === 0 ? (
@@ -257,10 +291,6 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
               <HistoryList items={upcoming} habitants={habitants} />
             )}
           </Card>
-        </div>
-
-        <div className="flex min-w-0 flex-col gap-6">
-          {recurring.paymentMethod === "wire_transfer" && upcoming[0] && <PaymentQrCard expense={upcoming[0]} />}
           <Card>
             <CardTitle>{t("detail.history")}</CardTitle>
             {history.length === 0 ? (
@@ -269,8 +299,8 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
               <HistoryList items={history} habitants={habitants} />
             )}
           </Card>
-        </div>
-      </PageGrid>
+        </PageGrid>}
+      />
     </PageContainer>
   );
 }

@@ -18,6 +18,8 @@ type PageHeaderProps = {
   breadcrumbs?: BreadcrumbItem[];
   /** Parent destination; exact originating record/filter context takes precedence. */
   backTo?: To;
+  /** A record hero can place the shared Back control above its media, once, in the page's normal slot. */
+  showBack?: boolean;
   /** Buttons on the right (below the title on small screens). */
   actions?: React.ReactNode;
   className?: string;
@@ -27,7 +29,7 @@ type PageHeaderProps = {
  * The page title. A short bar in the current section's colour (`data-accent`, docs/BRANDING.md) sits above
  * it, so every page shows at a glance which part of the app it belongs to.
  */
-export function PageHeader({ title, description, eyebrow, icon, breadcrumbs, backTo, actions, className }: PageHeaderProps) {
+export function PageHeader({ title, description, eyebrow, icon, breadcrumbs, backTo, showBack = true, actions, className }: PageHeaderProps) {
   const identity = usePageIdentity();
   const { t } = useTranslation();
   const shownIcon = icon === undefined && typeof title === "string" ? identity?.icon : icon;
@@ -35,7 +37,7 @@ export function PageHeader({ title, description, eyebrow, icon, breadcrumbs, bac
     ? [identity.section, { label: title }] : undefined);
   return (
     <header className={cn("flex min-w-0 flex-col gap-4", className)}>
-      <PageBackButton to={backTo ?? trail?.slice().reverse().find((item) => item.to)?.to ?? (identity && !identity.isSectionRoot ? identity.section.to : undefined)} />
+      {showBack && <PageBackButton to={backTo ?? trail?.slice().reverse().find((item) => item.to)?.to ?? (identity && !identity.isSectionRoot ? identity.section.to : undefined)} />}
       {trail && <BreadcrumbTrail items={trail} label={t("navigation.breadcrumbs")} />}
       <div className="flex min-w-0 flex-wrap items-start justify-between gap-x-6 gap-y-4">
       <div className="flex min-w-[min(100%,20rem)] flex-1 items-start gap-3">

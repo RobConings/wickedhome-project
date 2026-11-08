@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { productAlreadyOnList } from "./product-workspace";
+import { productAlreadyOnList, sharedStockDestination } from "./product-workspace";
 
 const products = [
   { id: "milk", stockProductId: null },
@@ -23,4 +23,19 @@ describe("productAlreadyOnList", () => {
   it("allows a new need when none exists", () => {
     assert.equal(productAlreadyOnList("milk", products, []), false);
   });
+  it("still recognises the selected product when a catalogue refresh omits it", () => {
+    assert.equal(productAlreadyOnList("milk", [], [{ productId: "milk" }]), true);
+    assert.equal(productAlreadyOnList("milk-boni", products.slice(1), [{ productId: "milk" }]), true);
+  });
+});
+
+it("shared-stock navigation preserves the originating record, section and filters independently of the variant", () => {
+  const destination = sharedStockDestination("https://home.test/inventory/products/milk-boni?workspace=overview&from=%2Fshopping%3FshopId%3Dlocal&filter=low#product-needs", "milk", "milk-boni");
+  const url = new URL(destination, "https://home.test");
+  assert.equal(url.pathname, "/inventory/products/milk");
+  assert.equal(url.searchParams.get("workspace"), "overview");
+  assert.equal(url.searchParams.get("from"), "/shopping?shopId=local");
+  assert.equal(url.searchParams.get("variant"), "milk-boni");
+  assert.equal(url.searchParams.get("filter"), "low");
+  assert.equal(url.hash, "#product-needs");
 });

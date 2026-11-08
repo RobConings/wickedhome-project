@@ -1,6 +1,6 @@
 # WickedHome total rework — implementation phases
 
-**Status:** implementation has started on `rework_features`; the product workspace and two opt-in shared controls are the first production slice. **The 78-screen HTML prototype is a visual and navigation guideline only.** It is not an inventory of all existing capabilities, a universal page renderer, or evidence that a module is complete.
+**Status:** implementation is in progress on `rework_features`; the product workspace has received local validation and the recurring-expense workspace is the next implemented reference slice. Neither module nor the whole redesign is fully accepted. **The 78-screen HTML prototype is a visual and navigation guideline only.** It is not an inventory of all existing capabilities, a universal page renderer, or evidence that a module is complete.
 
 ## Core decision: consistent grammar, different workspaces
 
@@ -33,7 +33,7 @@ WickedHome is for people running a household, not ERP administrators. Reuse reco
 
 - [x] Start a reusable **Details / Overview** record section with the active section in the URL, preserving origin/filter parameters.
 - [x] Start accessible primary-action + dropdown controls for everyday actions and management.
-- [ ] Verify these additions with Storybook, keyboard, 320/390px phones, desktop, EN/NL and theme variants; do not claim this gate finished without running the full suite.
+- [x] Locally validate the initial `RecordWorkspaceTabs` / `SplitAction` additions with Storybook, keyboard, 320/390/1440px, EN/NL and both themes, alongside compiler/lint/unit/integration/build/browser checks. See [fresh scoped evidence](workspace-validation-2026-11-08.json). This does not accept every feature or complete Phase B.
 - [ ] Consolidate visual tokens and media slot/crop policy; photograph fills its region, packshot retains label via contain. Avoid text-overflow and empty visual padding.
 - [ ] Extend stable record breadcrumbs, focused return navigation, owner-filtered related-record section composition and permission-aware actions across remaining features.
 - [ ] Ensure component APIs offer opt-in composition without hardcoding business-specific content or forcing every screen into a record template.
@@ -85,3 +85,9 @@ Run validated migrations and server/environment checks only through the reviewed
 First committed code: `src/components/shared/record-workspace-tabs.tsx`, `split-action.tsx`, rewritten `src/features/inventory/screens/product-stock-screen.tsx`, simplified `catalogue/components/product-context-panels.tsx`, bilingual inventory copy, shared Storybook examples and `productAlreadyOnList` test. These are **implementation in progress**, not production or whole-module acceptance. The branch's CI workflow currently triggers on `main` push / pull requests targeting `main`, not normal pushes to `rework_features`; fresh full checks are still required in a development checkout.
 
 Related: [rollout checklist](rollout-checklist.md) · [capability preservation](feature-preservation.md) · [wireframe feedback](wireframe-review-and-model-workspaces.md) · [interactive prototype](preview/all-feature-wireframes.html).
+
+## Local validation and next reference slice — 8 November 2026
+
+Starting commit `24bc574`; local reference work is uncommitted. Fixed product workspace TypeScript errors, stock status/default-unit accuracy, shared-stock origin handling, media fallback, Back placement and narrow-phone tab labels. Recurring expenses now have schedule Details and Payments & history with an explicit next-payment link and all existing lifecycle/repayment forms. Status failures no longer announce success. No new schema changes or production operations.
+
+The [initial outcome matrix](capability-matrix.md) maps the inspected product/recurring paths to real services and evidence, including remaining gaps. Added real-database finance tests for recurrence lifecycle, paid-history preservation, web/MCP payment and permissions, derived account debits, direct-debit automation/retry/undo. CI now includes that command. [Implementation evidence](implementation.md) distinguishes fresh checks from broad acceptance; all overall phase gates remain open.

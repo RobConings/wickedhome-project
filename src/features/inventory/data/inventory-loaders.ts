@@ -7,6 +7,7 @@ import { ApiRequestError } from "@/lib/api-client";
 import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
 import { stockItemInputSchema, stockItemUpdateFormSchema, type ProductStock, type StockItem } from "../types/inventory";
 import { createStockItem, deleteStockItem, fetchProductStock, fetchStock, updateStockItem } from "./inventory-requests";
+import { sharedStockDestination } from "../types/product-workspace";
 
 export type InventoryPageData = { stock: StockItem[]; products: Product[]; places: Place[]; shops: Shop[] };
 export type ProductStockPageData = {
@@ -16,7 +17,7 @@ export type ProductStockPageData = {
   shops: Shop[];
   /** The catalogue (alternatives: names and the products to link). */
   products: Product[];
-  /** The alternative whose page was opened (`?from=`): highlighted among the alternatives. */
+  /** The alternative whose page was opened (`?variant=`, or legacy `?from=id`). */
   highlightId: string | null;
 };
 export type ScanPageData = { products: Product[]; places: Place[]; shops: Shop[] };
@@ -40,10 +41,11 @@ export async function productStockLoader({ params, request }: LoaderFunctionArgs
     ]);
     // An alternative's stock is its main product's: show that page, with this brand highlighted.
     if (product.stockProductId) {
-      throw redirect(`/inventory/products/${encodeURIComponent(product.stockProductId)}?from=${encodeURIComponent(product.id)}`);
+      throw redirect(sharedStockDestination(request.url, product.stockProductId, product.id));
     }
-    const from = new URL(request.url).searchParams.get("from");
-    return { product, stock, places, shops, products, highlightId: from };
+    const search = new URL(request.url).searchParams;
+    const highlightId = search.get("variant") ?? search.get("from");
+    return { product, stock, places, shops, products, highlightId };
   } catch (error) {
     if (error instanceof ApiRequestError && error.status === 404) throw data(null, { status: 404 });
     throw error;

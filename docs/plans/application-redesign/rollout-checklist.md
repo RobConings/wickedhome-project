@@ -27,7 +27,7 @@ The user authorised the complete redesign. This checklist tracks completion acro
 - [x] Grouped application navigation, persistent mobile navigation and shared page identity.
 - [x] Shared return-to-context navigation and restored list positions.
 - [x] Shared imagery, banners, progress and filter foundations implemented; complete adoption belongs to Stage 4.
-- [x] Storybook coverage and responsive/browser validation of all additions.
+- [ ] Complete Storybook and responsive/browser acceptance of all additions. Earlier and current targeted runs are evidence for their named stories/journeys, not every feature/state.
 
 ## Stage 3: complete connected journey
 
@@ -49,7 +49,7 @@ The user authorised the complete redesign. This checklist tracks completion acro
 | Recipes | Keep covers, photos/card/list modes, meal needs, cooking and actual usage | Partial; implemented additions and entry-point checks do not complete module conversion |
 | Calendar | Events and source overlays, owners and return navigation | Partial; implemented additions and entry-point checks do not complete module conversion |
 | Projects | Keep banners, progress, tasks/materials, costs, purchases, contacts and documents | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Expenses | Purchase/source links, project shares, payments, receipts and recurring obligations | Partial; implemented additions and entry-point checks do not complete module conversion |
+| Expenses | Purchase/source links, project shares, payments, receipts and recurring obligations | Partial; recurring schedule/payment workspace and database lifecycle/account/MCP reference added; exhaustive occurrence navigation and full module acceptance remain open |
 | Income | URL-based focused views, expected/received/source forms, vouchers and account contributions | Partial; focused views implemented; implemented additions and entry-point checks do not complete module conversion |
 | Money | URL-selected account activity, transfers, contributions, forecasts and reconciliation | Partial; account navigation implemented; implemented additions and entry-point checks do not complete module conversion |
 | Places | Rooms/zones/floors stay first class, floor plans and owner-contributed related panels | Partial; implemented additions and entry-point checks do not complete module conversion |
@@ -71,7 +71,11 @@ The user authorised the complete redesign. This checklist tracks completion acro
 - [ ] Finish module conversion before accepting the complete application.
 - [ ] Verify all retained capabilities and their resulting owner workflows, beyond opening entry points.
 - [ ] Complete application-wide English/Dutch, theme, phone/desktop, keyboard and touch acceptance.
-- [x] Tests, architecture lint, builds, Storybook and real browser journeys pass for the implemented changes.
+- [ ] Complete whole-application checks. Targeted unit/integration/build/Storybook/browser runs for the implemented reference slices are tracked in [implementation](implementation.md).
 - [x] Record implemented evidence separately from remaining scope.
 
 Stage 4 and whole-app acceptance remain open. The [implementation report](implementation.md) records the completed foundation/reference workflows and their passing tests; those tests do not establish completion of every planned screen or feature. Deployment and physical HA checks are separate release/environment operations.
+
+## Current local evidence
+
+See [implementation](implementation.md) and the [product/finance outcome matrix](capability-matrix.md) for the 8 November continuation. The first workspace now compiles locally; recurring expenses have a dedicated schedule/payment composition. Neither a successful targeted run nor a bounded history preview completes the module. Phases A–E remain open; deployment is not performed.

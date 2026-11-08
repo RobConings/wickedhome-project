@@ -1,0 +1,191 @@
+{
+  "date": "2026-11-08",
+  "branch": "rework_features",
+  "startingCommit": "24bc574925ac5137265c1a9566596dcbbe714444",
+  "localMainSnapshot": "0cd05d6a87f3ef591c41760e247bb79fab4f8422",
+  "changesCommitted": false,
+  "preExistingLocalWorkPreserved": [
+    "docs/plans/app-samenhang/"
+  ],
+  "productionDeployment": false,
+  "productionMigration": false,
+  "newSchemaChanges": false,
+  "database": {
+    "kind": "disposable local PostgreSQL",
+    "host": "127.0.0.1",
+    "port": 55439,
+    "name": "wickedhome_shopping_test",
+    "existingPendingMigrationApplied": "20261108140000_energy_meter_branches"
+  },
+  "checks": {
+    "typecheck": {
+      "command": "npm run typecheck",
+      "passed": true
+    },
+    "lint": {
+      "command": "npm run lint",
+      "passed": true,
+      "warnings": 0
+    },
+    "unit": {
+      "command": "npm test",
+      "passed": 1617,
+      "failed": 0,
+      "skippedDatabaseTests": 35
+    },
+    "shoppingIntegration": {
+      "command": "npm run test:shopping-integration",
+      "passed": 33,
+      "failed": 0,
+      "skipped": 0
+    },
+    "financeIntegration": {
+      "command": "npm run test:finance-integration",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    "migrationPreservation": {
+      "command": "npm run test:shopping-migrations",
+      "passed": true,
+      "legacyTables": 103,
+      "populatedRecordsRetained": 14
+    },
+    "shoppingBrowser": {
+      "command": "npm run test:shopping-browser",
+      "passed": true,
+      "mobileBrowserContexts": 2,
+      "moduleLocaleThemeEntryChecks": 60,
+      "newProductOriginAndPreflightChecks": true,
+      "floorInspectorChecks": true
+    },
+    "schema": {
+      "command": "npx prisma validate",
+      "passed": true
+    },
+    "build": {
+      "command": "npm run build",
+      "passed": true,
+      "nonBlockingWarnings": [
+        "Existing large-chunk notices"
+      ]
+    },
+    "storybookBuild": {
+      "command": "npm run build-storybook",
+      "passed": true
+    },
+    "storybookBrowser": {
+      "command": "node scripts/redesign-storybook-smoke.mjs",
+      "examples": 86,
+      "widths": [
+        320,
+        390,
+        1440
+      ],
+      "locales": [
+        "en",
+        "nl"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "ownerNavigationAndMaintenanceChecks": true,
+      "productWorkspaceAndRecurringChecks": true,
+      "keyboardAndSplitActionChecks": true,
+      "checkedStories": 1032,
+      "englishAndDutch": true,
+      "lightAndDark": true,
+      "smallestPhoneWidth": 320,
+      "accessibility": [
+        {
+          "title": "Features/Inventory/Screens/ProductStockScreen",
+          "example": "CoffeeInTwoPlaces",
+          "theme": "light",
+          "width": 320,
+          "violations": []
+        },
+        {
+          "title": "Features/Inventory/Screens/ProductStockScreen",
+          "example": "CoffeeInTwoPlaces",
+          "theme": "dark",
+          "width": 320,
+          "violations": []
+        },
+        {
+          "title": "Features/Inventory/Screens/ProductStockScreen",
+          "example": "AsChild",
+          "theme": "light",
+          "width": 320,
+          "violations": []
+        },
+        {
+          "title": "Features/Inventory/Screens/ProductStockScreen",
+          "example": "AsChild",
+          "theme": "dark",
+          "width": 320,
+          "violations": []
+        },
+        {
+          "title": "Features/Expenses/Screens/RecurringExpenseDetailScreen",
+          "example": "LoanWithTotalOpen",
+          "theme": "light",
+          "width": 320,
+          "violations": []
+        },
+        {
+          "title": "Features/Expenses/Screens/RecurringExpenseDetailScreen",
+          "example": "LoanWithTotalOpen",
+          "theme": "dark",
+          "width": 320,
+          "violations": []
+        },
+        {
+          "title": "Features/Expenses/Screens/RecurringExpenseDetailScreen",
+          "example": "DownPayment",
+          "theme": "light",
+          "width": 320,
+          "violations": []
+        },
+        {
+          "title": "Features/Expenses/Screens/RecurringExpenseDetailScreen",
+          "example": "DownPayment",
+          "theme": "dark",
+          "width": 320,
+          "violations": []
+        },
+        {
+          "title": "Features/Expenses/Screens/RecurringExpenseDetailScreen",
+          "example": "Payments",
+          "theme": "light",
+          "width": 320,
+          "violations": []
+        },
+        {
+          "title": "Features/Expenses/Screens/RecurringExpenseDetailScreen",
+          "example": "Payments",
+          "theme": "dark",
+          "width": 320,
+          "violations": []
+        }
+      ],
+      "failures": [],
+      "errors": [],
+      "apiRequests": []
+    }
+  },
+  "acceptance": {
+    "initialSharedControlsLocallyValidated": true,
+    "productModuleComplete": false,
+    "financeModuleComplete": false,
+    "wholeRedesignComplete": false,
+    "productionReady": false
+  },
+  "openScope": [
+    "Complete outcome inventory and main comparison across every owner",
+    "Product brand persistence, recipe/document owner contributions and full offer details",
+    "Exhaustive recurring occurrence navigation and loan/calendar/document integration acceptance",
+    "Energy service/API/UI/MCP integration and remaining feature conversions",
+    "Whole-application permission, language, theme, responsive and workflow acceptance"
+  ]
+}

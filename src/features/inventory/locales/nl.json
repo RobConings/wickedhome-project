@@ -211,6 +211,8 @@
     "qrCode": "QR-code",
     "noLinkedShops": "Nog geen gekoppelde winkelaanbiedingen.",
     "stockUnit": "Voorraadeenheid",
-    "mixedUnits": "Verschillende eenheden"
+    "mixedUnits": "Verschillende eenheden",
+    "notTracked": "Nog niet bijgehouden",
+    "minimumByLocation": "Per bestaande locatie"
   }
 }

@@ -4,7 +4,7 @@ import {
   PencilIcon, PlusIcon, QrCodeIcon, ShoppingCartIcon, StoreIcon, TagIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useRevalidator, useSearchParams } from "react-router";
+import { useLocation, useNavigate, useRevalidator, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
@@ -12,8 +12,11 @@ import { PageContainer } from "@/components/layout/page-container";
 import { Card, CardTitle } from "@/components/shared/card";
 import { IconChip } from "@/components/shared/icon-chip";
 import { PageHeader } from "@/components/shared/page-header";
+import { PageBackButton } from "@/components/shared/page-back-button";
 import { RecordLink } from "@/components/shared/record-link";
+import { RecordImage } from "@/components/shared/record-image";
 import { formatCurrency } from "@/lib/format";
+import { withRecordOrigin } from "@/lib/record-navigation";
 import { RecordWorkspaceTabs } from "@/components/shared/record-workspace-tabs";
 import { SplitAction } from "@/components/shared/split-action";
 import {
@@ -39,7 +42,7 @@ type ProductStockScreenProps = {
 const productPath = (id: string) => `/inventory/products/${encodeURIComponent(id)}`;
 
 /**
- * Phase 4: a product-first workspace instead of a per-location stock administration page.
+ * Phase C: a product-first workspace instead of a per-location stock administration page.
  * No stock/history/API contracts change; existing location records remain editable in Advanced stock.
  * The shared Details/Overview grammar leaves each owning feature free to compose its own content.
  */
@@ -51,6 +54,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
   const locale = currentLocale();
   const revalidator = useRevalidator();
   const navigate = useNavigate();
+  const location = useLocation();
   const [, setSearchParams] = useSearchParams();
   const onChanged = React.useCallback(() => revalidator.revalidate(), [revalidator]);
   const { adjust, isPending, show, confirmation } = useStockActions({ onChanged });
@@ -83,7 +87,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
 
   function openAdjust() {
     // If several historical stock locations exist, let the user choose rather than guessing.
-    if (stockItems.length > 1 || (stockItems.length === 0 && availablePlaces.length === 0)) {
+    if (places.length === 0 || stockItems.length > 1 || (stockItems.length === 0 && availablePlaces.length === 0)) {
       showStockManagement();
     } else {
       setAdjustOpen(true);
@@ -98,11 +102,11 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
       const alreadyListed = productAlreadyOnList(product.id, products, existingItems);
       if (alreadyListed) {
         toast.info(t("workspace.alreadyOnShopping"));
-        navigate(`/shopping?productId=${encodeURIComponent(product.id)}`);
+        navigate(withRecordOrigin(`/shopping?productId=${encodeURIComponent(product.id)}`, `${location.pathname}${location.search}${location.hash}`));
         return;
       }
       await createShoppingItem({
-        productId: product.id, quantity: 1, unit: unit ?? undefined,
+        productId: product.id, quantity: 1, unit: product.unit ?? undefined,
         shopId: product.defaultShopId, source: "manual",
       });
       toast.success(t("workspace.addedToShopping"));
@@ -114,16 +118,21 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
     }
   }
 
-  const count = mixedUnits ? t("workspace.mixedUnits") : `${formatQuantity(total, locale)}${unit ? ` ${unit}` : ""}`;
+  const count = stockItems.length === 0 ? "—" : mixedUnits ? t("workspace.mixedUnits") : `${formatQuantity(total, locale)}${unit ? ` ${unit}` : ""}`;
   const packageSize = product.packageAmount !== null && product.packageUnit
     ? `${formatQuantity(product.packageAmount, locale)} ${product.packageUnit}`
     : null;
-  const minimum = stockItems.length === 1 ? stockItems[0].minQuantity : null;
-  const stockPlace = stockItems.length === 1 ? stockItems[0].placeName : null;
+  const onlyStockItem = stockItems.length === 1 ? stockItems[0] : undefined;
+  const minimum = onlyStockItem?.minQuantity ?? null;
+  const stockPlace = onlyStockItem?.placeName ?? null;
+  const stockStatus = stockItems.length === 0 ? t("workspace.notTracked")
+    : total === 0 ? t("workspace.outOfStock")
+    : stockItems.some((item) => item.isLow) ? t("stock.low") : t("workspace.inStock");
   const detailRows: { label: string; value: string }[] = [
     { label: t("workspace.category"), value: tShopping(`categories.${product.category}`) },
     { label: t("workspace.storage"), value: stockPlace ?? (stockItems.length > 1 ? t("workspace.multipleLocations") : t("workspace.notSet")) },
-    { label: t("workspace.minStock"), value: minimum === null ? t("workspace.notSet") : `${formatQuantity(minimum, locale)}${unit ? ` ${unit}` : ""}` },
+    { label: t("workspace.minStock"), value: stockItems.length > 1 && stockItems.some((item) => item.minQuantity !== null)
+      ? t("workspace.minimumByLocation") : minimum === null ? t("workspace.notSet") : `${formatQuantity(minimum, locale)}${unit ? ` ${unit}` : ""}` },
     { label: t("workspace.preferredShop"), value: preferredShop ?? t("workspace.notSet") },
     { label: t("workspace.essential"), value: product.isEssential ? t("workspace.yes") : t("workspace.no") },
   ];
@@ -171,23 +180,19 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
   return (
     <PageContainer>
       {confirmation}
+      <PageBackButton to="/inventory" />
       <div className="rounded-xl border bg-card p-3 shadow-xs sm:p-5">
         <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)]">
-          <div className="flex min-h-56 items-center justify-center overflow-hidden rounded-xl bg-muted/40 lg:min-h-72">
-            {product.imageUrl ? (
-              <img src={product.imageUrl} alt={product.name} referrerPolicy="no-referrer" className="h-56 w-full object-contain p-2 lg:h-72" />
-            ) : (
-              <ProductCategoryIcon category={product.category} className="size-20 text-section" />
-            )}
-          </div>
+          <RecordImage src={product.imageUrl} alt={product.name} shape="banner" fit="contain"
+            className="h-56 sm:h-56 lg:h-72" fallback={<ProductCategoryIcon category={product.category} className="size-20 text-section" />} />
           <div className="flex min-w-0 flex-col gap-4">
             <div className="grid min-w-0 gap-3 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
               <PageHeader
-                backTo="/inventory"
+                showBack={false}
                 title={product.name}
                 description={
                   <span className="flex flex-wrap items-center gap-2 pt-1">
-                    <Badge variant="outline">{total > 0 ? t("workspace.inStock") : t("workspace.outOfStock")}</Badge>
+                    <Badge variant="outline">{stockStatus}</Badge>
                     {product.isEssential && <Badge variant="outline">{t("workspace.essential")}</Badge>}
                     {preferredShop && <Badge variant="outline">{preferredShop}</Badge>}
                   </span>
@@ -202,7 +207,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
                   <IconChip icon={icon} tone={tone} size="sm" />
                   <div className="min-w-0">
                     <p className="break-words text-lg font-semibold leading-tight tabular-nums">{value}</p>
-                    <p className="text-xs text-muted-foreground">{label}</p>
+                    <p className="break-words text-xs text-muted-foreground">{label}</p>
                   </div>
                 </div>
               ))}
@@ -225,7 +230,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
                   { icon: BarcodeIcon, label: t("workspace.barcode"), value: product.barcode },
                   ...(product.qrCode ? [{ icon: QrCodeIcon, label: t("workspace.qrCode"), value: product.qrCode }] : []),
                   { icon: PackageIcon, label: t("workspace.packSize"), value: packageSize },
-                  { icon: BoxesIcon, label: t("workspace.stockUnit"), value: unit },
+                  { icon: BoxesIcon, label: t("workspace.stockUnit"), value: mixedUnits ? t("workspace.mixedUnits") : unit },
                   // Brand is not persisted in the current product model. Never infer it from its name.
                   { icon: TagIcon, label: t("workspace.brand"), value: null },
                   { icon: StoreIcon, label: t("workspace.preferredShop"), value: preferredShop },
@@ -242,7 +247,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
               <div className="flex items-center gap-2"><IconChip icon={TagIcon} tone="shopping" size="sm" /><CardTitle>{t("workspace.productDetails")}</CardTitle></div>
               <dl className="divide-y">
                 {detailRows.map(({ label, value }) => <div key={label} className="grid min-w-0 grid-cols-2 gap-3 py-2.5 text-sm">
-                  <dt className="text-muted-foreground">{label}</dt><dd className="break-words font-medium">{value}</dd>
+                  <dt className="break-words text-muted-foreground">{label}</dt><dd className="break-words font-medium">{value}</dd>
                 </div>)}
               </dl>
               <div className="flex items-center gap-2 border-t pt-4"><IconChip icon={PencilIcon} tone="tasks" size="sm" /><CardTitle>{t("workspace.notes")}</CardTitle></div>

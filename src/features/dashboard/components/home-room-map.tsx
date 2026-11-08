@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useHomeDevicePlan } from "@/features/devices";
 import { FloorPlanView } from "@/features/places";
 import type { HomeMapData } from "../data/home-map-loader";
-import { useHomeWorkMarkers } from "./home-room-summary";
+import { useHomeWorkMarkers } from "./use-home-work-markers";
 
 /** A floor preview opens the full-screen explorer; rooms are selected directly on the map. */
 export function HomeRoomMap({ data, live = true, now }: { data: HomeMapData | null; live?: boolean; now?: number }) {

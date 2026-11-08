@@ -382,5 +382,13 @@
     "loadError": "Kostenverdeling kon niet worden geladen",
     "retry": "Opnieuw proberen",
     "conflict": "Iemand heeft deze verdeling gewijzigd. Je invoer blijft bewaard; sluit en heropen om de nieuwste verdeling te bekijken voordat je opslaat."
+  },
+  "workspace": {
+    "navigation": "Onderdelen van de terugkerende uitgave",
+    "payments": "Betalingen en historiek",
+    "editSchedule": "Schema bewerken",
+    "openNextPayment": "Volgende betaling openen",
+    "manageSchedule": "Schema beheren",
+    "manageDescription": "Pauzeer, hervat of beëindig deze verplichting. Bestaande betaalde uitgaven blijven in de historiek."
   }
 }

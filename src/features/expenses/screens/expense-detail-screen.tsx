@@ -1,10 +1,11 @@
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { RelatedRecordCards } from "@/components/shared/related-record-cards";
 import { ExpenseAllocationPanel } from "../components/expense-allocation-panel";
 import { RelatedShoppingSessions } from "@/features/shopping";
 import * as React from "react";
 import { FolderIcon, FolderKanbanIcon, ListChecksIcon, CheckIcon, PauseCircleIcon, PencilIcon, RepeatIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useFetcher } from "react-router";
+import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

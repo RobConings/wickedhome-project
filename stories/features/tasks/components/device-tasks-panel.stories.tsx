@@ -5,6 +5,7 @@ const device = { id: "device-boiler", name: "Boiler" };
 const meta = {
   title: "Features/Tasks/Components/DeviceTasksPanel",
   component: DeviceTasksPanel,
+  parameters: { layout: "padded" },
   args: {
     deviceId: device.id,
     placeSelections: { favoriteIds: [], recentIds: [] },

@@ -1,12 +1,23 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { ReactNode } from "react";
+import { useSelections } from "@/lib/selections";
 import { SkeletonPage } from "@/components/shared/loading-state";
 import { RecurringExpenseDetailScreen } from "@/features/expenses/screens/recurring-expense-detail-screen";
 import { expenseHabitants, expenseShops, recurringExpenseDetailFixture, recurringFixtures, recurringLoanDetailFixture } from "../fixtures";
+
+/** Forms share selection stores; seed the optional picker preferences without a backend. */
+function SelectionFixtures({ children }: { children: ReactNode }) {
+  useSelections("payee", { initial: {} });
+  useSelections("shop", { initial: {} });
+  useSelections("habitant", { initial: {} });
+  return children;
+}
 
 const meta = {
   title: "Features/Expenses/Screens/RecurringExpenseDetailScreen",
   component: RecurringExpenseDetailScreen,
   parameters: { layout: "fullscreen" },
+  decorators: [(Story) => <SelectionFixtures><Story /></SelectionFixtures>],
   args: { detail: recurringExpenseDetailFixture, habitants: expenseHabitants, shops: expenseShops, canManage: true },
 } satisfies Meta<typeof RecurringExpenseDetailScreen>;
 
@@ -27,3 +38,5 @@ export const Paused: Story = {
 export const Ended: Story = { args: { detail: { ...recurringExpenseDetailFixture, recurring: recurringFixtures.gym, upcoming: [] } } };
 export const ReadOnly: Story = { args: { canManage: false } };
 export const Loading: Story = { render: () => <SkeletonPage /> };
+export const Payments: Story = { parameters: { router: { initialEntries: ["/expenses/recurring/fixture?workspace=overview&from=%2Fexpenses%3Fview%3Drecurring%26kind%3Dloan"] } } };
+export const StatusRejected: Story = { parameters: { router: { action: async () => ({ formError: "This schedule changed. Please refresh.", intent: "recurring-status" }) } } };

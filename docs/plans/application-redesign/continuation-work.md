@@ -2,6 +2,14 @@
 
 The full rollout is still in progress; do not infer completion from entry-point checks. An intermediate work-in-progress version was pushed to `rework_features`; this does **not** mean it was tested as a whole or deployed to the server. See the [compact Codex session handoff](codex-session-handoff.md) and [feature preservation contract](feature-preservation.md) before continuing.
 
+## Current local continuation
+
+Working branch remains `rework_features`, starting at `24bc574`. The only pre-existing local change was untracked `docs/plans/app-samenhang/`; it is preserved. Changes from this continuation are uncommitted. No deploy, push or production migration.
+
+Product compilation/navigation/status/media fixes and a real recurring-expense workspace are implemented. Added `test:finance-integration` and its CI step, plus [the initial product/finance outcome matrix](capability-matrix.md). The two-phone shopping browser test now exercises the floor inspector and product shared-stock origin/preflight, using named controls and visible reconnect results.
+
+Final local verification passed: 1,617 unit cases, 35 separately enabled database cases, migration preservation, two-phone browser journey, compiler/lint/builds, 1,032 Storybook renders and 10 focused accessibility cases. See [implementation.md](implementation.md) and the [validation report](workspace-validation-2026-11-08.json); broader Phase A–E gates remain open. Continue from the explicit open outcomes in the matrix and revised phases, without removing any existing owner workflows.
+
 ## Latest user review — supplied local wireframe exports
 
 The product owner supplied `app-samenhang.zip` (local vplan HTML, built preview and 27 desktop/mobile screenshots) as the latest visual reference. **Do not treat the current atlas as approved or complete.** The reference is not checked into GitHub. Review and iteration requirements are documented in [wireframe review and model workspaces](wireframe-review-and-model-workspaces.md): generic quick actions must be reconsidered, card imagery should visually occupy its media slot, all existing finance and recurrence functionality must receive complete access paths, and every first-class business record needs its own Odoo-like workspace and meaningful links to related models. This requires an end-to-end capability/relationship audit, not simply more counters.
@@ -29,4 +37,4 @@ Earlier focused verification passed 1,607 unit tests, 33 integration tests, migr
 - Implement the energy flow and typed parent/child metering model/validation, residual calculation, source/coverage details, usable configuration and MCP equivalents. An initial energy hierarchy helper/test and `20261108140000_energy_meter_branches` migration have since been added to the branch; their complete service/API/UI/MCP integration and combined verification are still pending.
 - Finish the remaining complete-module conversion/acceptance recorded in rollout-checklist.md. Broad phases remain open.
 
-Disposable local PostgreSQL: /tmp/wickedhome-shopping-pg.cpBVk9, 127.0.0.1:55439, wickedhome_shopping_test, role wickedhome_test (currently started by this task). Only this disposable DB receives migrations. A task-owned Python Storybook preview is on 127.0.0.1:55452 (exec session 76449); shut it down when no longer needed. Do not stop the older user-facing review preview on 55450. Do not deploy, commit, push or edit the SMB/server copy.
+Disposable local PostgreSQL: /tmp/wickedhome-shopping-pg.cpBVk9, 127.0.0.1:55439, wickedhome_shopping_test, role wickedhome_test (currently started by this task). Only this disposable DB receives migrations. A task-owned Python Storybook preview is on 127.0.0.1:55452 (exec session 76449); shut it down when no longer needed. Do not stop the older user-facing review preview on 55450. Do not deploy, commit, push or edit the SMB/server copy. That DB/server information is inherited from the earlier session; this continuation reused only the explicitly disposable loopback database and leaves the older preview services alone.

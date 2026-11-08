@@ -25,8 +25,8 @@ type PaymentQrCardProps = {
 export function CopyableValue({ value, display, mono = true }: { value: string; display: string; mono?: boolean }) {
   const { t } = useTranslation("expenses");
   return (
-    <span className="inline-flex min-w-0 items-center gap-1.5">
-      <span className={mono ? "truncate font-mono" : "truncate"}>{display}</span>
+    <span className="inline-flex max-w-full min-w-0 items-center gap-1.5">
+      <span className={mono ? "min-w-0 break-all font-mono" : "min-w-0 break-words"}>{display}</span>
       <Button
         type="button"
         variant="ghost"
@@ -148,7 +148,7 @@ export function PaymentQrCard({ expense }: PaymentQrCardProps) {
       {payload ? (
         <div className="flex flex-col gap-4">
           <p className="text-sm text-muted-foreground">{t("qr.description")}</p>
-          <React.Suspense fallback={<Skeleton className="mx-auto aspect-square w-full max-w-56" aria-label={t("qr.loading")} />}>
+          <React.Suspense fallback={<Skeleton role="status" className="mx-auto aspect-square w-full max-w-56" aria-label={t("qr.loading")} />}>
             <QrCode value={payload} label={t("qr.label", { payee: name })} className="mx-auto w-full max-w-56" />
           </React.Suspense>
           <PaymentQrActions
@@ -164,9 +164,9 @@ export function PaymentQrCard({ expense }: PaymentQrCardProps) {
               .filter(Boolean)
               .join("\n")}
           />
-          <dl className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-1 text-sm">
+          <dl className="grid min-w-0 grid-cols-1 items-center gap-x-3 gap-y-2 text-sm sm:grid-cols-[auto_minmax(0,1fr)]">
             <dt className="text-muted-foreground">{t("fields.beneficiaryName")}</dt>
-            <dd className="truncate">{name}</dd>
+            <dd className="min-w-0 break-words">{name}</dd>
             <dt className="text-muted-foreground">{t("fields.iban")}</dt>
             <dd>{expense.iban && <CopyableValue value={expense.iban} display={formatIban(expense.iban)} />}</dd>
             <dt className="text-muted-foreground">{t("fields.amount")}</dt>

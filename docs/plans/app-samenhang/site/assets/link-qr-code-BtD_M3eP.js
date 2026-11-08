@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-CqtjH1g4.js";import{t}from"./qr-code-GOKBguoh.js";var n=e();function r({value:e,label:r,className:i}){return(0,n.jsx)(t,{value:e,label:r,className:i})}export{r as LinkQrCode};

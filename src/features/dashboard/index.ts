@@ -13,4 +13,5 @@ export { DashboardScreen } from "./screens/dashboard-screen";
 export { HomeRoomMap, HomeRoomMapSkeleton } from "./components/home-room-map";
 export { fetchHomeMap } from "./data/home-map-loader";
 
-export { HomeRoomSummary, useHomeWorkMarkers } from "./components/home-room-summary";
+export { HomeRoomSummary } from "./components/home-room-summary";
+export { useHomeWorkMarkers } from "./components/use-home-work-markers";

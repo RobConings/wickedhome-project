@@ -1,10 +1,34 @@
 # Local redesign implementation — partial rollout
 
-## New product workspace implementation — 8 November 2026 (unverified)
+## Product and recurring workspace continuation — 8 November 2026
 
-The `rework_features` branch now contains an **initial production implementation**, not just a design preview: opt-in shared `RecordWorkspaceTabs` and `SplitAction`, a product-first Inventory screen with a total stock summary, Details (default) and linked Overview, bilingual copy, alternative and history links, existing advanced location-level stock management, and the original owner-service actions. Catalogue's product context shows linked owner-record cards directly instead of duplicating summary cards and lists. The Add-to-shopping action preflights existing open needs from linked product variants, with a focused regression test. Storybook examples were added for both shared components.
+The first product workspace has now received local TypeScript, lint, unit, database, build and browser validation. This continuation also implements a dedicated recurring-expense workspace: Details contains the real schedule, payer/payment information, QR and management; Payments & history contains the existing owner-supplied occurrences, with a direct next-payment link. Editing, repayment, pause/resume/end, deletion and individual expense navigation remain available. Rejected status changes no longer show a success toast; paused schedules no longer say they have ended. Expense/history/alternative links preserve their origin through `RecordLink`.
 
-This does **not** imply feature-wide parity, a verified build, database changes or deployment. Existing product records currently lack a persisted `brand` field; the UI explicitly displays it as unrecorded rather than inferring it from names. Packaged-unit and minimum-stock semantics and the complete shopping/action flows still require review on real representative data. The repository's CI workflow runs for `main` pushes / PRs to `main`, not ordinary `rework_features` pushes. Fresh tests are still outstanding, and the revised [implementation phases](implementation-phases.md) govern acceptance.
+Product fixes cover safe optional stock-row access, truthful low/untracked status (unrecorded quantity stays unknown), per-location minimum labels, catalogue stock units for new shopping needs, preserved origin/filter/section parameters through shared-stock redirects, backwards-compatible variant highlights, a consistent Back slot above media and a shared broken-image fallback. Workspace tab and product-stat labels wrap on small phones. The payment QR card stacks labels and values on phones; IBAN/reference text wraps completely while retaining exact copy values, and its loading placeholder has an accessible status role. The existing product/location stock records, services and historical semantics remain intact; no schema change was added.
+
+The outcome audit has started in [capability-matrix.md](capability-matrix.md). Local `main` / `origin/main` were `0cd05d6`; the inspected `rework_features` starting commit was `24bc574`. Finance service diffs retain recurrence/payment logic and add the branch's prior project-allocation guards; Money's service and the existing expense mutation MCP definitions have no diff from that `main` snapshot. This is a **limited inspected baseline**, not a completed all-feature comparison.
+
+Validation evidence is recorded below. The complete redesign, genuine product brand persistence, product recipe/document contributions, exhaustive recurrence history navigation and remaining module acceptance stay open. Existing product records lack a persisted brand, so the UI still displays it as unrecorded. The CI workflow still triggers on `main` pushes / PRs targeting `main`; it now includes the new finance integration command when that workflow runs. No production deployment or migration occurred.
+
+### Validation of this continuation
+
+Fresh local checks for the final code passed. See the [machine-readable validation report](workspace-validation-2026-11-08.json).
+
+| Check | Result |
+|---|---|
+| `npm run typecheck` / `npm run lint` | Passed; lint has no warnings |
+| `npm test` | 1,617 passed; 35 database cases skipped here and run separately below |
+| `npm run test:shopping-integration` | 33 passed, no skips; stock, money, ownership and MCP reference checks |
+| `npm run test:finance-integration` | 2 passed, no skips; recurring lifecycle, paid history, account debit, permissions and direct-debit retry/undo |
+| `npm run test:shopping-migrations` | 103 legacy tables and 14 populated records preserved |
+| `npm run test:shopping-browser` | Two phone contexts; product origin/variant/preflight, floor inspector, collaboration, exactly-once stock, receipt/payment replay, goods/cost allocation, return links and 60 module/language/theme entry checks |
+| `npx prisma validate` / `npm run build` | Passed; existing bundle-size notices are non-blocking |
+| `npm run build-storybook` | Passed |
+| `node scripts/redesign-storybook-smoke.mjs` | 86 selected examples × EN/NL × light/dark × 320/390/1440 = **1,032 renders**; no horizontal page overflow, story errors, browser errors or unexpected API calls. Keyboard/tab/menu/child/origin/failure assertions passed; 10 focused WCAG A/AA axe cases passed at 320px in both themes |
+
+All database commands used the explicitly disposable loopback test database. Its existing pending energy-branch migration was applied there; no new migration was authored. Unit, compiler and integration checks ran after client generation settled. The original untracked reference folder is preserved. Source changes remain uncommitted; there was no push, production migration, deployment or SMB/server edit.
+
+These checks validate the named components and reference outcomes. They do not complete every module, all states/permissions or full application acceptance. Temporary screenshots and browser evidence are under `/tmp/wh-redesign/`; the repository report records the reproducible commands and scope.
 
 The shared foundation and main connected workflows are implemented in `/Users/robconings/WickedHome`; the complete application redesign is not finished. It has not been deployed to the household server. Existing local work, persisted identities, server configuration and the canonical `wickedhome-project` remote are preserved.
 
@@ -53,7 +77,7 @@ See [Purchases](../../PURCHASES.md) and the [AI/MCP contract](ai-mcp-contract.md
 
 | Area | Result and retained capabilities |
 |---|---|
-| Home | Room/floor map, keyboard/touch room selection and cycling, saved geometry, live device markers, appliances, open tasks and current projects |
+| Home | Whole-floor map, keyboard/touch room selection with an inspector, floor selection, saved geometry, live device markers, appliances, open tasks and current projects |
 | Tasks | Existing scheduling, checklists, assignments, materials, dependencies, comments, repeat/completion/usage and documents; related room/project/material/document navigation |
 | Shopping and Shops | One destination, saved-group management, automatic checklist, explicit planning, extras, partial quantities, location decisions, receipts/payments/history, lists and recurring products |
 | Inventory and Catalogue | Existing stock/count/scan/minimum/usage workflows and product variants/photos; product context and acquisition history reuse current identities |

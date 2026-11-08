@@ -211,6 +211,8 @@
     "qrCode": "QR code",
     "noLinkedShops": "No linked shop offers yet.",
     "stockUnit": "Stock unit",
-    "mixedUnits": "Mixed units"
+    "mixedUnits": "Mixed units",
+    "notTracked": "Not tracked yet",
+    "minimumByLocation": "Per existing location"
   }
 }

@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Layers2Icon, LinkIcon, PlusIcon, UnlinkIcon } from "lucide-react";
 import { Trans, useTranslation } from "react-i18next";
-import { Link, useFetcher } from "react-router";
+import { useFetcher } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

@@ -20,3 +20,5 @@ type Story = StoryObj<typeof meta>;
 export const Action: Story = {};
 export const Management: Story = { args: { icon: PencilIcon, label: "Edit product", menuLabel: "More product management", variant: "outline" } };
 export const Phone: Story = { globals: { viewport: { value: "mobile1" } } };
+export const Busy: Story = { args: { busy: true } };
+export const Disabled: Story = { args: { disabled: true } };

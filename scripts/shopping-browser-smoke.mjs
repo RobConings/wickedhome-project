@@ -94,7 +94,7 @@ try {
       defaultShopId: shop.id,
     },
   });
-  await db.product.create({ data: { householdId: home.id, name: "Other linked milk brand", category: "DAIRY", unit: "pak", stockProductId: product.id } });
+  const variant = await db.product.create({ data: { householdId: home.id, name: "Other linked milk brand", category: "DAIRY", unit: "pak", stockProductId: product.id } });
   const initialStock = await db.stockItem.create({
     data: {
       householdId: home.id,
@@ -167,6 +167,7 @@ try {
     stockId: initialStock.id,
     shopId: shop.id,
     productId: product.id,
+    variantId: variant.id,
     spreadId: spread.id,
     accountId: account.id,
     robId: people[0].id,
@@ -234,20 +235,18 @@ try {
   );
   for (const page of [one, two])
     page.on("pageerror", (error) => errors.push(error.message));
-  // Home keeps the saved room map and cross-feature links, including phone navigation.
+  // The dashboard previews a whole floor; room selection opens its inspector in the explorer.
   await one.goto(base);
   await one.getByRole("heading", { name: "Ontdek je huis", exact: true }).waitFor();
-  await one.getByRole("link", { name: "Check pantry shelves", exact: true }).waitFor();
-  await one.getByRole("link", { name: "Pantry refresh", exact: true }).waitFor();
-  await one.getByRole("button", { name: "Volgende ruimte", exact: true }).click();
-  await one.getByRole("heading", { name: "Store room", exact: true }).waitFor();
-  await one.getByRole("button", { name: "Vorige ruimte", exact: true }).click();
-  await one.getByRole("link", { name: "Check pantry shelves", exact: true }).waitFor();
+  assert.equal(await one.getByRole("button", { name: "Volgende ruimte", exact: true }).count(), 0);
   await one.getByRole("button", { name: "Store room", exact: true }).press("Enter");
+  await one.waitForURL(/\/house\?.*room=/);
   await one.getByRole("heading", { name: "Store room", exact: true }).waitFor();
+  await one.getByRole("button", { name: "Sluiten", exact: true }).click();
   await one.getByRole("button", { name: "Pantry", exact: true }).press("Enter");
+  await one.getByRole("link", { name: "Check pantry shelves", exact: true }).waitFor();
   await one.getByRole("link", { name: "Pantry refresh", exact: true }).click();
-  await one.waitForURL(new RegExp(`/projects/${fixture.projectId}$`));
+  await one.waitForURL((url) => url.pathname === `/projects/${fixture.projectId}` && url.searchParams.has("from"));
   const related = one.getByRole("navigation", { name: "Gekoppeld aan dit project" });
   await related.waitFor();
   assert.equal(await related.getByRole("link").count(), 6);
@@ -258,6 +257,30 @@ try {
   await related.getByRole("link", { name: /^Documenten/ }).click();
   await one.waitForURL(/#project-documents$/);
   assert.equal(await one.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
+  // Product sections, shared-stock redirects and shopping preflight retain exact origin context.
+  const origin = `/shopping?stock=low&shopId=${fixture.shopId}`;
+  await one.goto(`${base}/inventory/products/${fixture.variantId}?workspace=overview&from=${encodeURIComponent(origin)}`);
+  await one.waitForURL((url) => url.pathname === `/inventory/products/${fixture.productId}` && url.searchParams.get("variant") === fixture.variantId);
+  assert.equal(new URL(one.url()).searchParams.get("from"), origin);
+  const productOverview = one.getByRole("tab", { name: "Overzicht", exact: true });
+  await productOverview.waitFor();
+  assert.equal(await productOverview.getAttribute("aria-selected"), "true");
+  const purchasesLink = one.locator(`a[href^="/purchases?productId=${fixture.productId}"]`);
+  await purchasesLink.waitFor();
+  const productOrigin = new URL(await purchasesLink.getAttribute("href"), base).searchParams.get("from");
+  assert.equal(new URL(productOrigin, base).searchParams.get("workspace"), "overview");
+  await one.getByRole("tab", { name: "Details", exact: true }).click();
+  const beforeNeeds = await database.query('SELECT count(*)::int AS n FROM shopping_items WHERE "householdId"=$1', [fixture.householdId]);
+  await one.getByRole("button", { name: "Aan boodschappenlijst toevoegen", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === "/shopping" && url.searchParams.get("productId") === fixture.productId);
+  const afterNeeds = await database.query('SELECT count(*)::int AS n FROM shopping_items WHERE "householdId"=$1', [fixture.householdId]);
+  assert.equal(afterNeeds.rows[0].n, beforeNeeds.rows[0].n, "An existing family need is opened without creating another one");
+  await one.getByRole("link", { name: "Terug naar waar je vandaan kwam", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === `/inventory/products/${fixture.productId}`);
+  assert.equal(new URL(one.url()).searchParams.get("from"), origin);
+  assert.equal(await one.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
+  await one.screenshot({ path: "/tmp/wh-redesign/product-phone.png", fullPage: true });
+
   // Verify the same forecast and visible toggles in ordinary groceries, shop view and visit selection.
   for (const screen of [
     "/shopping",
@@ -310,7 +333,7 @@ try {
     .getByRole("heading", { name: "Winkelsessies", exact: true })
     .waitFor();
   await one.locator("summary").filter({ hasText: "Specifieke boodschappen en andere opties kiezen" }).click();
-  await one.getByRole("combobox").first().click();
+  await one.getByRole("combobox", { name: "Winkel of opgeslagen groep", exact: true }).click();
   await one.getByRole("option", { name: /Colruyt/ }).click();
   await one
     .locator("input[name=name]")
@@ -462,10 +485,7 @@ try {
   );
   assert.equal(newItem.status(), 201, await newItem.text());
   await contexts[1].setOffline(false);
-  await two
-    .getByText("Extra na verbindingsherstel", { exact: false })
-    .first()
-    .waitFor();
+  await two.getByText("Extra na verbindingsherstel", { exact: false }).filter({ visible: true }).first().waitFor();
   assert.equal(
     await one.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth + 1,
@@ -554,7 +574,7 @@ try {
   }
   assert.deepEqual(errors, []);
   console.log(
-    "Browser smoke passed: room map and room cycling, project summary cards, quantity/variant Adjust without navigation or stock, retained drafts on concurrent edit conflicts, Op/Bijna op dividers and toggles across three shopping views, two mobile browsers, SSE collaboration, exactly-once buy, skip, close, PDF receipt, receipt/payment replay, saved-group automatic start, goods/cost allocation with conflict drafts, return context, 60 module/language/theme entry checks and mobile layout.",
+    "Browser smoke passed: floor map and room inspector, project summary cards, quantity/variant Adjust without navigation or stock, retained drafts on concurrent edit conflicts, Op/Bijna op dividers and toggles across three shopping views, two mobile browsers, SSE collaboration, exactly-once buy, skip, close, PDF receipt, receipt/payment replay, saved-group automatic start, goods/cost allocation with conflict drafts, return context, 60 module/language/theme entry checks and mobile layout.",
   );
 } catch (error) {
   const pages = browser?.contexts().flatMap((context) => context.pages()) ?? [];

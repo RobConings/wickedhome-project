@@ -45,7 +45,7 @@ export function LinkAlternativeDialog({
   initialSelections,
 }: LinkAlternativeDialogProps) {
   const { t } = useTranslation("shopping");
-  const { recordUse } = useProductSelections();
+  const { recordUse } = useProductSelections({ initial: initialSelections });
   const chosen = React.useRef<string | null>(null);
   const owner = product.stockProductId ?? product.id;
   const candidates = React.useMemo(() => products.filter((other) => (other.stockProductId ?? other.id) !== owner), [products, owner]);
