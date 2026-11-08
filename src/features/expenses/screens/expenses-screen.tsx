@@ -15,6 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger, workspaceTabListClassName, workspaceTabTriggerClassName } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { SplitAction } from "@/components/shared/split-action";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageContainer } from "@/components/layout/page-container";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -130,7 +132,7 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
     ...payers.map((habitant) => ({ value: habitant.id, label: habitant.name })),
   ];
 
-  const addButton = (request: string | null = null) =>
+  const addButton = (request: string | null = null, trigger?: React.ReactElement) =>
     canManage && (
       <ExpenseFormDialog
         key={request ?? "idle"}
@@ -141,15 +143,10 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
         today={overview.today}
         defaultOpen={request !== null}
         projectField={projectField}
-        trigger={
-          <Button variant="outline">
-            <PlusIcon />
-            {t("actions.add")}
-          </Button>
-        }
+        trigger={trigger ?? <Button variant="outline"><PlusIcon />{t("actions.add")}</Button>}
       />
     );
-  const logButton = (request: string | null = null) =>
+  const logButton = (request: string | null = null, trigger?: React.ReactElement) =>
     canManage && (
       <LogExpenseDialog
         key={request ?? "idle"}
@@ -159,12 +156,7 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
         today={overview.today}
         defaultOpen={request !== null}
         projectField={projectField}
-        trigger={
-          <Button>
-            <ShoppingBasketIcon />
-            {t("actions.log")}
-          </Button>
-        }
+        trigger={trigger ?? <Button><ShoppingBasketIcon />{t("actions.log")}</Button>}
       />
     );
 
@@ -187,12 +179,34 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
       <PageHeader
         title={t("page.title")}
         description={t("page.description")}
-        actions={
-          <>
-            {logButton(logRequest)}
-            {addButton(newRequest)}
-          </>
-        }
+        actions={canManage && <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 sm:ml-auto">
+          <SplitAction
+            icon={ShoppingBasketIcon}
+            label={t("actions.log")}
+            menuLabel={t("actions.logMenu")}
+            renderPrimary={(button) => logButton(logRequest, button)}
+            menu={<>
+              <DropdownMenuItem onSelect={() => setParam(EXPENSES_VIEW_PARAM, "history")}>
+                <HistoryIcon />{t("views.history")}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setParam(EXPENSES_VIEW_PARAM, "upcoming")}>
+                <ListTodoIcon />{t("views.upcoming")}
+              </DropdownMenuItem>
+            </>}
+          />
+          <SplitAction
+            icon={PlusIcon}
+            label={t("actions.add")}
+            menuLabel={t("actions.addMenu")}
+            variant="outline"
+            renderPrimary={(button) => addButton(newRequest, button)}
+            menu={<>
+              <DropdownMenuItem onSelect={() => setParam(EXPENSES_VIEW_PARAM, "recurring")}>
+                <RepeatIcon />{t("views.recurring")}
+              </DropdownMenuItem>
+            </>}
+          />
+        </div>}
       />
 
       <Tabs value={view} onValueChange={(value) => setParam(EXPENSES_VIEW_PARAM, value === "upcoming" ? null : value)} className="min-w-0 gap-4">
