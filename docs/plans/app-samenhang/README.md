@@ -10,6 +10,7 @@ All authored documentation is in English. **English is the default product langu
 - [Images, banners and view modes](visual-media.md)
 - [Implemented slice and remaining work](implementation.md)
 - [Visual plan](plan.mdx)
+- [Feature preservation and outcome parity (mandatory redesign and release contract)](feature-preservation.md)
 - [Ownership and architecture contracts](architecture-contracts.md)
 - [AI and MCP workflow contract](ai-mcp-contract.md)
 - [Complete page coverage](coverage.md)
