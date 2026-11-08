@@ -1,10 +1,10 @@
 import * as React from "react";
 import {
-  ArchiveIcon, BarcodeIcon, BoxesIcon, HistoryIcon, LinkIcon, PackageIcon,
+  BarcodeIcon, BoxesIcon, HistoryIcon, LinkIcon, PackageIcon,
   PencilIcon, PlusIcon, ShoppingCartIcon, StoreIcon, TagIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useRevalidator, useSearchParams } from "react-router";
+import { useNavigate, useRevalidator, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
@@ -16,7 +16,7 @@ import { RecordWorkspaceTabs } from "@/components/shared/record-workspace-tabs";
 import { SplitAction } from "@/components/shared/split-action";
 import {
   LinkAlternativeDialog, ProductAlternatives, ProductCategoryIcon,
-  ProductFormDialog, createShoppingItem, formatQuantity,
+  ProductFormDialog, createShoppingItem, fetchShoppingItems, formatQuantity,
 } from "@/features/shopping";
 import { currentLocale } from "@/lib/i18n";
 import type { UseSelectionsOptions } from "@/lib/selections";
@@ -47,6 +47,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
   const { product, stock, places, shops, products, highlightId } = data;
   const locale = currentLocale();
   const revalidator = useRevalidator();
+  const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
   const onChanged = React.useCallback(() => revalidator.revalidate(), [revalidator]);
   const { adjust, isPending, show, confirmation } = useStockActions({ onChanged });
@@ -89,6 +90,17 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
     if (adding) return;
     setAdding(true);
     try {
+      const existingItems = await fetchShoppingItems({ status: "open" });
+      const ownerId = product.stockProductId ?? product.id;
+      const alreadyListed = existingItems.some((item) => {
+        const listed = products.find((candidate) => candidate.id === item.productId);
+        return listed && (listed.stockProductId ?? listed.id) === ownerId;
+      });
+      if (alreadyListed) {
+        toast.info(t("workspace.alreadyOnShopping"));
+        navigate(`/shopping?productId=${encodeURIComponent(product.id)}`);
+        return;
+      }
       await createShoppingItem({
         productId: product.id, quantity: 1, unit: unit ?? undefined,
         shopId: product.defaultShopId, source: "manual",
@@ -148,7 +160,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
           menu={
             <>
               <DropdownMenuItem onSelect={() => setLinkOpen(true)}><LinkIcon />{t("workspace.linkAlternative")}</DropdownMenuItem>
-              <DropdownMenuItem onSelect={showStockManagement}><ArchiveIcon />{t("workspace.stockSettings")}</DropdownMenuItem>
+              <DropdownMenuItem onSelect={showStockManagement}><BoxesIcon />{t("workspace.stockSettings")}</DropdownMenuItem>
             </>
           }
         />
