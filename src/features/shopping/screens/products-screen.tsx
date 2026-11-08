@@ -5,6 +5,7 @@ import { PageContainer } from "@/components/layout/page-container";
 import { EmptyState } from "@/components/shared/empty-state";
 import { GeneralList } from "@/components/shared/general-list";
 import { PageHeader } from "@/components/shared/page-header";
+import { InventoryNavigation } from "@/features/inventory/components/inventory-navigation";
 import { useSamePagePending } from "@/lib/pending";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import { ProductCard } from "../components/product-card";
@@ -46,6 +47,7 @@ export function ProductsScreen({ data, canManage, initialSelections }: ProductsS
         actions={addButton}
       />
 
+      <InventoryNavigation />
       <GeneralList
         label={t("products.title")}
         items={products}
