@@ -12,7 +12,6 @@ import { PageContainer } from "@/components/layout/page-container";
 import { Card, CardTitle } from "@/components/shared/card";
 import { IconChip } from "@/components/shared/icon-chip";
 import { PageHeader } from "@/components/shared/page-header";
-import { PageBackButton } from "@/components/shared/page-back-button";
 import { RecordLink } from "@/components/shared/record-link";
 import { RecordImage } from "@/components/shared/record-image";
 import { formatCurrency } from "@/lib/format";
@@ -183,7 +182,6 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
   return (
     <PageContainer>
       {confirmation}
-      <PageBackButton to="/inventory" />
       <div className="rounded-xl border bg-card p-3 shadow-xs sm:p-5">
         <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)]">
           <RecordImage src={product.imageUrl} alt={product.name} shape="banner" fit="contain"
@@ -191,7 +189,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
           <div className="flex min-w-0 flex-col gap-4">
             <div className="flex min-w-0 flex-col gap-3">
               <PageHeader
-                showBack={false}
+                backTo="/inventory"
                 title={product.name}
                 description={
                   <span className="flex flex-wrap items-center gap-2 pt-1">
