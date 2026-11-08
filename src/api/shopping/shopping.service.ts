@@ -938,10 +938,11 @@ export async function listProducts(householdId: string, query: ProductQuery = {}
     where: {
       householdId,
       ...(query.code && { OR: [{ barcode: query.code }, { qrCode: query.code }] }),
-      ...(query.q && { OR: [
+      // AND keeps the barcode/QR code filter if both code and text were provided.
+      ...(query.q && { AND: [{ OR: [
         { name: { contains: query.q, mode: "insensitive" as const } },
         { brand: { contains: query.q, mode: "insensitive" as const } },
-      ] }),
+      ] }] }),
     },
     include: productInclude,
     orderBy: [{ name: "asc" }, { id: "asc" }],
