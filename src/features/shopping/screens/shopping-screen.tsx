@@ -5,7 +5,7 @@ import { useCategoryOrder } from "../data/use-category-order";
 import { AutomaticShoppingFilter, CategoryOrder } from "../components/shopping-preferences";
 import { currentLocale } from "@/lib/i18n";
 import * as React from "react";
-import { PackageIcon, PencilIcon, PlusIcon, SearchXIcon, ShoppingCartIcon, Trash2Icon } from "lucide-react";
+import { PackageIcon, PencilIcon, PlusIcon, SearchXIcon, ShoppingCartIcon, SlidersHorizontalIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher, useRevalidator, useSearchParams } from "react-router";
 import { toast } from "sonner";
@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
 import { PageSection } from "@/components/layout/page-section";
-import { ScrollRow } from "@/components/layout/scroll-row";
 import { Stack } from "@/components/layout/stack";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -21,10 +20,11 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionHeader } from "@/components/shared/section-header";
 import { SearchField } from "@/components/shared/search-field";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useShopSelections } from "@/features/shops";
 import { useOpenRequestFromUrl } from "@/lib/open-from-url";
 import type { UseSelectionsOptions } from "@/lib/selections";
-import { cn } from "@/lib/utils";
 import type { AddShoppingItemInput } from "../components/add-shopping-item-form";
 import { AddShoppingItemDialog } from "../components/add-shopping-item-dialog";
 import { ShopSummaryList } from "../components/shop-summary-list";
@@ -33,7 +33,6 @@ import { ShoppingGuidance } from "../components/shopping-guidance";
 import { filterShopViewItems, NO_SHOP_VIEW_FILTERS, parseStockFilter } from "../components/shopping-grouping";
 import { shoppingListViews } from "../types/shopping-list-views";
 import { shoppingItemListIds } from "../types/shopping-product-rows";
-import { ShoppingStockFilterField } from "../components/shopping-stock-filter";
 import { ShoppingItemFormDialog } from "../components/shopping-item-form-dialog";
 import { ShoppingListFormDialog } from "../components/shopping-list-form-dialog";
 import { StapleFormDialog } from "../components/staple-form-dialog";
@@ -97,7 +96,8 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
   const locale = currentLocale();
   const { sort, changeSort } = useShoppingSort();
   const stockFilter = parseStockFilter(searchParams.get("stock"));
-  const filtering = searching || stockFilter !== "all" || Boolean(productFilterId);
+  const filtering = searching || stockFilter !== "all" || !includeLowStock || Boolean(productFilterId);
+  const advancedFilterCount = Number(stockFilter !== "all") + Number(!includeLowStock);
   const visibleItems = filterShopViewItems(actions.items, { ...NO_SHOP_VIEW_FILTERS, query, stock: stockFilter, includeLowStock })
     .filter((item) => !productFilterId || Boolean(item.productId && familyIds.has(item.productId)))
     .filter((item) => !activeView || shoppingItemListIds(item).some((id) => activeView.listIds.includes(id)));
@@ -170,24 +170,6 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
     </>
   );
 
-  const chip = (id: string | null, label: string, count: number) => (
-    <button
-      key={id ?? "all"}
-      type="button"
-      aria-pressed={activeView?.id === id || (!activeView && id === null)}
-      onClick={() => selectList(id)}
-      className={cn(
-        "inline-flex min-h-9 shrink-0 items-center gap-2 rounded-full border px-3.5 text-sm whitespace-nowrap transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
-        (id === null ? !activeView : activeView?.id === id)
-          ? "border-primary bg-primary text-primary-foreground"
-          : "bg-card hover:bg-accent",
-      )}
-    >
-      {label}
-      <span className="text-xs tabular-nums opacity-80">{count}</span>
-    </button>
-  );
-
   return (
     <PageContainer className="gap-4 px-3 py-4 sm:gap-6 sm:px-6 sm:py-8 lg:px-8">
       {actions.confirmation}
@@ -197,31 +179,68 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
 
       <PageGrid columns="main-sidebar" className="items-start">
         <Stack gap="lg" className="gap-3 sm:gap-6">
-          {listViews.length > 1 && (
-            <ScrollRow label={t("lists.filterLabel")} focusable={false}>
-              {chip(null, t("lists.all"), totalOpen)}
-              {listViews.map((list) => chip(list.id, list.name, list.openCount))}
-            </ScrollRow>
-          )}
-
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <SearchField className="flex-1" value={query} onValueChange={search} label={t("lists.searchLabel")} placeholder={t("lists.search")} />
-            <AutomaticShoppingFilter included={includeLowStock} onChange={setIncludeLowStock} />
-            <CategoryOrder order={order} onChange={change} />
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2 sm:flex sm:items-center" role="group" aria-label={t("shopViewFilters.label")}>
+            {listViews.length > 1 && (
+              <Select value={activeView?.id ?? "all"} onValueChange={(value) => selectList(value === "all" ? null : value)}>
+                <SelectTrigger className="col-span-2 w-full min-w-0 sm:col-auto sm:w-48" aria-label={t("lists.filterLabel")}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("lists.all")} ({totalOpen})</SelectItem>
+                  {listViews.map((list) => (
+                    <SelectItem key={list.id} value={list.id}>{list.name} ({list.openCount})</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            <SearchField className="min-w-0 sm:flex-1" value={query} onValueChange={search} label={t("lists.searchLabel")} placeholder={t("lists.search")} />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button type="button" variant="outline" className="h-10 shrink-0" aria-label={t("shopViewFilters.viewOptions")}>
+                  <SlidersHorizontalIcon aria-hidden="true" />
+                  <span className="hidden sm:inline">{t("shopViewFilters.viewOptions")}</span>
+                  {advancedFilterCount > 0 && (
+                    <span className="rounded-full bg-section-soft px-1.5 text-xs tabular-nums text-section" aria-label={String(advancedFilterCount)}>
+                      {advancedFilterCount}
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="max-h-[min(75vh,38rem)] w-80 max-w-[calc(100vw-2rem)] space-y-4 overflow-y-auto">
+                <div>
+                  <p className="font-semibold">{t("shopViewFilters.viewOptions")}</p>
+                  <p className="text-xs text-muted-foreground">{t("shopViewFilters.viewOptionsDescription")}</p>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-medium">{t("shopView.sort.label")}</label>
+                  <ShoppingSortField value={sort} onChange={changeSort} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-medium">{t("stockFilter.label")}</label>
+                  <Select value={stockFilter} onValueChange={(value) => setSearchParams((params) => {
+                    if (value === "all") params.delete("stock"); else params.set("stock", value);
+                    return params;
+                  }, { replace: true, preventScrollReset: true })}>
+                    <SelectTrigger className="w-full" aria-label={t("stockFilter.label")}><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {(["all", "out", "low", "nearly_out", "below_minimum", "at_minimum", "above_minimum", "untracked"] as const).map((option) => (
+                        <SelectItem key={option} value={option}>{t(`stockFilter.${option}`)}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <AutomaticShoppingFilter included={includeLowStock} onChange={setIncludeLowStock} />
+                <CategoryOrder order={order} onChange={change} />
+                {totalOpen > 0 && <ShoppingGuidance />}
+              </PopoverContent>
+            </Popover>
           </div>
-          <ShoppingSortField value={sort} onChange={changeSort} />
-          <ShoppingStockFilterField value={stockFilter} onChange={(value) => setSearchParams((params) => {
-              if (value === "all") params.delete("stock"); else params.set("stock", value);
-              return params;
-            }, { replace: true, preventScrollReset: true })} />
 
           {filtering && (
-            <p role="status" className="text-sm text-muted-foreground">
+            <p role="status" className="sr-only">
               {tCommon("list.results", { count: visibleItems.length })}
             </p>
           )}
-
-          {totalOpen > 0 && !filtering && <ShoppingGuidance />}
 
           {filtering && visibleItems.length === 0 ? (
             <EmptyState
