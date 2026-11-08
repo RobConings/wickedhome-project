@@ -5,11 +5,13 @@ import { useCategoryOrder } from "../data/use-category-order";
 import { AutomaticShoppingFilter, CategoryOrder } from "../components/shopping-preferences";
 import { currentLocale } from "@/lib/i18n";
 import * as React from "react";
-import { PackageIcon, PencilIcon, PlusIcon, SearchXIcon, ShoppingCartIcon, SlidersHorizontalIcon, Trash2Icon } from "lucide-react";
+import { PackageIcon, PencilIcon, PlusIcon, SearchXIcon, ShoppingCartIcon, SlidersHorizontalIcon, StoreIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher, useRevalidator, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
 import { PageSection } from "@/components/layout/page-section";
@@ -19,6 +21,7 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionHeader } from "@/components/shared/section-header";
+import { SplitAction } from "@/components/shared/split-action";
 import { SearchField } from "@/components/shared/search-field";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -27,6 +30,7 @@ import { useOpenRequestFromUrl } from "@/lib/open-from-url";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import type { AddShoppingItemInput } from "../components/add-shopping-item-form";
 import { AddShoppingItemDialog } from "../components/add-shopping-item-dialog";
+import { SessionStartCard } from "../components/session-start-card";
 import { ShopSummaryList } from "../components/shop-summary-list";
 import { ShoppingItemList } from "../components/shopping-item-list";
 import { ShoppingGuidance } from "../components/shopping-guidance";
@@ -77,6 +81,8 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
   const revalidate = React.useCallback(() => void revalidator.revalidate(), [revalidator]);
   const actions = useShoppingItemActions({ items: overview.items, onChanged: revalidate });
   const [editing, setEditing] = React.useState<ShoppingItem | null>(null);
+  const [startOpen, setStartOpen] = React.useState(false);
+  const [startDestination, setStartDestination] = React.useState<string | null>(null);
 
   // The quick action opens a fresh dialog, including when this page is already showing.
   const addRequest = useOpenRequestFromUrl();
@@ -141,38 +147,67 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
     : listIds.includes(item.listId));
 
   const headerActions = (
-    <>
-      <Button asChild variant="outline">
-        <Link to="/shopping/products">
-          <PackageIcon />
-          {t("actions.products")}
-        </Link>
-      </Button>
+    <div className="grid w-full min-w-0 grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-end">
       {canManage && (
-        <ShoppingListFormDialog
-          trigger={
-            <Button variant="outline">
-              <PlusIcon />
-              {t("actions.newList")}
-            </Button>
+        <SplitAction
+          icon={ShoppingCartIcon}
+          label={t("sessions.startShopping")}
+          menuLabel={t("actions.shoppingMoreActions")}
+          onClick={() => setStartOpen(true)}
+          menu={
+            <>
+              <DropdownMenuItem asChild><Link to="/shopping/shops"><StoreIcon />{t("actions.shopView")}</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/shopping/sessions"><ShoppingCartIcon />{t("sessions.history")}</Link></DropdownMenuItem>
+            </>
           }
         />
       )}
-      <AddShoppingItemDialog
-        key={addRequest ?? "idle"}
-        defaultOpen={addRequest !== null}
-        products={products}
-        shops={shops}
-        onAdd={add}
-        previewLink={previewLink}
-        initialSelections={initialSelections}
+      <SplitAction
+        icon={PlusIcon}
+        label={t("actions.addItem")}
+        menuLabel={t("actions.shoppingManageActions")}
+        variant="outline"
+        renderPrimary={(button) => (
+          <AddShoppingItemDialog
+            key={addRequest ?? "idle"}
+            trigger={button}
+            defaultOpen={addRequest !== null}
+            products={products}
+            shops={shops}
+            onAdd={add}
+            previewLink={previewLink}
+            initialSelections={initialSelections}
+          />
+        )}
+        menu={
+          <>
+            {canManage && <ShoppingListFormDialog trigger={<DropdownMenuItem><PlusIcon />{t("actions.newList")}</DropdownMenuItem>} />}
+            <DropdownMenuItem asChild><Link to="/shopping/products"><PackageIcon />{t("actions.products")}</Link></DropdownMenuItem>
+          </>
+        }
       />
-    </>
+    </div>
   );
 
   return (
     <PageContainer className="gap-4 px-3 py-4 sm:gap-6 sm:px-6 sm:py-8 lg:px-8">
       {actions.confirmation}
+      <Dialog open={startOpen} onOpenChange={setStartOpen}>
+        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t("sessions.simpleStart")}</DialogTitle>
+            <DialogDescription>{t("sessions.simpleDescription")}</DialogDescription>
+          </DialogHeader>
+          <SessionStartCard
+            shopping={data}
+            destination={startDestination}
+            onDestinationChange={setStartDestination}
+            initialSelections={initialSelections && { shops: initialSelections.shops }}
+            action="/shopping/sessions"
+            compact
+          />
+        </DialogContent>
+      </Dialog>
       <PageHeader title={t("page.title")} description={t("page.description")} actions={headerActions} />
       <ShoppingNavigation />
       {productFilterId && <Button variant="secondary" className="self-start" onClick={() => setSearchParams((params) => { params.delete("productId"); return params; }, { preventScrollReset: true })}><PackageIcon />{productFilter?.name ?? t("picker.product")} · {tCommon("list.clearSearch")}</Button>}
