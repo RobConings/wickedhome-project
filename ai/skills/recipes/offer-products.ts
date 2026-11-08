@@ -57,6 +57,7 @@ export async function applyOfferTo(householdId: string, productId: string, offer
 export function productInputOf(product: Product): ProductInput {
   return {
     name: product.name,
+    brand: product.brand ?? null,
     unit: product.unit,
     category: product.category,
     isEssential: product.isEssential,
