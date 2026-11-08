@@ -8,11 +8,13 @@ import { SHOPPING_LIST_KINDS, shoppingListInputSchema, type ShoppingList } from 
 type ShoppingListFormDialogProps = {
   /** Edit this list; omit to create one. */
   list?: ShoppingList;
-  trigger: React.ReactElement;
+  trigger?: React.ReactElement;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 /** Create or rename a shopping list. Posts to the route action (`create-list` / `update-list`). */
-export function ShoppingListFormDialog({ list, trigger }: ShoppingListFormDialogProps) {
+export function ShoppingListFormDialog({ list, trigger, open, onOpenChange }: ShoppingListFormDialogProps) {
   const { t } = useTranslation("shopping");
 
   const fields: GeneralFormField[] = [
@@ -28,6 +30,8 @@ export function ShoppingListFormDialog({ list, trigger }: ShoppingListFormDialog
   return (
     <GeneralFormDialog<ShoppingActionResult>
       trigger={trigger}
+      open={open}
+      onOpenChange={onOpenChange}
       title={list ? t("listForm.editTitle") : t("listForm.createTitle")}
       description={t("listForm.description")}
       successMessage={list ? t("listForm.updated") : t("listForm.created")}
