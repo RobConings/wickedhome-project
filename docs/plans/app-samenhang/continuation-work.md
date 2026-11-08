@@ -1,6 +1,6 @@
 # Active implementation continuation — 8 November 2026
 
-All changes are local. The full rollout is still in progress; do not infer completion from entry-point checks.
+The full rollout is still in progress; do not infer completion from entry-point checks. An intermediate work-in-progress version was pushed to `rework_features`; this does **not** mean it was tested as a whole or deployed to the server. See the [compact Codex session handoff](codex-session-handoff.md) and [feature preservation contract](feature-preservation.md) before continuing.
 
 ## Latest user requirements
 
@@ -22,7 +22,7 @@ Earlier focused verification passed 1,607 unit tests, 33 integration tests, migr
 ## Work still being completed
 
 - Finish map/editor acceptance and edge cases, new component stories, header/navigation/media/sort tests, docs/MCP examples.
-- Implement the energy flow and typed parent/child metering model/validation, residual calculation, source/coverage details, usable configuration and MCP equivalents. No energy hierarchy migration has been added yet.
+- Implement the energy flow and typed parent/child metering model/validation, residual calculation, source/coverage details, usable configuration and MCP equivalents. An initial energy hierarchy helper/test and `20261108140000_energy_meter_branches` migration have since been added to the branch; their complete service/API/UI/MCP integration and combined verification are still pending.
 - Finish the remaining complete-module conversion/acceptance recorded in rollout-checklist.md. Broad phases remain open.
 
 Disposable local PostgreSQL: /tmp/wickedhome-shopping-pg.cpBVk9, 127.0.0.1:55439, wickedhome_shopping_test, role wickedhome_test (currently started by this task). Only this disposable DB receives migrations. A task-owned Python Storybook preview is on 127.0.0.1:55452 (exec session 76449); shut it down when no longer needed. Do not stop the older user-facing review preview on 55450. Do not deploy, commit, push or edit the SMB/server copy.
