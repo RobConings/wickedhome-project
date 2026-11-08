@@ -763,6 +763,21 @@ try {
     });
     console.error("Failing page:", pages[0].url());
     console.error((await pages[0].locator("body").innerText()).slice(-5000));
+    console.error("Heading visibility:", JSON.stringify(await pages[0].locator("h1").evaluateAll((headings) =>
+      headings.map((heading) => {
+        const ancestors = [];
+        let node = heading;
+        while (node && ancestors.length < 8) {
+          const style = getComputedStyle(node);
+          ancestors.push({ tag: node.tagName, id: node.id, className: node.className?.toString().slice(0, 120),
+            display: style.display, visibility: style.visibility, ariaHidden: node.getAttribute("aria-hidden"),
+            inert: node.inert, rect: [node.getBoundingClientRect().width, node.getBoundingClientRect().height] });
+          node = node.parentElement;
+        }
+        return { text: heading.textContent, ancestors };
+      })
+    )));
+
   }
   console.error("Browser errors:", errors);
   throw error;
