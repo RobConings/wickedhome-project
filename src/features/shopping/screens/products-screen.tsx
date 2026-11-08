@@ -41,7 +41,7 @@ export function ProductsScreen({ data, canManage, initialSelections }: ProductsS
   return (
     <PageContainer>
       <PageHeader
-        backTo="/shopping"
+        backTo="/inventory"
         title={t("products.title")}
         description={t("products.description")}
         actions={addButton}
