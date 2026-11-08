@@ -288,6 +288,16 @@ try {
   await purchasesLink.waitFor();
   const productOrigin = new URL(await purchasesLink.getAttribute("href"), base).searchParams.get("from");
   assert.equal(new URL(productOrigin, base).searchParams.get("workspace"), "overview");
+  // Related shopping needs have their own purpose-specific record workspace, without
+  // creating a second stock/expense record. The full product Overview is the return target.
+  const needLink = one.locator('#product-needs a[href^="/shopping/items/"]').first();
+  await needLink.waitFor();
+  await needLink.click();
+  await one.waitForURL((url) => url.pathname.startsWith("/shopping/items/"));
+  await one.locator('a[href^="/purchases?requirementId="]').waitFor();
+  await one.locator(`a[data-slot="page-back"][href^="/inventory/products/${fixture.productId}"]`).click();
+  await productOverview.waitFor();
+  assert.equal(await productOverview.getAttribute("aria-selected"), "true");
   await one.getByRole("link", { name: "Milk pancakes", exact: true }).click();
   await one.waitForURL((url) => url.pathname === `/recipes/${fixture.recipeId}`);
   await one.getByRole("heading", { name: "Milk pancakes", exact: true }).waitFor();
