@@ -217,6 +217,7 @@ registerAssistantTool({
     const detail = (product: Product, stock?: StockItem[]) => ({
       id: product.id,
       name: product.name,
+      brand: product.brand ?? null,
       imageUrl: product.imageUrl,
       unit: product.unit,
       packageAmount: product.packageAmount,
