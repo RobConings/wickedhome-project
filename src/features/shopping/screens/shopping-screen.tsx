@@ -82,6 +82,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
   const actions = useShoppingItemActions({ items: overview.items, onChanged: revalidate });
   const [editing, setEditing] = React.useState<ShoppingItem | null>(null);
   const [startOpen, setStartOpen] = React.useState(false);
+  const [newListOpen, setNewListOpen] = React.useState(false);
   const [startDestination, setStartDestination] = React.useState<string | null>(null);
 
   // The quick action opens a fresh dialog, including when this page is already showing.
@@ -181,7 +182,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
         )}
         menu={
           <>
-            {canManage && <ShoppingListFormDialog trigger={<DropdownMenuItem><PlusIcon />{t("actions.newList")}</DropdownMenuItem>} />}
+            {canManage && <DropdownMenuItem onSelect={() => setNewListOpen(true)}><PlusIcon />{t("actions.newList")}</DropdownMenuItem>}
             <DropdownMenuItem asChild><Link to="/shopping/products"><PackageIcon />{t("actions.products")}</Link></DropdownMenuItem>
           </>
         }
@@ -192,6 +193,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
   return (
     <PageContainer className="gap-4 px-3 py-4 sm:gap-6 sm:px-6 sm:py-8 lg:px-8">
       {actions.confirmation}
+      {canManage && <ShoppingListFormDialog open={newListOpen} onOpenChange={setNewListOpen} />}
       <Dialog open={startOpen} onOpenChange={setStartOpen}>
         <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
