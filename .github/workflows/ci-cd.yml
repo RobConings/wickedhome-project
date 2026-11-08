@@ -8,6 +8,12 @@ on:
     branches: [main, rework_features]
   workflow_dispatch:
 
+# Keep only the latest run for each branch while rapidly iterating on the redesign.
+# The deployment job remains explicitly restricted to main and requires an opt-in variable.
+concurrency:
+  group: wickedhome-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
