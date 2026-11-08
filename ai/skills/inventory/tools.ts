@@ -250,7 +250,7 @@ registerAssistantTool({
     }
     const products = await listProducts(ctx.householdId, { q: input.q });
     const page = capList(products.slice(input.offset), input.limit, (product) => ({
-      id: product.id, name: product.name, category: product.category, ...stockPriority(null, product.isEssential),
+      id: product.id, name: product.name, brand: product.brand ?? null, category: product.category, ...stockPriority(null, product.isEssential),
       unit: product.unit, packageAmount: product.packageAmount, packageUnit: product.packageUnit,
       sharesStockWith: product.stockProductId, alternatives: product.alternatives.map(({ id, name }) => ({ id, name })),
       shops: linkText(product),
@@ -471,6 +471,7 @@ const saveProductInput = z.object({
   offer: z.string().trim().max(20).optional().describe("The offer from inventory_prepare_product or recipes_find_product: copies its verified shop link, price, photo, barcode and package size"),
   imageUrl: productInputSchema.shape.imageUrl.describe("Verified product photo URL from inventory_prepare_product, web_read or the person. Omitted preserves it; null explicitly removes it"),
   name: z.string().trim().min(1).max(120).optional().describe("Required for a new product (default: the offer's name)"),
+  brand: productInputSchema.shape.brand.describe("Recorded product brand; omit to preserve the existing brand, null to clear it. Do not infer a brand from the name"),
   unit: z.string().trim().max(20).optional().describe("How stock is counted, e.g. 'pak', 'st.'"),
   packageAmount: z.number().positive().max(1_000_000).optional().describe("Content of one package, e.g. 200 (with packageUnit 'g'); a 6 x 33 cl pack is 198 cl"),
   packageUnit: z.enum(PACKAGE_UNITS).optional(),
@@ -558,11 +559,12 @@ registerAssistantTool({
     const changesProduct =
       !current ||
       Boolean(offer) ||
-      ["name", "unit", "packageAmount", "packageUnit", "category", "isEssential", "defaultShop", "barcode", "notes", "imageUrl", "linkShop"].some((key) => input[key as keyof typeof input] !== undefined);
+      ["name", "brand", "unit", "packageAmount", "packageUnit", "category", "isEssential", "defaultShop", "barcode", "notes", "imageUrl", "linkShop"].some((key) => input[key as keyof typeof input] !== undefined);
     let product = current;
     if (changesProduct) {
       const base = productInputSchema.parse({
         name: input.name ?? current?.name ?? offer?.name,
+        brand: input.brand !== undefined ? input.brand : current?.brand ?? null,
         unit: input.unit ?? current?.unit ?? null,
         // Kept unless given: a change of another field never drops the content per package.
         packageAmount: input.packageAmount ?? (input.packageUnit ? null : current?.packageAmount) ?? null,
@@ -596,7 +598,7 @@ registerAssistantTool({
     const saved = await getProduct(ctx.householdId, product.id).catch(() => null);
     if (!saved) return done(`Saved the product ${product.name}, but the final read-back failed. Do not create it again: use inventory_products with this id to verify the stored setup before confirming completion.`, { id: product.id, verification: "pending" });
     return done(`${current ? "Saved" : "Added"} the product ${saved.name}. Stored fields checked; summarise the setup and disclose any unresolved gaps.`, {
-      id: saved.id, name: saved.name, imageUrl: saved.imageUrl, defaultShopId: saved.defaultShopId,
+      id: saved.id, name: saved.name, brand: saved.brand ?? null, imageUrl: saved.imageUrl, defaultShopId: saved.defaultShopId,
       links: saved.shopLinks.map((link) => ({ shop: link.shop.name, url: link.url, price: money(link.priceCents) })),
       verification: "stored_fields_checked", setup: productSetup(saved), ...stockPriority(null, saved.isEssential),
     });
