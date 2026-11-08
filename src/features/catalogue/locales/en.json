@@ -8,5 +8,6 @@
   "noTasks": "No tasks linked through this product’s requirements.",
   "noProjects": "No projects linked through this product’s requirements.",
   "loadError": "Related product information could not be loaded.",
-  "retry": "Try again"
+  "retry": "Try again",
+  "viewPurchases": "View this product's purchases"
 }
