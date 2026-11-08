@@ -380,6 +380,21 @@ describe("shopping priority over MCP and the assistant", () => {
     assert.equal(products[0]?.isEssential, false);
   });
 
+  it("saves explicit product brands through MCP, preserves them on unrelated edits and clears only explicitly", async (t) => {
+    const { products } = setup(t);
+    const added = await callMcp("inventory_save_product", { product: "Milk", brand: "Boni", confirm: true });
+    assert.equal(added.result.isError, false, added.result.content[0]?.text);
+    assert.equal(products[0]?.brand, "Boni");
+    const detail = await callMcp("inventory_products", { product: "Milk" });
+    assert.equal((detail.result.structuredContent as { brand: string }).brand, "Boni");
+    const unrelated = await callMcp("inventory_save_product", { product: "Milk", notes: "Keep cool", confirm: true });
+    assert.equal(unrelated.result.isError, false);
+    assert.equal(products[0]?.brand, "Boni");
+    const cleared = await callMcp("inventory_save_product", { product: "Milk", brand: null, confirm: true });
+    assert.equal(cleared.result.isError, false);
+    assert.equal(products[0]?.brand, null);
+  });
+
   it("stores a directly supplied product photo, keeps it on later edits and removes it only explicitly", async (t) => {
     const { products } = setup(t);
     const photo = "https://market.example/milk.jpg";
@@ -414,7 +429,7 @@ describe("shopping priority over MCP and the assistant", () => {
     const receipt = saved.result.structuredContent as { imageUrl: string; defaultShopId: string; setup: { missing: string[] }; links: { shop: string; url: string; price: string }[] };
     assert.equal(receipt.imageUrl, "https://market.example/milk.jpg");
     assert.equal(receipt.defaultShopId, "market");
-    assert.deepEqual(receipt.setup.missing, []);
+    assert.deepEqual(receipt.setup.missing, ["brand"], "an offer with no verified brand must not be marked complete");
     assert.equal(receipt.links[0]?.url, "https://market.example/milk");
     assert.equal(receipt.links[0]?.price, "€ 1,99");
     assert.equal(products[0]!.barcode, "5400000000017");
