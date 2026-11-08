@@ -12,5 +12,6 @@
   "viewPurchases": "View this product's purchases",
   "recipes": "Used in recipes",
   "noRecipes": "No recipes have this product or a shared-stock alternative linked as an ingredient.",
-  "viewAllRecipes": "View all {{count}} recipes"
+  "viewAllRecipes": "View all {{count}} recipes",
+  "viewAllNeeds": "View all {{count}} shopping needs"
 }
