@@ -11,6 +11,7 @@ import {
   deletePlan,
   getMoneyLoans,
   getMoneyMonth,
+  getExpenseAccountEffect,
   getMoneyTimeline,
   listJointAccounts,
   recordDirectPayment,
@@ -60,6 +61,17 @@ registerAssistantSkill({
 });
 
 const LIMIT = 30;
+
+registerAssistantTool({
+  name: "money.expense_account",
+  description: "The existing account-history effect of a paid expense, using the same default-account and opening/correction rules as web. Reading records no new transaction.",
+  input: z.object({ expense: entityRef("expense") }),
+  permission: "read",
+  roles: MONEY_ROLES,
+  confirm: "never",
+  activity: { en: "Checked an expense account", nl: "Rekening van een uitgave bekeken" },
+  run: (ctx, input) => getExpenseAccountEffect(ctx.householdId, input.expense.id),
+});
 const currentMonth = () => monthOf(todayIn());
 const optionalMonth = monthSchema("Month YYYY-MM (default this month)").optional();
 const accountArg = entityRef("account", "Joint account by name (default the joint current account)").optional();

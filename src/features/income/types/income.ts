@@ -315,3 +315,10 @@ export const canManageIncome = (role: "owner" | "adult" | "child") => role !== "
 
 /** `YYYY-MM` */
 export const monthSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
+
+export type IncomeSourceDetail = {
+  source: IncomeSource;
+  month: string;
+  occurrences: IncomeOccurrence[];
+  history: { items: Income[]; total: number; page: number; pageSize: number };
+};

@@ -2,12 +2,14 @@ import { statfs } from "node:fs/promises";
 import type { Readable } from "node:stream";
 import type { SessionUser } from "@/features/auth/types/auth";
 import {
+  DOCUMENT_ENTITY_TYPES,
   STORAGE_TARGET_KINDS,
   normalizeMimeType,
   uniqueName,
   type StorageTargetKind,
   type DocumentEntityType,
   type DocumentFile,
+  type DocumentDetail,
   type DocumentFolder,
   type DocumentLinkInput,
   type DocumentLinkRef,
@@ -21,6 +23,7 @@ import {
   type FolderUpdateInput,
   type StorageUsage,
 } from "@/features/documents/types/documents";
+import { documentOwnerLink } from "./document-records";
 import { config } from "../lib/config";
 import { db, type Prisma } from "../lib/db";
 import { HttpError, badRequest, conflict, notFound } from "../lib/http";
@@ -605,4 +608,16 @@ export async function moveDocumentLinks(entityType: DocumentEntityType, moves: {
   await db.$transaction(
     moves.map(({ from, to }) => db.documentLink.updateMany({ where: { entityType, entityId: from }, data: { entityId: to } })),
   );
+}
+
+/** File identity and verified owner references; reading never moves or duplicates content. */
+export async function getDocumentDetail(householdId: string, id: string): Promise<DocumentDetail> {
+  const file = await getFile(householdId, id);
+  const [folder, refs] = await Promise.all([
+    file.folderId ? db.documentFolder.findFirst({ where: { id: file.folderId, householdId }, select: { id: true, name: true } }) : null,
+    db.documentLink.findMany({ where: { householdId, fileId: id }, select: { entityType: true, entityId: true }, orderBy: [{ entityType: "asc" }, { entityId: "asc" }] }),
+  ]);
+  const known = new Set<string>(DOCUMENT_ENTITY_TYPES);
+  const links = await Promise.all(refs.filter((ref) => known.has(ref.entityType)).map((ref) => documentOwnerLink(householdId, ref.entityType as DocumentEntityType, ref.entityId)));
+  return { file, folder, links: links.filter((link) => link !== null) };
 }

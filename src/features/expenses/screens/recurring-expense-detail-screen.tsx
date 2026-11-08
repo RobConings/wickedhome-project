@@ -283,6 +283,7 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
         </div>
       </PageGrid>}
         overview={<PageGrid columns="2">
+          <div className="md:col-span-2"><Button asChild variant="outline"><RecordLink to={`/expenses/recurring/${encodeURIComponent(recurring.id)}/payments`}>{t("workspace.allPayments")}</RecordLink></Button></div>
           <Card>
             <CardTitle>{t("detail.upcoming")}</CardTitle>
             {upcoming.length === 0 ? (

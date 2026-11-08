@@ -15,6 +15,7 @@ import type { ContactActionResult } from "../data/contacts-loaders";
 import { fetchContacts, unlinkContactFromProject } from "../data/contacts-requests";
 import { useContactSelections } from "../data/use-contact-selections";
 import { PROJECT_ROLE_SUGGESTIONS, type Contact } from "../types/contacts";
+import { ContactName } from "./contact-list-item";
 import { ContactAvatar } from "./contact-avatar";
 import { ContactFormDialog } from "./contact-form-dialog";
 import { ContactLinks } from "./contact-links";
@@ -177,7 +178,7 @@ export function ProjectContactsPanel({ projectId, canManage, initialData, initia
                 <ContactAvatar name={contact.name} size="md" />
                 <div className="flex min-w-0 flex-1 flex-col gap-2">
                   <div className="flex min-w-0 flex-col">
-                    <span className="font-medium break-words">{contact.name}</span>
+                    <ContactName contact={contact} className="font-medium break-words" />
                     {(link.role || contact.company) && (
                       <span className="text-sm break-words text-muted-foreground">{[link.role, contact.company].filter(Boolean).join(" · ")}</span>
                     )}

@@ -30,6 +30,8 @@ type MeterReadingFormProps = {
   /** Default date and time of a new reading, local (`YYYY-MM-DD`, `HH:MM`). */
   now: { date: string; time: string };
   canManage: boolean;
+  defaults?: { meter: ReadingMeter; register: string; applianceId: string | null };
+  historyLabel?: string;
 };
 
 /** Electricity grid meters have day/night registers; the inverter, the battery, gas and sub-meters have one. */
@@ -41,11 +43,11 @@ const meterOf = (values: GeneralFormValues): ReadingMeter => (isReadingMeter(val
 const isApplianceMeter = (meter: ReadingMeter) => meter === "appliance" || meter === "gas_appliance";
 
 /** Enter a cumulative meter value; the list below shows recent readings. */
-export function MeterReadingForm({ readings, appliances, now, canManage }: MeterReadingFormProps) {
+export function MeterReadingForm({ readings, appliances, now, canManage, defaults, historyLabel }: MeterReadingFormProps) {
   const { t } = useTranslation("energy");
   const locale = currentLocale();
   const deleter = useFetcher<EnergyActionResult>();
-  const [meter, setMeter] = React.useState<ReadingMeter>("grid_import");
+  const [meter, setMeter] = React.useState<ReadingMeter>(defaults?.meter ?? "grid_import");
   // A new form after each saved reading: clears the value, keeps the meter.
   const [formKey, setFormKey] = React.useState(0);
   const gas = readingMeterCarrier(meter) === "gas";
@@ -125,7 +127,7 @@ export function MeterReadingForm({ readings, appliances, now, canManage }: Meter
           schema={meterReadingFormSchema}
           fields={fields}
           intent="create-reading"
-          defaultValues={{ meter, register: "day", applianceId: null, date: now.date, time: now.time, value: "" }}
+          defaultValues={{ meter, register: defaults?.register ?? "day", applianceId: defaults?.applianceId ?? null, date: now.date, time: now.time, value: "" }}
           onValuesChange={(values) => setMeter(meterOf(values))}
           submitLabel={t("readings.add")}
           onSuccess={() => {
@@ -136,7 +138,7 @@ export function MeterReadingForm({ readings, appliances, now, canManage }: Meter
       )}
 
       <div className="flex flex-col gap-2 border-t pt-4">
-        <h3 className="text-sm font-medium">{t("readings.recent")}</h3>
+        <h3 className="text-sm font-medium">{historyLabel ?? t("readings.recent")}</h3>
         {readings.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t("readings.empty")}</p>
         ) : (

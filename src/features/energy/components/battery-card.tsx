@@ -1,3 +1,4 @@
+import { RecordLink } from "@/components/shared/record-link";
 import * as React from "react";
 import { BatteryFullIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -20,9 +21,10 @@ type BatteryCardProps = {
   /** Today (`YYYY-MM-DD`); a battery installed later is shown as planned. */
   today: string;
   canManage: boolean;
+  linkName?: boolean;
 };
 
-export function BatteryCard({ battery, today, canManage }: BatteryCardProps) {
+export function BatteryCard({ battery, today, canManage, linkName = true }: BatteryCardProps) {
   const { t } = useTranslation("energy");
   const { t: tCommon } = useTranslation();
   const locale = currentLocale();
@@ -40,7 +42,7 @@ export function BatteryCard({ battery, today, canManage }: BatteryCardProps) {
           <BatteryFullIcon className="size-5" aria-hidden="true" />
         </span>
         <div className="flex min-w-0 flex-col items-start gap-1">
-          <CardTitle className="truncate">{battery.name}</CardTitle>
+          <CardTitle className="break-words">{linkName ? <RecordLink to={`/energy/batteries/${encodeURIComponent(battery.id)}`}>{battery.name}</RecordLink> : battery.name}</CardTitle>
           {planned && <Badge variant="outline">{t("battery.planned")}</Badge>}
         </div>
         <p className="ml-auto text-xl font-semibold">{formatKwh(battery.capacityWh, locale)}</p>

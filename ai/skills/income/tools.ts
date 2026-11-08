@@ -10,7 +10,7 @@ import {
   type IncomeSource,
 } from "@/features/income/types/income";
 import { monthOf, todayIn } from "@/types/dates";
-import { createIncome, createIncomeSource, deleteIncome, getIncomeMonth, getIncomeOverview, updateIncomeSource } from "@/api/income/income.service";
+import { createIncome, createIncomeSource, deleteIncome, getIncomeMonth, getIncomeOverview, getIncome, getIncomeSource, updateIncomeSource } from "@/api/income/income.service";
 import { badRequest } from "@/api/lib/http";
 import {
   capList,
@@ -501,4 +501,39 @@ registerScreenContext({
   kind: "income",
   skills: ["income"],
   describe: (ctx) => ({ label: say(ctx.locale, "Income", "Inkomsten"), summary: "the incomes overview (income sources and received incomes)" }),
+});
+
+registerAssistantTool({
+  name: "income.source",
+  description: "Inspect a recurring income's schedule, full amount history, selected month occurrences and a bounded page of all recorded receipts, including old and ended sources.",
+  input: z.object({ source: entityRef("income_source"), month: optionalMonth, page: z.number().int().min(1).max(100000).optional() }),
+  permission: "read", confirm: "never", roles: MONEY_ROLES,
+  activity: { en: "Viewed recurring income", nl: "Terugkerende inkomsten bekeken" },
+  run: async (ctx, input) => ({ ...await getIncomeSource(ctx.householdId, input.source.id, input.month ?? monthOf(todayIn()), input.page ?? 1), url: `/income/sources/${encodeURIComponent(input.source.id)}` }),
+});
+
+registerAssistantTool({
+  name: "income.receipt",
+  description: "Inspect a recorded income by its exact ID, including historical receipts outside the overview. Amounts are cents; a future receipt is still expected. Does not change money or vouchers.",
+  input: z.object({ id: z.string().min(1).max(100) }),
+  permission: "read", confirm: "never", roles: MONEY_ROLES,
+  activity: { en: "Viewed recorded income", nl: "Vastgelegde inkomsten bekeken" },
+  run: async (ctx, input) => ({ ...await getIncome(ctx.householdId, input.id), url: `/income/receipts/${encodeURIComponent(input.id)}` }),
+});
+
+registerScreenContext({
+  kind: "income_source", skills: ["income"],
+  describe: async (ctx, id) => {
+    const source = id && (await getIncomeOverview(ctx.householdId, monthOf(todayIn()))).sources.find((row) => row.id === id);
+    return source ? { label: source.name, summary: `recurring income "${source.name}", ${source.kind}, ${source.amountMode}, ${source.active ? "active" : "ended"}` } : null;
+  },
+});
+
+registerScreenContext({
+  kind: "income_receipt", skills: ["income"],
+  describe: async (ctx, id) => {
+    if (!id) return null;
+    const income = await getIncome(ctx.householdId, id);
+    return { label: income.description ?? income.kind, summary: `recorded income ${money(income.amountCents)}, ${day(income.date)}, ${isExpected(income) ? "expected" : "received"}` };
+  },
 });

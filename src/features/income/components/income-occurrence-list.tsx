@@ -1,3 +1,4 @@
+import { RecordLink } from "@/components/shared/record-link";
 import * as React from "react";
 import { CalendarClockIcon, CircleCheckIcon, PencilLineIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -64,7 +65,7 @@ export function IncomeOccurrenceList({ occurrences, upcoming = [], habitants, ac
             <>
               {avatar(occurrence.habitantId)}
               <span className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-sm font-medium">{occurrence.name}</span>
+                <RecordLink to={occurrence.income ? `/income/receipts/${encodeURIComponent(occurrence.income.id)}` : `/income/sources/${encodeURIComponent(occurrence.sourceId)}?month=${occurrence.date.slice(0, 7)}`} className="break-words text-sm font-medium underline">{occurrence.name}</RecordLink>
                 <span className="truncate text-xs text-muted-foreground">
                   {whoName(occurrence.habitantId)} · {t(`kinds.${occurrence.kind}`)} · {dateText(occurrence.date)}
                 </span>
@@ -103,7 +104,7 @@ export function IncomeOccurrenceList({ occurrences, upcoming = [], habitants, ac
           <>
             {avatar(income.habitantId)}
             <span className="flex min-w-0 flex-1 flex-col">
-              <span className="truncate text-sm font-medium">{income.description ?? t(`kinds.${income.kind}`)}</span>
+              <RecordLink to={`/income/receipts/${encodeURIComponent(income.id)}`} className="break-words text-sm font-medium underline">{income.description ?? t(`kinds.${income.kind}`)}</RecordLink>
               <span className="truncate text-xs text-muted-foreground">
                 {whoName(income.habitantId)} · {t(`kinds.${income.kind}`)} · {t("month.oneOff")}
               </span>

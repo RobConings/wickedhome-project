@@ -301,5 +301,17 @@
     "empty": "Nog geen bijdragen",
     "emptyDescription": "Registreer een overschrijving van een persoon om bijdragen bij te houden.",
     "note": "Netto bijdragen houden rekening met terugnames en rechtstreekse verrekeningen tussen personen. Kies een spaarrekening om spaarbijdragen te zien."
+  },
+  "expenseEffect": {
+    "title": "Rekeninghistoriek",
+    "unpaid": "Deze uitgave is nog niet betaald.",
+    "outsideJoint": "Deze betaling gaat niet van een gezamenlijke bankrekening.",
+    "noAccount": "Er is geen gezamenlijke rekening beschikbaar voor deze betaling.",
+    "outsideHistory": "Deze betaling valt buiten de huidige rekeninghistoriek. Controleer het beginsaldo en de correcties.",
+    "posted": "Geregistreerde betaling van deze rekening.",
+    "scheduled": "Deze betaling telt mee vanaf de toekomstige betaaldatum.",
+    "failed": "De rekeninghistoriek kon niet geladen worden.",
+    "retry": "Opnieuw proberen",
+    "loading": "Rekeninghistoriek laden"
   }
 }

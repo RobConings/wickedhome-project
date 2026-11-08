@@ -155,7 +155,8 @@
     "back": "Back to inventory",
     "roomProgress": "{{current}} of {{total}} in this place",
     "encourage_one": "{{count}} product checked. Keep going!",
-    "encourage_other": "{{count}} products checked. Keep going!"
+    "encourage_other": "{{count}} products checked. Keep going!",
+    "returnToRecord": "Return to where you started"
   },
   "purchase": {
     "title": "Already counted?",
@@ -213,6 +214,8 @@
     "stockUnit": "Stock unit",
     "mixedUnits": "Mixed units",
     "notTracked": "Not tracked yet",
-    "minimumByLocation": "Per existing location"
+    "minimumByLocation": "Per existing location",
+    "articleNumber": "Article {{number}}",
+    "openOffer": "View offer at {{shop}}"
   }
 }

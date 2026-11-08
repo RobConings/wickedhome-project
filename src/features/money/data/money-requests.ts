@@ -17,6 +17,7 @@ import type {
   RecordTransferInput,
   SetBalanceInput,
   TakeBackInput,
+  ExpenseAccountEffect,
 } from "../types/money";
 
 const accountPath = (id: string) => `/money/accounts/${encodeURIComponent(id)}`;
@@ -24,6 +25,7 @@ const planPath = (id: string) => `/money/plans/${encodeURIComponent(id)}`;
 
 export const fetchMoneyMonth = (month?: string | null) => api.get<MoneyMonth>(month ? `/money?month=${encodeURIComponent(month)}` : "/money");
 export const fetchMoneySummary = () => api.get<MoneySummary>("/money/summary");
+export const fetchExpenseAccountEffect = (id: string) => api.get<ExpenseAccountEffect>(`/money/expenses/${encodeURIComponent(id)}/account-effect`);
 export const fetchContributionHistory = () => api.get<ContributionHistory>("/money/contributions/history");
 export const fetchMoneyLoans = () => api.get<MoneyLoans>("/money/loans");
 /** Default range: 12 months back to 24 ahead (`YYYY-MM` bounds otherwise). */

@@ -11,6 +11,7 @@ import { CARRIER_ICONS } from "./carrier-icons";
 type ApplianceFormDialogProps = {
   /** Edit this appliance; omit to create a new one. */
   appliance?: Appliance;
+  appliances?: Appliance[];
   /** Places to choose from. */
   places: Place[];
   /** Preselect a place for a new appliance (e.g. "add" inside a place group). */
@@ -21,7 +22,7 @@ type ApplianceFormDialogProps = {
 const asCarriers = (value: unknown): ActiveCarrier[] =>
   Array.isArray(value) ? ACTIVE_CARRIERS.filter((carrier) => value.includes(carrier)) : ["electricity"];
 
-export function ApplianceFormDialog({ appliance, places, defaultPlaceId, trigger }: ApplianceFormDialogProps) {
+export function ApplianceFormDialog({ appliance, appliances, places, defaultPlaceId, trigger }: ApplianceFormDialogProps) {
   const { t } = useTranslation("energy");
   const { recordUse } = usePlaceSelections();
   const isEdit = Boolean(appliance);
@@ -132,6 +133,11 @@ export function ApplianceFormDialog({ appliance, places, defaultPlaceId, trigger
       min: 0,
       step: 1,
     },
+    ...(appliances ? [{ name: "parentApplianceId", type: "select" as const, label: t("hierarchy.parent"),
+      description: t("hierarchy.parentHint"),
+      options: [{ value: "__independent__", label: t("hierarchy.independent") },
+        ...appliances.filter((other) => other.id !== appliance?.id).map((other) => ({ value: other.id, label: other.name }))],
+    }] : []),
     { name: "notes", type: "textarea", rows: 2, maxLength: 500, label: t("appliances.fields.notes") },
   ];
 
@@ -150,9 +156,10 @@ export function ApplianceFormDialog({ appliance, places, defaultPlaceId, trigger
       schema={applianceInputSchema}
       fields={fields}
       intent="save"
-      hiddenFields={{ id: appliance?.id }}
+      hiddenFields={{ id: appliance?.id, ...(appliances ? { hierarchyIncluded: "1" } : {}) }}
       defaultValues={{
         name: appliance?.name ?? "",
+        ...(appliances ? { parentApplianceId: appliance?.parentApplianceId ?? "__independent__" } : {}),
         category: appliance?.category ?? "other",
         placeId: initialPlaceId,
         carriers: initialCarriers,

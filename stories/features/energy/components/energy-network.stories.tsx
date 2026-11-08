@@ -1,0 +1,10 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { EnergyNetwork } from "@/features/energy/components/energy-network";
+import { daySummaryFixture, gridOnlySummaryFixture, gasMonthSummaryFixture, totalYearSummaryFixture } from "../fixtures";
+const meta = { title: "Features/Energy/Components/EnergyNetwork", component: EnergyNetwork, parameters: { layout: "padded" }, args: { summary: daySummaryFixture } } satisfies Meta<typeof EnergyNetwork>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+export const Default: Story = {};
+export const Missing: Story = { args: { summary: { ...gridOnlySummaryFixture, status: { ...gridOnlySummaryFixture.status, channels: [{ carrier: "electricity", kind: "grid_import", sources: ["fluvius_csv"], buckets: 10 }] } } } };
+export const Gas: Story = { args: { summary: gasMonthSummaryFixture } };
+export const Total: Story = { args: { summary: totalYearSummaryFixture } };

@@ -6,6 +6,7 @@ export {
   expensesLoader,
   expensesShouldRevalidate,
   recurringExpenseDetailLoader,
+  recurringPaymentsLoader,
   subscriptionsRedirectLoader,
   type ExpenseDetailPageData,
   type ExpensesPageData,
@@ -53,3 +54,5 @@ export {
 
 export type { ShoppingPaymentInput } from "./types/shopping-payment";
 export { ExpenseAllocationPanel } from "./components/expense-allocation-panel";
+
+export { RecurringPaymentsScreen } from "./screens/recurring-payments-screen";

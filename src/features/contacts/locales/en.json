@@ -100,5 +100,11 @@
     "invalidPhone": "Enter a valid phone number.",
     "duplicateValue": "This one is already in the list.",
     "unknownShop": "This shop no longer exists."
+  },
+  "detail": {
+    "about": "Contact details",
+    "notRecorded": "Not recorded",
+    "noProjects": "No projects linked yet.",
+    "projectsHint": "Open a project to manage the contact’s role or project link."
   }
 }

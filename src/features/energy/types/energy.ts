@@ -299,6 +299,7 @@ export type Appliance = {
   /** A meter (smart plug, sub-meter) measures this appliance. */
   measured: boolean;
   parentApplianceId?: string | null;
+  device?: { id: string; name: string } | null;
 };
 
 export type SolarInstallation = {
@@ -347,6 +348,9 @@ export type EnergyMeter = {
   source: EnergySource;
   ean: string | null;
   applianceId: string | null;
+  solarInstallationId?: string | null;
+  batteryId?: string | null;
+  haStatisticId?: string | null;
   intervalCount: number;
   /** ISO timestamps of the first and last data, or null without data. */
   firstAt: string | null;
@@ -426,6 +430,8 @@ export type ApplianceShare = {
 };
 
 export type EnergyBreakdown = {
+  /** Carrier-specific trees keep an electric parent from swallowing unrelated gas consumption. */
+  distributions?: { carrier: ActiveCarrier; totalWh: number | null; readings: EnergyDistributionReading[] }[];
   /** Explicit non-overlapping metered branches; null readings stay unknown. */
   distribution?: EnergyDistributionReading[];
   /** Measured appliances, largest first. */
@@ -468,6 +474,8 @@ export type EnergySummary = {
   peak: EnergyPeak;
   /** What is set up and what has data, for empty states and honest notices. */
   status: {
+    /** Actual selected source coverage: buckets with readings, not a claim of complete intervals. */
+    channels?: { carrier: ActiveCarrier; kind: MeterKind; sources: EnergySource[]; buckets: number }[];
     /** The view's carrier has meter data (grid or gas meter) in this period. */
     hasGridData: boolean;
     /** Electricity and gas data in this period, whatever the view. */
@@ -501,3 +509,12 @@ export const compassPoint = (azimuthDeg: number): CompassPoint =>
 
 /** Adults and owners manage energy data; children can only look. Mirrors the API's role check. */
 export const canManageEnergy = (role: "owner" | "adult" | "child") => role !== "child";
+
+export const energyRecordQuerySchema = z.object({ page: z.coerce.number().int().min(1).max(100000).default(1) });
+export type EnergyMeterDetail = {
+  meter: EnergyMeter;
+  appliance: { id: string; name: string } | null;
+  solar: { id: string; name: string } | null;
+  battery: { id: string; name: string } | null;
+  readings: { items: MeterReading[]; total: number; page: number; pageSize: number };
+};

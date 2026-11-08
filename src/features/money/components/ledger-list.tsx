@@ -105,8 +105,8 @@ function LineRow({ line, title, canManage }: { line: LedgerLine; title: string; 
     .join(" · ");
 
   const titleNode =
-    line.source === "expense" ? (
-      <RecordLink to={`/expenses/${line.sourceId}`} className="truncate text-sm font-medium hover:text-primary hover:underline">
+    line.source === "expense" || line.source === "income" ? (
+      <RecordLink to={line.source === "expense" ? `/expenses/${line.sourceId}` : `/income/receipts/${encodeURIComponent(line.sourceId)}`} className="truncate text-sm font-medium hover:text-primary hover:underline">
         {title}
       </RecordLink>
     ) : (

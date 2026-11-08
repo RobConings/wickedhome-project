@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { FavoriteToggle } from "@/components/shared/favorite-toggle";
-import { cn } from "@/lib/utils";
+import { RecordLink } from "@/components/shared/record-link";
+import { Button } from "@/components/ui/button";
+import { PencilIcon } from "lucide-react";
 import { contactSubtitle, type Contact } from "../types/contacts";
 import { ContactAvatar } from "./contact-avatar";
 import { ContactLinks } from "./contact-links";
@@ -15,20 +17,9 @@ type ContactListItemProps = {
   onEdit?: (contact: Contact) => void;
 };
 
-/** The contact's name: a button that opens the edit form for those who may edit, plain text otherwise. */
-export function ContactName({ contact, onEdit, className }: { contact: Contact; onEdit?: (contact: Contact) => void; className?: string }) {
-  const { t } = useTranslation("contacts");
-  if (!onEdit) return <span className={className}>{contact.name}</span>;
-  return (
-    <button
-      type="button"
-      onClick={() => onEdit(contact)}
-      title={t("actions.edit", { name: contact.name })}
-      className={cn("text-left underline-offset-4 outline-none hover:underline focus-visible:underline", className)}
-    >
-      {contact.name}
-    </button>
-  );
+/** Contact identity always opens its owner record, including for children. */
+export function ContactName({ contact, className }: { contact: Contact; onEdit?: (contact: Contact) => void; className?: string }) {
+  return <RecordLink to={`/contacts/${encodeURIComponent(contact.id)}`} className={className}>{contact.name}</RecordLink>;
 }
 
 /** One row in the contacts list (the list draws the dividers): name, trade and company, tap to call or mail, projects, star. */
@@ -46,6 +37,7 @@ export function ContactListItem({ contact, isFavorite, onToggleFavorite, onEdit 
         <ContactLinks contact={contact} />
         <ContactProjectChips projects={contact.projects} />
       </div>
+      {onEdit && <Button variant="ghost" size="icon" aria-label={t("actions.edit", { name: contact.name })} onClick={() => onEdit(contact)}><PencilIcon /></Button>}
       <FavoriteToggle
         active={isFavorite}
         label={t(isFavorite ? "favorite.remove" : "favorite.add", { name: contact.name })}

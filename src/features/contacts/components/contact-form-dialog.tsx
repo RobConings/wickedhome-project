@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import type { GeneralFormField } from "@/components/shared/general-form";
 import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
 import { ShopPicker, type Shop } from "@/features/shops";
+import type { UseSelectionsOptions } from "@/lib/selections";
 import { formatDate } from "@/types/date-format";
 import type { ContactActionResult } from "../data/contacts-loaders";
 import { MAX_CONTACT_VALUES, contactFormSchema, type Contact } from "../types/contacts";
@@ -16,6 +17,7 @@ type ContactFormDialogProps = {
   contact?: Contact;
   /** Shops for the "supplier's shop" field; the field is left out without them. */
   shops?: Shop[];
+  shopSelections?: UseSelectionsOptions["initial"];
   /** Trades the household already uses, suggested next to the built-in ones. */
   knownTrades?: readonly string[];
   /** Trade preselected for a new contact. */
@@ -39,6 +41,7 @@ const asList = (value: unknown) => (Array.isArray(value) ? value.map(String) : [
 export function ContactFormDialog({
   contact,
   shops,
+  shopSelections,
   knownTrades,
   defaultTrade,
   projectId,
@@ -114,6 +117,7 @@ export function ContactFormDialog({
           id={id}
           name={name}
           shops={shops ?? []}
+          initialSelections={shopSelections}
           value={typeof value === "string" ? value : null}
           onChange={setValue}
           invalid={invalid}

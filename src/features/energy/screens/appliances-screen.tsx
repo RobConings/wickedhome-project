@@ -31,6 +31,7 @@ export function AppliancesScreen({ appliances, places, canManage, documents }: A
 
   const addButton = canManage && (
     <ApplianceFormDialog
+      appliances={appliances}
       places={places}
       trigger={
         <Button>
@@ -51,10 +52,10 @@ export function AppliancesScreen({ appliances, places, canManage, documents }: A
         items={appliances}
         getKey={(appliance) => appliance.id}
         renderRow={(appliance) => (
-          <ApplianceRow appliance={appliance} places={places} canManage={canManage} documents={documents?.(appliance)} />
+          <ApplianceRow appliances={appliances} appliance={appliance} places={places} canManage={canManage} documents={documents?.(appliance)} />
         )}
         renderTile={(appliance) => (
-          <ApplianceTile appliance={appliance} places={places} canManage={canManage} documents={documents?.(appliance)} />
+          <ApplianceTile appliances={appliances} appliance={appliance} places={places} canManage={canManage} documents={documents?.(appliance)} />
         )}
         search={{
           keys: (appliance) => [

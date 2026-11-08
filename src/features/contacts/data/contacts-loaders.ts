@@ -1,11 +1,13 @@
 import i18n from "i18next";
-import type { ActionFunctionArgs } from "react-router";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
 import { fetchShops, type Shop } from "@/features/shops";
+import { ApiRequestError } from "@/lib/api-client";
 import { formDataToObject, parseForm, toFormResult, type FormResult } from "@/lib/forms";
 import { contactFormSchema, contactProjectLinkSchema, type Contact } from "../types/contacts";
 import {
   createContact,
   deleteContact,
+  fetchContact,
   fetchContacts,
   linkContactToProject,
   unlinkContactFromProject,
@@ -73,4 +75,20 @@ export async function contactsAction({ request }: ActionFunctionArgs): Promise<C
       intent,
     };
   }
+}
+
+/** A scoped owner record; an unavailable shop picker never prevents reading the contact. */
+export async function contactDetailLoader({ params }: LoaderFunctionArgs) {
+  try {
+    const [contact, shops] = await Promise.all([fetchContact(params.contactId!), fetchShops().catch(() => [] as Shop[])]);
+    return { contact, shops };
+  } catch (error) {
+    if (error instanceof ApiRequestError && error.status === 404) throw new Response(null, { status: 404 });
+    throw error;
+  }
+}
+
+export async function contactDetailAction(args: ActionFunctionArgs) {
+  const result = await contactsAction(args);
+  return result.ok && result.intent === "delete" ? redirect("/contacts") : result;
 }

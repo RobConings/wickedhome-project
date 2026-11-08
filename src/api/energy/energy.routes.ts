@@ -3,6 +3,7 @@ import {
   applianceInputSchema,
   batteryInputSchema,
   energySettingsInputSchema,
+  energyRecordQuerySchema,
   intervalImportSchema,
   meterReadingInputSchema,
   solarInstallationInputSchema,
@@ -21,10 +22,12 @@ import {
   deleteReading,
   deleteSolarInstallation,
   getEnergyData,
+  getEnergyMeterDetail,
   getEnergySetup,
   getEnergySummary,
   importIntervals,
   listAppliances,
+  getAppliance,
   saveEnergySettings,
   updateAppliance,
   updateBattery,
@@ -42,6 +45,11 @@ const household = (req: Parameters<typeof currentUser>[0]) => currentUser(req).h
  * Totals, time series, appliance breakdown and capacity peak for one day, week, month or year, for
  * `carrier=electricity` (default), `gas` or `total`.
  */
+energyRouter.get("/meters/:id", async (req, res) => {
+  const { page } = parse(energyRecordQuerySchema, req.query);
+  res.json(await getEnergyMeterDetail(currentUser(req).householdId, parse(idSchema, req.params.id), page));
+});
+
 energyRouter.get("/summary", async (req, res) => {
   const { period, date, carrier } = parse(summaryQuerySchema, req.query);
   res.json(await getEnergySummary(household(req), period, date, carrier));
@@ -50,6 +58,9 @@ energyRouter.get("/summary", async (req, res) => {
 // Appliances
 energyRouter.get("/appliances", async (req, res) => {
   res.json(await listAppliances(household(req)));
+});
+energyRouter.get("/appliances/:id", async (req, res) => {
+  res.json(await getAppliance(household(req), parse(idSchema, req.params.id)));
 });
 
 energyRouter.post("/appliances", canManage, async (req, res) => {

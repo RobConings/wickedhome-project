@@ -7,6 +7,7 @@ import {
   detachFile,
   getContents,
   getFile,
+  getDocumentDetail,
   getUsage,
   listFolders,
   listLinkedFiles,
@@ -117,13 +118,15 @@ registerAssistantTool({
   confirm: "never",
   activity: { en: "Looked at a document", nl: "Document bekeken" },
   run: async (ctx, input) => {
-    const file = await getFile(ctx.householdId, input.document.id);
+    const { file, links } = await getDocumentDetail(ctx.householdId, input.document.id);
     return {
       name: file.name,
       folder: input.document.hint,
       type: file.mimeType,
       size: size(file.sizeBytes),
       uploaded: file.uploadedAt ? `${formatDate(file.uploadedAt, ctx.locale)}${file.uploadedBy ? ` by ${file.uploadedBy.name}` : ""}` : "still uploading",
+      links,
+      url: `/documents/files/${encodeURIComponent(file.id)}`,
       storedOn: file.storageProvider === "local" ? "the home server" : "Google Drive",
     };
   },
@@ -290,4 +293,13 @@ registerScreenContext({
   kind: "documents",
   skills: ["documents"],
   describe: (ctx) => ({ label: say(ctx.locale, "Documents", "Documenten"), summary: "the documents (folders and files)" }),
+});
+
+registerScreenContext({
+  kind: "document", skills: ["documents"],
+  describe: async (ctx, id) => {
+    if (!id) return null;
+    const file = await getFile(ctx.householdId, id);
+    return { label: file.name, summary: `document "${file.name}", ${file.mimeType}, ${size(file.sizeBytes)}, ${file.storageProvider}` };
+  },
 });

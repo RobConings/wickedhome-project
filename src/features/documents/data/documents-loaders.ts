@@ -1,5 +1,5 @@
 import i18n from "i18next";
-import { data, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
+import { data, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
 import { ApiRequestError } from "@/lib/api-client";
 import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
 import { z } from "zod";
@@ -17,6 +17,7 @@ import {
   deleteFolderPermanently,
   emptyTrash,
   fetchContents,
+  fetchDocumentDetail,
   fetchFolders,
   fetchTrash,
   fetchUsage,
@@ -168,3 +169,15 @@ export async function documentsAction({ request }: ActionFunctionArgs): Promise<
 }
 
 export const documentsTrashAction = documentsAction;
+
+export async function documentDetailLoader({ params }: LoaderFunctionArgs) {
+  try {
+    const [detail, folders] = await Promise.all([fetchDocumentDetail(params.fileId!), fetchFolders()]);
+    return { detail, folders };
+  } catch (error) { return notFoundToRoute(error); }
+}
+
+export async function documentDetailAction(args: ActionFunctionArgs) {
+  const result = await documentsAction(args);
+  return result.ok && result.intent === "trash" ? redirect("/documents") : result;
+}

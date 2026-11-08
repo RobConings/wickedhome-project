@@ -89,5 +89,13 @@
       "addressIncomplete": "Fill in the whole address, or leave it all empty.",
       "coordinatesRequired": "Enter both coordinates."
     }
+  },
+  "detail": {
+    "about": "Household member",
+    "birthdayUnknown": "Birthday not recorded",
+    "noAccount": "No login linked",
+    "tasks": "Assigned tasks",
+    "income": "View income",
+    "incomeHint": "Opens the income owner with this person selected."
   }
 }

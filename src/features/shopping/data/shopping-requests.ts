@@ -76,3 +76,5 @@ export const unlinkProductAlternative = (id: string) => api.delete<Product>(`/sh
 
 /** Barcode auto-fill: what a (valid) barcode is, if known. Never rejects for "unknown": see `status`. */
 export const lookupBarcode = (code: string) => api.get<BarcodeLookupResult>(`/shopping/barcode/${enc(code)}`);
+
+export const fetchShoppingItem = (id: string) => api.get<ShoppingItem>(`/shopping/items/${enc(id)}`);

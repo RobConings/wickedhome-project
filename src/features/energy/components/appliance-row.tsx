@@ -1,3 +1,4 @@
+import { RecordLink } from "@/components/shared/record-link";
 import type * as React from "react";
 import { cn } from "@/lib/utils";
 import type { Place } from "@/features/places";
@@ -9,6 +10,7 @@ import { ApplianceMarkers, ApplianceSummary } from "./appliance-markers";
 
 type ApplianceRowProps = {
   appliance: Appliance;
+  appliances?: Appliance[];
   /** Places for the edit dialog. */
   places: Place[];
   canManage: boolean;
@@ -23,7 +25,7 @@ type ApplianceRowProps = {
  * One appliance as a row of a list (content only; the list draws the dividers and padding): category icon,
  * name, power figures, whether it is measured, and actions.
  */
-export function ApplianceRow({ appliance, places, canManage, documents }: ApplianceRowProps) {
+export function ApplianceRow({ appliance, appliances, places, canManage, documents }: ApplianceRowProps) {
   const deleting = useApplianceDeleting(appliance.id);
 
   return (
@@ -33,13 +35,13 @@ export function ApplianceRow({ appliance, places, canManage, documents }: Applia
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <span className="truncate font-medium">{appliance.name}</span>
+          <RecordLink to={`/energy/appliances/${encodeURIComponent(appliance.id)}`} className="truncate font-medium hover:underline">{appliance.name}</RecordLink>
           <ApplianceMarkers appliance={appliance} />
         </div>
         <ApplianceSummary appliance={appliance} className="truncate" />
         {appliance.notes && <p className="line-clamp-1 text-xs text-muted-foreground">{appliance.notes}</p>}
       </div>
-      <ApplianceActions appliance={appliance} places={places} canManage={canManage} documents={documents} />
+      <ApplianceActions appliances={appliances} appliance={appliance} places={places} canManage={canManage} documents={documents} />
     </div>
   );
 }

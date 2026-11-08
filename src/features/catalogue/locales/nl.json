@@ -9,5 +9,7 @@
   "noProjects": "Geen projecten gekoppeld via de behoeften van dit product.",
   "loadError": "Gekoppelde productinformatie kon niet worden geladen.",
   "retry": "Opnieuw proberen",
-  "viewPurchases": "Aankopen van dit product bekijken"
+  "viewPurchases": "Aankopen van dit product bekijken",
+  "recipes": "Gebruikt in recepten",
+  "noRecipes": "Geen recepten met dit product of een alternatief met gedeelde voorraad als gekoppeld ingrediënt."
 }

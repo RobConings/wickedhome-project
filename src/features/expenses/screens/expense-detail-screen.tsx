@@ -40,6 +40,7 @@ type ExpenseDetailScreenProps = {
   currentHabitantId?: string | null;
   /** The expense's documents (invoice, payment proof), rendered by the route (`DocumentAttachments`). */
   attachments?: React.ReactNode;
+  accountEffect?: React.ReactNode;
   /** A linked "Pay …" task (status, blockers, comments), composed in by the route. */
   linkedTask?: React.ReactNode;
   /** "On hold" reason from the linked pay task, passed in by the route. */
@@ -56,6 +57,7 @@ export function ExpenseDetailScreen({
   canManage,
   currentHabitantId,
   attachments,
+  accountEffect,
   linkedTask,
   onHold,
   projectField,
@@ -262,6 +264,7 @@ export function ExpenseDetailScreen({
 
         <div className="flex min-w-0 flex-col gap-6">
           {showQr && <PaymentQrCard expense={expense} />}
+          {accountEffect}
 
           {recurring && (
             <Card>

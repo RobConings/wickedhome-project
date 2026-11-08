@@ -1,3 +1,4 @@
+import { RecordLink } from "@/components/shared/record-link";
 import * as React from "react";
 import { PencilIcon, SunIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -17,9 +18,10 @@ import { SolarInstallationFormDialog } from "./solar-installation-form-dialog";
 type SolarInstallationCardProps = {
   installation: SolarInstallation;
   canManage: boolean;
+  linkName?: boolean;
 };
 
-export function SolarInstallationCard({ installation, canManage }: SolarInstallationCardProps) {
+export function SolarInstallationCard({ installation, canManage, linkName = true }: SolarInstallationCardProps) {
   const { t } = useTranslation("energy");
   const { t: tCommon } = useTranslation();
   const locale = currentLocale();
@@ -43,7 +45,7 @@ export function SolarInstallationCard({ installation, canManage }: SolarInstalla
           <SunIcon className="size-5" aria-hidden="true" />
         </span>
         <div className="flex min-w-0 flex-col">
-          <CardTitle className="truncate">{installation.name}</CardTitle>
+          <CardTitle className="break-words">{linkName ? <RecordLink to={`/energy/solar/${encodeURIComponent(installation.id)}`}>{installation.name}</RecordLink> : installation.name}</CardTitle>
           <p className="text-sm text-muted-foreground">
             {t("solar.panels", { count: installation.panelCount, wp: installation.panelWp })}
           </p>

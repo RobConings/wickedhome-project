@@ -1,3 +1,5 @@
+import { PencilIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { Inline } from "@/components/layout/inline";
 import { Card } from "@/components/shared/card";
@@ -38,6 +40,7 @@ export function ContactTile({ contact, isFavorite, onToggleFavorite, onEdit }: C
         {contact.address && <span className="pt-1 text-sm break-words text-muted-foreground">{contact.address}</span>}
       </div>
       <ContactLinks contact={contact} all website />
+      {onEdit && <Button variant="outline" className="h-auto min-h-11 whitespace-normal" onClick={() => onEdit(contact)}><PencilIcon />{t("actions.edit", { name: contact.name })}</Button>}
       <ContactProjectChips projects={contact.projects} />
     </Card>
   );

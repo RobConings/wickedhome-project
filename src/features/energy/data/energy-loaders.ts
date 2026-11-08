@@ -1,4 +1,6 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import i18n from "i18next";
+import { data, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
+import { ApiRequestError } from "@/lib/api-client";
 import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
 import { todayIn } from "@/types/dates";
 import { fetchPlaces, type Place } from "@/features/places";
@@ -26,7 +28,9 @@ import {
   deleteReading,
   deleteSolarInstallation,
   fetchAppliances,
+  fetchAppliance,
   fetchEnergyData,
+  fetchEnergyMeterDetail,
   fetchEnergySetup,
   fetchEnergySummary,
   saveEnergySettings,
@@ -74,11 +78,14 @@ async function save<T>(
   return { ok: true, intent };
 }
 
-async function runAction(intent: string, run: () => Promise<EnergyActionResult>): Promise<EnergyActionResult> {
+async function runAction<T extends EnergyActionResult | Response>(intent: string, run: () => Promise<T>): Promise<T | EnergyActionResult> {
   try {
     return await run();
   } catch (error) {
-    return { ...toFormResult(error), intent };
+    const result = toFormResult(error);
+    if (result.errors?.parentApplianceId) result.errors.parentApplianceId = result.errors.parentApplianceId.map((message) =>
+      ["unknownParent", "meterCycle", "parentCarrierMismatch"].includes(message) ? i18n.t(`energy:hierarchy.errors.${message}`) : message);
+    return { ...result, intent };
   }
 }
 
@@ -92,15 +99,36 @@ export async function appliancesLoader() {
 
 export type AppliancesData = Awaited<ReturnType<typeof appliancesLoader>>;
 
-export async function appliancesAction({ request }: ActionFunctionArgs): Promise<EnergyActionResult> {
+export async function applianceDetailLoader({ params }: LoaderFunctionArgs) {
+  try {
+    const [appliance, appliances, places, readings] = await Promise.all([
+      fetchAppliance(params.applianceId ?? ""), fetchAppliances(), fetchPlaces().catch((): Place[] => []), fetchEnergyData(),
+    ]);
+    const meters = readings.meters.filter((meter) => meter.applianceId === appliance.id);
+    return { appliance, appliances, places, meters };
+  } catch (error) {
+    if (error instanceof ApiRequestError && error.status === 404) throw data(null, { status: 404 });
+    throw error;
+  }
+}
+
+export async function appliancesAction({ request }: ActionFunctionArgs): Promise<EnergyActionResult | Response> {
   const formData = await request.formData();
   const intent = String(formData.get("intent") ?? "save");
   return runAction(intent, async () => {
     if (intent === "delete") {
       await deleteAppliance(String(formData.get("id") ?? ""));
+      if (formData.get("redirectTo") === "/energy/appliances") return redirect("/energy/appliances");
       return { ok: true, intent };
     }
-    return save(formData, applianceInputSchema, intent, createAppliance, updateAppliance);
+    if (formData.get("parentApplianceId") === "__independent__") formData.delete("parentApplianceId");
+    const { data, errors } = parseForm(applianceInputSchema, formData);
+    if (errors) return { errors, intent };
+    // The form's explicit Independent choice clears the edge; omission by older clients preserves it.
+    if (!formData.has("parentApplianceId") && formData.get("hierarchyIncluded") === "1") data.parentApplianceId = null;
+    const id = String(formData.get("id") ?? "");
+    await (id ? updateAppliance(id, data) : createAppliance(data));
+    return { ok: true, intent };
   });
 }
 
@@ -160,4 +188,31 @@ export async function energyImportAction({ request }: ActionFunctionArgs): Promi
     await createReading(data);
     return { ok: true, intent };
   });
+}
+
+export async function energyMeterLoader({ params, request }: LoaderFunctionArgs) {
+  try {
+    const query = new URL(request.url).searchParams;
+    const search = new URLSearchParams();
+    if (query.has("page")) search.set("page", query.get("page")!);
+    const [detail, appliances] = await Promise.all([fetchEnergyMeterDetail(params.meterId!, `?${search}`), fetchAppliances()]);
+    return { detail, appliances };
+  } catch (error) {
+    if (error instanceof ApiRequestError && error.status === 404) throw data(null, { status: 404 });
+    throw error;
+  }
+}
+
+export async function energySourceLoader({ params }: LoaderFunctionArgs) {
+  const [setup, data] = await Promise.all([fetchEnergySetup(), fetchEnergyData()]);
+  const solar = setup.solarInstallations.find((row) => row.id === params.solarId) ?? null;
+  const battery = setup.batteries.find((row) => row.id === params.batteryId) ?? null;
+  if (!solar && !battery) throw new Response(null, { status: 404 });
+  const meters = data.meters.filter((row) => solar ? row.solarInstallationId === solar.id : row.batteryId === battery!.id);
+  return { solar, battery, meters };
+}
+export async function energySourceAction(args: ActionFunctionArgs) {
+  const result = await energySetupAction(args);
+  if (result.ok && (result.intent === "delete-solar" || result.intent === "delete-battery")) return redirect("/energy/setup");
+  return result;
 }

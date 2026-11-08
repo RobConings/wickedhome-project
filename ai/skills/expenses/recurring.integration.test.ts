@@ -51,7 +51,7 @@ it("recurring schedule → occurrence → web/MCP payment → one account debit 
   assert.equal(await db.accountEntry.count({ where: { householdId: f.home.id } }), 0, "An expense supplies its ledger effect without a second entry");
 
   const foreign = await fixture(t);
-  await assert.rejects(getRecurringExpenseDetail(foreign.home.id, id), /not found/);
+  await assert.rejects(getRecurringExpenseDetail(foreign.home.id, id), /not found/i);
   const deniedChild = await call({ ...f.user, role: "child" }, "expenses_edit", { recurring: id, status: "paused", confirm: true });
   assert.equal(deniedChild.isError, true);
   const deniedScope = await call(f.user, "expenses_edit", { recurring: id, status: "paused", confirm: true }, "read");
@@ -100,4 +100,108 @@ it("direct-debit automation and its replay debit once; undo stays unpaid through
   const reply = await call(f.user, "expenses_mark_paid", { expense: first.id, paid: true, paidOn: today, confirm: true });
   assert.equal(reply.isError, false, reply.content[0]?.text);
   assert.equal((await listJointAccounts(f.home.id))[0]!.balanceCents, -4500);
+});
+
+it("complete recurring payment pages retain old history and extra repayments, filter and clamp pages, isolate households and match MCP without a second money effect", options, async (t) => {
+  const { listRecurringPayments } = await import("@/api/expenses/expenses.service");
+  const { recurringPaymentsQuerySchema } = await import("@/features/expenses/types/expenses");
+  const f = await fixture(t);
+  await db.paymentAccount.create({ data: { householdId: f.home.id, name: "History account", kind: "JOINT", color: "#123456", isDefault: true } });
+  const first = await createExpense(f.home.id, expenseCreateInputSchema.parse({ payee: "Historic commitment", amountCents: 100, dueDate: todayIn(), rrule: "FREQ=MONTHLY", category: "insurance", payerType: "joint" }));
+  const id = first.recurringExpenseId!;
+  await db.expense.createMany({ data: Array.from({ length: 31 }, (_, index) => ({
+    householdId: f.home.id, payee: "Historic commitment", amountCents: 100, category: "INSURANCE" as const, payerType: "JOINT" as const,
+    dueDate: new Date(Date.UTC(2020 + Math.floor(index / 12), index % 12, 1)), paidOn: new Date("2023-12-31"),
+    ...(index === 30 ? { earlyRepaymentForId: id } : { recurringExpenseId: id }),
+  })) });
+  const before = (await listJointAccounts(f.home.id))[0]!.balanceCents;
+  const ids: string[] = [];
+  for (const page of [1, 2, 3, 4]) {
+    const result = await listRecurringPayments(f.home.id, id, recurringPaymentsQuerySchema.parse({ status: "paid", page, pageSize: 10 }));
+    assert.equal(result.total, 31);
+    ids.push(...result.items.map((row) => row.id));
+  }
+  assert.equal(new Set(ids).size, 31, "More than the old 24-row preview is reachable without duplicates");
+  const oldDetail = await call(f.user, "expenses_details", { expense: ids[0] });
+  assert.equal(oldDetail.isError, false, oldDetail.content[0]?.text);
+  const last = await listRecurringPayments(f.home.id, id, recurringPaymentsQuerySchema.parse({ status: "paid", page: 999, pageSize: 10 }));
+  assert.equal(last.page, 4);
+  const unpaid = await listRecurringPayments(f.home.id, id, recurringPaymentsQuerySchema.parse({ status: "unpaid" }));
+  assert.ok(unpaid.items.length > 0);
+  assert.ok(unpaid.items.every((row) => row.paidOn === null));
+  const foreign = await fixture(t);
+  await assert.rejects(listRecurringPayments(foreign.home.id, id, recurringPaymentsQuerySchema.parse({})), /not found/i);
+  await setRecurringStatus(f.home.id, id, { status: "ended", endDate: todayIn() });
+  const reply = await call(f.user, "expenses_payments", { recurring: id, status: "paid", page: 2, pageSize: 10 });
+  assert.equal(reply.isError, false, reply.content[0]?.text);
+  const mcp = JSON.parse(reply.content[0]!.text);
+  const web = await listRecurringPayments(f.home.id, id, recurringPaymentsQuerySchema.parse({ status: "paid", page: 2, pageSize: 10 }));
+  assert.deepEqual(mcp.items.map((row: { id: string }) => row.id), web.items.map((row) => row.id));
+  assert.equal((await listJointAccounts(f.home.id))[0]!.balanceCents, before);
+  assert.equal(await db.accountEntry.count({ where: { householdId: f.home.id } }), 0);
+});
+
+it("expense account navigation uses the actual selected/default account and existing source line, then removes the effect on undo", options, async (t) => {
+  const { getExpenseAccountEffect, setBalance } = await import("@/api/money/money.service");
+  const f = await fixture(t);
+  const a = await db.paymentAccount.create({ data: { householdId: f.home.id, name: "Default", kind: "JOINT", color: "#123456", isDefault: true } });
+  const b = await db.paymentAccount.create({ data: { householdId: f.home.id, name: "Selected", kind: "JOINT", color: "#345678" } });
+  const expense = await createExpense(f.home.id, expenseCreateInputSchema.parse({ payee: "Account source", amountCents: 1200, category: "household", payerType: "joint", dueDate: todayIn(), paidOn: todayIn() }));
+  const defaultEffect = await getExpenseAccountEffect(f.home.id, expense.id);
+  assert.equal(defaultEffect.status, "posted"); assert.equal(defaultEffect.account!.id, a.id);
+  assert.equal(defaultEffect.lineKey, `expense:${expense.id}`); assert.equal(defaultEffect.amountCents, -1200);
+  await db.expense.update({ where: { id: expense.id }, data: { paymentAccountId: b.id } });
+  const selected = await getExpenseAccountEffect(f.home.id, expense.id);
+  assert.equal(selected.account!.id, b.id);
+  const reply = await call(f.user, "money_expense_account", { expense: expense.id });
+  assert.equal(reply.isError, false, reply.content[0]?.text);
+  assert.deepEqual(JSON.parse(reply.content[0]!.text), selected);
+  assert.equal((await call({ ...f.user, role: "child" }, "money_expense_account", { expense: expense.id })).isError, true);
+  assert.equal(await db.accountEntry.count({ where: { householdId: f.home.id } }), 0);
+  assert.equal((await listJointAccounts(f.home.id)).reduce((sum, row) => sum + row.balanceCents, 0), -1200);
+  const foreign = await fixture(t);
+  await assert.rejects(getExpenseAccountEffect(foreign.home.id, expense.id), /not found/i);
+  await markExpenseUnpaid(f.home.id, expense.id);
+  const unpaid = await getExpenseAccountEffect(f.home.id, expense.id);
+  assert.equal(unpaid.status, "unpaid"); assert.equal(unpaid.amountCents, null);
+  assert.equal((await listJointAccounts(f.home.id)).reduce((sum, row) => sum + row.balanceCents, 0), 0);
+  const old = await createExpense(f.home.id, expenseCreateInputSchema.parse({ payee: "Before opening", amountCents: 300, category: "household", payerType: "joint", dueDate: "2020-01-01", paidOn: "2020-01-01" }));
+  await setBalance(f.home.id, f.user.id, a.id, { date: todayIn(), balanceCents: 5000, note: null });
+  const outside = await getExpenseAccountEffect(f.home.id, old.id);
+  assert.equal(outside.status, "outsideHistory"); assert.equal(outside.amountCents, null);
+  assert.equal((await listJointAccounts(f.home.id)).find((row) => row.id === a.id)!.balanceCents, 5000);
+});
+
+it("income owner records preserve old receipts, source amount history, month occurrences and a single derived account credit through web/MCP reads", options, async (t) => {
+  const { createIncomeSource, createIncome, getIncome, getIncomeSource, updateIncomeSource, deleteIncomeSource } = await import("@/api/income/income.service");
+  const { incomeSourceCreateSchema, incomeSourceUpdateSchema, incomeInputSchema } = await import("@/features/income/types/income");
+  const f = await fixture(t);
+  const foreign = await fixture(t);
+  const account = await db.paymentAccount.create({ data: { householdId: f.home.id, name: "Income account", kind: "JOINT", color: "#123456", isDefault: true } });
+  const input = { name: "Old salary", kind: "salary", rrule: "FREQ=MONTHLY", startDate: "2018-01-01", amountMode: "fixed", amountCents: 100000, targetAccountId: account.id };
+  const source = await createIncomeSource(f.home.id, incomeSourceCreateSchema.parse(input));
+  const old = await createIncome(f.home.id, incomeInputSchema.parse({ sourceId: source.id, periodDate: "2018-01-01", date: "2018-01-02", amountCents: 99900, kind: "salary", targetAccountId: account.id }));
+  await updateIncomeSource(f.home.id, source.id, incomeSourceUpdateSchema.parse({ ...input, amountCents: 110000, amountFrom: "2020-01-01" }));
+  const detail = await getIncomeSource(f.home.id, source.id, "2018-01", 999);
+  assert.equal(detail.history.page, 1);
+  assert.equal(detail.history.total, 1);
+  assert.equal(detail.source.amounts.length, 2);
+  assert.equal(detail.occurrences[0]!.plannedCents, 100000);
+  assert.equal(detail.occurrences[0]!.income!.id, old.id);
+  assert.equal((await getIncome(f.home.id, old.id)).amountCents, 99900);
+  const ledger = (await getMoneyMonth(f.home.id, "2018-01")).accountMonths.find((row) => row.accountId === account.id)!;
+  assert.deepEqual(ledger.lines.filter((row) => row.source === "income").map((row) => [row.sourceId, row.amountCents]), [[old.id, 99900]]);
+  assert.equal(await db.accountEntry.count({ where: { householdId: f.home.id } }), 0);
+  assert.equal((await call(f.user, "income_source", { source: source.id, month: "2018-01" }, "read")).isError, false);
+  const receipt = await call(f.user, "income_receipt", { id: old.id }, "read");
+  assert.equal(receipt.isError, false, receipt.content[0]?.text);
+  assert.match(receipt.content[0]!.text, new RegExp(old.id));
+  assert.equal((await call({ ...f.user, role: "child" }, "income_receipt", { id: old.id }, "read")).isError, true);
+  await assert.rejects(getIncome(foreign.home.id, old.id), /not found/i);
+  await assert.rejects(getIncomeSource(foreign.home.id, source.id, "2018-01"), /not found/i);
+  assert.equal((await call(foreign.user, "income_receipt", { id: old.id }, "read")).isError, true);
+  await deleteIncomeSource(f.home.id, source.id);
+  assert.equal((await getIncome(f.home.id, old.id)).sourceId, null);
+  const after = (await getMoneyMonth(f.home.id, "2018-01")).accountMonths.find((row) => row.accountId === account.id)!;
+  assert.equal(after.lines.filter((row) => row.source === "income").length, 1, "Deleting the plan preserves the real receipt and its sole account effect");
 });

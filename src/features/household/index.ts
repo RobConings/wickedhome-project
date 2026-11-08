@@ -21,3 +21,6 @@ export {
   type HomeLocation,
   type HouseholdSettings,
 } from "./types/household-settings";
+
+export { habitantDetailLoader, habitantDetailAction } from "./data/household-loaders";
+export { HabitantDetailScreen } from "./screens/habitant-detail-screen";

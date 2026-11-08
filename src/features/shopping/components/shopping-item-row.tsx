@@ -1,3 +1,4 @@
+import { RecordLink } from "@/components/shared/record-link";
 import { shoppingStockNeed } from "../types/shopping";
 import * as React from "react";
 import { CheckIcon, ChevronDownIcon, ExternalLinkIcon, MapPinIcon, MoreHorizontalIcon, PackageIcon, PencilIcon, Trash2Icon } from "lucide-react";
@@ -156,6 +157,7 @@ export function ShoppingItemRow({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="max-w-[calc(100vw-2rem)]">
           <DropdownMenuLabel className="max-w-64 truncate">{item.name}</DropdownMenuLabel>
+          <DropdownMenuItem asChild><RecordLink to={`/shopping/items/${encodeURIComponent(item.id)}`}>{t("need.open")}</RecordLink></DropdownMenuItem>
           <DropdownMenuItem onSelect={() => setDetailsOpen((open) => !open)}><ChevronDownIcon />{t(detailsOpen ? "item.hideDetails" : "item.details")}</DropdownMenuItem>
           {onSkip && item.status === "open" && <DropdownMenuItem onSelect={() => onSkip(item)}>{t("planning.skip")}</DropdownMenuItem>}
           {item.status === "skipped" && <DropdownMenuItem onSelect={() => onToggle(item)}>{t("planning.restore")}</DropdownMenuItem>}

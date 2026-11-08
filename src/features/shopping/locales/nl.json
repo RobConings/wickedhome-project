@@ -541,5 +541,18 @@
   },
   "navigation": {
     "label": "Boodschappenweergaven"
+  },
+  "need": {
+    "open": "Boodschappenbehoefte openen",
+    "title": "Boodschappenbehoefte",
+    "quantity": "Te kopen hoeveelheid",
+    "reasons": "Waarom het op de lijst staat",
+    "product": "Product en voorraad",
+    "list": "Lijst openen",
+    "purchases": "Werkelijke aankopen voor deze behoefte",
+    "purchasesHint": "Een behoefte is een plan. Aankopen en hun vastgelegde voorraadeffecten blijven afzonderlijke feiten.",
+    "removeTitle": "Deze kooppositie verwijderen?",
+    "removeHint": "Alle gekoppelde redenen voor deze positie worden uit de boodschappenlijst verwijderd. Vastgelegde aankopen en voorraad blijven behouden.",
+    "notRecorded": "Niet vastgelegd"
   }
 }

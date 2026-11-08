@@ -64,9 +64,9 @@ export function DocumentListItem({ item, canManage, onAction, showPath = false }
             {name}
           </Link>
         ) : (
-          <button type="button" className={overlay} onClick={() => onAction("open", item)} title={name}>
+          <Link to={`/documents/files/${encodeURIComponent(item.file.id)}`} className={overlay} title={name}>
             {name}
-          </button>
+          </Link>
         )}
         <span className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
           {!isFolder && <DocumentStorageBadge file={item.file} />}

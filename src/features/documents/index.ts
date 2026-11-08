@@ -23,3 +23,6 @@ export {
   type DocumentFolder,
   type StorageTargetKind,
 } from "./types/documents";
+
+export { documentDetailLoader, documentDetailAction } from "./data/documents-loaders";
+export { DocumentDetailScreen } from "./screens/document-detail-screen";

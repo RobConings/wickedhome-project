@@ -162,7 +162,7 @@ export function DeviceDetailScreen({
             <DescriptionItem label={t("detail.plan")}>{device.position ? t("placement.placed") : t("placement.notPlaced")}</DescriptionItem>
             <DescriptionItem label={t("fields.appliance")}>
               {device.appliance ? (
-                <Link to="/energy/appliances" className="inline-flex items-center gap-1 hover:underline">
+                <Link to={`/energy/appliances/${encodeURIComponent(device.appliance.id)}`} className="inline-flex items-center gap-1 hover:underline">
                   <ZapIcon className="size-3.5" aria-hidden="true" />
                   {device.appliance.name}
                 </Link>

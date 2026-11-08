@@ -7,6 +7,7 @@ import {
   type BatteryInput,
   type CurrentEnergySummary,
   type EnergyDataOverview,
+  type EnergyMeterDetail,
   type EnergySettings,
   type EnergySettingsInput,
   type EnergySetup,
@@ -32,6 +33,7 @@ export const fetchEnergySummary = (period: EnergyPeriod, date: string, carrier: 
   api.get<EnergySummary>(`/energy/summary?period=${period}&date=${date}&carrier=${carrier}`);
 
 export const fetchAppliances = () => api.get<Appliance[]>("/energy/appliances");
+export const fetchAppliance = (id: string) => api.get<Appliance>(`/energy/appliances/${path(id)}`);
 export const createAppliance = (input: ApplianceInput) => api.post<Appliance>("/energy/appliances", input);
 export const updateAppliance = (id: string, input: ApplianceInput) =>
   api.put<Appliance>(`/energy/appliances/${path(id)}`, input);
@@ -119,3 +121,5 @@ export async function fetchCurrentEnergySummary(period: EnergyPeriod = "month"):
   ]);
   return { ...electricity, gas };
 }
+
+export const fetchEnergyMeterDetail = (id: string, search = "") => api.get<EnergyMeterDetail>(`/energy/meters/${path(id)}${search}`);

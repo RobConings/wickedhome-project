@@ -1,5 +1,5 @@
 import i18n from "i18next";
-import type { ActionFunctionArgs } from "react-router";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
 import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
 import { habitantInputSchema } from "../types/household";
 import { createHabitant, deleteHabitant, fetchHouseholdOverview, updateHabitant } from "./household-requests";
@@ -37,4 +37,15 @@ export async function habitantsAction({ request }: ActionFunctionArgs): Promise<
       intent: intent ?? undefined,
     };
   }
+}
+
+export async function habitantDetailLoader({ params }: LoaderFunctionArgs) {
+  const overview = await fetchHouseholdOverview();
+  const habitant = overview.habitants.find((row) => row.id === params.habitantId);
+  if (!habitant) throw new Response(null, { status: 404 });
+  return { habitant, household: overview.household };
+}
+export async function habitantDetailAction(args: ActionFunctionArgs) {
+  const result = await habitantsAction(args);
+  return result.ok && result.intent === "delete" ? redirect("/habitants") : result;
 }

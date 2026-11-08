@@ -31,6 +31,7 @@ import {
   deleteStaple,
   getLinkPreview,
   getProduct,
+  getItem,
   getShoppingOverview,
   linkAlternative,
   listItems,
@@ -68,6 +69,10 @@ shoppingRouter.get("/items", async (req, res) => {
   const query = parse(shoppingItemQuerySchema, req.query);
   const user = currentUser(req);
   res.json(await listItems(user.householdId, query, user.locale));
+});
+
+shoppingRouter.get("/items/:id", async (req, res) => {
+  res.json(await getItem(currentUser(req).householdId, parse(idSchema, req.params.id)));
 });
 
 shoppingRouter.post("/items", async (req, res) => {

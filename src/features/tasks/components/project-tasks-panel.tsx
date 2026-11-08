@@ -25,7 +25,7 @@ type ProjectTasksPanelProps = {
   initialData?: { overview: TasksOverview; habitants: Habitant[]; places: Place[] };
 };
 
-type RecordTasksPanelProps = Omit<ProjectTasksPanelProps, "projectId"> & { projectId?: string; deviceId?: string };
+type RecordTasksPanelProps = Omit<ProjectTasksPanelProps, "projectId"> & { projectId?: string; deviceId?: string; assigneeId?: string };
 
 /**
  * The tasks of one project, for the project page: open ones as a chain (what can start first, then what waits
@@ -41,16 +41,20 @@ export function DeviceTasksPanel(props: Omit<ProjectTasksPanelProps, "projectId"
   return <RecordTasksPanel {...props} />;
 }
 
-function RecordTasksPanel({ projectId, deviceId, placeId, onChanged, initialData, placeSelections }: RecordTasksPanelProps) {
+export function HabitantTasksPanel(props: Omit<ProjectTasksPanelProps, "projectId"> & { assigneeId: string }) {
+  return <RecordTasksPanel {...props} />;
+}
+
+function RecordTasksPanel({ projectId, deviceId, assigneeId, placeId, onChanged, initialData, placeSelections }: RecordTasksPanelProps) {
   const { t } = useTranslation("tasks");
   const { t: tCommon } = useTranslation();
   const [showDone, setShowDone] = React.useState(false);
-  const { data, error, refresh } = useAsyncResource(`${projectId ?? ""}:${deviceId ?? ""}`, async () => {
-    const [overview, household, places] = await Promise.all([fetchTasksOverview({ projectId, deviceId }), fetchHouseholdOverview(), fetchPlaces()]);
+  const { data, error, refresh } = useAsyncResource(`${projectId ?? ""}:${deviceId ?? ""}:${assigneeId ?? ""}`, async () => {
+    const [overview, household, places] = await Promise.all([fetchTasksOverview({ projectId, deviceId, assigneeId }), fetchHouseholdOverview(), fetchPlaces()]);
     return { overview, habitants: household.habitants, places };
   }, { initial: initialData });
   const reload = () => { refresh(); onChanged?.(); };
-  const labels = deviceId ? "maintenance" : "project";
+  const labels = assigneeId ? "person" : deviceId ? "maintenance" : "project";
   if (!data && !error) {
     return (
       <div className="flex flex-col gap-2" role="status" aria-label={t(`${labels}.loading`)}>
@@ -117,7 +121,7 @@ function RecordTasksPanel({ projectId, deviceId, placeId, onChanged, initialData
           habitants={habitants}
           places={places}
           today={overview.today}
-          defaults={{ type: deviceId ? "maintenance" : "job", placeId: placeId ?? null, projectId, deviceId }}
+          defaults={{ type: assigneeId ? "chore" : deviceId ? "maintenance" : "job", assigneeIds: assigneeId ? [assigneeId] : [], placeId: placeId ?? null, projectId, deviceId }}
           trigger={
             <Button variant="outline" size="sm" className="self-start">
               <PlusIcon />

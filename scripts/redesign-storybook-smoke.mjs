@@ -7,8 +7,8 @@ import { chromium } from "playwright";
 
 const directory = path.resolve("dist/storybook");
 const index = JSON.parse(await readFile(path.join(directory, "index.json"), "utf8"));
-const names = /\/(?:AppShell|RecordWorkspaceTabs|SplitAction|ProductStockScreen|RecurringExpenseDetailScreen|HomeRoomMap|EntityMultiPicker|ImageChoiceGrid|RecordImage|RecordLink|RecordOrigin|RecordProgress|RelatedRecordCards|SectionNavigation|ShoppingNavigation|IncomeScreen|SettingsScreen|MoneyFlowScreen|DeviceFormField|DeviceTasksPanel|GoodsAllocationDialog|PurchaseDetailScreen|PurchasesScreen|ProductContextPanels|PlaceDevicesSection|PlaceProjectsSection|LinkedImagePicker|ExpenseAllocationPanel|HaDeviceControlPanel|HaScenesPanel|PurchasePaymentsPanel|SessionPayments|SessionStartCard|SessionExtraDialog|SessionsScreen|ShopDestinationPicker|ShopGroupFormDialog|SessionItemAdjustDialog)$/;
-const examples = new Set(["Default", "WithOrigin", "Action", "Management", "Busy", "Disabled", "CoffeeInTwoPlaces", "AsChild", "NotKeptYet", "SharedStock", "MixedUnits", "LowStock", "BrokenImage", "DownPayment", "LoanWithTotalOpen", "DownPaymentWithTotalOpen", "Paused", "Ended", "ReadOnly", "Payments", "StatusRejected", "ThisMonth", "Expected", "Received", "Sources", "Household", "LegacyWasteLink", "SectionFailed", "Start", "Checklist", "Child", "Empty", "Offline", "NoCapabilities", "Missing", "Failed", "Complete", "Loading", "NestedDestination", "PersistentPhoneNavigation"]);
+const names = /\/(?:EnergyMeterScreen|EnergySourceScreen|DocumentDetailScreen|HabitantDetailScreen|ContactDetailScreen|IncomeSourceScreen|IncomeRecordScreen|AppShell|ExpenseAccountPanel|RecurringPaymentsScreen|EnergyNetwork|EnergyMeterTree|ApplianceDetailScreen|EnergyOverviewScreen|PlaceAppliancesSection|RecordWorkspaceTabs|SplitAction|ProductStockScreen|RecurringExpenseDetailScreen|HomeRoomMap|EntityMultiPicker|ImageChoiceGrid|RecordImage|RecordLink|RecordOrigin|RecordProgress|RelatedRecordCards|SectionNavigation|ShoppingNavigation|IncomeScreen|SettingsScreen|MoneyFlowScreen|DeviceFormField|DeviceTasksPanel|GoodsAllocationDialog|PurchaseDetailScreen|PurchasesScreen|ProductContextPanels|PlaceDevicesSection|PlaceProjectsSection|LinkedImagePicker|ExpenseAllocationPanel|HaDeviceControlPanel|HaScenesPanel|PurchasePaymentsPanel|SessionPayments|SessionStartCard|SessionExtraDialog|SessionsScreen|ShopDestinationPicker|ShopGroupFormDialog|SessionItemAdjustDialog)$/;
+const examples = new Set(["Default", "Imported", "Battery", "Pending", "Deleted", "Pet", "Supplier", "Historical", "Voucher", "Variable", "Unpaid", "OutsideHistory", "Gas", "Total", "Excess", "Independent", "GasMonth", "TotalYear", "SolarNotMeasured", "WithOrigin", "Action", "Management", "Busy", "Disabled", "CoffeeInTwoPlaces", "AsChild", "NotKeptYet", "SharedStock", "MixedUnits", "LowStock", "BrokenImage", "DownPayment", "LoanWithTotalOpen", "DownPaymentWithTotalOpen", "Paused", "Ended", "ReadOnly", "Payments", "StatusRejected", "ThisMonth", "Expected", "Received", "Sources", "Household", "LegacyWasteLink", "SectionFailed", "Start", "Checklist", "Child", "Empty", "Offline", "NoCapabilities", "Missing", "Failed", "Complete", "Loading", "NestedDestination", "PersistentPhoneNavigation"]);
 const stories = Object.values(index.entries).filter((entry) => entry.type === "story" && names.test(entry.title) && examples.has(entry.exportName));
 assert.ok(stories.length >= 25, "Build the complete component catalogue first");
 const mime = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".woff2": "font/woff2" };
@@ -124,10 +124,30 @@ try {
     ["Features/Expenses/Screens/RecurringExpenseDetailScreen", "LoanWithTotalOpen"],
     ["Features/Expenses/Screens/RecurringExpenseDetailScreen", "DownPayment"],
     ["Features/Expenses/Screens/RecurringExpenseDetailScreen", "Payments"],
+    ["Features/Expenses/Screens/RecurringPaymentsScreen", "Default"],
+    ["Features/Money/Components/ExpenseAccountPanel", "Default"],
+    ["Features/Energy/Components/EnergyNetwork", "Default"],
+    ["Features/Energy/Components/EnergyMeterTree", "Default"],
+    ["Features/Energy/Components/EnergyMeterTree", "Excess"],
+    ["Features/Energy/Screens/ApplianceDetailScreen", "Default"],
+    ["Features/Energy/Screens/ApplianceDetailScreen", "Child"],
+    ["Features/Contacts/Screens/ContactDetailScreen", "Default"],
+    ["Features/Contacts/Screens/ContactDetailScreen", "Child"],
+    ["Features/Income/Screens/IncomeSourceScreen", "Default"],
+    ["Features/Income/Screens/IncomeSourceScreen", "Child"],
+    ["Features/Income/Screens/IncomeRecordScreen", "Default"],
+    ["Features/Documents/Screens/DocumentDetailScreen", "Default"],
+    ["Features/Documents/Screens/DocumentDetailScreen", "Child"],
+    ["Features/Household/Screens/HabitantDetailScreen", "Default"],
+    ["Features/Household/Screens/HabitantDetailScreen", "Child"],
+    ["Features/Energy/Screens/EnergyMeterScreen", "Default"],
+    ["Features/Energy/Screens/EnergyMeterScreen", "Child"],
+    ["Features/Energy/Screens/EnergySourceScreen", "Default"],
+    ["Features/Energy/Screens/EnergySourceScreen", "Battery"],
   ]) {
     for (const theme of ["light", "dark"]) {
       await openStory(title, example);
-      await page.getByRole("tab").first().waitFor();
+      await page.waitForFunction(() => document.querySelector("#storybook-root")?.textContent?.trim().length > 0);
       await page.setViewportSize({ width: 320, height: 1000 });
       await page.evaluate((value) => document.documentElement.classList.toggle("dark", value === "dark"), theme);
       await page.addStyleTag({ content: "*,*::before,*::after{transition:none!important;animation:none!important}" });
@@ -141,6 +161,47 @@ try {
   }
   await page.setViewportSize({ width: 390, height: 900 });
 
+  await openStory("Features/Contacts/Screens/ContactDetailScreen", "Default");
+  assert.equal(await page.locator('a[href^="tel:"]').count(), 2);
+  assert.equal(await page.locator('a[href^="mailto:"]').count(), 2);
+  const contactProject = new URL(await page.getByRole("link", { name: "Badkamer renovatie", exact: true }).getAttribute("href"), base);
+  assert.equal(contactProject.pathname, "/projects/pr-bathroom");
+  await page.getByRole("button", { name: "Edit Jan Peeters", exact: true }).click();
+  await page.getByRole("dialog").waitFor();
+  await page.keyboard.press("Escape");
+  await openStory("Features/Contacts/Screens/ContactDetailScreen", "Child");
+  assert.equal(await page.getByRole("button", { name: "Edit Jan Peeters", exact: true }).count(), 0);
+  await openStory("Features/Documents/Screens/DocumentDetailScreen", "Default");
+  assert.equal(new URL(await page.getByRole("link", { name: "Household milk", exact: true }).getAttribute("href"), base).pathname, "/inventory/products/p-milk");
+  await page.getByRole("button", { name: "Rename", exact: true }).click();
+  await page.getByRole("dialog").waitFor();
+  await page.keyboard.press("Escape");
+  await openStory("Features/Documents/Screens/DocumentDetailScreen", "Child");
+  assert.equal(await page.getByRole("button", { name: "Rename", exact: true }).count(), 0);
+  await openStory("Features/Income/Screens/IncomeSourceScreen", "Default");
+  await page.getByRole("button", { name: "Edit", exact: true }).click();
+  await page.getByRole("dialog").waitFor();
+  await page.keyboard.press("Escape");
+  await openStory("Features/Income/Screens/IncomeSourceScreen", "Child");
+  assert.equal(await page.getByRole("button", { name: "Edit", exact: true }).count(), 0);
+
+  await openStory("Features/Expenses/Screens/RecurringPaymentsScreen", "Default");
+  const nextPayments = new URL(await page.getByRole("link", { name: "Next", exact: true }).getAttribute("href"), base);
+  assert.equal(nextPayments.searchParams.get("status"), "paid");
+  assert.equal(nextPayments.searchParams.get("page"), "3");
+  assert.equal(nextPayments.searchParams.get("from"), "/expenses/recurring/series?workspace=overview");
+  const historyOrigin = new URL(await page.getByRole("link", { name: "Next", exact: true }).getAttribute("href"), base).searchParams.get("from");
+  assert.ok(historyOrigin);
+  await openStory("Features/Energy/Screens/ApplianceDetailScreen", "Default");
+  const parentBranch = page.getByRole("link", { name: "Kitchen circuit", exact: true });
+  const branchHref = new URL(await parentBranch.getAttribute("href"), base);
+  assert.equal(branchHref.pathname, "/energy/appliances/kitchen");
+  assert.match(branchHref.searchParams.get("from"), /date%3D2026-10-01/);
+  await page.getByRole("button", { name: "Edit", exact: true }).click();
+  await page.getByRole("dialog").getByRole("combobox", { name: /Included in this meter branch/ }).waitFor();
+  await page.keyboard.press("Escape");
+  await openStory("Features/Energy/Screens/ApplianceDetailScreen", "Child");
+  assert.equal(await page.getByRole("button", { name: "Edit", exact: true }).count(), 0);
   await openStory("Features/Income/Screens/IncomeScreen", "ThisMonth");
   const incomeNav = page.getByRole("navigation", { name: "Income views" });
   await incomeNav.getByRole("link", { name: "Received", exact: true }).click();

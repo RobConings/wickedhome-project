@@ -155,7 +155,8 @@
     "back": "Terug naar voorraad",
     "roomProgress": "{{current}} van {{total}} op deze plek",
     "encourage_one": "Al {{count}} product gecontroleerd. Lekker bezig!",
-    "encourage_other": "Al {{count}} producten gecontroleerd. Lekker bezig!"
+    "encourage_other": "Al {{count}} producten gecontroleerd. Lekker bezig!",
+    "returnToRecord": "Terug naar waar je begon"
   },
   "purchase": {
     "title": "Is dit al meegeteld?",
@@ -213,6 +214,8 @@
     "stockUnit": "Voorraadeenheid",
     "mixedUnits": "Verschillende eenheden",
     "notTracked": "Nog niet bijgehouden",
-    "minimumByLocation": "Per bestaande locatie"
+    "minimumByLocation": "Per bestaande locatie",
+    "articleNumber": "Artikel {{number}}",
+    "openOffer": "Aanbod bij {{shop}} bekijken"
   }
 }

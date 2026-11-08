@@ -4,6 +4,7 @@ import {
   FALLBACK_MIME_TYPE,
   normalizeMimeType,
   type DocumentFile,
+  type DocumentDetail,
   type DocumentFolder,
   type DocumentLinkInput,
   type DocumentLinkRef,
@@ -81,3 +82,5 @@ export const fetchLinkedFiles =({ entityType, entityId }: DocumentLinkRef) =>
 export const attachFile = (input: DocumentLinkInput) => api.post("/documents/links", input);
 export const detachFile = ({ fileId, entityType, entityId }: DocumentLinkInput) =>
   api.delete(`/documents/links/${id(fileId)}/${entityType}/${id(entityId)}`);
+
+export const fetchDocumentDetail = (fileId: string) => api.get<DocumentDetail>(`/documents/files/${id(fileId)}/detail`);

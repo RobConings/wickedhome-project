@@ -31,9 +31,9 @@ export const SearchWithoutResults: Story = {
     await userEvent.type(within(canvasElement).getByRole("searchbox"), "zzz");
   },
 };
-/** The name opens the edit form. */
+/** Explicit edit action retains the inline form. */
 export const Editing: Story = {
   play: async ({ canvasElement }) => {
-    await userEvent.click(within(canvasElement).getAllByRole("button", { name: "Jan Peeters" })[0]!);
+    await userEvent.click(within(canvasElement).getAllByRole("button", { name: /Jan Peeters/ })[0]!);
   },
 };

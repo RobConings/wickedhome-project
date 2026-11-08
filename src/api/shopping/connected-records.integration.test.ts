@@ -166,3 +166,54 @@ it("purpose quantities use the selected jars while canonical stock credit retain
   assert.equal(allocation.unallocatedQuantity, 0); assert.equal(allocation.quantity, 2);
   assert.equal(await f.quantity(), 500);
 });
+
+it("product recipe links follow recorded shared-stock ingredients, isolate households and retain document ownership without changing stock", options, async (t) => {
+  const { getProductContext } = await import("../catalogue/catalogue.service");
+  const { listRecipesUsingProduct } = await import("../recipes/recipes.service");
+  const { listLinkedFiles, detachFile } = await import("../documents/documents.service");
+  const f = await fixture(t);
+  const variant = await db.product.create({ data: { householdId: f.home.id, name: "Alternative", category: "MEAT_FISH", stockProductId: f.product.id } });
+  const recipe = await db.recipe.create({ data: { householdId: f.home.id, name: "Family recipe", ingredients: { create: [
+    { position: 0, name: "Main", productId: f.product.id }, { position: 1, name: "Alternative", productId: variant.id },
+  ] } } });
+  await db.recipe.create({ data: { householdId: f.home.id, name: "Unlinked namesake", ingredients: { create: { position: 0, name: f.product.name } } } });
+  const foreign = await fixture(t);
+  await db.recipe.create({ data: { householdId: foreign.home.id, name: "Foreign recipe", ingredients: { create: { position: 0, name: "Invalid cross-home historical link", productId: f.product.id } } } });
+  assert.deepEqual((await listRecipesUsingProduct(f.home.id, variant.id)).map((row) => row.id), [recipe.id]);
+  assert.deepEqual((await getProductContext(f.home.id, f.product.id)).recipes.map((row) => row.id), [recipe.id]);
+  await assert.rejects(listRecipesUsingProduct(foreign.home.id, variant.id), /not found/);
+  const file = await f.receipt();
+  const link = { fileId: file.id, entityType: "product" as const, entityId: f.product.id };
+  await attachFile(f.home.id, link);
+  await attachFile(f.home.id, link);
+  assert.equal((await listLinkedFiles(f.home.id, link)).length, 1);
+  assert.equal((await listLinkedFiles(foreign.home.id, link)).length, 0);
+  await assert.rejects(attachFile(foreign.home.id, link), /not found/);
+  await detachFile(f.home.id, link);
+  assert.equal((await listLinkedFiles(f.home.id, link)).length, 0);
+  assert.ok(await db.documentFile.findUnique({ where: { id: file.id } }), "Detaching retains the document file");
+  assert.equal(await f.quantity(), 0);
+  assert.equal(await db.expense.count({ where: { householdId: f.home.id } }), 0);
+});
+
+it("document workspace resolves only recorded household owners, keeps attachment identity through rename/move, and hides missing or foreign references", options, async (t) => {
+  const { getDocumentDetail, updateFile, createFolder } = await import("../documents/documents.service");
+  const f = await fixture(t);
+  const foreign = await fixture(t);
+  const file = await f.receipt();
+  await attachFile(f.home.id, { fileId: file.id, entityType: "product", entityId: f.product.id });
+  await attachFile(f.home.id, { fileId: file.id, entityType: "product", entityId: foreign.product.id });
+  await attachFile(f.home.id, { fileId: file.id, entityType: "task", entityId: "missing-task" });
+  const before = await getDocumentDetail(f.home.id, file.id);
+  assert.deepEqual(before.links.map((row) => [row.entityId, row.name, row.href]), [[f.product.id, f.product.name, `/inventory/products/${f.product.id}`]]);
+  await assert.rejects(getDocumentDetail(foreign.home.id, file.id), /not found/i);
+  const folder = await createFolder(f.home.id, { name: "Receipts" });
+  await updateFile(f.home.id, file.id, { name: "Renamed receipt.pdf", folderId: folder.id });
+  const after = await getDocumentDetail(f.home.id, file.id);
+  assert.equal(after.file.id, file.id);
+  assert.equal(after.file.name, "Renamed receipt.pdf");
+  assert.equal(after.folder!.id, folder.id);
+  assert.deepEqual(after.links, before.links);
+  assert.equal(await f.quantity(), 0);
+  assert.equal(await db.expense.count({ where: { householdId: f.home.id } }), 0);
+});

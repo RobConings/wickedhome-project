@@ -301,5 +301,17 @@
     "empty": "No contributions yet",
     "emptyDescription": "Record a transfer from a person to start tracking contributions.",
     "note": "Net contributions include withdrawals and direct settlements between people. Savings are shown when you select a savings account."
+  },
+  "expenseEffect": {
+    "title": "Account history",
+    "unpaid": "This expense is not paid yet.",
+    "outsideJoint": "This payment does not debit a joint bank account.",
+    "noAccount": "No joint account is available for this payment.",
+    "outsideHistory": "This payment is outside the current account history. Review the opening balance and corrections.",
+    "posted": "Recorded payment from this account.",
+    "scheduled": "This payment affects the account on its future payment date.",
+    "failed": "The account history could not be loaded.",
+    "retry": "Try again",
+    "loading": "Loading account history"
   }
 }

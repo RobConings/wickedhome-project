@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink } from "@/components/shared/record-link";
 import { projectPath } from "@/types/projects";
 import { cn } from "@/lib/utils";
 import type { ContactProjectLink } from "../types/contacts";
@@ -17,7 +17,7 @@ export function ContactProjectChips({ projects, className }: ContactProjectChips
     <ul className={cn("flex flex-wrap gap-1.5", className)} aria-label={t("projects.label")}>
       {projects.map((project) => (
         <li key={project.id} className="min-w-0 max-w-full">
-          <Link
+          <RecordLink
             to={projectPath(project.id)}
             title={t("projects.linkLabel", { name: project.name })}
             className={cn(
@@ -30,7 +30,7 @@ export function ContactProjectChips({ projects, className }: ContactProjectChips
               {project.name}
               {project.role && <span className="text-muted-foreground"> · {project.role}</span>}
             </span>
-          </Link>
+          </RecordLink>
         </li>
       ))}
     </ul>

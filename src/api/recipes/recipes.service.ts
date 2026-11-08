@@ -225,6 +225,19 @@ export async function getRecipe(householdId: string, id: string): Promise<Recipe
   return toRecipe(await findRecipeRow(householdId, id));
 }
 
+/** Recorded ingredient links for a product's shared-stock family, never a name-based guess. */
+export async function listRecipesUsingProduct(householdId: string, productId: string) {
+  const product = await db.product.findFirst({ where: { householdId, id: productId }, select: { id: true, stockProductId: true } });
+  if (!product) throw notFound("Product not found");
+  const ownerId = product.stockProductId ?? product.id;
+  const family = await db.product.findMany({ where: { householdId, OR: [{ id: ownerId }, { stockProductId: ownerId }] }, select: { id: true } });
+  return db.recipe.findMany({
+    where: { householdId, ingredients: { some: { productId: { in: family.map(({ id }) => id) } } } },
+    select: { id: true, name: true, imageUrl: true, coverFileId: true },
+    orderBy: [{ name: "asc" }, { id: "asc" }],
+  });
+}
+
 /** Saves a new recipe with its ingredients and steps, in the given order. */
 export async function createRecipe(user: Pick<SessionUser, "id" | "householdId">, input: RecipeInput): Promise<Recipe> {
   await checkProducts(user.householdId, input);

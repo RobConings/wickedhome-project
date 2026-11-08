@@ -7,6 +7,7 @@ import {
   expensePaymentInputSchema,
   recurringExpenseInputSchema,
   recurringStatusInputSchema,
+  recurringPaymentsQuerySchema,
 } from "@/features/expenses/types/expenses";
 import { idSchema } from "@/types/common";
 import { addDays, todayIn } from "@/types/dates";
@@ -23,6 +24,7 @@ import {
   getExpensesOverview,
   getExpensesSummary,
   getRecurringExpenseDetail,
+  listRecurringPayments,
   listUnpaidExpenses,
   markExpensePaid,
   markExpenseUnpaid,
@@ -79,6 +81,9 @@ expensesRouter.get("/recurring/by-subscription/:subscriptionId", async (req, res
 expensesRouter.get("/recurring/:id", async (req, res) => {
   const id = parse(idSchema, req.params.id);
   res.json(await getRecurringExpenseDetail(currentUser(req).householdId, id));
+});
+expensesRouter.get("/recurring/:id/payments", async (req, res) => {
+  res.json(await listRecurringPayments(currentUser(req).householdId, parse(idSchema, req.params.id), parse(recurringPaymentsQuerySchema, req.query)));
 });
 
 expensesRouter.put("/recurring/:id", canManage, async (req, res) => {

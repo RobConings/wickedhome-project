@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { RecordLink } from "@/components/shared/record-link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
 import { intlLocale } from "@/lib/format";
@@ -33,11 +34,11 @@ export function EnergyMeterList({ meters, appliances }: EnergyMeterListProps) {
         <ul className="flex flex-col divide-y text-sm">
           {meters.map((meter) => (
             <li key={meter.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2">
-              <span className="min-w-0 flex-1 truncate font-medium">
+              <RecordLink to={`/energy/meters/${encodeURIComponent(meter.id)}`} className="min-w-0 flex-1 break-words font-medium underline">
                 {(meter.applianceId && names.get(meter.applianceId)) ||
                   (meter.carrier === "gas" ? t("readingMeters.gas") : t(`kinds.${meter.kind}`))}
                 {meter.register !== "single" && ` · ${t(`registers.${meter.register}`)}`}
-              </span>
+              </RecordLink>
               <CarrierBadge carrier={meter.carrier} />
               <Badge variant="outline" className="font-normal">
                 {t(`sources.${meter.source}`)}

@@ -1,6 +1,8 @@
 import i18n from "i18next";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
+import { ApiRequestError } from "@/lib/api-client";
+import { monthOf, todayIn } from "@/types/dates";
 import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
 import {
   incomeInputSchema,
@@ -16,6 +18,8 @@ import {
   deleteIncomeAmount,
   deleteIncomeSource,
   fetchIncomeOverview,
+  fetchIncome,
+  fetchIncomeSource,
   updateIncome,
   updateIncomeSource,
 } from "./income-requests";
@@ -96,4 +100,37 @@ export async function incomeAction({ request }: ActionFunctionArgs): Promise<Inc
     });
     return { ...result, intent };
   }
+}
+
+export async function incomeRecordLoader(args: LoaderFunctionArgs) {
+  try {
+    const base = await incomeLoader(args);
+    const income = await fetchIncome(args.params.incomeId!);
+    const source = income.sourceId ? (await fetchIncomeSource(income.sourceId, `?month=${income.periodDate?.slice(0, 7) ?? monthOf(todayIn())}`)).source : null;
+    return { ...base, income, source };
+  } catch (error) {
+    if (error instanceof ApiRequestError && error.status === 404) throw new Response(null, { status: 404 });
+    throw error;
+  }
+}
+
+export async function incomeSourceLoader(args: LoaderFunctionArgs) {
+  try {
+    const base = await incomeLoader(args);
+    const params = new URL(args.request.url).searchParams;
+    const query = new URLSearchParams({ month: base.overview.month });
+    if (params.has("page")) query.set("page", params.get("page")!);
+    const detail = await fetchIncomeSource(args.params.sourceId!, `?${query}`);
+    return { ...base, detail };
+  } catch (error) {
+    if (error instanceof ApiRequestError && error.status === 404) throw new Response(null, { status: 404 });
+    throw error;
+  }
+}
+
+/** A deleted record returns to its owner index; edits retain the precise source context. */
+export async function incomeRecordAction(args: ActionFunctionArgs) {
+  const result = await incomeAction(args);
+  if (result.ok && (result.intent === "delete-income" || result.intent === "delete-source")) return redirect("/income");
+  return result;
 }

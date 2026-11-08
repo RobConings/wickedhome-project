@@ -2,6 +2,7 @@ import { goodsAllocationInclude, goodsAllocationView } from "./goods-allocation.
 import type { SessionUser } from "@/features/auth/types/auth";
 import type { PurchaseDetail, PurchaseLine, PurchaseSummary } from "@/features/purchases/types/purchases";
 import { db, type Prisma } from "../lib/db";
+import { getItem } from "../shopping/shopping.service";
 import { notFound } from "../lib/http";
 
 const lineInclude = { ...goodsAllocationInclude, sessionItem: { select: { requirementIds: true } } } as const;
@@ -34,7 +35,7 @@ function summary(row: Header, names: Map<string, string>, canReadMoney: boolean)
 }
 
 /** Views of existing acquisitions, not a second purchase ledger. Empty planned visits stay in Shopping. */
-export async function listPurchases(user: SessionUser, filter: { productId?: string; projectId?: string } = {}): Promise<PurchaseSummary[]> {
+export async function listPurchases(user: SessionUser, filter: { productId?: string; projectId?: string; requirementId?: string } = {}): Promise<PurchaseSummary[]> {
   const lineFilters: Prisma.StockPurchaseWhereInput[] = [];
   const headerFilters: Prisma.ShoppingPurchaseWhereInput[] = [];
   if (filter.productId) {
@@ -44,6 +45,12 @@ export async function listPurchases(user: SessionUser, filter: { productId?: str
     const ids = (await db.product.findMany({ where: { householdId: user.householdId, OR: [{ id: owner }, { stockProductId: owner }] }, select: { id: true } })).map((row) => row.id);
     const productFilter = { OR: [{ productId: { in: ids } }, { purchasedProductId: { in: ids } }] };
     lineFilters.push(productFilter); headerFilters.push({ stockPurchases: { some: productFilter } });
+  }
+  if (filter.requirementId) {
+    const position = await getItem(user.householdId, filter.requirementId);
+    const ids = (position.requirements ?? [position]).map((row) => row.id);
+    const requirementFilter = { OR: [{ shoppingItemId: { in: ids } }, { sessionItem: { requirementIds: { hasSome: ids } } }] };
+    lineFilters.push(requirementFilter); headerFilters.push({ stockPurchases: { some: requirementFilter } });
   }
   if (filter.projectId) {
     const projectId = filter.projectId;

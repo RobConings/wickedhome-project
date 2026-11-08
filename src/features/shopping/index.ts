@@ -73,3 +73,6 @@ export { fetchShoppingSession, fetchShoppingSessions } from "./data/sessions-req
 
 export { RelatedShoppingSessions } from "./components/session-payments";
 export { PurchasePaymentsPanel } from "./components/purchase-payments-panel";
+
+export { shoppingItemLoader, shoppingItemAction } from "./data/shopping-loaders";
+export { ShoppingItemScreen } from "./screens/shopping-item-screen";

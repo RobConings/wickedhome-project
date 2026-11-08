@@ -389,6 +389,16 @@
     "editSchedule": "Edit schedule",
     "openNextPayment": "Open next payment",
     "manageSchedule": "Manage schedule",
-    "manageDescription": "Pause, resume or end this commitment. Existing paid payments remain in its history."
+    "manageDescription": "Pause, resume or end this commitment. Existing paid payments remain in its history.",
+    "allPayments": "All recorded payments",
+    "allPaymentsHint": "Every stored occurrence and extra loan repayment, including older history. Open a payment to inspect or change it.",
+    "paymentFilters": "Payment filters",
+    "all": "All",
+    "paymentCount_one": "{{count}} payment",
+    "paymentCount_other": "{{count}} payments",
+    "pagination": "Payment pages",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} of {{pages}}"
   }
 }

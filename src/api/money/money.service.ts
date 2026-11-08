@@ -43,7 +43,8 @@ import { buildMoneyTimeline, loanTotals } from "@/features/money/types/money-tim
 import { formatDate } from "@/types/date-format";
 import { addDays, monthOf, todayIn } from "@/types/dates";
 import { audit, type AuditActor } from "../audit/audit.service";
-import { getLoanSummaries, listExpenseFlow, listExpensesBetween, listJointPayments } from "../expenses/expenses.service";
+import { getExpenseDetail, getLoanSummaries, listExpenseFlow, listExpensesBetween, listJointPayments } from "../expenses/expenses.service";
+import type { ExpenseAccountEffect } from "@/features/money/types/money";
 import { getIncomeMonth, getVoucherBalances, listAccountIncomes, listIncomeFlow } from "../income/income.service";
 import {
   db,
@@ -214,6 +215,24 @@ export async function listJointAccounts(householdId: string): Promise<JointAccou
   const accounts = await loadAccounts(householdId);
   const ledgers = await buildLedgers(householdId, accounts, now);
   return accounts.map((row) => toAccount(row, ledgers.get(row.id) ?? [], now));
+}
+
+/** Reuse the account owner's real source line, including corrections and default-account rules. */
+export async function getExpenseAccountEffect(householdId: string, expenseId: string): Promise<ExpenseAccountEffect> {
+  const { expense } = await getExpenseDetail(householdId, expenseId);
+  const empty = { expenseId, account: null, month: expense.paidOn?.slice(0, 7) ?? null, amountCents: null, lineKey: null };
+  if (!expense.paidOn) return { ...empty, status: "unpaid" };
+  if (expense.payerType !== "joint" || expense.paymentMethod === "meal_voucher") return { ...empty, status: "outsideJoint" };
+  const [accounts, payments] = await Promise.all([loadAccounts(householdId), listJointPayments(householdId, expense.paidOn)]);
+  const payment = payments.find((row) => row.id === expenseId);
+  const accountId = payment ? accountForJointExpense(payment.paymentAccountId, accounts.map(toRef)) : null;
+  const account = accounts.find((row) => row.id === accountId);
+  if (!account) return { ...empty, status: "noAccount" };
+  const ledgers = await buildLedgers(householdId, accounts, today());
+  const line = ledgers.get(account.id)?.find((row) => row.source === "expense" && row.sourceId === expenseId);
+  const ref = { id: account.id, name: account.name };
+  return line ? { expenseId, account: ref, month: line.date.slice(0, 7), amountCents: line.amountCents, lineKey: line.key, status: line.future ? "scheduled" : "posted" }
+    : { ...empty, account: ref, status: "outsideHistory" };
 }
 
 export async function getMoneyMonth(householdId: string, month: string): Promise<MoneyMonth> {

@@ -484,5 +484,13 @@
     "allDone": "All maintenance completed.",
     "done": "Completed · {{count}}",
     "add": "Plan maintenance"
+  },
+  "person": {
+    "loading": "Loading assigned tasks…",
+    "error": "Could not load assigned tasks.",
+    "empty": "No tasks assigned to this person.",
+    "allDone": "All assigned tasks are closed.",
+    "done": "Closed tasks ({{count}})",
+    "add": "Assign a task"
   }
 }

@@ -4,3 +4,5 @@ export { moneyAction, moneyLoader, type MoneyPageData } from "./data/money-loade
 export { fetchContributionHistory, fetchMoneyLoans, fetchMoneySummary, fetchMoneyTimeline } from "./data/money-requests";
 export { MoneyFlowScreen } from "./screens/money-flow-screen";
 export { canManageMoney, type JointAccount, type MoneyLoans, type MoneyMonth, type MoneySummary, type MoneyTimeline } from "./types/money";
+
+export { ExpenseAccountPanel } from "./components/expense-account-panel";

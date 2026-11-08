@@ -1,3 +1,4 @@
+import { RecordLink } from "@/components/shared/record-link";
 import type * as React from "react";
 import { Card } from "@/components/shared/card";
 import { cn } from "@/lib/utils";
@@ -10,6 +11,7 @@ import { ApplianceMarkers, ApplianceSummary } from "./appliance-markers";
 
 type ApplianceTileProps = {
   appliance: Appliance;
+  appliances?: Appliance[];
   /** Places for the edit dialog. */
   places: Place[];
   canManage: boolean;
@@ -18,7 +20,7 @@ type ApplianceTileProps = {
 };
 
 /** An appliance as a tile (two per row on a phone): icon, name, badges, power figures and actions. */
-export function ApplianceTile({ appliance, places, canManage, documents }: ApplianceTileProps) {
+export function ApplianceTile({ appliance, appliances, places, canManage, documents }: ApplianceTileProps) {
   const deleting = useApplianceDeleting(appliance.id);
 
   return (
@@ -27,7 +29,7 @@ export function ApplianceTile({ appliance, places, canManage, documents }: Appli
         <ApplianceCategoryIcon category={appliance.category} className="size-5" />
       </span>
       <div className="flex min-w-0 flex-col gap-1.5">
-        <span className="line-clamp-2 font-medium break-words">{appliance.name}</span>
+        <RecordLink to={`/energy/appliances/${encodeURIComponent(appliance.id)}`} className="line-clamp-2 font-medium break-words hover:underline">{appliance.name}</RecordLink>
         <div className="flex flex-wrap gap-1.5">
           <ApplianceMarkers appliance={appliance} />
         </div>
@@ -35,6 +37,7 @@ export function ApplianceTile({ appliance, places, canManage, documents }: Appli
         {appliance.notes && <p className="line-clamp-2 text-xs text-muted-foreground">{appliance.notes}</p>}
       </div>
       <ApplianceActions
+        appliances={appliances}
         appliance={appliance}
         places={places}
         canManage={canManage}

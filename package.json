@@ -26,7 +26,8 @@
     "test:shopping-integration": "SHOPPING_INTEGRATION_TESTS=1 tsx --test src/api/shopping/*.integration.test.ts src/api/tasks/*.integration.test.ts ai/skills/shopping/sessions.integration.test.ts",
     "test:shopping-migrations": "node scripts/verify-shopping-migration.mjs",
     "test:shopping-browser": "tsx scripts/shopping-browser-smoke.mjs",
-    "test:finance-integration": "FINANCE_INTEGRATION_TESTS=1 tsx --test ai/skills/expenses/*.integration.test.ts"
+    "test:finance-integration": "FINANCE_INTEGRATION_TESTS=1 tsx --test ai/skills/expenses/*.integration.test.ts",
+    "test:energy-integration": "ENERGY_INTEGRATION_TESTS=1 tsx --test ai/skills/energy/*.integration.test.ts"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

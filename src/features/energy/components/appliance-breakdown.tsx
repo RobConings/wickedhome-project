@@ -6,6 +6,7 @@ import { InlineAlert } from "@/components/shared/inline-alert";
 import { currentLocale } from "@/lib/i18n";
 import type { EnergyBreakdown } from "../types/energy";
 import { ApplianceCategoryIcon } from "./appliance-category-icon";
+import { EnergyMeterTree } from "./energy-meter-tree";
 import { formatKwh, formatPercent } from "./energy-format";
 
 type ApplianceBreakdownProps = {
@@ -17,6 +18,7 @@ type ApplianceBreakdownProps = {
 export function ApplianceBreakdown({ breakdown, className }: ApplianceBreakdownProps) {
   const { t } = useTranslation("energy");
   const locale = currentLocale();
+  if (breakdown.distributions) return <EnergyMeterTree breakdown={breakdown} className={className} />;
   const total = breakdown.totalWh;
   const share = (wh: number) => (total ? formatPercent(wh / total, locale) : undefined);
 

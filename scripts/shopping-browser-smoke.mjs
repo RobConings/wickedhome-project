@@ -6,6 +6,7 @@ import path from "node:path";
 import { tmpdir } from "node:os";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
+import { zonedMidnight } from "../src/features/energy/types/energy-time.ts";
 import { db } from "../src/api/lib/db.ts";
 import { hashPassword } from "../src/api/lib/password.ts";
 import { createRequire } from "node:module";
@@ -159,9 +160,19 @@ try {
     },
   });
 
+  const recipe = await db.recipe.create({ data: { householdId: home.id, name: "Milk pancakes", ingredients: { create: { name: "Milk", position: 0, productId: product.id, quantity: 1, unit: "pak" } } } });
+  const circuit = await db.appliance.create({ data: { householdId: home.id, name: "Kitchen circuit", category: "OTHER", carriers: ["ELECTRICITY"], placeId: place.id } });
+  const fridge = await db.appliance.create({ data: { householdId: home.id, name: "Fridge meter", category: "COLD", carriers: ["ELECTRICITY"], placeId: place.id, parentApplianceId: circuit.id } });
+  for (const [kind, applianceId, energyWh] of [["GRID_IMPORT", null, 1000], ["APPLIANCE", circuit.id, 500], ["APPLIANCE", fridge.id, 200]]) {
+    await db.energyMeter.create({ data: { householdId: home.id, name: applianceId ?? "Grid", carrier: "ELECTRICITY", kind, source: "MANUAL", applianceId,
+      intervals: { create: { startAt: zonedMidnight("2026-10-01"), endAt: zonedMidnight("2026-10-02"), energyWh, status: "MEASURED" } } } });
+  }
   fixture = {
     householdId: home.id,
     projectId: project.id,
+    recipeId: recipe.id,
+    circuitId: circuit.id,
+    fridgeId: fridge.id,
     password,
     emails: users.map((user) => user.email),
     stockId: initialStock.id,
@@ -269,6 +280,12 @@ try {
   await purchasesLink.waitFor();
   const productOrigin = new URL(await purchasesLink.getAttribute("href"), base).searchParams.get("from");
   assert.equal(new URL(productOrigin, base).searchParams.get("workspace"), "overview");
+  await one.getByRole("link", { name: "Milk pancakes", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === `/recipes/${fixture.recipeId}`);
+  await one.getByRole("heading", { name: "Milk pancakes", exact: true }).waitFor();
+  await one.getByRole("link", { name: "Terug naar waar je vandaan kwam", exact: true }).click();
+  await productOverview.waitFor();
+  assert.equal(await productOverview.getAttribute("aria-selected"), "true");
   await one.getByRole("tab", { name: "Details", exact: true }).click();
   const beforeNeeds = await database.query('SELECT count(*)::int AS n FROM shopping_items WHERE "householdId"=$1', [fixture.householdId]);
   await one.getByRole("button", { name: "Aan boodschappenlijst toevoegen", exact: true }).click();
@@ -280,6 +297,36 @@ try {
   assert.equal(new URL(one.url()).searchParams.get("from"), origin);
   assert.equal(await one.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
   await one.screenshot({ path: "/tmp/wh-redesign/product-phone.png", fullPage: true });
+
+  await one.getByRole("button", { name: "Meer productacties", exact: true }).click();
+  await one.getByRole("menuitem", { name: "Voorraadtelling", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === "/inventory/count" && url.searchParams.get("productId") === fixture.productId);
+  await one.getByRole("button", { name: "Start (1 product)", exact: true }).waitFor();
+  await one.getByRole("link", { name: "Stoppen", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === `/inventory/products/${fixture.productId}`);
+  // Energy period flow and inclusion are inspectable in their owner records, including a real form save.
+  const energyOrigin = "/energy?period=day&date=2026-10-01";
+  await one.goto(`${base}${energyOrigin}`);
+  await one.getByText("Energie door je huis", { exact: true }).waitFor();
+  await one.getByRole("link", { name: "Kitchen circuit", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === `/energy/appliances/${fixture.circuitId}`);
+  assert.equal(new URL(one.url()).searchParams.get("from"), energyOrigin);
+  await one.getByRole("link", { name: "Fridge meter", exact: true }).click();
+  await one.getByRole("heading", { name: "Fridge meter", exact: true }).waitFor();
+  await one.getByRole("button", { name: "Bewerken", exact: true }).click();
+  const applianceEdit = one.getByRole("dialog");
+  await applianceEdit.getByRole("combobox", { name: /Inbegrepen in deze metertak/ }).click();
+  await one.getByRole("option", { name: "Onafhankelijke tak", exact: true }).click();
+  const saveAppliance = one.waitForResponse((response) => new URL(response.url()).pathname === `/api/energy/appliances/${fixture.fridgeId}` && response.request().method() === "PUT");
+  await applianceEdit.getByRole("button", { name: "Opslaan", exact: true }).click();
+  assert.ok((await saveAppliance).ok());
+  await applianceEdit.waitFor({ state: "hidden" });
+  assert.equal((await db.appliance.findUniqueOrThrow({ where: { id: fixture.fridgeId } })).parentApplianceId, null);
+  await one.getByRole("link", { name: "Terug naar waar je vandaan kwam", exact: true }).click();
+  await one.getByRole("heading", { name: "Kitchen circuit", exact: true }).waitFor();
+  await one.getByRole("link", { name: "Terug naar waar je vandaan kwam", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === "/energy" && url.searchParams.get("date") === "2026-10-01");
+  assert.equal(await one.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
 
   // Verify the same forecast and visible toggles in ordinary groceries, shop view and visit selection.
   for (const screen of [
@@ -533,6 +580,11 @@ try {
   assert.equal(assigned.householdQuantity, 1); assert.equal(assigned.projects[0].quantity, 1); assert.equal(assigned.unallocatedQuantity, 0);
   await one.getByRole("link", { name: "Colruyt", exact: true }).click();
   await one.waitForURL((url) => url.pathname === `/expenses/${expenseId}` && url.searchParams.has("from"));
+  const expenseOwnerUrl = one.url();
+  await one.getByRole("link", { name: "Gezamenlijke rekening", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === "/money" && url.searchParams.get("account") === fixture.accountId && url.searchParams.get("tab") === "history");
+  await one.getByRole("link", { name: "Terug naar waar je vandaan kwam", exact: true }).click();
+  await one.waitForURL(expenseOwnerUrl);
   await one.getByRole("button", { name: "Kosten verdelen", exact: true }).click();
   const costsDialog = one.getByRole("dialog");
   await costsDialog.getByLabel("Huishouden", { exact: true }).fill("1,00");

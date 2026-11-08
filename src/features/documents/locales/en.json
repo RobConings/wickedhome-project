@@ -210,5 +210,21 @@
     "remove": "Remove {{name}} as cover",
     "loadError": "Images could not be loaded.",
     "saveError": "The cover could not be saved."
+  },
+  "detail": {
+    "title": "File details",
+    "folder": "Folder",
+    "type": "File type",
+    "size": "Size",
+    "uploaded": "Uploaded",
+    "notUploaded": "Upload not completed",
+    "owner": "Uploaded by",
+    "unknown": "Not recorded",
+    "linked": "Linked records",
+    "noLinks": "No active linked records.",
+    "trashTitle": "Move this file to trash?",
+    "trashHint": "The file can be restored from trash. Its linked records stay.",
+    "deleted": "This file is in trash. Open trash to restore it.",
+    "pending": "Content is still uploading. Preview and download become available when the upload finishes."
   }
 }

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { ArrowLeftIcon, CheckIcon, ClipboardCheckIcon, MapPinIcon, PackageIcon, TrophyIcon, SparklesIcon, XIcon } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
+import { internalOrigin } from "@/lib/record-navigation";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,9 @@ type Props = {
 export function StocktakeScreen({ items, images = {}, onChanged, onSave = saveStockCount, onReload = (item) => fetchStock({ productId: item.productId, placeId: item.placeId }) }: Props) {
   const { t } = useTranslation("inventory");
   const locale = currentLocale();
+  const location = useLocation();
+  const origin = internalOrigin(new URLSearchParams(location.search).get("from"));
+  const returnTo = origin && origin !== `${location.pathname}${location.search}` ? origin : "/inventory";
   const [placeId, setPlaceId] = React.useState("all");
   const [started, setStarted] = React.useState(false);
   const [queue, setQueue] = React.useState<Entry[]>([]);
@@ -93,7 +97,7 @@ export function StocktakeScreen({ items, images = {}, onChanged, onSave = saveSt
   return <main className="fixed inset-0 z-[100] flex flex-col overflow-y-auto bg-background text-foreground" aria-label={t("count.title")}>
     <header className="sticky top-0 z-10 flex shrink-0 items-center justify-between gap-3 border-b bg-background/95 px-4 py-3 backdrop-blur sm:px-8">
       <div className="flex items-center gap-2 text-sm font-semibold"><ClipboardCheckIcon className="size-5 text-primary" />{t("count.title")}</div>
-      <Button asChild variant="ghost" size="sm" disabled={saving}><Link to="/inventory" aria-disabled={saving} onClick={(event) => { if (saving) event.preventDefault(); }}><XIcon />{t("count.stop")}</Link></Button>
+      <Button asChild variant="ghost" size="sm" disabled={saving}><Link to={returnTo} aria-disabled={saving} onClick={(event) => { if (saving) event.preventDefault(); }}><XIcon />{t("count.stop")}</Link></Button>
     </header>
     <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center gap-6 px-4 py-6 sm:px-8 sm:py-10">
       {!started ? <>
@@ -112,7 +116,7 @@ export function StocktakeScreen({ items, images = {}, onChanged, onSave = saveSt
         <div className="grid grid-cols-3 gap-2 text-center">{[[counted, "count.counted"], [changed, "count.changed"], [skipped, "count.skipped"]].map(([value, label]) => <div key={label} className="rounded-2xl border bg-card p-4"><p className="text-3xl font-bold tabular-nums">{value}</p><p className="text-xs text-muted-foreground">{t(String(label))}</p></div>)}</div>
         <p className="text-center text-xs text-muted-foreground">{t("count.savedImmediately")}</p>
         {skipped > 0 && <Button variant="outline" onClick={() => { setQueue(queue.filter((entry) => answers[entry.id] && "skipped" in answers[entry.id]!)); setAnswers({}); setIndex(0); setDraft(""); }}>{t("count.retrySkipped")}</Button>}
-        <Button asChild className="h-12"><Link to="/inventory"><CheckIcon />{t("count.back")}</Link></Button>
+        <Button asChild className="h-12"><Link to={returnTo}><CheckIcon />{origin ? t("count.returnToRecord") : t("count.back")}</Link></Button>
       </> : current && <>
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-2"><p role="status" className="text-sm font-medium">{t("count.progress", { current: index + 1, total: queue.length })}</p><span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">{percent}%</span></div>

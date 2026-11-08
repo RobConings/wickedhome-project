@@ -263,3 +263,6 @@ export function uniqueName(name: string, taken: Iterable<string>): string {
     if (!lower.has(candidate.toLowerCase())) return candidate;
   }
 }
+
+export type DocumentOwnerLink = DocumentLinkRef & { name: string; href: string };
+export type DocumentDetail = { file: DocumentFile; folder: FolderCrumb | null; links: DocumentOwnerLink[] };

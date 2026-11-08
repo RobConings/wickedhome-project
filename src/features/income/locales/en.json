@@ -176,5 +176,26 @@
     "expected": "Expected",
     "received": "Received",
     "sources": "Recurring sources"
+  },
+  "detail": {
+    "receipt": "Recorded income",
+    "voucherHint": "Meal vouchers add to the voucher balance. They are excluded from bank money totals.",
+    "moneyHint": "A future date stays expected until that date.",
+    "period": "Planned period",
+    "source": "Recurring source",
+    "noAccount": "No account selected",
+    "schedule": "Schedule",
+    "amountMode": "Amount type",
+    "starts": "Starts",
+    "ends": "Ends",
+    "noEnd": "No end date",
+    "notRecorded": "Not recorded",
+    "history_one": "{{count}} recorded receipt",
+    "history_other": "{{count}} recorded receipts",
+    "noReceipts": "No receipts recorded for this source.",
+    "pagination": "Receipt history pages",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} of {{pages}}"
   }
 }

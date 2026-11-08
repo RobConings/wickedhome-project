@@ -24,6 +24,16 @@ export type LedgerType = (typeof LEDGER_TYPES)[number];
 /** Where a ledger line comes from: a stored entry, a paid joint expense or a recorded income. */
 export type LedgerSource = "entry" | "expense" | "income";
 
+/** Read-only ownership of the existing expense's account effect; never a new ledger entry. */
+export type ExpenseAccountEffect = {
+  expenseId: string;
+  status: "unpaid" | "outsideJoint" | "noAccount" | "outsideHistory" | "posted" | "scheduled";
+  account: { id: string; name: string } | null;
+  month: string | null;
+  amountCents: number | null;
+  lineKey: string | null;
+};
+
 export const ACCOUNT_COLORS = ["#124734", "#2563eb", "#7c3aed", "#db2777", "#ea580c", "#0d9488", "#ca8a04", "#475569"] as const;
 
 /** Largest amount accepted: € 10 000 000. */

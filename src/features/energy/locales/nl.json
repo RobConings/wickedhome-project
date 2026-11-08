@@ -407,5 +407,52 @@
     "carrier": "{{carrier}} laden…",
     "error": "De energiecijfers konden niet geladen worden.",
     "appliances": "Toestellen laden…"
+  },
+  "network": {
+    "title": "Energie door je huis",
+    "description": "Geregistreerde energie voor de gekozen periode, in kWh. Dit is geen livevermogen.",
+    "home": "Verbruik in huis",
+    "recorded": "Voor deze periode",
+    "unknown": "Onbekend",
+    "sources": "Bronnen en dekking",
+    "coverageHint": "Deze aantallen tonen tijdvakken met meetwaarden. Een tijdvak kan maar deels gemeten zijn; ontbrekende kanalen blijven onbekend.",
+    "coverage": "{{count}} van {{total}} tijdvakken",
+    "manageBranches": "Toestellen en metertakken beheren"
+  },
+  "hierarchy": {
+    "parent": "Inbegrepen in deze metertak",
+    "parentHint": "De bovenliggende meter bevat dit toestel al. Tel het verbruik niet nogmaals op.",
+    "independent": "Onafhankelijke tak",
+    "description": "Submeters zitten in hun bovenliggende meter. Overig is het niet-toegewezen deel op elk niveau; ontbrekende of tegenstrijdige metingen blijven onbekend.",
+    "other": "Overig · niet toegewezen",
+    "knownSubtotal": "Bekend subtotaal van submeters: {{amount}}",
+    "excess": "Inbegrepen meetwaarden overschrijden de bovenliggende meter met {{amount}}. Controleer bronnen en dekking.",
+    "noBranches": "Geen toesteltakken ingesteld voor deze energiedrager.",
+    "errors": {
+      "unknownParent": "Kies een bovenliggende meter uit dit huishouden.",
+      "meterCycle": "Een metertak kan zichzelf of een bovenliggende tak niet bevatten.",
+      "parentCarrierMismatch": "De bovenliggende meter moet alle energiedragers van zijn onderliggende toestellen bevatten."
+    }
+  },
+  "detail": {
+    "title": "Toesteldetails",
+    "device": "Fysiek apparaat",
+    "notRecorded": "Niet geregistreerd",
+    "children": "Inbegrepen submeters",
+    "noChildren": "Geen inbegrepen submeters.",
+    "openEnergy": "Energiestroom bekijken"
+  },
+  "sourceRecord": {
+    "meter": "Meterbron",
+    "ean": "EAN",
+    "statistic": "Home Assistant-statistiek",
+    "mapping": "Bronkoppeling beheren",
+    "readingCount_one": "{{count}} opgeslagen meterstand",
+    "readingCount_other": "{{count}} opgeslagen meterstanden",
+    "pagination": "Pagina’s meterstandgeschiedenis",
+    "previous": "Vorige",
+    "next": "Volgende",
+    "pageOf": "Pagina {{page}} van {{pages}}",
+    "configurationHint": "De installatie beschrijft de capaciteit. Alleen gekoppelde gemeten kanalen leveren vastgelegd energieverbruik."
   }
 }

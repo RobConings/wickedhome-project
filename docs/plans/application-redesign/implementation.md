@@ -1,5 +1,7 @@
 # Local redesign implementation — partial rollout
 
+**Active continuation:** baseline `2dda61a`; see the [follow-up implementation and validation ledger](followup-implementation-2026-11-08.md) for newly implemented energy, history, account, product and record-owner work and fresh check status. Earlier checkpoint counts below remain historical evidence.
+
 ## Product and recurring workspace continuation — 8 November 2026
 
 The first product workspace has now received local TypeScript, lint, unit, database, build and browser validation. This continuation also implements a dedicated recurring-expense workspace: Details contains the real schedule, payer/payment information, QR and management; Payments & history contains the existing owner-supplied occurrences, with a direct next-payment link. Editing, repayment, pause/resume/end, deletion and individual expense navigation remain available. Rejected status changes no longer show a success toast; paused schedules no longer say they have ended. Expense/history/alternative links preserve their origin through `RecordLink`.

@@ -1,8 +1,9 @@
+import { energyDistribution } from "@/features/energy/types/energy-distribution";
 import { z } from "zod";
 import { APPLIANCE_CATEGORIES, READING_METERS, readingMeterCarrier, type ReadingMeter } from "@/features/energy/types/energy";
 import { HOUSEHOLD_TIME_ZONE, todayIn } from "@/types/dates";
 import { formatDateTime } from "@/types/date-format";
-import { createAppliance, createReading, deleteAppliance, deleteReading, getEnergyData, getEnergySetup, getEnergySummary, listAppliances, updateAppliance } from "@/api/energy/energy.service";
+import { createAppliance, createReading, deleteAppliance, deleteReading, getAppliance, getEnergyData, getEnergyMeterDetail, getEnergySetup, getEnergySummary, listAppliances, updateAppliance } from "@/api/energy/energy.service";
 import { HA_ENERGY_JOB_ID } from "@/api/home-assistant/home-assistant.jobs";
 import { getEnergyOverview } from "@/api/home-assistant/ha-energy";
 import { isHaHousehold } from "@/api/home-assistant/ha-connection";
@@ -65,6 +66,8 @@ registerAssistantTool({
       consumptionKwh: kwh(totals.consumptionWh),
       gasM3: totals.volumeLitres === null ? null : round(totals.volumeLitres / 1000),
       selfSufficiencyPercent: percent(totals.selfSufficiency),
+      meterBranches: breakdown.distributions?.map((part) => ({ carrier: part.carrier, ...energyDistribution(part.totalWh, part.readings) })),
+      sourceCoverage: status.channels,
       topAppliances: breakdown.appliances.slice(0, 5).map((share) => `${share.name} ${kwh(share.energyWh)} kWh`),
       peak: input.carrier === "electricity" ? { month: peak.month, kw: peak.kw, billedKw: peak.billedKw } : null,
     };
@@ -206,6 +209,20 @@ registerAssistantTool({
 // ── Appliances ──────────────────────────────────────────────────────────────────────────────────────
 
 registerAssistantTool({
+  name: "energy.appliance",
+  description: "One appliance's recorded configuration, physical device, included parent/sub-meters, source coverage and owner workspace. No inferred controls or expense.",
+  input: z.object({ appliance: entityRef("appliance") }),
+  permission: "read",
+  confirm: "never",
+  activity: { en: "Opened an appliance", nl: "Toestel geopend" },
+  run: async (ctx, input) => {
+    const [appliance, appliances, data] = await Promise.all([getAppliance(ctx.householdId, input.appliance.id), listAppliances(ctx.householdId), getEnergyData(ctx.householdId)]);
+    return { appliance, children: appliances.filter((row) => row.parentApplianceId === appliance.id).map(({ id, name }) => ({ id, name })),
+      meters: data.meters.filter((meter) => meter.applianceId === appliance.id), url: `/energy/appliances/${encodeURIComponent(appliance.id)}` };
+  },
+});
+
+registerAssistantTool({
   name: "energy.appliances",
   description: "Appliances (fridge, washing machine, heat pump…) with their room, category, power and whether a meter measures them.",
   input: z.object({ room: entityRef("place").optional() }),
@@ -230,6 +247,7 @@ registerAssistantTool({
 });
 
 const applianceFields = {
+  parent: entityRef("appliance", "Meter branch that already includes this appliance; null makes it independent").nullable().optional(),
   category: z.enum(APPLIANCE_CATEGORIES).optional(),
   room: entityRef("place").optional(),
   carriers: z.array(z.enum(["electricity", "gas"])).min(1).max(2).optional(),
@@ -240,15 +258,16 @@ const applianceFields = {
 
 registerAssistantTool({
   name: "energy.save_appliance",
-  description: "Add an appliance (name + category), or change one (appliance + the fields to change: name, room, category, power).",
+  description: "Add an appliance (name + category), or change one (appliance + the fields to change: name, room, category, power, included parent branch or parent:null for an independent branch).",
   input: z.object({ appliance: entityRef("appliance").optional().describe("Existing appliance to change"), name: z.string().trim().min(1).max(80).optional(), ...applianceFields }),
   permission: "write",
   confirm: "always",
   activity: { en: "Saved an appliance", nl: "Toestel bewaard" },
   describe: (ctx, input) =>
-    input.appliance
+    (input.appliance
       ? say(ctx.locale, `Change the appliance ${input.appliance.name}`, `Het toestel ${input.appliance.name} aanpassen`)
-      : say(ctx.locale, `Add the appliance “${input.name ?? "?"}”${input.room ? ` in ${input.room.name}` : ""}`, `Het toestel “${input.name ?? "?"}” toevoegen${input.room ? ` in ${input.room.name}` : ""}`),
+      : say(ctx.locale, `Add the appliance “${input.name ?? "?"}”${input.room ? ` in ${input.room.name}` : ""}`, `Het toestel “${input.name ?? "?"}” toevoegen${input.room ? ` in ${input.room.name}` : ""}`))
+      + (input.parent === undefined ? "" : input.parent === null ? say(ctx.locale, " as an independent meter branch", " als onafhankelijke metertak") : say(ctx.locale, ` included in ${input.parent.name}`, ` inbegrepen in ${input.parent.name}`)),
   run: async (ctx, input) => {
     const current = input.appliance ? (await listAppliances(ctx.householdId)).find((appliance) => appliance.id === input.appliance!.id) : undefined;
     const name = input.name ?? current?.name;
@@ -262,6 +281,7 @@ registerAssistantTool({
       ratedPowerW: input.ratedPowerW ?? current?.ratedPowerW ?? null,
       standbyPowerW: input.standbyPowerW ?? current?.standbyPowerW ?? null,
       notes: input.notes ?? current?.notes ?? null,
+      ...(input.parent !== undefined ? { parentApplianceId: input.parent?.id ?? null } : {}),
     };
     const saved = current ? await updateAppliance(ctx.householdId, current.id, data) : await createAppliance(ctx.householdId, data);
     return done(`${current ? "Saved" : "Added"} ${saved.name}${saved.place ? ` (${saved.place.name})` : ""}.`, { id: saved.id });
@@ -288,4 +308,13 @@ registerScreenContext({
   kind: "energy",
   skills: ["energy"],
   describe: (ctx) => ({ label: say(ctx.locale, "Energy", "Energie"), summary: "the energy pages (usage, meter readings, appliances)" }),
+});
+
+registerAssistantTool({
+  name: "energy.meter",
+  description: "Inspect an energy source channel by exact ID, recorded equipment links, measured interval coverage and a bounded page of complete manual reading history. Does not change measurements.",
+  input: z.object({ id: z.string().min(1).max(100), page: z.number().int().min(1).max(100000).optional() }),
+  permission: "read", confirm: "never",
+  activity: { en: "Viewed energy source", nl: "Energiebron bekeken" },
+  run: async (ctx, input) => ({ ...await getEnergyMeterDetail(ctx.householdId, input.id, input.page ?? 1), url: `/energy/meters/${encodeURIComponent(input.id)}` }),
 });

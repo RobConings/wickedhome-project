@@ -100,5 +100,11 @@
     "invalidPhone": "Geef een geldig telefoonnummer in.",
     "duplicateValue": "Deze staat al in de lijst.",
     "unknownShop": "Deze winkel bestaat niet meer."
+  },
+  "detail": {
+    "about": "Contactgegevens",
+    "notRecorded": "Niet vastgelegd",
+    "noProjects": "Nog geen projecten gekoppeld.",
+    "projectsHint": "Open een project om de rol of projectkoppeling te beheren."
   }
 }

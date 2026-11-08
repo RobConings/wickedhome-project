@@ -1,5 +1,5 @@
 import i18n from "i18next";
-import type { ActionFunctionArgs, ShouldRevalidateFunctionArgs } from "react-router";
+import { redirect, type LoaderFunctionArgs, type ActionFunctionArgs, type ShouldRevalidateFunctionArgs } from "react-router";
 import { fetchShops, fetchShopGroups, type Shop, type SavedShopGroup } from "@/features/shops";
 import { ApiRequestError } from "@/lib/api-client";
 import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
@@ -25,6 +25,8 @@ import {
   deleteShoppingList,
   deleteStaple,
   fetchProducts,
+  fetchShoppingItem,
+  deleteShoppingItem,
   fetchShoppingOverview,
   linkProductAlternative,
   unlinkProductAlternative,
@@ -171,7 +173,7 @@ export async function shoppingAction({ request }: ActionFunctionArgs): Promise<S
         return { formError: i18n.t("shopping:errors.generic"), intent };
     }
   } catch (error) {
-    if (error instanceof ApiRequestError && error.status === 404) return { ok: true, intent };
+    if (error instanceof ApiRequestError && error.status === 404 && (intent === "delete-list" || intent === "delete-staple")) return { ok: true, intent };
     return failed(error, intent);
   }
 }
@@ -210,4 +212,22 @@ export async function productsAction({ request }: ActionFunctionArgs): Promise<S
   } catch (error) {
     return failed(error, intent);
   }
+}
+
+export async function shoppingItemLoader({ params }: LoaderFunctionArgs) {
+  try {
+    const [item, products, shops] = await Promise.all([fetchShoppingItem(params.itemId!), fetchProducts(), fetchShops()]);
+    return { item, products, shops };
+  } catch (error) {
+    if (error instanceof ApiRequestError && error.status === 404) throw new Response(null, { status: 404 });
+    throw error;
+  }
+}
+export async function shoppingItemAction(args: ActionFunctionArgs) {
+  const form = await args.request.clone().formData();
+  if (form.get("intent") === "delete-item") {
+    try { await deleteShoppingItem(String(form.get("id") ?? "")); return redirect("/shopping"); }
+    catch (error) { return failed(error, "delete-item"); }
+  }
+  return shoppingAction(args);
 }

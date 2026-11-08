@@ -10,3 +10,6 @@ export { fetchContact, fetchContacts } from "./data/contacts-requests";
 export { useContactSelections } from "./data/use-contact-selections";
 export { ContactsScreen } from "./screens/contacts-screen";
 export { canManageContacts, contactSubtitle, mailtoHref, telHref, type Contact, type ContactProjectLink } from "./types/contacts";
+
+export { contactDetailLoader, contactDetailAction } from "./data/contacts-loaders";
+export { ContactDetailScreen } from "./screens/contact-detail-screen";

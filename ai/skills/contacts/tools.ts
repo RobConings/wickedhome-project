@@ -87,6 +87,7 @@ registerAssistantTool({
       return {
         ...row(contact, favorites.has(contact.id)),
         id: contact.id,
+        url: `/contacts/${encodeURIComponent(contact.id)}`,
         emails: contact.emails.length > 1 ? contact.emails : null,
         phones: contact.phones.length > 1 ? contact.phones : null,
         address: contact.address,
@@ -238,4 +239,13 @@ registerScreenContext({
   kind: "contacts",
   skills: ["contacts"],
   describe: (ctx) => ({ label: say(ctx.locale, "Contacts", "Contacten"), summary: "the contacts list" }),
+});
+
+registerScreenContext({
+  kind: "contact", skills: ["contacts"],
+  describe: async (ctx, id) => {
+    if (!id) return null;
+    const contact = await getContact(ctx.householdId, id);
+    return { label: contact.name, summary: `contact "${contact.name}", ${[contact.company, contact.trade].filter(Boolean).join(", ")}` };
+  },
 });

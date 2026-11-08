@@ -1,10 +1,12 @@
 # Active implementation continuation — 8 November 2026
 
+**Active continuation:** baseline `2dda61a`; see the [follow-up implementation and validation ledger](followup-implementation-2026-11-08.md) for newly implemented energy, history, account, product and record-owner work and fresh check status. Earlier checkpoint counts below remain historical evidence.
+
 The full rollout is still in progress; do not infer completion from entry-point checks. An intermediate work-in-progress version was pushed to `rework_features`; this does **not** mean it was tested as a whole or deployed to the server. See the [compact Codex session handoff](codex-session-handoff.md) and [feature preservation contract](feature-preservation.md) before continuing.
 
-## Current local continuation
+## Previous reference continuation (now committed in `2dda61a`)
 
-Working branch remains `rework_features`, starting at `24bc574`. The only pre-existing local change was untracked `docs/plans/app-samenhang/`; it is preserved. Changes from this continuation are uncommitted. No deploy, push or production migration.
+The previous reference continuation started at `24bc574` on `rework_features`. The only pre-existing local change was untracked `docs/plans/app-samenhang/`; it is preserved. Those changes were subsequently committed in `2dda61a`; the active follow-up is local. No deploy, push or production migration.
 
 Product compilation/navigation/status/media fixes and a real recurring-expense workspace are implemented. Added `test:finance-integration` and its CI step, plus [the initial product/finance outcome matrix](capability-matrix.md). The two-phone shopping browser test now exercises the floor inspector and product shared-stock origin/preflight, using named controls and visible reconnect results.
 

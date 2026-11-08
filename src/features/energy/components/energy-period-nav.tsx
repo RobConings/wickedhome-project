@@ -50,13 +50,13 @@ export function EnergyPeriodNav({ period, date, today, carrier = "electricity", 
         ))}
       </ScrollRow>
 
-      <div className="flex min-w-0 items-center gap-1">
+      <div className="grid w-full min-w-0 grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] items-center gap-1 sm:flex sm:w-auto">
         <Button asChild variant="ghost" size="icon" aria-label={t("period.previous")}>
           <Link to={href(period, shiftPeriod(period, date, -1))}>
             <ChevronLeftIcon />
           </Link>
         </Button>
-        <p className="relative min-w-40 text-center font-medium tabular-nums first-letter:uppercase" aria-live="polite">
+        <p className="relative min-w-0 text-center sm:min-w-40 font-medium tabular-nums first-letter:uppercase" aria-live="polite">
           {formatPeriod(period, from, to, currentLocale())}
           {pending && (
             <span className="absolute top-1/2 -right-5 flex -translate-y-1/2 animate-appear text-muted-foreground">
@@ -76,7 +76,7 @@ export function EnergyPeriodNav({ period, date, today, carrier = "electricity", 
           </Button>
         )}
         {!isCurrent && (
-          <Button asChild variant="outline" size="sm" className="ml-1">
+          <Button asChild variant="outline" size="sm" className="col-span-3 justify-self-end sm:ml-1">
             <Link to={href(period, periodStart(period, today))}>{t("period.today")}</Link>
           </Button>
         )}

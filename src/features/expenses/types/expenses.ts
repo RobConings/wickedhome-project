@@ -462,6 +462,21 @@ export type RecurringExpenseDetail = {
   history: Expense[];
 };
 
+export const recurringPaymentsQuerySchema = z.object({
+  status: z.enum(["all", "paid", "unpaid"]).default("all"),
+  page: z.coerce.number().int().min(1).max(100000).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(25),
+});
+export type RecurringPaymentsQuery = z.infer<typeof recurringPaymentsQuerySchema>;
+export type RecurringPayments = {
+  recurring: { id: string; payee: string };
+  today: string;
+  items: Expense[];
+  total: number;
+  page: number;
+  pageSize: number;
+};
+
 /** `GET /api/expenses/summary`: what the dashboard shows. */
 export type ExpensesSummary = {
   today: string;

@@ -6,6 +6,7 @@ export { PlaceAppliancesSection } from "./components/place-appliances-section";
 export {
   appliancesAction,
   appliancesLoader,
+  applianceDetailLoader,
   energyImportAction,
   energyImportLoader,
   energyOverviewLoader,
@@ -32,3 +33,9 @@ export {
   type SummaryView,
 } from "./types/energy";
 export type { EnergyPeriod } from "./types/energy-period";
+
+export { ApplianceDetailScreen } from "./screens/appliance-detail-screen";
+
+export { energyMeterLoader, energySourceLoader, energySourceAction } from "./data/energy-loaders";
+export { EnergyMeterScreen } from "./screens/energy-meter-screen";
+export { EnergySourceScreen } from "./screens/energy-source-screen";

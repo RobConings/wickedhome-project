@@ -1,3 +1,4 @@
+import { RecordLink } from "@/components/shared/record-link";
 import * as React from "react";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -47,7 +48,7 @@ function IncomeSourceRow({ source, habitants, accounts, today, canManage }: Omit
     <li className="flex min-h-14 items-center gap-3 py-2">
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="flex items-center gap-2">
-          <span className="truncate text-sm font-medium">{source.name}</span>
+          <RecordLink to={`/income/sources/${encodeURIComponent(source.id)}`} className="break-words text-sm font-medium underline">{source.name}</RecordLink>
           <Badge variant="outline">{t(`kinds.${source.kind}`)}</Badge>
         </span>
         <span className="truncate text-xs text-muted-foreground">{amountText}</span>

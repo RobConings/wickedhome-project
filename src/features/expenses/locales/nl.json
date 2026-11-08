@@ -389,6 +389,16 @@
     "editSchedule": "Schema bewerken",
     "openNextPayment": "Volgende betaling openen",
     "manageSchedule": "Schema beheren",
-    "manageDescription": "Pauzeer, hervat of beëindig deze verplichting. Bestaande betaalde uitgaven blijven in de historiek."
+    "manageDescription": "Pauzeer, hervat of beëindig deze verplichting. Bestaande betaalde uitgaven blijven in de historiek.",
+    "allPayments": "Alle geregistreerde betalingen",
+    "allPaymentsHint": "Alle opgeslagen termijnen en extra aflossingen, ook oudere historiek. Open een betaling om die te bekijken of wijzigen.",
+    "paymentFilters": "Betalingsfilters",
+    "all": "Alles",
+    "paymentCount_one": "{{count}} betaling",
+    "paymentCount_other": "{{count}} betalingen",
+    "pagination": "Betalingspagina’s",
+    "previous": "Vorige",
+    "next": "Volgende",
+    "pageOf": "Pagina {{page}} van {{pages}}"
   }
 }

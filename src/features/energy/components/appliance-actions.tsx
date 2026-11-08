@@ -15,6 +15,7 @@ import { ApplianceFormDialog } from "./appliance-form-dialog";
 
 type ApplianceActionsProps = {
   appliance: Appliance;
+  appliances?: Appliance[];
   /** Places for the edit dialog. */
   places: Place[];
   canManage: boolean;
@@ -24,7 +25,7 @@ type ApplianceActionsProps = {
 };
 
 /** Icon buttons of an appliance: its documents, edit and delete (with a confirmation). */
-export function ApplianceActions({ appliance, places, canManage, documents, className }: ApplianceActionsProps) {
+export function ApplianceActions({ appliance, appliances, places, canManage, documents, className }: ApplianceActionsProps) {
   const { t } = useTranslation("energy");
   const { t: tCommon } = useTranslation();
   const fetcher = useFetcher<EnergyActionResult>({ key: applianceDeleteKey(appliance.id) });
@@ -62,6 +63,7 @@ export function ApplianceActions({ appliance, places, canManage, documents, clas
         <>
           <ApplianceFormDialog
             appliance={appliance}
+            appliances={appliances}
             places={places}
             trigger={
               <Button variant="ghost" size="icon" aria-label={`${tCommon("actions.edit")}: ${appliance.name}`}>

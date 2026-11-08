@@ -1,3 +1,4 @@
+import { RecordLink } from "@/components/shared/record-link";
 import * as React from "react";
 import { GaugeIcon, PlugZapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -87,7 +88,7 @@ export function PlaceAppliancesSection({ placeId, initialData }: PlaceAppliances
                 <ApplianceCategoryIcon category={appliance.category} />
               </span>
               <div className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-sm font-medium">{appliance.name}</span>
+                <RecordLink to={`/energy/appliances/${encodeURIComponent(appliance.id)}`} className="min-h-11 truncate py-2 text-sm font-medium hover:underline">{appliance.name}</RecordLink>
                 <span className="truncate text-xs text-muted-foreground">
                   {[
                     t(`categories.${appliance.category}`),

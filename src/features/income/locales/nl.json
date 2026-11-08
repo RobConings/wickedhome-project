@@ -176,5 +176,26 @@
     "expected": "Verwacht",
     "received": "Ontvangen",
     "sources": "Vaste inkomsten"
+  },
+  "detail": {
+    "receipt": "Vastgelegde inkomsten",
+    "voucherHint": "Maaltijdcheques verhogen het chequesaldo. Ze tellen niet mee als geld op de bank.",
+    "moneyHint": "Een datum in de toekomst blijft verwacht tot die datum.",
+    "period": "Geplande periode",
+    "source": "Terugkerende bron",
+    "noAccount": "Geen rekening geselecteerd",
+    "schedule": "Planning",
+    "amountMode": "Bedragtype",
+    "starts": "Begint",
+    "ends": "Eindigt",
+    "noEnd": "Geen einddatum",
+    "notRecorded": "Niet vastgelegd",
+    "history_one": "{{count}} vastgelegde ontvangst",
+    "history_other": "{{count}} vastgelegde ontvangsten",
+    "noReceipts": "Nog geen ontvangsten vastgelegd voor deze bron.",
+    "pagination": "Pagina’s ontvangstgeschiedenis",
+    "previous": "Vorige",
+    "next": "Volgende",
+    "pageOf": "Pagina {{page}} van {{pages}}"
   }
 }

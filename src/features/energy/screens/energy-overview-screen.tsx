@@ -15,6 +15,7 @@ import { currentLocale } from "@/lib/i18n";
 import { useSamePagePending } from "@/lib/pending";
 import { ApplianceBreakdown } from "../components/appliance-breakdown";
 import { EnergyCarrierTabs } from "../components/energy-carrier-tabs";
+import { EnergyNetwork } from "../components/energy-network";
 import { EnergyFlowChart } from "../components/energy-flow-chart";
 import { formatPeriod } from "../components/energy-format";
 import { EnergyNav } from "../components/energy-nav";
@@ -203,6 +204,7 @@ function EnergyOverviewContent({ summary, setup, canManage, importButton }: Ener
       )}
 
       <EnergyStatTiles summary={summary} totalKwp={totalKwp || undefined} />
+      <EnergyNetwork summary={summary} />
 
       {carrier === "electricity" ? (
         <PageGrid columns="main-sidebar">

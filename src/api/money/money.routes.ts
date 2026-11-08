@@ -33,6 +33,7 @@ import {
   getMoneySummary,
   getMoneyTimeline,
   listJointAccounts,
+  getExpenseAccountEffect,
   recordDirectPayment,
   recordTransfer,
   setBalance,
@@ -60,6 +61,9 @@ moneyRouter.get("/", async (req, res) => {
 
 moneyRouter.get("/summary", async (req, res) => {
   res.json(await getMoneySummary(currentUser(req).householdId));
+});
+moneyRouter.get("/expenses/:id/account-effect", canManage, async (req, res) => {
+  res.json(await getExpenseAccountEffect(currentUser(req).householdId, parse(idSchema, req.params.id)));
 });
 
 moneyRouter.get("/contributions/history", async (req, res) => {

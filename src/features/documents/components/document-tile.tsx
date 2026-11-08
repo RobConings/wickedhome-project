@@ -82,9 +82,9 @@ function FileTile({ file, canManage, onAction }: MenuProps & { file: DocumentFil
       </div>
       <div className="flex items-start gap-1 pl-1">
         <div className="flex min-w-0 flex-1 flex-col">
-          <button type="button" className={overlay} onClick={() => onAction("open", item)} title={file.name}>
+          <Link to={`/documents/files/${encodeURIComponent(file.id)}`} className={overlay} title={file.name}>
             {file.name}
-          </button>
+          </Link>
           <span className="truncate text-xs text-muted-foreground">
             {fileSize(file.sizeBytes)} · {shortDate(fileModified(file))}
           </span>

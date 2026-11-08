@@ -4,6 +4,7 @@ import {
   EXPENSE_CATEGORIES,
   EXPENSE_KINDS,
   RECURRING_STATUSES,
+  recurringPaymentsQuerySchema,
   type Expense,
   type RecurringExpense,
 } from "@/features/expenses/types/expenses";
@@ -18,10 +19,11 @@ import {
   getRecurringExpenseDetail,
   listExpensesBetween,
   listRecurringExpenses,
+  listRecurringPayments,
   listUnpaidExpenses,
 } from "@/api/expenses/expenses.service";
 import { db } from "@/api/lib/db";
-import { badRequest } from "@/api/lib/http";
+import { badRequest, HttpError } from "@/api/lib/http";
 import { getLinkedHolds } from "@/api/tasks/tasks.service";
 import {
   capList,
@@ -63,18 +65,27 @@ registerAssistantSkill({
 
 const LIST_LIMIT = 25;
 
+registerAssistantTool({
+  name: "expenses.payments",
+  description: "Every stored payment of one recurring expense, including older paid occurrences and extra loan repayments. Paginated; status all, paid or unpaid. Reading never records a payment.",
+  input: recurringPaymentsQuerySchema.extend({ recurring: entityRef("recurring_expense") }),
+  permission: "read",
+  confirm: "never",
+  activity: { en: "Opened recurring payment history", nl: "Historiek van terugkerende betalingen geopend" },
+  run: (ctx, input) => listRecurringPayments(ctx.householdId, input.recurring.id, input),
+});
+
 registerEntityResolver({
   type: "recurring_expense",
   label: "recurring payment",
   skill: "expenses",
   list: async (ctx) =>
     (await listRecurringExpenses(ctx.householdId))
-      .filter((expense) => expense.status !== "ended")
       .map((expense) => ({
         id: expense.id,
         name: expense.description ? `${expense.payee} – ${expense.description}` : expense.payee,
         aliases: [expense.payee, ...(expense.description ? [expense.description] : [])],
-        hint: `${money(expense.amountCents)}${expense.status === "paused" ? ", paused" : ""}`,
+        hint: `${money(expense.amountCents)}${expense.status !== "active" ? `, ${expense.status}` : ""}`,
       })),
 });
 
@@ -85,7 +96,10 @@ registerEntityResolver({
   type: "expense",
   label: "expense",
   skill: "expenses",
-  search: async (ctx) => {
+  search: async (ctx, query) => {
+    // Explicit IDs returned by history remain usable beyond the named-date search window.
+    try { return expenseCandidates([(await getExpenseDetail(ctx.householdId, query)).expense]); }
+    catch (error) { if (!(error instanceof HttpError) || error.status !== 404) throw error; }
     const today = todayIn();
     const [unpaid, recent] = await Promise.all([
       listUnpaidExpenses(ctx.householdId, addDays(today, NAMED_DAYS)),

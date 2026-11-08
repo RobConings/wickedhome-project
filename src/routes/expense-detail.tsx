@@ -6,6 +6,7 @@ import { ExpenseDetailScreen, canManageExpenses, expenseDetailLoader, expensesAc
 import { useMailFileNote } from "@/features/integrations";
 import { ProjectFormField } from "@/features/projects";
 import { LinkedTaskPanel, fetchLinkedHolds } from "@/features/tasks";
+import { ExpenseAccountPanel } from "@/features/money";
 import { screenHandle } from "@/lib/screen-context";
 
 /** The expense, plus whether its pay task is on hold (a missing answer only hides the hold). */
@@ -33,6 +34,7 @@ export function Component() {
       canManage={canManageExpenses(user.role)}
       currentHabitantId={user.habitantId}
       onHold={onHold}
+      accountEffect={canManageExpenses(user.role) && <ExpenseAccountPanel key={expenseId} expenseId={expenseId} />}
       projectField={({ defaultValue }) => <ProjectFormField defaultValue={defaultValue} />}
       linkedTask={
         // The pay task follows the expense (and the other way round): its status, who pays, on hold,

@@ -541,5 +541,18 @@
   },
   "navigation": {
     "label": "Shopping views"
+  },
+  "need": {
+    "open": "Open shopping need",
+    "title": "Shopping need",
+    "quantity": "Quantity to buy",
+    "reasons": "Why it is on the list",
+    "product": "Product and stock",
+    "list": "Open list",
+    "purchases": "Actual purchases for this need",
+    "purchasesHint": "A need is a plan. Purchases and their recorded stock effects remain separate facts.",
+    "removeTitle": "Remove this buying position?",
+    "removeHint": "All linked reasons for this position are removed from the shopping list. Recorded purchases and stock remain.",
+    "notRecorded": "Not recorded"
   }
 }

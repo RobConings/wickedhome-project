@@ -9,5 +9,7 @@
   "noProjects": "No projects linked through this product’s requirements.",
   "loadError": "Related product information could not be loaded.",
   "retry": "Try again",
-  "viewPurchases": "View this product's purchases"
+  "viewPurchases": "View this product's purchases",
+  "recipes": "Used in recipes",
+  "noRecipes": "No recipes have this product or a shared-stock alternative linked as an ingredient."
 }

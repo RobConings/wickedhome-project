@@ -26,6 +26,7 @@ import {
   emptyTrash,
   getContents,
   getFile,
+  getDocumentDetail,
   getUsage,
   listFolders,
   listLinkedFiles,
@@ -135,6 +136,10 @@ documentsRouter.post("/folders/:id/restore", canManage, async (req, res) => {
 documentsRouter.post("/files", canManage, async (req, res) => {
   const input = parse(fileCreateSchema, req.body);
   res.status(201).json(await createFile(currentUser(req), input));
+});
+
+documentsRouter.get("/files/:id/detail", async (req, res) => {
+  res.json(await getDocumentDetail(currentUser(req).householdId, parse(idSchema, req.params.id)));
 });
 
 documentsRouter.get("/files/:id", async (req, res) => {

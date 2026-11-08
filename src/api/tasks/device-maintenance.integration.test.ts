@@ -42,3 +42,19 @@ it("device maintenance uses real recurring tasks, isolated references, durable h
   assert.equal(retained.task.device, null);
   assert.equal(retained.history.length, 1);
 });
+
+it("person workspace keeps full assigned task history, isolates households and preserves completion permissions", { skip: !enabled }, async (t) => {
+  const f = await fixture(t);
+  const foreign = await fixture(t);
+  const person = await db.habitant.create({ data: { householdId: f.home.id, name: "Household child", type: "CHILD", color: "#c2508a" } });
+  const assigned = await createTask(f.home.id, taskInputSchema.parse({ title: "Assigned chore", assigneeIds: [person.id] }));
+  const historical = await createTask(f.home.id, taskInputSchema.parse({ title: "Old assigned chore", assigneeIds: [person.id] }));
+  await db.task.update({ where: { id: historical.id }, data: { status: "DONE", closedAt: new Date("2020-01-01") } });
+  await createTask(f.home.id, taskInputSchema.parse({ title: "Unassigned chore" }));
+  const rows = (await getTasksOverview(f.user, { assigneeId: person.id })).tasks;
+  assert.deepEqual(new Set(rows.map((row) => row.id)), new Set([assigned.id, historical.id]));
+  assert.equal((await getTasksOverview(foreign.user, { assigneeId: person.id })).tasks.length, 0);
+  await assert.rejects(completeTask({ ...f.user, role: "child", habitantId: null }, assigned.id, { force: false }), /Only tasks assigned/);
+  await completeTask({ ...f.user, role: "child", habitantId: person.id }, assigned.id, { force: false });
+  assert.equal((await getTaskDetail(f.user, assigned.id)).history[0]!.completedById, person.id);
+});

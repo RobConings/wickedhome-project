@@ -407,5 +407,52 @@
     "carrier": "Loading {{carrier}}…",
     "error": "The energy figures could not be loaded.",
     "appliances": "Loading appliances…"
+  },
+  "network": {
+    "title": "Energy through your home",
+    "description": "Recorded energy for the selected period, in kWh. This is not live power.",
+    "home": "Home consumption",
+    "recorded": "For this period",
+    "unknown": "Unknown",
+    "sources": "Sources & coverage",
+    "coverageHint": "These counts show time buckets containing readings. A bucket can be only partly measured; missing channels stay unknown.",
+    "coverage": "{{count}} of {{total}} time buckets",
+    "manageBranches": "Manage appliances and meter branches"
+  },
+  "hierarchy": {
+    "parent": "Included in this meter branch",
+    "parentHint": "The parent reading already includes this appliance. It must not be added a second time.",
+    "independent": "Independent branch",
+    "description": "Sub-meters are included in their parent. Other is the unassigned residual at each level; missing or inconsistent readings stay unknown.",
+    "other": "Other · unassigned",
+    "knownSubtotal": "Known sub-meter subtotal: {{amount}}",
+    "excess": "Included readings exceed their parent by {{amount}}. Review sources and coverage.",
+    "noBranches": "No appliance branches configured for this carrier.",
+    "errors": {
+      "unknownParent": "Choose a parent from this household.",
+      "meterCycle": "A meter branch cannot contain itself or one of its ancestors.",
+      "parentCarrierMismatch": "The parent must include every energy carrier used by its children."
+    }
+  },
+  "detail": {
+    "title": "Appliance details",
+    "device": "Physical device",
+    "notRecorded": "Not recorded",
+    "children": "Included sub-meters",
+    "noChildren": "No included sub-meters.",
+    "openEnergy": "View energy flow"
+  },
+  "sourceRecord": {
+    "meter": "Meter source",
+    "ean": "EAN",
+    "statistic": "Home Assistant statistic",
+    "mapping": "Manage source mapping",
+    "readingCount_one": "{{count}} stored reading",
+    "readingCount_other": "{{count}} stored readings",
+    "pagination": "Reading history pages",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} of {{pages}}",
+    "configurationHint": "Installed equipment describes capacity. Only linked measured channels supply recorded energy."
   }
 }

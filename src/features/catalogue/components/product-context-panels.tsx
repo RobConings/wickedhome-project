@@ -1,4 +1,4 @@
-import { FolderKanbanIcon, ListChecksIcon, ReceiptTextIcon, ShoppingCartIcon } from "lucide-react";
+import { BookOpenIcon, FolderKanbanIcon, ListChecksIcon, ReceiptTextIcon, ShoppingCartIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardTitle } from "@/components/shared/card";
 import { IconChip } from "@/components/shared/icon-chip";
@@ -32,7 +32,7 @@ export function ProductContextPanels({ productId, initial }: { productId: string
           <ul className="divide-y">{data.needs.map((need) => (
             <li key={need.id}>
               <RecordLink className="flex min-h-11 items-center justify-between gap-3 rounded-lg p-2 text-sm hover:bg-accent"
-                to={`/shopping?productId=${productFilter}`}>
+                to={`/shopping/items/${encodeURIComponent(need.id)}`}>
                 <span>{need.name}</span>
                 <span className="shrink-0 text-muted-foreground">{need.quantity} {need.unit}</span>
               </RecordLink>
@@ -59,6 +59,14 @@ export function ProductContextPanels({ productId, initial }: { productId: string
         <div className="flex items-center gap-2"><IconChip icon={ReceiptTextIcon} tone="finance" size="sm" /><CardTitle>{t("purchases")}</CardTitle></div>
         <RecordLink className="inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-medium underline-offset-4 hover:underline"
           to={`/purchases?productId=${productFilter}`}>{t("viewPurchases")}</RecordLink>
+      </Card>
+      <Card id="product-recipes" className="scroll-mt-20">
+        <div className="flex items-center gap-2"><IconChip icon={BookOpenIcon} tone="home" size="sm" /><CardTitle>{t("recipes")} ({data.recipes.length})</CardTitle></div>
+        {data.recipes.length ? <ul className="divide-y">{data.recipes.map((recipe) => (
+          <li key={recipe.id}><RecordLink to={`/recipes/${encodeURIComponent(recipe.id)}`} className="flex min-h-11 items-center gap-3 rounded-lg py-2 text-sm hover:bg-accent">
+            <RecordImage src={recipe.imageUrl} shape="avatar" fallback={<BookOpenIcon className="size-5" />} /><span className="min-w-0 break-words">{recipe.name}</span>
+          </RecordLink></li>
+        ))}</ul> : <p className="text-sm text-muted-foreground">{t("noRecipes")}</p>}
       </Card>
     </PageGrid>
   );

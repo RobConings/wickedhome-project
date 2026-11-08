@@ -17,6 +17,8 @@ import {
   type RecurringExpenseDetail,
   type RecurringExpenseInput,
   type RecurringStatusInput,
+  type RecurringPayments,
+  type RecurringPaymentsQuery,
 } from "@/features/expenses/types/expenses";
 import { normalizeIban, normalizeStructuredCommunication } from "@/features/expenses/types/payment-references";
 import { baseRuleOf, planTotalOpen, scaleShares, withUntil } from "@/features/expenses/types/total-open";
@@ -222,6 +224,21 @@ export async function getRecurringExpenseDetail(householdId: string, id: string)
     upcoming: upcomingRows.map((expense) => toExpense(expense, now)),
     history: historyRows.map((expense) => toExpense(expense, now)),
   };
+}
+
+/** Full stored history, including extra loan repayments and occurrences older than the overview window. */
+export async function listRecurringPayments(householdId: string, id: string, query: RecurringPaymentsQuery): Promise<RecurringPayments> {
+  const recurring = await findOwnRecurring(householdId, id);
+  const now = today();
+  await topUpRecurring(householdId, now);
+  const where: Prisma.ExpenseWhereInput = { householdId, OR: [{ recurringExpenseId: id }, { earlyRepaymentForId: id }],
+    ...(query.status === "paid" ? { paidOn: { not: null } } : query.status === "unpaid" ? { paidOn: null } : {}) };
+  return db.$transaction(async (tx) => {
+    const total = await tx.expense.count({ where });
+    const page = Math.min(query.page, Math.max(1, Math.ceil(total / query.pageSize)));
+    const rows = await tx.expense.findMany({ where, include: expenseInclude, orderBy: [{ dueDate: "desc" }, { id: "desc" }], skip: (page - 1) * query.pageSize, take: query.pageSize });
+    return { recurring: { id: recurring.id, payee: recurring.payee }, today: now, items: rows.map((row) => toExpense(row, now)), total, page, pageSize: query.pageSize };
+  }, { isolationLevel: "RepeatableRead" });
 }
 
 /** The recurring expense a subscription was migrated to (old `/subscriptions/:id` links), or `null`. */

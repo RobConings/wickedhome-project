@@ -11,6 +11,8 @@ import type {
   RecurringExpenseDetail,
   RecurringExpenseInput,
   RecurringStatusInput,
+  RecurringPayments,
+  RecurringPaymentsQuery,
 } from "../types/expenses";
 
 const expensePath = (id: string) => `/expenses/${encodeURIComponent(id)}`;
@@ -22,6 +24,8 @@ export const fetchExpensesSummary = () => api.get<ExpensesSummary>("/expenses/su
 export const fetchUnpaidExpenses = () => api.get<Expense[]>("/expenses/unpaid");
 export const fetchExpenseDetail = (id: string) => api.get<ExpenseDetail>(expensePath(id));
 export const fetchRecurringExpenseDetail = (id: string) => api.get<RecurringExpenseDetail>(recurringPath(id));
+export const fetchRecurringPayments = (id: string, query: RecurringPaymentsQuery) =>
+  api.get<RecurringPayments>(`${recurringPath(id)}/payments?${new URLSearchParams({ status: query.status, page: String(query.page), pageSize: String(query.pageSize) })}`);
 export const fetchRecurringForSubscription = (subscriptionId: string) =>
   api.get<{ id: string }>(`/expenses/recurring/by-subscription/${encodeURIComponent(subscriptionId)}`);
 

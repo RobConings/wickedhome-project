@@ -1,6 +1,6 @@
 import * as React from "react";
 import {
-  BarcodeIcon, BoxesIcon, HistoryIcon, LinkIcon, PackageIcon,
+  BarcodeIcon, BoxesIcon, ExternalLinkIcon, HistoryIcon, LinkIcon, PackageIcon,
   PencilIcon, PlusIcon, QrCodeIcon, ShoppingCartIcon, StoreIcon, TagIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -36,6 +36,7 @@ type ProductStockScreenProps = {
   data: ProductStockPageData;
   canManage: boolean;
   context?: React.ReactNode;
+  attachments?: React.ReactNode;
   initialSelections?: { products?: UseSelectionsOptions["initial"]; places?: UseSelectionsOptions["initial"]; shops?: UseSelectionsOptions["initial"] };
 };
 
@@ -46,7 +47,7 @@ const productPath = (id: string) => `/inventory/products/${encodeURIComponent(id
  * No stock/history/API contracts change; existing location records remain editable in Advanced stock.
  * The shared Details/Overview grammar leaves each owning feature free to compose its own content.
  */
-export function ProductStockScreen({ data, canManage, initialSelections, context }: ProductStockScreenProps) {
+export function ProductStockScreen({ data, canManage, initialSelections, context, attachments }: ProductStockScreenProps) {
   const { t } = useTranslation("inventory");
   const { t: tCommon } = useTranslation();
   const { t: tShopping } = useTranslation("shopping");
@@ -154,7 +155,9 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
         onClick={() => void addToShopping()}
         menu={
           <>
-            {canManage ? <DropdownMenuItem onSelect={openAdjust}><BoxesIcon />{t("workspace.adjustStock")}</DropdownMenuItem> : <DropdownMenuItem onSelect={() => navigate("/inventory/scan")}><BoxesIcon />{t("actions.scan")}</DropdownMenuItem>}
+            {canManage && <DropdownMenuItem onSelect={openAdjust}><BoxesIcon />{t("workspace.adjustStock")}</DropdownMenuItem>}
+            <DropdownMenuItem asChild><RecordLink to="/inventory/scan"><BarcodeIcon />{t("actions.scan")}</RecordLink></DropdownMenuItem>
+            {canManage && <DropdownMenuItem asChild><RecordLink to={`/inventory/count?productId=${encodeURIComponent(product.id)}`}><BoxesIcon />{t("count.title")}</RecordLink></DropdownMenuItem>}
             {canManage && <DropdownMenuItem onSelect={showStockManagement}><HistoryIcon />{t("workspace.stockSettings")}</DropdownMenuItem>}
           </>
         }
@@ -280,16 +283,19 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
         overview={
           <div className="flex min-w-0 flex-col gap-4">
             {context}
+            {attachments && <section id="product-documents" className="scroll-mt-20">{attachments}</section>}
             <div className="grid gap-4 lg:grid-cols-2">
               <Card>
                 <div className="flex items-center gap-2"><IconChip icon={StoreIcon} tone="shopping" size="sm" /><CardTitle>{t("workspace.linkedShops")} ({product.shopLinks.length})</CardTitle></div>
                 {product.shopLinks.length ? <ul className="divide-y">
-                  {product.shopLinks.map((link) => <li key={link.id}>
+                  {product.shopLinks.map((link) => <li key={link.id} className="py-1">
                     <RecordLink to={`/shops/${encodeURIComponent(link.shopId)}`}
                       className="flex min-h-11 items-center justify-between gap-3 py-2 text-sm hover:underline">
                       <span className="min-w-0 truncate font-medium">{link.shop.name}</span>
                       <span className="shrink-0 tabular-nums text-muted-foreground">{link.priceCents === null ? "" : formatCurrency(link.priceCents, locale)}</span>
                     </RecordLink>
+                    {link.articleNumber && <p className="break-words text-xs text-muted-foreground">{t("workspace.articleNumber", { number: link.articleNumber })}</p>}
+                    {link.url && /^https?:\/\//i.test(link.url) && <a href={link.url} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 text-sm font-medium underline-offset-4 hover:underline"><ExternalLinkIcon className="size-4 shrink-0" aria-hidden="true" />{t("workspace.openOffer", { shop: link.shop.name })}</a>}
                   </li>)}
                 </ul> : <p className="text-sm text-muted-foreground">{t("workspace.noLinkedShops")}</p>}
               </Card>

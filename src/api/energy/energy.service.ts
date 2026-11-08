@@ -9,6 +9,7 @@ import {
   type ApplianceShare,
   type BatteryInput,
   type EnergyDataOverview,
+  type EnergyMeterDetail,
   type EnergyRegister,
   type EnergySeriesPoint,
   type EnergyCarrier,
@@ -43,6 +44,8 @@ import {
   type SolarInstallation as SolarInstallationRow,
 } from "../lib/db";
 import { badRequest, notFound } from "../lib/http";
+import { energyDistribution, energyHierarchyError } from "@/features/energy/types/energy-distribution";
+import { Prisma } from "../lib/db";
 
 // Mapping between contract enums (lowercase) and Prisma enums (UPPERCASE) ------------------------------------
 
@@ -63,6 +66,7 @@ const fromDate = (value: Date | null) => value?.toISOString().slice(0, 10) ?? nu
 // Appliances ---------------------------------------------------------------------------------------------------
 
 const applianceInclude = {
+  device: { select: { id: true, name: true } },
   place: { select: { id: true, name: true, kind: true, color: true, icon: true, floor: { select: { name: true } } } },
   _count: { select: { meters: true } },
 } as const;
@@ -87,6 +91,8 @@ function toAppliance(row: ApplianceRowWithPlace): Appliance {
     ratedPowerW: row.ratedPowerW,
     standbyPowerW: row.standbyPowerW,
     notes: row.notes,
+    parentApplianceId: row.parentApplianceId,
+    device: row.device,
     measured: row._count.meters > 0,
   };
 }
@@ -97,9 +103,9 @@ async function findOwnAppliance(householdId: string, id: string) {
   return row;
 }
 
-async function applianceData(householdId: string, input: ApplianceInput) {
+async function applianceData(householdId: string, input: ApplianceInput, tx: Prisma.TransactionClient) {
   if (input.placeId) {
-    const place = await db.place.findFirst({ where: { id: input.placeId, householdId }, select: { id: true } });
+    const place = await tx.place.findFirst({ where: { id: input.placeId, householdId }, select: { id: true } });
     if (!place) throw badRequest("Validation failed", { placeId: ["Unknown place"] });
   }
   return {
@@ -110,6 +116,7 @@ async function applianceData(householdId: string, input: ApplianceInput) {
     ratedPowerW: input.ratedPowerW ?? null,
     standbyPowerW: input.standbyPowerW ?? null,
     notes: input.notes || null,
+    ...(input.parentApplianceId !== undefined ? { parentApplianceId: input.parentApplianceId } : {}),
   };
 }
 
@@ -118,28 +125,50 @@ export async function listAppliances(householdId: string): Promise<Appliance[]> 
   return rows.map(toAppliance);
 }
 
+export async function getAppliance(householdId: string, id: string): Promise<Appliance> {
+  return toAppliance(await findOwnAppliance(householdId, id));
+}
+
 export async function createAppliance(householdId: string, input: ApplianceInput): Promise<Appliance> {
-  const row = await db.appliance.create({
-    data: { householdId, ...(await applianceData(householdId, input)) },
-    include: applianceInclude,
-  });
-  return toAppliance(row);
+  return saveAppliance(householdId, input);
 }
 
 export async function updateAppliance(householdId: string, id: string, input: ApplianceInput): Promise<Appliance> {
-  await findOwnAppliance(householdId, id);
-  const row = await db.appliance.update({
-    where: { id },
-    data: await applianceData(householdId, input),
-    include: applianceInclude,
+  return saveAppliance(householdId, input, id);
+}
+
+/** Serialize graph changes so concurrent reparenting cannot create a cycle. */
+async function saveAppliance(householdId: string, input: ApplianceInput, id?: string): Promise<Appliance> {
+  const row = await db.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM households WHERE id = ${householdId} FOR UPDATE`;
+    const existing = id ? await tx.appliance.findFirst({ where: { householdId, id } }) : null;
+    if (id && !existing) throw notFound("Appliance not found");
+    const records = await tx.appliance.findMany({ where: { householdId }, select: { id: true, parentApplianceId: true, carriers: true } });
+    const parentId = input.parentApplianceId === undefined ? existing?.parentApplianceId ?? null : input.parentApplianceId;
+    const candidateId = id ?? "__new_appliance__";
+    const graph = [...records.filter((record) => record.id !== candidateId).map((record) => ({ id: record.id, parentId: record.parentApplianceId, carriers: record.carriers })),
+      { id: candidateId, parentId, carriers: input.carriers.map(fromCarrier) }];
+    const error = energyHierarchyError(graph);
+    if (error) throw badRequest("Invalid meter hierarchy", { parentApplianceId: [error] });
+    for (const record of graph) {
+      const parent = graph.find((node) => node.id === record.parentId);
+      if (parent && record.carriers.some((carrier) => !parent.carriers.includes(carrier)))
+        throw badRequest("Invalid meter hierarchy", { parentApplianceId: ["parentCarrierMismatch"] });
+    }
+    const data = await applianceData(householdId, input, tx);
+    return id ? tx.appliance.update({ where: { id }, data, include: applianceInclude })
+      : tx.appliance.create({ data: { householdId, ...data }, include: applianceInclude });
   });
   return toAppliance(row);
 }
 
 /** Deleting an appliance also deletes its meters and their data. */
 export async function deleteAppliance(householdId: string, id: string): Promise<void> {
-  await findOwnAppliance(householdId, id);
-  await db.appliance.delete({ where: { id } });
+  await db.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM households WHERE id = ${householdId} FOR UPDATE`;
+    if (!await tx.appliance.findFirst({ where: { householdId, id }, select: { id: true } })) throw notFound("Appliance not found");
+    await tx.appliance.delete({ where: { id } });
+  });
   await forgetDocumentLinks("appliance", id);
 }
 
@@ -451,6 +480,9 @@ export async function getEnergyData(householdId: string): Promise<EnergyDataOver
         source: toSource(meter.source),
         ean: meter.ean,
         applianceId: meter.applianceId,
+        solarInstallationId: meter.solarInstallationId,
+        batteryId: meter.batteryId,
+        haStatisticId: meter.haStatisticId,
         intervalCount: stat?._count._all ?? 0,
         firstAt: stat?._min.startAt?.toISOString() ?? null,
         lastAt: stat?._max.endAt?.toISOString() ?? null,
@@ -619,7 +651,7 @@ export async function getEnergySummary(
   const start = zonedMidnight(from);
   const end = zonedMidnight(to);
 
-  const [meterRows, solar, batteries, applianceCount] = await Promise.all([
+  const [meterRows, solar, batteries, configuredAppliances] = await Promise.all([
     db.energyMeter.findMany({
       where: {
         householdId,
@@ -637,29 +669,38 @@ export async function getEnergySummary(
     }),
     db.solarInstallation.findMany({ where: { householdId }, select: { installedOn: true } }),
     db.homeBattery.findMany({ where: { householdId }, select: { installedOn: true } }),
-    db.appliance.count({ where: { householdId } }),
+    db.appliance.findMany({ where: { householdId }, select: { id: true, name: true, category: true, carriers: true, parentApplianceId: true } }),
   ]);
   const meters = meterRows;
   const installedBy = (rows: { installedOn: Date | null }[]) =>
     rows.some((row) => !row.installedOn || (fromDate(row.installedOn) ?? "") < to);
-  const hasSolar = installedBy(solar);
-  const hasBattery = installedBy(batteries);
+  const hasSolar = installedBy(solar) || meters.some((meter) => meter.kind === "SOLAR_PRODUCTION");
+  const hasBattery = installedBy(batteries) || meters.some((meter) => meter.kind === "BATTERY_CHARGE" || meter.kind === "BATTERY_DISCHARGE");
   const has = (carrier: CarrierRow, kind: MeterKindRow) =>
     meters.some((meter) => meter.carrier === carrier && meter.kind === kind);
   const solarMeasured = has("ELECTRICITY", "SOLAR_PRODUCTION");
-  const batteryMeasured = has("ELECTRICITY", "BATTERY_CHARGE") || has("ELECTRICITY", "BATTERY_DISCHARGE");
+  const chargeMeasured = has("ELECTRICITY", "BATTERY_CHARGE");
+  const dischargeMeasured = has("ELECTRICITY", "BATTERY_DISCHARGE");
+  const batteryMeasured = chargeMeasured && dischargeMeasured;
 
   // Prorate every interval over the local buckets it overlaps (manual readings span days or weeks).
   const step = STEP[period];
+  // Hour buckets are instants: the autumn 02:00 label contains both hours; the spring gap has none.
+  const bucketQuery = period === "day" ? Prisma.sql`
+      SELECT to_char(instant AT TIME ZONE ${HOUSEHOLD_TIME_ZONE}, ${LABEL_FORMAT[period]}) AS label,
+             instant AS start_at, instant + interval '1 hour' AS end_at
+      FROM generate_series(${start}::timestamptz, ${end}::timestamptz - interval '1 hour', interval '1 hour') AS instant`
+    : Prisma.sql`
+      SELECT to_char(local_start, ${LABEL_FORMAT[period]}) AS label,
+             local_start AT TIME ZONE ${HOUSEHOLD_TIME_ZONE} AS start_at,
+             (local_start + ${step}::interval) AT TIME ZONE ${HOUSEHOLD_TIME_ZONE} AS end_at
+      FROM generate_series(${from}::timestamp, ${to}::timestamp - ${step}::interval, ${step}::interval) AS local_start`;
   const rows =
     meters.length === 0
       ? []
       : await db.$queryRaw<BucketRow[]>`
           WITH buckets AS (
-            SELECT to_char(local_start, ${LABEL_FORMAT[period]}) AS label,
-                   local_start AT TIME ZONE ${HOUSEHOLD_TIME_ZONE} AS start_at,
-                   (local_start + ${step}::interval) AT TIME ZONE ${HOUSEHOLD_TIME_ZONE} AS end_at
-            FROM generate_series(${from}::timestamp, ${to}::timestamp - ${step}::interval, ${step}::interval) AS local_start
+            ${bucketQuery}
           ),
           parts AS (
             SELECT b.label, m.source, m.carrier, m.kind, m.register, m."applianceId", i."energyWh", i."volumeLitres",
@@ -683,7 +724,12 @@ export async function getEnergySummary(
   const gasRows = bestRows.filter((row) => row.carrier === "GAS");
 
   const elecHasGrid = has("ELECTRICITY", "GRID_IMPORT") || has("ELECTRICITY", "GRID_EXPORT");
-  const elecKnown = elecHasGrid && (!hasSolar || solarMeasured) && (!hasBattery || batteryMeasured);
+  const electricityBucketKnown = (label: string) => {
+    const present = (kind: MeterKindRow) => elecRows.some((row) => row.label === label && row.kind === kind);
+    return present("GRID_IMPORT") && (!hasSolar || (present("SOLAR_PRODUCTION") && present("GRID_EXPORT")))
+      && (!hasBattery || (present("BATTERY_CHARGE") && present("BATTERY_DISCHARGE") && present("GRID_EXPORT")));
+  };
+  const elecKnown = has("ELECTRICITY", "GRID_IMPORT") && [...new Set(elecRows.filter((row) => row.kind !== "APPLIANCE").map((row) => row.label))].every(electricityBucketKnown);
   const electricity: CarrierData = {
     ...collect(elecRows, labels),
     hasGridData: elecHasGrid,
@@ -712,8 +758,8 @@ export async function getEnergySummary(
   const series: EnergySeriesPoint[] = labels.map((label) => {
     const e = bucketOf(electricity, label);
     const g = bucketOf(gas, label);
-    const elecWh = electricity.consumption(e);
-    const gasWh = gas.consumption(g);
+    const elecWh = electricityBucketKnown(label) ? Math.max(0, e.import + e.solar + e.discharge - e.export - e.charge) : null;
+    const gasWh = gasRows.some((row) => row.label === label && row.kind === "GRID_IMPORT") ? gas.consumption(g) : null;
     if (view === "gas") {
       return {
         label,
@@ -734,8 +780,8 @@ export async function getEnergySummary(
       importWh: Math.round(e.import + (total ? g.import : 0)),
       exportWh: Math.round(e.export),
       solarWh: orNull(solarMeasured, e.solar),
-      batteryChargeWh: orNull(batteryMeasured, e.charge),
-      batteryDischargeWh: orNull(batteryMeasured, e.discharge),
+      batteryChargeWh: orNull(chargeMeasured, e.charge),
+      batteryDischargeWh: orNull(dischargeMeasured, e.discharge),
       consumptionWh: nullable(total ? totalOf(elecWh, gasWh) : elecWh),
       volumeLitres: null,
       electricityWh: nullable(elecWh),
@@ -767,11 +813,28 @@ export async function getEnergySummary(
       };
     })
     .sort((a, b) => b.energyWh - a.energyWh);
-  const measuredTotal = appliances.reduce((sum, appliance) => sum + appliance.energyWh, 0);
 
   const elecTotal = electricity.consumption(electricity.totals);
   const gasTotal = gas.consumption(gas.totals);
   const consumption = nullable(view === "electricity" ? elecTotal : view === "gas" ? gasTotal : totalOf(elecTotal, gasTotal));
+  const distributionFor = (carrier: "electricity" | "gas", data: CarrierData) => ({
+    carrier,
+    totalWh: nullable(data.consumption(data.totals)),
+    readings: configuredAppliances.filter((appliance) => appliance.carriers.includes(fromCarrier(carrier))).map((appliance) => ({
+      id: appliance.id, name: appliance.name, parentId: appliance.parentApplianceId,
+      energyWh: data.perAppliance.has(appliance.id) ? Math.round(data.perAppliance.get(appliance.id)!) : null,
+    })),
+  });
+  const distributions = view === "electricity" ? [distributionFor("electricity", electricity)]
+    : view === "gas" ? [distributionFor("gas", gas)]
+    : [distributionFor("electricity", electricity), distributionFor("gas", gas)];
+  const residuals = distributions.filter((part) => part.totalWh !== null).map((part) => energyDistribution(part.totalWh, part.readings).otherWh);
+  const unknownWh = consumption === null || residuals.some((value) => value === null) ? null : residuals.reduce<number>((sum, value) => sum + (value ?? 0), 0);
+  const channels = (["ELECTRICITY", "GAS"] as const).flatMap((carrier) =>
+    (["GRID_IMPORT", "GRID_EXPORT", "SOLAR_PRODUCTION", "BATTERY_CHARGE", "BATTERY_DISCHARGE", "APPLIANCE"] as const).flatMap((kind) => {
+      const selected = bestRows.filter((row) => row.carrier === carrier && row.kind === kind);
+      return selected.length ? [{ carrier: toCarrier(carrier) as "electricity" | "gas", kind: toKind(kind), sources: [...new Set(selected.map((row) => toSource(row.source)))], buckets: new Set(selected.map((row) => row.label)).size }] : [];
+    }));
 
   // The capacity peak belongs to a month: the period's last month, but never one in the future.
   const anchor = [addDays(to, -1), todayIn()].sort()[0] ?? from;
@@ -803,12 +866,12 @@ export async function getEnergySummary(
           importNightWh: Math.round(e.importNight),
           exportWh: Math.round(e.export),
           solarWh: orNull(solarMeasured, e.solar),
-          batteryChargeWh: orNull(batteryMeasured, e.charge),
-          batteryDischargeWh: orNull(batteryMeasured, e.discharge),
+          batteryChargeWh: orNull(chargeMeasured, e.charge),
+          batteryDischargeWh: orNull(dischargeMeasured, e.discharge),
           consumptionWh: consumption,
           // Self-sufficiency is an electricity figure; it means little with gas mixed in.
           selfSufficiency: view === "electricity" && elecTotal !== null ? ratio(elecTotal - e.import, elecTotal) : null,
-          selfConsumption: solarMeasured ? ratio(e.solar - e.export, e.solar) : null,
+          selfConsumption: solarMeasured && elecKnown ? ratio(e.solar - e.export, e.solar) : null,
           volumeLitres: null,
           calorificKwhPerM3: null,
         };
@@ -822,7 +885,9 @@ export async function getEnergySummary(
     series,
     breakdown: {
       appliances,
-      unknownWh: consumption === null ? null : Math.max(0, consumption - measuredTotal),
+      distribution: view === "total" ? undefined : distributions[0]?.readings,
+      distributions,
+      unknownWh,
       totalWh: consumption,
     },
     peak: {
@@ -832,6 +897,7 @@ export async function getEnergySummary(
       rollingAverageKw: billed.length ? round2(billed.reduce((sum, kw) => sum + kw, 0) / billed.length) : null,
     },
     status: {
+      channels,
       hasGridData: view === "electricity" ? elecHasGrid : view === "gas" ? gasHasGrid : elecHasGrid || gasHasGrid,
       hasElectricityData: elecHasGrid,
       hasGasData: gasHasGrid,
@@ -839,7 +905,7 @@ export async function getEnergySummary(
       hasBattery,
       solarMeasured,
       batteryMeasured,
-      applianceCount,
+      applianceCount: configuredAppliances.length,
     },
   };
 }
@@ -986,4 +1052,28 @@ export async function clearHomeAssistantIntervals(householdId: string, statistic
 /** The household's gas calorific value (Wh/m³) for converting Home Assistant gas volumes. */
 export async function gasCalorificWhPerM3(householdId: string): Promise<number> {
   return (await findSettings(householdId))?.gasCalorificWhPerM3 ?? DEFAULT_CALORIFIC_WH_PER_M3;
+}
+
+/** Stable source identity with bounded complete manual-reading history. */
+export async function getEnergyMeterDetail(householdId: string, id: string, requestedPage = 1): Promise<EnergyMeterDetail> {
+  const row = await db.energyMeter.findFirst({ where: { id, householdId }, include: {
+    appliance: { select: { id: true, name: true, householdId: true } },
+    solarInstallation: { select: { id: true, name: true, householdId: true } },
+    battery: { select: { id: true, name: true, householdId: true } },
+  } });
+  if (!row) throw notFound("Meter not found");
+  const [data, readings] = await Promise.all([
+    getEnergyData(householdId),
+    db.$transaction(async (tx) => {
+      const where = { meterId: id, meter: { householdId } };
+      const total = await tx.energyMeterReading.count({ where });
+      const page = Math.min(Math.max(1, requestedPage), Math.max(1, Math.ceil(total / 25)));
+      const items = await tx.energyMeterReading.findMany({ where, orderBy: [{ readAt: "desc" }, { id: "desc" }], skip: (page - 1) * 25, take: 25 });
+      return { total, page, pageSize: 25, items: items.map((reading) => ({ id: reading.id, meterId: id, carrier: toCarrier(row.carrier), kind: toKind(row.kind), register: toRegister(row.register), applianceName: row.appliance?.householdId === householdId ? row.appliance.name : null, readAt: reading.readAt.toISOString(), valueWh: reading.valueWh, valueLitres: reading.valueLitres })) };
+    }, { isolationLevel: "RepeatableRead" }),
+  ]);
+  const own = (ref: { id: string; name: string; householdId: string } | null) => ref?.householdId === householdId ? { id: ref.id, name: ref.name } : null;
+  const meter = data.meters.find((meter) => meter.id === id);
+  if (!meter) throw notFound("Meter not found");
+  return { meter, appliance: own(row.appliance), solar: own(row.solarInstallation), battery: own(row.battery), readings };
 }

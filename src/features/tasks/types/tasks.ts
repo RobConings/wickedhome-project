@@ -303,7 +303,7 @@ export type ChecklistToggleInput = z.infer<typeof checklistToggleInputSchema>;
  * `GET /api/tasks?placeId=`: only the tasks of one place. `?projectId=`: only the tasks of one project (then
  * closed tasks of any age are included, so the project shows its whole progress). `?deviceId=` does the same for maintenance.
  */
-export const tasksQuerySchema = z.object({ placeId: idSchema.optional(), projectId: idSchema.optional(), deviceId: idSchema.optional() });
+export const tasksQuerySchema = z.object({ placeId: idSchema.optional(), projectId: idSchema.optional(), deviceId: idSchema.optional(), assigneeId: idSchema.optional() });
 export type TasksQuery = z.infer<typeof tasksQuerySchema>;
 
 // ── Read models ───────────────────────────────────────────────────────────────────────────────────────

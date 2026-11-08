@@ -87,10 +87,6 @@ export function DocumentAttachments({
   const [attaching, setAttaching] = React.useState(false);
   const [previewing, setPreviewing] = React.useState<DocumentFile | null>(null);
 
-  const open = (file: DocumentFile) => {
-    if (previewKind(file.mimeType) !== "none") setPreviewing(file);
-    else window.location.assign(documentContentUrl(file.id, { download: true }));
-  };
 
   const handleDetach = (file: DocumentFile) =>
     void detach(file).then(
@@ -156,14 +152,9 @@ export function DocumentAttachments({
               >
                 <FileTypeIcon mimeType={file.mimeType} name={file.name} size="sm" />
                 <div className="flex min-w-0 flex-1 flex-col">
-                  <button
-                    type="button"
-                    className="truncate text-left text-sm font-medium outline-none after:absolute after:inset-0 after:rounded-lg focus-visible:after:ring-[3px] focus-visible:after:ring-ring/50"
-                    onClick={() => open(file)}
-                    title={file.name}
-                  >
+                  <Link to={`/documents/files/${encodeURIComponent(file.id)}`} className="truncate text-left text-sm font-medium outline-none after:absolute after:inset-0 after:rounded-lg focus-visible:after:ring-[3px] focus-visible:after:ring-ring/50" title={file.name}>
                     {file.name}
-                  </button>
+                  </Link>
                   <span className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
                     <DocumentStorageBadge file={file} />
                     <span className="truncate">

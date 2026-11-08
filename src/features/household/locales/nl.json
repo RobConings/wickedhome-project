@@ -89,5 +89,13 @@
       "addressIncomplete": "Vul het volledige adres in, of laat alles leeg.",
       "coordinatesRequired": "Vul beide coördinaten in."
     }
+  },
+  "detail": {
+    "about": "Bewoner",
+    "birthdayUnknown": "Geboortedatum niet vastgelegd",
+    "noAccount": "Geen login gekoppeld",
+    "tasks": "Toegewezen taken",
+    "income": "Inkomsten bekijken",
+    "incomeHint": "Opent de inkomsten met deze persoon geselecteerd."
   }
 }

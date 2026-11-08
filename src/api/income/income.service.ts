@@ -412,3 +412,26 @@ export async function deleteIncome(householdId: string, id: string): Promise<voi
   await findOwnIncome(householdId, id);
   await db.income.delete({ where: { id } });
 }
+
+/** Stable record reads include historical receipts outside the overview's two-year preview. */
+export async function getIncome(householdId: string, id: string): Promise<Income> {
+  const row = await db.income.findFirst({ where: { id, householdId } });
+  if (!row) throw notFound();
+  return toIncome(row);
+}
+
+export async function getIncomeSource(householdId: string, id: string, month: string, requestedPage = 1) {
+  const sourceRow = await db.incomeSource.findFirst({ where: { id, householdId }, include: sourceInclude });
+  if (!sourceRow) throw notFound();
+  const [monthData, history] = await Promise.all([
+    getIncomeMonth(householdId, month),
+    db.$transaction(async (tx) => {
+      const where = { householdId, sourceId: id };
+      const total = await tx.income.count({ where });
+      const page = Math.min(Math.max(1, requestedPage), Math.max(1, Math.ceil(total / 25)));
+      const rows = await tx.income.findMany({ where, orderBy: [{ date: "desc" }, { id: "desc" }], skip: (page - 1) * 25, take: 25 });
+      return { items: rows.map(toIncome), total, page, pageSize: 25 };
+    }, { isolationLevel: "RepeatableRead" }),
+  ]);
+  return { source: toSource(sourceRow, today()), month, occurrences: monthData.occurrences.filter((row) => row.sourceId === id), history };
+}

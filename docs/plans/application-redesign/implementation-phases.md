@@ -1,5 +1,7 @@
 # WickedHome total rework — implementation phases
 
+**Active continuation:** baseline `2dda61a`; see the [follow-up implementation and validation ledger](followup-implementation-2026-11-08.md) for newly implemented energy, history, account, product and record-owner work and fresh check status. Earlier checkpoint counts below remain historical evidence.
+
 **Status:** implementation is in progress on `rework_features`; the product workspace has received local validation and the recurring-expense workspace is the next implemented reference slice. Neither module nor the whole redesign is fully accepted. **The 78-screen HTML prototype is a visual and navigation guideline only.** It is not an inventory of all existing capabilities, a universal page renderer, or evidence that a module is complete.
 
 ## Core decision: consistent grammar, different workspaces
@@ -19,7 +21,9 @@ WickedHome is for people running a household, not ERP administrators. Reuse reco
 
 **Data rules:** product quantity is a household total in natural package units wherever recorded, not forced multi-room micromanagement; preserve existing location records, stock movements and historical details in advanced paths until a separately tested migration is approved. Do not add average-use metrics that do not exist. Unrecorded fields (currently including product brand) stay unknown until implemented, never invented.
 
-## Phase A — capability inventory and guardrails (opened, not completed)
+## Phase A — capability inventory and guardrails (inventory expanded, acceptance open)
+
+The [29-owner application outcome inventory](application-outcomes.md) now maps the real access paths, persistence/service rules, automation, evidence and explicit remaining gaps. The local baseline API service/MCP export comparison finds zero removed names; this is contract evidence, not proof of every outcome.
 
 1. Snapshot `main` and `rework_features` business capabilities, existing routes, forms, service APIs, data models, jobs, permissions, MCP tools and migration assumptions. The earlier 65-route/62-dialog atlas is a starting index, **not** outcome-level coverage.
 2. For **every** feature, build a matrix: existing user outcome → current service/API and persistence → intended simple entry point → connected records → edge cases/permissions/automation → test → status. Track missing or risky capabilities explicitly. Preserve history, IDs and source attribution.

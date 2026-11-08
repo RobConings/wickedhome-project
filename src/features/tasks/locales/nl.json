@@ -484,5 +484,13 @@
     "allDone": "Alle onderhoud is afgerond.",
     "done": "Afgerond · {{count}}",
     "add": "Onderhoud plannen"
+  },
+  "person": {
+    "loading": "Toegewezen taken laden…",
+    "error": "Toegewezen taken konden niet worden geladen.",
+    "empty": "Geen taken toegewezen aan deze persoon.",
+    "allDone": "Alle toegewezen taken zijn afgesloten.",
+    "done": "Afgesloten taken ({{count}})",
+    "add": "Taak toewijzen"
   }
 }

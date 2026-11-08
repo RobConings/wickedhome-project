@@ -19,6 +19,7 @@ import {
   expensePaymentInputSchema,
   recurringExpenseInputSchema,
   recurringStatusInputSchema,
+  recurringPaymentsQuerySchema,
   type ExpenseDetail,
   type ExpensesOverview,
   type RecurringExpenseDetail,
@@ -32,6 +33,7 @@ import {
   fetchExpenseDetail,
   fetchExpensesOverview,
   fetchRecurringExpenseDetail,
+  fetchRecurringPayments,
   fetchRecurringForSubscription,
   markExpensePaid,
   markExpenseUnpaid,
@@ -124,6 +126,16 @@ export async function recurringExpenseDetailLoader({ params }: LoaderFunctionArg
   } catch (error) {
     return notFoundAs404(error);
   }
+}
+
+export async function recurringPaymentsLoader({ params, request }: LoaderFunctionArgs) {
+  try {
+    const url = new URL(request.url);
+    const query = recurringPaymentsQuerySchema.parse({ status: url.searchParams.get("status") ?? undefined, page: url.searchParams.get("page") ?? undefined });
+    const [payments, household] = await Promise.all([fetchRecurringPayments(params.recurringId ?? "", query), fetchHouseholdOverview()]);
+    if (payments.page !== query.page) { url.searchParams.set("page", String(payments.page)); throw redirect(`${url.pathname}${url.search}`); }
+    return { payments, habitants: household.habitants };
+  } catch (error) { return notFoundAs404(error); }
 }
 
 /** `/bills`, `/bills/:id`: the pages moved to the expenses (instances kept their ids). */

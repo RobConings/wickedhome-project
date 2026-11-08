@@ -210,5 +210,21 @@
     "remove": "{{name}} als omslag verwijderen",
     "loadError": "Afbeeldingen konden niet worden geladen.",
     "saveError": "De omslag kon niet worden opgeslagen."
+  },
+  "detail": {
+    "title": "Bestandsgegevens",
+    "folder": "Map",
+    "type": "Bestandstype",
+    "size": "Grootte",
+    "uploaded": "Geüpload",
+    "notUploaded": "Upload niet voltooid",
+    "owner": "Geüpload door",
+    "unknown": "Niet vastgelegd",
+    "linked": "Gekoppelde records",
+    "noLinks": "Geen actieve gekoppelde records.",
+    "trashTitle": "Dit bestand naar de prullenbak verplaatsen?",
+    "trashHint": "Het bestand kan worden hersteld vanuit de prullenbak. De gekoppelde records blijven behouden.",
+    "deleted": "Dit bestand staat in de prullenbak. Open de prullenbak om het te herstellen.",
+    "pending": "De inhoud wordt nog geüpload. Voorbeeld en download zijn beschikbaar zodra de upload klaar is."
   }
 }

@@ -155,8 +155,9 @@ export async function getTasksOverview(user: SessionUser, query: TasksQuery = {}
         ...(query.placeId && { placeId: query.placeId }),
         ...(query.deviceId && { deviceId: query.deviceId }),
         ...(query.projectId && { projectId: query.projectId }),
-        // A project or device shows its complete task history.
-        ...(!query.projectId && !query.deviceId && { OR: [{ status: "OPEN" as const }, { closedAt: { gte: closedSince } }] }),
+        ...(query.assigneeId && { assignees: { some: { habitantId: query.assigneeId } } }),
+        // A record workspace shows its complete task history.
+        ...(!query.projectId && !query.deviceId && !query.assigneeId && { OR: [{ status: "OPEN" as const }, { closedAt: { gte: closedSince } }] }),
       },
       include: taskInclude,
     }),

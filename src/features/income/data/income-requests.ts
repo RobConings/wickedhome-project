@@ -4,6 +4,7 @@ import type {
   IncomeInput,
   IncomeOverview,
   IncomeSource,
+  IncomeSourceDetail,
   IncomeSourceCreateInput,
   IncomeSourceUpdateInput,
 } from "../types/income";
@@ -23,3 +24,6 @@ export const deleteIncomeAmount = (id: string, amountId: string) =>
 export const createIncome = (input: IncomeInput) => api.post<Income>("/income/incomes", input);
 export const updateIncome = (id: string, input: IncomeInput) => api.put<Income>(incomePath(id), input);
 export const deleteIncome = (id: string) => api.delete(incomePath(id));
+
+export const fetchIncome = (id: string) => api.get<Income>(incomePath(id));
+export const fetchIncomeSource = (id: string, query: string) => api.get<IncomeSourceDetail>(`${sourcePath(id)}${query}`);

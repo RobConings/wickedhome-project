@@ -18,6 +18,8 @@ import {
   deleteIncomeAmount,
   deleteIncomeSource,
   getIncomeOverview,
+  getIncome,
+  getIncomeSource,
   updateIncome,
   updateIncomeSource,
 } from "./income.service";
@@ -36,6 +38,17 @@ const monthParam = (value: unknown) => (value === undefined || value === "" ? mo
 
 incomeRouter.get("/", async (req, res) => {
   res.json(await getIncomeOverview(currentUser(req).householdId, monthParam(req.query.month)));
+});
+
+incomeRouter.get("/sources/:id", async (req, res) => {
+  const id = parse(idSchema, req.params.id);
+  const page = Number(req.query.page ?? 1);
+  if (!Number.isSafeInteger(page) || page < 1 || page > 100000) return res.status(400).json({ error: { code: "validation", message: "Invalid page" } });
+  res.json(await getIncomeSource(currentUser(req).householdId, id, monthParam(req.query.month), page));
+});
+
+incomeRouter.get("/incomes/:id", async (req, res) => {
+  res.json(await getIncome(currentUser(req).householdId, parse(idSchema, req.params.id)));
 });
 
 incomeRouter.post("/sources", canManage, async (req, res) => {
