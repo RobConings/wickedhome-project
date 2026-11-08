@@ -554,6 +554,10 @@
     "purchasesHint": "Een behoefte is een plan. Aankopen en hun vastgelegde voorraadeffecten blijven afzonderlijke feiten.",
     "removeTitle": "Deze kooppositie verwijderen?",
     "removeHint": "Alle gekoppelde redenen voor deze positie worden uit de boodschappenlijst verwijderd. Vastgelegde aankopen en voorraad blijven behouden.",
-    "notRecorded": "Niet vastgelegd"
+    "notRecorded": "Niet vastgelegd",
+    "connected": "Gekoppelde gegevens",
+    "expense": "Geregistreerde uitgave",
+    "openExpense": "Uitgave bekijken",
+    "alternatives": "Andere producten met dezelfde voorraad"
   }
 }
