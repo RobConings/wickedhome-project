@@ -189,7 +189,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
           <RecordImage src={product.imageUrl} alt={product.name} shape="banner" fit="contain"
             className="h-56 sm:h-56 lg:h-72" fallback={<ProductCategoryIcon category={product.category} className="size-20 text-section" />} />
           <div className="flex min-w-0 flex-col gap-4">
-            <div className="grid min-w-0 gap-3 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
+            <div className="flex min-w-0 flex-col gap-3">
               <PageHeader
                 showBack={false}
                 title={product.name}
@@ -202,7 +202,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
                 }
                 className="min-w-0"
               />
-              <div className="hidden xl:block">{actionButtons}</div>
+              {actionButtons}
             </div>
             <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
               {stats.map(({ id, icon, tone, value, label }) => (
@@ -215,7 +215,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
                 </div>
               ))}
             </div>
-            <div className="xl:hidden">{actionButtons}</div>
+
           </div>
         </div>
       </div>
