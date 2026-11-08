@@ -2,6 +2,8 @@ import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { BuildingIcon, MapPinIcon } from "lucide-react";
 import { fn } from "storybook/test";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { EntityPicker, type EntityPickerItem } from "@/components/shared/entity-picker";
 
 const places: EntityPickerItem[] = [
@@ -95,4 +97,29 @@ export const Busy: Story = { args: { busy: true, value: "kitchen" } };
 /** `onChange` returns a promise: the trigger spins until it settles (here 1.5 s). */
 export const SavesOnChange: Story = {
   args: { onChange: fn(() => new Promise((resolve) => setTimeout(resolve, 1500))) },
+};
+
+/** Regression case: the picker opens from a modal, has many destinations and must remain scrollable. */
+export const GroupedDestinationsInsideDialog: Story = {
+  render: () => {
+    function Example() {
+      const [value, setValue] = React.useState<string | null>(null);
+      const items: EntityPickerItem[] = [
+        { id: "group-colruyt", label: "Colruyt-groep", description: "Colruyt · OKay", featuredGroup: "Winkelgroepen" },
+        { id: "group-diy", label: "Doe-het-zelf", description: "Gamma · Snuffelmarkt", featuredGroup: "Winkelgroepen" },
+        ...Array.from({ length: 40 }, (_, index) => ({
+          id: `shop-${index}`, label: `Winkel ${index + 1}`, description: "Afzonderlijke winkel",
+        })),
+      ];
+      return <Dialog>
+        <DialogTrigger asChild><Button>Start winkelen</Button></DialogTrigger>
+        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-visible">
+          <DialogHeader><DialogTitle>Een winkelbeurt starten</DialogTitle>
+            <DialogDescription>Kies een winkel of opgeslagen groep.</DialogDescription></DialogHeader>
+          <EntityPicker items={items} value={value} onChange={setValue} favoriteIds={["shop-0", "shop-1"]} placeholder="Kies een winkel of groep" />
+        </DialogContent>
+      </Dialog>;
+    }
+    return <Example />;
+  },
 };
