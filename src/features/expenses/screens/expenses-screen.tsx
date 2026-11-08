@@ -12,6 +12,8 @@ import {
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigation, useSearchParams } from "react-router";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger, workspaceTabListClassName, workspaceTabTriggerClassName } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageContainer } from "@/components/layout/page-container";
@@ -193,27 +195,27 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
         }
       />
 
-      <div className="flex min-w-0 items-center gap-2">
-        <SegmentedControl
-          label={t("views.label")}
-          size="lg"
-          value={view}
-          onChange={(value) => setParam(EXPENSES_VIEW_PARAM, value === "upcoming" ? null : value)}
-          options={[
-            { value: "upcoming", label: t("views.upcoming"), icon: ListTodoIcon },
-            { value: "recurring", label: t("views.recurring"), icon: RepeatIcon },
-            { value: "history", label: t("views.history"), icon: HistoryIcon },
-          ]}
-        />
-        {overdueCount > 0 && view !== "upcoming" && (
-          <Badge variant="destructive" className="shrink-0 tabular-nums">
-            {overdueCount}
-          </Badge>
-        )}
-      </div>
+      <Tabs value={view} onValueChange={(value) => setParam(EXPENSES_VIEW_PARAM, value === "upcoming" ? null : value)} className="min-w-0 gap-4">
+        <div className="flex min-w-0 items-center gap-2">
+          <TabsList aria-label={t("views.label")} className={cn(workspaceTabListClassName, "grid flex-1 grid-cols-3")}>
+            {([
+              { value: "upcoming", icon: ListTodoIcon },
+              { value: "recurring", icon: RepeatIcon },
+              { value: "history", icon: HistoryIcon },
+            ] as const).map(({ value, icon: Icon }) => (
+              <TabsTrigger key={value} value={value} className={workspaceTabTriggerClassName}>
+                <Icon aria-hidden="true" className="size-4" />
+                {t(`views.${value}`)}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {overdueCount > 0 && view !== "upcoming" && (
+            <Badge variant="destructive" className="shrink-0 tabular-nums">{overdueCount}</Badge>
+          )}
+        </div>
 
-      <PendingContent pending={pending} label={tCommon("loading.updating")}>
-        {view === "upcoming" && (
+        <PendingContent pending={pending} label={tCommon("loading.updating")}>
+        <TabsContent value="upcoming" className="min-w-0">
           <div className="flex flex-col gap-6">
             {suggestions}
             <ExpenseTotals totals={overview.totals} />
@@ -238,9 +240,9 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
               noMatchesState={filteredEmpty(CircleCheckIcon)}
             />
           </div>
-        )}
+        </TabsContent>
 
-        {view === "recurring" && (
+        <TabsContent value="recurring" className="min-w-0">
           <div className="flex flex-col gap-6">
             <RecurringTotals totals={overview.recurringTotals} />
             <GeneralList<RecurringExpense>
@@ -300,9 +302,9 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
               noResultsState={recurringQuery.trim() ? undefined : filteredEmpty(RepeatIcon)}
             />
           </div>
-        )}
+        </TabsContent>
 
-        {view === "history" && (
+        <TabsContent value="history" className="min-w-0">
           <ExpenseList
             expenses={lists.history}
             today={overview.today}
@@ -317,8 +319,9 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
             emptyState={<EmptyState icon={HistoryIcon} title={t("empty.history.title")} description={t("empty.history.description")} action={logButton()} />}
             noMatchesState={filteredEmpty(HistoryIcon)}
           />
-        )}
-      </PendingContent>
+        </TabsContent>
+        </PendingContent>
+      </Tabs>
     </PageContainer>
   );
 }
