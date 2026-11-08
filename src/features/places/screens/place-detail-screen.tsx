@@ -118,8 +118,7 @@ export function PlaceDetailScreen({ detail, canManage, sections = {} }: PlaceDet
         </PageSection>
 
       <RelatedRecordCards label={t("detail.contentsTitle")} items={LINKED_SECTIONS.filter(({ key }) => sections[key]).map(({ key, icon }) => ({ id: key, label: t(`detail.sections.${key}.title`), icon, accent: "home", to: `#place-${key}` }))} />
-      <PageGrid columns="main-sidebar">
-        <PageSection aria-labelledby="place-contents">
+      <PageSection aria-labelledby="place-contents">
           <SectionHeader id="place-contents" title={t("detail.contentsTitle")} description={t("detail.contentsDescription")} />
           <PageGrid columns="2" className="gap-4">
             {LINKED_SECTIONS.map(({ key, icon: Icon }) => (
@@ -137,10 +136,7 @@ export function PlaceDetailScreen({ detail, canManage, sections = {} }: PlaceDet
               </Card>
             ))}
           </PageGrid>
-        </PageSection>
-
-
-      </PageGrid>
+      </PageSection>
     </PageContainer>
   );
 }
