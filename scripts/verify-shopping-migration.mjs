@@ -237,6 +237,10 @@ try {
     sessionItemId: null,
     quantity: "10.000",
   });
+  const purpose = await client.query('SELECT "allocationRevision", "allocationHouseholdQuantity", "purchasedQuantity", "purchasedUnit" FROM "stock_purchases" WHERE id=$1', ["legacy-purchase"]);
+  assert.deepEqual(purpose.rows[0], { allocationRevision: 0, allocationHouseholdQuantity: null, purchasedQuantity: null, purchasedUnit: null });
+  assert.equal((await client.query('SELECT count(*)::int AS n FROM "purchase_project_allocations"')).rows[0].n, 0);
+  assert.equal((await client.query('SELECT count(*)::int AS n FROM "expense_project_allocations"')).rows[0].n, 0);
   console.log(
     `Migration preservation passed: ${snapshots.length} legacy tables, ${records} populated records unchanged; products, recipes, requirements, stock, acquisition evidence and paid expenses retained.`,
   );

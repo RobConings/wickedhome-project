@@ -49,6 +49,8 @@ model DeviceProfile {
 /// A thing with a state and a place: a window contact, the dryer, the alarm panel. Optionally on a floor
 /// plan at (x, y) in centimetres, and optionally linked to one energy appliance.
 model Device {
+  /// Selected image attached to this device; document identity and access stay with Documents.
+  coverFileId String?
   id          String             @id @default(cuid())
   householdId String
   household   Household          @relation(fields: [householdId], references: [id], onDelete: Cascade)
@@ -66,6 +68,7 @@ model Device {
   appliance   Appliance?         @relation(fields: [applianceId], references: [id], onDelete: SetNull)
   notes       String?
   values      DeviceFieldValue[]
+  tasks       Task[]
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
 

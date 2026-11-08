@@ -1,335 +1,65 @@
-import { CategorySelect, type ExpenseCategory } from "@/features/expenses";
-import * as React from "react";
-import { Link } from "react-router";
+import { todayIn } from "@/types/dates";
+import { useState } from "react";
+import { PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { CategorySelect, type ExpenseCategory } from "@/features/expenses";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { EntityPicker } from "@/components/shared/entity-picker";
+import { GeneralFormDialog } from "@/components/shared/general-form-dialog";
+import type { GeneralFormField } from "@/components/shared/general-form";
+import { RelatedRecordCards } from "@/components/shared/related-record-cards";
+import { RecordLink } from "@/components/shared/record-link";
+import { InlineAlert } from "@/components/shared/inline-alert";
+import { ShoppingCartIcon } from "lucide-react";
 import { api } from "@/lib/api-client";
+import { useAsyncResource } from "@/lib/use-async-resource";
 import { currentLocale } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format";
+import { sessionPaymentFormSchema } from "../data/sessions-actions";
 import type { ShoppingFinanceOptions, SessionView } from "../types/sessions";
-import { recordSessionPayment } from "../data/sessions-requests";
 
-const selectClass =
-  "min-h-11 w-full rounded-md border bg-background px-3 text-sm";
-export function SessionPayments({
-  session,
-  purchase,
-  disabled,
-  onAction,
-  payeeDefault,
-}: {
-  payeeDefault: string;
-  session: SessionView;
-  purchase: SessionView["purchases"][number];
-  disabled: boolean;
-  onAction: (work: () => Promise<unknown>) => Promise<void>;
+export function SessionPayments({ session, purchase, disabled, payeeDefault, initialOptions }: {
+  payeeDefault: string; session: SessionView; purchase: SessionView["purchases"][number]; disabled: boolean;
+  initialOptions?: ShoppingFinanceOptions;
 }) {
-  const { t } = useTranslation("shopping");
-  const locale = currentLocale();
-  const [options, setOptions] = React.useState<ShoppingFinanceOptions | null>(
-    null,
-  );
-  const [existingId, setExistingId] = React.useState("");
-  const [category, setCategory] = React.useState<ExpenseCategory>("groceries");
-  const categoryId = React.useId();
-  const [payerType, setPayerType] = React.useState<"joint" | "person">("joint");
-  React.useEffect(() => {
-    let cancelled = false;
-    void api
-      .get<ShoppingFinanceOptions>(
-        `/shopping/sessions/${session.id}/finance-options`,
-      )
-      .then((value) => {
-        if (!cancelled) setOptions(value);
-      })
-      .catch(() => {
-        if (!cancelled) setOptions(null);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [session.id, purchase.payments.length]);
-  const total = purchase.payments.reduce(
-    (sum, payment) => sum + payment.amountCents,
-    0,
-  );
-  return (
-    <section className="space-y-3 border-t pt-4">
-      <h3 className="font-medium">{t("payments.title")}</h3>
-      <p className="text-sm">
-        {t("payments.recorded", { total: formatCurrency(total, locale) })}
-        {purchase.totalCents !== null
-          ? ` / ${formatCurrency(purchase.totalCents, locale)}`
-          : ""}
-      </p>
-      {purchase.payments.map((payment) => (
-        <p className="text-sm" key={payment.id}>
-          {payment.expenseId ? (
-            <Link className="underline" to={`/expenses/${payment.expenseId}`}>
-              {payment.payee} · {formatCurrency(payment.amountCents, locale)}
-            </Link>
-          ) : (
-            <span>
-              {t("payments.deletedExpense")} ·{" "}
-              {formatCurrency(payment.amountCents, locale)}
-            </span>
-          )}
-          {payment.paymentAccountId && (
-            <span>
-              {" "}
-              ·{" "}
-              {
-                options?.accounts.find(
-                  (account) => account.id === payment.paymentAccountId,
-                )?.name
-              }
-            </span>
-          )}
-        </p>
-      ))}
-      {options ? (
-        <details className="space-y-3">
-          <summary className="min-h-11 cursor-pointer py-3 text-sm">
-            {t("payments.manage")}
-          </summary>
-          <form
-            className="grid gap-3 sm:grid-cols-2"
-            onSubmit={(event) => {
-              event.preventDefault();
-              const form = new FormData(event.currentTarget);
-              const value = (name: string) => String(form.get(name) ?? "");
-              const date = value("date");
-              void onAction(() =>
-                recordSessionPayment(session.id, {
-                  reference: value("reference"),
-                  receiptId: value("receiptId") || undefined,
-                  expenseId: existingId || undefined,
-                  expense: existingId
-                    ? undefined
-                    : {
-                        payee: value("payee"),
-                        amountCents: Math.round(Number(value("amount")) * 100),
-                        category,
-                        payerType,
-                        payerHabitantId: value("payerId") || undefined,
-                        shares: [],
-                        kind: "other",
-                        candidateToCancel: false,
-                        dueDate: date,
-                        paidOn: date,
-                        shopId: purchase.shopId,
-                        paymentMethod: value("method") as
-                          | "card"
-                          | "cash"
-                          | "meal_voucher"
-                          | "wire_transfer"
-                          | "other",
-                      },
-                  paymentAccountId: value("accountId") || undefined,
-                  paidByHabitantId: value("paidBy") || undefined,
-                }),
-              );
-            }}
-          >
-            <label className="text-sm">
-              {t("payments.existing")}
-              <select
-                className={selectClass}
-                value={existingId}
-                onChange={(event) => setExistingId(event.target.value)}
-              >
-                <option value="">{t("payments.newExpense")}</option>
-                {options.expenses.map((expense) => (
-                  <option key={expense.id} value={expense.id}>
-                    {expense.payee} ·{" "}
-                    {formatCurrency(expense.amountCents, locale)} ·{" "}
-                    {expense.paidOn}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="text-sm">
-              {t("payments.receipt")}
-              <select
-                className={selectClass}
-                name="receiptId"
-                defaultValue={
-                  purchase.receipts.length === 1 ? purchase.receipts[0]!.id : ""
-                }
-              >
-                <option value="">{t("payments.wholeVisit")}</option>
-                {purchase.receipts.map((receipt) => (
-                  <option key={receipt.id} value={receipt.id}>
-                    {receipt.filename}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="text-sm">
-              {t("payments.reference")}
-              <Input
-                name="reference"
-                required
-                defaultValue="card-1"
-                maxLength={100}
-              />
-            </label>
-            <fieldset
-              disabled={Boolean(existingId) || disabled}
-              className="grid gap-3 sm:col-span-2 sm:grid-cols-2"
-            >
-              <label className="text-sm">
-                {t("payments.payee")}
-                <Input
-                  name="payee"
-                  defaultValue={payeeDefault.slice(0, 64)}
-                  maxLength={64}
-                  required
-                />
-              </label>
-              <label className="text-sm">
-                {t("payments.amount")}
-                <Input
-                  name="amount"
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  required
-                  defaultValue={
-                    purchase.totalCents !== null
-                      ? ((purchase.totalCents - total) / 100).toFixed(2)
-                      : undefined
-                  }
-                />
-              </label>
-              <label className="text-sm" htmlFor={categoryId}>
-                {t("fields.category")}
-                <CategorySelect
-                  id={categoryId}
-                  value={category}
-                  onChange={setCategory}
-                  first="everyday"
-                />
-              </label>
-              <label className="text-sm">
-                {t("payments.date")}
-                <Input
-                  name="date"
-                  type="date"
-                  defaultValue={purchase.purchasedAt.slice(0, 10)}
-                  required
-                />
-              </label>
-              <label className="text-sm">
-                {t("payments.method")}
-                <select name="method" className={selectClass}>
-                  <option value="card">{t("payments.card")}</option>
-                  <option value="cash">{t("payments.cash")}</option>
-                  <option value="meal_voucher">
-                    {t("payments.mealVouchers")}
-                  </option>
-                  <option value="wire_transfer">
-                    {t("payments.transfer")}
-                  </option>
-                  <option value="other">{t("payments.other")}</option>
-                </select>
-              </label>
-              <label className="text-sm">
-                {t("payments.payerType")}
-                <select
-                  className={selectClass}
-                  value={payerType}
-                  onChange={(event) =>
-                    setPayerType(event.target.value as "joint" | "person")
-                  }
-                >
-                  <option value="joint">{t("payments.joint")}</option>
-                  <option value="person">{t("payments.personal")}</option>
-                </select>
-              </label>
-              {payerType === "person" && (
-                <label className="text-sm">
-                  {t("payments.person")}
-                  <select name="payerId" required className={selectClass}>
-                    <option value="">{t("payments.choosePerson")}</option>
-                    {options.habitants.map((person) => (
-                      <option value={person.id} key={person.id}>
-                        {person.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              )}
-              <label className="text-sm">
-                {t("payments.account")}
-                <select name="accountId" className={selectClass}>
-                  <option value="">{t("payments.defaultAccount")}</option>
-                  {options.accounts.map((account) => (
-                    <option value={account.id} key={account.id}>
-                      {account.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="text-sm">
-                {t("payments.paidBy")}
-                <select name="paidBy" className={selectClass}>
-                  <option value="">{t("payments.unspecified")}</option>
-                  {options.habitants.map((person) => (
-                    <option value={person.id} key={person.id}>
-                      {person.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </fieldset>
-            <p className="text-xs text-muted-foreground sm:col-span-2">
-              {t("payments.splitHint")}
-            </p>
-            <Button disabled={disabled}>{t("payments.save")}</Button>
-          </form>
-        </details>
-      ) : (
-        <p className="text-sm text-muted-foreground">{t("payments.loading")}</p>
-      )}
-    </section>
-  );
+  const { t } = useTranslation("shopping"); const locale = currentLocale();
+  const resource = useAsyncResource(`session-finance:${session.id}:${purchase.payments.length}`, () => api.get<ShoppingFinanceOptions>(`/shopping/sessions/${encodeURIComponent(session.id)}/finance-options`), { initial: initialOptions });
+  const [reference, setReference] = useState(() => crypto.randomUUID());
+  const options = resource.data;
+  const total = purchase.payments.reduce((sum, payment) => sum + payment.amountCents, 0);
+  const isNew = (values: Record<string, unknown>) => values.mode !== "existing";
+  const picker = (name: string, label: string, items: { id: string; label: string }[], when?: GeneralFormField["when"]): GeneralFormField => ({ name, label, type: "custom", optional: true, when,
+    render: ({ id, name, value, setValue, disabled, invalid }) => <EntityPicker id={id} name={name} value={typeof value === "string" ? value : null} onChange={setValue} items={items} disabled={disabled} invalid={invalid} /> });
+  const fields: GeneralFormField[] = [
+    { name: "mode", type: "select", label: t("payments.existing"), options: [{ value: "new", label: t("payments.newExpense") }, { value: "existing", label: t("payments.linkExisting") }] },
+    picker("expenseId", t("payments.existing"), options?.expenses.map((expense) => ({ id: expense.id, label: `${expense.payee} · ${formatCurrency(expense.amountCents, locale)}${expense.paidOn ? ` · ${expense.paidOn}` : ""}` })) ?? [], (values) => !isNew(values)),
+    { name: "payee", optional: false, type: "text", label: t("payments.payee"), when: isNew },
+    { name: "amountCents", optional: false, type: "money", label: t("payments.amount"), when: isNew },
+    { name: "date", optional: false, type: "date", label: t("payments.date"), when: isNew },
+    { name: "category", optional: false, type: "custom", label: t("fields.category"), when: isNew, render: ({ id, name, value, setValue, disabled }) => <CategorySelect name={name} id={id} value={value as ExpenseCategory} onChange={setValue} disabled={disabled} first="everyday" /> },
+    { name: "method", optional: false, type: "select", label: t("payments.method"), when: isNew, options: (["card", "cash", "meal_voucher", "wire_transfer", "other"] as const).map((value) => ({ value, label: t(`payments.${({ card: "card", cash: "cash", meal_voucher: "mealVouchers", wire_transfer: "transfer", other: "other" })[value]}`) })) },
+    { name: "payerType", optional: false, type: "select", label: t("payments.payerType"), when: isNew, options: [{ value: "joint", label: t("payments.joint") }, { value: "person", label: t("payments.personal") }] },
+    picker("payerId", t("payments.person"), options?.habitants.map((person) => ({ id: person.id, label: person.name })) ?? [], (values) => isNew(values) && values.payerType === "person"),
+    picker("accountId", t("payments.account"), options?.accounts.map((account) => ({ id: account.id, label: account.name })) ?? [], isNew),
+    picker("paidBy", t("payments.paidBy"), options?.habitants.map((person) => ({ id: person.id, label: person.name })) ?? [], isNew),
+    picker("receiptId", t("payments.receipt"), purchase.receipts.map((receipt) => ({ id: receipt.id, label: receipt.filename }))),
+  ];
+  return <section className="space-y-3 border-t pt-4"><h3 className="font-medium">{t("payments.title")}</h3>
+    <p className="text-sm">{t("payments.recorded", { total: formatCurrency(total, locale) })}{purchase.totalCents !== null ? ` / ${formatCurrency(purchase.totalCents, locale)}` : ""}</p>
+    {purchase.payments.map((payment) => <p className="text-sm" key={payment.id}>{payment.expenseId ? <RecordLink className="inline-flex min-h-11 items-center gap-2 rounded-lg font-medium underline" to={`/expenses/${encodeURIComponent(payment.expenseId)}`}>{payment.payee} · {formatCurrency(payment.amountCents, locale)}</RecordLink> : <span>{t("payments.deletedExpense")} · {formatCurrency(payment.amountCents, locale)}</span>}</p>)}
+    {resource.error && <InlineAlert tone="error">{t("errors.generic")} <Button variant="outline" onClick={resource.refresh}>{t("payments.retry")}</Button></InlineAlert>}
+    {options ? <GeneralFormDialog trigger={<Button variant="outline" disabled={disabled}><PlusIcon />{t("payments.manage")}</Button>}
+      title={t("payments.manage")} description={t("payments.splitHint")} intent="record-payment" action={`/shopping/sessions/${encodeURIComponent(session.id)}`}
+      schema={sessionPaymentFormSchema} fields={fields} hiddenFields={{ reference, shopId: purchase.shopId }} submitLabel={t("payments.save")}
+      onOpenChange={(open) => { if (open) setReference(crypto.randomUUID()); }} onSuccess={resource.refresh}
+      defaultValues={{ mode: "new", payee: payeeDefault.slice(0, 64), amountCents: purchase.totalCents === null ? undefined : Math.max(0, purchase.totalCents - total), date: todayIn(undefined, new Date(purchase.purchasedAt)), method: "card", category: "groceries", payerType: "joint", receiptId: purchase.receipts.length === 1 ? purchase.receipts[0]!.id : undefined }}
+    /> : !resource.error && <p className="text-sm text-muted-foreground">{t("payments.loading")}</p>}
+  </section>;
 }
 
 export function RelatedShoppingSessions({ expenseId }: { expenseId: string }) {
   const { t } = useTranslation("shopping");
-  const [visits, setVisits] = React.useState<{ id: string; name: string }[]>(
-    [],
-  );
-  React.useEffect(() => {
-    let cancelled = false;
-    void api
-      .get<{ id: string; name: string }[]>(
-        `/shopping/sessions/for-expense/${encodeURIComponent(expenseId)}`,
-      )
-      .then((rows) => {
-        if (!cancelled) setVisits(rows);
-      })
-      .catch(() => {
-        if (!cancelled) setVisits([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [expenseId]);
-  return visits.length ? (
-    <div className="flex flex-wrap gap-2 text-sm">
-      <span>{t("sessions.title")}:</span>
-      {visits.map((visit) => (
-        <Link
-          className="underline"
-          to={`/shopping/sessions/${visit.id}`}
-          key={visit.id}
-        >
-          {visit.name}
-        </Link>
-      ))}
-    </div>
-  ) : null;
+  const resource = useAsyncResource(`expense-visits:${expenseId}`, () => api.get<{ id: string; name: string }[]>(`/shopping/sessions/for-expense/${encodeURIComponent(expenseId)}`));
+  if (resource.error) return <InlineAlert tone="error">{t("errors.generic")}</InlineAlert>;
+  return resource.data?.length ? <RelatedRecordCards label={t("sessions.title")} items={resource.data.map((visit) => ({ id: visit.id, label: visit.name, to: `/shopping/sessions/${encodeURIComponent(visit.id)}`, icon: ShoppingCartIcon, accent: "shopping" }))} /> : null;
 }

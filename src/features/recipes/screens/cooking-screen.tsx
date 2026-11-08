@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ArrowLeftIcon, CheckIcon, ChefHatIcon, ChevronUpIcon, MonitorSmartphoneIcon, UsersIcon } from "lucide-react";
+import { CheckIcon, ChefHatIcon, ChevronUpIcon, MonitorSmartphoneIcon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher } from "react-router";
 import { toast } from "sonner";
@@ -107,13 +107,7 @@ export function CookingScreen({ state, products, canSaveToRecipe, pending = fals
   return (
     <PageContainer>
       <Stack gap="md">
-        <Button asChild variant="ghost" size="sm" className="-ml-2 self-start text-muted-foreground">
-          <Link to={recipePath(recipe.id)}>
-            <ArrowLeftIcon />
-            {t("cooking.backToRecipe")}
-          </Link>
-        </Button>
-        <PageHeader
+        <PageHeader backTo={recipePath(recipe.id)}
           title={
             <span className="flex items-center gap-3">
               <ChefHatIcon className="size-7 shrink-0 text-primary" aria-hidden="true" />

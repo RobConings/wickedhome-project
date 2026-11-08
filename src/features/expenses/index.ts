@@ -52,3 +52,4 @@ export {
 } from "./types/expenses";
 
 export type { ShoppingPaymentInput } from "./types/shopping-payment";
+export { ExpenseAllocationPanel } from "./components/expense-allocation-panel";

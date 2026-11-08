@@ -18,6 +18,7 @@ type IncomeOccurrenceListProps = {
   accounts: IncomeTargetAccount[];
   today: string;
   canManage: boolean;
+  renderIncomeActions?: (income: Income) => React.ReactNode;
 };
 
 /** "Expected 30/10/2026": recorded, but dated after today, so not received yet. */
@@ -37,7 +38,7 @@ function ExpectedBadge({ date }: { date: string }) {
  * date after today (an amount entered early, a tax return announced for the 30th) is still expected:
  * "Expected 30/10/2026".
  */
-export function IncomeOccurrenceList({ occurrences, upcoming = [], habitants, accounts, today, canManage }: IncomeOccurrenceListProps) {
+export function IncomeOccurrenceList({ occurrences, upcoming = [], habitants, accounts, today, canManage, renderIncomeActions }: IncomeOccurrenceListProps) {
   const { t } = useTranslation("income");
   const whoName = useWhoName(habitants);
   const [entering, setEntering] = React.useState<IncomeOccurrence | null>(null);
@@ -68,7 +69,7 @@ export function IncomeOccurrenceList({ occurrences, upcoming = [], habitants, ac
                   {whoName(occurrence.habitantId)} · {t(`kinds.${occurrence.kind}`)} · {dateText(occurrence.date)}
                 </span>
               </span>
-              <span className="flex items-center gap-2">
+              <span className="flex max-w-full flex-wrap items-center gap-2">
                 <span className={cn("text-sm font-semibold tabular-nums", occurrence.status !== "received" && "text-muted-foreground")}>
                   {amount !== null ? money(amount) : "—"}
                 </span>
@@ -88,6 +89,7 @@ export function IncomeOccurrenceList({ occurrences, upcoming = [], habitants, ac
                   <Badge variant="outline">{t(`status.${occurrence.status}`, { date: dateText(occurrence.date) })}</Badge>
                 )}
               </span>
+              {canManage && occurrence.income && renderIncomeActions?.(occurrence.income)}
             </>
           );
         },
@@ -106,9 +108,10 @@ export function IncomeOccurrenceList({ occurrences, upcoming = [], habitants, ac
                 {whoName(income.habitantId)} · {t(`kinds.${income.kind}`)} · {t("month.oneOff")}
               </span>
             </span>
-            <span className="flex items-center gap-2">
+            <span className="flex max-w-full flex-wrap items-center gap-2">
               <span className="text-sm font-semibold text-muted-foreground tabular-nums">{money(income.amountCents)}</span>
               <ExpectedBadge date={income.date} />
+              {canManage && renderIncomeActions?.(income)}
             </span>
           </>
         ),

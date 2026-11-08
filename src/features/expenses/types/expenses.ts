@@ -325,6 +325,8 @@ type PaymentDetails = {
 };
 
 export type Expense = PaymentDetails & {
+  /** Explicit shares are edited in the allocation panel rather than the single project field. */
+  hasProjectAllocation?: boolean;
   id: string;
   /** Extra repayment, independent of the regular instalment on the same date. */
   earlyRepayment?: boolean;

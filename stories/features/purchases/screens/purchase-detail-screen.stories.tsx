@@ -1,0 +1,10 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { PurchaseDetailScreen } from "@/features/purchases/screens/purchase-detail-screen";
+import { purchaseFixture } from "../fixtures";
+const meta = { title: "Features/Purchases/Screens/PurchaseDetailScreen", component: PurchaseDetailScreen, parameters: { layout: "fullscreen" }, args: { purchase: purchaseFixture } } satisfies Meta<typeof PurchaseDetailScreen>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+export const Default: Story = {};
+export const Phone: Story = { globals: { viewport: { value: "mobile1", isRotated: false } } };
+export const Paid: Story = { args: { purchase: { ...purchaseFixture, totalCents: 4500, linkedPaidCents: 4500, expenses: [{ id: "expense", name: "Colruyt", amountCents: 4500, paidOn: "2026-11-07" }] } } };
+export const Child: Story = { args: { purchase: { ...purchaseFixture, canReadMoney: false, linkedPaidCents: null } } };

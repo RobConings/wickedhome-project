@@ -19,5 +19,6 @@
   "sectionError": {
     "title": "Dit onderdeel kon niet geladen worden",
     "description": "Laad de pagina opnieuw om het nog eens te proberen."
-  }
+  },
+  "allSections": "Alle instellingen"
 }

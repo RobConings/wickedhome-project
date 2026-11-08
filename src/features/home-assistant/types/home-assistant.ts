@@ -263,3 +263,17 @@ export const HA_STATUS_EVENT = "home_assistant.status";
 /** `alarm.state`: the alarm panel changed state (data: `{ entityId, state, at }`). */
 export const ALARM_STATE_EVENT = "alarm.state";
 export type AlarmStateEvent = { entityId: string; state: AlarmState; at: string };
+
+/** Controls offered by the server from the actual HA entity, never from a device icon/category. */
+export const haControlInputSchema = z.object({
+  entityId: z.string().min(1).max(255),
+  action: z.enum(["on", "off", "open", "close", "brightness", "position", "temperature"]),
+  value: z.number().finite().optional(),
+});
+export type HaControl = { entityId: string; name: string; state: string; updatedAt: string | null;
+  actions: ("on" | "off" | "open" | "close")[];
+  adjustment: { action: "brightness" | "position" | "temperature"; value: number | null; min: number; max: number; step: number; unit: string } | null;
+};
+export type HaDeviceControls = { connected: boolean; controls: HaControl[] };
+
+export type HaControlInput = z.infer<typeof haControlInputSchema>;

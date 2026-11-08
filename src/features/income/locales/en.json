@@ -169,5 +169,12 @@
       "title": "Meal voucher reminders",
       "description": "Adds a task \"Use € … meal vouchers before …\" for whoever has vouchers expiring within 30 days, and closes it once they are used or expired."
     }
+  },
+  "views": {
+    "label": "Income views",
+    "overview": "Overview",
+    "expected": "Expected",
+    "received": "Received",
+    "sources": "Recurring sources"
   }
 }

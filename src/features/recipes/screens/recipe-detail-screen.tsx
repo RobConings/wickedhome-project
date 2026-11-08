@@ -1,6 +1,8 @@
+import { RelatedRecordCards } from "@/components/shared/related-record-cards";
+import { RecordImage } from "@/components/shared/record-image";
 import * as React from "react";
 import {
-  ArrowLeftIcon,
+  FolderIcon,
   CalendarPlusIcon,
   ChefHatIcon,
   ExternalLinkIcon,
@@ -186,14 +188,8 @@ export function RecipeDetailScreen({
   return (
     <PageContainer>
       <Stack gap="md">
-        <Button asChild variant="ghost" size="sm" className="-ml-2 self-start text-muted-foreground">
-          <Link to="/recipes?tab=all">
-            <ArrowLeftIcon />
-            {t("actions.back")}
-          </Link>
-        </Button>
-        {coverUrl && <img src={coverUrl} alt="" className="h-40 w-full rounded-xl object-cover sm:h-56" />}
-        <PageHeader
+        {coverUrl && <RecordImage src={coverUrl} shape="banner" alt="" />}
+        <PageHeader backTo="/recipes?tab=all"
           title={
             <span className="flex items-center gap-3">
               <ChefHatIcon className="size-7 shrink-0 text-primary" aria-hidden="true" />
@@ -210,6 +206,11 @@ export function RecipeDetailScreen({
       </Stack>
       {canManage && editing && <RecipeFormDialog recipe={recipe} categories={categories} products={products} shops={shops} open={editing} onOpenChange={setEditing} />}
 
+      <RelatedRecordCards label={t("detail.details")} items={[
+        { id: "ingredients", label: t("detail.ingredients"), value: recipe.ingredients.length, to: "#recipe-ingredients", icon: ChefHatIcon, accent: "shopping" },
+        { id: "steps", label: t("detail.steps"), value: recipe.steps.length, to: "#recipe-steps", icon: ListOrderedIcon, accent: "shopping" },
+        ...(attachments ? [{ id: "documents", label: tCommon("nav.documents"), to: "#recipe-documents", icon: FolderIcon, accent: "documents" as const }] : []),
+      ]} />
       {mealPlan.length > 0 && (
         <PageGrid columns="cards">
           {mealPlan.map((entry) => (
@@ -332,7 +333,7 @@ export function RecipeDetailScreen({
             <CardTitle>{t("cover.title")}</CardTitle>
             <RecipeCoverChooser recipeId={recipe.id} coverFileId={recipe.coverFileId} canManage={canManage} />
           </Card>
-          {attachments}
+          {attachments && <section id="recipe-documents" className="scroll-mt-20">{attachments}</section>}
         </Stack>
       </PageGrid>
     </PageContainer>

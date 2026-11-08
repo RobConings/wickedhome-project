@@ -1,3 +1,4 @@
+import { publish } from "../lib/events";
 import { Router } from "express";
 import { pipeline } from "node:stream/promises";
 import {
@@ -65,6 +66,7 @@ documentsUploadRouter.put(
         contentType: req.get("content-type"),
         contentLength: req.get("content-length"),
       });
+      publish(currentUser(req).householdId, "documents.changed", { fileId: id });
       res.json(file);
     } catch (error) {
       // The client may still be sending; don't keep reading a body we refused.
@@ -79,6 +81,13 @@ documentsUploadRouter.put(
 export const documentsRouter = Router();
 
 documentsRouter.use(requireUser);
+documentsRouter.use((req, res, next) => {
+  if (!["GET", "HEAD", "OPTIONS"].includes(req.method)) {
+    const householdId = currentUser(req).householdId;
+    res.once("finish", () => { if (res.statusCode < 400) publish(householdId, "documents.changed", { scope: "files" }); });
+  }
+  next();
+});
 
 documentsRouter.get("/contents", async (req, res) => {
   const { folderId } = parse(contentsQuerySchema, req.query);

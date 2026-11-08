@@ -1,38 +1,20 @@
+import { ChartNoAxesCombinedIcon, PlugZapIcon, SettingsIcon, UploadIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { NavLink } from "react-router";
-import { ScrollRow } from "@/components/layout/scroll-row";
-import { cn } from "@/lib/utils";
+import { useLocation } from "react-router";
+import { SectionNavigation } from "@/components/shared/section-navigation";
 
 const PAGES = [
-  { to: "/energy", key: "overview", end: true },
-  { to: "/energy/appliances", key: "appliances", end: false },
-  { to: "/energy/setup", key: "setup", end: false },
-  { to: "/energy/import", key: "import", end: false },
+  { to: "/energy", key: "overview", icon: ChartNoAxesCombinedIcon },
+  { to: "/energy/appliances", key: "appliances", icon: PlugZapIcon },
+  { to: "/energy/setup", key: "setup", icon: SettingsIcon },
+  { to: "/energy/import", key: "import", icon: UploadIcon },
 ] as const;
 
-/** Links between the energy pages, styled like tabs. */
 export function EnergyNav({ className }: { className?: string }) {
   const { t } = useTranslation("energy");
-  return (
-    // One pill row that scrolls inside itself on narrow phones (the links are focusable), never the page.
-    <nav aria-label={t("nav.label")} className={cn("min-w-0", className)}>
-      <ScrollRow gap="xs" focusable={false} className="inline-flex h-9 w-fit gap-0 rounded-lg bg-muted p-[3px] text-muted-foreground">
-        {PAGES.map((page) => (
-          <NavLink
-            key={page.key}
-            to={page.to}
-            end={page.end}
-            className={({ isActive }) =>
-              cn(
-                "inline-flex h-full items-center rounded-md px-3 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none",
-                isActive ? "bg-background text-foreground shadow-sm" : "text-foreground/70 hover:text-foreground",
-              )
-            }
-          >
-            {t(`nav.${page.key}`)}
-          </NavLink>
-        ))}
-      </ScrollRow>
-    </nav>
-  );
+  const { pathname } = useLocation();
+  return <SectionNavigation label={t("nav.label")} className={className} items={PAGES.map((page) => ({
+    id: page.key, to: page.to, icon: page.icon, label: t(`nav.${page.key}`),
+    current: page.key === "overview" ? pathname === page.to : pathname === page.to || pathname.startsWith(`${page.to}/`),
+  }))} />;
 }

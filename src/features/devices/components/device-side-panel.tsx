@@ -18,16 +18,17 @@ type DeviceSidePanelProps = {
   canSetValues: boolean;
   now: number;
   onClose?: () => void;
+  hideHeading?: boolean;
   className?: string;
 };
 
 /** The device clicked on the live plan: state, every value (manual ones settable) and a link to it. */
-export function DeviceSidePanel({ device, profile, state, canSetValues, now, onClose, className }: DeviceSidePanelProps) {
+export function DeviceSidePanel({ device, profile, state, canSetValues, now, onClose, hideHeading = false, className }: DeviceSidePanelProps) {
   const { t } = useTranslation("devices");
   const { t: tCommon } = useTranslation();
   return (
     <Card className={cn("gap-3", className)} aria-label={device.name}>
-      <div className="flex items-start gap-3">
+      {!hideHeading && <div className="flex items-start gap-3">
         <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-section-soft text-section">
           <DeviceIcon icon={profile.icon} className="size-5" />
         </span>
@@ -40,7 +41,7 @@ export function DeviceSidePanel({ device, profile, state, canSetValues, now, onC
             <XIcon />
           </Button>
         )}
-      </div>
+      </div>}
       <div className="flex flex-wrap items-center gap-2">
         {state && <DeviceStateChip state={state} />}
         {device.place && <PlaceBadge place={device.place} />}

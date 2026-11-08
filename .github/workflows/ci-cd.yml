@@ -65,6 +65,10 @@ jobs:
         run: npm run test:shopping-browser
       - name: Compile server and client
         run: npm run build
+      - name: Build the shared component catalogue
+        run: npm run build-storybook
+      - name: Verify redesign components on phone and desktop
+        run: node scripts/redesign-storybook-smoke.mjs
 
   deploy:
     name: Deploy WickedHome (opt-in)

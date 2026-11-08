@@ -1,11 +1,17 @@
-# WickedHome — Feature Roadmap
+# WickedHome — product vision and roadmap
 
 WickedHome is the household hub: one place that knows and manages everything about the home.
+
+The next interface/experience work is defined by the [complete redesign plan](plans/app-samenhang/plan.mdx)
+and [annotated wireframe journeys](plans/app-samenhang/preview/walkthrough.html). Feature implementation
+and domain rules live in the linked feature guides. The MVP/later lists and foundation phases below retain
+the original product scope; they are not a current deployment checklist or a claim that built features
+still need to be created. English is the source language; Dutch is fully supported.
 
 Two missions:
 
 - **Functional**: manage places, tasks, shopping, stock, calendar, habitants, bills and subscriptions, and
-  later the house itself through Home Assistant (alarm, climate, appliances).
+  the connected home through Home Assistant (alarm, climate, appliances).
 - **Coding**: be the reference implementation of the hybrid Atomic + Feature component methodology
   (see [ARCHITECTURE.md](ARCHITECTURE.md) and [BRANDING.md](BRANDING.md)).
 
@@ -19,7 +25,7 @@ Two missions:
    the same lists, grouped by shop.
 4. **Home Assistant is the device hub.** WickedHome never talks to appliances or the alarm directly. It
    reads and acts through Home Assistant.
-5. **Bilingual from day one.** English and Dutch (nl-BE formatting), EUR only.
+5. **Bilingual from day one.** English first, with Dutch support; shared Belgian date/currency formatting, EUR only.
 6. **Every picker remembers.** Any selection (shop, product, place, habitant…) shows **Favourites** and
    **Recently used** above the full list, so reselecting is one tap. One shared picker component and two
    generic tables (`favorites`, `recent_selections`) make this automatic for every new domain.
@@ -32,8 +38,8 @@ Each domain becomes a `features/<domain>` folder on both the web and API side.
 
 | Domain | What it owns |
 |---|---|
-| `auth` | Accounts, sessions, passkeys, invites |
-| `household` | The household and its habitants (adults, kids, pets, guests), roles |
+| `auth` | Accounts, sessions, roles and invites; passkeys remain future scope |
+| `household` | The household and its habitants (adults, kids, pets, guests), resident profiles |
 | `places` | Floors, rooms, outdoor zones, the 2D floor plan editor |
 | `tasks` | Jobs inside and outside, recurrence, assignment, required materials |
 | `shops` | Physical shops and webshops, their details, product links |
@@ -45,15 +51,18 @@ Each domain becomes a `features/<domain>` folder on both the web and API side.
 | `income` | Finance: recurring incomes per member or joint (fixed with amount history, or variable like meal vouchers), one-off incomes, meal voucher balances ([FINANCE.md](FINANCE.md)) |
 | `money` | Finance: joint current and savings accounts with ledger and corrections, contributions, the monthly money flow ([FINANCE.md](FINANCE.md)) |
 | `projects` | Finance: open-ended budget pots (renovation, holiday, trip, Christmas…) with linked tasks, materials and expenses; spent / committed / remaining ([PROJECTS.md](PROJECTS.md)) |
-| `documents` | Folders and files like a drive, stored on the server (Google Drive later), attachable to anything |
+| `documents` | Folders and files like a drive, stored on the server or through the integrated Google Drive provider, attachable to anything |
 | `devices` | Things on the floor plan with live state: sensors, appliances, alarm parts; configurable fields and indicator rules |
 | `energy` | Electricity and gas (water later): use per period, appliances, solar panels, home battery, per-appliance breakdown, capacity peak |
 | `dashboard` | Today, upcoming, overdue, ready-to-start jobs, money this month |
 | `weather` | Forecast for the home address (Open-Meteo, KMI/IRM or Google) on the dashboard |
 | `waste` | Waste collection days from the local collector (Limburg.net, Recycle!), on the calendar and dashboard |
-| `settings` | The settings page: household and address, weather source, waste collector, later automations and integrations |
+| `settings` | The settings page: household and address, weather source, waste collector, automations and integrations |
 | `integrations` | Google (Gmail, Calendar), Home Assistant, connection health |
-| `home` | Home Assistant data: alarm state, temperatures, appliances (read first, act later) |
+| `home-assistant` | External connection, entities, live state, source mapping and supported commands |
+| `contacts` | People and suppliers outside the household, contact details and project roles |
+| `audit` | Traceable activity with actor, channel, target and retention |
+| `automations` | Scheduled jobs, run history and controls |
 | `assistant` | Chat, voice, tool calling against LM Studio, MCP server |
 | `notifications` | In-app, web push, digests |
 
@@ -78,7 +87,7 @@ Each domain becomes a `features/<domain>` folder on both the web and API side.
                    │  calendar  │
                    └────────────┘
 
-   places ──located in──► appliances ──measured by──► energy meters ◄── Home Assistant (later)
+   places ──located in──► appliances ──measured by──► energy meters ◄── Home Assistant
                                                            ▲
                           grid · solar · battery ──────────┘
 ```
@@ -316,7 +325,7 @@ Route 1 comes with the assistant phase. Route 2 comes once Home Assistant is run
 
 ---
 
-## Phases
+## Historical foundation sequence
 
 | Phase | Goal | Contents |
 |---|---|---|
@@ -344,9 +353,20 @@ The dashboard and notifications are not a phase. Every phase adds its own widget
 - **Camera scanning** needs HTTPS. That's fine on the public domain, but over plain `http://` on the LAN
   it won't work.
 
-## Open questions
+## Local redesign sequence — rollout in progress
 
-1. Bills and subscriptions are now phase 4. Is that late enough, or are they more urgent than stock?
-2. Domain name for WickedHome (e.g. `home.<domain>`)?
-3. Node 20 on the server has been end-of-life since April 2026. Upgrade to Node 24 LTS (via nvm for the
-   `wicked` user, so other apps are untouched)?
+1. Confirm existing capability coverage and owner contracts, including the purchase/project/expense/account chain.
+2. Establish approved shared page, selection, relationship and progress compositions in both languages/themes.
+3. Prove one complete project → material → shopping → acquisition → expense → account journey.
+4. Apply the same model to daily life, money, home, library and management modules.
+5. Maintain web/MCP help, screen context, source identities and architecture checks together.
+
+See the [complete plan](plans/app-samenhang/plan.mdx) for acceptance criteria and the
+[architecture contracts](plans/app-samenhang/architecture-contracts.md) for ownership. Catalogue and
+Purchases now expose public contracts over existing records, not additional parallel ledgers.
+
+## Release and environment follow-up
+
+Implemented foundations and reference journeys, plus outstanding module conversion and acceptance, are recorded in the [implementation report](plans/app-samenhang/implementation.md). Goods purpose, expense shares, correction guards, shared compositions and supported HA controls are implemented and tested against their owner services. The redesign preserves existing records and capabilities.
+
+Deployment, applying the additive migrations on the household server and testing physical HA commands against actual devices remain release/environment work. Hosting/runtime upgrades remain a separate operations decision.

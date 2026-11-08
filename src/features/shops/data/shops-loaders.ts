@@ -2,10 +2,10 @@ import i18n from "i18next";
 import { data, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
 import { ApiRequestError } from "@/lib/api-client";
 import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
-import { shopFormSchema } from "../types/shops";
-import { createShop, deleteShop, fetchShop, fetchShops, refreshShopIcon, setShopIngredientSearch, updateShop } from "./shops-requests";
+import { shopFormSchema, shopGroupFormSchema } from "../types/shops";
+import { createShopGroup, updateShopGroup, deleteShopGroup, createShop, deleteShop, fetchShop, fetchShops, refreshShopIcon, setShopIngredientSearch, updateShop } from "./shops-requests";
 
-export const SHOP_INTENTS = ["create", "update", "delete", "refresh-icon", "ingredient-search"] as const;
+export const SHOP_INTENTS = ["create", "update", "delete", "refresh-icon", "ingredient-search", "create-group", "update-group", "delete-group"] as const;
 export type ShopIntent = (typeof SHOP_INTENTS)[number];
 
 export type ShopActionResult = FormResult & { intent?: ShopIntent; shopId?: string };
@@ -28,6 +28,13 @@ async function handleShopForm(formData: FormData): Promise<ShopActionResult> {
   const id = String(formData.get("id") ?? "");
 
   try {
+    if (intent === "delete-group") { await deleteShopGroup(id); return { ok: true, intent }; }
+    if (intent === "create-group" || intent === "update-group") {
+      const { data: input, errors } = parseForm(shopGroupFormSchema, formData);
+      if (errors) return { errors, intent };
+      await (intent === "update-group" ? updateShopGroup(id, input) : createShopGroup(input));
+      return { ok: true, intent };
+    }
     if (intent === "delete") {
       await deleteShop(id);
       return { ok: true, intent, shopId: id };

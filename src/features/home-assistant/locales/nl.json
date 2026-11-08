@@ -246,5 +246,26 @@
       "title": "Toestelwaarden uit Home Assistant",
       "description": "Ververst toestelvelden die aan Home Assistant gekoppeld zijn wanneer de sensor dezelfde waarde opnieuw meldde, zodat ze niet als verouderd verschijnen."
     }
+  },
+  "controls": {
+    "title": "Toestel bedienen",
+    "description": "Beschikbare acties van de gekoppelde Home Assistant-entiteit. De gemelde toestand kan na de opdracht volgen.",
+    "offline": "Home Assistant is offline. Live bediening is niet beschikbaar.",
+    "none": "Dit toestel heeft geen ondersteunde bedieningsbron.",
+    "unavailable": "Deze entiteit is niet beschikbaar of heeft geen ondersteunde actie.",
+    "loadError": "Kon de toestelbediening niet laden.",
+    "retry": "Opnieuw proberen",
+    "failed": "De opdracht is niet uitgevoerd. Controleer de verbinding en probeer opnieuw.",
+    "on": "Inschakelen",
+    "off": "Uitschakelen",
+    "open": "Openen",
+    "close": "Sluiten",
+    "brightness": "Helderheid",
+    "position": "Positie",
+    "temperature": "Doeltemperatuur",
+    "adjustHint": "Kies een waarde binnen het bereik van het toestel.",
+    "scenes": "Scènes",
+    "scenesHint": "Start een scène uit je gekoppelde Home Assistant. Alleen ondersteunde scènes verschijnen hier.",
+    "noScenes": "Geen ondersteunde scènes beschikbaar."
   }
 }

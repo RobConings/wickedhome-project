@@ -1,7 +1,8 @@
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { useCurrentUser } from "@/features/auth";
-import { canManageDevices, fetchDevicesOverview, useDevicePlanLayer, type DevicesOverview } from "@/features/devices";
+import { PlanDeviceCreator, canManageDevices, fetchDevicesOverview, useDevicePlanLayer, type DevicesOverview } from "@/features/devices";
 import { FloorPlanScreen, canManagePlaces, floorPlanAction, floorPlanLoader } from "@/features/places";
+import { PlanTaskActions } from "@/features/tasks";
 import { screenHandle } from "@/lib/screen-context";
 
 /**
@@ -20,5 +21,8 @@ export function Component() {
   const { plan, devices } = useLoaderData<typeof loader>();
   // Route-level composition: places draws generic markers, devices turns devices into markers and a palette.
   const deviceLayer = useDevicePlanLayer({ overview: devices, floorId: plan.floor.id, canManage: canManageDevices(user.role) });
-  return <FloorPlanScreen plan={plan} canManage={canManagePlaces(user.role)} {...deviceLayer} />;
+  return <FloorPlanScreen plan={plan} canManage={canManagePlaces(user.role)} {...deviceLayer}
+    markerPalette={<div className="flex flex-col gap-3">{deviceLayer.markerPalette}{canManageDevices(user.role) && <PlanDeviceCreator />}</div>}
+    renderPlaceActions={(placeId) => <><PlanTaskActions placeId={placeId} />{canManageDevices(user.role) && <PlanDeviceCreator placeId={placeId} />}</>}
+  />;
 }

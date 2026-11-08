@@ -1,6 +1,6 @@
 import { CalendarIcon, ListChecksIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Card } from "@/components/shared/card";
 import { documentContentUrl } from "@/features/documents";
 import { cn } from "@/lib/utils";
@@ -20,7 +20,7 @@ export function ProjectTile({ project }: { project: Project }) {
   return (
     <Card className={cn("relative gap-3 overflow-hidden p-0 has-[a:hover]:bg-accent/30", closed && "opacity-80")}>
       {project.coverFileId ? (
-        <img src={documentContentUrl(project.coverFileId)} alt="" className="h-24 w-full object-cover" loading="lazy" />
+        <img src={documentContentUrl(project.coverFileId)} alt="" className="aspect-[16/9] w-full object-cover" loading="lazy" />
       ) : (
         <div className="h-1.5 w-full" style={{ backgroundColor: project.color }} aria-hidden="true" />
       )}

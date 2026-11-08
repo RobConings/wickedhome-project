@@ -317,7 +317,8 @@
     "startDateNeedsDate": "Several days need a last day.",
     "startDateAfterEnd": "The first day has to come before the last day.",
     "daysTooLong": "At most a year from the first to the last day.",
-    "daysAllDay": "Several days are always all day: no time."
+    "daysAllDay": "Several days are always all day: no time.",
+    "unknownDevice": "Choose a device in this household."
   },
   "project": {
     "label": "Project",
@@ -475,5 +476,13 @@
       "daysBefore_other": "{{count}} days before, {{time}}",
       "before": "{{offset}} {{time}}"
     }
+  },
+  "maintenance": {
+    "loading": "Loading maintenance tasks",
+    "error": "Maintenance tasks could not be loaded.",
+    "empty": "No maintenance planned for this device.",
+    "allDone": "All maintenance completed.",
+    "done": "Completed · {{count}}",
+    "add": "Plan maintenance"
   }
 }

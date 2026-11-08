@@ -114,5 +114,17 @@
     "needsWebshop": "Alleen voor een winkel met een webshop en een website.",
     "saving": "Bewaren…",
     "forbidden": "Alleen volwassenen kiezen in welke winkels gezocht wordt."
+  },
+  "destination": {
+    "placeholder": "Kies een winkel of opgeslagen groep"
+  },
+  "groups": {
+    "title": "Winkelgroepen",
+    "add": "Groep maken",
+    "edit": "Groep aanpassen",
+    "delete": "Groep verwijderen",
+    "deleteHint": "Winkelbeurten bewaren hun geschiedenis. Alleen deze opgeslagen groep wordt verwijderd.",
+    "shops": "Winkels in deze groep",
+    "description": "Bewaar winkels die je samen bezoekt. Kies één groep om een winkelsessie te starten."
   }
 }

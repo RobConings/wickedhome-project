@@ -19,5 +19,6 @@
   "sectionError": {
     "title": "This section couldn't be loaded",
     "description": "Reload the page to try again."
-  }
+  },
+  "allSections": "All settings"
 }

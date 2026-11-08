@@ -246,5 +246,26 @@
       "title": "Home Assistant device values",
       "description": "Refreshes device fields bound to Home Assistant whose sensor reported the same value again, so they don't show as out of date."
     }
+  },
+  "controls": {
+    "title": "Device controls",
+    "description": "Available actions from the linked Home Assistant entity. The reported state may follow the command.",
+    "offline": "Home Assistant is offline. Live controls are unavailable.",
+    "none": "This device has no supported control source linked.",
+    "unavailable": "This entity is unavailable or has no supported action.",
+    "loadError": "Could not load device capabilities.",
+    "retry": "Try again",
+    "failed": "The command could not be completed. Check the connection and try again.",
+    "on": "Turn on",
+    "off": "Turn off",
+    "open": "Open",
+    "close": "Close",
+    "brightness": "Brightness",
+    "position": "Position",
+    "temperature": "Target temperature",
+    "adjustHint": "Choose a value within the range reported by the device.",
+    "scenes": "Scenes",
+    "scenesHint": "Run a scene from your connected Home Assistant. Only supported scenes appear here.",
+    "noScenes": "No supported scenes are available."
   }
 }

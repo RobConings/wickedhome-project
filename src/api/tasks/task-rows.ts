@@ -29,6 +29,7 @@ type TaskRefRow = Prisma.TaskGetPayload<{ select: typeof taskRefSelect }>;
 
 export const taskInclude = {
   place: placeSelect,
+  device: { select: { id: true, name: true } },
   assignees: { orderBy: { position: "asc" } },
   checklist: { orderBy: { position: "asc" } },
   // What it still waits for: blockers that are open.
@@ -99,6 +100,7 @@ export function toTask(row: TaskRow, materials: TaskMaterials | null): Task {
     hold: row.heldAt ? { since: row.heldAt.toISOString(), reason: row.holdReason } : null,
     waitingFor: status === "open" ? row.links.map((link) => toTaskRef(link.otherTask)) : [],
     commentCount: row._count.comments,
+    device: row.device ? { id: row.device.id, name: row.device.name } : null,
     project: row.project ? { id: row.project.id, name: row.project.name, color: row.project.color } : null,
   };
 }

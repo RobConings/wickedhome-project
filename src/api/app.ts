@@ -1,4 +1,6 @@
 import express from "express";
+import { purchasesRouter } from "./purchases/purchases.routes";
+import { catalogueRouter } from "./catalogue/catalogue.routes";
 // The assistant lives in ai/ (ai/README.md): its core (chat, MCP) and every skill, registered here once.
 import { assistantRouter } from "@ai/core/assistant.routes";
 import { mcpRouter } from "@ai/core/mcp.routes";
@@ -18,9 +20,9 @@ import { incomeRouter } from "./income/income.routes";
 import { integrationsRouter } from "./integrations/integrations.routes";
 import { inventoryRouter } from "./inventory/inventory.routes";
 import { jobsRouter } from "./jobs/jobs.routes";
-import { eventsRouter } from "./lib/events";
+import { eventsRouter, publish } from "./lib/events";
 import { errorHandler, notFoundHandler, requireAppHeader } from "./lib/http";
-import { loadSession } from "./lib/session";
+import { currentUser, loadSession } from "./lib/session";
 import { mailRouter } from "./mail/mail.routes";
 import { moneyRouter } from "./money/money.routes";
 import { notificationsRouter } from "./notifications/notifications.routes";
@@ -64,6 +66,18 @@ export function createApp() {
   api.use(express.json({ limit: "1mb" }));
   api.use(requireAppHeader);
   api.use(loadSession);
+  // Successful HTTP mutations and assistant/MCP writes invalidate the same composed browser views.
+  api.use((req, res, next) => {
+    const feature = req.path.split("/")[1];
+    const observable = new Set(["household", "places", "tasks", "shops", "shopping", "inventory", "expenses", "income", "money", "projects", "contacts", "recipes", "calendar", "energy", "devices", "home-assistant", "documents", "integrations", "mail", "jobs"]);
+    if (!["GET", "HEAD", "OPTIONS"].includes(req.method) && feature && observable.has(feature)) {
+      try {
+        const householdId = currentUser(req).householdId;
+        res.once("finish", () => { if (res.statusCode < 400) publish(householdId, "records.changed", { feature }); });
+      } catch { /* Public/auth requests have no household view to invalidate. */ }
+    }
+    next();
+  });
 
   api.get("/health", (_req, res) => {
     res.json({ ok: true });
@@ -76,6 +90,8 @@ export function createApp() {
   api.use("/selections", selectionsRouter);
   api.use("/shops", shopsRouter);
   api.use("/shopping", shoppingRouter);
+  api.use("/purchases", purchasesRouter);
+  api.use("/catalogue", catalogueRouter);
   api.use("/inventory", inventoryRouter);
   // Finance: bills and subscriptions became expenses (docs/FINANCE.md).
   api.use("/expenses", expensesRouter);

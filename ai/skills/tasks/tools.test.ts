@@ -41,6 +41,7 @@ const task: Task = {
   waitingFor: [],
   commentCount: 0,
   project: null,
+  device: null,
 };
 
 describe("tasks skill", () => {
@@ -142,4 +143,11 @@ describe("tasks skill", () => {
     assert.equal(remove?.permission, "sensitive");
     assert.equal(remove?.confirm, "always");
   });
+});
+
+it("MCP task edits preserve, change and explicitly clear the maintained device", () => {
+  const linked = { ...task, device: { id: "d-boiler", name: "Boiler" } };
+  assert.equal(mergeTaskInput(linked, { notes: "Replace filter" }).deviceId, "d-boiler");
+  assert.equal(mergeTaskInput(linked, { deviceId: "d-pump" }).deviceId, "d-pump");
+  assert.equal(mergeTaskInput(linked, { deviceId: null }).deviceId, null);
 });

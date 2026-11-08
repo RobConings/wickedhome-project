@@ -2,6 +2,8 @@ import {
   shoppingStockStatus,
   shoppingStockNeed,
 } from "@/features/shopping/types/shopping";
+import { requirementsForDestination } from "@/features/shopping/types/visit-destination";
+import { todayIn } from "@/types/dates";
 import { householdStockUnit } from "@/types/units";
 import { createHash } from "node:crypto";
 import type { SessionUser } from "@/features/auth/types/auth";
@@ -32,6 +34,7 @@ import {
   getItem,
   getShoppingOverview,
   listItems,
+  listProducts,
   suppressShoppingRestock,
 } from "./shopping.service";
 
@@ -174,9 +177,12 @@ export async function getShoppingSession(
               payerHabitantId: payment.expense?.payerHabitantId ?? null,
             })),
       lines: purchase.stockPurchases.map((line) => ({
-        name: line.sessionItem?.name ?? line.productId,
+        name: line.purchasedProductName ?? line.sessionItem?.name ?? line.productId,
+        productId: line.purchasedProductId,
         id: line.id,
         sessionItemId: line.sessionItemId,
+        purchasedQuantity: line.purchasedQuantity?.toNumber() ?? null,
+        purchasedUnit: line.purchasedUnit,
         quantity: line.quantity.toNumber(),
         unit: line.unit,
         stockAdded: line.stockAdded,
@@ -290,11 +296,14 @@ export async function createShoppingSession(
   input: SessionCreateInput,
 ) {
   manager(user);
+  if (input.selection === "matching" && ((input.shopGroupId ? 1 : 0) + input.shopIds.length !== 1 || input.requirementIds.length))
+    throw badRequest("Choose one shop or saved group for matching needs");
   const sourceKey = `visit-start:${user.id}:${input.operationId ?? crypto.randomUUID()}`;
   const startHash = createHash("sha256")
     .update(
       JSON.stringify({
         name: input.name,
+        selection: input.selection,
         shopIds: [...input.shopIds].sort(),
         shopGroupId: input.shopGroupId,
         requirementIds: [...input.requirementIds].sort(),
@@ -334,11 +343,16 @@ export async function createShoppingSession(
     })) !== shopIds.length
   )
     throw notFound("Shop not found");
-  const requirements = input.requirementIds.length
-    ? await listItems(user.householdId, { status: "open" }, user.locale)
-    : [];
+  const matching = input.selection === "matching";
+  // Ordinary starts refresh current needs without resetting a recent acquisition's restock suppression.
+  const requirements = matching
+    ? (await getShoppingOverview(user.householdId, user.locale)).items.filter((item) => item.status === "open")
+    : input.requirementIds.length ? await listItems(user.householdId, { status: "open" }, user.locale) : [];
+  const matchingProducts = matching ? await listProducts(user.householdId) : [];
+  const destination = group?.name ?? (shopIds[0] ? (await db.shop.findFirst({ where: { id: shopIds[0], OR: [{ householdId: user.householdId }, { householdId: null }] }, select: { name: true } }))?.name : null);
+  const visitName = input.name ?? `${(destination ?? (user.locale === "nl" ? "Winkelbeurt" : "Shopping trip")).slice(0, 85)} · ${todayIn()}`;
   const chosen = new Set(input.requirementIds);
-  const selected = requirements.filter(
+  const selected = matching ? requirementsForDestination(requirements, shopIds, matchingProducts) : requirements.filter(
     (item) =>
       (item.requirements ?? [item]).some((part) => chosen.has(part.id)) ||
       chosen.has(item.id),
@@ -403,7 +417,7 @@ export async function createShoppingSession(
     const created = await tx.shoppingSession.create({
       data: {
         householdId: user.householdId,
-        name: input.name,
+        name: visitName,
         shopIds,
         shopGroupId: input.shopGroupId,
         createdByUserId: user.id,
@@ -540,6 +554,13 @@ async function acquire(
       purchasedAt: receipt?.purchasedAt.toISOString(),
       countDisposition: receipt?.countDisposition,
     });
+    const evidence = await tx.stockPurchaseEvidence.findUniqueOrThrow({
+      where: { householdId_sourceKey: { householdId: user.householdId, sourceKey } },
+    });
+    await tx.stockPurchase.updateMany({
+      where: { householdId: user.householdId, id: { in: evidence.purchaseIds } },
+      data: { purchasedProductId: item.productId, purchasedProductName: item.name, purchasedQuantity: delta, purchasedUnit: item.unit },
+    });
     await tx.shoppingSessionItem.update({
       where: { id: item.id },
       data: { stockItemId: stock.id },
@@ -554,6 +575,10 @@ async function acquire(
         householdId: user.householdId,
         stockItemId: `untracked:${item.id}`,
         productId: item.productId ?? `unlinked:${item.id}`,
+        purchasedProductId: item.productId,
+        purchasedProductName: item.name,
+        purchasedQuantity: delta,
+        purchasedUnit: item.unit,
         quantity: delta,
         unit: item.unit,
         purchasedAt: receipt?.purchasedAt ?? new Date(),
@@ -584,7 +609,7 @@ export async function updateShoppingSessionItem(
   input: SessionItemUpdateInput,
 ) {
   await withShoppingSessionTransaction(user, sessionId, async (tx) => {
-    const item = await tx.shoppingSessionItem.findFirst({
+    let item = await tx.shoppingSessionItem.findFirst({
       where: { id, sessionId, removedAt: null },
     });
     if (!item) throw notFound("Shopping visit item not found");
@@ -594,6 +619,7 @@ export async function updateShoppingSessionItem(
           id,
           status: input.status,
           quantity: input.quantity,
+          productId: input.productId,
           purchasedQuantity: input.purchasedQuantity,
           stockItemId: input.stockItemId,
           remove: input.remove,
@@ -629,7 +655,8 @@ export async function updateShoppingSessionItem(
       target === item.purchasedQuantity.toNumber() &&
       item.status === "BOUGHT" &&
       !input.quantity &&
-      !input.remove
+      !input.remove &&
+      !input.productId
     ) {
       await remember();
       return;
@@ -642,6 +669,24 @@ export async function updateShoppingSessionItem(
       throw badRequest(
         "Undoing a tick does not remove real goods; correct the stock count explicitly",
       );
+    if (input.productId && input.productId !== item.productId) {
+      const current = item.productId ? await tx.product.findFirst({
+        where: { id: item.productId, householdId: user.householdId },
+      }) : null;
+      const variant = await tx.product.findFirst({
+        where: { id: input.productId, householdId: user.householdId },
+      });
+      if (!current || !variant || (current.stockProductId ?? current.id) !== (variant.stockProductId ?? variant.id))
+        throw badRequest("Choose a linked variant of this product", { productId: ["Choose a linked variant of this product"] });
+      await tx.stockPurchase.updateMany({
+        where: { householdId: user.householdId, sessionItemId: item.id, purchasedProductName: null },
+        data: { purchasedProductId: item.productId, purchasedProductName: item.name },
+      });
+      // Preserve the visit position, requirement IDs and stock unit. Earlier acquisitions retain their snapshots.
+      item = await tx.shoppingSessionItem.update({ where: { id }, data: {
+        productId: variant.id, name: variant.name, category: variant.category,
+      } });
+    }
     await acquire(
       tx,
       user,
@@ -1136,7 +1181,13 @@ export async function reconcileShoppingReceiptLine(
           existingPurchaseIds: acquisitions.map((line) => line.id),
         });
       }
-      if (input.existingPurchaseIds)
+      if (input.existingPurchaseIds) {
+        // A manually recorded acquisition can join the visit later. Freeze its confirmed label once;
+        // receipt evidence must never rename an earlier, already identified variant.
+        await tx.stockPurchase.updateMany({
+          where: { householdId: user.householdId, id: { in: acquisitions.map((line) => line.id) }, purchasedProductName: null },
+          data: { purchasedProductId: item.productId, purchasedProductName: item.name },
+        });
         await tx.stockPurchase.updateMany({
           where: {
             householdId: user.householdId,
@@ -1147,6 +1198,7 @@ export async function reconcileShoppingReceiptLine(
             sessionItemId: item.id,
           },
         });
+      }
       const allLines = await tx.stockPurchase.findMany({
         where: {
           householdId: user.householdId,

@@ -7,6 +7,7 @@ import { idSchema } from "./common";
  */
 export const SELECTION_ENTITY_TYPES = [
   "shop",
+  "shop_group",
   "place",
   "product",
   "habitant",

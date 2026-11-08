@@ -137,6 +137,7 @@ export function EntityPicker({
     ...labelOverrides,
   };
 
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
   const [highlighted, setHighlighted] = React.useState("");
@@ -283,6 +284,7 @@ export function EntityPicker({
 
   const trigger = (
     <Button
+      ref={triggerRef}
       id={id}
       type="button"
       variant="outline"
@@ -322,6 +324,7 @@ export function EntityPicker({
               className="gap-0 rounded-t-xl pb-[env(safe-area-inset-bottom)]"
               // Show the list first; focusing the search would cover it with the keyboard.
               onOpenAutoFocus={(event) => event.preventDefault()}
+              onCloseAutoFocus={(event) => { event.preventDefault(); triggerRef.current?.focus(); }}
             >
               <SheetHeader className="sr-only">
                 <SheetTitle>{labels.placeholder}</SheetTitle>

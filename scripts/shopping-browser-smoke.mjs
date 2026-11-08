@@ -76,9 +76,14 @@ try {
       color: "#123456",
     },
   });
+  await db.place.update({ where: { id: place.id }, data: { polygon: [{ x: 0, y: 0 }, { x: 400, y: 0 }, { x: 400, y: 400 }, { x: 0, y: 400 }] } });
+  await db.place.create({ data: { householdId: home.id, floorId: floor.id, name: "Store room", kind: "ROOM", color: "#345678", polygon: [{ x: 400, y: 0 }, { x: 800, y: 0 }, { x: 800, y: 400 }, { x: 400, y: 400 }] } });
+  await db.task.create({ data: { householdId: home.id, title: "Check pantry shelves", placeId: place.id } });
+  const project = await db.project.create({ data: { householdId: home.id, name: "Pantry refresh", color: "#345678", status: "ACTIVE", places: { create: { placeId: place.id } } } });
   const shop = await db.shop.create({
     data: { householdId: home.id, name: "Colruyt", type: "SUPERMARKET" },
   });
+  await db.shop.create({ data: { householdId: home.id, name: "Collect&Go", type: "SUPERMARKET" } });
   const product = await db.product.create({
     data: {
       householdId: home.id,
@@ -89,6 +94,7 @@ try {
       defaultShopId: shop.id,
     },
   });
+  await db.product.create({ data: { householdId: home.id, name: "Other linked milk brand", category: "DAIRY", unit: "pak", stockProductId: product.id } });
   const initialStock = await db.stockItem.create({
     data: {
       householdId: home.id,
@@ -155,6 +161,7 @@ try {
 
   fixture = {
     householdId: home.id,
+    projectId: project.id,
     password,
     emails: users.map((user) => user.email),
     stockId: initialStock.id,
@@ -227,6 +234,30 @@ try {
   );
   for (const page of [one, two])
     page.on("pageerror", (error) => errors.push(error.message));
+  // Home keeps the saved room map and cross-feature links, including phone navigation.
+  await one.goto(base);
+  await one.getByRole("heading", { name: "Ontdek je huis", exact: true }).waitFor();
+  await one.getByRole("link", { name: "Check pantry shelves", exact: true }).waitFor();
+  await one.getByRole("link", { name: "Pantry refresh", exact: true }).waitFor();
+  await one.getByRole("button", { name: "Volgende ruimte", exact: true }).click();
+  await one.getByRole("heading", { name: "Store room", exact: true }).waitFor();
+  await one.getByRole("button", { name: "Vorige ruimte", exact: true }).click();
+  await one.getByRole("link", { name: "Check pantry shelves", exact: true }).waitFor();
+  await one.getByRole("button", { name: "Store room", exact: true }).press("Enter");
+  await one.getByRole("heading", { name: "Store room", exact: true }).waitFor();
+  await one.getByRole("button", { name: "Pantry", exact: true }).press("Enter");
+  await one.getByRole("link", { name: "Pantry refresh", exact: true }).click();
+  await one.waitForURL(new RegExp(`/projects/${fixture.projectId}$`));
+  const related = one.getByRole("navigation", { name: "Gekoppeld aan dit project" });
+  await related.waitFor();
+  assert.equal(await related.getByRole("link").count(), 6);
+  for (const link of await related.getByRole("link").all()) {
+    const box = await link.boundingBox();
+    assert.ok(box.width >= 44 && box.height >= 76);
+  }
+  await related.getByRole("link", { name: /^Documenten/ }).click();
+  await one.waitForURL(/#project-documents$/);
+  assert.equal(await one.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
   // Verify the same forecast and visible toggles in ordinary groceries, shop view and visit selection.
   for (const screen of [
     "/shopping",
@@ -234,6 +265,7 @@ try {
     "/shopping/sessions",
   ]) {
     await one.goto(`${base}${screen}`);
+    if (screen === "/shopping/sessions") await one.locator("summary").filter({ hasText: "Specifieke boodschappen en andere opties kiezen" }).click();
     const essential = one.getByText(/^Test essentieel op minimum(?:\s|$)/);
     const optional = one.getByText(/^Test niet essentieel op minimum(?:\s|$)/);
     await essential.first().waitFor();
@@ -277,18 +309,50 @@ try {
   await one
     .getByRole("heading", { name: "Winkelsessies", exact: true })
     .waitFor();
+  await one.locator("summary").filter({ hasText: "Specifieke boodschappen en andere opties kiezen" }).click();
+  await one.getByRole("combobox").first().click();
+  await one.getByRole("option", { name: /Colruyt/ }).click();
   await one
     .locator("input[name=name]")
     .fill("Colruyt — gezamenlijke winkelbeurt");
-  await one.getByRole("checkbox", { name: "Colruyt", exact: true }).check();
   await one.getByRole("checkbox", { name: /Boni Halfvolle Melk/ }).check();
   await one.getByRole("button", { name: /Start sessie/ }).click();
   await one.waitForURL(/\/shopping\/sessions\/.+/);
   const sessionUrl = one.url();
   const sessionId = sessionUrl.split("/").at(-1);
+  // Adjust is an overlay, not a navigation or a purchase. Select only already-linked variants.
+  const edit = async (quantity, variant) => {
+    await one.getByRole("button", { name: "Aanpassen", exact: true }).click();
+    const dialog = one.getByRole("dialog").filter({ has: one.locator("input[name=quantity]") });
+    await dialog.locator("input[name=quantity]").fill(String(quantity));
+    await dialog.getByRole("combobox").click();
+    await one.getByRole("option", { name: new RegExp(variant) }).click();
+    await dialog.getByRole("button", { name: "Hoeveelheid bewaren", exact: true }).click();
+    await dialog.waitFor({ state: "hidden" });
+    assert.equal(one.url(), sessionUrl);
+    const stock = await database.query("SELECT quantity::text FROM stock_items WHERE id=$1", [fixture.stockId]);
+    assert.equal(stock.rows[0].quantity, "0.000", "Adjust never buys goods");
+  };
+  await edit(3, "Other linked milk brand");
+  await edit(2, "Boni Halfvolle Melk");
   await two.goto(sessionUrl);
   await two.getByRole("button", { name: "Deelnemen", exact: true }).click();
   await one.getByText(/Cindy/).first().waitFor();
+  // Another household member changes the row while Adjust is open: keep the draft and explain the conflict.
+  await one.getByRole("button", { name: "Aanpassen", exact: true }).click();
+  const staleDialog = one.getByRole("dialog").filter({ has: one.locator("input[name=quantity]") });
+  await staleDialog.locator("input[name=quantity]").fill("3");
+  const latest = await (await contexts[1].request.get(`${base}/api/shopping/sessions/${sessionId}`)).json();
+  const changed = await contexts[1].request.patch(`${base}/api/shopping/sessions/${sessionId}/items/${latest.items[0].id}`, {
+    headers: { "X-WickedHome": "1" }, data: { revision: latest.items[0].revision, operationId: "other-person-while-editing", quantity: 2 },
+  });
+  assert.ok(changed.ok(), await changed.text());
+  await staleDialog.getByRole("button", { name: "Hoeveelheid bewaren", exact: true }).click();
+  await staleDialog.getByText(/Iemand heeft dit product gewijzigd/).waitFor();
+  assert.equal(await staleDialog.locator("input[name=quantity]").inputValue(), "3");
+  assert.equal(one.url(), sessionUrl);
+  await staleDialog.getByRole("button", { name: "Annuleren", exact: true }).click();
+  await staleDialog.waitFor({ state: "hidden" });
   await Promise.all([
     one.getByRole("button", { name: "Gekocht", exact: true }).click(),
     two.getByRole("button", { name: "Gekocht", exact: true }).click(),
@@ -307,11 +371,13 @@ try {
     [fixture.householdId],
   );
   assert.equal(count.rows[0].n, 1);
-  const add = one
-    .locator("form")
-    .filter({ has: one.locator("select[name=productId]") });
-  await add.locator("select[name=productId]").selectOption(fixture.spreadId);
-  await add.getByRole("button", { name: "Toevoegen", exact: true }).click();
+  await one.getByRole("button", { name: "Toevoegen", exact: true }).click();
+  const extra = one.getByRole("dialog", { name: "Toevoegen", exact: true });
+  await extra.getByRole("combobox").click();
+  await one.getByRole("option", { name: /BERTOLLI smeerboter/ }).click();
+  await one.locator('[data-slot="sheet-content"]').waitFor({ state: "hidden" });
+  await extra.getByRole("button", { name: "Opslaan", exact: true }).click();
+  await extra.waitFor({ state: "hidden" });
   const spreadForm = one
     .locator("form")
     .filter({ hasText: "BERTOLLI smeerboter" });
@@ -361,26 +427,21 @@ try {
   await match
     .getByRole("button", { name: "Bonregel koppelen", exact: true })
     .click();
-  await one
-    .locator("summary")
-    .filter({ hasText: "Betaling toevoegen of koppelen" })
-    .click();
-  const payment = one
-    .locator("form")
-    .filter({ has: one.locator("input[name=amount]") });
+  await one.getByRole("button", { name: "Betaling toevoegen of koppelen", exact: true }).click();
+  const payment = one.getByRole("dialog");
   await payment.locator("input[name=payee]").fill("Colruyt");
-  await payment.locator("input[name=amount]").fill("5.00");
-  await payment
-    .locator("select[name=accountId]")
-    .selectOption(fixture.accountId);
-  await payment.locator("select[name=paidBy]").selectOption(fixture.robId);
-  await payment
-    .getByRole("button", { name: "Betaling opslaan", exact: true })
-    .click();
+  await payment.getByLabel("Betaald bedrag (€)", { exact: true }).fill("5,00");
+  await payment.getByLabel(/^Betaalrekening/ ).click();
+  await one.getByRole("option", { name: "Gezamenlijke rekening", exact: true }).click();
+  await payment.getByLabel(/^Betaald door/ ).click();
+  await one.getByRole("option", { name: "Rob", exact: true }).click();
+  const paymentRequest = one.waitForRequest((request) => request.url().endsWith(`/sessions/${sessionId}/payments`) && request.method() === "POST");
+  await payment.getByRole("button", { name: "Betaling opslaan", exact: true }).click();
+  const originalPayment = (await paymentRequest).postDataJSON();
+  await payment.waitFor({ state: "hidden" });
   await one.getByRole("link", { name: /Colruyt.*5,00/ }).waitFor();
-  await payment
-    .getByRole("button", { name: "Betaling opslaan", exact: true })
-    .click();
+  const replay = await contexts[0].request.post(`${base}/api/shopping/sessions/${sessionId}/payments`, { headers: { "X-WickedHome": "1" }, data: originalPayment });
+  assert.ok(replay.ok(), await replay.text());
   const expenses = await database.query(
     'SELECT count(*)::int AS n FROM bills WHERE "householdId"=$1',
     [fixture.householdId],
@@ -417,9 +478,83 @@ try {
       process.env.SHOPPING_BROWSER_SCREENSHOT ?? "/tmp/wh-shopping-browser.png",
     fullPage: true,
   });
+  // Saved groups belong to Shops and feed the ordinary, single-choice session start.
+  await one.goto(`${base}/shops`);
+  await one.getByRole("button", { name: "Groep maken", exact: true }).click();
+  const groupDialog = one.getByRole("dialog");
+  await groupDialog.locator("input[name=name]").fill("Weekly run");
+  await groupDialog.locator("button[role=combobox]").click();
+  await one.getByRole("option", { name: "Colruyt", exact: true }).click();
+  await groupDialog.locator("button[role=combobox]").click();
+  await one.getByRole("option", { name: "Collect&Go", exact: true }).click();
+  await groupDialog.getByRole("button", { name: "Opslaan", exact: true }).click();
+  await groupDialog.waitFor({ state: "hidden" });
+  await one.getByRole("link", { name: /^Weekly run/ }).click();
+  await one.getByRole("heading", { name: "Winkelsessies", exact: true }).waitFor();
+  assert.equal(await one.locator("input[name=name]").isVisible(), false, "Ordinary start needs no administrative name");
+  assert.equal(await one.getByRole("checkbox").filter({ visible: true }).count(), 0, "Ordinary destination selection has no checkbox matrix");
+  await one.getByRole("button", { name: "Start winkelen", exact: true }).click();
+  await one.waitForURL(/\/shopping\/sessions\/[^?]+$/);
+  const started = await (await contexts[0].request.get(`${base}/api/shopping/sessions/${one.url().split("/").at(-1)}`)).json();
+  assert.equal(started.shopIds.length, 2); assert.ok(started.items.length > 0, "Current matching needs become the checklist");
+
+  // Deliberate goods purpose and cost shares stay separate from stock and account effects.
+  const paidVisit = await (await contexts[0].request.get(`${base}/api/shopping/sessions/${sessionId}`)).json();
+  const purchased = paidVisit.purchases[0]; const acquisitionId = purchased.lines[0].id; const expenseId = purchased.payments[0].expenseId;
+  await one.goto(`${base}/purchases/${purchased.id}`);
+  await one.getByRole("button", { name: "Doel toewijzen", exact: true }).click();
+  const goodsDialog = one.getByRole("dialog");
+  await goodsDialog.locator("input[name=householdQuantity]").fill("1");
+  await goodsDialog.getByRole("button", { name: "Project toevoegen", exact: true }).click();
+  await goodsDialog.getByLabel("Aantal voor dit project", { exact: true }).fill("1");
+  await goodsDialog.getByRole("button", { name: "Opslaan", exact: true }).click();
+  await goodsDialog.waitFor({ state: "hidden" });
+  const assigned = await (await contexts[0].request.get(`${base}/api/purchases/goods/${acquisitionId}/allocation`)).json();
+  assert.equal(assigned.householdQuantity, 1); assert.equal(assigned.projects[0].quantity, 1); assert.equal(assigned.unallocatedQuantity, 0);
+  await one.getByRole("link", { name: "Colruyt", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === `/expenses/${expenseId}` && url.searchParams.has("from"));
+  await one.getByRole("button", { name: "Kosten verdelen", exact: true }).click();
+  const costsDialog = one.getByRole("dialog");
+  await costsDialog.getByLabel("Huishouden", { exact: true }).fill("1,00");
+  await costsDialog.getByRole("button", { name: "Project toevoegen", exact: true }).click();
+  await costsDialog.getByLabel("Projectbedrag", { exact: true }).fill("4,00");
+  await costsDialog.getByRole("button", { name: "Opslaan", exact: true }).click();
+  await costsDialog.waitFor({ state: "hidden" });
+  const costView = await (await contexts[0].request.get(`${base}/api/expenses/${expenseId}/allocations`)).json();
+  assert.equal(costView.householdCents, 100); assert.equal(costView.projects[0].amountCents, 400);
+  await one.getByRole("button", { name: "Kosten verdelen", exact: true }).click();
+  await costsDialog.getByLabel("Projectbedrag", { exact: true }).waitFor();
+  const concurrent = await contexts[1].request.put(`${base}/api/expenses/${expenseId}/allocations`, { headers: { "X-WickedHome": "1" }, data: { revision: costView.revision, householdCents: 150, projects: [{ projectId: fixture.projectId, amountCents: 350 }] } });
+  assert.ok(concurrent.ok(), await concurrent.text());
+  await costsDialog.getByRole("button", { name: "Opslaan", exact: true }).click();
+  await costsDialog.getByText(/Je invoer blijft bewaard/).waitFor();
+  assert.equal(await costsDialog.getByLabel("Projectbedrag", { exact: true }).inputValue(), "4,00");
+  await costsDialog.getByRole("button", { name: "Annuleren", exact: true }).click();
+  await one.getByRole("link", { name: "Terug naar waar je vandaan kwam", exact: true }).click();
+  await one.waitForURL(new RegExp(`/purchases/${purchased.id}$`));
+  assert.equal((await database.query('SELECT count(*)::int AS n FROM bills WHERE "householdId"=$1', [fixture.householdId])).rows[0].n, 1);
+  assert.equal((await database.query('SELECT quantity::text FROM stock_items WHERE id=$1', [fixture.stockId])).rows[0].quantity, "2.000");
+
+  // Every top-level module keeps a working entry point under the shared shell.
+  const modulePaths = ["/", "/tasks", "/projects", "/shopping", "/inventory", "/recipes", "/calendar", "/purchases", "/expenses", "/income", "/money", "/house", "/places", "/devices", "/energy", "/habitants", "/shopping/products", "/shops", "/documents", "/contacts", "/assistant", "/home-assistant", "/integrations", "/notifications", "/settings", "/devices/profiles", "/energy/appliances", "/energy/setup", "/energy/import", "/documents/trash"];
+  for (const [locale, theme, width] of [["en", "light", 390], ["nl", "dark", 1440]]) {
+    await db.user.updateMany({ where: { householdId: fixture.householdId }, data: { locale } });
+    await one.evaluate(({ locale, theme }) => { localStorage.setItem("wh-locale", locale); localStorage.setItem("wh-theme", theme); }, { locale, theme });
+    await one.setViewportSize({ width, height: 1000 });
+    for (const modulePath of modulePaths) {
+      console.log("Module check:", modulePath, locale, theme);
+      await one.goto(`${base}${modulePath}`);
+      await one.locator("main h1").first().waitFor();
+      await one.locator("main [role=alert]").first().isVisible().then((visible) => { if (visible) console.log("Visible module notice:", modulePath); });
+      assert.equal(await one.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, `${modulePath} ${locale}/${theme} fits ${width}px`);
+      assert.equal(await one.getByText(/Unexpected Application Error|Something went wrong/i).count(), 0, `${modulePath} has no route error`);
+      if (width >= 1024) assert.equal(await one.locator("aside nav a[aria-current=page]").count(), 1, `${modulePath} has one active sidebar destination`);
+      assert.ok((await one.locator("main h1").first().innerText()).trim(), `${modulePath} has a page identity`);
+    }
+  }
   assert.deepEqual(errors, []);
   console.log(
-    "Browser smoke passed: Op/Bijna op dividers and toggles across three shopping views, two mobile browsers, SSE collaboration, exactly-once buy, skip, close, PDF receipt, receipt replay, payment replay, reconnect and mobile layout.",
+    "Browser smoke passed: room map and room cycling, project summary cards, quantity/variant Adjust without navigation or stock, retained drafts on concurrent edit conflicts, Op/Bijna op dividers and toggles across three shopping views, two mobile browsers, SSE collaboration, exactly-once buy, skip, close, PDF receipt, receipt/payment replay, saved-group automatic start, goods/cost allocation with conflict drafts, return context, 60 module/language/theme entry checks and mobile layout.",
   );
 } catch (error) {
   const pages = browser?.contexts().flatMap((context) => context.pages()) ?? [];
@@ -428,6 +563,7 @@ try {
       path: "/tmp/wh-shopping-browser-failure.png",
       fullPage: true,
     });
+    console.error("Failing page:", pages[0].url());
     console.error((await pages[0].locator("body").innerText()).slice(-5000));
   }
   console.error("Browser errors:", errors);

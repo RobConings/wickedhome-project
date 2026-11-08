@@ -64,8 +64,10 @@ const expenseSelect = {
   dueDate: true,
   paidOn: true,
   recurringExpenseId: true,
+  allocationHouseholdCents: true,
+  projectAllocations: { select: { projectId: true, amountCents: true } },
 } as const satisfies Prisma.ExpenseSelect;
-type ExpenseRow = Prisma.ExpenseGetPayload<{ select: typeof expenseSelect }>;
+type ExpenseRow = Prisma.ExpenseGetPayload<{ select: typeof expenseSelect }> & { totalAmountCents?: number };
 
 const itemSelect = {
   id: true,
@@ -123,7 +125,7 @@ async function loadLinked(householdId: string, projectIds: string[]): Promise<Li
   if (projectIds.length === 0) return linked;
   const [expenses, tasks] = await Promise.all([
     db.expense.findMany({
-      where: { householdId, projectId: { in: projectIds } },
+      where: { householdId, OR: [{ projectId: { in: projectIds } }, { projectAllocations: { some: { projectId: { in: projectIds } } } }] },
       select: expenseSelect,
       orderBy: { dueDate: "asc" },
     }),
@@ -136,7 +138,12 @@ async function loadLinked(householdId: string, projectIds: string[]): Promise<Li
     orderBy: [{ status: "asc" }, { createdAt: "asc" }],
   });
 
-  for (const expense of expenses) if (expense.projectId) push(linked.expenses, expense.projectId, expense);
+  for (const expense of expenses) {
+    if (expense.allocationHouseholdCents != null || expense.projectAllocations?.length) {
+      for (const part of expense.projectAllocations ?? []) if (part.projectId && projectIds.includes(part.projectId))
+        push(linked.expenses, part.projectId, { ...expense, projectId: part.projectId, amountCents: part.amountCents, totalAmountCents: expense.amountCents });
+    } else if (expense.projectId) push(linked.expenses, expense.projectId, expense);
+  }
   for (const item of items) {
     // An item's own project wins over the project of its task.
     const projectId = item.projectId ?? (item.taskId ? taskProject.get(item.taskId) : undefined);
@@ -232,6 +239,7 @@ export async function getProjectDetail(householdId: string, id: string): Promise
       id: expense.id,
       payee: expense.payee,
       amountCents: expense.amountCents,
+      ...(expense.totalAmountCents !== undefined && { totalAmountCents: expense.totalAmountCents }),
       dueDate: fromDate(expense.dueDate),
       paidOn: optionalDate(expense.paidOn),
       recurringExpenseId: expense.recurringExpenseId,
@@ -282,7 +290,7 @@ export async function getProjectCandidates(householdId: string): Promise<Project
       take: 300,
     }),
     db.expense.findMany({
-      where: { householdId, projectId: null, recurringExpenseId: null, dueDate: { gte: toDate(addDays(now, -365)) } },
+      where: { householdId, projectId: null, allocationHouseholdCents: null, projectAllocations: { none: {} }, recurringExpenseId: null, dueDate: { gte: toDate(addDays(now, -365)) } },
       select: { id: true, payee: true, amountCents: true, dueDate: true, paidOn: true },
       orderBy: { dueDate: "desc" },
       take: 300,
@@ -439,6 +447,8 @@ export async function linkToProject(householdId: string, id: string, input: Proj
       return;
     }
     case "expense": {
+      if (await db.expense.count({ where: { id: input.id, householdId, OR: [{ allocationHouseholdCents: { not: null } }, { projectAllocations: { some: {} } }] } }))
+        throw badRequest("Edit this expense's project allocation to change its purpose");
       const { count } = await db.expense.updateMany({ where: { id: input.id, householdId }, data: { projectId: id } });
       if (!count) throw missing();
       return;
@@ -446,7 +456,7 @@ export async function linkToProject(householdId: string, id: string, input: Proj
     case "recurring": {
       const { count } = await db.recurringExpense.updateMany({ where: { id: input.id, householdId }, data: { projectId: id } });
       if (!count) throw missing();
-      await db.expense.updateMany({ where: { householdId, recurringExpenseId: input.id }, data: { projectId: id } });
+      await db.expense.updateMany({ where: { householdId, recurringExpenseId: input.id, allocationHouseholdCents: null, projectAllocations: { none: {} } }, data: { projectId: id } });
       return;
     }
     case "item": {
@@ -466,6 +476,18 @@ export async function unlinkFromProject(householdId: string, id: string, input: 
       await db.task.updateMany({ where, data: { projectId: null } });
       return;
     case "expense": {
+      const row = await db.expense.findFirst({ where: { id: input.id, householdId }, select: { allocationHouseholdCents: true, projectAllocations: true } });
+      if (row && (row.allocationHouseholdCents !== null || row.projectAllocations.length)) {
+        await db.$transaction(async (tx) => {
+          await tx.$queryRaw`SELECT "id" FROM "bills" WHERE "id" = ${input.id} AND "householdId" = ${householdId} FOR UPDATE`;
+          await tx.expenseProjectAllocation.deleteMany({ where: { expenseId: input.id, projectId: id } });
+          const remaining = await tx.expenseProjectAllocation.findMany({ where: { expenseId: input.id } });
+          await tx.expense.update({ where: { id: input.id }, data: { projectId: remaining.length === 1 ? remaining[0]!.projectId : null } });
+          const taskIds = (await tx.task.findMany({ where: { householdId, projectId: id }, select: { id: true } })).map((task) => task.id);
+          await tx.shoppingItem.updateMany({ where: { householdId, expenseId: input.id, OR: [{ projectId: id }, { projectId: null, taskId: { in: taskIds } }] }, data: { expenseId: null } });
+        });
+        return;
+      }
       const { count } = await db.expense.updateMany({ where, data: { projectId: null } });
       // Its materials are no longer on an invoice of the project: they count as bought items again.
       if (count) await db.shoppingItem.updateMany({ where: { householdId, expenseId: input.id }, data: { expenseId: null } });
@@ -473,7 +495,7 @@ export async function unlinkFromProject(householdId: string, id: string, input: 
     }
     case "recurring":
       await db.recurringExpense.updateMany({ where, data: { projectId: null } });
-      await db.expense.updateMany({ where: { householdId, recurringExpenseId: input.id, projectId: id }, data: { projectId: null } });
+      await db.expense.updateMany({ where: { householdId, recurringExpenseId: input.id, projectId: id, allocationHouseholdCents: null, projectAllocations: { none: {} } }, data: { projectId: null } });
       return;
     case "item":
       await db.shoppingItem.updateMany({ where, data: { projectId: null } });
@@ -487,14 +509,17 @@ export async function unlinkFromProject(householdId: string, id: string, input: 
  */
 export async function recordProjectPurchase(householdId: string, id: string, input: ProjectPurchaseInput): Promise<void> {
   await findOwnProject(householdId, id);
-  const expense = await db.expense.findFirst({ where: { id: input.expenseId, householdId }, select: { id: true, projectId: true } });
+  const expense = await db.expense.findFirst({ where: { id: input.expenseId, householdId }, select: { id: true, projectId: true, allocationHouseholdCents: true, projectAllocations: { select: { projectId: true } } } });
   if (!expense) throw notFound("Expense not found");
+  const allocated = expense.allocationHouseholdCents !== null || expense.projectAllocations.length > 0;
+  if (allocated ? !expense.projectAllocations.some((part) => part.projectId === id) : expense.projectId && expense.projectId !== id)
+    throw badRequest("Allocate this expense to the project before linking its materials");
   const { materials } = await loadLinked(householdId, [id]);
   const own = new Set((materials.get(id) ?? []).map((material) => material.id));
   const itemIds = input.itemIds.filter((itemId) => own.has(itemId));
   if (itemIds.length === 0) throw badRequest("Validation failed", { itemIds: ["notProjectMaterials"] });
   await db.$transaction([
-    ...(expense.projectId ? [] : [db.expense.update({ where: { id: expense.id }, data: { projectId: id } })]),
+    ...(expense.projectId || allocated ? [] : [db.expense.update({ where: { id: expense.id }, data: { projectId: id } })]),
     db.shoppingItem.updateMany({ where: { householdId, id: { in: itemIds } }, data: { expenseId: expense.id } }),
   ]);
 }
@@ -514,8 +539,11 @@ export async function linkExpenseMaterials(
 ): Promise<void> {
   const { householdId } = user;
   await findOwnProject(householdId, id);
-  const expense = await db.expense.findFirst({ where: { id: expenseId, householdId }, select: { id: true, projectId: true, paidOn: true } });
+  const expense = await db.expense.findFirst({ where: { id: expenseId, householdId }, select: { id: true, projectId: true, paidOn: true, allocationHouseholdCents: true, projectAllocations: { select: { projectId: true } } } });
   if (!expense) throw notFound("Expense not found");
+  const allocated = expense.allocationHouseholdCents !== null || expense.projectAllocations.length > 0;
+  if (allocated ? !expense.projectAllocations.some((part) => part.projectId === id) : expense.projectId && expense.projectId !== id)
+    throw badRequest("Allocate this expense to the project before linking its materials");
   const { materials } = await loadLinked(householdId, [id]);
   const own = new Map((materials.get(id) ?? []).map((material) => [material.id, material]));
   const itemIds = [...new Set(input.itemIds)];
@@ -540,7 +568,7 @@ export async function linkExpenseMaterials(
   }
 
   await db.$transaction([
-    ...(expense.projectId ? [] : [db.expense.update({ where: { id: expense.id }, data: { projectId: id } })]),
+    ...(expense.projectId || allocated ? [] : [db.expense.update({ where: { id: expense.id }, data: { projectId: id } })]),
     db.shoppingItem.updateMany({ where: { householdId, id: { in: dropped } }, data: { expenseId: null } }),
     db.shoppingItem.updateMany({ where: { householdId, id: { in: [...itemIds, ...created] } }, data: { expenseId: expense.id } }),
     ...(input.markBought ? [db.shoppingItem.updateMany({ where: { householdId, id: { in: [...toBuy, ...created] }, status: "OPEN" }, data: bought })] : []),

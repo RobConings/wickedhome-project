@@ -77,3 +77,18 @@ const quickActions = {
 export const DesktopWithQuickActions: Story = { args: { quickActions } };
 /** Phones: the "+" in the top bar, before the account (bell and avatar). */
 export const MobileWithQuickActions: Story = { args: { quickActions }, globals: { viewport: { value: "mobile1" } } };
+
+export const PersistentPhoneNavigation: Story = {
+  args: { mobileNavigation: { label: "Main navigation", moreLabel: "More", items: [
+    { to: "/", label: "Home", icon: HouseIcon, end: true },
+    { to: "/tasks", label: "Tasks", icon: ListChecksIcon },
+    { to: "/shopping", label: "Shopping", icon: ShoppingCartIcon },
+    { to: "/rooms", label: "Rooms", icon: LayoutGridIcon },
+  ] } }, globals: { viewport: { value: "mobile1" } },
+};
+export const NestedDestination: Story = { parameters: { router: { initialEntries: ["/shopping/products"] } }, args: {
+  navigation: [{ items: [
+    { to: "/shopping", label: "Shopping", icon: ShoppingCartIcon },
+    { to: "/shopping/products", label: "Products", icon: LayoutGridIcon },
+  ] }],
+} };

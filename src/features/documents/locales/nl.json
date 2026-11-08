@@ -202,5 +202,13 @@
       "title": "Documenten naar Google Drive verplaatsen",
       "description": "Verplaatst factuurdocumenten die op Drive wachten (Drive was niet bereikbaar, of \"bestaande verplaatsen\"), controleert elke kopie en verwijdert pas dan de kopie op de server."
     }
+  },
+  "images": {
+    "empty": "Voeg een afbeelding toe om ze als omslag te kiezen.",
+    "clear": "Omslag verwijderen",
+    "use": "{{name}} als omslag gebruiken",
+    "remove": "{{name}} als omslag verwijderen",
+    "loadError": "Afbeeldingen konden niet worden geladen.",
+    "saveError": "De omslag kon niet worden opgeslagen."
   }
 }

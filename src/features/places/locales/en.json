@@ -115,6 +115,14 @@
       "appliances": {
         "title": "Appliances",
         "empty": "No appliances here yet."
+      },
+      "projects": {
+        "title": "Projects",
+        "empty": "No projects linked yet."
+      },
+      "devices": {
+        "title": "Devices",
+        "empty": "No devices linked yet."
       }
     },
     "planTitle": "On the plan",

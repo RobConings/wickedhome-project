@@ -1,88 +1,13 @@
-import * as React from "react";
-import { CheckIcon, ImageIcon } from "lucide-react";
+import type { ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
-import { useFetcher } from "react-router";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { documentContentUrl, fetchLinkedFiles, type DocumentFile } from "@/features/documents";
-import { cn } from "@/lib/utils";
-import type { ProjectActionResult } from "../data/projects-loaders";
+import { LinkedImagePicker } from "@/features/documents";
 
-type ProjectCoverChooserProps = {
-  projectId: string;
-  coverFileId: string | null;
-  canManage: boolean;
-  /** Changes when attachments change, so the images reload. */
-  reloadKey?: unknown;
-  /** Seed data instead of fetching (stories). */
-  initialImages?: Pick<DocumentFile, "id" | "name" | "mimeType">[];
-};
+type Props = { projectId: string; coverFileId: string | null; canManage: boolean; reloadKey?: unknown;
+  initialImages?: ComponentProps<typeof LinkedImagePicker>["initialImages"]; };
 
-/** Pick one of the images attached to the project as its cover (shown on its tile and page). */
-export function ProjectCoverChooser({ projectId, coverFileId, canManage, reloadKey, initialImages }: ProjectCoverChooserProps) {
+/** Owner-specific composition; the saved cover and existing images keep their identities. */
+export function ProjectCoverChooser({ projectId, coverFileId, canManage, reloadKey, initialImages }: Props) {
   const { t } = useTranslation("projects");
-  const fetcher = useFetcher<ProjectActionResult>();
-  const [images, setImages] = React.useState<Pick<DocumentFile, "id" | "name" | "mimeType">[] | null>(initialImages ?? null);
-  const pendingCover = fetcher.formData ? String(fetcher.formData.get("fileId") ?? "") || null : undefined;
-  const current = pendingCover === undefined ? coverFileId : pendingCover;
-
-  React.useEffect(() => {
-    if (initialImages) return;
-    let cancelled = false;
-    fetchLinkedFiles({ entityType: "project", entityId: projectId })
-      .then((files) => !cancelled && setImages(files.filter((file) => file.mimeType.startsWith("image/"))))
-      .catch(() => !cancelled && setImages([]));
-    return () => {
-      cancelled = true;
-    };
-  }, [projectId, reloadKey, initialImages]);
-
-  if (images === null) return <Skeleton className="h-16 rounded-lg" />;
-  if (images.length === 0) {
-    return (
-      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-        <ImageIcon className="size-4 shrink-0" aria-hidden="true" />
-        {t("cover.empty")}
-      </p>
-    );
-  }
-
-  const choose = (fileId: string | null) => void fetcher.submit({ intent: "cover", id: projectId, fileId: fileId ?? "" }, { method: "post" });
-
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap gap-2">
-        {images.map((image) => {
-          const selected = current === image.id;
-          return (
-            <button
-              key={image.id}
-              type="button"
-              disabled={!canManage || fetcher.state !== "idle"}
-              onClick={() => choose(selected ? null : image.id)}
-              aria-pressed={selected}
-              aria-label={selected ? t("cover.remove", { name: image.name }) : t("cover.use", { name: image.name })}
-              title={image.name}
-              className={cn(
-                "relative size-16 overflow-hidden rounded-lg border-2 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
-                selected ? "border-primary" : "border-transparent",
-              )}
-            >
-              <img src={documentContentUrl(image.id)} alt="" className="size-full object-cover" loading="lazy" />
-              {selected && (
-                <span className="absolute top-1 right-1 grid size-5 place-items-center rounded-full bg-primary text-primary-foreground">
-                  <CheckIcon className="size-3" aria-hidden="true" />
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-      {canManage && current && (
-        <Button variant="link" size="sm" className="self-start px-0" onClick={() => choose(null)}>
-          {t("cover.clear")}
-        </Button>
-      )}
-    </div>
-  );
+  return <LinkedImagePicker entityType="project" entityId={projectId} selectedId={coverFileId} canManage={canManage} reloadKey={reloadKey} initialImages={initialImages}
+    labels={{ empty: t("cover.empty"), clear: t("cover.clear"), use: (name) => t("cover.use", { name }), remove: (name) => t("cover.remove", { name }) }} />;
 }

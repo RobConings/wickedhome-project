@@ -70,6 +70,16 @@ model StockMovement {
 /// One actual acquisition, independent of scans, shopping ticks and receipt evidence.
 /// Soft product/place/shop references preserve its identity after catalogue/list changes.
 model StockPurchase {
+  /// Deliberate purpose shares; these neither consume nor reserve stock and never book a payment.
+  allocationRevision Int @default(0)
+  allocationHouseholdQuantity Decimal? @db.Decimal(12, 3)
+  projectAllocations PurchaseProjectAllocation[]
+  /// Actual selected variant, independently of the canonical stock product and mutable visit item.
+  purchasedProductId String?
+  purchasedProductName String?
+  /// Quantity/unit the person actually selected; stock quantity can use a different known unit.
+  purchasedQuantity Decimal? @db.Decimal(12, 3)
+  purchasedUnit String?
   shoppingPurchaseId String?
   shoppingPurchase ShoppingPurchase? @relation(fields: [shoppingPurchaseId], references: [id], onDelete: SetNull)
   sessionItemId String?
@@ -109,4 +119,18 @@ model StockPurchaseEvidence {
   @@unique([householdId, sourceKey])
   @@index([householdId])
   @@map("stock_purchase_evidence")
+}
+
+/// Purpose of already acquired goods, independently of expense cost shares and actual consumption.
+model PurchaseProjectAllocation {
+  id String @id @default(cuid())
+  purchaseId String
+  purchase StockPurchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  projectId String?
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectName String
+  quantity Decimal @db.Decimal(12, 3)
+  @@unique([purchaseId, projectId])
+  @@index([projectId])
+  @@map("purchase_project_allocations")
 }

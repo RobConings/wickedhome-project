@@ -1,3 +1,4 @@
+import type { EnergyDistributionReading } from "./energy-distribution";
 import { z } from "zod";
 import { idSchema, isoDateSchema } from "@/types/common";
 import { energyPeriodSchema, type EnergyPeriod } from "./energy-period";
@@ -97,6 +98,8 @@ export const applianceInputSchema = z.object({
   placeId: idSchema.optional().nullable(),
   ratedPowerW: optionalInt(0, 100_000),
   standbyPowerW: optionalInt(0, 10_000),
+  /** Omission preserves existing inclusion on edit; null makes this an independent branch. */
+  parentApplianceId: idSchema.optional().nullable(),
   notes: optionalText(500),
 });
 export type ApplianceInput = z.infer<typeof applianceInputSchema>;
@@ -295,6 +298,7 @@ export type Appliance = {
   notes: string | null;
   /** A meter (smart plug, sub-meter) measures this appliance. */
   measured: boolean;
+  parentApplianceId?: string | null;
 };
 
 export type SolarInstallation = {
@@ -422,6 +426,8 @@ export type ApplianceShare = {
 };
 
 export type EnergyBreakdown = {
+  /** Explicit non-overlapping metered branches; null readings stay unknown. */
+  distribution?: EnergyDistributionReading[];
   /** Measured appliances, largest first. */
   appliances: ApplianceShare[];
   /** Consumption no appliance meter accounts for (≥ 0). Null when consumption is unknown. */

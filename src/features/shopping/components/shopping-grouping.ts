@@ -139,3 +139,10 @@ export const itemsForShops = (items: ShoppingItem[], keys: readonly string[]) =>
   const selected = new Set(keys);
   return items.filter((item) => selected.has(item.shopId ?? NO_SHOP));
 };
+
+/** The same grouping for requirements and acquired-trip lines; name mode is globally alphabetical. */
+export function groupChecklistItems<T extends { id: string; name: string; category?: string | null }>(items: T[], sort: ShopViewSort, order: readonly ProductCategory[] = PRODUCT_CATEGORIES, locale = "en"): { key: ProductCategory | "all"; items: T[] }[] {
+  const byName = (a: T, b: T) => a.name.localeCompare(b.name, locale) || a.id.localeCompare(b.id);
+  if (sort !== "category") return items.length ? [{ key: "all", items: [...items].sort(byName) }] : [];
+  return [...new Set([...order, ...PRODUCT_CATEGORIES])].map((key) => ({ key, items: items.filter((item) => (PRODUCT_CATEGORIES.includes(item.category as ProductCategory) ? item.category : "other") === key).sort(byName) })).filter((group) => group.items.length > 0);
+}

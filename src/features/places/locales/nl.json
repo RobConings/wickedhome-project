@@ -115,6 +115,14 @@
       "appliances": {
         "title": "Toestellen",
         "empty": "Hier nog geen toestellen."
+      },
+      "projects": {
+        "title": "Projecten",
+        "empty": "Nog geen projecten gekoppeld."
+      },
+      "devices": {
+        "title": "Toestellen",
+        "empty": "Nog geen toestellen gekoppeld."
       }
     },
     "planTitle": "Op het plan",

@@ -72,7 +72,7 @@ export function AskButton({ client = assistantClient, className, open: openProp,
           title={t("ask.button")}
           onClick={() => setOpen(true)}
           className={cn(
-            "fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 size-11 rounded-full shadow-lg print:hidden",
+            "fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[calc(max(1rem,env(safe-area-inset-bottom))+var(--mobile-nav-height,0px))] z-40 size-11 rounded-full shadow-lg print:hidden",
             className,
           )}
         >

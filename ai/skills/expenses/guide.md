@@ -1,12 +1,10 @@
-- Expenses are one-off bills or recurring payments (subscriptions, loans, afbetalingen).
-- Payer: joint account or a person; splits are supported by add/edit. Meal vouchers belong to a person.
-- Domiciliëring = direct_debit: paid automatically; never tell people to pay it. Overschrijving = wire_transfer.
-- Bills due → `expenses_due`, optionally person/joint. Payment instructions → `expenses_details`: use recorded IBAN/OGM only; "not recorded" means unknown.
-- Already spent → `expenses_log`; unpaid bill → `expenses_add`. Recurring: repeat + kind; loan balance: totalOpen.
-- Extra aflossing/early repayment → `expenses_log` with loan + exact amount paid. Full payoff: read `expenses_details` recurring, then use remainingAmount. Never edit totalOpen to record payment.
-- Repayments are expenses: history/details give their ids. Correct/delete/undo via `expenses_edit`, `expenses_delete`, `expenses_mark_paid` paid false with that expense id; the loan recalculates.
-- Regular bill paid → `expenses_mark_paid`; bounced → paid false. Payee alone means its next unpaid bill; add a date for another.
-- Price change or pause/end → `expenses_edit` recurring; one expense → expense. Disputed → `expenses_hold` + reason.
-- `expenses_list`: recurring costs/loan balances or monthly paid history by category.
-- Every change requires confirmation; owners/adults only.
-- Shopping visit payment: shopping_session_record_payment links an existing expense or creates one once. Do not also expenses_log the same payment. Bon/stock alone never proves an amount paid.
+- Expenses are one-off bills or recurring subscriptions, loans and instalments. Owners/adults only; every write requires confirmation.
+- Payer: joint account or person; add/edit support splits. Meal vouchers belong to a person. direct_debit pays automatically; never tell people to pay it. wire_transfer needs payment.
+- Due bills: expenses_due. Instructions: expenses_details; use recorded IBAN/OGM only. Missing means unknown.
+- Already spent: expenses_log; unpaid bill: expenses_add. Recurring: repeat/kind; loan balance: totalOpen.
+- Extra repayment: expenses_log with loan and exact paid amount. Full payoff: first expenses_details recurring.remainingAmount. Never edit totalOpen as a payment.
+- Repayment history gives expense IDs: correct/delete/undo with expenses_edit/delete/mark_paid (paid false); loan recalculates.
+- Bill paid: expenses_mark_paid; bounced: paid false. Payee alone selects next unpaid bill; specify date otherwise. Price/pause/end: expenses_edit recurring. Dispute: expenses_hold + reason.
+- expenses_list: recurring costs, loan balances or monthly paid history.
+- Visit payment: shopping_session_record_payment links an expense or creates one once. Never also expenses_log that payment. Stock/receipt alone proves no paid amount.
+- Mixed purposes: expenses_project_allocation reads revision/shares. expenses_allocate_projects replaces project/household shares in integer cents on the SAME expense. Keep unallocated remainder visible; allocation never debits the account again.

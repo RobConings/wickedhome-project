@@ -15,7 +15,7 @@ export { LinkedTaskPanel } from "./components/linked-task-panel";
 export { PlaceTasksSection } from "./components/place-tasks-section";
 // - Projects: `<ProjectTasksPanel projectId placeId onChanged />` on a project page (loads its own data); the task
 //   forms take an optional `projectField` slot (`TaskProjectField`) that the routes fill with the project picker.
-export { ProjectTasksPanel } from "./components/project-tasks-panel";
+export { ProjectTasksPanel, DeviceTasksPanel } from "./components/project-tasks-panel";
 export type { TaskProjectField } from "./components/task-form-dialog";
 export {
   taskDetailLoader,
@@ -40,3 +40,5 @@ export {
   type TasksOverview,
   type TasksSummary,
 } from "./types/tasks";
+
+export { PlanTaskActions } from "./components/plan-task-actions";

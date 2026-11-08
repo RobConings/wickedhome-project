@@ -97,3 +97,6 @@ export const canDeleteShop = (role: Role, shop: Pick<Shop, "isBuiltIn">) => role
 export const canSearchIngredients = (shop: Pick<Shop, "hasWebshop" | "websiteUrl">) => shop.hasWebshop && Boolean(shop.websiteUrl);
 /** Adults and owners choose which shops are searched (also built-in ones: the setting is the household's). */
 export const canSetIngredientSearch = (role: Role) => role !== "child";
+
+/** Form serialization shares the same owner validation as the API. */
+export const shopGroupFormSchema = shopGroupInputSchema.extend({ shopIds: z.string().transform((value) => value.split(",").filter(Boolean)).pipe(shopGroupInputSchema.shape.shopIds) });

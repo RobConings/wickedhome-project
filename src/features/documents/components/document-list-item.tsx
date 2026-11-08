@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Spinner } from "@/components/ui/spinner";
 import { FileTypeIcon } from "@/components/shared/file-type-icon";
 import { fileModified, fileSize, shortDate } from "./document-format";

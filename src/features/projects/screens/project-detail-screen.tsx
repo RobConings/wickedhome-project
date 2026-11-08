@@ -1,8 +1,9 @@
 import * as React from "react";
 import {
-  ArrowLeftIcon,
   BanIcon,
   CalendarIcon,
+  FolderIcon,
+  WalletIcon,
   CircleCheckIcon,
   LinkIcon,
   ListChecksIcon,
@@ -15,7 +16,7 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useFetcher } from "react-router";
+import { Link, useFetcher, useLocation } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +32,7 @@ import { Stack } from "@/components/layout/stack";
 import { Card, CardTitle } from "@/components/shared/card";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { PageHeader } from "@/components/shared/page-header";
+import { RelatedRecordCards, type RelatedRecordLink } from "@/components/shared/related-record-cards";
 import { SectionHeader } from "@/components/shared/section-header";
 import { documentContentUrl } from "@/features/documents";
 import { LinkToProjectDialog } from "../components/link-to-project-dialog";
@@ -90,6 +92,7 @@ export function ProjectDetailScreen({ detail, places, canManage, tasks, material
   const text = useProjectText();
   const { project } = detail;
   const fetcher = useFetcher<ProjectActionResult>();
+  const location = useLocation();
   const [editing, setEditing] = React.useState(false);
   const period = text.period(project);
   const pendingStatus = fetcher.formData?.get("intent") === "status" ? (String(fetcher.formData.get("status")) as ProjectStatus) : null;
@@ -158,16 +161,7 @@ export function ProjectDetailScreen({ detail, places, canManage, tasks, material
   return (
     <PageContainer>
       <Stack gap="md">
-        <Button asChild variant="ghost" size="sm" className="-ml-2 self-start text-muted-foreground">
-          <Link to="/projects">
-            <ArrowLeftIcon />
-            {t("actions.back")}
-          </Link>
-        </Button>
-        {project.coverFileId && (
-          <img src={documentContentUrl(project.coverFileId)} alt="" className="h-36 w-full rounded-xl object-cover sm:h-48" />
-        )}
-        <PageHeader
+        <PageHeader backTo="/projects"
           title={
             <span className="flex items-center gap-3">
               <ProjectAvatar project={project} size="lg" />
@@ -189,16 +183,29 @@ export function ProjectDetailScreen({ detail, places, canManage, tasks, material
           }
           actions={actions}
         />
+        {project.coverFileId && (
+          <img src={documentContentUrl(project.coverFileId)} alt="" className="h-36 w-full rounded-xl object-cover sm:h-48" />
+        )}
       </Stack>
       {canManage && editing && (
         <ProjectFormDialog project={project} places={places} open={editing} onOpenChange={setEditing} />
       )}
 
+      <RelatedRecordCards
+        label={t("related.label")}
+        items={([
+          { id: "tasks", label: t("tasks.title"), value: project.tasks.total, to: "#project-tasks-section", icon: ListChecksIcon, accent: "tasks" },
+          { id: "materials", label: t("materials.title"), value: detail.materials.length, to: "#project-materials-section", icon: PackageIcon, accent: "shopping" },
+          { id: "purchases", label: t("related.purchases"), to: `/purchases?projectId=${encodeURIComponent(project.id)}`, icon: ReceiptIcon, accent: "shopping" },
+          { id: "expenses", label: t("expenses.title"), value: detail.expenses.length, to: "#project-expenses-section", icon: ReceiptIcon, accent: "finance" },
+          { id: "budget", label: t("budget.spent"), value: text.money(project.budget.spentCents), to: "#project-budget", icon: WalletIcon, accent: "finance" },
+          ...(attachments ? [{ id: "documents", label: t("related.documents"), to: "#project-documents", icon: FolderIcon, accent: "documents" } satisfies RelatedRecordLink] : []),
+        ] satisfies RelatedRecordLink[]).map((item) => ({ ...item, to: item.to.startsWith("#") ? `${location.pathname}${location.search}${item.to}` : item.to, current: location.hash === item.to }))}
+      />
+
       <PageGrid columns="main-sidebar" className="items-start">
         <Stack gap="lg">
-          <ProjectBudgetCard budget={project.budget} className="lg:hidden" />
-
-          <PageSection aria-labelledby="project-tasks">
+          <PageSection id="project-tasks-section" tabIndex={-1} className="scroll-mt-20 outline-none" aria-labelledby="project-tasks">
             <SectionHeader
               id="project-tasks"
               title={
@@ -226,7 +233,7 @@ export function ProjectDetailScreen({ detail, places, canManage, tasks, material
             )}
           </PageSection>
 
-          <PageSection aria-labelledby="project-materials">
+          <PageSection id="project-materials-section" tabIndex={-1} className="scroll-mt-20 outline-none" aria-labelledby="project-materials">
             <SectionHeader
               id="project-materials"
               title={
@@ -243,7 +250,7 @@ export function ProjectDetailScreen({ detail, places, canManage, tasks, material
             )}
           </PageSection>
 
-          <PageSection aria-labelledby="project-expenses">
+          <PageSection id="project-expenses-section" tabIndex={-1} className="scroll-mt-20 outline-none" aria-labelledby="project-expenses">
             <SectionHeader
               id="project-expenses"
               title={
@@ -268,7 +275,7 @@ export function ProjectDetailScreen({ detail, places, canManage, tasks, material
         </Stack>
 
         <Stack gap="lg">
-          <ProjectBudgetCard budget={project.budget} className="hidden lg:flex" />
+          <div id="project-budget" tabIndex={-1} className="scroll-mt-20 outline-none"><ProjectBudgetCard budget={project.budget} /></div>
           <Card>
             <CardTitle>{t("detail.details")}</CardTitle>
             <dl className="flex flex-col gap-3 text-sm">
@@ -315,7 +322,7 @@ export function ProjectDetailScreen({ detail, places, canManage, tasks, material
             <CardTitle>{t("cover.title")}</CardTitle>
             <ProjectCoverChooser projectId={project.id} coverFileId={project.coverFileId} canManage={canManage} />
           </Card>
-          {attachments}
+          {attachments && <section id="project-documents" tabIndex={-1} className="scroll-mt-20 outline-none" aria-label={t("related.documents")}>{attachments}</section>}
         </Stack>
       </PageGrid>
     </PageContainer>

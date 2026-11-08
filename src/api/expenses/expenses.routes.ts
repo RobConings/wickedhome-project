@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { projectAllocationInputSchema } from "@/features/expenses/types/project-allocation";
+import { getExpenseAllocation, setExpenseAllocation } from "./project-allocation.service";
 import {
   expenseCreateInputSchema,
   expenseInputSchema,
@@ -40,6 +42,13 @@ export const expensesRouter = Router();
 expensesRouter.use(requireUser);
 
 const canManage = requireRole("owner", "adult");
+
+expensesRouter.get("/:id/allocations", canManage, async (req, res) => {
+  res.json(await getExpenseAllocation(currentUser(req).householdId, parse(idSchema, req.params.id)));
+});
+expensesRouter.put("/:id/allocations", canManage, async (req, res) => {
+  res.json(await setExpenseAllocation(currentUser(req).householdId, parse(idSchema, req.params.id), parse(projectAllocationInputSchema, req.body)));
+});
 
 expensesRouter.get("/", async (req, res) => {
   res.json(await getExpensesOverview(currentUser(req).householdId));

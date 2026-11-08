@@ -117,10 +117,10 @@ that point at it (`stockProductId` → main). Only the main product has `StockIt
 - **Shopping labels**: "Below minimum", "At minimum" and "Above minimum" use current stock, including
   shared stock for alternatives. A shopping item's place wins when stock is kept there; otherwise the
   lowest stock level across the product's places wins (below takes precedence over at minimum).
-- **Shopping forecasts**: below minimum is **Op** (`out`) for every product. An essential product exactly
-  at minimum is also **Op**. A nonessential product exactly at minimum is **Bijna op** (`nearly_out`).
-  These are replenishment forecasts; **Op does not necessarily mean zero stock**. Ordinary groceries,
-  the shop view and visit selection use visible All/Op/Bijna op toggles and the same dividers within each
+- **Shopping forecasts**: below minimum is **Out** (`out`) for every product. An essential product exactly
+  at minimum is also **Out**. A nonessential product exactly at minimum is **Nearly out** (`nearly_out`).
+  These are replenishment forecasts; **Out does not necessarily mean zero stock**. Ordinary groceries,
+  the shop view and visit selection use visible All/Out/Nearly out toggles and the same dividers within each
   category. Other explicit/recipe needs remain visible in All. The essential setting stays editable on
   the product, without a separate essential/nice-to-have shopping filter.
 - **Assistant and MCP**: `shopping_list`, `inventory_stock` and `inventory_low_stock` expose raw

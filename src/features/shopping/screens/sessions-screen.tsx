@@ -1,3 +1,14 @@
+import { useShoppingSort } from "../data/use-shopping-sort";
+import { ShoppingSortField } from "../components/shopping-sort-field";
+import { ShoppingNavigation } from "../components/shopping-navigation";
+import { formatCurrency } from "@/lib/format";
+import { CheckIcon, CircleIcon, ShoppingBagIcon } from "lucide-react";
+import { RecordImage } from "@/components/shared/record-image";
+import { RecordProgress } from "@/components/shared/record-progress";
+import { RecordLink } from "@/components/shared/record-link";
+import { SessionExtraDialog } from "../components/session-extra-dialog";
+import { SessionStartCard } from "../components/session-start-card";
+import { SessionItemAdjustDialog } from "../components/session-item-adjust-dialog";
 import { ShoppingNeedSections } from "../components/shopping-need-sections";
 import { ShoppingStockFilterField } from "../components/shopping-stock-filter";
 import { visitRequirements } from "../types/shopping-product-rows";
@@ -5,7 +16,7 @@ import { SessionPayments } from "../components/session-payments";
 import { useLiveEventsStatus } from "@/lib/live-events";
 import { useCategoryOrder } from "../data/use-category-order";
 import * as React from "react";
-import { Link, useNavigate, useRevalidator } from "react-router";
+import { Link, useNavigate, useRevalidator, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -16,7 +27,7 @@ import { Card, CardTitle } from "@/components/shared/card";
 import { uploadDocument } from "@/features/documents";
 import { formatDate } from "@/types/date-format";
 import { currentLocale } from "@/lib/i18n";
-import { todayIn } from "@/types/dates";
+import { startOfDayIn, todayIn } from "@/types/dates";
 import type { ShoppingPageData } from "../data/shopping-loaders";
 import type {
   SessionItem,
@@ -28,12 +39,12 @@ import {
   CategoryOrder,
 } from "../components/shopping-preferences";
 import {
-  groupItemsByCategory,
+  groupChecklistItems,
+  parseStockFilter,
   matchesStockFilter,
   type ShoppingStockFilter,
 } from "../components/shopping-grouping";
 import {
-  addSessionItem,
   attachReceipt,
   closeSession,
   joinSession,
@@ -49,6 +60,8 @@ type Props = {
   sessions: SessionSummary[];
   session: SessionView | null;
   canManage: boolean;
+  live?: boolean;
+  initialSelections?: React.ComponentProps<typeof SessionStartCard>["initialSelections"];
 };
 const selectClass =
   "min-h-11 w-full rounded-md border bg-background px-3 text-sm";
@@ -59,22 +72,27 @@ export function SessionsScreen({
   shopping,
   sessions,
   session,
-  canManage,
+  canManage, live = true, initialSelections,
 }: Props) {
   const { t } = useTranslation("shopping");
   const locale = currentLocale();
   const { order, change } = useCategoryOrder();
   const navigate = useNavigate();
   const revalidator = useRevalidator();
-  useLiveRevalidation();
+  useLiveRevalidation(live ? 10_000 : null);
   const liveStatus = useLiveEventsStatus();
   const [busy, setBusy] = React.useState(false);
-  const [stockFilter, setStockFilter] =
-    React.useState<ShoppingStockFilter>("all");
   const [includeLowStock, setIncludeLowStock] = React.useState(true);
   const [selected, setSelected] = React.useState<string[]>([]);
-  const [shopIds, setShopIds] = React.useState<string[]>([]);
-  const [groupId, setGroupId] = React.useState("");
+
+  const [params, setParams] = useSearchParams();
+  const stockFilter = parseStockFilter(params.get("stock"));
+  const setStockFilter = (value: ShoppingStockFilter) => setParams((current) => { if (value === "all") current.delete("stock"); else current.set("stock", value); return current; }, { preventScrollReset: true });
+  const { sort, changeSort } = useShoppingSort();
+  const [destination, setDestination] = React.useState<string | null>(params.get("destination"));
+  const groupId = destination?.startsWith("group:") ? destination.slice(6) : "";
+  const selectedShops = groupId ? shopping.shopGroups?.find((group) => group.id === groupId)?.shopIds ?? [] : destination?.startsWith("shop:") ? [destination.slice(5)] : [];
+
   const perform = async (work: () => Promise<unknown>) => {
     setBusy(true);
     try {
@@ -96,7 +114,7 @@ export function SessionsScreen({
   const renderItem = (item: SessionItem) =>
     session && (
       <SessionItemForm
-        key={`${item.id}:${item.revision}`}
+        key={item.id}
         item={item}
         session={session}
         shopping={shopping}
@@ -122,20 +140,12 @@ export function SessionsScreen({
             : t("sessions.description")
         }
       />
-      <div className="flex flex-wrap gap-3 text-sm">
-        <Link to="/shopping" className="underline">
-          {t("actions.backToShopping")}
-        </Link>
-        {session && (
-          <Link to="/shopping/sessions" className="underline">
-            {t("sessions.history")}
-          </Link>
-        )}
-      </div>
+      <ShoppingNavigation />
+      <ShoppingSortField value={sort} onChange={changeSort} />
       <p role="status" className="text-xs text-muted-foreground">
         {t(`sessions.live_${liveStatus}`)}
       </p>
-      {(!session || active) && (
+      {session && active && (
         <ShoppingStockFilterField
           value={stockFilter}
           onChange={setStockFilter}
@@ -155,8 +165,11 @@ export function SessionsScreen({
         )}
       {!session ? (
         <>
+          {canManage && <SessionStartCard shopping={shopping} destination={destination} onDestinationChange={setDestination} initialSelections={initialSelections} />}
           {canManage && (
-            <Card className="space-y-4">
+            <details className="rounded-xl border p-4">
+              <summary className="min-h-11 cursor-pointer py-2 font-medium">{t("sessions.advancedPlanning")}</summary>
+            <Card className="space-y-4 border-0 p-0 shadow-none">
               <CardTitle>{t("sessions.plan")}</CardTitle>
               <Button
                 disabled={busy}
@@ -174,7 +187,7 @@ export function SessionsScreen({
                     const result = await startShoppingSession({
                       operationId: crypto.randomUUID(),
                       name: field(form, "name"),
-                      shopIds,
+                      shopIds: selectedShops,
                       shopGroupId: groupId || undefined,
                       requirementIds: selected.filter((id) =>
                         open.some((item) => item.id === id),
@@ -194,67 +207,19 @@ export function SessionsScreen({
                     defaultValue={`${t("sessions.visit")} ${formatDate(todayIn(), locale)}`}
                   />
                 </label>
-                <label className="block text-sm">
-                  {t("sessions.shopGroup")}
-                  <select
-                    className={selectClass}
-                    value={groupId}
-                    onChange={(event) => {
-                      setGroupId(event.target.value);
-                      setShopIds(
-                        shopping.shopGroups?.find(
-                          (group) => group.id === event.target.value,
-                        )?.shopIds ?? [],
-                      );
-                    }}
-                  >
-                    <option value="">{t("sessions.chooseShops")}</option>
-                    {shopping.shopGroups?.map((group) => (
-                      <option key={group.id} value={group.id}>
-                        {group.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <fieldset>
-                  <legend className="text-sm font-medium">
-                    {t("sessions.chooseShops")}
-                  </legend>
-                  <div className="grid gap-2 sm:grid-cols-3">
-                    {shopping.shops.map((shop) => (
-                      <label
-                        key={shop.id}
-                        className="flex min-h-11 items-center gap-2 text-sm"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={shopIds.includes(shop.id)}
-                          onChange={(event) => {
-                            setGroupId("");
-                            setShopIds((ids) =>
-                              event.target.checked
-                                ? [...ids, shop.id]
-                                : ids.filter((id) => id !== shop.id),
-                            );
-                          }}
-                        />
-                        {shop.name}
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
                 <AutomaticShoppingFilter
                   included={includeLowStock}
                   onChange={setIncludeLowStock}
                 />
                 <CategoryOrder order={order} onChange={change} />
+                <ShoppingStockFilterField value={stockFilter} onChange={setStockFilter} />
                 <div className="space-y-4">
-                  {groupItemsByCategory(open, order).map((group) => (
-                    <fieldset key={group.category}>
+                  {groupChecklistItems(open, sort, order, locale).map((group) => (
+                    <fieldset key={group.key}>
                       <legend className="font-medium">
-                        {t(`categories.${group.category}`)}
+                        {group.key === "all" ? t("shopView.sort.name") : t(`categories.${group.key}`)}
                       </legend>
-                      <ShoppingNeedSections items={group.items}>
+                      <ShoppingNeedSections grouped={sort === "category"} items={group.items}>
                         {(items) =>
                           items.map((item) => (
                             <label
@@ -301,6 +266,7 @@ export function SessionsScreen({
                 </Button>
               </form>
             </Card>
+            </details>
           )}
           <Card className="space-y-3">
             <CardTitle>{t("sessions.history")}</CardTitle>
@@ -345,33 +311,16 @@ export function SessionsScreen({
               </Button>
             )}
           </div>
-          <CategoryOrder order={order} onChange={change} />
-          {order
-            .filter((category) =>
-              session.items.some(
-                (item) =>
-                  item.category === category &&
-                  item.status === "open" &&
-                  matchesStockFilter(item, stockFilter),
-              ),
-            )
-            .map((category) => (
-              <Card className="space-y-3" key={category}>
-                <CardTitle>{t(`categories.${category}`)}</CardTitle>
-                <ShoppingNeedSections
-                  items={session.items
-                    .filter(
-                      (item) =>
-                        item.category === category &&
-                        item.status === "open" &&
-                        matchesStockFilter(item, stockFilter),
-                    )
-                    .sort((a, b) => a.name.localeCompare(b.name, "nl"))}
-                >
-                  {(items) => items.map(renderItem)}
-                </ShoppingNeedSections>
-              </Card>
-            ))}
+          <RecordProgress label={t("sessions.progress")} completed={session.items.filter((item) => item.status !== "open").length} total={session.items.length}
+            summary={t("sessions.progressSummary", { bought: session.items.filter((item) => item.status === "bought").length, skipped: session.items.filter((item) => item.status === "skipped").length })} />
+          {active && <CategoryOrder order={order} onChange={change} />}
+          {!active && <Card className="space-y-2"><CardTitle>{t("sessions.finishedTitle")}</CardTitle><p className="text-sm text-muted-foreground">{t("sessions.finishedHint")}</p></Card>}
+          {groupChecklistItems(session.items.filter((item) => item.status === "open" && matchesStockFilter(item, stockFilter)), sort, order, locale).map((group) => (
+            <Card className="space-y-3" key={group.key}>
+              <CardTitle>{group.key === "all" ? t("shopView.sort.name") : t(`categories.${group.key}`)}</CardTitle>
+              <ShoppingNeedSections grouped={sort === "category"} items={group.items}>{(items) => items.map(renderItem)}</ShoppingNeedSections>
+            </Card>
+          ))}
           {(["bought", "skipped"] as const).map((status) => {
             const items = session.items.filter(
               (item) => item.status === status,
@@ -381,13 +330,13 @@ export function SessionsScreen({
                 <details
                   key={status}
                   data-item-status={status}
-                  className="space-y-3 rounded-xl border p-3"
+                  className="space-y-3 rounded-xl border bg-card p-3"
                 >
                   <summary className="min-h-11 cursor-pointer py-3 font-medium">
                     {t(`sessions.item_${status}`)} ({items.length})
                   </summary>
                   {items
-                    .sort((a, b) => a.name.localeCompare(b.name, "nl"))
+                    .sort((a, b) => a.name.localeCompare(b.name, locale))
                     .map(renderItem)}
                 </details>
               )
@@ -398,60 +347,18 @@ export function SessionsScreen({
               session.purchases.some(
                 (purchase) => purchase.receipts.length > 0,
               ))) && (
-            <Card>
-              <form
-                className="flex flex-wrap items-end gap-3"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  const form = event.currentTarget;
-                  void perform(() =>
-                    addSessionItem(session.id, {
-                      productId: field(form, "productId") || undefined,
-                      name: field(form, "name") || undefined,
-                      quantity: Number(field(form, "quantity")),
-                    }),
-                  );
-                }}
-              >
-                <label className="min-w-48 flex-1 text-sm">
-                  {t("sessions.product")}
-                  <select name="productId" className={selectClass}>
-                    <option value="">{t("sessions.oneOff")}</option>
-                    {shopping.products.map((product) => (
-                      <option key={product.id} value={product.id}>
-                        {product.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="text-sm">
-                  {t("fields.name")}
-                  <Input name="name" />
-                </label>
-                <label className="w-28 text-sm">
-                  {t("fields.quantity")}
-                  <Input
-                    name="quantity"
-                    type="number"
-                    min="0.001"
-                    step="0.001"
-                    defaultValue="1"
-                    required
-                  />
-                </label>
-                <Button disabled={busy}>{t("sessions.add")}</Button>
-              </form>
-            </Card>
+            <SessionExtraDialog products={shopping.products} disabled={busy} />
           )}
+
           {session.purchases.map((purchase) => (
             <Card key={purchase.id} className="space-y-4">
-              <CardTitle>{t("sessions.purchase")}</CardTitle>
+              <div className="flex flex-wrap items-center justify-between gap-2"><CardTitle>{t("sessions.purchase")}</CardTitle><Button asChild variant="outline"><RecordLink to={`/purchases/${purchase.id}`}><ShoppingBagIcon />{t("sessions.openPurchase")}</RecordLink></Button></div>
               <p className="text-sm text-muted-foreground">
                 {t("sessions.stockHint")}
               </p>
               {purchase.lines.map((line) => (
                 <p className="text-sm" key={line.id}>
-                  {line.name} · {line.quantity} {line.unit} ·{" "}
+                  {line.name} · {line.purchasedQuantity ?? line.quantity} {line.purchasedQuantity != null ? line.purchasedUnit : line.unit} ·{" "}
                   {t(
                     line.stockAdded
                       ? "sessions.stockCredited"
@@ -483,7 +390,7 @@ export function SessionsScreen({
                     }{" "}
                     · {formatDate(receipt.purchasedAt, locale)}
                     {receipt.totalCents !== null
-                      ? ` · € ${(receipt.totalCents / 100).toFixed(2)}`
+                      ? ` · ${formatCurrency(receipt.totalCents, locale)}`
                       : ""}
                   </p>
                   {canManage && (
@@ -553,7 +460,7 @@ export function SessionsScreen({
                                     (item) => item.id === line.sessionItemId,
                                   )?.name
                                 }{" "}
-                                · {line.quantity} {line.unit}
+                                · {line.purchasedQuantity ?? line.quantity} {line.purchasedQuantity != null ? line.purchasedUnit : line.unit}
                               </option>
                             ))}
                           </select>
@@ -636,7 +543,7 @@ export function SessionsScreen({
                         return attachReceipt(session.id, {
                           documentId: document.id,
                           shopId: field(form, "shopId") || undefined,
-                          purchasedAt: `${date}T12:00:00.000Z`,
+                          purchasedAt: startOfDayIn(date).toISOString(),
                           totalCents: total
                             ? Math.round(Number(total) * 100)
                             : undefined,
@@ -674,7 +581,7 @@ export function SessionsScreen({
                       <Input
                         name="date"
                         type="date"
-                        defaultValue={session.startedAt.slice(0, 10)}
+                        defaultValue={todayIn(undefined, new Date(purchase.purchasedAt))}
                         required
                       />
                     </label>
@@ -702,7 +609,6 @@ export function SessionsScreen({
                   session={session}
                   purchase={purchase}
                   disabled={busy}
-                  onAction={perform}
                 />
               )}
             </Card>
@@ -732,6 +638,7 @@ function SessionItemForm({
   ) => Promise<void>;
 }) {
   const { t } = useTranslation("shopping");
+  const [adjusting, setAdjusting] = React.useState<SessionItem | null>(null);
   const product = shopping.products.find(
     (product) => product.id === item.productId,
   );
@@ -739,12 +646,13 @@ function SessionItemForm({
     (stock) => stock.productId === (product?.stockProductId ?? item.productId),
   );
   const values = (form: HTMLFormElement) => ({
-    quantity: Number(field(form, "quantity")),
+    quantity: item.quantity,
     stockItemId: field(form, "stockItemId") || undefined,
   });
   return (
+    <>
     <form
-      className="space-y-3 rounded-xl border p-3"
+      className="space-y-3 rounded-xl border bg-card p-3"
       onSubmit={(event) => {
         event.preventDefault();
         const form = event.currentTarget;
@@ -755,7 +663,9 @@ function SessionItemForm({
         });
       }}
     >
-      <p className="font-medium">
+      <div className="flex items-center gap-3">
+      <RecordImage src={product?.imageUrl} alt="" shape="avatar" fit="contain" className="size-14 shrink-0 rounded-xl bg-background" />
+      <p className="min-w-0 flex-1 font-medium">
         {item.name}{" "}
         <span className="ml-2 text-xs text-muted-foreground">
           {t(
@@ -766,10 +676,11 @@ function SessionItemForm({
           · {item.purchasedQuantity}/{item.quantity} {item.unit}
         </span>
       </p>
+      </div>
       <div className="flex flex-wrap gap-2">
         {item.status !== "bought" && (
           <Button disabled={disabled} type="submit">
-            {t("sessions.buy")}
+            <CircleIcon />{t("sessions.buy")}
           </Button>
         )}
         {item.status !== "bought" && (
@@ -788,25 +699,18 @@ function SessionItemForm({
             )}
           </Button>
         )}
+        {item.status === "bought" && <span className="inline-flex min-h-11 items-center gap-2 px-2 text-sm font-medium text-section"><CheckIcon className="size-5" />{t("sessions.item_bought")}</span>}
+        <Button disabled={disabled} variant="outline" className="min-h-11" type="button" onClick={() => setAdjusting(item)}>{t("sessions.adjust")}</Button>
       </div>
       <details className="space-y-3">
         <summary className="min-h-11 cursor-pointer py-3 text-sm text-muted-foreground">
-          {t("sessions.adjust")}
+          {t("sessions.purchaseDetails")}
         </summary>
         <fieldset disabled={disabled} className="grid gap-3 sm:grid-cols-3">
           <label className="text-sm">
-            {t("sessions.plannedQuantity")}
-            <Input
-              name="quantity"
-              type="number"
-              min="0.001"
-              step="0.001"
-              defaultValue={item.quantity}
-            />
-          </label>
-          <label className="text-sm">
             {t("sessions.boughtQuantity")}
             <Input
+              key={`quantity:${item.revision}`}
               name="purchasedQuantity"
               type="number"
               min="0.001"
@@ -818,6 +722,7 @@ function SessionItemForm({
             <label className="text-sm">
               {t("sessions.stockLocation")}
               <select
+                key={`stock:${item.revision}`}
                 name="stockItemId"
                 className={selectClass}
                 defaultValue={
@@ -840,10 +745,10 @@ function SessionItemForm({
             variant="outline"
             type="button"
             onClick={(event) =>
-              void onChange(values(event.currentTarget.form!))
+              void onChange({ stockItemId: values(event.currentTarget.form!).stockItemId })
             }
           >
-            {t("sessions.saveQuantity")}
+            {t("sessions.saveLocation")}
           </Button>
           <Button
             disabled={disabled}
@@ -856,5 +761,7 @@ function SessionItemForm({
         </div>
       </details>
     </form>
+      {adjusting && <SessionItemAdjustDialog item={adjusting} products={shopping.products} open onOpenChange={(open) => { if (!open) setAdjusting(null); }} />}
+    </>
   );
 }

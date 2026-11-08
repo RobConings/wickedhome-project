@@ -103,6 +103,7 @@ type FloorPlanEditorProps = {
   onMarkerMove?: (id: string, x: number, y: number) => void;
   /** Things to place, e.g. a list of `PlanMarkerPaletteItem`s, shown above the plan while editing. */
   markerPalette?: React.ReactNode;
+  renderPlaceActions?: (placeId: string) => React.ReactNode;
   /** Tap-to-place: the palette entry being placed; a tap on the plan calls `onMarkerMove` for it (see the canvas). */
   placingMarker?: { id: string; label: string } | null;
   onPlacingCancel?: () => void;
@@ -124,6 +125,7 @@ export function FloorPlanEditor({
   onMarkerClick,
   onMarkerMove,
   markerPalette,
+  renderPlaceActions,
   placingMarker,
   onPlacingCancel,
   underlayUrl,
@@ -453,7 +455,7 @@ export function FloorPlanEditor({
           </React.Suspense>
         )}
         {selectedPlace && (
-          <div className="absolute inset-x-4 bottom-16 z-10 mx-auto flex max-w-sm items-center justify-between gap-3 rounded-xl border bg-popover/95 p-3 shadow-md backdrop-blur">
+          <div className="absolute inset-x-4 bottom-16 z-10 mx-auto flex max-w-xl flex-wrap items-center justify-between gap-3 rounded-xl border bg-popover/95 p-3 shadow-md backdrop-blur">
             <div className="flex min-w-0 flex-col gap-1">
               <PlaceBadge place={{ ...selectedPlace, kind: placeKindForFloor(floorKind) }} />
               {selectedPlace.polygon && (
@@ -462,6 +464,7 @@ export function FloorPlanEditor({
                 </span>
               )}
             </div>
+            {!readOnly && selectedPlace.id && renderPlaceActions?.(selectedPlace.id)}
             {selectedPlace.id && (
               <Button asChild size="sm" variant="secondary">
                 <Link to={placeHref(selectedPlace.id)}>

@@ -3,6 +3,14 @@
 One React application with its API in `src/api`, Prisma and PostgreSQL. One `package.json`, one install,
 one process.
 
+## Application-wide design proposal
+
+The [One WickedHome design dossier](plans/app-samenhang/README.md) inventories all current routes,
+dialogs and features, with English-first bilingual wireframes and proposed ownership/composition contracts.
+Its [architecture contracts](plans/app-samenhang/architecture-contracts.md) extend the principles below;
+implementation is phased and the current layer rules remain authoritative. The atlas is design tooling,
+not a proposed universal production page renderer.
+
 ## Stack
 
 | Concern | Choice | Why |
@@ -166,6 +174,31 @@ query at a time anyway, so nothing is lost). Queries outside transactions use th
 
 ## Working on the code
 
-The repo lives on the server at `/var/www/WickedHome` and is edited from the Mac over SMB. Run Node
-commands **on the server** (`ssh wicked@192.168.1.10`, `cd /var/www/WickedHome`). Running `npm install`
-from the Mac would put macOS binaries on the share.
+The canonical Git remote is `https://github.com/RobConings/wickedhome-project.git`.
+The local development checkout is `/Users/robconings/WickedHome`; the server deployment has its own
+checkout/runtime under `/var/www/WickedHome` or the configured release path. Verify the Git remote and
+revision in the checkout you are using. Local edits do not automatically change the running server.
+
+Run development commands in the local checkout with dependencies installed for that machine and an
+explicit development/test database. Keep macOS and Linux `node_modules` separate. A mounted SMB server
+directory is useful for inspection; do not install macOS binaries into the server's runtime directory.
+Server-only operations, PM2 and deployment use the server environment. Follow [CI-CD.md](CI-CD.md) for
+release handling rather than treating a documentation or wireframe change as a deployment.
+
+## Documentation and language
+
+Project documentation and source interface copy are authored in English. Dutch remains supported through
+feature-local `en.json` / `nl.json` namespaces, search aliases and locale-aware UI. Preserve source-data
+labels, stable IDs and explicit Dutch translation examples. Both languages use the shared Belgian date
+and currency formatting contracts. The redesign atlas starts in English and offers a Dutch switch;
+production locale detection and saved preferences remain controlled by the existing i18n/account code.
+
+## Connected record implementation
+
+The application shell supplies grouped navigation, one current sidebar destination, a persistent mobile bar and page identity. Shared `PageHeader` uses this identity for an icon and breadcrumbs. `RecordLink` carries a safe originating path (filters and section included); `RecordOrigin` returns to it. Related records use `RelatedRecordCards`; imagery uses `RecordImage` and `ImageChoiceGrid`; progress uses `RecordProgress` over the existing UI progress primitive. Domain forms/lists retain their existing GeneralForm/GeneralList and picker implementations. `SectionNavigation` provides icon links between an owner's focused views; it is distinct from state filters and cross-feature relationship cards. Views and durable filters live in the URL. Settings mounts one owner-contributed section at a time, while legacy `/settings#section` links remain valid.
+
+`catalogue` exposes public product/context contracts over existing Shopping-owned product persistence. `purchases` exposes read views and acquired-goods purpose allocation over existing Shopping/Inventory acquisitions. These facades do not duplicate products, purchases, stock or expenses. See [Purchases](PURCHASES.md) for the separate meanings of acquired quantity, stock credit, purpose and expense cost shares.
+
+Routes compose owner contributions: Places receives project/device/task/stock panels; device details receive Documents images, Home Assistant controls and Tasks-owned maintenance; task forms receive the Devices-owned picker; purchase details receive Shopping payments. Browser imports cross feature boundaries through public indexes. Shared components never query a feature's data directly.
+
+Successful owner writes publish household-scoped events. The frame coalesces linked-record invalidation after commits; open dialogs retain drafts and use revisions to reject stale changes. Incoming source values remain observations rather than proof that a command succeeded.

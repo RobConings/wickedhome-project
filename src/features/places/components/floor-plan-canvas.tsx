@@ -107,6 +107,8 @@ type FloorPlanCanvasProps = {
   markers?: PlanMarker[];
   selectedMarkerId?: string | null;
   onMarkerClick?: (id: string) => void;
+  /** Read-only room navigation; pointer drags still pan the plan. */
+  onPlaceClick?: (id: string) => void;
   /** Makes markers draggable (and accepts palette drops); called with the new position in cm. */
   onMarkerMove?: (id: string, x: number, y: number) => void;
   /**
@@ -144,6 +146,7 @@ export function FloorPlanCanvas({
   markers = NO_MARKERS,
   selectedMarkerId,
   onMarkerClick,
+  onPlaceClick,
   onMarkerMove,
   placingMarker,
   onPlacingCancel,
@@ -941,6 +944,16 @@ export function FloorPlanCanvas({
             return (
               <polygon
                 key={place.key}
+                role={onPlaceClick ? "button" : undefined}
+                aria-label={onPlaceClick ? place.name : undefined}
+                tabIndex={onPlaceClick ? 0 : undefined}
+                onKeyDown={onPlaceClick ? (event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    dispatch({ type: "select", selection: { type: "place", key: place.key } });
+                    onPlaceClick(place.key);
+                  }
+                } : undefined}
                 points={toPath(place.polygon)}
                 fill={place.color}
                 fillOpacity={selected ? 0.32 : 0.18}
@@ -950,7 +963,10 @@ export function FloorPlanCanvas({
                 vectorEffect="non-scaling-stroke"
                 className={cn(tool === "select" && (editable ? "cursor-move" : "cursor-pointer"))}
                 {...shapeHandlers(
-                  () => dispatch({ type: "select", selection: { type: "place", key: place.key } }),
+                  () => {
+                    dispatch({ type: "select", selection: { type: "place", key: place.key } });
+                    onPlaceClick?.(place.key);
+                  },
                   movePlace(place),
                 )}
               />

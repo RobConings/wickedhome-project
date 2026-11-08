@@ -101,5 +101,28 @@
       "title": "Smart home",
       "description": "Alarm, temperatures and devices via Home Assistant."
     }
+  },
+  "rooms": {
+    "title": "Explore your home",
+    "description": "Explore the floor plan and select rooms, devices and their work.",
+    "all": "All rooms",
+    "floor": "Floor",
+    "choose": "Room",
+    "previous": "Previous room",
+    "next": "Next room",
+    "open": "Open room",
+    "empty": "Your rooms belong here",
+    "manage": "Manage rooms and floor plans",
+    "planError": "A floor plan could not be loaded. Open Rooms to try again.",
+    "notDrawn": "This room has not been drawn on the floor plan yet.",
+    "noRooms": "Add rooms to this floor to explore them here.",
+    "work": "{{tasks}} tasks · {{projects}} projects",
+    "appliances": "Appliances and devices",
+    "tasks": "Open tasks",
+    "projects": "Current projects",
+    "noAppliances": "No appliances linked to this room.",
+    "noTasks": "No open tasks in this room.",
+    "noProjects": "No current projects linked to this room.",
+    "explore": "Explore home"
   }
 }

@@ -1,6 +1,6 @@
 import { ChefHatIcon, ListOrderedIcon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Card } from "@/components/shared/card";
 import { Badge } from "@/components/ui/badge";
 import { FavoriteToggle } from "@/components/shared/favorite-toggle";

@@ -46,3 +46,5 @@ export const deleteDeviceProfile = (id: string) => api.delete(`/devices/profiles
 export const fetchDevicePresets = () => api.get<DevicePresetSummary[]>("/devices/presets");
 /** Creates an editable profile from a preset, in the user's language. */
 export const createProfileFromPreset = (key: string) => api.post<DeviceProfile>(`/devices/presets/${path(key)}`);
+
+export const setDeviceCover = (id: string, fileId: string | null) => api.post(`/devices/${encodeURIComponent(id)}/cover`, { fileId });

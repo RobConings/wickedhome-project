@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BanknoteIcon, PencilIcon, PlusIcon, RepeatIcon, Trash2Icon } from "lucide-react";
+import { BanknoteIcon, CalendarClockIcon, ChartNoAxesCombinedIcon, PencilIcon, PlusIcon, RepeatIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher, useSearchParams } from "react-router";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { GeneralList } from "@/components/shared/general-list";
 import { PendingContent } from "@/components/shared/loading-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { PeriodNavigator } from "@/components/shared/period-navigator";
+import { SectionNavigation } from "@/components/shared/section-navigation";
 import { SectionHeader } from "@/components/shared/section-header";
 import type { Habitant } from "@/features/household";
 import { useOpenFromUrl } from "@/lib/open-from-url";
@@ -86,11 +87,24 @@ function IncomeActions({ income, overview, habitants }: { income: Income; overvi
 export function IncomeScreen({ overview, habitants, canManage, currentHabitantId }: IncomeScreenProps) {
   const { t } = useTranslation("income");
   const { t: tCommon } = useTranslation();
-  const [, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const pending = useSamePagePending();
   const whoName = useWhoName(habitants);
-  const [whoFilter, setWhoFilter] = React.useState<string>(ALL);
-  const [kindFilter, setKindFilter] = React.useState<string>(ALL);
+  const view = ["expected", "received", "sources"].includes(searchParams.get("view") ?? "") ? searchParams.get("view")! : "overview";
+  const whoFilter = searchParams.get("person") ?? ALL;
+  const kindFilter = searchParams.get("kind") ?? ALL;
+  const setFilter = (key: string, value: string) => setSearchParams((params) => {
+    if (value === ALL) params.delete(key);
+    else params.set(key, value);
+    return params;
+  }, { preventScrollReset: true });
+  const viewLink = (next: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (next === "overview") params.delete("view");
+    else params.set("view", next);
+    params.delete("new");
+    return { search: params.toString() ? `?${params}` : "" };
+  };
   // `?new=1` (the dashboard's "Record income") opens the one-off form at once.
   const [openNew, setOpenNew] = useOpenFromUrl(canManage);
   const currentMonth = overview.today.slice(0, 7);
@@ -139,7 +153,7 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
     );
 
   const incomes = overview.incomes.filter(
-    (income) => (whoFilter === ALL || (income.habitantId ?? JOINT) === whoFilter) && (kindFilter === ALL || income.kind === kindFilter),
+    (income) => income.date <= overview.today && (whoFilter === ALL || (income.habitantId ?? JOINT) === whoFilter) && (kindFilter === ALL || income.kind === kindFilter),
   );
   const people = [...earners(habitants).map((habitant) => habitant.id), JOINT];
 
@@ -156,7 +170,14 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
         }
       />
 
-      <PageSection className="gap-4">
+      <SectionNavigation label={t("views.label")} items={[
+        { id: "overview", label: t("views.overview"), icon: ChartNoAxesCombinedIcon },
+        { id: "expected", label: t("views.expected"), icon: CalendarClockIcon },
+        { id: "received", label: t("views.received"), icon: BanknoteIcon },
+        { id: "sources", label: t("views.sources"), icon: RepeatIcon },
+      ].map((item) => ({ ...item, to: viewLink(item.id), current: view === item.id }))} />
+
+      {(view === "overview" || view === "expected") && <PageSection className="gap-4">
         <PeriodNavigator
           label={monthLabel(overview.month)}
           onPrevious={() => goToMonth(shiftMonth(overview.month, -1))}
@@ -169,24 +190,25 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
           pending={pending}
         />
         <PendingContent pending={pending} label={tCommon("loading.updating")} contentClassName="flex flex-col gap-4">
-          <IncomeMonthTotalsTiles totals={overview.totals} habitants={habitants} />
-          <div className="grid items-start gap-4 lg:grid-cols-3">
-            <div className="lg:col-span-2">
+          {view === "overview" && <IncomeMonthTotalsTiles totals={overview.totals} habitants={habitants} />}
+          <div className="grid min-w-0 grid-cols-1 items-start gap-4 lg:grid-cols-3">
+            <div className="min-w-0 lg:col-span-2">
               <IncomeOccurrenceList
-                occurrences={overview.occurrences}
+                occurrences={overview.occurrences.filter((occurrence) => occurrence.status !== "received")}
                 upcoming={overview.upcoming}
                 habitants={habitants}
                 accounts={overview.accounts}
                 today={overview.today}
                 canManage={canManage}
+                renderIncomeActions={(income) => <IncomeActions income={income} overview={overview} habitants={habitants} />}
               />
             </div>
             <VoucherBalances balances={overview.vouchers} habitants={habitants} />
           </div>
         </PendingContent>
-      </PageSection>
+      </PageSection>}
 
-      <PageSection className="gap-4">
+      {view === "sources" && <PageSection className="gap-4">
         <SectionHeader title={t("sources.title")} description={t("sources.description")} />
         {overview.sources.length === 0 ? (
           <EmptyState
@@ -204,9 +226,9 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
             canManage={canManage}
           />
         )}
-      </PageSection>
+      </PageSection>}
 
-      <PageSection className="gap-4">
+      {view === "received" && <PageSection className="gap-4">
         <SectionHeader title={t("incomes.title")} />
         <GeneralList
           label={t("incomes.label")}
@@ -223,6 +245,7 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
           renderTile={(income) => (
             <Card className="h-full">
               <IncomeRow income={income} habitants={habitants} sources={overview.sources} accounts={overview.accounts} today={overview.today} tile />
+              {canManage && <div className="flex justify-end"><IncomeActions income={income} overview={overview} habitants={habitants} /></div>}
             </Card>
           )}
           search={{
@@ -241,7 +264,7 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
           filtered={whoFilter !== ALL || kindFilter !== ALL}
           toolbar={
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Select value={whoFilter} onValueChange={setWhoFilter}>
+              <Select value={whoFilter} onValueChange={(value) => setFilter("person", value)}>
                 <SelectTrigger className="w-full sm:w-44" aria-label={t("who.label")}>
                   <SelectValue />
                 </SelectTrigger>
@@ -254,7 +277,7 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
                   ))}
                 </SelectContent>
               </Select>
-              <Select value={kindFilter} onValueChange={setKindFilter}>
+              <Select value={kindFilter} onValueChange={(value) => setFilter("kind", value)}>
                 <SelectTrigger className="w-full sm:w-48" aria-label={t("incomes.kindFilter")}>
                   <SelectValue />
                 </SelectTrigger>
@@ -273,7 +296,7 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
             <EmptyState icon={BanknoteIcon} title={t("empty.incomes.title")} description={t("empty.incomes.description")} action={oneOffDialog(false)} />
           }
         />
-      </PageSection>
+      </PageSection>}
     </PageContainer>
   );
 }

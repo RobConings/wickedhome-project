@@ -134,7 +134,7 @@ export function ShoppingItemRow({
         className="flex min-w-0 items-center gap-2 rounded-md text-left outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
       >
         {item.imageUrl ? (
-          <img src={item.imageUrl} alt="" loading="lazy" referrerPolicy="no-referrer" className="size-8 shrink-0 rounded border bg-white object-contain sm:size-9" />
+          <img src={item.imageUrl} alt="" loading="lazy" referrerPolicy="no-referrer" className="size-16 shrink-0 rounded-lg border bg-white object-contain p-1" />
         ) : (
           <span className="grid size-8 shrink-0 place-items-center rounded bg-muted/50 sm:size-9"><PackageIcon className="size-4 text-muted-foreground" aria-hidden="true" /></span>
         )}

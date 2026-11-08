@@ -8,6 +8,7 @@
 // - Materials on an invoice: the route gives the shopping panel the expenses' labels and `unlinkExpenseMaterial`.
 // - Assistant: `ProjectPlanPreview` draws the planner's `project-plan` card (lazy, src/app/assistant-previews.ts).
 export { ProjectBudgetBar } from "./components/project-budget-bar";
+export { PlaceProjectsSection } from "./components/place-projects-section";
 export { ProjectBudgetsCard } from "./components/project-budgets-card";
 export { ProjectBudgetsSummary } from "./components/project-budgets-summary";
 export { ProjectAvatar } from "./components/project-icon";

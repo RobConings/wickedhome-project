@@ -23,7 +23,7 @@
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio --port 5555 --browser none",
     "postinstall": "prisma generate",
-    "test:shopping-integration": "SHOPPING_INTEGRATION_TESTS=1 tsx --test src/api/shopping/*.integration.test.ts ai/skills/shopping/sessions.integration.test.ts",
+    "test:shopping-integration": "SHOPPING_INTEGRATION_TESTS=1 tsx --test src/api/shopping/*.integration.test.ts src/api/tasks/*.integration.test.ts ai/skills/shopping/sessions.integration.test.ts",
     "test:shopping-migrations": "node scripts/verify-shopping-migration.mjs",
     "test:shopping-browser": "tsx scripts/shopping-browser-smoke.mjs"
   },

@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { AssistantStreamEvent, AssistantToolStatus, ToolResult } from "@/features/assistant/types/assistant";
 import type { ScreenRef } from "@/types/screen-context";
 import { HttpError } from "@/api/lib/http";
+import { publish } from "@/api/lib/events";
 import { Prisma } from "@/api/lib/db";
 import { prune } from "./compact";
 import { invalidateAssistantContext } from "./context";
@@ -250,6 +251,7 @@ export async function runTool(tool: RegisteredAssistantTool, ctx: AssistantToolC
       // Names and the snapshot may have changed: look them up fresh next time.
       invalidateEntityCache(ctx.householdId);
       invalidateAssistantContext(ctx.householdId);
+      publish(ctx.householdId, "records.changed", { feature: tool.name.split(".")[0], channel: "assistant" });
     }
     // The one place every assistant and MCP write passes: record it in the household audit log.
     await auditToolCall(tool, ctx, input.data);

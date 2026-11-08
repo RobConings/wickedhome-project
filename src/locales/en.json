@@ -7,7 +7,7 @@
     "home": "Home",
     "habitants": "Habitants",
     "contacts": "Contacts",
-    "places": "Places",
+    "places": "Rooms & spaces",
     "tasks": "Tasks",
     "shopping": "Shopping",
     "shops": "Shops",
@@ -28,7 +28,16 @@
     "settings": "Settings",
     "energy": "Energy",
     "house": "House",
-    "devices": "Devices"
+    "devices": "Devices",
+    "dailyLife": "Daily life",
+    "ourHome": "Our home",
+    "library": "Library",
+    "system": "Connections and settings",
+    "products": "Products",
+    "rooms": "Rooms",
+    "more": "More",
+    "dailyNavigation": "Daily navigation",
+    "purchases": "Purchases"
   },
   "screen": {
     "products": "Products",
@@ -79,7 +88,8 @@
     "optional": "optional",
     "saving": "Saving…",
     "choose": "Choose…",
-    "checkFields": "Check the fields marked in red."
+    "checkFields": "Check the fields marked in red.",
+    "required": "This field is required."
   },
   "list": {
     "search": "Search…",
@@ -132,7 +142,9 @@
     "addFavorite": "Add to favourites",
     "removeFavorite": "Remove from favourites",
     "clear": "Clear selection",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "unavailable": "Unavailable selection",
+    "removeSelection": "Remove {{name}}"
   },
   "recurrence": {
     "repeat": "Repeat",
@@ -216,5 +228,10 @@
     "loading": "Loading the PDF…",
     "failed": "The PDF couldn't be loaded.",
     "page": "Page {{page}} of {{total}}"
+  },
+  "navigation": {
+    "breadcrumbs": "You are here",
+    "context": "Originating context",
+    "returnToContext": "Back to where you came from"
   }
 }

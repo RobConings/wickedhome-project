@@ -1,3 +1,4 @@
+import { getProductContext } from "@/api/catalogue/catalogue.service";
 import { z } from "zod";
 import { stockPurchaseInputSchema } from "@/features/inventory/types/purchases";
 import { purchaseReview, recordStockPurchase } from "@/api/inventory/purchases.service";
@@ -710,4 +711,10 @@ registerScreenContext({
   kind: "scan",
   skills: ["inventory"],
   describe: (ctx) => ({ label: say(ctx.locale, "Scan", "Scannen"), summary: "the scan screen (scan a barcode to use up, restock or count a product)" }),
+});
+
+registerAssistantTool({
+  name: "inventory.product_context", description: "Read a catalogue product's existing shopping needs, related tasks and projects through their actual requirement links. No project-specific duplicate products, inferred reservations or new purchases. Purchase history is purchases_list with productId.",
+  input: z.object({ product: entityRef("product") }), permission: "read", confirm: "never", activity: { en: "Checked product relationships", nl: "Productrelaties bekeken" },
+  run: (ctx, input) => getProductContext(ctx.householdId, input.product.id),
 });

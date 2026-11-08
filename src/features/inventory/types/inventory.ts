@@ -71,6 +71,7 @@ export type StockItem = {
   id: string;
   productId: string;
   productName: string;
+  productImageUrl?: string | null;
   placeId: string;
   placeName: string;
   quantity: number;

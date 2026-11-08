@@ -1,6 +1,6 @@
 import { ExternalLinkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Button } from "@/components/ui/button";
 import { Inline } from "@/components/layout/inline";
 import { Card } from "@/components/shared/card";

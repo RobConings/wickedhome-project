@@ -1,8 +1,7 @@
 import * as React from "react";
-import { ArrowLeftRightIcon, FolderKanbanIcon, LandmarkIcon, PiggyBankIcon, PlusIcon } from "lucide-react";
+import { ArrowLeftRightIcon, ChartNoAxesCombinedIcon, HistoryIcon, ScaleIcon, UsersIcon, FolderKanbanIcon, LandmarkIcon, PiggyBankIcon, PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
@@ -13,6 +12,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { PendingContent } from "@/components/shared/loading-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { PeriodNavigator } from "@/components/shared/period-navigator";
+import { SectionNavigation } from "@/components/shared/section-navigation";
 import { SectionHeader } from "@/components/shared/section-header";
 import { SegmentedControl } from "@/components/shared/segmented-control";
 import type { Habitant } from "@/features/household";
@@ -65,16 +65,27 @@ export function MoneyFlowScreen({ data, contributionHistory, habitants, canManag
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedTab = searchParams.get("tab");
   const tab = requestedTab && ["contributions", "settlement", "history"].includes(requestedTab) ? requestedTab : "overview";
-  const setTab = (value: string) => setSearchParams((params) => {
+  const tabLink = (value: string) => {
+    const params = new URLSearchParams(searchParams);
     if (value === "overview") params.delete("tab");
     else params.set("tab", value);
-    return params;
-  }, { preventScrollReset: true });
+    return { search: params.size ? `?${params}` : "" };
+  };
+  const accountActivityLink = (id: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("tab", "history");
+    params.set("account", id);
+    return { search: `?${params}` };
+  };
   const pending = useSamePagePending();
   const currentMonth = data.today.slice(0, 7);
   const active = data.accounts.filter((account) => !account.archived);
   const archived = data.accounts.filter((account) => account.archived);
-  const [historyAccountId, setHistoryAccountId] = React.useState<string>(active[0]?.id ?? data.accounts[0]?.id ?? "");
+  const historyAccountId = searchParams.get("account") ?? active[0]?.id ?? data.accounts[0]?.id ?? "";
+  const setHistoryAccountId = (value: string) => setSearchParams((params) => {
+    params.set("account", value);
+    return params;
+  }, { preventScrollReset: true });
   const historyAccount = data.accounts.find((account) => account.id === historyAccountId) ?? active[0] ?? data.accounts[0];
   const historyMonth = data.accountMonths.find((item) => item.accountId === historyAccount?.id);
 
@@ -160,16 +171,16 @@ export function MoneyFlowScreen({ data, contributionHistory, habitants, canManag
         />
       )}
 
-      <Tabs value={tab} onValueChange={setTab} className="gap-6">
-        <TabsList aria-label={t("tabs.label")}>
-          <TabsTrigger value="overview">{t("tabs.overview")}</TabsTrigger>
-          <TabsTrigger value="contributions">{t("tabs.contributions")}</TabsTrigger>
-          <TabsTrigger value="settlement">{t("tabs.settlement")}</TabsTrigger>
-          <TabsTrigger value="history">{t("tabs.history")}</TabsTrigger>
-        </TabsList>
-        <TabsContent value="contributions">
+      <div className="flex flex-col gap-6">
+        <SectionNavigation label={t("tabs.label")} items={[
+          { id: "overview", label: t("tabs.overview"), icon: ChartNoAxesCombinedIcon },
+          { id: "contributions", label: t("tabs.contributions"), icon: UsersIcon },
+          { id: "settlement", label: t("tabs.settlement"), icon: ScaleIcon },
+          { id: "history", label: t("tabs.history"), icon: HistoryIcon },
+        ].map((item) => ({ ...item, to: tabLink(item.id), current: tab === item.id }))} />
+        {tab === "contributions" && <section>
           <ContributionHistory data={contributionHistory} accounts={data.accounts} plans={data.plans} habitants={habitants} />
-        </TabsContent>
+        </section>}
 
         {tab !== "contributions" && (
           <PeriodNavigator
@@ -186,13 +197,14 @@ export function MoneyFlowScreen({ data, contributionHistory, habitants, canManag
         )}
 
         <PendingContent pending={pending} label={tCommon("loading.updating")} contentClassName="flex flex-col gap-6">
-          <TabsContent value="overview" className="flex flex-col gap-6">
+          {tab === "overview" && <section className="flex flex-col gap-6">
             {active.length > 0 && (
               <PageGrid as="section" columns={accountColumns(active.length + placeholders.length)} className="gap-4" aria-label={t("accounts.title")}>
                 {active.map((account) => (
                   <AccountCard
                     key={account.id}
                     account={account}
+                    activityTo={accountActivityLink(account.id)}
                     month={data.accountMonths.find((item) => item.accountId === account.id)}
                     accounts={data.accounts}
                     habitants={habitants}
@@ -231,12 +243,12 @@ export function MoneyFlowScreen({ data, contributionHistory, habitants, canManag
             {archived.length > 0 && (
               <PageGrid columns={accountColumns(archived.length)} className="gap-4">
                 {archived.map((account) => (
-                  <AccountCard key={account.id} account={account} accounts={data.accounts} habitants={habitants} today={data.today} canManage={canManage} />
+                  <AccountCard key={account.id} activityTo={accountActivityLink(account.id)} account={account} accounts={data.accounts} habitants={habitants} today={data.today} canManage={canManage} />
                 ))}
               </PageGrid>
             )}
-          </TabsContent>
-          <TabsContent value="settlement" className="flex flex-col gap-6">
+          </section>}
+          {tab === "settlement" && <section className="flex flex-col gap-6">
             {data.accounts.length > 0 && (
               <PageGrid columns="main-sidebar" className="items-start">
                 <ContributionsCard
@@ -261,8 +273,8 @@ export function MoneyFlowScreen({ data, contributionHistory, habitants, canManag
                 />
               </PageGrid>
             )}
-          </TabsContent>
-          <TabsContent value="history" className="flex flex-col gap-6">
+          </section>}
+          {tab === "history" && <section className="flex flex-col gap-6">
             {historyAccount && historyMonth && (
               <PageSection className="gap-4">
                 <SectionHeader title={t("ledger.title")} description={monthLabel(data.month)} />
@@ -283,9 +295,9 @@ export function MoneyFlowScreen({ data, contributionHistory, habitants, canManag
                 <LedgerList lines={historyMonth.lines} accounts={data.accounts} habitants={habitants} canManage={canManage} />
               </PageSection>
             )}
-          </TabsContent>
+          </section>}
         </PendingContent>
-      </Tabs>
+      </div>
     </PageContainer>
   );
 }

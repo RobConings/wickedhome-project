@@ -1,6 +1,5 @@
 import * as React from "react";
 import {
-  ArrowLeftIcon,
   ClockIcon,
   ExternalLinkIcon,
   MapPinIcon,
@@ -10,7 +9,7 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useFetcher } from "react-router";
+import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
@@ -132,13 +131,7 @@ export function ShopDetailScreen({
   return (
     <PageContainer>
       <Stack gap="md">
-        <Button asChild variant="ghost" size="sm" className="-ml-2 self-start text-muted-foreground">
-          <Link to="/shops">
-            <ArrowLeftIcon />
-            {t("actions.backToShops")}
-          </Link>
-        </Button>
-        <PageHeader
+        <PageHeader backTo="/shops"
           title={
             <span className="flex items-center gap-3">
               <ShopLogo shop={shop} size="lg" />

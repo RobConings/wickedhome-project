@@ -12,3 +12,6 @@ export {
   type AlarmOverview,
   type HaConnectionStatus,
 } from "./types/home-assistant";
+
+export { HaDeviceControlPanel } from "./components/ha-device-controls";
+export { HaScenesPanel } from "./components/ha-scenes-panel";

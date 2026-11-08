@@ -146,7 +146,7 @@ servings, ingredients and steps itself and calls `recipes_match` and `recipes_sa
 call of its own. Routing goes by the question's words, so a photo with no text routes nowhere: add a word
 like "recept" / "recipe" (see Known gaps).
 
-Invoices are the exception: `projects_link_invoice` ("koppel de factuur van Toppy aan het materiaal") and the
+Invoices are the exception: `projects_link_invoice` ("link the Toppy invoice to the materials") and the
 project page's "Read invoice with AI" make a model call of their own through
 `ai/skills/projects/invoice-reader.ts` (registered into `src/api/projects/invoice-readers.ts`, like the mail
 scan's bill reader): the expense's attached PDF text, or its photo when `ASSISTANT_VISION` is on, plus the
@@ -203,7 +203,7 @@ page changes); the question in the thread keeps the chip. No context, no chip.
 
 Kinds now: detail pages `product`, `place`, `floor` (floor plan), `task`, `shop`, `project`, `expense`,
 `recurring_expense`, `event`, `device`, `recipe`, `cooking` (a meal being cooked: recipe, servings, current
-step and the ingredients used/needed, so "ik heb nog 1 look extra gebruikt" goes to `recipes_use`); overview pages `recipes`, `shopping` (also per shop), `products`, `inventory`,
+step and the ingredients used/needed, so "I used one extra clove of garlic" goes to `recipes_use`); overview pages `recipes`, `shopping` (also per shop), `products`, `inventory`,
 `scan`, `tasks`, `places`, `shops`, `projects`, `expenses`, `income`, `money`, `energy`, `calendar`,
 `documents`, `devices`, `contacts`. A new page adds its `handle` and, for a new kind, one
 `registerScreenContext` in its skill. Eval scenarios take `screen: { kind, name? }` (ai/eval/scenarios.ts).

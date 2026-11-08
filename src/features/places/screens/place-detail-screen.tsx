@@ -1,7 +1,7 @@
 import type * as React from "react";
-import { ArrowLeftIcon, BoxIcon, ListChecksIcon, MapIcon, PencilIcon, PlugIcon, ShoppingCartIcon, Trash2Icon, type LucideIcon } from "lucide-react";
+import { BoxIcon, CpuIcon, FolderKanbanIcon, ListChecksIcon, MapIcon, PencilIcon, PlugIcon, ShoppingCartIcon, Trash2Icon, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useFetcher } from "react-router";
+import { Link, useFetcher, useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
@@ -11,13 +11,14 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionHeader } from "@/components/shared/section-header";
 import { currentLocale } from "@/lib/i18n";
-import { FloorPlanThumbnail } from "../components/floor-plan-thumbnail";
+import { FloorPlanView } from "../components/floor-plan-view";
+import { RelatedRecordCards } from "@/components/shared/related-record-cards";
 import { PlaceFormDialog } from "../components/place-form-dialog";
 import { formatArea } from "../components/place-format";
 import type { PlacesActionResult } from "../data/places-loaders";
 import { isOutside, type PlaceDetail } from "../types/places";
 
-type LinkedSectionKey = "tasks" | "stock" | "shopping" | "appliances";
+type LinkedSectionKey = "tasks" | "stock" | "shopping" | "appliances" | "devices" | "projects";
 
 type PlaceDetailScreenProps = {
   detail: PlaceDetail;
@@ -33,6 +34,8 @@ type PlaceDetailScreenProps = {
 /** What hangs off a place. Each feature fills its own section via the `sections` prop. */
 const LINKED_SECTIONS: { key: LinkedSectionKey; icon: LucideIcon }[] = [
   { key: "tasks", icon: ListChecksIcon },
+  { key: "projects", icon: FolderKanbanIcon },
+  { key: "devices", icon: CpuIcon },
   { key: "stock", icon: BoxIcon },
   { key: "shopping", icon: ShoppingCartIcon },
   { key: "appliances", icon: PlugIcon },
@@ -44,6 +47,7 @@ export function PlaceDetailScreen({ detail, canManage, sections = {} }: PlaceDet
   const { t: tCommon } = useTranslation();
   const fetcher = useFetcher<PlacesActionResult>();
   const { place, plan, floors } = detail;
+  const navigate = useNavigate();
   const planHref = `/places/floors/${place.floorId}/plan`;
 
   const actions = canManage && (
@@ -80,52 +84,18 @@ export function PlaceDetailScreen({ detail, canManage, sections = {} }: PlaceDet
   return (
     <PageContainer>
       <PageHeader
-        eyebrow={
-          <Link to="/places" className="inline-flex items-center gap-1 hover:underline">
-            <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-            {t("page.title")}
-          </Link>
-        }
+        backTo="/places"
         title={place.icon ? `${place.icon} ${place.name}` : place.name}
         description={`${place.floorName} · ${isOutside(place) ? t("location.outside") : t("location.inside")}`}
         actions={actions}
       />
-
-      <PageGrid columns="main-sidebar">
-        <PageSection aria-labelledby="place-contents">
-          <SectionHeader id="place-contents" title={t("detail.contentsTitle")} description={t("detail.contentsDescription")} />
-          <PageGrid columns="2" className="gap-4">
-            {LINKED_SECTIONS.map(({ key, icon: Icon }) => (
-              <Card key={key} className="gap-2">
-                <CardHeader className="justify-start gap-3">
-                  <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-section-soft text-section">
-                    <Icon className="size-4" aria-hidden="true" />
-                  </span>
-                  <div className="flex min-w-0 flex-col gap-0.5">
-                    <CardTitle>{t(`detail.sections.${key}.title`)}</CardTitle>
-                    {!sections[key] && <CardDescription>{t(`detail.sections.${key}.empty`)}</CardDescription>}
-                  </div>
-                </CardHeader>
-                {sections[key]}
-              </Card>
-            ))}
-          </PageGrid>
-        </PageSection>
-
         <PageSection aria-labelledby="place-plan">
           <SectionHeader id="place-plan" title={t("detail.planTitle")} />
-          <Card>
+          <Card className="overflow-hidden p-0">
             {place.polygon ? (
               <>
-                <div className="overflow-hidden rounded-lg border bg-background p-2">
-                  <FloorPlanThumbnail
-                    places={plan.places}
-                    elements={plan.elements}
-                    highlightId={place.id}
-                    north={plan.north ?? null}
-                    label={t("detail.planLabel", { name: place.name, floor: plan.floor.name })}
-                    className="max-h-72"
-                  />
+                <div className="overflow-hidden bg-background">
+                  <FloorPlanView plan={plan} selectedPlaceId={place.id} onPlaceClick={(id) => void navigate(`/places/${encodeURIComponent(id)}`)} className="h-[65dvh] min-h-96 rounded-none border-0" />
                 </div>
                 <dl className="grid grid-cols-2 gap-2 text-sm">
                   <dt className="text-muted-foreground">{t("fields.floor")}</dt>
@@ -145,6 +115,30 @@ export function PlaceDetailScreen({ detail, canManage, sections = {} }: PlaceDet
             </Button>
           </Card>
         </PageSection>
+
+      <RelatedRecordCards label={t("detail.contentsTitle")} items={LINKED_SECTIONS.filter(({ key }) => sections[key]).map(({ key, icon }) => ({ id: key, label: t(`detail.sections.${key}.title`), icon, accent: "home", to: `#place-${key}` }))} />
+      <PageGrid columns="main-sidebar">
+        <PageSection aria-labelledby="place-contents">
+          <SectionHeader id="place-contents" title={t("detail.contentsTitle")} description={t("detail.contentsDescription")} />
+          <PageGrid columns="2" className="gap-4">
+            {LINKED_SECTIONS.map(({ key, icon: Icon }) => (
+              <Card key={key} id={`place-${key}`} className="scroll-mt-20 gap-2">
+                <CardHeader className="justify-start gap-3">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-section-soft text-section">
+                    <Icon className="size-4" aria-hidden="true" />
+                  </span>
+                  <div className="flex min-w-0 flex-col gap-0.5">
+                    <CardTitle>{t(`detail.sections.${key}.title`)}</CardTitle>
+                    {!sections[key] && <CardDescription>{t(`detail.sections.${key}.empty`)}</CardDescription>}
+                  </div>
+                </CardHeader>
+                {sections[key]}
+              </Card>
+            ))}
+          </PageGrid>
+        </PageSection>
+
+
       </PageGrid>
     </PageContainer>
   );

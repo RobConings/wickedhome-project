@@ -1,5 +1,6 @@
 import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
+import { DeviceFormField } from "@/features/devices";
 import { ProjectFormField } from "@/features/projects";
 import { TasksScreen, canManageTasks, tasksAction, tasksLoader, tasksShouldRevalidate } from "@/features/tasks";
 import { screenHandle } from "@/lib/screen-context";
@@ -19,6 +20,7 @@ export function Component() {
       places={places}
       canManage={canManageTasks(user.role)}
       currentHabitantId={user.habitantId}
+      deviceField={({ defaultValue, errors }) => <DeviceFormField defaultValue={defaultValue} errors={errors} />}
       projectField={({ defaultValue }) => <ProjectFormField defaultValue={defaultValue} />}
     />
   );

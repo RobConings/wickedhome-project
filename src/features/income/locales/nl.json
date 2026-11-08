@@ -169,5 +169,12 @@
       "title": "Herinneringen maaltijdcheques",
       "description": "Maakt een taak \"€ … maaltijdcheques gebruiken vóór …\" voor wie cheques heeft die binnen 30 dagen vervallen, en sluit ze zodra ze gebruikt of vervallen zijn."
     }
+  },
+  "views": {
+    "label": "Inkomstenweergaven",
+    "overview": "Overzicht",
+    "expected": "Verwacht",
+    "received": "Ontvangen",
+    "sources": "Vaste inkomsten"
   }
 }

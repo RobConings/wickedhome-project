@@ -171,3 +171,36 @@ it(
     assert.ok(child.error || child.result.isError);
   },
 );
+
+it("MCP purchase context and purpose/cost allocation use the web owners, scopes and original records", options, async (t) => {
+  const f = await fixture(t);
+  const project = await db.project.create({ data: { householdId: f.home.id, name: "Bathroom", color: "#123456" } });
+  const expense = await db.expense.create({ data: { householdId: f.home.id, payee: "Mixed receipt", amountCents: 4500, category: "HOUSEHOLD", payerType: "JOINT", dueDate: new Date(), paidOn: new Date() } });
+  const visit = await f.start();
+  await updateShoppingSessionItem(f.user, visit.id, visit.items[0]!.id, { revision: visit.items[0]!.revision, operationId: "mcp-context-buy", status: "bought" });
+  const acquisition = await db.stockPurchase.findFirstOrThrow({ where: { householdId: f.home.id } });
+  const call = async (name: string, args: Record<string, unknown>, role = f.user.role, scope: "read" | "write" = "write") => await handleMcpMessage({ jsonrpc: "2.0", id: 9, method: "tools/call", params: { name, arguments: args } }, { user: { ...f.user, role }, tokenId: "fixture", tokenName: "Fixture", scope }, new AbortController().signal) as { result?: { isError?: boolean; content: { text: string }[]; structuredContent?: Record<string, unknown> }; error?: unknown };
+  const goods = await call("purchases_goods_allocation", { acquisitionId: acquisition.id });
+  assert.equal(goods.result?.isError, false, goods.result?.content[0]?.text);
+  const purpose = { acquisitionId: acquisition.id, revision: goods.result!.structuredContent!.revision, householdQuantity: 1, projects: [{ project: project.id, quantity: 1 }], confirm: true };
+  const assigned = await call("purchases_allocate_goods", purpose);
+  assert.equal(assigned.result?.isError, false, assigned.result?.content[0]?.text);
+  const costs = await call("expenses_project_allocation", { expense: expense.id });
+  assert.equal(costs.result?.isError, false, costs.result?.content[0]?.text);
+  const allocation = { expense: expense.id, revision: costs.result!.structuredContent!.revision, householdCents: 1000, projects: [{ project: project.id, amountCents: 3500 }], confirm: true };
+  const allocated = await call("expenses_allocate_projects", allocation);
+  assert.equal(allocated.result?.isError, false, allocated.result?.content[0]?.text);
+  const history = await call("purchases_list", { projectId: project.id });
+  assert.equal(history.result?.isError, false, history.result?.content[0]?.text);
+  const context = await call("inventory_product_context", { product: f.product.id });
+  assert.equal(context.result?.isError, false, context.result?.content[0]?.text);
+  assert.match(JSON.stringify(context.result?.structuredContent), new RegExp(project.id));
+  for (const [name, payload] of [["purchases_allocate_goods", purpose], ["expenses_allocate_projects", allocation]] as const) {
+    const child = await call(name, payload, "child"); assert.ok(child.error || child.result?.isError);
+    const readOnly = await call(name, payload, "adult", "read"); assert.ok(readOnly.error || readOnly.result?.isError);
+  }
+  assert.equal(await f.quantity(), 2);
+  assert.equal(await db.stockMovement.count({ where: { householdId: f.home.id, reason: "BOUGHT" } }), 1);
+  assert.equal(await db.expense.count({ where: { householdId: f.home.id } }), 1);
+  assert.equal(await db.expenseProjectAllocation.count({ where: { expenseId: expense.id } }), 1);
+});

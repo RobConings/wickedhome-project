@@ -4,8 +4,8 @@ import { DEVICE_CATEGORIES, formatFieldValue, type Device, type DeviceProfile } 
 import { evaluateIndicator } from "@/features/devices/types/indicator";
 import { PLAN_DIFF_KIND } from "@/features/places/types/plan-diff";
 import { formatDateTime } from "@/types/date-format";
-import { createDevice, createProfileFromPreset, deleteDevice, getDevicesOverview, setDevicePosition, setDeviceValue, updateDevice } from "@/api/devices/devices.service";
-import { controlCall, controlEntity, listScenes, type ControlAction } from "@/api/home-assistant/ha-control";
+import { setDeviceCover, createDevice, createProfileFromPreset, deleteDevice, getDevicesOverview, setDevicePosition, setDeviceValue, updateDevice } from "@/api/devices/devices.service";
+import { controlCall, controlDevice, getDeviceControls, validateDeviceControl, controlEntity, listScenes, type ControlAction } from "@/api/home-assistant/ha-control";
 import { connectionStatusFor, getEntityState } from "@/api/home-assistant/ha-connection";
 import { db } from "@/api/lib/db";
 import { HttpError } from "@/api/lib/http";
@@ -187,7 +187,7 @@ registerAssistantTool({
   },
   run: async (ctx, input) => {
     const { device, entityId } = await switchable(ctx, input.device);
-    const result = await controlEntity(ctx.householdId, entityId, { action: input.action as ControlAction, value: input.value });
+    const result = await controlDevice(ctx.householdId, device.id, entityId, { action: input.action as ControlAction, value: input.value });
     return done(`${device.name}: ${input.action}${input.value !== undefined ? ` ${input.value}%` : ""} sent.`, { state: result.state });
   },
 });
@@ -216,8 +216,10 @@ registerAssistantTool({
   run: async (ctx, input) => {
     const { device, entityId } = await switchable(ctx, input.device);
     if (!entityId.startsWith("climate.")) failWith(`${device.name} is not a thermostat.`);
-    if (input.power) await controlEntity(ctx.householdId, entityId, { action: input.power });
-    if (input.temperature !== undefined) await controlEntity(ctx.householdId, entityId, { action: "temperature", value: input.temperature });
+    if (input.power) await validateDeviceControl(ctx.householdId, device.id, entityId, { action: input.power });
+    if (input.temperature !== undefined) await validateDeviceControl(ctx.householdId, device.id, entityId, { action: "temperature", value: input.temperature });
+    if (input.power) await controlDevice(ctx.householdId, device.id, entityId, { action: input.power });
+    if (input.temperature !== undefined) await controlDevice(ctx.householdId, device.id, entityId, { action: "temperature", value: input.temperature });
     return done(`${device.name}: ${input.temperature !== undefined ? `${input.temperature} °C` : `turned ${input.power}`}.`);
   },
 });
@@ -388,4 +390,18 @@ registerScreenContext({
   kind: "devices",
   skills: ["devices"],
   describe: (ctx) => ({ label: say(ctx.locale, "Devices", "Toestellen"), summary: "the devices overview" }),
+});
+
+registerAssistantTool({
+  name: "devices.set_cover", description: "Choose or clear an existing image attached to this device as its photo. Attach it through Documents first. The photo changes identity presentation only, never live state or capabilities.",
+  input: z.object({ device: entityRef("device"), fileId: z.string().min(1).max(160).nullable() }),
+  permission: "write", confirm: "first-time", roles: ["owner", "adult"], activity: { en: "Updated device photo", nl: "Toestelfoto aangepast" },
+  run: async (ctx, input) => { await setDeviceCover(ctx.householdId, input.device.id, input.fileId); return done("Device photo updated."); },
+});
+
+registerAssistantTool({
+  name: "devices.capabilities", description: "Read the real linked Home Assistant entity's current supported actions, ranges, units, state and update time before switching. Offline, unavailable or unsupported means no command; a linked source or icon alone never proves control capability.",
+  input: z.object({ device: entityRef("device") }), permission: "read", confirm: "never", roles: ["owner", "adult"],
+  activity: { en: "Checked device capabilities", nl: "Toestelbediening bekeken" },
+  run: (ctx, input) => getDeviceControls(ctx.householdId, input.device.id),
 });

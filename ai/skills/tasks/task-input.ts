@@ -60,6 +60,7 @@ export type TaskChanges = {
   endDate?: string | null;
   assigneeIds?: string[];
   placeId?: string | null;
+  deviceId?: string | null;
   priority?: TaskInput["priority"];
   type?: TaskInput["type"];
   notes?: string | null;
@@ -118,6 +119,7 @@ export function mergeTaskInput(task: Task, changes: TaskChanges): TaskInput {
     notes: changes.notes !== undefined ? changes.notes : task.notes,
     type: changes.type ?? task.type,
     placeId: changes.placeId !== undefined ? changes.placeId : (task.place?.id ?? null),
+    deviceId: changes.deviceId !== undefined ? changes.deviceId : (task.device?.id ?? null),
     assigneeIds: changes.assigneeIds ?? task.assigneeIds,
     dueDate,
     priority: changes.priority ?? task.priority,

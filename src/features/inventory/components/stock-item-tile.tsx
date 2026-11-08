@@ -1,7 +1,8 @@
+import { RecordImage } from "@/components/shared/record-image";
 import type * as React from "react";
 import { CalendarClockIcon, MapPinIcon, MinusIcon, PlusIcon, TriangleAlertIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -30,7 +31,9 @@ export function StockItemTile({ item, showPlace = true, onAdjust, pending, actio
   const locale = currentLocale();
 
   return (
-    <Card className={cn("gap-3 p-4", item.isLow && "border-warning/40")}>
+    <Card className={cn("gap-0 overflow-hidden p-0", item.isLow && "border-warning/40")}>
+      {item.productImageUrl && <RecordImage src={item.productImageUrl} alt={item.productName} fit="contain" className="aspect-[4/3] w-full rounded-none border-b" />}
+      <div className="flex min-w-0 flex-1 flex-col gap-3 p-4">
       <div className="flex min-w-0 flex-col gap-1">
         <Link
           to={`/inventory/products/${encodeURIComponent(item.productId)}`}
@@ -105,6 +108,7 @@ export function StockItemTile({ item, showPlace = true, onAdjust, pending, actio
           {actions}
         </div>
       )}
+      </div>
     </Card>
   );
 }

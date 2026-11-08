@@ -13,13 +13,14 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useFetcher } from "react-router";
+import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/shared/card";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
+import { RecordLink } from "@/components/shared/record-link";
 import { GeneralList } from "@/components/shared/general-list";
 import type { Habitant } from "@/features/household";
 import type { FormResult } from "@/lib/forms";
@@ -105,9 +106,9 @@ function LineRow({ line, title, canManage }: { line: LedgerLine; title: string; 
 
   const titleNode =
     line.source === "expense" ? (
-      <Link to={`/expenses/${line.sourceId}`} className="truncate text-sm font-medium hover:text-primary hover:underline">
+      <RecordLink to={`/expenses/${line.sourceId}`} className="truncate text-sm font-medium hover:text-primary hover:underline">
         {title}
-      </Link>
+      </RecordLink>
     ) : (
       <span className="truncate text-sm font-medium">{title}</span>
     );

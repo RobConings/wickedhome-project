@@ -45,7 +45,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "shopping.session",
   description:
-    "Read a shopping visit with item ids/revisions, bought quantities, participants, receipts, acquisitions and known stock locations. stockNeed out (Op) means below minimum or essential at minimum; nearly_out (Bijna op) means nonessential at minimum. Forecast, not zero stock. Read before writing; a conflict requires a fresh read. Item revision is distinct from session revision (used for closing). stockAdded false means goods were logged without changing tracked stock; report that accurately.",
+    "Read a shopping visit with item ids/revisions, bought quantities, participants, receipts, acquisitions and known stock locations. stockNeed out (Op) means below minimum or essential at minimum; nearly_out (Bijna op) means nonessential at minimum. Forecast, not zero stock. Read before writing; a conflict requires a fresh read. Item revision is distinct from session revision (used for closing). stockAdded false means no tracked stock increase. Acquisition-line purchasedQuantity/purchasedUnit describe selected goods when known; legacy quantity/unit describe canonical stock credit. Never confuse them or invent a conversion.",
   input: z.object({ sessionId: idSchema }),
   permission: "read",
   confirm: "never",
@@ -67,7 +67,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "shopping.start_session",
   description:
-    "Start a visit with only explicitly selected requirementIds; an empty selection starts an empty visit. Shops or a saved shop group. Never silently add every below-minimum product. Reuse operationId and unchanged payload when retrying; includeLowStock false removes automatic contributions.",
+    "Start shopping with selection matching and exactly one shopId OR saved shopGroupId: current matching open needs become the checklist, with a suggested name. Do not require a planning/recalculation step. selection selected retains explicit requirementIds, including an intentional empty visit. Reuse operationId and unchanged payload on retry; includeLowStock false excludes automatic contributions.",
   input: sessionCreateSchema,
   permission: "write",
   confirm: "always",
@@ -100,7 +100,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "shopping.session_update_item",
   description:
-    "Update one visit item using its latest revision. operationId is a stable unique action id reused on retry. purchasedQuantity is TOTAL actually bought, including earlier partial purchases, in the item's unit. Bought goods credit known stock once; skipped/remove never credit stock. Unticking never removes real goods. Specify stockItemId if locations are ambiguous. Normal full buy: status bought with purchasedQuantity omitted. For 1 bought earlier + 1 now, purchasedQuantity is 2. No gram weight is required for household counts.",
+    "Update one visit item using its latest revision. operationId is a stable unique action id reused on retry. purchasedQuantity is TOTAL actually bought, including earlier partial purchases, in the item's unit. Bought goods credit known stock once; skipped/remove never credit stock. Unticking never removes real goods. Specify stockItemId if locations are ambiguous. Adjust productId only to a linked variant sharing stock; this changes future purchases, preserving earlier goods. Unrelated extras use session_add_item. Normal full buy: status bought with purchasedQuantity omitted. For 1 bought earlier + 1 now, purchasedQuantity is 2. No gram weight is required for household counts.",
   input: sessionItemUpdateSchema.extend({
     sessionId: idSchema,
     itemId: idSchema,

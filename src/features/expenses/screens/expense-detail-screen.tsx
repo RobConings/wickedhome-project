@@ -1,6 +1,8 @@
+import { RelatedRecordCards } from "@/components/shared/related-record-cards";
+import { ExpenseAllocationPanel } from "../components/expense-allocation-panel";
 import { RelatedShoppingSessions } from "@/features/shopping";
 import * as React from "react";
-import { ArrowLeftIcon, CheckIcon, PauseCircleIcon, PencilIcon, RepeatIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
+import { FolderIcon, FolderKanbanIcon, ListChecksIcon, CheckIcon, PauseCircleIcon, PencilIcon, RepeatIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher } from "react-router";
 import { toast } from "sonner";
@@ -109,7 +111,7 @@ export function ExpenseDetailScreen({
         habitants={habitants}
         shops={shops}
         today={today}
-        projectField={projectField}
+        projectField={expense.hasProjectAllocation ? undefined : projectField}
         trigger={
           <Button variant="outline">
             <PencilIcon />
@@ -146,14 +148,7 @@ export function ExpenseDetailScreen({
 
   return (
     <PageContainer>
-      <Button asChild variant="ghost" size="sm" className="-mb-4 self-start">
-        <Link to="/expenses">
-          <ArrowLeftIcon />
-          {t("detail.back")}
-        </Link>
-      </Button>
-
-      <PageHeader
+      <PageHeader backTo="/expenses"
         eyebrow={expense.earlyRepayment ? t("repayment.title") : recurring ? t(`kinds.${recurring.kind}`) : t(`categories.${expense.category}`)}
         title={expense.payee}
         description={
@@ -168,6 +163,12 @@ export function ExpenseDetailScreen({
         }
         actions={actions}
       />
+      <RelatedRecordCards label={t("detail.related")} items={[
+        ...(canManage ? [{ id: "allocation", label: t("allocation.title"), to: "#expense-allocation", icon: FolderKanbanIcon, accent: "finance" as const }] : []),
+        ...(linkedTask ? [{ id: "task", label: tCommon("nav.tasks"), to: "#expense-task", icon: ListChecksIcon, accent: "tasks" as const }] : []),
+        ...(attachments ? [{ id: "documents", label: tCommon("nav.documents"), to: "#expense-documents", icon: FolderIcon, accent: "documents" as const }] : []),
+        ...(recurring ? [{ id: "recurring", label: t("detail.recurring"), to: `/expenses/recurring/${encodeURIComponent(recurring.id)}`, icon: RepeatIcon, accent: "finance" as const }] : []),
+      ]} />
       {canManage && <RelatedShoppingSessions expenseId={expense.id} />}
 
       <PageGrid columns="main-sidebar">
@@ -253,8 +254,9 @@ export function ExpenseDetailScreen({
             </Card>
           )}
 
-          {linkedTask}
-          {attachments}
+          {linkedTask && <section id="expense-task" className="scroll-mt-20">{linkedTask}</section>}
+          {canManage && <ExpenseAllocationPanel key={expense.id + expense.amountCents} expenseId={expense.id} />}
+          {attachments && <section id="expense-documents" className="scroll-mt-20">{attachments}</section>}
         </div>
 
         <div className="flex min-w-0 flex-col gap-6">

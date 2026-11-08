@@ -1,108 +1,112 @@
-# Boodschappen en winkelsessies
+# Shopping and shopping trips
 
-## Uitgangspunt
+Implementation report for the shopping changes recorded on 7 November 2026. The store feedback predates merge `bdc1a96`. Existing products, `ShoppingItem` requirements, `StockPurchase` acquisitions, `StockMovement` records and `Expense` records are reused; starting a new workflow does not delete household history.
 
-De waarnemingen uit de winkel dateren van vóór merge `bdc1a96`. Producten, ShoppingItem-behoeften, StockPurchase-aankopen, StockMovement-mutaties en Expense-uitgaven worden hergebruikt. Gegevens worden niet verwijderd om een nieuwe workflow te starten.
+This document describes implemented domain behaviour and records its original validation. The [application-wide redesign](plans/app-samenhang/README.md) proposes a simpler interface over that behaviour. Its wireframes are design artifacts, not evidence of a server deployment. The historical test counts below are not new test runs performed during documentation editing.
 
-## Fase 1 – Analyse en P0-herstel
+## Phase 1 — Analysis and critical fixes
 
-- Bestanden: `src/api/shopping/shopping.service.ts`, `shopping-actions.ts`, `shopping.routes.ts`, `ai/skills/shopping/tools.ts`, `src/api/inventory/purchases.service.ts` en regressietests.
-- Afvinken onderdrukt direct nieuwe automatische voorraadregels, ongeacht essentieel en ook bij een nog onbekende voorraadlocatie. Web en MCP delen dezelfde aankoopactie.
-- Bronidentiteiten blijven onbeperkt idempotent. Historische aankopen buiten de huidige mogelijke overlap blokkeren geen onafhankelijke nieuwe aankoop; kassabonnen blijven gecontroleerd op bron, hoeveelheid en eerdere tellingen.
-- Geen migratie. Bestaande aankopen en voorraad blijven behouden.
-- Gerichte regressies: 69 tests geslaagd. Inclusief recept/minimum-combinaties, herhaalde aankopen, oude bronherhaling en essentieel afvinken.
-- Verdere sessiegebonden isolatie, werkelijk transactionele sessie-afhandeling en realtime volgen in fases 3–4.
+- Files: `src/api/shopping/shopping.service.ts`, `shopping-actions.ts`, `shopping.routes.ts`, `ai/skills/shopping/tools.ts`, `src/api/inventory/purchases.service.ts` and regression tests.
+- Marking an item purchased immediately suppresses replacement automatic stock needs, including essential items and purchases without a known stock location. Web and MCP share the purchase action.
+- Source identities remain idempotent indefinitely. Historical purchases outside a possible current overlap do not block an independent purchase; receipts are still checked against source identity, quantity and previous counts.
+- No migration; existing purchases and stock are preserved.
+- Recorded targeted result: 69 passing tests, including combined recipe/minimum needs, repeat purchases, replayed old sources and essential-item completion.
+- Session isolation, transactional handling and realtime updates are addressed in phases 3–4.
 
-## Fase 2 – Boodschappen-UX
+## Phase 2 — Shopping interface
 
-- Bestanden: shopping-types, shopping-service, MCP-shoppingtools, `shopping-item-list`, `shopping-item-row`, `shopping-grouping`, `shopping-preferences`, beide shopping-schermen en EN/NL-teksten.
-- Categorieën gebruiken opgeslagen productcategorieën, nooit zoekwoorden. De gewone lijst groepeert standaard; de winkelweergave start op categorie. De volgorde is op dit apparaat instelbaar en wordt tussen tabbladen bijgewerkt.
-- Automatische minimumvoorraadregels kunnen uit beeld worden gefilterd zonder instellingen te wijzigen. Gemengde recept/expliciete regels blijven zichtbaar.
-- Nu niet bewaart de regel als SKIPPED, onderdrukt automatische herhaling en laat voorraad/product/minimum ongemoeid. Opnieuw opnemen herstelt OPEN.
-- Migratie `20261107170000_shopping_skip`: uitsluitend extra enumwaarde; geen bestaande rijen gewijzigd of verwijderd.
-- Gerichte UX/service-regressies: 29 tests geslaagd. Bestaande brede categorieën hergebruikt; geen extra subcategorietabellen.
+- Files: shopping types/service, MCP tools, `shopping-item-list`, `shopping-item-row`, grouping/preferences, both shopping screens and EN/NL copy.
+- Categories use stored product categories rather than name keywords. The ordinary list groups by default; the shop view starts with categories. Category order is a device preference synchronised between tabs.
+- Automatic minimum-stock contributions can be hidden without changing stock settings. Mixed recipe/explicit needs remain visible.
+- **Not now** stores `SKIPPED`, suppresses immediate automatic repetition and leaves stock, product identity and minimums unchanged. Restoring an item returns it to `OPEN`.
+- Migration `20261107170000_shopping_skip` adds an enum value without changing or deleting existing rows.
+- Recorded targeted result: 29 passing interface/service regressions. Existing broad categories are reused; no new subcategory tables.
 
-## Fase 3 – Winkelsessies en aankoopbewijzen
+## Phase 3 — Trips and purchase evidence
 
-- Nieuwe bestanden: `prisma/schema/shopping-sessions.prisma`, `src/api/shopping/sessions.service.ts`, `sessions.routes.ts`, `src/features/shopping/types/sessions.ts`, `data/sessions-requests.ts`, `screens/sessions-screen.tsx`, `src/routes/shopping-sessions.tsx`, `ai/skills/shopping/sessions.ts` en database-integratietests.
-- Gewijzigd: shopping-router/routes/index, EN/NL, inventory-transacties en aankoopcontext, Prisma household/inventory-relaties. De categorievoorkeur is verplaatst naar een afzonderlijke hook.
-- Migraties `20261107173000_shopping_sessions` en `20261107180000_shopping_operations`: uitsluitend nieuwe tabellen, nullable relaties en indexen. Bestaande StockPurchase-regels blijven bestaan en kunnen aan nieuwe aankoophoofden worden gekoppeld.
-- Een sessie bevat uitsluitend geselecteerde behoeften. Meerdere deelnemers, winkels/groepen, hoeveelheden, gedeeltelijke aankopen, Nu niet, verwijderen, afsluiten en historiek zijn beschikbaar via web én MCP.
-- Sessieactie, aankoopbewijs, voorraadmutatie en status worden in één transactie verwerkt. Een vaste actie-ID met payloadcontrole voorkomt ook veranderde retries; revisies voorkomen overschreven wijzigingen.
-- Bonnen worden als bestaande documenten opgeslagen. Inhoudshash + gedrukte regel voorkomen dubbele imports. Eerdere acquisities kunnen worden geselecteerd; afwijkingen vragen beoordeling. Meerdere bonnen kunnen afzonderlijke deelacquisities van hetzelfde product bevestigen.
-- Ontbrekende bonproducten kunnen worden toegevoegd, ook bij een afgesloten sessie. Niet bijgehouden producten krijgen een aankoopregel zonder fictieve voorraadverhoging.
-- Acht echte PostgreSQL-integratietests geslaagd, waaronder gelijktijdige MCP/web-acties, twee deelnemers, gedeeltelijke aankopen, bronherhaling, conflicterende revisies, meerdere bonnen en household-isolatie.
-- Geen automatische OCR toegevoegd: bonregels worden gecontroleerd gekoppeld via web of MCP. Uitgaven/betalingen volgen in fase 5.
+- Added: `prisma/schema/shopping-sessions.prisma`, `src/api/shopping/sessions.service.ts`, `sessions.routes.ts`, `src/features/shopping/types/sessions.ts`, `data/sessions-requests.ts`, `screens/sessions-screen.tsx`, `src/routes/shopping-sessions.tsx`, `ai/skills/shopping/sessions.ts` and database integration tests.
+- Updated shopping routes/public exports/locales, inventory transactions and purchase context, and household/inventory Prisma relations. Category preferences moved into a separate hook.
+- Migrations `20261107173000_shopping_sessions` and `20261107180000_shopping_operations` add tables, nullable relations and indexes. Existing `StockPurchase` rows can link to the new acquisition headers.
+- A session contains selected needs. Web and MCP support participants, shop/group selection, quantities, partial purchases, skipping, removal, closure and history.
+- Session action, purchase evidence, stock movement and status are processed in one transaction. Stable action IDs with payload checks prevent changed retries; revisions prevent lost updates.
+- Receipts use existing document storage. Content hash plus printed line identity prevent duplicate imports. Existing acquisitions can be matched; differences require review. Separate receipts may confirm separate acquisitions of the same product.
+- Missing receipt products can be added after closure. Untracked products receive an acquisition record without an invented stock increase.
+- Recorded result at this phase: eight PostgreSQL integration tests, including concurrent MCP/web updates, two participants, partial purchases, source retries, revision conflicts, multiple receipts and household isolation.
+- No new automatic OCR parser was added. Receipt lines are reviewed and matched through web or MCP; payments follow in phase 5.
 
-## Fase 4 – Realtime en concurrentie
+## Phase 4 — Realtime and concurrency
 
-- Bestanden: `shopping-events.ts`, shopping/inventory-services, `use-live-shopping.ts`, de bestaande SSE-client, `live-events.test.ts`, gewone editformulieren, MCP en aanvullende integratietests.
-- Centrale servicegrenzen publiceren na geslaagde wijzigingen: ook MCP, recepten, voorraad en achtergrondaanvullingen. Boodschappen en sessies gebruiken de bestaande household-SSE-stream; focus/polling blijven fallback.
-- Op iedere ready/reconnect wordt actuele serverdata geladen. Verouderde fetch-antwoorden worden genegeerd; events tijdens revalidatie worden nogmaals verwerkt zodra die klaar is.
-- Bestaande lijstbewerkingen ondersteunen expectedUpdatedAt; sessies gebruiken revisies en vaste actie-ID's. Een verouderde hoeveelheid overschrijft geen wijziging van iemand anders. Gelijktijdig afvinken blijft idempotent.
-- Geen nieuwe migratie in deze fase. De actiehistoriek uit fase 3 ondersteunt de concurrencycontrole.
-- Gerichte tests: 20 geslaagd, inclusief echte reconnect met een nagebootste EventSource. PostgreSQL: 10 integratietests geslaagd, inclusief gelijktijdige MCP/web-aankoop en MCP-toevoeging naar twee subscribers.
-- De bestaande SSE-bus werkt in één API-proces, conform de huidige PM2-configuratie. Voor meerdere API-workers is gedeelde pub/sub nodig; polling blijft ook dan een herstelpad, geen onmiddellijke cross-worker-broadcast.
+- Files: `shopping-events.ts`, shopping/inventory services, `use-live-shopping.ts`, existing SSE client, `live-events.test.ts`, editing forms, MCP and integration tests.
+- Central service boundaries publish after successful changes, including MCP, recipes, inventory and background replenishment. Lists and sessions share the household SSE stream; focus/polling remain recovery paths.
+- Ready/reconnect reloads current server data. Stale fetch results are ignored; events arriving during revalidation cause another refresh afterwards.
+- List edits support `expectedUpdatedAt`; sessions use revisions and stable action IDs. A stale quantity cannot overwrite another person's change. Concurrent completion stays idempotent.
+- No additional migration; phase 3 action history supports concurrency checks.
+- Recorded targeted result: 20 tests, including reconnect with a simulated EventSource; ten PostgreSQL integration tests at this stage, including concurrent MCP/web purchases and one MCP addition reaching two subscribers.
+- Immediate SSE broadcasting assumes one API process, matching the current PM2 configuration. Multiple API workers require shared pub/sub; polling alone is not immediate cross-worker broadcasting.
 
-## Fase 5 – Financiële koppeling
+## Phase 5 — Financial links
 
-- Bestanden: `session-payments.service.ts`, shopping-sessieroutes/MCP, `src/features/expenses/types/shopping-payment.ts`, de bestaande expenses-service, `session-payments.tsx`, sessie- en uitgavedetails, EN/NL.
-- Migratie `20261107183000_shopping_payments`: nieuwe koppeltabel met unieke bron-/uitgave-identiteit; bestaande uitgaven en rekeninggegevens blijven ongewijzigd.
-- Een betaling koppelt een bestaande betaalde uitgave of maakt met dezelfde uitgavenservice transactioneel één nieuwe uitgave. De bon kan later worden gekoppeld. Alleen bonnen koppelen creëert nooit een uitgave.
-- Ondersteunt meerdere betalingen per sessie/bon, gezamenlijk of persoonlijk, bestaande gesplitste aandelen via API/MCP, betaalrekening en daadwerkelijke betaler. Web ondersteunt gesplitste betalingen als afzonderlijke bedragen met een eigen referentie.
-- Betalingsreferenties zijn idempotent; gewijzigde retries worden geweigerd. Een uitgave kan niet dubbel worden gekoppeld. Bekende bontotalen bewaken overregistratie. Links lopen van sessie naar uitgave en terug.
-- Vijf echte PostgreSQL-financetests geslaagd: parallelle retries, rekening/betaler, gesplitste betalingen/aandelen, bestaande uitgave hergebruiken, overbetaling en toegang voor kinderen. Voorraad blijft bij financiële acties ongewijzigd.
-- De bestaande uitgavenfunctie accepteert een transactionele context voor eenmalige betalingen; meldingen volgen pas na commit. Periodieke uitgaven en leningen blijven hun bestaande route volgen.
+- Files: `session-payments.service.ts`, session routes/MCP, `src/features/expenses/types/shopping-payment.ts`, existing expenses service, `session-payments.tsx`, session/expense details and EN/NL copy.
+- Migration `20261107183000_shopping_payments` adds a linking table with unique source/expense identity. Existing expenses and account records remain intact.
+- A payment links an existing paid expense or transactionally creates one through the same expenses service. The receipt may be linked later; attaching a receipt alone creates no expense.
+- Supports several payments per session/receipt, joint or personal payment, existing split shares through API/MCP, account selection and actual payer. The web interface represents split payments as separate amounts with distinct references.
+- Payment references are idempotent; changed retries are rejected. An expense cannot be linked twice. Known receipt totals prevent over-recording. Navigation connects session and expense in both directions.
+- Recorded result: five PostgreSQL financial tests covering parallel retries, account/payer, split payments/shares, expense reuse, overpayment and child-role access. Financial actions do not change stock.
+- The existing expense function accepts a transaction context for one-off payments and publishes notifications after commit. Recurring expenses and loans retain their established workflow.
 
-## Fase 6 – Consistentie en eindvalidatie
+## Phase 6 — Consistency and final validation
 
-- Bestanden: `src/features/shopping/types/product-identity.ts`, `src/types/units.ts`, `src/api/shopping/product-alternatives.ts`, shopping-/receptservices, MCP-productvoorbereiding en receptmatching; aanvullende sessie-/betalingstests, `scripts/verify-shopping-migration.mjs`, `scripts/shopping-browser-smoke.mjs`, npm-scripts en CI.
-- Productmatching sluit bekende conflicterende producttypen uit. Bertolli smeerboter wordt niet aan vloeibare olijfolie gekoppeld omdat ‘olijfolie’ in de naam staat. De opgeslagen categorie blijft leidend. Gedeelde voorraad weigert bekende conflicterende typen, verpakkingen, eenheden of verpakkingsinhouden; generieke voorraadgroepen behouden verpakkingsmetadata.
-- Huishoudelijk tellen blijft eenvoudig: één potje is één voorraadeenheid, zonder verplicht gramgewicht. Nieuwe boodschappen en sessieregels gebruiken de ene bekende huishoudelijke voorraadeenheid als standaard, ook bij een verouderd cataloguslabel. Expliciet ingevoerde recept-/aankoopeenheden worden niet stilzwijgend omgerekend. Gramomrekening is alleen beschikbaar als de inhoud al bekend is; onbekende inhoud blokkeert gewoon potjes tellen niet.
-- De actuele catalogus is alleen gelezen: Bertolli staat al onder zuivel, tomatenpuree heeft 10 potjes voorraad en geen bekend gewicht. Geen echte voorraad, recepten, productkoppelingen of financiën aangepast. Een echte PostgreSQL-test controleert juist die verouderde tube/potje-situatie: één potje erbij geeft 11, zonder verpakkingsgewicht.
-- Winkelen toont primair Gekocht en Nu niet. Hoeveelheden, voorraadlocaties en verwijderen zitten onder Aanpassen. Gekochte en overgeslagen producten staan buiten de actieve categorieën in inklapbare overzichten. Bon- en betalingsformulieren zijn optioneel uitklapbaar.
-- Aanvullend hersteld: onderdrukking van automatische regels bij gedeelde voorraad en bulkafvinken, receptselectie zonder verborgen minimumhoeveelheden, later voorraad boeken bij een oorspronkelijk niet bijgehouden aankoop, veilige herhaling van sessiestart en betalingen, en behoud van aankoopnamen na verwijderen uit een sessie.
-- Geen extra datamigratie boven de vier hierboven beschreven additieve migraties. Bestaande entiteiten en rollen blijven behouden.
+- Files: `src/features/shopping/types/product-identity.ts`, `src/types/units.ts`, `src/api/shopping/product-alternatives.ts`, shopping/recipe services, MCP product preparation/matching, additional session/payment tests, `scripts/verify-shopping-migration.mjs`, `scripts/shopping-browser-smoke.mjs`, npm scripts and CI.
+- Product matching rejects known conflicting product types. A spread containing olive oil does not match liquid olive oil because the names overlap. Stored categories take priority. Shared stock rejects conflicting types, packaging, units and known package contents; generic stock groups retain packaging metadata.
+- Household counts stay simple: one jar is one stock unit without a required gram weight. New shopping/session rows prefer the single known household stock unit, including when the catalogue label is older. Explicit recipe/purchase units are not silently converted. Conversion to grams requires known contents; unknown weight does not prevent counting jars.
+- The original catalogue inspection was read-only: the spread was already classified as dairy; tomato paste had ten jars in stock and no known weight. No real stock, recipes, alternatives or finances were changed by that investigation. A PostgreSQL regression covers the older tube/jar label: adding one jar gives eleven without a package weight.
+- The checklist emphasises **Purchased** and **Not now**. Quantity, stock location and removal sit under **Adjust**. Purchased/skipped rows move out of active categories into collapsible summaries. Receipt/payment forms are optional sections.
+- Further fixes cover shared-stock/bulk suppression, recipe selection without hidden minimum quantities, later stock recording for originally untracked goods, safe session/payment retries and preserving purchase names after removal from a session.
+- No migrations beyond the four additive migrations above. Existing entities and roles are preserved.
 
-### Definitieve controles
+### Recorded final checks
 
-| Controle | Resultaat |
-| --- | --- |
-| `npm run typecheck` | Geslaagd |
-| `npm run lint` | Geslaagd |
-| `npm test` | 1.603 geslaagd; 23 database-integratietests bewust overgeslagen in deze unitrun |
-| `npm run test:shopping-integration` | Alle 23 tests geslaagd op echte PostgreSQL, inclusief MCP |
-| `npm run test:shopping-migrations` | 103 oude tabellen vergeleken; alle 14 representatieve bestaande records exact behouden |
-| `npm run test:shopping-browser` | Geslaagd met twee onafhankelijke mobiele Chrome-contexten van 390 × 844 |
-| `npm run build` | Client en API gebouwd |
-| `git diff --check` | Geslaagd |
+| Check | Recorded result |
+|---|---|
+| `npm run typecheck` | Passed |
+| `npm run lint` | Passed |
+| `npm test` | 1,603 passed; 23 database integration tests deliberately skipped in this unit run |
+| `npm run test:shopping-integration` | All 23 passed on PostgreSQL, including MCP |
+| `npm run test:shopping-migrations` | 103 old tables compared; all 14 representative records preserved exactly |
+| `npm run test:shopping-browser` | Passed in two independent 390 × 844 mobile Chrome contexts |
+| `npm run build` | Client and API built |
+| `git diff --check` | Passed |
 
-De browsercontrole gebruikt echte login, API, SSE en PostgreSQL: selectie, deelnemen, gelijktijdig afvinken, Nu niet, afsluiten, PDF-upload, bonregelherhaling, betalingsherhaling, offline/reconnect en mobiele breedte. API/MCP-integratietests controleren dezelfde service-events naar beide subscribers. De migratietest start van het schema vóór deze wijzigingen en vergelijkt alle bestaande kolomwaarden, inclusief voorraadmutatie, aankoopbewijs, receptbehoefte en betaalde uitgave. Dit is een wegwerpdataset, geen wijziging aan of volledige kopie van de huishoudelijke productiedatabase.
+The browser checks use real login, API, SSE and disposable PostgreSQL: selection, joining, concurrent completion, skipping, closure, PDF upload, receipt/payment retries, offline/reconnect and mobile width. API/MCP tests verify the same service events reach both subscribers. Migration checks start from the earlier schema and compare every stored column value, including stock movement, purchase evidence, recipe requirement and paid expense. This is a disposable dataset, not a production database copy.
 
-### Acceptatietests 1–16
+### Acceptance cases 1–16
 
-| Nr. | Geautomatiseerd gecontroleerd |
-| --- | --- |
-| 1–2 | Essentieel/minimum afvinken: één aankoop en mutatie, geen dubbele actieve regel (`sessions.integration.test.ts`) |
-| 3 | Nu niet wijzigt geen voorraad en keert niet terug in dezelfde beurt (sessie- en shopping-regressies) |
-| 4 | Alleen geselecteerde producten, idempotente sessiestart (sessie-integratie en browser) |
-| 5 | Gedeeltelijke aankoop, cumulatieve hoeveelheid, veilige retry (sessie-integratie) |
-| 6–7 | Zonder bon kopen, later dezelfde goederen aan bon koppelen zonder extra voorraad (sessie-integratie en browser) |
-| 8 | Identieke upload en herhaalde gedrukte bonregel boeken niet opnieuw (sessie-integratie en browser) |
-| 9 | Oude onafhankelijke aankoop blokkeert nieuwe beurt niet; oude bronherhaling blijft idempotent (purchase-unit- en sessie-integratie) |
-| 10 | Gelijktijdig afvinken: twee deelnemers en MCP/web, één mutatie (database-integratie en twee browsers) |
-| 11 | MCP-publicatie vanuit gedeelde service naar twee household-subscribers; echte browser ontvangt dezelfde SSE-stream (MCP-integratie en browser) |
-| 12 | Verbindingsherstel haalt actuele status op (EventSource-test en offline/reconnect in browser) |
-| 13 | Recept/minimum combineren zonder dubbel optellen; automatische bijdrage uitsluiten bij selectie (shopping-regressies en sessie-integratie) |
-| 14 | Potje/tube blijven verschillende expliciete verpakkingen; potjes tellen zonder gewicht; verifieerbare gramomrekening werkt (units en database-integratie) |
-| 15 | Aankoop, voorraad, bon, bestaande/nieuwe uitgave, rekening, betaler en gesplitste betaling (financiële integratie en browser) |
-| 16 | Migratie behoudt oude gegevens en relaties (`verify-shopping-migration.mjs`) |
+| Case | Automated evidence |
+|---|---|
+| 1–2 | Essential/minimum completion creates one purchase and movement without a duplicate active need (`sessions.integration.test.ts`) |
+| 3 | Skipping changes no stock and does not reappear during the same trip (session/shopping regressions) |
+| 4 | Selected products only; idempotent session start (integration/browser) |
+| 5 | Partial purchase, cumulative quantity and safe retry (integration) |
+| 6–7 | Purchase without receipt, then link the same goods without extra stock (integration/browser) |
+| 8 | Identical upload and replayed printed line do not book again (integration/browser) |
+| 9 | An old independent purchase does not block a new trip; old source replay remains idempotent (purchase units/integration) |
+| 10 | Two participants and MCP/web complete concurrently with one movement (database/two browsers) |
+| 11 | MCP service publication reaches two subscribers and the real browser SSE client (integration/browser) |
+| 12 | Reconnect loads current state (EventSource/browser) |
+| 13 | Recipe/minimum combination avoids duplication; selection can exclude automatic contribution (shopping/integration) |
+| 14 | Explicit tube/jar packages differ; jars need no weight; known gram conversion works (units/database) |
+| 15 | Purchase, stock, receipt, existing/new expense, account, payer and split payments (financial integration/browser) |
+| 16 | Existing data and relations survive migration (`verify-shopping-migration.mjs`) |
 
-### Gebruik en uitrol
+### Current interface and proposed redesign
 
-Open **Boodschappen → Winkelsessies**, kies de winkels en gewenste producten en start de beurt. Andere gezinsleden openen dezelfde sessie en kiezen Deelnemen. Gekocht registreert de geplande hoeveelheid; Aanpassen ondersteunt deelhoeveelheden en locatiekeuze. Nu niet verplaatst de regel uit de actieve lijst. Sluit de sessie af wanneer geen te kopen regels overblijven. Bonnen en betalingen kunnen later worden toegevoegd; bij een bonregel verwijst het gedrukte regelnummer steeds naar dezelfde echte bonregel.
+In the implemented interface, open **Shopping → Shopping trips**, select shops and needs, then start. Other household members open the same trip and join. Purchased records the planned quantity; Adjust supports partial quantities and location selection. Not now removes an item from the active checklist. Close after resolving open items. Receipts/payments may be attached later; the printed line number must consistently identify the same physical receipt line.
 
-Voor opnieuw testen is een expliciete wegwerpdatabase nodig waarvan de naam op `test` of `ci` eindigt:
+The proposed interface removes this preparation burden: **start → choose one shop or saved group → automatic checklist → finish → optional receipt/expense/stock review**. See the [wireframe walkthrough](plans/app-samenhang/preview/walkthrough.html) and [redesign contracts](plans/app-samenhang/architecture-contracts.md). Those proposed screens do not change current API semantics by themselves.
+
+### Reproducing the original domain checks
+
+Use an explicitly disposable database with a name ending in `test` or `ci`:
 
 ```sh
 export DATABASE_URL=postgresql://USER@127.0.0.1:5432/wickedhome_test
@@ -112,57 +116,66 @@ MIGRATION_TEST_DATABASE_URL="$DATABASE_URL" npm run test:shopping-migrations
 npm run test:shopping-browser
 ```
 
-De browsertest start en stopt zelf zijn lokale API/Vite-proces, gebruikt tijdelijke documentopslag en ruimt uitsluitend zijn eigen testhuishouden op. Chrome/Chromium moet geïnstalleerd zijn; desgewenst via `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. CI voert de database-, migratie- en browsertests ook uit.
+The browser test starts/stops its own API/Vite process, uses temporary document storage and removes only its test household. Chrome/Chromium is required; `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` may override the path. CI also runs the database, migration and browser checks.
 
-Uitrol gebeurt via het bestaande deployproces: backup behouden, dependencies installeren, `prisma migrate deploy`, client/API bouwen en API herstarten. De nieuwe functies zijn pas op de server beschikbaar na die uitrol. Deze werkzaamheden hebben de serverapplicatie en productiedatabase niet bijgewerkt.
+Deploy through the process in [CI-CD.md](CI-CD.md): preserve backups, install dependencies, apply migrations, build client/API and restart the API. This implementation report does not establish the currently deployed revision.
 
-### Grenzen en invloed op bestaande functies
+### Limits and effects on existing features
 
-- Bonnen worden opgeslagen en gecontroleerd gekoppeld; er is geen nieuwe automatische OCR-parser toegevoegd. De bestaande document- en MCP-workflows blijven bruikbaar.
-- De categorievolgorde is een voorkeur per apparaat; productstatussen, aankopen en sessies zijn household-breed gedeeld.
-- De huidige SSE-infrastructuur vereist één API-proces voor directe broadcasts. Meerdere workers vereisen gedeelde pub/sub.
-- Oude bulkafronding markeert lijstregels gekocht zonder fictieve voorraad te verzinnen. Individueel kopen en sessie-aankopen registreren bekende voorraad via de bestaande aankoopadministratie.
-- Verouderde edits leveren een conflict op en laden de actuele stand. Hoeveelheidsverschillen op bonnen vragen beoordeling; bestaande voorraad wordt niet automatisch verlaagd.
-- Productmatching is een conservatieve uitsluiting van bekende conflicten, geen volledige productontologie of bewijs van gelijkwaardigheid. Bestaande productkoppelingen zijn niet automatisch herschreven.
+- Receipt evidence is stored and reviewed; no new automatic OCR parser was introduced.
+- Category order is device-local; product states, purchases and sessions are household-wide.
+- Immediate realtime delivery assumes one API process; multiple workers require shared pub/sub.
+- Legacy bulk completion marks list rows purchased without inventing stock. Individual/session purchases credit known stock through existing acquisition records.
+- Stale edits return conflicts and reload current state. Receipt quantity differences require review; existing stock is not automatically reduced.
+- Product matching conservatively excludes known conflicts. It is not a complete ontology or proof of equivalence, and existing product links were not automatically rewritten.
 
-## MCP en AI: operationele uitleg
+## Operational AI and MCP guidance
 
-De AI leest deze regels via `skills_load` voor shopping, inventory, recipes en expenses. De uitleg staat ook in de werkelijk gepubliceerde toolbeschrijvingen en JSON Schema-velden; dit rapport is geen vereiste om de tools correct te gebruiken.
+The AI receives these rules through `skills_load` for shopping, inventory, recipes and expenses. Published descriptions and JSON Schemas carry the important semantics; this report is not required reading for ordinary tool use.
 
-- **Eerst lezen:** `shopping_sessions` en `shopping_session` leveren sessie-/regel-ID's, de aparte revisies, cumulatief gekochte hoeveelheden, aankoopregels en voorraadlocaties. Productidentiteit en eenheden komen uit de bestaande catalogus/voorraad.
-- **Gewoon kopen:** `shopping_session_update_item` met `status: bought`, huidige regelrevisie en een vaste `operationId` koopt de geplande hoeveelheid. `purchasedQuantity` mag dan wegblijven. Eén potje heeft geen gramgewicht nodig.
-- **Deelkoop:** eerder 1 gekocht en nu nog 1 betekent `purchasedQuantity: 2`, niet 1. Een nieuwe actie krijgt een nieuwe actie-ID. Een netwerkretry gebruikt dezelfde ID en ongewijzigde inhoud. Bij revisieconflict eerst opnieuw lezen.
-- **Nieuwe planning:** `shopping_plan_visit` start een nieuwe beoordeling van behoeften; `shopping_start_session` neemt uitsluitend geselecteerde behoefte-ID's over. `includeLowStock: false` sluit de automatische hoeveelheidsbijdrage uit. Dat wijzigt geen minimumvoorraad.
-- **Nu niet:** `skipped` koopt niets en wijzigt geen voorraad. `open` neemt opnieuw op. Afsluiten registreert geen ontbrekende aankopen of uitgaven.
-- **Voorraad:** `stockAdded: false` betekent dat de aankoop wel geregistreerd is, maar geen bijgehouden voorraad verhoogde. De AI mag dan geen voorraadverhoging claimen. Bij verschillende locaties vraagt de AI om een herkenbare locatie, niet om een intern ID.
-- **Bon na aankoop:** document uploaden, `shopping_session_attach_receipt`, daarna `shopping_session_match_receipt`. Gebruik steeds hetzelfde gedrukte regelnummer voor dezelfde bonregel. Bestaande aankoop-ID's betekenen dezelfde goederen; die krijgen geen tweede voorraadboeking. Verschillen of een latere voorraadtelling vragen beoordeling.
-- **Betaling:** de nieuwe alleen-lezen tool `shopping_payment_options` geeft beschikbare betaalrekening-, betaler- en recente betaalde uitgave-ID's met namen. De AI vertaalt namen naar die ID's. Daarna koppelt `shopping_session_record_payment` een bestaande uitgave of maakt één nieuwe; nooit daarnaast `expenses_log` voor dezelfde betaling. Een vaste referentie identificeert één betaling; afzonderlijke betalingen krijgen eigen referenties.
-- **Veilig gedeeld:** web en MCP gebruiken dezelfde transacties en events. De bestaande MCP-bevestiging voor schrijfacties blijft gelden. Kinderen kunnen geen financiële opties lezen of betalingen vastleggen.
+- **Read first:** `shopping_sessions` / `shopping_session` return session/item IDs, separate revisions, cumulative purchased quantities, acquisitions and stock locations. Product identity and units come from the existing catalogue/inventory.
+- **Ordinary purchase:** `shopping_session_update_item` with `status: bought`, current item revision and stable `operationId` buys the planned quantity. `purchasedQuantity` may be omitted. One jar does not need a gram weight.
+- **Partial purchase:** one previously bought plus one more means `purchasedQuantity: 2`, not 1. A new action gets a new ID; a network retry keeps the ID and payload. Re-read after revision conflict.
+- **New assessment:** `shopping_plan_visit` assesses needs; `shopping_start_session` copies selected requirement IDs. `includeLowStock: false` excludes automatic quantities without changing minimum stock settings.
+- **Skip/restore:** `skipped` buys nothing and changes no stock; `open` restores the item. Closure invents no missing purchases or expenses.
+- **Stock:** `stockAdded: false` means an acquisition was recorded without increasing tracked stock. Do not claim otherwise. Resolve ambiguous locations by a recognisable name rather than asking for an internal ID.
+- **Later receipt:** upload document → `shopping_session_attach_receipt` → `shopping_session_match_receipt`. Keep a printed line identity stable. Existing acquisition IDs identify the same goods and receive no second stock credit. Differences or later counts require review.
+- **Payment:** `shopping_payment_options` reads available accounts, payers and recent paid expenses by ID/name. `shopping_session_record_payment` links an expense or creates one; do not additionally call `expenses_log` for the same payment. One stable reference identifies one payment; separate payments use separate references.
+- **Shared access:** web/MCP use the same transactions/events and existing write-confirmation rules. Children cannot read financial options or record payments.
 
-Aanvullend gecontroleerd: alle 31 bestaande MCP-/toolcontracttests slagen, inclusief echte JSON Schema-generatie en het maximale formaat van de AI-handleidingen. Een extra PostgreSQL/MCP-test controleert het uitlezen van betaalrekening-ID's, household-isolatie en het weigeren van toegang voor kinderen.
+The original delivery also recorded 31 passing MCP/tool contract tests, including JSON Schema generation and skill-guide size limits. An additional PostgreSQL/MCP case verified account IDs, household isolation and financial denial for children.
 
+## Out and Nearly out
 
-## Aanpassing: Op en Bijna op
+The essential/extras filter was replaced with visible **All / Out / Nearly out** controls. Selecting the active option again restores All. Within categories, Out and Nearly out have separate dividers; explicit/recipe needs without a replenishment classification remain in All. The same rules apply to ordinary lists, shop views, session selection and active sessions.
 
-De losse essentieel/extraatjes-filter in de winkelweergave is vervangen door direct zichtbare
-**Alles / Op / Bijna op**-knoppen. Opnieuw op de actieve knop drukken toont Alles. Binnen elke
-categorie staan Op en Bijna op gescheiden door een divider; overige expliciete/receptboodschappen
-blijven in Alles zichtbaar. Dit geldt voor de gewone lijst, winkelweergave, sessieselectie en actieve
-sessies.
+| Stock | Essential | Advice |
+|---|---|---|
+| Below minimum | Either | Out |
+| At minimum | Yes | Out |
+| At minimum | No | Nearly out |
+| Above minimum or minimum unknown | Either | Neither; explicit needs remain visible |
 
-| Voorraad | Essentieel | Advies |
-| --- | --- | --- |
-| Onder minimum | Ja of nee | Op |
-| Precies op minimum | Ja | Op |
-| Precies op minimum | Nee | Bijna op |
-| Boven minimum of zonder bekende minimumvoorraad | Ja of nee | Geen van beide; expliciete behoeften blijven zichtbaar |
+Out predicts a possible replenishment need; it does not assert that physical stock is zero. Preserve minimums, essential settings and acquisition history. The shared helper serves web/MCP. Raw `stockStatus` remains available; `stockNeed` returns `out` / `nearly_out` and supports MCP read filtering. Session reads refresh stock context; no migration was required.
 
-Op is een voorspelling dat aanvullen nodig kan zijn, geen uitspraak dat de fysieke voorraad nul is.
-De minimumvoorraad, essential-instelling en aankoopadministratie blijven behouden. Eén gedeelde
-functie bepaalt dit advies voor web en MCP. De ruwe `stockStatus` blijft bestaan; `stockNeed` geeft
-`out` of `nearly_out` terug en is ook een MCP-leesfilter. Sessie-reads halen actuele voorraadcontext
-op; daarvoor is geen datamigratie nodig. De AI-handleidingen en toolbeschrijvingen beschrijven de nieuwe grensregel.
+The original validation recorded 1,603 unit tests and 23 PostgreSQL/MCP integration tests. Mobile coverage checked dividers, both filters and returning to All in the ordinary list, shop view and selection, followed by the established purchase/receipt/payment journey.
 
-Validatie: 1.603 unittests en 23 PostgreSQL/MCP-integratietests geslaagd. De uitgebreide mobiele
-browsertest controleert scheidingen, beide filters en het terugschakelen naar Alles in de gewone
-lijst, winkelweergave en sessieselectie, gevolgd door de bestaande aankoop-/bon-/betalingsworkflow.
+## In-place quantity and variant adjustment
+
+The web checklist now opens Adjust with `GeneralFormDialog` and the existing product picker. It changes planned quantity and optionally the selected linked variant without navigation or acquisition. Stock location, partial purchases, extras, removal and payment remain separate controls.
+
+`shopping_session_update_item.productId` is limited to products sharing the current canonical stock owner. The service enforces this, household scope, revisions and retry identities. Switching a variant changes future acquisitions; existing acquisition lines retain `purchasedProductId`/`purchasedProductName` snapshots. The session response exposes each acquired variant as purchase-line `productId` and `name`. Unrelated goods use `shopping_session_add_item`.
+
+This local implementation needs the additive `20261107190000_shopping_variant_history` migration as part of release. The rest of the proposed session-start simplification is tracked in the [implementation status](plans/app-samenhang/implementation.md).
+
+## Unified session experience
+
+The ordinary start asks for one shop or saved shop group, then automatically selects current matching needs. No administrative name, checkbox matrix or manual recalculation is required. Shop groups are maintained in Shops using the shared multi-picker. Advanced explicit planning remains available when needed.
+
+The active visit uses a progress summary, category/Out/Nearly out sections, recognisable product images, Bought and Not now actions, and an in-place Adjust dialog. Adjust only changes the planned quantity or verified linked variant. Unrelated goods use the separate shared Add extra dialog. Original requirement and acquisition identities stay stable.
+
+Finishing exposes recorded goods, receipt evidence, a purchase link and the shared payment dialog. Link a paid expense or record one using the existing money input, category and searchable selections. Retry identity is managed by the form rather than requiring a technical reference from the person. Payment linking never credits stock.
+
+Date-only receipts use the start of the household's calendar day as a conservative ordering boundary, not an asserted purchase hour. This avoids future-noon timestamps and retains stock-count review when the actual ordering is uncertain. Both winter/summer time and midnight uploads are tested.
+
+The latest validation and additive migrations are listed in the [implementation report](plans/app-samenhang/implementation.md) and [Purchases guide](PURCHASES.md). Earlier phase test counts above are historical results, not current totals.

@@ -268,7 +268,8 @@
     "unknownHabitant": "Voormalige bewoner",
     "details": "Gegevens",
     "reminderOn_one": "{{count}} dag vooraf: op {{date}}",
-    "reminderOn_other": "{{count}} dagen vooraf: op {{date}}"
+    "reminderOn_other": "{{count}} dagen vooraf: op {{date}}",
+    "related": "Gekoppelde gegevens"
   },
   "qr": {
     "title": "Betalen met je bankapp",
@@ -362,5 +363,24 @@
     "exceedsBalance": "De terugbetaling is hoger dan het resterende saldo.",
     "paymentDateHint": "Vul de dag in waarop je echt betaalde. Dat mag vóór de eerste termijn zijn.",
     "futureDate": "Vul de dag in waarop je echt betaalde, op of vóór {{date}}."
+  },
+  "allocation": {
+    "title": "Project- en huishoudkosten",
+    "description": "Verdeel deze uitgave zonder een nieuwe aankoop of betaling te registreren.",
+    "edit": "Kosten verdelen",
+    "editDescription": "Verdeel over projecten en het huishouden. Een restbedrag blijft zichtbaar onverdeelbaar.",
+    "household": "Huishouden",
+    "projects": "Projectaandelen",
+    "projectAmount": "Projectbedrag",
+    "remove": "Projectaandeel verwijderen",
+    "add": "Project toevoegen",
+    "over": "{{amount}} boven het uitgavetotaal",
+    "remaining": "{{amount}} nog te verdelen",
+    "total": "Uitgavetotaal",
+    "unallocated": "Nog te verdelen",
+    "deletedProject": "{{name}} · project verwijderd",
+    "loadError": "Kostenverdeling kon niet worden geladen",
+    "retry": "Opnieuw proberen",
+    "conflict": "Iemand heeft deze verdeling gewijzigd. Je invoer blijft bewaard; sluit en heropen om de nieuwste verdeling te bekijken voordat je opslaat."
   }
 }

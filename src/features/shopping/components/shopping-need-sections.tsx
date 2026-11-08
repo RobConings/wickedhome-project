@@ -12,8 +12,10 @@ type StockItem = {
 export function ShoppingNeedSections<T extends StockItem>({
   items,
   children,
+  grouped = true,
 }: {
   items: T[];
+  grouped?: boolean;
   children: (items: T[]) => ReactNode;
 }) {
   const { t } = useTranslation("shopping");
@@ -28,6 +30,7 @@ export function ShoppingNeedSections<T extends StockItem>({
       ),
     }))
     .filter((group) => group.items.length);
+  if (!grouped) return children(items);
   if (groups.length === 1 && groups[0]!.key === "other") return children(items);
   return (
     <div className="space-y-2">

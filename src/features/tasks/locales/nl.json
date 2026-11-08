@@ -317,7 +317,8 @@
     "startDateNeedsDate": "Meerdere dagen hebben een laatste dag nodig.",
     "startDateAfterEnd": "De eerste dag moet voor de laatste dag komen.",
     "daysTooLong": "Hoogstens een jaar van de eerste tot de laatste dag.",
-    "daysAllDay": "Meerdere dagen zijn altijd de hele dag: geen uur."
+    "daysAllDay": "Meerdere dagen zijn altijd de hele dag: geen uur.",
+    "unknownDevice": "Kies een toestel in dit huishouden."
   },
   "project": {
     "label": "Project",
@@ -475,5 +476,13 @@
       "daysBefore_other": "{{count}} dagen ervoor, {{time}}",
       "before": "{{offset}} {{time}}"
     }
+  },
+  "maintenance": {
+    "loading": "Onderhoudstaken laden",
+    "error": "Onderhoudstaken konden niet worden geladen.",
+    "empty": "Nog geen onderhoud gepland voor dit toestel.",
+    "allDone": "Alle onderhoud is afgerond.",
+    "done": "Afgerond · {{count}}",
+    "add": "Onderhoud plannen"
   }
 }

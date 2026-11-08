@@ -139,3 +139,19 @@ See [INTEGRATIONS.md](INTEGRATIONS.md#home-assistant-as-built-2026-10-03). In sh
 - No value history, no notifications ("window open while armed"), no click-to-place for touch/keyboard (palette
   uses HTML drag and drop; editing is desktop-only anyway).
 - The event bus is in-memory (one process). More processes → Postgres `LISTEN/NOTIFY` behind `publish`/`subscribe`.
+
+## Photos, rooms and supported controls
+
+Device identity can select an image already attached through Documents. The same shared image chooser serves projects and recipes; device rows/cards/details keep their live indicator separate from the photograph. A cover must be a non-trashed image attached to that household's device. Clearing it changes no binding, profile, room or value.
+
+Room details contain Devices' own live list/card contribution and Projects' room contribution. Home keeps the saved Places floor geometry, room cycling, device markers and room-scoped tasks/projects. Work markers summarise a room; they do not invent precise task positions.
+
+Adults/owners see capability-backed controls on device details. The adapter reads current linked HA entities, availability, feature flags, ranges and units. Unknown/unavailable sources expose no command. Thermostat Celsius controls require a reported Celsius unit; Fahrenheit or unknown units are not reinterpreted. Offered temperature increments intersect the reported native grid with the adapter’s existing half-degree precision; unsupported typed increments are rejected rather than silently rounded. Scenes are listed on Home Assistant and use the existing scene service. Existing physical-security restrictions and the separate alarm policy remain authoritative.
+
+Web device commands and MCP `devices_switch`/`devices_climate` use the same capability validation and owner service. `devices_capabilities` describes the current supported actions; `devices_set_cover` selects an attached image. The UI reports source state/timestamps and refreshes after source events rather than pretending a sent command is a confirmed state.
+
+The adapter's feature flags follow Home Assistant's [cover entity contract](https://developers.home-assistant.io/docs/core/entity/cover/) and [climate entity contract](https://developers.home-assistant.io/docs/core/entity/climate/). Validation uses simulated entity states; testing against the household's actual physical devices remains a deployment/environment check.
+
+## Maintenance tasks
+
+Device details have a Maintenance relationship card and a Tasks-owned panel for planning work, completing it and reviewing completed tasks. New work defaults to the device and its current room, with type Maintenance; recurrence, assignments, reminders and materials use the ordinary task form. The Devices-owned picker is also available in the Tasks workspace and task details. An unavailable picker preserves an existing device relationship when other task fields save. Device membership is a typed `Task.deviceId` relationship, not inferred from notes or nearby room tasks. See [Tasks](TASKS.md#device-maintenance) for API, history and MCP semantics.

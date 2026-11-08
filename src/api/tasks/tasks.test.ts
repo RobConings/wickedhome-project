@@ -142,6 +142,7 @@ const baseTask: Task = {
   waitingFor: [],
   commentCount: 0,
   project: null,
+    device: null,
 };
 
 describe("a task's when", () => {

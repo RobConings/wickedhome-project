@@ -22,5 +22,8 @@ export const FirstVisit: Story = {
 };
 export const ReadOnly: Story = { args: { canManage: false } };
 /** The waste section failed to load; the household section still works. */
-export const SectionFailed: Story = { args: { data: { today: WASTE_TODAY, household: householdSettingsFixture, waste: null, weather: weatherSettingsFixture, habitants: [] } } };
+export const SectionFailed: Story = { parameters: { router: { initialEntries: ["/settings#waste"] } }, args: { data: { today: WASTE_TODAY, household: householdSettingsFixture, waste: null, weather: weatherSettingsFixture, habitants: [] } } };
 export const Mobile: Story = { globals: { viewport: { value: "mobile1" } } };
+
+export const Household: Story = { parameters: { router: { initialEntries: ["/settings?section=household"] } } };
+export const LegacyWasteLink: Story = { parameters: { router: { initialEntries: ["/settings#waste"] } } };

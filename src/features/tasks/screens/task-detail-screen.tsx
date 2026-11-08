@@ -1,7 +1,8 @@
+import { RelatedRecordCards, type RelatedRecordLink } from "@/components/shared/related-record-cards";
 import * as React from "react";
 import {
+  WrenchIcon, BoxIcon, FolderIcon, FolderKanbanIcon, MapPinIcon,
   AlarmClockIcon,
-  ArrowLeftIcon,
   BellIcon,
   CheckIcon,
   Link2Icon,
@@ -15,7 +16,7 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Spinner } from "@/components/ui/spinner";
@@ -34,7 +35,7 @@ import { TaskAssignees } from "../components/task-assignees";
 import { TaskChecklist } from "../components/task-checklist";
 import { TaskComments } from "../components/task-comments";
 import { TaskHoldBadge, TaskOriginBadge, TaskProjectChip, TaskWaitingBadge } from "../components/task-flags";
-import { TaskFormDialog, type TaskProjectField } from "../components/task-form-dialog";
+import { TaskFormDialog, type TaskProjectField, type TaskDeviceField } from "../components/task-form-dialog";
 import { TaskHoldDialog } from "../components/task-hold-dialog";
 import { TaskLinksPanel } from "../components/task-links";
 import { TaskHistory } from "../components/task-history";
@@ -62,6 +63,7 @@ type TaskDetailScreenProps = {
   attachments?: React.ReactNode;
   /** Optional "Project" field in the edit form, composed by the route. */
   projectField?: TaskProjectField;
+  deviceField?: TaskDeviceField;
 };
 
 /** One task: readiness, the details, its steps and materials, and who did it before. */
@@ -74,6 +76,7 @@ export function TaskDetailScreen({
   materials,
   attachments,
   projectField,
+  deviceField,
 }: TaskDetailScreenProps) {
   const { t } = useTranslation("tasks");
   const { t: tCommon } = useTranslation();
@@ -172,7 +175,7 @@ export function TaskDetailScreen({
             habitants={habitants}
             places={places}
             today={today}
-            projectField={projectField}
+            projectField={projectField} deviceField={deviceField}
             trigger={
               <Button variant="outline">
                 <PencilIcon />
@@ -204,17 +207,19 @@ export function TaskDetailScreen({
   return (
     <PageContainer>
       <PageHeader
-        eyebrow={
-          <Link to="/tasks" className="inline-flex items-center gap-1 hover:underline">
-            <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-            {t("page.title")}
-          </Link>
-        }
+        backTo="/tasks"
         title={task.title}
         description={recurrence ?? undefined}
         actions={actions}
       />
 
+      <RelatedRecordCards label={t("links.title")} items={([
+        ...(task.device ? [{ id: "device", label: task.device.name, icon: WrenchIcon, accent: "devices", to: `/devices/${encodeURIComponent(task.device.id)}` } satisfies RelatedRecordLink] : []),
+        ...(task.project ? [{ id: "project", label: task.project.name, icon: FolderKanbanIcon, accent: "home", to: `/projects/${encodeURIComponent(task.project.id)}` } satisfies RelatedRecordLink] : []),
+        ...(task.place ? [{ id: "room", label: task.place.name, icon: MapPinIcon, accent: "home", to: `/places/${encodeURIComponent(task.place.id)}` } satisfies RelatedRecordLink] : []),
+        ...(materials ? [{ id: "materials", label: tCommon("nav.shopping"), value: task.materials ? `${task.materials.bought}/${task.materials.total}` : undefined, icon: BoxIcon, accent: "shopping", to: "#task-materials" } satisfies RelatedRecordLink] : []),
+        ...(attachments ? [{ id: "documents", label: tCommon("nav.documents"), icon: FolderIcon, accent: "documents", to: "#task-documents" } satisfies RelatedRecordLink] : []),
+      ] satisfies RelatedRecordLink[])} />
       <PageGrid columns="main-sidebar">
         <div className="flex min-w-0 flex-col gap-6">
           <Card>
@@ -307,7 +312,7 @@ export function TaskDetailScreen({
           </Card>
 
           {/* Jobs are where materials matter most: right under the details. */}
-          {task.type === "job" && materials}
+          {task.type === "job" && <section id="task-materials" className="scroll-mt-20">{materials}</section>}
 
           {task.checklist.length > 0 && (
             <Card>
@@ -316,9 +321,9 @@ export function TaskDetailScreen({
             </Card>
           )}
 
-          {task.type !== "job" && materials}
+          {task.type !== "job" && <section id="task-materials" className="scroll-mt-20">{materials}</section>}
 
-          {attachments}
+          {attachments && <section id="task-documents" className="scroll-mt-20">{attachments}</section>}
 
           <Card>
             <CardHeader>
@@ -380,7 +385,7 @@ export function TaskDetailScreen({
 
       {holding && <TaskHoldDialog task={task} open onOpenChange={setHolding} onHold={(reason) => submit("hold", { reason })} />}
       {repeating && (
-        <TaskFormDialog task={task} habitants={habitants} places={places} today={today} open onOpenChange={setRepeating} startRepeating projectField={projectField} />
+        <TaskFormDialog task={task} habitants={habitants} places={places} today={today} open onOpenChange={setRepeating} startRepeating projectField={projectField} deviceField={deviceField} />
       )}
     </PageContainer>
   );

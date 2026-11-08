@@ -2,8 +2,9 @@ import i18n from "i18next";
 import type { ActionFunctionArgs } from "react-router";
 import { toFormResult, type FormResult } from "@/lib/forms";
 import { fetchAppliances, type Appliance } from "@/features/energy";
-import { haApplianceLinksInputSchema, haSettingsInputSchema } from "../types/home-assistant";
+import { haControlInputSchema, haApplianceLinksInputSchema, haSettingsInputSchema } from "../types/home-assistant";
 import {
+  sendDeviceControl,
   fetchAlarmOverview,
   fetchHaEnergy,
   fetchHaEntities,
@@ -35,10 +36,17 @@ export type HomeAssistantData = Awaited<ReturnType<typeof homeAssistantLoader>>;
 
 /** JSON submissions; `intent`: save-links · save-settings · import-energy. (The device import calls the API itself.) */
 export async function homeAssistantAction({ request }: ActionFunctionArgs): Promise<HomeAssistantActionResult> {
-  const body = (await request.json()) as Record<string, unknown>;
+  const isJson = request.headers.get("content-type")?.includes("application/json");
+  const body = (isJson ? await request.json() : Object.fromEntries(await request.formData())) as Record<string, unknown>;
   const intent = typeof body.intent === "string" ? body.intent : "";
   try {
     switch (intent) {
+      case "control-device": {
+        const input = haControlInputSchema.safeParse({ entityId: body.entityId, action: body.controlAction, value: Number(body.value) });
+        if (!input.success || typeof body.deviceId !== "string") return { formError: i18n.t("common:errors.generic"), intent };
+        await sendDeviceControl(body.deviceId, input.data);
+        return { ok: true, intent };
+      }
       case "save-links": {
         const input = haApplianceLinksInputSchema.safeParse({ links: body.links });
         if (!input.success) return { formError: i18n.t("common:errors.generic"), intent };

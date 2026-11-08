@@ -627,6 +627,12 @@ export async function updateExpense(householdId: string, id: string, input: Expe
       if (input.paymentMethod === "meal_voucher") throw badRequest("Validation failed", { paymentMethod: ["A loan cannot be repaid with meal vouchers"] });
       await validateLoanRepayment(tx, loan, input.amountCents, input.dueDate, id, repaymentDueDate(loan, input.dueDate, existing));
     }
+    await tx.$queryRaw`SELECT "id" FROM "bills" WHERE "id" = ${id} AND "householdId" = ${householdId} FOR UPDATE`;
+    const allocation = await tx.expense.findUniqueOrThrow({ where: { id }, select: { projectId: true, allocationHouseholdCents: true, projectAllocations: { select: { amountCents: true } } } });
+    const allocated = (allocation.allocationHouseholdCents ?? 0) + allocation.projectAllocations.reduce((sum, part) => sum + part.amountCents, 0);
+    if (allocated > input.amountCents) throw badRequest("Review the project/household allocation before reducing this expense", { amountCents: ["Allocated amounts exceed the expense total"] });
+    if ((allocation.allocationHouseholdCents !== null || allocation.projectAllocations.length) && input.projectId !== undefined && (input.projectId || null) !== allocation.projectId)
+      throw badRequest("Use the project allocation editor to change this expense's purpose");
     await tx.expenseShare.deleteMany({ where: { expenseId: id } });
     const row = await tx.expense.update({
       where: { id },
@@ -716,6 +722,8 @@ export async function updateRecurringExpense(householdId: string, id: string, in
   const replacedWhere = { recurringExpenseId: id, paidOn: null, dueDate: { gte: toDate(cutoff) } };
   const { row, replaced, regenerated } = await db.$transaction(async (tx) => {
     await tx.recurringExpenseShare.deleteMany({ where: { recurringExpenseId: id } });
+    if (await tx.expense.count({ where: { ...replacedWhere, OR: [{ allocationHouseholdCents: { gt: 0 } }, { projectAllocations: { some: {} } }] } }))
+      throw badRequest("Validation failed", { projectId: ["Review allocated future expenses before changing this recurring expense"] });
     const replaced = await tx.expense.findMany({ where: replacedWhere, select: { id: true, dueDate: true } });
     await tx.expense.deleteMany({ where: replacedWhere });
     // What is left from the as-of date on (paid ones, older unpaid ones) is settled; the rest is planned again.
@@ -735,7 +743,7 @@ export async function updateRecurringExpense(householdId: string, id: string, in
     });
     // A changed project applies to every instance, paid ones included (projects feature).
     if (input.projectId !== undefined && (input.projectId || null) !== existing.projectId) {
-      await tx.expense.updateMany({ where: { recurringExpenseId: id }, data: { projectId: input.projectId || null } });
+      await tx.expense.updateMany({ where: { recurringExpenseId: id, allocationHouseholdCents: null, projectAllocations: { none: {} } }, data: { projectId: input.projectId || null } });
     }
     if (existing.status === "ACTIVE") {
       await generateInstances(tx, recurring, cutoff, horizon(now > input.startDate ? now : input.startDate));

@@ -1,5 +1,7 @@
 import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
+import { PlaceDevicesSection } from "@/features/devices";
+import { PlaceProjectsSection } from "@/features/projects";
 import { PlaceAppliancesSection } from "@/features/energy";
 import { PlaceStockSection } from "@/features/inventory";
 import { PlaceDetailScreen, canManagePlaces, placeDetailLoader, placesAction } from "@/features/places";
@@ -21,6 +23,8 @@ export function Component() {
       canManage={canManagePlaces(user.role)}
       sections={{
         // Keyed: another place starts with a skeleton instead of the previous place's tasks.
+        projects: <PlaceProjectsSection key={`projects-${placeId}`} placeId={placeId} />,
+        devices: <PlaceDevicesSection key={`devices-${placeId}`} placeId={placeId} />,
         tasks: <PlaceTasksSection key={placeId} placeId={placeId} />,
         stock: <PlaceStockSection placeId={placeId} />,
         shopping: <PlaceShoppingSection placeId={placeId} />,

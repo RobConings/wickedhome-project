@@ -22,6 +22,8 @@ import "./money/tools";
 import "./places/tools";
 import "./planner/tools";
 import "./projects/tools";
+import "./purchases/tools";
+import "./expenses/project-allocation";
 import "./recipes/tools";
 import "./settings/tools";
 import "./shopping/tools";

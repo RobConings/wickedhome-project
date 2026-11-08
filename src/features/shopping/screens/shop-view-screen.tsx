@@ -1,9 +1,11 @@
+import { useShoppingSort } from "../data/use-shopping-sort";
+import { ShoppingNavigation } from "../components/shopping-navigation";
 import { useCategoryOrder } from "../data/use-category-order";
 import { AutomaticShoppingFilter, CategoryOrder } from "../components/shopping-preferences";
 import * as React from "react";
-import { ArrowLeftIcon, CircleHelpIcon, PartyPopperIcon, RefreshCwIcon, SearchXIcon, StoreIcon } from "lucide-react";
+import { CircleHelpIcon, PartyPopperIcon, RefreshCwIcon, SearchXIcon, StoreIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate, useRevalidator, useSearchParams } from "react-router";
+import { useNavigate, useRevalidator, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
@@ -22,12 +24,10 @@ import { AddShoppingItemDialog } from "../components/add-shopping-item-dialog";
 import { ProductCategoryIcon } from "../components/product-category-icon";
 import {
   NO_SHOP_VIEW_FILTERS,
-  SHOP_VIEW_SORTS,
   filterShopViewItems,
   groupShopViewItems,
   itemsForShops,
   type ShopViewFilters,
-  type ShopViewSort,
 } from "../components/shopping-grouping";
 import { ShopViewToolbar } from "../components/shop-view-toolbar";
 import { ShopSummaryList } from "../components/shop-summary-list";
@@ -84,12 +84,9 @@ export function ShopViewScreen({
   const actions = useShoppingItemActions({ items: overview.items, onChanged: revalidate });
   const [editing, setEditing] = React.useState<ShoppingItem | null>(null);
   const locale = currentLocale();
-  const [sort, setSort] = React.useState<ShopViewSort>(readStoredSort);
+  const { sort, changeSort } = useShoppingSort(true);
   const [filters, setFilters] = React.useState<ShopViewFilters>(NO_SHOP_VIEW_FILTERS);
-  const changeSort = (next: ShopViewSort) => {
-    setSort(next);
-    storeSort(next);
-  };
+
 
   const shop = selectedKeys.length === 1 && selectedKeys[0] !== NO_SHOP ? (shops.find((candidate) => candidate.id === selectedKeys[0]) ?? null) : null;
   const here = itemsForShops(actions.items, selectedKeys);
@@ -137,19 +134,15 @@ export function ShopViewScreen({
     initialSelections={initialSelections}
   />;
 
-  const back = (
-    <Link to={hasSelection ? "/shopping/shops" : "/shopping"} className="inline-flex items-center gap-1 hover:underline">
-      <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-      {hasSelection ? t("shopView.title") : t("actions.backToShopping")}
-    </Link>
-  );
+
 
   if (!hasSelection) {
     const anything = actions.items.some((item) => item.status === "open");
     return (
       <PageContainer className="gap-4 px-3 py-4 sm:gap-6 sm:px-6 sm:py-8 lg:px-8">
       {actions.confirmation}
-        <PageHeader eyebrow={back} title={t("shopView.title")} description={t("shopView.description")} actions={addAction} />
+        <PageHeader backTo="/shopping" title={t("shopView.title")} description={t("shopView.description")} actions={addAction} />
+        <ShoppingNavigation />
         <div className="mb-6 max-w-xl">{selection}</div>
         {anything ? (
           <Card className="max-w-xl">
@@ -167,7 +160,7 @@ export function ShopViewScreen({
     <PageContainer className="gap-4 px-3 py-4 sm:gap-6 sm:px-6 sm:py-8 lg:px-8">
       {actions.confirmation}
       <PageHeader
-        eyebrow={back}
+        backTo="/shopping"
         actions={addAction}
         title={
           <span className="flex items-center gap-3">
@@ -190,6 +183,7 @@ export function ShopViewScreen({
           </span>
         }
       />
+      <ShoppingNavigation />
 
       <PageGrid columns="main-sidebar" className="items-start">
         <Stack gap="lg" className="gap-3 sm:gap-6">
@@ -216,7 +210,7 @@ export function ShopViewScreen({
               const list = (
                 <ShoppingItemList
                   groupByCategory={false}
-                  groupByNeed={sort !== "priority"}
+                  groupByNeed={sort === "category"}
                   items={group.items}
                   shops={shops}
                   size="large"
@@ -283,22 +277,3 @@ export function ShopViewScreen({
   );
 }
 
-const SORT_STORAGE_KEY = "wh-shop-view-sort";
-
-/** The sort picked before on this device; name until then (or when storage is unavailable). */
-function readStoredSort(): ShopViewSort {
-  try {
-    const stored = globalThis.localStorage?.getItem(SORT_STORAGE_KEY);
-    return (SHOP_VIEW_SORTS as readonly string[]).includes(stored ?? "") ? (stored as ShopViewSort) : "category";
-  } catch {
-    return "category";
-  }
-}
-
-function storeSort(sort: ShopViewSort) {
-  try {
-    globalThis.localStorage?.setItem(SORT_STORAGE_KEY, sort);
-  } catch {
-    // Not remembered on this device; the view still sorts.
-  }
-}

@@ -101,5 +101,28 @@
       "title": "Slim huis",
       "description": "Alarm, temperaturen en toestellen via Home Assistant."
     }
+  },
+  "rooms": {
+    "title": "Ontdek je huis",
+    "description": "Verken het grondplan en selecteer ruimtes, toestellen en hun werk.",
+    "all": "Alle ruimtes",
+    "floor": "Verdieping",
+    "choose": "Ruimte",
+    "previous": "Vorige ruimte",
+    "next": "Volgende ruimte",
+    "open": "Ruimte openen",
+    "empty": "Hier komen jouw ruimtes",
+    "manage": "Ruimtes en grondplannen beheren",
+    "planError": "Een grondplan kon niet worden geladen. Open Ruimtes om opnieuw te proberen.",
+    "notDrawn": "Deze ruimte is nog niet getekend op het grondplan.",
+    "noRooms": "Voeg ruimtes toe aan deze verdieping om ze hier te bekijken.",
+    "work": "{{tasks}} taken · {{projects}} projecten",
+    "appliances": "Toestellen en apparaten",
+    "tasks": "Open taken",
+    "projects": "Lopende projecten",
+    "noAppliances": "Geen toestellen gekoppeld aan deze ruimte.",
+    "noTasks": "Geen open taken in deze ruimte.",
+    "noProjects": "Geen lopende projecten gekoppeld aan deze ruimte.",
+    "explore": "Huis verkennen"
   }
 }

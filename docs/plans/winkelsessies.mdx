@@ -1,78 +1,66 @@
-# WickedHome: betrouwbaar samen winkelen
+# WickedHome — reliable shared shopping
 
-De bestaande productcatalogus, boodschappenregels, voorraadmutaties, aankoopbewijzen en uitgaven blijven behouden. Implementatie in zes geteste fases.
+Historical implementation plan, translated into English. Existing products, shopping needs, stock movements, purchase evidence and expenses are retained. The six phases below describe completed implementation work. The [application-wide redesign](./app-samenhang/plan.mdx) is the current proposal for navigation and interface composition; this plan is not evidence of the current server revision.
 
 ```mermaid
 flowchart TD
-  R[Recepten en minimumvoorraad] --> B[Bestaande boodschappenbehoefte]
-  B --> S[Selectie voor winkelsessie]
-  W[Webapp] --> A[Gedeelde services]
+  R[Recipes and minimum stock] --> B[Existing shopping need]
+  B --> S[Shopping-trip selection]
+  W[Web app] --> A[Shared services]
   M[MCP] --> A
   A --> S
-  S --> P[Aankoop met vaste bronidentiteit]
-  K[Kassabon] --> P
-  P --> V[Eenmalige voorraadmutatie]
-  P --> U[Bestaande uitgaven en betalingen]
-  A --> E[SSE naar alle gezinsleden]
+  S --> P[Purchase with stable source identity]
+  K[Receipt] --> P
+  P --> V[Single stock movement]
+  P --> U[Existing expenses and payments]
+  A --> E[SSE to household members]
 ```
 
-<Phase title="1. Bestaande fouten herstellen" status="done">
-
+<Phase title="1. Repair existing defects" status="done">
 <Checklist>
-- [x] Aankopen onderdrukken onmiddellijke automatische herhaling
-- [x] Historische aankopen blokkeren geen onafhankelijke aankoop
-- [x] Bronidentiteiten blijven idempotent
+- [x] Purchases suppress immediate automatic repetition
+- [x] Historical purchases do not block independent acquisitions
+- [x] Source identities stay idempotent
 </Checklist>
-
 </Phase>
 
-<Phase title="2. Boodschappen overzichtelijk maken" status="done">
-
+<Phase title="2. Make shopping understandable" status="done">
 <FileTree>
-- modify src/features/shopping/components/ -- categorieën, volgorde, herkomstfilter en overslaan
-- modify src/api/shopping/shopping.service.ts -- gedeelde statuslogica
+- modify src/features/shopping/components/ -- categories, order, source filter and skipping
+- modify src/api/shopping/shopping.service.ts -- shared status logic
 </FileTree>
-
 </Phase>
 
-<Phase title="3. Winkelsessies en kassabonnen" status="done">
-
+<Phase title="3. Shopping trips and receipts" status="done">
 <FileTree>
-- add prisma/schema/shopping-sessions.prisma -- sessies, deelnemers, aankopen en bonkoppelingen
-- add src/api/shopping/sessions.service.ts -- transacties en broncontrole
-- add src/features/shopping/screens/sessions-screen.tsx -- selectie, afvinken en historiek
+- add prisma/schema/shopping-sessions.prisma -- sessions, participants, purchases and receipt links
+- add src/api/shopping/sessions.service.ts -- transactions and source checks
+- add src/features/shopping/screens/sessions-screen.tsx -- selection, checklist and history
 </FileTree>
-
 </Phase>
 
-<Phase title="4. Realtime en gelijktijdige acties" status="done">
-
+<Phase title="4. Realtime and concurrent actions" status="done">
 <Checklist>
-- [x] Bestaande SSE uitbreiden vanuit de servicelaag
-- [x] Revisiecontrole voorkomt verloren wijzigingen
-- [x] Opnieuw verbinden haalt actuele gegevens op
+- [x] Extend the existing SSE mechanism from service boundaries
+- [x] Revision checks prevent lost updates
+- [x] Reconnection loads current records
 </Checklist>
-
 </Phase>
 
-<Phase title="5. Financiële koppeling" status="done">
-
+<Phase title="5. Financial links" status="done">
 <FileTree>
-- modify src/api/shopping/sessions.service.ts -- bestaande uitgaven en gesplitste betalingen koppelen
-- modify src/features/shopping/screens/sessions-screen.tsx -- aankoop, bon en uitgaven samen raadplegen
+- modify src/api/shopping/sessions.service.ts -- coordinate existing expenses and split payments
+- modify src/features/shopping/screens/sessions-screen.tsx -- browse purchase, receipt and expense together
 </FileTree>
-
 </Phase>
 
-<Phase title="6. Consistentie en oplevering" status="done">
-
+<Phase title="6. Consistency and delivery" status="done">
 <Checklist>
-- [x] Potjes tellen zonder verplicht gewicht; expliciete verpakkingen veilig vergelijken
-- [x] Migratie op wegwerpdatabase met bestaande gegevens controleren
-- [x] API, MCP, concurrentie, bonherhaling en realtime testen
-- [x] Rapport per fase met bestanden, migraties, resultaten en beperkingen
+- [x] Count jars without mandatory weights; compare explicit packaging safely
+- [x] Verify migration on a disposable database with existing records
+- [x] Test API, MCP, concurrency, receipt retries and realtime
+- [x] Record files, migrations, results and limits for each phase
 </Checklist>
-
 </Phase>
 
-Uitgevoerd en gevalideerd: 1.603 unittests, 23 PostgreSQL/MCP-integratietests, twee mobiele browsers en behoud van bestaande migratiegegevens. Details staan in `docs/SHOPPING-SESSIONS.md`.
+Recorded implementation validation: 1,603 unit tests, 23 PostgreSQL/MCP integration tests, two mobile browsers and preservation of representative pre-migration data. See [the implementation report](../SHOPPING-SESSIONS.md). These counts describe that delivery, not a new domain test run during documentation translation.

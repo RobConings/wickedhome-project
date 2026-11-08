@@ -1,0 +1,11 @@
+{
+  "checkedMediaCases": 13,
+  "largeCovers": true,
+  "cardAndListModes": true,
+  "rememberedView": true,
+  "thumbnailRows": true,
+  "containedProductPhotos": true,
+  "missingAndFailedImageFallback": true,
+  "browserErrors": [],
+  "realApiRequests": 0
+}

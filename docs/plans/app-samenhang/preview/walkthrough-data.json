@@ -1,0 +1,278 @@
+[
+  {
+    "id": "home-rooms",
+    "journey": "Connected home",
+    "step": "1. Explore the rooms",
+    "title": "Your home starts with its rooms",
+    "image": "home-rooms.png",
+    "format": "desktop",
+    "intro": "The home dashboard keeps the house map prominent. Choose a floor, tap a room or cycle through rooms without leaving Home.",
+    "changes": [
+      "Uses the existing floor-plan viewer and saved room outlines.",
+      "Appliances appear at their real saved positions, with device state and freshness owned by Devices.",
+      "Room work markers open the room context: appliances, open tasks and current projects.",
+      "Rooms without an outline remain selectable; unavailable information is shown as unknown."
+    ],
+    "next": "Select another room, open a linked task or project, or open the room itself.",
+    "connection": "Places owns rooms and geometry. Devices, Energy, Tasks and Projects contribute their existing records.",
+    "screen": "dashboard"
+  },
+  {
+    "id": "project-detail",
+    "journey": "Projects and money",
+    "step": "1. Start with the goal",
+    "title": "One project, with its useful connections",
+    "image": "project.png",
+    "format": "desktop",
+    "intro": "The project answers three questions: what is next, what do we need, and how is the budget doing?",
+    "changes": [
+      "The existing project cover banner stays: the image helps identify the project immediately.",
+      "A stable header and related-record cards replace unrelated blocks and loose links.",
+      "Related records use coloured icons, counts and a whole-card tap target; phones show two cards per row.",
+      "Real task progress, residents and a clear next step make the project feel achievable.",
+      "Spent, still planned and remaining amounts have separate meanings."
+    ],
+    "next": "Open Materials to see what the task needs, then open the product.",
+    "connection": "Projects hosts the page; Tasks, Shopping, Inventory and Expenses provide their own records.",
+    "screen": "project-detail"
+  },
+  {
+    "id": "inventory-product",
+    "journey": "Projects and money",
+    "step": "2. Open the same product",
+    "title": "A product keeps one identity throughout the household",
+    "image": "product.png",
+    "format": "desktop",
+    "intro": "The product page brings stock, task needs, project use, purchases and shop variants together.",
+    "changes": [
+      "Three cartridges at home and two required for a task are shown as different facts.",
+      "Related views use the same product, rather than creating project-specific copies.",
+      "Household units stay practical: jars, packs and pieces do not require weights."
+    ],
+    "next": "Follow the requirement into shopping, or use existing stock for the task.",
+    "connection": "The catalogue owns identity; Inventory owns quantities and movements; each project relationship explains its purpose.",
+    "screen": "inventory-product"
+  },
+  {
+    "id": "visit-start",
+    "journey": "Shopping",
+    "step": "1. Choose a destination",
+    "title": "Start a trip by choosing one shop or saved group",
+    "image": "start.png",
+    "format": "mobile",
+    "intro": "No trip-name form, preparation wizard or second list of shop checkboxes.",
+    "changes": [
+      "The shared selection control puts favourites and recent choices first.",
+      "A saved group already defines its shops; users do not select them again.",
+      "The matching shopping list becomes the checklist automatically."
+    ],
+    "next": "Choose the Colruyt group and press Start shopping.",
+    "connection": "Shops owns destinations and groups. Shopping reuses existing needs.",
+    "screen": "visit-start"
+  },
+  {
+    "id": "visit-active",
+    "journey": "Shopping",
+    "step": "2. Use the checklist",
+    "title": "Large, clear actions while walking through the shop",
+    "image": "checklist.png",
+    "format": "mobile",
+    "intro": "The screen focuses on the items and the next useful tap.",
+    "changes": [
+      "Purchased and Not now are distinct actions; skipped products do not increase stock.",
+      "Adjust opens over the checklist for planned quantity and linked variants only. Extra products and stock locations remain separate.",
+      "Extra products remain possible without leaving the trip behind."
+    ],
+    "next": "Finish after resolving the checklist. Remaining open items require an explicit skip decision.",
+    "connection": "Acquisitions use the existing central purchase/stock workflow once; other household members see the same session.",
+    "screen": "visit-active"
+  },
+  {
+    "id": "visit-adjust",
+    "journey": "Shopping",
+    "step": "3. Adjust in place",
+    "title": "Quantity and a linked variant, without leaving the checklist",
+    "image": "adjust-in-place.png",
+    "format": "mobile",
+    "intro": "Adjust is a small form over the current shopping checklist. The background and visit context remain in place.",
+    "changes": [
+      "Uses the production shared form dialog and existing product picker.",
+      "Only planned quantity and variants already linked to this product appear here.",
+      "Saving a plan does not add stock or change earlier acquisitions.",
+      "Stock locations, extra products, receipts and payment keep their own actions."
+    ],
+    "next": "Save to continue shopping at the same place in the checklist.",
+    "connection": "The web and MCP use the same session service, stock-owner validation and item revisions.",
+    "screen": "visit-active"
+  },
+  {
+    "id": "visit-summary",
+    "journey": "Shopping",
+    "step": "4. Finish and link payment",
+    "title": "Close the trip first; add evidence and payment when useful",
+    "image": "finish.png",
+    "format": "mobile",
+    "intro": "Completion leads to a short review instead of another compulsory administrative task.",
+    "changes": [
+      "Review purchased quantities and stock location, including goods not tracked yet.",
+      "Link a receipt or an existing/new expense during or after the trip.",
+      "Adding a receipt or payment must not purchase the same goods again."
+    ],
+    "next": "Open the linked purchase or expense whenever you need the details.",
+    "connection": "Shopping owns the checklist; purchase evidence, inventory and payments keep their own responsibilities.",
+    "screen": "visit-summary"
+  },
+  {
+    "id": "purchase-detail",
+    "journey": "Projects and money",
+    "step": "3. Review the acquisition",
+    "title": "One receipt can serve a project and the household",
+    "image": "purchase.png",
+    "format": "desktop",
+    "intro": "A €45 Gamma purchase allocates €35 to the bathroom and €10 to the household.",
+    "changes": [
+      "Actual product lines stay visible with quantities and purpose.",
+      "Receipt, stock, expense and project links provide a traceable path.",
+      "Allocation explains a cost; it does not create another payment."
+    ],
+    "next": "Open the expense to see payer, account and payment status.",
+    "connection": "Acquisitions describe goods. Expenses records payment. Projects reads its allocated share.",
+    "screen": "purchase-detail"
+  },
+  {
+    "id": "money",
+    "journey": "Projects and money",
+    "step": "4. Understand the money",
+    "title": "Actual account balance and forecast are separate",
+    "image": "money.png",
+    "format": "desktop",
+    "intro": "The account view explains where its balance came from and what is still expected.",
+    "changes": [
+      "Actual balance, still to pay and projected balance are labelled separately.",
+      "Contributions are transfers into this account, not a second salary.",
+      "The purchase debits the account once, even when several projects share its cost."
+    ],
+    "next": "Follow the expense or account-history record to understand an amount.",
+    "connection": "Money composes account entries and owner-provided financial records; it does not duplicate expenses.",
+    "screen": "money"
+  },
+  {
+    "id": "house-live",
+    "journey": "Connected home",
+    "step": "2. Understand the home",
+    "title": "Home Assistant belongs in everyday home context",
+    "image": "home.png",
+    "format": "desktop",
+    "intro": "Rooms, climate, lighting, devices and energy share the same household navigation.",
+    "changes": [
+      "Colourful icon tiles give each area a recognisable place.",
+      "Source and freshness explain whether a value is current.",
+      "Room and device links lead to useful information and supported controls."
+    ],
+    "next": "Open a room, then the actual device or its maintenance task.",
+    "connection": "Home Assistant supplies live state. WickedHome features own names, spaces, maintenance and financial context.",
+    "screen": "house-live"
+  },
+  {
+    "id": "room-live",
+    "journey": "Connected home",
+    "step": "3. Act in the room",
+    "title": "Room controls follow actual device capabilities",
+    "image": "room.png",
+    "format": "mobile",
+    "intro": "A room combines its climate, lighting and relevant tasks without becoming a separate control system.",
+    "changes": [
+      "The same card, selection, state and navigation patterns continue here.",
+      "Supported controls come from the linked device; sensor-only devices do not gain imaginary buttons.",
+      "Offline or stale state stays visible and must not be presented as confirmed success."
+    ],
+    "next": "Open the device for supported actions or follow its task.",
+    "connection": "Devices owns identity and maintenance; Home Assistant owns the external state and command result.",
+    "screen": "room-live"
+  },
+  {
+    "id": "recipes",
+    "journey": "Photos and views",
+    "step": "1. Recognise the recipe",
+    "title": "Recipe cards keep their food covers",
+    "image": "recipes-cards.png",
+    "format": "desktop",
+    "intro": "Food images make recipes easy to recognise and pleasant to browse.",
+    "changes": [
+      "Generous cover cards remain the default recipe overview.",
+      "List mode keeps the same recipes and facts, with compact thumbnails.",
+      "Missing covers use a clear recipe icon instead of a broken image."
+    ],
+    "next": "Open the recipe to see its existing banner and cooking actions.",
+    "connection": "Media belongs to the record owner. The overview, list and detail reuse the same image reference and shared presentation patterns.",
+    "screen": "recipes"
+  },
+  {
+    "id": "recipe-detail",
+    "journey": "Photos and views",
+    "step": "2. Keep the banner",
+    "title": "The recipe banner remains part of its identity",
+    "image": "recipe-banner.png",
+    "format": "desktop",
+    "intro": "A wide cover belongs with the recipe title, facts and next action.",
+    "changes": [
+      "Retain the existing recipe cover and cover chooser.",
+      "The title, stock facts and actions stay legible outside the photo.",
+      "The same product and stock relationships remain available."
+    ],
+    "next": "Check requirements or start cooking from the same record.",
+    "connection": "Media belongs to the record owner. The overview, list and detail reuse the same image reference and shared presentation patterns.",
+    "screen": "recipe-detail"
+  },
+  {
+    "id": "projects",
+    "journey": "Photos and views",
+    "step": "3. Browse projects visually",
+    "title": "Project cards keep covers, progress and budget",
+    "image": "projects-cards.png",
+    "format": "desktop",
+    "intro": "A project is easier to spot through its image and meaningful status.",
+    "changes": [
+      "Keep project photos on cards and detail banners.",
+      "Switch to a list for denser comparison without losing context.",
+      "Progress, budget and next actions accompany the image."
+    ],
+    "next": "Open the project to continue its task or inspect materials.",
+    "connection": "Media belongs to the record owner. The overview, list and detail reuse the same image reference and shared presentation patterns.",
+    "screen": "projects"
+  },
+  {
+    "id": "shopping-products",
+    "journey": "Photos and views",
+    "step": "4. Recognise the product",
+    "title": "Product photos and compact thumbnails belong in both views",
+    "image": "products-cards.png",
+    "format": "desktop",
+    "intro": "Product images help recognition while units, stock and links remain readable.",
+    "changes": [
+      "Use the actual saved product image; keep packaging visible with contain.",
+      "The same shared card/list switch remembers your choice.",
+      "A missing product photo falls back to its domain icon; no forced upload."
+    ],
+    "next": "Open the product for stock, purchases, shop variants and project use.",
+    "connection": "Media belongs to the record owner. The overview, list and detail reuse the same image reference and shared presentation patterns.",
+    "screen": "shopping-products"
+  },
+  {
+    "id": "devices",
+    "journey": "Photos and views",
+    "step": "5. Find the device",
+    "title": "Device photos sit beside useful state information",
+    "image": "devices-cards.png",
+    "format": "desktop",
+    "intro": "A familiar photo helps locate the right appliance or device.",
+    "changes": [
+      "Use saved device photos where available, with profile icons as fallbacks.",
+      "Location, state and source freshness remain explicit.",
+      "Controls still come from real capabilities; the photo proves no live state."
+    ],
+    "next": "Open the device for its room, maintenance and supported controls.",
+    "connection": "Media belongs to the record owner. The overview, list and detail reuse the same image reference and shared presentation patterns.",
+    "screen": "devices"
+  }
+]

@@ -81,7 +81,8 @@ function store() {
     deleteMany: async ({ where }: { where: Record<string, unknown> }) => { rows = rows.filter((row) => !matches(row, where)); },
   };
   const tx = {
-    expense,
+    $queryRaw: async () => [],
+    expense: { ...expense, findUniqueOrThrow: async ({ where }: { where: { id: string } }) => ({ ...rows.find((row) => row.id === where.id), allocationHouseholdCents: null, projectAllocations: [] }) },
     expenseShare: { deleteMany: async () => ({ count: 0 }) },
     recurringExpense: {
       updateMany: async ({ where }: { where: { id: string; householdId: string } }) => ({ count: where.id === loan.id && where.householdId === loan.householdId ? 1 : 0 }),

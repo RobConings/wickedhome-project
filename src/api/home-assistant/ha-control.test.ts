@@ -46,3 +46,25 @@ describe("Home Assistant control", () => {
     assert.equal(typeof controlCall(entity("scene.film"), { action: "off" }), "string");
   });
 });
+
+it("offers only reported, available device capabilities and preserves unknown values", async () => {
+  const { describeControl } = await import("./ha-control");
+  const state = (entity_id: string, attributes: Record<string, unknown> = {}, value = "on") => ({ entity_id, attributes, state: value, last_changed: "2026-11-07T10:00:00Z", last_updated: "2026-11-07T10:00:00Z", context: { id: "test", parent_id: null, user_id: null } });
+  assert.equal(describeControl(state("lock.front")), null);
+  assert.equal(describeControl(state("cover.garage", { device_class: "garage" })), null);
+  assert.equal(describeControl(state("light.kitchen"))?.adjustment, null);
+  assert.equal(describeControl(state("light.kitchen", { supported_color_modes: ["brightness"] }))?.adjustment?.value, null);
+  assert.deepEqual(describeControl(state("light.kitchen", {}, "unavailable"))?.actions, []);
+  const blind = describeControl(state("cover.living", { device_class: "blind", supported_features: 5, current_position: 40 }));
+  assert.deepEqual(blind?.actions, ["open"]); assert.equal(blind?.adjustment?.value, 40);
+  assert.equal(describeControl(state("climate.living", { supported_features: 1, temperature_unit: "°F" }))?.adjustment, null);
+  assert.equal(describeControl(state("climate.living", { supported_features: 0 }))?.adjustment, null);
+  assert.equal(describeControl(state("climate.living", { supported_features: 1 }))?.adjustment, null);
+  assert.deepEqual(describeControl(state("climate.living", { supported_features: 256 }))?.actions, ["on"]);
+  assert.equal(describeControl(state("climate.living", { supported_features: 1, temperature_unit: "°C", min_temp: 10, max_temp: 25, temperature: 21 }))?.adjustment?.max, 25);
+  const fine = describeControl(state("climate.living", { supported_features: 1, temperature_unit: "°C", min_temp: 7, max_temp: 25, target_temp_step: 0.1 }));
+  assert.equal(fine?.adjustment?.step, 0.5, "Do not offer precision the command adapter would round away");
+  const unusual = describeControl(state("climate.living", { supported_features: 1, temperature_unit: "°C", min_temp: 7.2, max_temp: 25, target_temp_step: 0.3 }));
+  assert.equal(unusual?.adjustment?.min, 7.5); assert.equal(unusual?.adjustment?.step, 1.5);
+
+});

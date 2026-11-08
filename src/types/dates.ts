@@ -42,3 +42,18 @@ export function daysBetween(from: string, to: string): number {
 
 /** `YYYY-MM` of a date. */
 export const monthOf = (date: string) => date.slice(0, 7);
+
+/** Earliest instant of a calendar day. Useful as a conservative boundary when no time was supplied. */
+export function startOfDayIn(date: string, timeZone: string = HOUSEHOLD_TIME_ZONE): Date {
+  const target = toUtc(date).getTime();
+  const formatter = new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" });
+  let instant = target;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const parts = Object.fromEntries(formatter.formatToParts(new Date(instant)).map((part) => [part.type, part.value]));
+    const wallTime = Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day), Number(parts.hour), Number(parts.minute), Number(parts.second));
+    const difference = wallTime - target;
+    if (!difference) break;
+    instant -= difference;
+  }
+  return new Date(instant);
+}

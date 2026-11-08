@@ -1,5 +1,6 @@
 import * as React from "react";
-import { ArrowLeftRightIcon, EllipsisVerticalIcon, LandmarkIcon, PiggyBankIcon, ScaleIcon } from "lucide-react";
+import { ArrowLeftRightIcon, HistoryIcon, EllipsisVerticalIcon, LandmarkIcon, PiggyBankIcon, ScaleIcon } from "lucide-react";
+import { Link, type To } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import { dateText, money } from "./use-money-text";
 
 type AccountCardProps = {
   account: JointAccount;
+  activityTo?: To;
   month?: AccountMonth;
   accounts: JointAccount[];
   habitants: Habitant[];
@@ -33,7 +35,7 @@ const groupIban = (iban: string) => iban.replace(/(.{4})/g, "$1 ").trim();
  * One joint account: balance today, the latest correction, this month's in and out, and the actions
  * "Set real balance" and "Record transfer" (more: edit, other money in or out).
  */
-export function AccountCard({ account, month, accounts, habitants, today, canManage }: AccountCardProps) {
+export function AccountCard({ account, month, accounts, habitants, today, canManage, activityTo }: AccountCardProps) {
   const { t } = useTranslation("money");
   const [dialog, setDialog] = React.useState<"edit" | "other" | null>(null);
   const Icon = account.kind === "savings" ? PiggyBankIcon : LandmarkIcon;
@@ -128,6 +130,7 @@ export function AccountCard({ account, month, accounts, habitants, today, canMan
         </div>
       )}
 
+      {activityTo && <Button asChild variant="outline"><Link to={activityTo} preventScrollReset><HistoryIcon />{t("tabs.history")}</Link></Button>}
       {dialog === "edit" && <AccountFormDialog open onOpenChange={close} account={account} habitants={habitants} today={today} />}
       {dialog === "other" && <OtherEntryDialog open onOpenChange={close} account={account} today={today} />}
     </Card>

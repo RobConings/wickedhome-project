@@ -1,3 +1,4 @@
+import { forgetDocumentLinks } from "../documents/documents.service";
 import { devicePresetProfile } from "@/features/devices/types/device-presets";
 import {
   DEVICE_CHANGED_EVENT,
@@ -83,6 +84,8 @@ function toDevice(row: DeviceRow): Device {
     id: row.id,
     name: row.name,
     notes: row.notes,
+    coverFileId: row.coverFileId,
+    imageUrl: row.coverFileId ? `/api/documents/files/${encodeURIComponent(row.coverFileId)}/content` : null,
     profileId: row.profileId,
     place: row.place
       ? {
@@ -255,6 +258,7 @@ export async function updateDevice(householdId: string, id: string, input: Devic
 export async function deleteDevice(householdId: string, id: string): Promise<void> {
   const row = await findDevice(householdId, id);
   await db.device.delete({ where: { id } });
+  await forgetDocumentLinks("device", id);
   changed(householdId, { deviceId: id, profileId: row.profileId, action: "deleted" });
 }
 
@@ -333,4 +337,14 @@ export async function setDeviceValue(
   // Indicator turned orange/red for someone who follows this device (docs/NOTIFICATIONS.md); not awaited.
   void checkDeviceIndicator(householdId, id);
   return binding;
+}
+
+/** A device's photo is an existing, household-scoped attached document. */
+export async function setDeviceCover(householdId: string, id: string, fileId: string | null) {
+  const device = await db.device.findFirst({ where: { id, householdId }, select: { id: true } });
+  if (!device) throw notFound("Device not found");
+  if (fileId && !await db.documentLink.count({ where: { householdId, entityType: "device", entityId: id, fileId, file: { deletedAt: null, mimeType: { startsWith: "image/" } } } }))
+    throw badRequest("Choose an image attached to this device");
+  await db.device.update({ where: { id }, data: { coverFileId: fileId } });
+  changed(householdId, { deviceId: id, profileId: null, action: "updated" });
 }

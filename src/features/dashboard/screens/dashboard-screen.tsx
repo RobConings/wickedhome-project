@@ -24,6 +24,8 @@ type DashboardScreenProps = {
   userName: string;
   /** The fourth stat card, filled by the route (Devices' house status, with its own Suspense). */
   homeStatus?: React.ReactNode;
+  /** The room map, composed independently of the other dashboard cards. */
+  roomMap?: React.ReactNode;
   /** Injectable for stories and tests. */
   now?: Date;
 };
@@ -64,7 +66,7 @@ function HouseholdAvatars({ overview }: { overview: HouseholdOverview }) {
  * top bar, "+ Quick action" in the sidebar, Ctrl/Cmd + K), reachable from every page. The page renders at
  * once; every card shows its own skeleton until its data arrives and copes with that data failing to load.
  */
-export function DashboardScreen({ data, userName, homeStatus, now = new Date() }: DashboardScreenProps) {
+export function DashboardScreen({ data, userName, homeStatus, roomMap, now = new Date() }: DashboardScreenProps) {
   const { t } = useTranslation("dashboard");
   const firstName = userName.split(/\s+/)[0];
 
@@ -96,6 +98,8 @@ export function DashboardScreen({ data, userName, homeStatus, now = new Date() }
           )}
         </Await>
       </React.Suspense>
+
+      {roomMap}
 
       <PageGrid columns="3" className="items-start">
         <React.Suspense fallback={<DashboardCardSkeleton title={t("today.title")} rows={4} />}>

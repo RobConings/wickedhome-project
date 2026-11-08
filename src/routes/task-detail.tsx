@@ -1,6 +1,7 @@
 import { useLoaderData, useRevalidator } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { DocumentAttachments, canManageDocuments } from "@/features/documents";
+import { DeviceFormField } from "@/features/devices";
 import { ProjectFormField } from "@/features/projects";
 import { TaskMaterialsPanel } from "@/features/shopping";
 import { TaskDetailScreen, canManageTasks, taskDetailLoader, tasksAction } from "@/features/tasks";
@@ -22,6 +23,7 @@ export function Component() {
       places={places}
       canManage={canManage}
       currentHabitantId={user.habitantId}
+      deviceField={({ defaultValue, errors }) => <DeviceFormField defaultValue={defaultValue} errors={errors} />}
       projectField={({ defaultValue }) => <ProjectFormField defaultValue={defaultValue} />}
       materials={
         <TaskMaterialsPanel

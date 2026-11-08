@@ -37,12 +37,15 @@ export type TaskFormDefaults = {
   dueTime?: string | null;
   /** The project a new task belongs to (e.g. added from a project's page). */
   projectId?: string | null;
+  deviceId?: string | null;
 };
 
 /**
  * A "Project" field for the form, composed by the route (e.g. the projects feature's `ProjectFormField`); it must
  * post `projectId`. Tasks don't know projects: without the slot, the project stays as it is.
  */
+export type TaskDeviceField = (props: { defaultValue: string | null; errors?: string[] }) => React.ReactNode;
+
 export type TaskProjectField = (props: { defaultValue: string | null }) => React.ReactNode;
 
 type TaskFormDialogProps = {
@@ -64,6 +67,7 @@ type TaskFormDialogProps = {
   startRepeating?: boolean;
   /** Optional "Project" field (see `TaskProjectField`). */
   projectField?: TaskProjectField;
+  deviceField?: TaskDeviceField;
 };
 
 const NO_ESTIMATE = "none";
@@ -91,6 +95,7 @@ export function TaskFormDialog({
   placeSelections,
   startRepeating = false,
   projectField,
+  deviceField,
 }: TaskFormDialogProps) {
   const { t } = useTranslation("tasks");
   const text = useTaskText();
@@ -312,6 +317,10 @@ export function TaskFormDialog({
       hidden: !projectField,
       render: () => projectField?.({ defaultValue: task ? (task.project?.id ?? null) : (defaults.projectId ?? null) }),
     },
+    {
+      name: "deviceId", type: "custom", label: "", bare: true, hidden: !deviceField,
+      render: ({ errors }) => deviceField?.({ defaultValue: task ? (task.device?.id ?? null) : (defaults.deviceId ?? null), errors: errors?.map(translateError) }),
+    },
     { name: "notes", type: "textarea", label: t("fields.notes"), optional: true, rows: 3, maxLength: 2000, placeholder: t("placeholders.notes") },
   ];
 
@@ -338,6 +347,7 @@ export function TaskFormDialog({
         ...(linked && task ? { title: task.title, type: task.type, priority: task.priority, dueDate: task.dueDate } : {}),
         // A new task from a project's page belongs to it, also without a project field.
         projectId: !task && !projectField ? defaults.projectId : undefined,
+        deviceId: !task && !deviceField ? defaults.deviceId : undefined,
       }}
       intro={
         linked && task ? (

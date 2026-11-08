@@ -1,0 +1,10 @@
+{
+  "frames": 16,
+  "journeys": 4,
+  "checkedScreens": 64,
+  "sourceAndBuiltAssets": true,
+  "portableLocalHtml": true,
+  "zoomAndKeyboard": true,
+  "browserErrors": [],
+  "realApiRequests": 0
+}

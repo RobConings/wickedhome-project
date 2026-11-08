@@ -748,3 +748,79 @@ it(
     );
   },
 );
+
+it("linked variants keep the checklist identity and earlier acquisition names, with no stock from Adjust", options, async (t) => {
+  const f = await fixture(t);
+  const variant = await db.product.create({ data: { householdId: f.home.id, name: "Other brand chicken", category: "MEAT_FISH", unit: "pak", stockProductId: f.product.id } });
+  let visit = await f.start();
+  const original = visit.items[0]!;
+  visit = await updateShoppingSessionItem(f.user, visit.id, original.id, {
+    revision: original.revision, operationId: "buy-original-part", purchasedQuantity: 1,
+  });
+  assert.equal(await f.quantity(), 1);
+  // Legacy/manual acquisitions may not yet have a variant snapshot.
+  await db.stockPurchase.updateMany({ where: { householdId: f.home.id }, data: { purchasedProductId: null, purchasedProductName: null } });
+  const adjust = { revision: visit.items[0]!.revision, operationId: "adjust-variant", quantity: 3, productId: variant.id };
+  visit = await updateShoppingSessionItem(f.user, visit.id, original.id, adjust);
+  await updateShoppingSessionItem(f.user, visit.id, original.id, adjust);
+  assert.equal(visit.items[0]!.id, original.id);
+  assert.deepEqual(visit.items[0]!.requirementIds, original.requirementIds);
+  assert.equal(visit.items[0]!.productId, variant.id);
+  assert.equal(visit.items[0]!.quantity, 3);
+  assert.equal(await f.quantity(), 1, "Adjust does not acquire goods");
+  assert.equal(visit.purchases[0]!.lines[0]!.name, f.product.name);
+  const document = await f.receipt();
+  visit = await attachShoppingReceipt(f.user, visit.id, { documentId: document.id, purchasedAt: new Date().toISOString() });
+  visit = await reconcileShoppingReceiptLine(f.user, visit.id, visit.purchases[0]!.receipts[0]!.id, {
+    reference: "original-brand", sessionItemId: original.id, quantity: 1, acceptDifference: false,
+    existingPurchaseIds: [visit.purchases[0]!.lines[0]!.id],
+  });
+  assert.equal(visit.purchases[0]!.lines[0]!.name, f.product.name, "A later receipt does not rename an identified variant");
+  visit = await updateShoppingSessionItem(f.user, visit.id, original.id, {
+    revision: visit.items[0]!.revision, operationId: "buy-variant-rest", status: "bought",
+  });
+  assert.equal(await f.quantity(), 3);
+  assert.deepEqual(visit.purchases[0]!.lines.map((line) => line.name).sort(), [f.product.name, variant.name].sort());
+  assert.deepEqual(visit.purchases[0]!.lines.map((line) => line.productId).sort(), [f.product.id, variant.id].sort(), "Session and MCP expose the acquired variant identity");
+  const purchases = await db.stockPurchase.findMany({ where: { householdId: f.home.id } });
+  assert.equal(purchases.length, 2);
+  assert.deepEqual(purchases.map((row) => row.purchasedProductId).sort(), [f.product.id, variant.id].sort());
+  assert.ok(purchases.every((row) => row.productId === f.product.id), "Stock stays with the canonical owner");
+  await assert.rejects(updateShoppingSessionItem(f.user, visit.id, original.id, { ...adjust, productId: f.product.id }), /operation id/);
+});
+
+it("variant changes reject unrelated and foreign products and stale revisions", options, async (t) => {
+  const f = await fixture(t);
+  const unrelated = await db.product.create({ data: { householdId: f.home.id, name: "Unrelated goods", category: "OTHER" } });
+  const variant = await db.product.create({ data: { householdId: f.home.id, name: "Linked variant", category: "MEAT_FISH", unit: "pak", stockProductId: f.product.id } });
+  const foreign = await fixture(t);
+  let visit = await f.start();
+  const item = visit.items[0]!;
+  for (const productId of [unrelated.id, foreign.product.id]) {
+    await assert.rejects(updateShoppingSessionItem(f.user, visit.id, item.id, { revision: item.revision, operationId: `reject-${productId}`, productId }), /linked variant/);
+  }
+  visit = await updateShoppingSessionItem(f.user, visit.id, item.id, { revision: item.revision, operationId: "first-edit", quantity: 3 });
+  await assert.rejects(updateShoppingSessionItem(f.user, visit.id, item.id, { revision: item.revision, operationId: "stale-variant", productId: variant.id }), /Someone changed/);
+  assert.equal(visit.items[0]!.productId, f.product.id);
+  assert.equal(await f.quantity(), 0);
+});
+
+it("ordinary shop/group starts choose current needs automatically and stay retry-safe as needs change", options, async (t) => {
+  const f = await fixture(t);
+  const otherShop = await db.shop.create({ data: { householdId: f.home.id, name: "Second shop", type: "SUPERMARKET" } });
+  const elsewhere = await db.shoppingItem.create({ data: { householdId: f.home.id, listId: f.requirement.listId, name: "Other shop only", quantity: 1, shopId: otherShop.id } });
+  const request = { selection: "matching" as const, operationId: "ordinary-shop-start", shopIds: [f.shop.id], requirementIds: [], includeLowStock: true };
+  const visit = await createShoppingSession(f.user, request);
+  assert.ok(visit.name.startsWith(f.shop.name));
+  assert.equal(visit.items.length, 1);
+  assert.equal(visit.items[0]!.productId, f.product.id);
+  await db.shoppingItem.create({ data: { householdId: f.home.id, listId: f.requirement.listId, name: "Need added after start", quantity: 1, shopId: f.shop.id } });
+  const retried = await createShoppingSession(f.user, request);
+  assert.equal(retried.id, visit.id);
+  assert.equal(retried.items.length, 1, "A retry cannot silently change the original checklist");
+  const group = await db.shopGroup.create({ data: { householdId: f.home.id, name: "Saved shopping group", members: { create: [{ shopId: f.shop.id }, { shopId: otherShop.id }] } } });
+  const grouped = await createShoppingSession(f.user, { ...request, operationId: "ordinary-group-start", shopIds: [], shopGroupId: group.id });
+  assert.ok(grouped.name.startsWith(group.name));
+  assert.ok(grouped.items.some((item) => item.requirementIds.includes(elsewhere.id)));
+  assert.equal(await f.quantity(), 0, "Starting either trip never acquires stock");
+});

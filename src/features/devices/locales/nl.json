@@ -158,7 +158,8 @@
     "noDevicesHere": {
       "title": "Geen toestellen op deze verdieping",
       "description": "Sleep toestellen op het plan in de plan-editor."
-    }
+    },
+    "openRoom": "Ruimte openen"
   },
   "profiles": {
     "title": "Toestelprofielen",
@@ -341,5 +342,21 @@
   },
   "loading": {
     "refreshing": "Vernieuwen…"
+  },
+  "related": {
+    "label": "Gekoppeld aan dit toestel",
+    "plan": "Op het grondplan",
+    "documents": "Documenten",
+    "photo": "Toestelfoto",
+    "controls": "Bediening"
+  },
+  "room": {
+    "empty": "Geen toestellen gekoppeld aan deze ruimte."
+  },
+  "maintenance": {
+    "title": "Onderhoud",
+    "description": "Plan onderhoud, verdeel het werk en bekijk wat al gedaan is.",
+    "device": "Toestel voor onderhoud",
+    "loadError": "Toestellen konden niet worden geladen."
   }
 }

@@ -114,5 +114,17 @@
     "needsWebshop": "Only for a shop with a webshop and a website.",
     "saving": "Saving…",
     "forbidden": "Only adults can change which shops are searched."
+  },
+  "destination": {
+    "placeholder": "Choose a shop or saved group"
+  },
+  "groups": {
+    "title": "Shop groups",
+    "add": "Create a group",
+    "edit": "Edit group",
+    "delete": "Delete group",
+    "deleteHint": "Visits keep their history. Only this saved group is removed.",
+    "shops": "Shops in this group",
+    "description": "Save shops you visit together. Select one group when starting a shopping session."
   }
 }

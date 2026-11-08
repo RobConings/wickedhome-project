@@ -45,7 +45,7 @@ registerAssistantSkill({
   routing case to `ai/core/tools.test.ts` ("routes everyday questions…") for your main phrasing.
 - **hints** (optional): words that point to the skill but that other areas use too, like the calendar's
   dates and "wanneer"/"when". They route a question that has nothing stronger, count half, and never make a
-  part of a message a question of its own (so "wat is het weer morgen" is a weather question, not an agenda
+  part of a message a question of its own (so "what is the weather tomorrow" is a weather question, not an agenda
   one). A message with several questions is routed per part (split at ?, commas, "en"/"and"…).
 
 ## 3. Write the guide (guide.md)
@@ -90,7 +90,7 @@ registerAssistantTool({
   activity: { en: "Recorded a purchase", nl: "Aankoop genoteerd" },
   describe: (ctx, input) => say(ctx.locale,
     `Record ${money(toCents(input.amount))} for “${input.what}” in ${input.project.name}`,
-    `${money(toCents(input.amount))} voor “${input.what}” noteren bij ${input.project.name}`),
+    `record ${money(toCents(input.amount))} for “${input.what}” against ${input.project.name}`),
   run: async (ctx, input) => {
     await recordProjectPurchase(ctx.householdId, input.project.id, { … , amountCents: toCents(input.amount) });
     return done(`Recorded ${money(toCents(input.amount))} for “${input.what}” in ${input.project.name}.`);
@@ -308,7 +308,7 @@ A tool whose target may be "this" can default it: `input.vehicle?.id ?? screenTa
   the LM Studio model (see ai/README.md).
 - The generic tests (`ai/core/tools.test.ts`) check every tool: valid schema, a registered skill, guide
   size, confirmation rules, no disarm. Add a `tools.test.ts` in your skill folder for skill-specific rules.
-- Run on the server: `npx tsc --noEmit -p .`, `npx eslint ai src/api/<feature>`, `npm test`.
+- Run in the configured development checkout: `npx tsc --noEmit -p .`, `npx eslint ai src/api/<feature>`, `npm test`. Use a disposable test database for database checks; SSH is only needed for server-only operations.
 
 ## Checklist
 

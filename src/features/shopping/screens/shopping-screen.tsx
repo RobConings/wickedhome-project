@@ -1,7 +1,11 @@
+import { useShoppingSort } from "../data/use-shopping-sort";
+import { ShoppingSortField } from "../components/shopping-sort-field";
+import { ShoppingNavigation } from "../components/shopping-navigation";
 import { useCategoryOrder } from "../data/use-category-order";
 import { AutomaticShoppingFilter, CategoryOrder } from "../components/shopping-preferences";
+import { currentLocale } from "@/lib/i18n";
 import * as React from "react";
-import { PackageIcon, PencilIcon, PlusIcon, SearchXIcon, ShoppingCartIcon, StoreIcon, Trash2Icon } from "lucide-react";
+import { PackageIcon, PencilIcon, PlusIcon, SearchXIcon, ShoppingCartIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher, useRevalidator, useSearchParams } from "react-router";
 import { toast } from "sonner";
@@ -84,11 +88,18 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
   }));
   const activeView = listViews.find((list) => list.listIds.includes(activeListId ?? "")) ?? null;
   const activeList = activeView?.editableList ?? null;
+  const productFilterId = searchParams.get("productId");
+  const productFilter = products.find((product) => product.id === productFilterId);
+  const productOwner = productFilter?.stockProductId ?? productFilter?.id;
+  const familyIds = new Set(products.filter((product) => (product.stockProductId ?? product.id) === productOwner).map((product) => product.id));
   const query = searchParams.get("q") ?? "";
   const searching = query.trim() !== "";
+  const locale = currentLocale();
+  const { sort, changeSort } = useShoppingSort();
   const stockFilter = parseStockFilter(searchParams.get("stock"));
-  const filtering = searching || stockFilter !== "all";
+  const filtering = searching || stockFilter !== "all" || Boolean(productFilterId);
   const visibleItems = filterShopViewItems(actions.items, { ...NO_SHOP_VIEW_FILTERS, query, stock: stockFilter, includeLowStock })
+    .filter((item) => !productFilterId || Boolean(item.productId && familyIds.has(item.productId)))
     .filter((item) => !activeView || shoppingItemListIds(item).some((id) => activeView.listIds.includes(id)));
   const totalOpen = actions.items.filter((item) => item.status === "open").length;
 
@@ -147,12 +158,6 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
           }
         />
       )}
-      <Button asChild variant="outline">
-        <Link to="/shopping/shops">
-          <StoreIcon />
-          {t("actions.shopView")}
-        </Link>
-      </Button>
       <AddShoppingItemDialog
         key={addRequest ?? "idle"}
         defaultOpen={addRequest !== null}
@@ -185,9 +190,10 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
 
   return (
     <PageContainer className="gap-4 px-3 py-4 sm:gap-6 sm:px-6 sm:py-8 lg:px-8">
-      <Link className="text-sm font-medium underline" to="/shopping/sessions">{t("sessions.title")}</Link>
       {actions.confirmation}
       <PageHeader title={t("page.title")} description={t("page.description")} actions={headerActions} />
+      <ShoppingNavigation />
+      {productFilterId && <Button variant="secondary" className="self-start" onClick={() => setSearchParams((params) => { params.delete("productId"); return params; }, { preventScrollReset: true })}><PackageIcon />{productFilter?.name ?? t("picker.product")} · {tCommon("list.clearSearch")}</Button>}
 
       <PageGrid columns="main-sidebar" className="items-start">
         <Stack gap="lg" className="gap-3 sm:gap-6">
@@ -203,6 +209,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
             <AutomaticShoppingFilter included={includeLowStock} onChange={setIncludeLowStock} />
             <CategoryOrder order={order} onChange={change} />
           </div>
+          <ShoppingSortField value={sort} onChange={changeSort} />
           <ShoppingStockFilterField value={stockFilter} onChange={(value) => setSearchParams((params) => {
               if (value === "all") params.delete("stock"); else params.set("stock", value);
               return params;
@@ -277,7 +284,9 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
                     }
                   />
                   <ShoppingItemList
-                    items={items}
+                    items={sort === "name" ? [...items].sort((a, b) => a.name.localeCompare(b.name, locale)) : items}
+                    groupByCategory={sort === "category"}
+                    groupByNeed={sort === "category"}
                     shops={shops}
                     onToggle={(item) => void actions.toggle(item)}
                     onSkip={(item) => void actions.skip(item)}

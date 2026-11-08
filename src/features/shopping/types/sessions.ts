@@ -17,7 +17,10 @@ export const sessionCreateSchema = z.object({
     .describe(
       "Stable session-start action id; reuse with unchanged input on retry",
     ),
-  name: z.string().trim().min(1).max(100),
+  name: z.string().trim().min(1).max(100).optional(),
+  selection: z.enum(["selected", "matching"]).optional().describe(
+    "Prefer matching: choose exactly one shopId OR shopGroupId; matching open needs become the checklist automatically. Omit name for a suggested name. Selected retains explicit requirementIds, including an intentionally empty visit",
+  ),
   shopIds: z.array(idSchema).max(30).default([]),
   shopGroupId: idSchema.optional(),
   requirementIds: z
@@ -33,6 +36,13 @@ export const sessionCreateSchema = z.object({
     .describe(
       "False excludes automatic minimum-stock quantities, including in mixed recipe rows; does not change minima",
     ),
+}).superRefine((value, ctx) => {
+  if (value.selection !== "matching" && !value.name)
+    ctx.addIssue({ code: "custom", path: ["name"], message: "Give the visit a name" });
+  if (value.selection === "matching" && ((value.shopGroupId ? 1 : 0) + value.shopIds.length !== 1))
+    ctx.addIssue({ code: "custom", path: ["shopIds"], message: "Choose one shop or saved shop group" });
+  if (value.selection === "matching" && value.requirementIds.length)
+    ctx.addIssue({ code: "custom", path: ["requirementIds"], message: "Matching visits select their needs automatically" });
 });
 export const sessionAddItemSchema = z
   .object({
@@ -73,6 +83,9 @@ export const sessionItemUpdateSchema = z.object({
       "Unique id for this action; retry with SAME id and payload; new action needs a new id",
     ),
   status: z.enum(["open", "bought", "skipped"]).optional(),
+  productId: idSchema.optional().describe(
+    "Selected variant: current product or a product sharing its canonical stock product. Changes future acquisitions only; use add-item for unrelated goods",
+  ),
   quantity: amount
     .optional()
     .describe("Planned total; changing it alone does not buy goods"),
@@ -180,8 +193,14 @@ export type SessionView = SessionSummary & {
     }[];
     lines: {
       name: string;
+      /** Actual acquired variant; null when the historic identity is unknown/unlinked. */
+      productId: string | null;
       id: string;
       sessionItemId: string | null;
+      /** Selected goods; older acquisitions may only have the canonical stock quantity below. */
+      purchasedQuantity?: number | null;
+      purchasedUnit?: string | null;
+      /** Canonical stock-credit quantity/unit, retained for existing clients. */
       quantity: number;
       unit: string | null;
       stockAdded: boolean;

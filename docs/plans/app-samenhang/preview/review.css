@@ -1,0 +1,135 @@
+@import "../../../../src/styles/index.css";
+@source "../../../../src";
+@source "./main.tsx";
+@source "./home-panels.tsx";
+@source "./media-patterns.tsx";
+@source "./related-records.tsx";
+@source "./visit-adjust.tsx";
+.review-root {
+  min-height: 100vh;
+  background: var(--background);
+  padding: 18px;
+  color: var(--foreground);
+}
+.review-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1600px;
+  margin: 0 auto 14px;
+  flex-wrap: wrap;
+}
+.review-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 1600px;
+  margin: 0 auto 8px;
+  flex-wrap: wrap;
+}
+.review-tools > button:first-child {
+  width: 190px;
+}
+.review-tools > button:nth-child(2) {
+  width: 330px;
+}
+.review-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  max-width: 1600px;
+  margin: 0 auto 12px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.preview-wrap {
+  max-width: 1600px;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+}
+.preview-wrap iframe {
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--background);
+}
+.review-inspector {
+  max-width: 1600px;
+  margin: 16px auto;
+  font-size: 13px;
+}
+.review-inspector p {
+  margin: 10px 0;
+  overflow-wrap: anywhere;
+}
+.review-inspector summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  min-height: 260px;
+}
+@media (max-width: 639px) {
+  .review-root {
+    padding: 8px;
+  }
+  .review-tools {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .review-tools > button:first-child,
+  .review-tools > button:nth-child(2) {
+    width: 100%;
+  }
+  .calendar-grid {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .calendar-grid > div {
+    min-height: 50px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+/* Prototype direction from the original household-hub artwork. Tokens only; live theme unchanged. */
+:root {
+  --background: #f6f4ed;
+  --card: #fffefa;
+  --popover: #fffefa;
+}
+:root.dark {
+  --background: #0e1211;
+  --card: #161b1a;
+  --popover: #1d2321;
+}
+
+/* Review equivalent of PageGrid's larger cards variant; implementation exposes it through GeneralList. */
+@media (min-width: 640px) {
+  .photo-record-list [role="list"].grid {
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  }
+}
+
+.related-record-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+@media (min-width: 640px) {
+  .related-record-grid {
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 12px;
+  }
+}

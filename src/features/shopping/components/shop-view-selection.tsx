@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import { SearchField } from "@/components/shared/search-field";
-import { matchesSearch } from "@/components/shared/general-list-helpers";
+import { EntityMultiPicker } from "@/components/shared/entity-multi-picker";
 import { ApiRequestError } from "@/lib/api-client";
 import { createShopGroup, updateShopGroup, deleteShopGroup, type SavedShopGroup, type Shop } from "@/features/shops";
 import { NO_SHOP } from "../types/shopping";
@@ -32,7 +31,6 @@ export function ShopViewSelection({ shops, groups, selectedKeys, activeGroupId, 
   const [draft, setDraft] = React.useState<string[]>([]);
   const [editing, setEditing] = React.useState<SavedShopGroup | null>(null);
   const [name, setName] = React.useState("");
-  const [query, setQuery] = React.useState("");
   const [busy, setBusy] = React.useState(false);
   const groupNameId = React.useId();
 
@@ -40,7 +38,7 @@ export function ShopViewSelection({ shops, groups, selectedKeys, activeGroupId, 
     setEditing(group ?? null);
     setDraft(group?.shopIds ?? selectedKeys);
     setName(group?.name ?? "");
-    setQuery("");
+
     setOpen(true);
   }
 
@@ -93,13 +91,8 @@ export function ShopViewSelection({ shops, groups, selectedKeys, activeGroupId, 
         <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-lg">
           {compact && groups.length > 0 && <div className="flex flex-wrap gap-2 pr-6">{groups.map((group) => <Button key={group.id} variant="outline" size="sm" onClick={() => { onSelectGroup(group.id); setOpen(false); }}>{group.name}</Button>)}</div>}
           <DialogHeader><DialogTitle>{editing ? t("shopGroups.edit", { name: editing.name }) : t("shopGroups.combine")}</DialogTitle><DialogDescription>{t("shopGroups.description")}</DialogDescription></DialogHeader>
-          <SearchField value={query} onValueChange={setQuery} label={t("shopGroups.search")} placeholder={t("shopGroups.search")} />
-          <div className="flex max-h-64 flex-col gap-1 overflow-y-auto">
-            {options.filter((shop) => matchesSearch([shop.name], query)).map((shop) => <label key={shop.id} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-2 hover:bg-accent">
-              <input type="checkbox" className="size-4 accent-primary" checked={draft.includes(shop.id)} disabled={busy || (Boolean(editing) && shop.id === NO_SHOP)} onChange={() => setDraft((ids) => ids.includes(shop.id) ? ids.filter((id) => id !== shop.id) : [...ids, shop.id])} />
-              {shop.name}
-            </label>)}
-          </div>
+          <EntityMultiPicker items={options.filter((shop) => !editing || shop.id !== NO_SHOP).map((shop) => ({ id: shop.id, label: shop.name }))}
+            value={draft} onChange={setDraft} disabled={busy} placeholder={t("shopGroups.search")} />
           {canManage && <div className="flex flex-col gap-2 border-t pt-4">
             <label htmlFor={groupNameId} className="text-sm font-medium">{t("shopGroups.name")}</label>
             <Input id={groupNameId} value={name} onChange={(event) => setName(event.target.value)} maxLength={80} placeholder={t("shopGroups.namePlaceholder")} disabled={busy} />

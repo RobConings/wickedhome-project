@@ -12,7 +12,7 @@ import { formatDate } from "@/types/date-format";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
 import { fetchShops, type Shop } from "@/features/shops";
 import { ApiRequestError } from "@/lib/api-client";
-import { formDataToObject, toFormResult, type FormResult } from "@/lib/forms";
+import { formDataToObject, parseForm, toFormResult, type FormResult } from "@/lib/forms";
 import {
   expenseCreateInputSchema,
   expenseInputSchema,
@@ -23,6 +23,8 @@ import {
   type ExpensesOverview,
   type RecurringExpenseDetail,
 } from "../types/expenses";
+import { projectAllocationFormSchema } from "../types/project-allocation";
+import { saveExpenseAllocation } from "./project-allocation-requests";
 import {
   createExpense,
   deleteExpense,
@@ -40,6 +42,7 @@ import {
 
 export const EXPENSE_INTENTS = [
   "create",
+  "allocate",
   "update",
   "update-recurring",
   "recurring-status",
@@ -191,6 +194,12 @@ export async function expensesAction({ request }: ActionFunctionArgs): Promise<E
 
   try {
     switch (intent) {
+      case "allocate": {
+        const { data: input, errors } = parseForm(projectAllocationFormSchema, formData);
+        if (errors) return { errors, intent };
+        await saveExpenseAllocation(id, input);
+        return { ok: true, intent };
+      }
       case "delete":
         await deleteExpense(id);
         return done();
@@ -236,7 +245,7 @@ export async function expensesAction({ request }: ActionFunctionArgs): Promise<E
         return { formError: i18n.t("common:errors.generic") };
     }
   } catch (error) {
-    const result = toFormResult(error, { not_found: i18n.t("expenses:errors.notFound") });
+    const result = toFormResult(error, { not_found: i18n.t("expenses:errors.notFound"), ...(intent === "allocate" ? { conflict: i18n.t("expenses:allocation.conflict") } : {}) });
     const errors = result.errors && renameKey(result.errors, "startDate", "dueDate");
     for (const [field, messages] of Object.entries(errors ?? {})) {
       errors![field] = messages.map((message) => message.startsWith("Payment date cannot be in the future")

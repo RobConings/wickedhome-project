@@ -1,6 +1,6 @@
 import { ChevronRightIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { currentLocale } from "@/lib/i18n";
 import type { Place } from "../types/places";
 import { formatArea } from "./place-format";

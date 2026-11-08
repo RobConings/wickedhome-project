@@ -61,6 +61,7 @@ const task = (seed: TaskSeed): Task => {
     waitingFor: [],
     commentCount: 0,
     project: null,
+    device: null,
     ...seed,
   };
   return { ...full, readiness: taskReadiness(full) };

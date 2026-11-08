@@ -7,7 +7,7 @@
     "home": "Thuis",
     "habitants": "Bewoners",
     "contacts": "Contacten",
-    "places": "Ruimtes",
+    "places": "Ruimtes & zones",
     "tasks": "Taken",
     "shopping": "Boodschappen",
     "shops": "Winkels",
@@ -28,7 +28,16 @@
     "settings": "Instellingen",
     "energy": "Energie",
     "house": "Huis",
-    "devices": "Toestellen"
+    "devices": "Toestellen",
+    "dailyLife": "Dagelijks leven",
+    "ourHome": "Ons huis",
+    "library": "Bibliotheek",
+    "system": "Koppelingen en instellingen",
+    "products": "Producten",
+    "rooms": "Ruimtes",
+    "more": "Meer",
+    "dailyNavigation": "Dagelijkse navigatie",
+    "purchases": "Aankopen"
   },
   "screen": {
     "products": "Producten",
@@ -79,7 +88,8 @@
     "optional": "optioneel",
     "saving": "Opslaan…",
     "choose": "Kies…",
-    "checkFields": "Controleer de velden in het rood."
+    "checkFields": "Controleer de velden in het rood.",
+    "required": "Dit veld is verplicht."
   },
   "list": {
     "search": "Zoeken…",
@@ -132,7 +142,9 @@
     "addFavorite": "Toevoegen aan favorieten",
     "removeFavorite": "Verwijderen uit favorieten",
     "clear": "Selectie wissen",
-    "loading": "Laden…"
+    "loading": "Laden…",
+    "unavailable": "Onbeschikbare selectie",
+    "removeSelection": "{{name}} verwijderen"
   },
   "recurrence": {
     "repeat": "Herhalen",
@@ -216,5 +228,10 @@
     "loading": "PDF laden…",
     "failed": "De PDF kon niet geladen worden.",
     "page": "Pagina {{page}} van {{total}}"
+  },
+  "navigation": {
+    "breadcrumbs": "Je bent hier",
+    "context": "Oorspronkelijke context",
+    "returnToContext": "Terug naar waar je vandaan kwam"
   }
 }

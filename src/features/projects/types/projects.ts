@@ -186,6 +186,8 @@ export type Project = {
 
 /** An expense counted in the project. */
 export type ProjectExpense = {
+  /** Original expense total when this project owns only an allocated share. */
+  totalAmountCents?: number;
   id: string;
   payee: string;
   amountCents: number;

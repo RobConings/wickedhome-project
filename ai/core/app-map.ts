@@ -100,7 +100,7 @@ function buildPages(locale: Locale): AppPage[] {
   ]) {
     const source = readRepoFile(...file) ?? "";
     const translators = translatorNamespaces(source);
-    for (const match of source.matchAll(/id:\s*"([\w-]+)",\s*icon:\s*\w+,\s*title:\s*(\w+)\("([^"]+)"\)/g)) {
+    for (const match of source.matchAll(/id:\s*"([\w-]+)",\s*[^{}]*?\btitle:\s*(\w+)\("([^"]+)"\)/g)) {
       const [, id, fn, key] = match as unknown as [string, string, string, string];
       const title = appText(`${translators.get(fn) ?? "common"}:${key}`, locale);
       if (title) pages.push({ name: `${settingsName} › ${title}`, path: `/settings#${id}` });

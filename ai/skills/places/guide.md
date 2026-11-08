@@ -1,6 +1,7 @@
-- A floor (gelijkvloers, eerste verdieping, kelder, zolder, the outdoor plan) holds places: rooms indoors, zones outdoors (tuin, oprit).
-- Refer to rooms and floors by name ("keuken", "gelijkvloers", "de living"); the Rooms line in the snapshot lists them per floor.
-- "Hoe groot is de keuken" → `places_rooms` or `places_room` (area in m² and size, only when the room is drawn). "Wat staat er in de badkamer" → `places_room` (devices, appliances, documents); tasks and stock: those skills.
+- A floor (ground floor, first floor, basement, attic, outdoor plan) holds places: rooms indoors, zones outdoors (garden, driveway).
+- Home shows the existing floor plan: select/cycle rooms to see linked appliances, open tasks and current projects. Retrieve project details through Projects, tasks through Tasks; never invent positions or treat a missing outline as a missing room.
+- Refer to rooms and floors by name ("kitchen", "ground floor", "living room"); the Rooms line in the snapshot lists them per floor.
+- "How large is the kitchen" → `places_rooms` or `places_room` (area in m² and size, only when the room is drawn). "What is in the bathroom" → `places_room` (devices, appliances, documents); tasks and stock: those skills.
 - A room without a size → `places_add_room`; with a size or a position → `floorplan_draw_room` (the drawing skill).
 - Deleting a room removes it from tasks, devices and stock (they lose their room): sensitive, always asks. `onlyDrawing` keeps the room and erases only its outline. A floor with rooms can't be deleted.
 - Moving a room to another floor removes its drawing (draw it again there).

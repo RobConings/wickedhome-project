@@ -385,7 +385,7 @@
   "stockFilter": {
     "label": "Voorraadfilter",
     "all": "Alles",
-    "low": "Op en bijna op",
+    "low": "Op + bijna op",
     "below_minimum": "Onder minimum",
     "at_minimum": "Op minimum",
     "above_minimum": "Boven minimum",
@@ -472,7 +472,28 @@
     "live_reconnecting": "Verbinding herstellen…",
     "live_offline": "Offline: wijzigingen worden na herstel opnieuw opgehaald",
     "pendingReceipt": "Bonregel nog te beoordelen",
-    "adjust": "Aanpassen"
+    "adjust": "Aanpassen",
+    "variant": "Gekoppelde variant",
+    "adjustProduct": "{{name}} aanpassen",
+    "adjustDescription": "Pas het geplande aantal aan of kies een gekoppelde variant. Dit registreert geen aankoop; eerdere aankopen blijven behouden.",
+    "purchaseDetails": "Aankoopdetails en voorraadlocatie",
+    "saveLocation": "Voorraadlocatie opslaan",
+    "adjustConflict": "Iemand heeft dit product gewijzigd. Annuleer en open Aanpassen opnieuw om de laatste aantallen te bekijken.",
+    "destination": "Winkel of opgeslagen groep",
+    "simpleStart": "Een winkelbeurt starten",
+    "simpleDescription": "Kies waar je gaat winkelen. Je passende boodschappen worden de checklist.",
+    "startShopping": "Start winkelen",
+    "advancedPlanning": "Specifieke boodschappen en andere opties kiezen",
+    "matchingNeeds_one": "{{count}} passend product. De actuele lijst wordt bij het starten opnieuw gecontroleerd.",
+    "matchingNeeds_other": "{{count}} passende producten. De actuele lijst wordt bij het starten opnieuw gecontroleerd.",
+    "extraNameHint": "Geef een naam voor iets buiten de catalogus.",
+    "extraDescription": "Voeg een ander catalogusproduct of een eenmalig artikel toe aan deze checklist.",
+    "progress": "Voortgang winkelbeurt",
+    "progressSummary": "{{bought}} gekocht · {{skipped}} niet nu",
+    "finishedTitle": "Winkelbeurt afgerond",
+    "finishedHint": "Je gekochte producten staan hieronder. Voeg een bon toe of koppel de betaling wanneer je wilt.",
+    "openPurchase": "Aankoop bekijken",
+    "extraUnitHint": "Laat leeg voor de bekende voorraadeenheid. Gebruik potjes of pakken als je die telt."
   },
   "payments": {
     "title": "Betalingen en uitgaven",
@@ -504,7 +525,9 @@
     "splitHint": "Registreer gesplitste betalingen afzonderlijk met een eigen referentie. Een bestaande uitgave koppelen maakt geen nieuwe uitgave aan.",
     "save": "Betaling opslaan",
     "loading": "Betaalgegevens laden…",
-    "manage": "Betaling toevoegen of koppelen"
+    "manage": "Betaling toevoegen of koppelen",
+    "linkExisting": "Bestaande betaalde uitgave koppelen",
+    "retry": "Opnieuw proberen"
   },
   "stockNeed": {
     "out": "Op",
@@ -515,5 +538,8 @@
     "out": "Aanvuladvies: onder minimum, of essentieel en precies op minimum. Dit betekent niet noodzakelijk dat de voorraad nul is.",
     "nearly_out": "Niet essentieel en precies op minimum: misschien alvast meenemen.",
     "other": "Zelf toegevoegd of nodig voor een recept, zonder dit voorraadadvies."
+  },
+  "navigation": {
+    "label": "Boodschappenweergaven"
   }
 }

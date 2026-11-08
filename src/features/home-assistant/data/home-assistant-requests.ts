@@ -1,3 +1,4 @@
+import type { HaDeviceControls, HaControlInput } from "../types/home-assistant";
 import { api } from "@/lib/api-client";
 import type {
   AlarmActionResponse,
@@ -33,3 +34,8 @@ export const disarmAlarm = (code: string) => api.post<AlarmActionResponse>("/hom
 export const fetchHaEnergy = () => api.get<HaEnergyOverview>("/home-assistant/energy");
 export const saveHaApplianceLinks = (input: HaApplianceLinksInput) => api.put("/home-assistant/energy/links", input);
 export const startHaEnergyImport = () => api.post("/home-assistant/energy/import");
+
+export const fetchDeviceControls = (deviceId: string) => api.get<HaDeviceControls>(`/home-assistant/devices/${encodeURIComponent(deviceId)}/controls`);
+export const sendDeviceControl = (deviceId: string, input: HaControlInput) => api.post(`/home-assistant/devices/${encodeURIComponent(deviceId)}/control`, input);
+export const fetchHaScenes = () => api.get<{ entityId: string; name: string }[]>("/home-assistant/scenes");
+export const runHaScene = (entityId: string) => api.post("/home-assistant/scenes/run", { entityId, action: "on" });

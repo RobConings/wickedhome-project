@@ -1,3 +1,4 @@
+import { HaScenesPanel } from "../components/ha-scenes-panel";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Await, useFetcher } from "react-router";
@@ -61,6 +62,7 @@ export function HomeAssistantScreen({ status, entities, suggestions, energy, ala
 
       {configured && (
         <>
+          {canManage && <HaScenesPanel />}
           {canManage && (
             <Card>
               <CardHeader>

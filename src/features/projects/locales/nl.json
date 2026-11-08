@@ -89,7 +89,8 @@
     "unpaid": "Niet betaald",
     "log": "Uitgave noteren",
     "linkExisting": "Bestaande uitgave toevoegen",
-    "linkRecurring": "Terugkerende uitgave toevoegen"
+    "linkRecurring": "Terugkerende uitgave toevoegen",
+    "shareOf": "Deel van {{amount}} totaal"
   },
   "purchases": {
     "unlogged_one": "{{count}} gekocht materiaal is nog geen uitgave ({{amount}}).",
@@ -303,5 +304,13 @@
     "link": "Open de webshoppagina van {{name}}",
     "showAll": "Toon alle {{count}}",
     "showLess": "Toon minder"
+  },
+  "related": {
+    "label": "Gekoppeld aan dit project",
+    "documents": "Documenten",
+    "purchases": "Aankopen"
+  },
+  "room": {
+    "empty": "Geen projecten gekoppeld aan deze ruimte."
   }
 }

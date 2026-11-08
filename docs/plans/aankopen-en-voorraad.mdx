@@ -1,64 +1,64 @@
-# Aankopen één keer tellen, voorraad eenvoudig controleren
+# Count each purchase once and check stock simply
 
-<Callout type="decision">
-Lokaal geïmplementeerd: ‘Gekocht’ telt voorraad automatisch bij wanneer locatie en eenheid duidelijk zijn. Scans en bonnen gebruiken dezelfde aankoopregistraties. Bij mogelijke overlap vraagt de app of het dezelfde aankoop of iets extra’s is. De voorraadtelling heeft een eigen schermvullende telronde. Nog niet gedeployed.
+<Callout type="note">
+Historical implementation plan, translated into English. Its completed phases describe the recorded purchase/counting work, not a fresh deployment assessment. The current cross-feature redesign is in `docs/plans/app-samenhang/plan.mdx`; the implementation report is `docs/SHOPPING-SESSIONS.md`. The existing filename is retained for link compatibility.
 </Callout>
 
 ```mermaid
 flowchart TD
-  A["Gekocht aanvinken"] --> P["Aankoop eenmaal bijtellen"]
-  S["Later scannen of bon verwerken"] --> K{"Bron al bekend?"}
-  K -->|Ja| B["Bestaande registratie; niets bijtellen"]
-  K -->|Nee| C{"Mogelijk dezelfde goederen?"}
-  C -->|Ja| Q["Vraag: al meegeteld of extra gekocht?"]
-  Q -->|Al meegeteld| B
-  Q -->|Extra| P
-  C -->|Nee| P
+  A[Mark purchased] --> P[Credit acquisition once]
+  S[Later scan or receipt] --> K{Known source?}
+  K -->|Yes| B[Reuse acquisition; no extra stock]
+  K -->|No| C{Possibly the same goods?}
+  C -->|Yes| Q[Ask: already counted or additional purchase?]
+  Q -->|Already counted| B
+  Q -->|Additional| P
+  C -->|No| P
 ```
 
 <Matrix>
-| Handeling | Gedrag | Status |
-|-----------|--------|--------|
-| Gekocht aanvinken | Eenmaal automatisch bijtellen | Lokaal |
-| Opnieuw aanvinken | Voorraad blijft behouden | Lokaal |
-| Latere scan of bon | Koppelen of extra bevestigen | Lokaal |
-| Dezelfde bon uploaden | Herkend via inhoudshash | Lokaal |
-| Oude bon na telling | Vragen of al meegeteld | Lokaal |
-| Voorraadtelling | Aantal per plek vervangen | Lokaal |
+| Action | Behaviour | Recorded status |
+|---|---|---|
+| Mark purchased | Credit once | Implemented |
+| Mark again | Preserve stock | Implemented |
+| Later scan/receipt | Link or confirm extra | Implemented |
+| Same receipt upload | Recognise content hash | Implemented |
+| Receipt predates count | Ask about overlap | Implemented |
+| Count stock | Replace location count | Implemented |
 </Matrix>
 
-<Phase title="Schermvullende telronde" status="done">
+<Phase title="Full-screen counting journey" status="done">
 
-- Eigen pagina via Voorraad → Voorraadtelling; kies een ruimte of alle locaties.
-- Eén product per stap, foto, voortgang per ruimte, aanmoediging en afsluitende trofee.
-- Bewaar elk geteld aantal meteen; leeg is onbekend, expliciet nul is nul, overslaan wijzigt niets.
-- Bij gelijktijdige wijzigingen: vernieuw het geregistreerde aantal en behoud de ingetypte telling voor controle.
-- Afronding toont getelde, gewijzigde en overgeslagen producten; overgeslagen producten kun je opnieuw doorlopen.
+- Open Inventory → Count stock and choose a room or all locations.
+- One product per step, photo, room progress, encouragement and a completion moment.
+- Save each count immediately. Empty means unknown, explicit zero means zero, and skipping changes nothing.
+- On concurrent changes, refresh the recorded quantity while retaining the typed count for review.
+- The summary separates counted, changed and skipped products; skipped products can be revisited.
 
 </Phase>
 
-<Phase title="Aankopen en bewijs eenmaal verwerken" status="done">
+<Phase title="Process acquisitions and evidence once" status="done">
 
 ```mermaid
 flowchart TD
-  A["Winkel A: 2 pakken"] --> PA["Aankoop A: +2"]
-  BA["Bon A"] --> PA
-  B["Winkel B: 3 pakken"] --> PB["Aankoop B: +3"]
-  BB["Bon B"] --> PB
-  PA --> V["Voorraad totaal: +5"]
+  A[Shop A: 2 packs] --> PA[Acquisition A: plus 2]
+  BA[Receipt A] --> PA
+  B[Shop B: 3 packs] --> PB[Acquisition B: plus 3]
+  BB[Receipt B] --> PB
+  PA --> V[Total stock increase: 5]
   PB --> V
 ```
 
-- De server bewaart aankopen en bronverwijzingen samen met de voorraadbeweging in één transactie.
-- Vaste bronidentiteiten voorkomen dubbel bijtellen bij herhaling; gelijktijdige aanvragen worden vergrendeld.
-- Een bonregel kan aan meerdere eerdere aankopen worden gekoppeld als het totaal klopt. Hoeveelheidsverschillen stoppen voor controle.
-- Een barcode identificeert een product; mogelijke overlap vraagt daarom een begrijpelijke keuze van de gebruiker.
-- MCP `inventory_purchases` controleert eerdere aankopen; `inventory_record_purchase` boekt of koppelt dezelfde goederen.
-- Een bevestigde telling bewaart ook het telmoment wanneer het aantal onveranderd is. Een oudere bon vraagt of die goederen in de telling zaten.
-- Een geplande winkel kan door de werkelijk bevestigde winkel op de bon worden vervangen.
+- Store acquisition, source references and stock movement in one transaction.
+- Stable source identities prevent duplicate credits on retries; concurrent requests are locked.
+- A receipt line may link several earlier acquisitions when quantities reconcile. Differences stop for review.
+- A barcode identifies a product, not a unique purchase. Possible overlap therefore needs a clear household choice.
+- MCP `inventory_purchases` checks history; `inventory_record_purchase` records or links the goods.
+- A confirmed count records its timestamp even when quantity is unchanged. Older receipts ask whether those goods were already included.
+- The confirmed receipt shop may replace the planned shop.
 
 </Phase>
 
 <Callout type="note">
-Grenzen: aanvinken koopt de hele getoonde hoeveelheid. Voor een afwijkende aankoop pas je eerst de hoeveelheid aan of registreer je die aankoop via MCP. Er is geen automatische bonherkenning in deze wijziging: de gekoppelde AI leest de bon en gebruikt de aankooptools. Uitgaven blijven een afzonderlijke registratie. Ongelijke aantallen worden niet stilzwijgend gecorrigeerd.
+At this implementation stage, marking purchased buys the displayed quantity. Adjust it first or record a different acquisition through MCP. Later shopping-session work adds cumulative partial quantities. This change introduced no automatic OCR parser: a connected AI reads the receipt and uses acquisition tools. Expenses remain separate financial records. Quantity differences are never silently corrected.
 </Callout>

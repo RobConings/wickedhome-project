@@ -17,7 +17,7 @@ type SegmentedControlProps<T extends string> = {
   label: string;
   /** Form field name; the control then submits with native forms. Generated when omitted. */
   name?: string;
-  /** `lg` makes the whole control 40 px tall: a full touch target, next to 40 px inputs. */
+  /** Phone options have 44 px touch targets; `lg` increases the desktop control. */
   size?: "sm" | "default" | "lg";
   /** Show only the icons (labels stay available to screen readers and as tooltips). */
   iconOnly?: boolean;
@@ -67,9 +67,9 @@ export function SegmentedControl<T extends string>({
                 // Selected: a raised chip with a hairline and the icon in the current section's colour.
                 "hover:text-foreground peer-checked:bg-card peer-checked:text-foreground peer-checked:shadow-xs peer-checked:ring-1 peer-checked:ring-section-border peer-checked:[&_svg]:text-section dark:peer-checked:bg-elevated",
                 "peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring/50",
-                size === "sm" && "h-7 px-2.5 text-xs [&_svg]:size-3.5",
-                size === "default" && "h-8 px-3 text-sm [&_svg]:size-4",
-                size === "lg" && "h-9 min-w-10 px-3 text-sm [&_svg]:size-4",
+                size === "sm" && "h-11 sm:h-7 px-2.5 text-xs [&_svg]:size-3.5",
+                size === "default" && "h-11 sm:h-8 px-3 text-sm [&_svg]:size-4",
+                size === "lg" && "h-11 sm:h-9 min-w-11 sm:min-w-10 px-3 text-sm [&_svg]:size-4",
               )}
             >
               {Icon && <Icon aria-hidden="true" />}

@@ -1,7 +1,7 @@
 import * as React from "react";
-import { BellIcon, CheckIcon, ListChecksIcon, RepeatIcon, TimerIcon } from "lucide-react";
+import { BellIcon, WrenchIcon, CheckIcon, ListChecksIcon, RepeatIcon, TimerIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import type { Habitant } from "@/features/household";
 import { PlaceBadge } from "@/features/places";
 import { cn } from "@/lib/utils";
@@ -110,7 +110,7 @@ export function TaskRow({
       }
       title={open ? t("actions.complete") : canUndo ? t("actions.undo") : undefined}
       className={cn(
-        "relative z-10 grid size-8 shrink-0 place-items-center rounded-full border-2 transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:size-7",
+        "relative z-10 grid size-11 shrink-0 place-items-center rounded-full border-2 transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:size-8",
         showAsDone ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/40 text-transparent",
         canComplete && !busy && "hover:border-primary hover:text-primary",
         !canComplete && open && "cursor-not-allowed opacity-50",
@@ -162,6 +162,7 @@ export function TaskRow({
       <TaskOriginBadge task={task} />
       {!hidePlace && task.place && <PlaceBadge place={task.place} className="py-0.5 text-xs" />}
       {!hideProject && <TaskProjectChip task={task} />}
+      {task.device && <Link to={`/devices/${encodeURIComponent(task.device.id)}`} className="inline-flex min-h-11 min-w-0 items-center gap-1 rounded-lg px-1 hover:bg-muted"><WrenchIcon className="size-3.5 shrink-0" aria-hidden="true" /><span className="truncate">{task.device.name}</span></Link>}
       {recurrence && (
         <span className="inline-flex min-w-0 items-center gap-1">
           <RepeatIcon className="size-3.5 shrink-0" aria-hidden="true" />

@@ -1,3 +1,4 @@
+import type { HaControl, HaDeviceControls } from "@/features/home-assistant/types/home-assistant";
 import { HttpError } from "../lib/http";
 import { HaNotConnectedError, type HaState } from "./ha-client";
 import { connectionStatusFor, getEntityState, getEntityStates, requireConnectedClient } from "./ha-connection";
@@ -96,4 +97,76 @@ export async function listScenes(householdId: string): Promise<{ entityId: strin
     .filter((state) => domainOf(state.entity_id) === "scene" && !controlRefusal(state))
     .map((state) => ({ entityId: state.entity_id, name: nameOf(state) }))
     .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** Read capabilities from HA itself. Unknown/unavailable entities expose no physical commands. */
+export function describeControl(state: HaState): HaControl | null {
+  if (controlRefusal(state)) return null;
+  const domain = domainOf(state.entity_id);
+  if (domain === "scene") return null;
+  const available = !["unavailable", "unknown"].includes(state.state);
+  const features = typeof state.attributes.supported_features === "number" ? state.attributes.supported_features : 0;
+  const number = (key: string) => typeof state.attributes[key] === "number" ? state.attributes[key] as number : null;
+  const value: HaControl = {
+    entityId: state.entity_id, name: nameOf(state), state: state.state, updatedAt: state.last_updated ?? null,
+    actions: [], adjustment: null,
+  };
+  if (!available) return value;
+  if (["light", "switch", "fan"].includes(domain)) value.actions = ["on", "off"];
+  if (domain === "cover") {
+    if (features & 1) value.actions.push("open");
+    if (features & 2) value.actions.push("close");
+    if (features & 4) value.adjustment = { action: "position", value: number("current_position"), min: 0, max: 100, step: 1, unit: "%" };
+  }
+  const modes = state.attributes.supported_color_modes;
+  if (domain === "light" && Array.isArray(modes) && modes.some((mode) => typeof mode === "string" && !["onoff", "unknown"].includes(mode))) {
+    const brightness = number("brightness");
+    value.adjustment = { action: "brightness", value: brightness === null ? null : Math.round(brightness / 255 * 100), min: 1, max: 100, step: 1, unit: "%" };
+  }
+  if (domain === "climate") {
+    if (features & 256) value.actions.push("on");
+    if (features & 128) value.actions.push("off");
+  }
+  if (domain === "climate" && (features & 1) && state.attributes.temperature_unit === "°C") {
+    // controlCall currently accepts Celsius, 5–30. Do not reinterpret Fahrenheit targets.
+    const min = Math.max(5, number("min_temp") ?? 5); const max = Math.min(30, number("max_temp") ?? 30);
+    // Intersect the device grid with this adapter's existing half-degree command precision.
+    const nativeStep = number("target_temp_step") ?? 0.5;
+    const nativeMin = number("min_temp") ?? min;
+    const supported: number[] = [];
+    if (nativeStep > 0) for (let half = Math.ceil(min * 2); half <= Math.floor(max * 2); half++) {
+      const candidate = half / 2; const steps = (candidate - nativeMin) / nativeStep;
+      if (Math.abs(steps - Math.round(steps)) < 0.000001) supported.push(candidate);
+    }
+    if (supported.length > 1) value.adjustment = { action: "temperature", value: number("temperature"), min: supported[0]!, max: supported.at(-1)!, step: supported[1]! - supported[0]!, unit: "°C" };
+  }
+  return value;
+}
+
+export async function getDeviceControls(householdId: string, deviceId: string): Promise<HaDeviceControls> {
+  const { db } = await import("../lib/db");
+  const device = await db.device.findFirst({ where: { id: deviceId, householdId }, include: { values: true } });
+  if (!device) throw new HttpError(404, "not_found", "Device not found");
+  const status = await connectionStatusFor(householdId);
+  if (!status.linked || status.state !== "connected") return { connected: false, controls: [] };
+  const ids = [...new Set(device.values.filter((value) => value.source === "HOME_ASSISTANT").flatMap((value) => value.haEntityId ? [value.haEntityId] : []))];
+  return { connected: true, controls: ids.flatMap((id) => { const state = getEntityState(id); const description = state ? describeControl(state) : null; return description ? [description] : []; }) };
+}
+
+export async function validateDeviceControl(householdId: string, deviceId: string, entityId: string, request: ControlRequest) {
+  const { controls } = await getDeviceControls(householdId, deviceId);
+  const control = controls.find((value) => value.entityId === entityId);
+  const allowed = control && (control.actions.some((action) => action === request.action) || control.adjustment?.action === request.action);
+  if (!allowed) throw new HttpError(400, "bad_request", "This command is not currently supported by the linked device");
+  if (control.adjustment?.action === request.action) {
+    const adjustment = control.adjustment; const value = request.value;
+    if (value === undefined || value < adjustment.min || value > adjustment.max) throw new HttpError(400, "bad_request", "Choose a value within the device range");
+    const steps = (value - adjustment.min) / adjustment.step;
+    if (Math.abs(steps - Math.round(steps)) > 0.000001) throw new HttpError(400, "bad_request", "Choose a supported device increment");
+  }
+}
+
+export async function controlDevice(householdId: string, deviceId: string, entityId: string, request: ControlRequest) {
+  await validateDeviceControl(householdId, deviceId, entityId, request);
+  return controlEntity(householdId, entityId, request);
 }

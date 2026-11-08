@@ -14,6 +14,7 @@ export const DOCUMENT_ENTITY_TYPES = [
   "task",
   "place",
   "product",
+  "device",
   "shopping_list",
   "shopping_item",
   "calendar_event",

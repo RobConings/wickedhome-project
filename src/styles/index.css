@@ -18,7 +18,7 @@
   --brand-peach: #f4d7b5;
 
   /* Surfaces: page < card < elevated (popovers, menus). Muted = quiet fills (tracks, inactive tabs). */
-  --background: #f6f7f8;
+  --background: #f6f4ed;
   --foreground: #0f172a;
   --card: #ffffff;
   --card-foreground: var(--foreground);
@@ -27,8 +27,8 @@
   --elevated: #ffffff;
   --muted: #eef0f2;
   --muted-foreground: #5b6779;
-  --border: #e5e7eb;
-  --input: #e5e7eb;
+  --border: #e0e4dc;
+  --input: #e0e4dc;
   --ring: #6b8f73;
 
   /* The one call-to-action colour: deep brand green, white text. Secondary buttons stay quiet (mint). */

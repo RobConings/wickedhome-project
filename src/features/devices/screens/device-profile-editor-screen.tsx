@@ -1,7 +1,7 @@
 import * as React from "react";
-import { ArrowLeftIcon, SaveIcon, Trash2Icon } from "lucide-react";
+import { SaveIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useBeforeUnload, useFetcher } from "react-router";
+import { useBeforeUnload, useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,12 +86,7 @@ export function DeviceProfileEditorScreen({ profile, canManage, initialSampleVal
   return (
     <PageContainer className="max-w-7xl">
       <PageHeader
-        eyebrow={
-          <Link to="/devices/profiles" className="inline-flex items-center gap-1 hover:underline">
-            <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-            {t("profiles.title")}
-          </Link>
-        }
+        backTo="/devices/profiles"
         title={
           <span className="flex items-center gap-3">
             <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-section-soft text-section">

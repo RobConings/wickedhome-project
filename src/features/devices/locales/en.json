@@ -158,7 +158,8 @@
     "noDevicesHere": {
       "title": "No devices on this floor",
       "description": "Drag devices onto the plan in the floor plan editor."
-    }
+    },
+    "openRoom": "Open room"
   },
   "profiles": {
     "title": "Device profiles",
@@ -341,5 +342,21 @@
   },
   "loading": {
     "refreshing": "Refreshing…"
+  },
+  "related": {
+    "label": "Connected to this device",
+    "plan": "On the floor plan",
+    "documents": "Documents",
+    "photo": "Device photo",
+    "controls": "Controls"
+  },
+  "room": {
+    "empty": "No devices linked to this room."
+  },
+  "maintenance": {
+    "title": "Maintenance",
+    "description": "Plan maintenance, share the work and keep its completion history.",
+    "device": "Device to maintain",
+    "loadError": "Devices could not be loaded."
   }
 }

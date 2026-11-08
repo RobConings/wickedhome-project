@@ -13,6 +13,7 @@ import { idSchema, localeSchema } from "@/types/common";
 import { parse } from "../lib/http";
 import { currentUser, requireRole, requireUser } from "../lib/session";
 import {
+  setDeviceCover,
   createDevice,
   createProfile,
   createProfileFromPreset,
@@ -129,4 +130,10 @@ devicesRouter.put("/:id/values/:fieldKey", canManage, async (req, res) => {
   const fieldKey = parse(fieldKeySchema, req.params.fieldKey);
   const { value } = parse(deviceValueInputSchema, req.body);
   res.json(await setDeviceValue(currentUser(req).householdId, id, fieldKey, value));
+});
+
+devicesRouter.post("/:id/cover", canManage, async (req, res) => {
+  const { fileId } = parse(z.object({ fileId: idSchema.nullable() }), req.body);
+  await setDeviceCover(currentUser(req).householdId, parse(idSchema, req.params.id), fileId);
+  res.status(204).end();
 });

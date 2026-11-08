@@ -1,6 +1,5 @@
 import * as React from "react";
 import {
-  ArrowLeftIcon,
   DownloadIcon,
   ExternalLinkIcon,
   EyeIcon,
@@ -11,7 +10,7 @@ import {
   UnlinkIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -73,23 +72,11 @@ export function DriveFolderScreen({ listing, ...props }: DriveFolderScreenProps)
   return <DriveFolderContent {...props} listing={listing} />;
 }
 
-function BackLink() {
-  const { t } = useTranslation("integrations");
-  return (
-    <Button asChild variant="ghost" size="sm" className="w-fit">
-      <Link to="/documents">
-        <ArrowLeftIcon />
-        {t("driveFolder.back")}
-      </Link>
-    </Button>
-  );
-}
-
 function DriveFolderSkeleton() {
   const { t } = useTranslation("integrations");
   return (
     <PageContainer aria-busy="true" aria-label={t("driveFolder.title")}>
-      <BackLink />
+      <PageHeader backTo="/documents" title={t("driveFolder.title")} />
       <SkeletonList rows={6} />
     </PageContainer>
   );
@@ -107,7 +94,7 @@ function DriveFolderContent({ linkId, listing, canManage, client = googleClient 
   if (!listing) {
     return (
       <PageContainer>
-        <BackLink />
+        <PageHeader backTo="/documents" title={t("driveFolder.title")} />
         <ErrorState
           title={t("driveFolder.loadError")}
           action={
@@ -211,8 +198,7 @@ function DriveFolderContent({ linkId, listing, canManage, client = googleClient 
 
   return (
     <PageContainer>
-      <BackLink />
-      <PageHeader
+      <PageHeader backTo="/documents"
         eyebrow={
           <span className="flex items-center gap-2">
             <Badge variant="secondary">{t("driveFolder.badge")}</Badge>

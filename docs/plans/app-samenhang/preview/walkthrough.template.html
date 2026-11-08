@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en-BE">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WickedHome — UI and journey walkthrough</title>
+<style>
+:root{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:#122b23;background:#f6f4ed;font-synthesis:none;line-height:1.5}*{box-sizing:border-box}body{margin:0}button,a{-webkit-tap-highlight-color:transparent}button{font:inherit;cursor:pointer}a{color:inherit}button:focus-visible,a:focus-visible{outline:3px solid #de852b;outline-offset:4px}[hidden]{display:none!important}.shell{max-width:1580px;margin:auto;padding:32px}.eyebrow{font-size:12px;font-weight:750;letter-spacing:.13em;text-transform:uppercase;color:#57745f}.hero{display:flex;justify-content:space-between;align-items:center;gap:24px}.hero h1{font-size:clamp(28px,4vw,44px);letter-spacing:-.04em;margin:7px 0 10px;line-height:1.12}.hero p{max-width:800px;color:#5b6d65;margin:0}.atlas-link{display:inline-flex;flex-shrink:0;border-radius:14px;padding:13px 18px;text-decoration:none;background:#124734;color:#fff;font-weight:650}.journeys{display:flex;gap:10px;flex-wrap:wrap;margin:30px 0 12px}.journeys button{background:#fffefa;border:1px solid #d9e0d7;border-radius:14px;padding:13px 18px;font-weight:650}.journeys button[aria-pressed=true]{background:#124734;color:white;border-color:#124734}.steps{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}.steps button{border:1px solid #d9e0d7;background:transparent;border-radius:999px;padding:8px 13px;color:#5b6d65;font-size:13px}.steps button[aria-current=step]{background:#fae6ca;border-color:#e2bf8c;color:#643b12;font-weight:700}.screen{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start}.frame{margin:0;border-radius:20px;border:1px solid #d9e0d7;background:#e9ede4;padding:16px;min-width:0}.frame img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid #d9e0d7;background:#fff;cursor:zoom-in}.frame.mobile img{width:390px;max-width:100%;margin:auto}.frame figcaption{padding:13px 4px 0;font-size:12px;color:#5b6d65}.notes{position:sticky;top:20px}.notes h2{font-size:25px;line-height:1.2;letter-spacing:-.025em;margin:0 0 12px}.intro{color:#5b6d65;margin:0 0 20px}.changes{list-style:none;padding:0;counter-reset:changes;display:grid;gap:14px}.changes li{position:relative;padding:0 0 0 38px;font-size:14px}.changes li:before{counter-increment:changes;content:counter(changes);position:absolute;left:0;top:0;display:grid;place-items:center;width:26px;height:26px;border-radius:9px;background:#f7ddbb;color:#794616;font-weight:700}.next{padding:17px;border-radius:16px;background:#e5efe7;margin:22px 0 14px;font-size:14px}.next strong{display:block;margin-bottom:5px}.connections{font-size:12px;color:#607469;border-top:1px solid #d9e0d7;padding-top:14px}.interactive{display:inline-block;font-size:14px;font-weight:650;margin:15px 0;text-underline-offset:4px}.pager{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 12px}.pager button{border:1px solid #d9e0d7;border-radius:12px;padding:10px 16px;background:#fffefa}.pager button:disabled{opacity:.4;cursor:default}.pager span{font-size:13px;color:#607469}.footer{font-size:12px;color:#607469;max-width:950px;margin:20px 0}dialog{border:0;padding:16px;border-radius:18px;max-width:96vw;max-height:96vh;background:#f6f4ed}dialog::backdrop{background:#072217c7}dialog button{display:block;margin:0 0 12px auto;border:1px solid #d9e0d7;background:white;border-radius:10px;padding:7px 14px}dialog img{max-width:none;width:auto;height:auto;display:block}dialog .zoom-wrap{max-height:82vh;max-width:90vw;overflow:auto}
+@media(max-width:1050px){.screen{grid-template-columns:1fr}.notes{position:static;max-width:820px}.frame.mobile{padding:16px}.frame.mobile img{width:390px}.hero{display:block}.atlas-link{margin-top:20px}.shell{padding:20px}}
+@media(max-width:480px){.shell{padding:14px}.journeys button{padding:10px 12px;font-size:13px}.frame{padding:6px}.frame.mobile{padding:6px}.pager button{padding:10px}.pager span{max-width:130px;text-align:center}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main class="shell">
+<header class="hero"><div><div class="eyebrow">WickedHome · design review</div><h1>How WickedHome should feel</h1><p>Explore everyday journeys and image-led views in a consistent household app. These wireframes use the actual shared components, with clearer relationships, colourful cues and useful progress.</p></div><a class="atlas-link" href="./index.html?screen=project-detail&amp;lang=en">Explore all 173 wireframes ↗</a></header>
+<nav class="journeys" aria-label="Choose a journey">__JOURNEYS__</nav>
+<nav class="steps" aria-label="Journey steps"></nav>
+<div id="screens">__SCREENS__</div>
+<div class="pager"><button type="button" id="previous">← Previous step</button><span id="position" role="status" aria-live="polite"></span><button type="button" id="next">Next step →</button></div>
+<p class="footer">Design examples with fictional data. The walkthrough explains the proposed experience; the atlas demonstrates selected interactions. No household records, stock, payments or Home Assistant controls are changed. English is the default; the interactive atlas also supports Dutch. Click a screen to inspect it at full size.</p>
+</main>
+<dialog aria-label="Wireframe at full size"><button type="button" id="close-zoom">Close full-size view</button><div class="zoom-wrap"><img alt=""></div></dialog>
+<script id="frame-data" type="application/json">__DATA__</script>
+<script>
+if(location.protocol==='file:')document.querySelectorAll('a[href*="index.html"]').forEach(a=>{a.href='http://127.0.0.1:55450/'+new URL(a.href).search});
+const frames=JSON.parse(document.getElementById('frame-data').textContent);
+const initial=frames.find(f=>f.id===location.hash.slice(1));
+let journey=initial?.journey||'Shopping',id=initial?.id||'visit-start';
+function show(){
+ const visible=frames.filter(f=>f.journey===journey);if(!visible.some(f=>f.id===id))id=visible[0].id;
+ const index=visible.findIndex(f=>f.id===id);
+ document.querySelectorAll('[data-journey]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.journey===journey)));
+ document.querySelectorAll('.screen').forEach(a=>a.hidden=a.id!==id);
+ const steps=document.querySelector('.steps');steps.replaceChildren();
+ for(const f of visible){const b=document.createElement('button');b.type='button';b.textContent=f.step;b.setAttribute('aria-current',f.id===id?'step':'false');b.onclick=()=>{id=f.id;show()};steps.append(b)}
+ document.getElementById('previous').disabled=index===0;document.getElementById('next').disabled=index===visible.length-1;
+ document.getElementById('position').textContent=`${index+1} of ${visible.length} · ${journey}`;
+ history.replaceState(null,'','#'+id);
+}
+document.querySelectorAll('[data-journey]').forEach(b=>b.onclick=()=>{journey=b.dataset.journey;show()});
+function move(delta){const list=frames.filter(f=>f.journey===journey);const next=list[list.findIndex(f=>f.id===id)+delta];if(next){id=next.id;show()}}
+document.getElementById('previous').onclick=()=>move(-1);document.getElementById('next').onclick=()=>move(1);
+const zoom=document.querySelector('dialog');document.querySelectorAll('.frame img').forEach(img=>{img.onclick=()=>{const target=zoom.querySelector('img');target.src=img.src;target.alt=img.alt;zoom.showModal()};img.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();img.click()}}});document.getElementById('close-zoom').onclick=()=>zoom.close();
+document.addEventListener('keydown',e=>{if(zoom.open)return;if(e.key==='ArrowRight')move(1);if(e.key==='ArrowLeft')move(-1)});show();
+</script>
+</body></html>

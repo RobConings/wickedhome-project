@@ -1,3 +1,4 @@
+import { useLiveEvents } from "@/lib/live-events";
 import * as React from "react";
 import type { DocumentEntityType, DocumentFile, DocumentLinkRef } from "../types/documents";
 import { attachFile, detachFile, fetchLinkedFiles } from "./documents-requests";
@@ -33,6 +34,7 @@ export function useDocumentAttachments(
     failed: false,
   }));
   const [attempt, setAttempt] = React.useState(0);
+  useLiveEvents("documents.changed", () => setAttempt((value) => value + 1), { enabled: !seeded });
   const [busyIds, setBusyIds] = React.useState<ReadonlySet<string>>(NO_IDS);
   const loadRef = React.useRef(load);
   React.useEffect(() => {

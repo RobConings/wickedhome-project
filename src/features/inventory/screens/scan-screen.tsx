@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ArrowLeftIcon, CircleHelpIcon, Layers2Icon, PackageMinusIcon, PackagePlusIcon, PackageSearchIcon, PlusIcon, ScanLineIcon } from "lucide-react";
+import { CircleHelpIcon, Layers2Icon, PackageMinusIcon, PackagePlusIcon, PackageSearchIcon, PlusIcon, ScanLineIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useRevalidator } from "react-router";
 import { toast } from "sonner";
@@ -194,12 +194,7 @@ export function ScanScreen({
     <PageContainer>
       {confirmation}
       <PageHeader
-        eyebrow={
-          <Link to="/inventory" className="inline-flex items-center gap-1 hover:underline">
-            <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-            {t("page.title")}
-          </Link>
-        }
+        backTo="/inventory"
         title={t("scan.title")}
         description={t("scan.description")}
       />

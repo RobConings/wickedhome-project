@@ -1,12 +1,15 @@
 // Public API of the devices feature. Routes, the app frame and other features import from here only.
 export type { DeviceEntityPickerProps } from "./components/device-bindings-form";
 export { DeviceIcon } from "./components/device-icon";
+export { PlaceDevicesSection } from "./components/place-devices-section";
+export { DeviceFormField } from "./components/device-form-field";
 export { DevicePicker } from "./components/device-picker";
 export { DeviceStateChip } from "./components/device-state-chip";
 export { HouseStatusCard } from "./components/house-status-card";
 export { HouseStatusCardSkeleton } from "./components/house-status-card-skeleton";
 export { LiveStatusBadge } from "./components/live-status-badge";
 export { useDevicePlanLayer } from "./components/use-device-plan-layer";
+export { useHomeDevicePlan } from "./data/use-home-device-plan";
 export {
   deviceDetailLoader,
   deviceProfileAction,
@@ -36,3 +39,5 @@ export {
   type IndicatorTone,
 } from "./types/devices";
 export { evaluateIndicator, type IndicatorResult } from "./types/indicator";
+
+export { PlanDeviceCreator } from "./components/plan-device-creator";

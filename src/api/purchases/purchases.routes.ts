@@ -1,0 +1,15 @@
+import { goodsAllocationInputSchema } from "@/features/purchases/types/goods-allocation";
+import { getGoodsAllocation, setGoodsAllocation } from "./goods-allocation.service";
+import { Router } from "express";
+import { z } from "zod";
+import { idSchema } from "@/types/common";
+import { parse } from "../lib/http";
+import { currentUser, requireRole, requireUser } from "../lib/session";
+import { getPurchase, listPurchases } from "./purchases.service";
+export const purchasesRouter = Router();
+purchasesRouter.use(requireUser);
+purchasesRouter.get("/", async (req, res) => res.json(await listPurchases(currentUser(req), parse(z.object({ productId: idSchema.optional(), projectId: idSchema.optional() }), req.query))));
+purchasesRouter.get("/acquisitions/:id", async (req, res) => res.json(await getPurchase(currentUser(req), parse(idSchema, req.params.id), "acquisition")));
+purchasesRouter.get("/goods/:id/allocation", async (req, res) => res.json(await getGoodsAllocation(currentUser(req).householdId, parse(idSchema, req.params.id))));
+purchasesRouter.put("/goods/:id/allocation", requireRole("owner", "adult"), async (req, res) => res.json(await setGoodsAllocation(currentUser(req).householdId, parse(idSchema, req.params.id), parse(goodsAllocationInputSchema, req.body))));
+purchasesRouter.get("/:id", async (req, res) => res.json(await getPurchase(currentUser(req), parse(idSchema, req.params.id))));

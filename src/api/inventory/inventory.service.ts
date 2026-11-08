@@ -46,7 +46,7 @@ const round = (value: number) => Math.round(value * 1000) / 1000;
 const fromCategory = (category: ProductCategory) => category.toUpperCase() as ProductCategoryRow;
 
 const stockInclude = {
-  product: { select: { name: true, unit: true, shoppingRestockState: true } },
+  product: { select: { name: true, imageUrl: true, unit: true, shoppingRestockState: true } },
   place: { select: { name: true } },
 } as const;
 type StockRow = Prisma.StockItemGetPayload<{ include: typeof stockInclude }>;
@@ -58,6 +58,7 @@ function toStockItem(row: StockRow): StockItem {
     id: row.id,
     productId: row.productId,
     productName: row.product.name,
+    productImageUrl: row.product.imageUrl,
     placeId: row.placeId,
     placeName: row.place.name,
     quantity,

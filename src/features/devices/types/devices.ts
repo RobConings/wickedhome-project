@@ -268,6 +268,8 @@ export type DeviceFieldBinding = {
 };
 
 export type Device = {
+  coverFileId?: string | null;
+  imageUrl?: string | null;
   id: string;
   name: string;
   notes: string | null;

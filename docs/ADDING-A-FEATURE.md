@@ -40,12 +40,13 @@ Use kebab-case file names that say what they are (`habitant-card.tsx`, not `card
 - **Dates: always through `@/types/date-format`, dd/mm/yyyy** (`formatDate` → "30/10/2026", `formatDateTime` →
   "30/10/2026 14:05", 24 h, Brussels wall clock), in both languages, in the browser and in server texts
   (notifications, task titles, assistant summaries). Never `Intl.DateTimeFormat` / `toLocaleDateString` for a
-  shown date. Words only for month headers (`formatMonth` → "oktober 2026"), chart ticks, calendar grids and
-  relative words ("vandaag").
+  shown date. Words only for month headers (`formatMonth` → "October 2026"), chart ticks, calendar grids and
+  relative words ("today").
 - **Recurrence** is an RFC 5545 RRULE string.
 - **Pickers**: every selection of an entity (shop, place, product, habitant…) uses the shared
   `EntityPicker` (`components/shared/entity-picker.tsx`), which shows **Favourites** and **Recently used**
   first. Record a use with `POST /api/selections/recent` when a selection is saved.
+- **English is the source language** for documentation and interface copy; Dutch is supported equally.
 - **UI text** is never hard-coded: `useTranslation("<feature>")`, and `common` for generic words.
 - **Every component and screen gets a story** in `stories/` (never next to the component), titled
   `Features/<Feature>/Components/<Name>` or `Features/<Feature>/Screens/<Name>`, using the feature's
@@ -80,26 +81,30 @@ Need a new primitive (`components/ui`) or shared pattern (`components/shared`)? 
 domain-agnostic, gets its own story, and goes in the right layer. If two features need the same pattern,
 it belongs in `shared`, not in one of the features.
 
-## 4. Commands (always on the server)
+## 4. Commands in the correct checkout
 
-```bash
-ssh -i ~/.ssh/wickedhome -o IdentitiesOnly=yes wicked@192.168.1.10
-cd /var/www/WickedHome
+Use the local development checkout with machine-local dependencies and an explicitly configured
+development/test database. These checks do not require SSH:
 
-flock /tmp/wh-prisma.lock npx prisma validate
-flock /tmp/wh-prisma.lock npx prisma generate     # after changing your .prisma file
-flock /tmp/wh-npm.lock npm install <package>      # only if really needed; prefer what is installed
-npx tsc                                           # typecheck
+```sh
+cd /Users/robconings/WickedHome
+npx prisma validate
+npx prisma generate                         # after changing a .prisma file
+npx tsc                                    # type checking
 npx eslint src/features/<feature> src/api/<feature> src/routes
 ```
 
-Don't run `prisma format` while others are working: it rewrites every schema file, not just yours.
+Only install dependencies when needed; prefer existing packages. Do not share `node_modules` between
+macOS and the Linux server. Run server-only commands in a server shell using that server's own install;
+SMB visibility is not a remote command session. Linux `flock` can serialise shared `prisma generate` or
+`npm install` operations there. The Mac's isolated checkout does not require Linux-only lock commands.
 
-The `flock` locks matter when several people (or agents) work at the same time: concurrent
-`prisma generate` or `npm install` runs corrupt each other. Database migrations are created by one
-person at a time (`npm run db:migrate -- --name <feature>`), never in parallel.
+Avoid `prisma format` during concurrent schema work because it rewrites every schema file. Create database
+migrations one at a time against a disposable development database. Deployment migrations use the separate
+[deployment process](CI-CD.md); development checks do not authorise production database changes.
 
-Storybook runs at http://192.168.1.10:6006 and reloads on save.
+`npm run storybook` starts the component catalogue on port 6006 and reloads on save. Use the host where
+the process is actually running; historical LAN addresses in examples are not environment discovery.
 
 ## Assistant tools
 

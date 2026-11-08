@@ -1,17 +1,17 @@
 import * as React from "react";
-import { CloudSunIcon, HouseIcon, Trash2Icon, type LucideIcon } from "lucide-react";
+import { CloudSunIcon, HouseIcon, LayoutGridIcon, SettingsIcon, Trash2Icon, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageSection } from "@/components/layout/page-section";
-import { ScrollRow } from "@/components/layout/scroll-row";
 import { ErrorState } from "@/components/shared/error-state";
 import { PageHeader } from "@/components/shared/page-header";
-import { SectionHeader } from "@/components/shared/section-header";
+import { RelatedRecordCards } from "@/components/shared/related-record-cards";
+import { SectionNavigation } from "@/components/shared/section-navigation";
 import { HouseholdSettingsForm } from "@/features/household";
 import { WasteSettingsSection } from "@/features/waste";
 import { WeatherSettingsSection } from "@/features/weather";
-import { cn } from "@/lib/utils";
+import type { SectionAccent } from "@/lib/section-accent";
 import type { SettingsData } from "../data/settings-loaders";
 
 /** One block of the settings page, contributed by a feature. */
@@ -19,6 +19,7 @@ export type SettingsSectionItem = {
   /** Anchor: `/settings#<id>`. */
   id: string;
   icon: LucideIcon;
+  accent?: SectionAccent;
   title: string;
   description?: string;
   content: React.ReactNode;
@@ -35,22 +36,10 @@ type SettingsScreenProps = {
   extraSections?: SettingsSectionItem[];
 };
 
-/** Scrolls to `#section` after navigating to `/settings#section` (links from the dashboard cards). */
-function useScrollToHash() {
-  const { hash } = useLocation();
-  React.useEffect(() => {
-    if (!hash) return;
-    document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [hash]);
-}
-
-/**
- * Settings: one page, a section per feature (household and address, waste collector, later integrations
- * and notifications), with a jump list on top. A section that failed to load shows an error by itself.
- */
+/** Owner-provided settings stay in their feature; navigation mounts one section at a time. */
 export function SettingsScreen({ data, canManage, extraSections = [] }: SettingsScreenProps) {
   const { t } = useTranslation("settings");
-  useScrollToHash();
+  const location = useLocation();
   const unavailable = <ErrorState title={t("sectionError.title")} description={t("sectionError.description")} />;
   const address = data.household?.address;
 
@@ -100,35 +89,41 @@ export function SettingsScreen({ data, canManage, extraSections = [] }: Settings
     ...extraSections,
   ];
 
+  // Keep bookmarked notification, weather and MCP links such as `/settings#waste` working.
+  const params = new URLSearchParams(location.search);
+  const selectedId = params.get("section") ?? location.hash.slice(1);
+  const selected = sections.find((section) => section.id === selectedId);
+  const sectionLink = (id?: string) => {
+    const next = new URLSearchParams(location.search);
+    if (id) next.set("section", id);
+    else next.delete("section");
+    return { pathname: "/settings", search: next.size ? `?${next}` : "", hash: "" };
+  };
+
   return (
-    <PageContainer className="max-w-4xl">
-      <PageHeader title={t("title")} description={t("description")} />
-
-      {/* Jump links: one row that scrolls inside itself on phones, wrapping from `md`. */}
-      <nav aria-label={t("jumpTo")} className="-mt-4">
-        <ScrollRow wrapFrom="md" focusable={false}>
-        {sections.map((section) => (
-          <a
-            key={section.id}
-            href={`#${section.id}`}
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1 text-sm transition-colors outline-none",
-              "hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50",
-            )}
-          >
-            <section.icon className="size-3.5 text-muted-foreground" aria-hidden="true" />
-            {section.title}
-          </a>
-        ))}
-        </ScrollRow>
-      </nav>
-
-      {sections.map((section) => (
-        <PageSection key={section.id} id={section.id} aria-labelledby={`${section.id}-heading`} className="scroll-mt-20">
-          <SectionHeader id={`${section.id}-heading`} title={section.title} description={section.description} />
-          {section.content}
-        </PageSection>
-      ))}
+    <PageContainer className="max-w-4xl" data-accent={selected?.accent ?? "home"}>
+      <PageHeader
+        title={selected?.title ?? t("title")}
+        description={selected?.description ?? t("description")}
+        icon={selected?.icon ?? SettingsIcon}
+        breadcrumbs={selected ? [{ label: t("title"), to: `/settings${sectionLink().search}` }, { label: selected.title }] : undefined}
+      />
+      {selected ? (
+        <>
+          <SectionNavigation label={t("jumpTo")} items={[
+            { id: "all", label: t("allSections"), to: sectionLink(), icon: LayoutGridIcon, current: false },
+            ...sections.map((section) => ({ id: section.id, label: section.title, to: sectionLink(section.id), icon: section.icon, current: section.id === selected.id })),
+          ]} />
+          <PageSection key={selected.id} id={selected.id} aria-label={selected.title}>
+            {selected.content}
+          </PageSection>
+        </>
+      ) : (
+        <RelatedRecordCards label={t("jumpTo")} items={sections.map((section) => ({
+          id: section.id, label: section.title, description: section.description,
+          to: sectionLink(section.id), icon: section.icon, accent: section.accent ?? "home",
+        }))} />
+      )}
     </PageContainer>
   );
 }

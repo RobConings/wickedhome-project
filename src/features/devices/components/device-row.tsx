@@ -1,6 +1,7 @@
 import { ChevronRightIcon, MapPinOffIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
+import { RecordImage } from "@/components/shared/record-image";
 import { cn } from "@/lib/utils";
 import type { Device, DeviceProfile } from "../types/devices";
 import { DeviceIcon } from "./device-icon";
@@ -28,9 +29,7 @@ export function DeviceRow({ device, profile, state, href = `/devices/${device.id
         to={href}
         className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-1 hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
       >
-        <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
-          <DeviceIcon icon={profile?.icon} />
-        </span>
+        <RecordImage src={device.imageUrl} shape="avatar" className="size-11" fallback={<DeviceIcon icon={profile?.icon} />} />
         <span className="flex min-w-0 flex-1 flex-col">
           <span className="truncate font-medium">{device.name}</span>
           <span className="flex items-center gap-1.5 truncate text-xs text-muted-foreground">

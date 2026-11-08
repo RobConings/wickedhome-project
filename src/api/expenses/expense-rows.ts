@@ -110,6 +110,7 @@ export function toExpense(row: ExpenseRow, today: string): Expense {
   return {
     id: row.id,
     ...toPaymentDetails(row),
+    hasProjectAllocation: row.allocationHouseholdCents !== null && row.allocationHouseholdCents !== undefined,
     recurringExpenseId: row.recurringExpenseId ?? row.earlyRepaymentForId,
     earlyRepayment: Boolean(row.earlyRepaymentForId),
     rrule: row.recurringExpense?.rrule ?? row.earlyRepaymentFor?.rrule ?? null,

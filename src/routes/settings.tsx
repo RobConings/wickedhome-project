@@ -46,6 +46,7 @@ export function Component() {
     // Everyone's own notifications: this device, devices, quiet hours, what and when (loads its own data).
     {
       id: "notifications",
+      accent: "assistant",
       icon: BellIcon,
       title: tNotifications("section.title"),
       description: tNotifications("section.description"),
@@ -63,6 +64,7 @@ export function Component() {
     // The activity log (owners and adults, the same people who manage accounts); it loads its own data.
     accountSections.push({
       id: "activity",
+      accent: "documents",
       icon: HistoryIcon,
       title: tAudit("section.title"),
       description: tAudit("section.description"),
@@ -78,6 +80,7 @@ export function Component() {
         ...accountSections,
         {
           id: "automations",
+          accent: "integrations",
           icon: WorkflowIcon,
           title: t("section.title"),
           description: t("section.description"),
@@ -85,6 +88,7 @@ export function Component() {
         },
         {
           id: "integrations",
+          accent: "integrations",
           icon: PlugIcon,
           title: tIntegrations("settingsLink.title"),
           description: tIntegrations("settingsLink.description"),

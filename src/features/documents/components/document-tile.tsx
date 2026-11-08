@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Spinner } from "@/components/ui/spinner";
 import { Card } from "@/components/shared/card";
 import { FileTypeIcon } from "@/components/shared/file-type-icon";

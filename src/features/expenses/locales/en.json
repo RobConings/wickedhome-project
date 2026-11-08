@@ -268,7 +268,8 @@
     "unknownHabitant": "Former habitant",
     "details": "Details",
     "reminderOn_one": "{{count}} day before: on {{date}}",
-    "reminderOn_other": "{{count}} days before: on {{date}}"
+    "reminderOn_other": "{{count}} days before: on {{date}}",
+    "related": "Related records"
   },
   "qr": {
     "title": "Pay with your banking app",
@@ -362,5 +363,24 @@
     "exceedsBalance": "The repayment exceeds the remaining balance.",
     "paymentDateHint": "Use the day you actually paid. It can be before the first instalment.",
     "futureDate": "Enter the day you actually paid, on or before {{date}}."
+  },
+  "allocation": {
+    "title": "Project and household costs",
+    "description": "Divide this expense without recording another purchase or payment.",
+    "edit": "Allocate costs",
+    "editDescription": "Assign project shares and the household share. Any remainder stays visibly unallocated.",
+    "household": "Household",
+    "projects": "Project shares",
+    "projectAmount": "Project amount",
+    "remove": "Remove project share",
+    "add": "Add a project",
+    "over": "{{amount}} above the expense total",
+    "remaining": "{{amount}} still unallocated",
+    "total": "Expense total",
+    "unallocated": "Unallocated",
+    "deletedProject": "{{name}} · project removed",
+    "loadError": "Could not load the cost allocation",
+    "retry": "Try again",
+    "conflict": "Someone changed this allocation. Your draft is kept; close and reopen to review the latest shares before saving."
   }
 }

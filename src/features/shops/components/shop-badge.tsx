@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { Shop } from "../types/shops";

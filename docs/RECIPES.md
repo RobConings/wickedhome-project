@@ -254,7 +254,7 @@ model gets the recipe, servings, the current step and every ingredient's used/ne
   confirmation card shows the link and price.
 - `recipes_list` (recipes, To cook, one recipe with its stock check), `recipes_plan` (To cook + missing items,
   list preview of what goes on the list).
-- Cooking: `recipes_use` ("ik heb nog 1 look extra gebruikt"; a product not in the recipe becomes an extra),
+- Cooking: `recipes_use` ("I used one extra clove of garlic"; a product not in the recipe becomes an extra),
   `recipes_add_ingredient`, `recipes_step` (current and next step, read only), `recipes_go_to_step`,
   `recipes_done`. Children may use all cooking tools (not `saveToRecipe`). The meal defaults to the cooking
   screen's, else the one being cooked of the recipe on screen, else the only one being cooked; otherwise the

@@ -211,6 +211,8 @@ export const taskInputSchema = z
     checklist: z.array(checklistItemInputSchema).max(MAX_CHECKLIST_ITEMS).default([]),
     /** The project (projects feature). Left out: an edit keeps the current project; `null` removes it. */
     projectId: idSchema.optional().nullable(),
+    /** Maintained device. Omission preserves the link on edit; null removes it. */
+    deviceId: idSchema.optional().nullable(),
   })
   .superRefine((value, ctx) => {
     if (value.rrule && !value.dueDate) {
@@ -299,9 +301,9 @@ export type ChecklistToggleInput = z.infer<typeof checklistToggleInputSchema>;
 
 /**
  * `GET /api/tasks?placeId=`: only the tasks of one place. `?projectId=`: only the tasks of one project (then
- * closed tasks of any age are included, so the project shows its whole progress).
+ * closed tasks of any age are included, so the project shows its whole progress). `?deviceId=` does the same for maintenance.
  */
-export const tasksQuerySchema = z.object({ placeId: idSchema.optional(), projectId: idSchema.optional() });
+export const tasksQuerySchema = z.object({ placeId: idSchema.optional(), projectId: idSchema.optional(), deviceId: idSchema.optional() });
 export type TasksQuery = z.infer<typeof tasksQuerySchema>;
 
 // ── Read models ───────────────────────────────────────────────────────────────────────────────────────
@@ -369,6 +371,8 @@ export type Task = {
   commentCount: number;
   /** The project it is part of (projects feature), or `null`. */
   project: ProjectRef | null;
+  /** The device being maintained; null for tasks without a device. */
+  device: { id: string; name: string } | null;
 };
 
 export type TaskHold = {
@@ -447,7 +451,7 @@ export type TasksOverview = {
   /** Today in the household time zone: the reference for overdue and due labels. */
   today: string;
   viewer: TaskViewer;
-  /** Open tasks plus tasks closed in the last `CLOSED_TASKS_DAYS` days. */
+  /** Open tasks plus recent closed tasks; an explicit project/device query includes all its closed tasks. */
   tasks: Task[];
   /**
    * Everything closed today (one-off tasks and occurrences of recurring ones), newest first. Each refers to

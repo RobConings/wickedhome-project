@@ -17,17 +17,18 @@ type DeviceFormDialogProps = {
   appliances: Appliance[];
   /** Preselect a profile for a new device. */
   defaultProfileId?: string;
+  defaultPlaceId?: string;
   trigger: React.ReactElement;
 };
 
 const idOrNull = (value: unknown) => (typeof value === "string" && value !== "" ? value : null);
 
-export function DeviceFormDialog({ device, profiles, places, appliances, defaultProfileId, trigger }: DeviceFormDialogProps) {
+export function DeviceFormDialog({ device, profiles, places, appliances, defaultProfileId, defaultPlaceId, trigger }: DeviceFormDialogProps) {
   const { t } = useTranslation("devices");
   const { recordUse: recordPlace } = usePlaceSelections();
   const { recordUse: recordAppliance } = useSelections("appliance");
   const isEdit = Boolean(device);
-  const initial = { placeId: device?.place?.id ?? null, applianceId: device?.appliance?.id ?? null };
+  const initial = { placeId: device?.place?.id ?? defaultPlaceId ?? null, applianceId: device?.appliance?.id ?? null };
   // What is chosen in the open dialog, to record as "recently used" once it saved.
   const chosen = React.useRef(initial);
 
@@ -103,6 +104,7 @@ export function DeviceFormDialog({ device, profiles, places, appliances, default
       }}
       schema={deviceInputSchema}
       fields={fields}
+      action="/devices"
       intent="save"
       hiddenFields={{ id: device?.id }}
       defaultValues={{

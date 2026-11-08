@@ -1,0 +1,44 @@
+import assert from "node:assert/strict";
+import { after, it } from "node:test";
+import { taskInputSchema } from "@/features/tasks/types/tasks";
+import { todayIn } from "@/types/dates";
+import { db } from "../lib/db";
+import { shoppingSessionFixture as fixture } from "../shopping/sessions-test-helpers";
+import { completeTask, createTask, getTaskDetail, getTasksOverview, updateTask } from "./tasks.service";
+
+const enabled = process.env.SHOPPING_INTEGRATION_TESTS === "1";
+after(async () => { if (enabled) await db.$disconnect(); });
+
+it("device maintenance uses real recurring tasks, isolated references, durable history and safe device removal", { skip: !enabled }, async (t) => {
+  const f = await fixture(t);
+  const other = await fixture(t);
+  const profile = await db.deviceProfile.create({ data: { householdId: f.home.id, name: "Boiler", icon: "thermometer", category: "APPLIANCE", fields: [], rules: [] } });
+  const device = await db.device.create({ data: { householdId: f.home.id, profileId: profile.id, name: "Hall boiler" } });
+  const original = taskInputSchema.parse({ title: "Service the boiler", type: "maintenance", deviceId: device.id, dueDate: todayIn(), rrule: "FREQ=YEARLY" });
+  const task = await createTask(f.home.id, original);
+  assert.deepEqual(task.device, { id: device.id, name: device.name });
+  await assert.rejects(createTask(other.home.id, original), /Validation failed/);
+  const unrelated = await createTask(other.home.id, taskInputSchema.parse({ title: "Other household task" }));
+  await assert.rejects(updateTask(other.home.id, unrelated.id, original), /Validation failed/);
+  await updateTask(f.home.id, task.id, taskInputSchema.parse({ ...original, deviceId: undefined, notes: "Keep the device when editing elsewhere" }));
+  assert.equal((await getTaskDetail(f.user, task.id)).task.device?.id, device.id);
+  await assert.rejects(completeTask({ ...f.user, role: "child", habitantId: null }, task.id, { force: false }), /Only tasks assigned/);
+  const next = await completeTask(f.user, task.id, { force: false });
+  assert.equal(next.status, "open");
+  assert.equal(next.device?.id, device.id);
+  const detail = await getTaskDetail(f.user, task.id);
+  assert.equal(detail.history.length, 1);
+  assert.equal(detail.history[0]!.outcome, "done");
+  assert.notEqual(next.dueDate, task.dueDate);
+  const old = await createTask(f.home.id, taskInputSchema.parse({ title: "Old inspection", type: "maintenance", deviceId: device.id }));
+  await db.task.update({ where: { id: old.id }, data: { status: "DONE", closedAt: new Date("2020-01-01") } });
+  assert.ok(!(await getTasksOverview(f.user)).tasks.some((item) => item.id === old.id));
+  assert.deepEqual(new Set((await getTasksOverview(f.user, { deviceId: device.id })).tasks.map((item) => item.id)), new Set([task.id, old.id]));
+  assert.equal((await getTasksOverview(other.user, { deviceId: device.id })).tasks.length, 0);
+  await updateTask(f.home.id, old.id, taskInputSchema.parse({ title: old.title, deviceId: null }));
+  assert.equal((await getTaskDetail(f.user, old.id)).task.device, null);
+  await db.device.delete({ where: { id: device.id } });
+  const retained = await getTaskDetail(f.user, task.id);
+  assert.equal(retained.task.device, null);
+  assert.equal(retained.history.length, 1);
+});

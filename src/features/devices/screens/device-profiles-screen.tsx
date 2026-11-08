@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, PlusIcon, SlidersHorizontalIcon } from "lucide-react";
+import { PlusIcon, SlidersHorizontalIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
@@ -48,12 +48,7 @@ export function DeviceProfilesScreen({ profiles, presets, canManage }: DevicePro
   return (
     <PageContainer>
       <PageHeader
-        eyebrow={
-          <Link to="/devices" className="inline-flex items-center gap-1 hover:underline">
-            <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-            {t("page.title")}
-          </Link>
-        }
+        backTo="/devices"
         title={t("profiles.title")}
         description={t("profiles.description")}
         actions={newButton}

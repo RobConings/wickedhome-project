@@ -47,7 +47,7 @@ export function ProductListItem({ product, shops, canManage, initialSelections, 
       aria-busy={actions.busy || undefined}
     >
       {product.imageUrl ? (
-        <img src={product.imageUrl} alt="" referrerPolicy="no-referrer" className="size-10 shrink-0 rounded-lg border bg-white object-contain" />
+        <img src={product.imageUrl} alt="" referrerPolicy="no-referrer" className="size-16 shrink-0 rounded-lg border bg-white object-contain p-1" />
       ) : (
         <span className="grid size-10 shrink-0 place-items-center rounded-full bg-section-soft text-section">
           <ProductCategoryIcon category={product.category} className="size-5" />

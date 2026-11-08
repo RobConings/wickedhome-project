@@ -21,6 +21,14 @@ ai/
   docs/                ASSISTANT.md (setup, chat, MCP, API), MCP-OAUTH.md (ChatGPT/Claude connectors), ADDING-TOOLS.md (how to add tools), WEB-SEARCH.md (SearXNG, SSRF rules)
 ```
 
+## Unified application design
+
+The [application-wide design dossier](../docs/plans/app-samenhang/README.md) includes a dedicated
+[AI/MCP contract](../docs/plans/app-samenhang/ai-mcp-contract.md): canonical record context, owner actions,
+quantity and payment semantics, retries, permissions and English/Dutch workflows. It is a redesign
+proposal; current tool definitions and skill guides remain the authority for available operations.
+Implementing a redesigned journey includes updating its help, guide, tool descriptions and eval cases.
+
 ## How a question flows
 
 1. **The question arrives** (`POST /api/assistant/conversations[/:id/messages]`, `core/assistant.routes.ts`)
@@ -28,7 +36,7 @@ ai/
 2. **Routing** (`core/routing.ts`, `core/skills.ts`): the question is matched against every skill's
    keywords (Dutch and English, accents and plurals ignored; when no keyword matches, names of known things
    such as "Fluvius" or "Delhaize" point to their skill). A message with several questions is routed per
-   part (split at "?", commas, "en"/"and"…): "wat is de volgende betaling en wat is het weer morgen" activates
+   part (split at "?", commas, "en"/"and"…): "what is the next payment and what is the weather tomorrow" activates
    expenses *and* weather. Words every area uses (dates, "wanneer") are calendar **hints**: half weight, never
    a question of their own. The question's skills (plus the best one or two of the whole message) become
    **active** for this conversation, together with skills used earlier (at most 3; skills of earlier turns
@@ -66,7 +74,7 @@ ai/
      that tool is no longer offered this turn, and after two repeats (as on the last step) it must answer in
      text (tool_choice none plus a note);
    - an answer without any text (e.g. tool-call markup on the last step, which is filtered out), even after
-     asking once more, becomes a short fallback answer ("Ik kon dit niet afronden …", logged) instead of silence.
+     asking once more, becomes a short fallback answer ("I could not complete this …", logged) instead of silence.
 
    **Several questions, one message**: the prompt asks the model to handle every part, and the loop checks
    it (`missedParts` in `core/routing.ts`): when the model answers in text but called no tool for a part of
@@ -125,7 +133,7 @@ line in `ai/skills/index.ts`, scenarios in `ai/eval/scenarios.ts`.
 
 ## Speed and context: the numbers
 
-A typical question ("Wat moet ik vandaag nog doen?") with the tasks skill pre-routed:
+A typical question ("What do I still need to do today?") with the tasks skill pre-routed:
 
 Measured with `npm run assistant:eval -- --routing` (estimates, 2026-10-04, 24 tools registered):
 
@@ -167,7 +175,7 @@ npm run assistant:eval -- --only=tasks,exp --verbose
 (`tools: [...]`: every part's tool must be called), each in a fresh conversation against a seeded
 household (`eval/seed.ts`) on a throwaway database (created, migrated, dropped). Writes stop at the
 confirmation, so nothing is changed. It reports pre-routing accuracy, tool choice, argument accuracy,
-refusals (disarming, children and money), average latency and prompt tokens. Run it on the server (it needs
+refusals (disarming, children and money), average latency and prompt tokens. Run it in an environment configured for the evaluator (it needs
 `DATABASE_URL` with a role that may create databases).
 
 Unit tests (no model, no database): `ai/core/*.test.ts` (registry rules, routing, resolvers, skill loading,

@@ -1,12 +1,10 @@
-- Tasks: title, day/time, assignees (rotating = one on duty), priority, room, checklist, materials. Recurring completion finishes this occurrence.
-- Tonight/vanavond → `tasks_list_open` `today`; assigned to me → `mine`/`person`. Counts/`todayRemaining` are household-wide; `items` are filtered. With empty personal results, name remaining household tasks with their assignees. Never claim names are inaccessible.
-- Notes, history, dependencies → `tasks_details`; use title and date if ambiguous. Hold → `on_hold`; finished → `done`.
-- "Elke week/maand" → `repeat` + `dueDate` (first time). "Elke zondag om 18u" → `repeat` weekly, `weekdays` ["sun"], `time` "18:00". "Om beurten" → `rotate`.
-- "Van 10 tot 12" → `time` "10:00" + `endTime` "12:00". "Van maandag tot woensdag" → `dueDate` + `endDate`, no time.
-- "Herinnering om 21u" → `time` "21:00" + `remind` true (or minutes before); no day → today.
-- Edits → `tasks_update` (only what changes). Uitstellen → `tasks_change_status` snooze + until; overslaan → skip; "on hold want…" → hold + reason; hervatten → resume; heropenen → reopen.
-- "X moet eerst" → `tasks_link` blocked_by. A waiting task can't be completed: say what it waits for; `force` only when the person insists.
-- Linked payments/waste: only people and notes change; skip instead of deleting. Payment completion marks paid; reopening marks unpaid.
-- Things to buy for a task: `materials` on add/update.
-- Children complete and tick off their own tasks and comment; adding, editing, deleting is for adults.
-- Relative dates: see the Household section.
+- Tasks: title, date/time, assignees, priority, room, device, checklist, materials. Recurring completion finishes one occurrence.
+- Tonight → `tasks_list_open` today; assigned to me → mine/person. Summary/todayRemaining cover the household; items are filtered. If personal results are empty, name household tasks/assignees. Never claim names are inaccessible.
+- Notes/dependencies/history → `tasks_details`; disambiguate title/date. Hold → on_hold; closed → done.
+- Repeat → repeat + dueDate (first occurrence). Every Sunday 18:00 → weekly, weekdays ["sun"], time "18:00". Take turns → rotate.
+- Timeslot → time + endTime. Multiple days → dueDate + endDate, no time. Reminder → time + remind true/minutes; no day means today.
+- Edit only changed fields with `tasks_update`. Snooze/skip/hold(reason)/resume/reopen → `tasks_change_status`.
+- Prerequisite → `tasks_link` blocked_by. Explain blockers; force only if the person insists. Purchases → materials on add/update.
+- Payment/waste title/type/dates follow their origin. People/notes/materials/device can change; skip rather than delete. Payment completion marks paid; reopening marks unpaid.
+- Resolve device, then pass device to add/update/list (maintenance type for maintenance). Never infer linkage from notes/room. Omission keeps it; noDevice true unlinks. Deleting a device retains tasks/history. done + device includes old closed tasks; recurring occurrence history is in details. No HA command is implied.
+- Children complete/tick assigned tasks and comment; adults add/edit/delete. Relative dates: Household.

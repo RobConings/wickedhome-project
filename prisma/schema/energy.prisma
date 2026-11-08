@@ -69,6 +69,10 @@ model Appliance {
   ratedPowerW   Int?
   standbyPowerW Int?
   notes         String?
+  /// This meter is included in the selected parent, never additional consumption.
+  parentApplianceId String?
+  parentAppliance Appliance? @relation("EnergyApplianceBranches", fields: [parentApplianceId], references: [id], onDelete: SetNull)
+  childAppliances Appliance[] @relation("EnergyApplianceBranches")
   meters        EnergyMeter[]
   device        Device?
   createdAt     DateTime          @default(now())
@@ -76,6 +80,7 @@ model Appliance {
 
   @@index([householdId])
   @@index([placeId])
+  @@index([parentApplianceId])
   @@map("appliances")
 }
 

@@ -1,7 +1,8 @@
+import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import { LinkIcon, PackageCheckIcon, PlusIcon, ReceiptIcon, RepeatIcon, UnlinkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useFetcher } from "react-router";
+import { useFetcher } from "react-router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -103,6 +104,7 @@ export function ProjectExpensesSection({
                   </Link>
                   <span className={cn("text-xs text-muted-foreground", overdue && "text-destructive")}>
                     {expense.paidOn ? t("expenses.paidOn", { date: text.date(expense.paidOn) }) : t("expenses.dueOn", { date: text.date(expense.dueDate) })}
+                    {expense.totalAmountCents !== undefined && expense.totalAmountCents !== expense.amountCents && <> · {t("expenses.shareOf", { amount: text.money(expense.totalAmountCents) })}</>}
                     {onInvoice(expense.id) > 0 && <> · {t("invoice.count", { count: onInvoice(expense.id) })}</>}
                   </span>
                 </div>

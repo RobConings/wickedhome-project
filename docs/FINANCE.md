@@ -453,3 +453,9 @@ record again), project cover images, the payment QR.
 1. Expenses (merge, payment methods, references, payer, QR, calendar source, migration).
 2. Income, joint accounts with ledger and corrections, money flow page.
 3. Projects and their budgets in the money flow.
+
+## Mixed purchase costs and project shares
+
+An expense remains the account's one gross payment. The explicit allocation editor assigns project and household shares in integer cents and shows any unallocated remainder. Project budgets use their assigned share, including the effective project of task-linked materials; account activity never sums these shares as new payments.
+
+Legacy single-project expenses retain their meaning until deliberately allocated. Explicit shares disable the older single-project picker. A gross-amount reduction below assigned costs is rejected. Removing a project share requires reviewing invoice-material links. Recurring-template edits cannot silently replace allocated unpaid instances. See [Purchases](PURCHASES.md) for locking, retry identity, goods-purpose separation and MCP operations.

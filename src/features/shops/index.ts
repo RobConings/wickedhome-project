@@ -2,6 +2,7 @@
 export { ShopBadge } from "./components/shop-badge";
 export { ShopLogo } from "./components/shop-logo";
 export { ShopPicker } from "./components/shop-picker";
+export { ShopDestinationPicker } from "./components/shop-destination-picker";
 export { ShopTypeIcon } from "./components/shop-type-icon";
 export { shopAction, shopLoader, shopsAction, shopsLoader } from "./data/shops-loaders";
 export { fetchShop, fetchShops, fetchShopGroups, createShopGroup, updateShopGroup, deleteShopGroup } from "./data/shops-requests";

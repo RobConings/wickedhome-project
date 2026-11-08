@@ -10,7 +10,7 @@ import type { Place } from "@/features/places";
 import { useOpenFromUrl } from "@/lib/open-from-url";
 import { useSamePagePending } from "@/lib/pending";
 import { TaskFilterControls, TaskViewTabs } from "../components/task-filters-bar";
-import { TaskFormDialog, type TaskProjectField } from "../components/task-form-dialog";
+import { TaskFormDialog, type TaskProjectField, type TaskDeviceField } from "../components/task-form-dialog";
 import { TaskList } from "../components/task-list";
 import { TaskTodayProgress } from "../components/task-today-progress";
 import {
@@ -35,6 +35,7 @@ type TasksScreenProps = {
   currentHabitantId?: string | null;
   /** Optional "Project" field in the task form, composed by the route. */
   projectField?: TaskProjectField;
+  deviceField?: TaskDeviceField;
 };
 
 /**
@@ -42,7 +43,7 @@ type TasksScreenProps = {
  * errands, bins and other linked tasks), by day, with today's progress and an "All done" moment. Views
  * and filters live in the URL.
  */
-export function TasksScreen({ overview, habitants, places, canManage, currentHabitantId, projectField }: TasksScreenProps) {
+export function TasksScreen({ overview, habitants, places, canManage, currentHabitantId, projectField, deviceField }: TasksScreenProps) {
   const { t } = useTranslation("tasks");
   // Filters apply in the browser; this covers reloads (after a change elsewhere, or live updates).
   const pending = useSamePagePending();
@@ -73,7 +74,7 @@ export function TasksScreen({ overview, habitants, places, canManage, currentHab
       places={places}
       today={overview.today}
       defaults={{ type: filters.type ?? undefined, placeId: filters.place, assigneeIds: filters.assignee ? [filters.assignee] : [] }}
-      projectField={projectField}
+      projectField={projectField} deviceField={deviceField}
       trigger={
         <Button>
           <PlusIcon />
@@ -133,7 +134,7 @@ export function TasksScreen({ overview, habitants, places, canManage, currentHab
           places={places}
           today={overview.today}
           defaults={{ placeId: filters.place }}
-          projectField={projectField}
+          projectField={projectField} deviceField={deviceField}
           open
           onOpenChange={setCreating}
         />

@@ -1,6 +1,9 @@
 # Energy — design notes
 
-Electricity and gas; water is modelled for later. Research checked October 2026 (Flanders, Fluvius, Home Assistant).
+Electricity and gas; water is modelled for later. Research recorded in October 2026 (Flanders, Fluvius, Home Assistant). Source-format labels below are
+kept verbatim because imports recognise those values. The existing implementation provides measurements
+and capacity information; the tariff/cost presentation in the redesign is proposed work, not a new
+financial capability established by these notes.
 
 ## Data sources, in the order they arrive
 

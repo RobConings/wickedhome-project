@@ -1,7 +1,7 @@
 import * as React from "react";
-import { ArrowLeftIcon, PencilIcon, Trash2Icon } from "lucide-react";
+import { PencilIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useFetcher } from "react-router";
+import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
@@ -31,14 +31,7 @@ export function CalendarEventScreen({ data, canManage, renderShopList }: Calenda
 
   return (
     <PageContainer className="max-w-3xl gap-6">
-      <Button asChild variant="ghost" size="sm" className="self-start">
-        <Link to={`/calendar?date=${event.startDate}`}>
-          <ArrowLeftIcon />
-          {t("eventPage.back")}
-        </Link>
-      </Button>
-
-      <PageHeader
+      <PageHeader backTo={`/calendar?date=${event.startDate}`}
         title={
           <span className="flex items-center gap-3">
             <span className="size-3.5 shrink-0 rounded-full" style={{ backgroundColor: event.color }} aria-hidden="true" />

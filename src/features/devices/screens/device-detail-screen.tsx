@@ -1,11 +1,13 @@
 import type * as React from "react";
-import { ArrowLeftIcon, MapIcon, MapPinOffIcon, PencilIcon, Trash2Icon, ZapIcon } from "lucide-react";
+import { ActivityIcon, ListChecksIcon, FolderIcon, MapIcon, MapPinIcon, SlidersHorizontalIcon, MapPinOffIcon, PencilIcon, Trash2Icon, ZapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher } from "react-router";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
+import { RecordImage } from "@/components/shared/record-image";
+import { RelatedRecordCards, type RelatedRecordLink } from "@/components/shared/related-record-cards";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { DescriptionItem, DescriptionList } from "@/components/shared/description-list";
 import { InlineAlert } from "@/components/shared/inline-alert";
@@ -37,6 +39,10 @@ type DeviceDetailScreenProps = {
   renderEntityPicker?: (props: DeviceEntityPickerProps) => React.ReactNode;
   /** Extra header actions for everyone, composed by the route (the notifications feature's "Notify me"). */
   headerActions?: React.ReactNode;
+  controls?: React.ReactNode;
+  attachments?: React.ReactNode;
+  maintenance?: React.ReactNode;
+  coverChooser?: React.ReactNode;
   live?: boolean;
   now?: number;
 };
@@ -51,6 +57,10 @@ export function DeviceDetailScreen({
   canManage,
   renderEntityPicker,
   headerActions,
+  controls,
+  attachments,
+  maintenance,
+  coverChooser,
   live = true,
   now: fixedNow,
 }: DeviceDetailScreenProps) {
@@ -67,12 +77,7 @@ export function DeviceDetailScreen({
   return (
     <PageContainer>
       <PageHeader
-        eyebrow={
-          <Link to="/devices" className="inline-flex items-center gap-1 hover:underline">
-            <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-            {t("page.title")}
-          </Link>
-        }
+        backTo="/devices"
         title={
           <span className="flex items-center gap-3">
             <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-section-soft text-section">
@@ -120,13 +125,24 @@ export function DeviceDetailScreen({
           )
         }
       />
+      {device.imageUrl && <RecordImage src={device.imageUrl} shape="banner" alt={device.name} fallback={<DeviceIcon icon={profile.icon} className="size-12" />} />}
+      <RelatedRecordCards label={t("related.label")} items={([
+        ...(controls ? [{ id: "controls", label: t("related.controls"), to: "#device-controls", icon: SlidersHorizontalIcon, accent: "devices" } satisfies RelatedRecordLink] : []),
+        { id: "values", label: t("detail.values"), to: "#device-values", icon: ActivityIcon, accent: "devices" },
+        ...(device.place ? [{ id: "room", label: device.place.name, to: `/places/${encodeURIComponent(device.place.id)}`, icon: MapPinIcon, accent: "home" } satisfies RelatedRecordLink] : []),
+        ...(planFloorId ? [{ id: "plan", label: t("related.plan"), to: `/house?floor=${encodeURIComponent(planFloorId)}&device=${encodeURIComponent(device.id)}`, icon: MapIcon, accent: "home" } satisfies RelatedRecordLink] : []),
+        ...(maintenance ? [{ id: "maintenance", label: t("maintenance.title"), to: "#device-maintenance", icon: ListChecksIcon, accent: "tasks" } satisfies RelatedRecordLink] : []),
+        ...(attachments ? [{ id: "documents", label: t("related.documents"), to: "#device-documents", icon: FolderIcon, accent: "documents" } satisfies RelatedRecordLink] : []),
+        ...(canManage ? [{ id: "sources", label: t("bindings.title"), to: "#device-sources", icon: SlidersHorizontalIcon, accent: "integrations" } satisfies RelatedRecordLink] : []),
+      ] satisfies RelatedRecordLink[])} />
       {remove.data?.formError && <InlineAlert tone="error">{remove.data.formError}</InlineAlert>}
 
+      {controls}
       <PageGrid columns="main-sidebar">
         <Card>
           <CardHeader>
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <CardTitle>{t("detail.values")}</CardTitle>
+              <CardTitle id="device-values" className="scroll-mt-20" tabIndex={-1}>{t("detail.values")}</CardTitle>
               <span className="flex flex-wrap items-center gap-2">
                 {live && <LiveStatusBadge refreshing={refreshing} />}
                 {state && <DeviceStateChip state={state} />}
@@ -186,13 +202,16 @@ export function DeviceDetailScreen({
         {canManage && (
           <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle>{t("bindings.title")}</CardTitle>
+              <CardTitle id="device-sources" className="scroll-mt-20" tabIndex={-1}>{t("bindings.title")}</CardTitle>
               <CardDescription>{t("bindings.description")}</CardDescription>
             </CardHeader>
             <DeviceBindingsForm key={`${device.profileId}-${profile.fields.length}`} device={device} profile={profile} renderEntityPicker={renderEntityPicker} />
           </Card>
         )}
       </PageGrid>
+      {maintenance && <Card id="device-maintenance" className="scroll-mt-20"><CardTitle>{t("maintenance.title")}</CardTitle><CardDescription>{t("maintenance.description")}</CardDescription>{maintenance}</Card>}
+      {coverChooser && <Card><CardTitle>{t("related.photo")}</CardTitle>{coverChooser}</Card>}
+      {attachments && <section id="device-documents" className="scroll-mt-20" tabIndex={-1} aria-label={t("related.documents")}>{attachments}</section>}
     </PageContainer>
   );
 }

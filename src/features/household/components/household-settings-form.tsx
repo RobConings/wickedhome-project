@@ -61,9 +61,9 @@ export function HouseholdSettingsForm({ settings, canManage }: HouseholdSettings
 
   return (
     <Card id="household-settings">
-      <fetcher.Form method="post" noValidate className="flex flex-col gap-5">
+      <fetcher.Form method="post" noValidate className="flex min-w-0 flex-col gap-5">
         <input type="hidden" name="intent" value={HOUSEHOLD_SETTINGS_INTENT} />
-        <fieldset disabled={busy || !canManage} className="flex flex-col gap-5">
+        <fieldset disabled={busy || !canManage} className="flex min-w-0 flex-col gap-5">
           {result?.formError && <InlineAlert tone="error">{result.formError}</InlineAlert>}
 
           <FormField label={t("settings.fields.name")} htmlFor="household-name" errors={errors("name")}>

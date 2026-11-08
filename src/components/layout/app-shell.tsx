@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { LucideIcon } from "lucide-react";
-import { MenuIcon } from "lucide-react";
-import { NavLink } from "react-router";
+import { MenuIcon, MoreHorizontalIcon } from "lucide-react";
+import { Link, NavLink, matchPath, useLocation } from "react-router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -46,6 +46,7 @@ type AppShellProps = {
    * `sidebar` at the top of the desktop sidebar, under the brand. Only one of the two is visible at a time.
    */
   quickActions?: { topBar: React.ReactNode; sidebar: React.ReactNode };
+  mobileNavigation?: { items: AppShellNavItem[]; label: string; moreLabel: string };
   children: React.ReactNode;
 };
 
@@ -53,11 +54,11 @@ type AppShellProps = {
  * The frame around every signed-in page: sidebar on large screens, top bar with a slide-out menu on
  * small screens. It knows nothing about features; navigation and account content come in as props.
  */
-export function AppShell({ brand, navigation, account, menuLabel, accent, busy = false, quickActions, children }: AppShellProps) {
+export function AppShell({ brand, navigation, account, menuLabel, accent, busy = false, quickActions, mobileNavigation, children }: AppShellProps) {
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   return (
-    <div data-accent={accent} className="min-h-dvh lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
+    <div data-accent={accent} className={cn("min-h-dvh lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:[--mobile-nav-height:0px]", mobileNavigation && "[--mobile-nav-height:4.5rem] pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0")}>
       {busy && (
         <div className="fixed inset-x-0 top-0 z-50 animate-appear">
           <Progress className="h-0.5 rounded-none bg-transparent" />
@@ -69,6 +70,13 @@ export function AppShell({ brand, navigation, account, menuLabel, accent, busy =
         <ShellNavigation sections={navigation} className="flex-1 overflow-y-auto px-3 py-2" />
         <div className="border-t border-sidebar-border p-3">{account}</div>
       </aside>
+      {mobileNavigation && <nav aria-label={mobileNavigation.label} className="fixed inset-x-0 bottom-0 z-30 flex border-t bg-background/95 px-2 pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
+        {mobileNavigation.items.map((item) => <NavLink key={item.to} to={item.to} end={item.end} data-accent={item.accent}
+          className={({ isActive }) => cn("flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 text-[11px] font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring", isActive ? "bg-section-soft text-section-foreground" : "text-muted-foreground")}>
+          <item.icon className="size-5" aria-hidden="true" /><span className="max-w-full truncate">{item.label}</span>
+        </NavLink>)}
+        <button type="button" onClick={() => setMenuOpen(true)} aria-expanded={menuOpen} className="flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 text-[11px] font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"><MoreHorizontalIcon className="size-5" aria-hidden="true" />{mobileNavigation.moreLabel}</button>
+      </nav>}
 
       {/* Safe-area padding keeps the bar clear of the notch when installed as a home screen app. */}
       <header className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center gap-2 border-b bg-background/85 pt-[env(safe-area-inset-top)] pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] backdrop-blur lg:hidden">
@@ -124,6 +132,10 @@ type ShellNavigationProps = {
 };
 
 function ShellNavigation({ sections, className, onNavigate }: ShellNavigationProps) {
+  const { pathname } = useLocation();
+  const selected = sections.flatMap((section) => section.items)
+    .filter((item) => !item.disabled && matchPath({ path: item.to, end: item.end ?? false }, pathname))
+    .sort((a, b) => b.to.length - a.to.length)[0]?.to;
   return (
     <nav className={cn("flex flex-col gap-4", className)}>
       {sections.map((section, index) => (
@@ -145,7 +157,7 @@ function ShellNavigation({ sections, className, onNavigate }: ShellNavigationPro
             </p>
           )}
           {section.items.map((item) => (
-            <ShellNavLink key={item.to} item={item} onNavigate={onNavigate} />
+            <ShellNavLink key={item.to} item={item} active={item.to === selected} onNavigate={onNavigate} />
           ))}
         </div>
       ))}
@@ -154,9 +166,9 @@ function ShellNavigation({ sections, className, onNavigate }: ShellNavigationPro
 }
 
 const navItemClass =
-  "relative flex h-9 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors [&_svg]:size-4 [&_svg]:shrink-0";
+  "relative flex h-11 items-center lg:h-9 gap-3 rounded-md px-3 text-sm font-medium transition-colors [&_svg]:size-4 [&_svg]:shrink-0";
 
-function ShellNavLink({ item, onNavigate }: { item: AppShellNavItem; onNavigate?: () => void }) {
+function ShellNavLink({ item, active, onNavigate }: { item: AppShellNavItem; active: boolean; onNavigate?: () => void }) {
   const content = (
     <>
       {/* The icon carries the item's section colour; the label stays neutral and readable. */}
@@ -182,22 +194,11 @@ function ShellNavLink({ item, onNavigate }: { item: AppShellNavItem; onNavigate?
   }
 
   return (
-    <NavLink
-      to={item.to}
-      end={item.end}
-      onClick={onNavigate}
-      data-accent={item.accent}
-      className={({ isActive }) =>
-        cn(
-          navItemClass,
-          isActive
-            ? // Active: section-tinted fill, a bar in the section colour at the left edge, strong text.
-              "bg-section-soft font-semibold text-foreground before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-full before:bg-section"
-            : "text-sidebar-foreground/85 hover:bg-sidebar-accent hover:text-sidebar-foreground",
-        )
-      }
-    >
+    <Link to={item.to} onClick={onNavigate} data-accent={item.accent} aria-current={active ? "page" : undefined}
+      className={cn(navItemClass, active
+        ? "bg-section-soft font-semibold text-foreground before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-full before:bg-section"
+        : "text-sidebar-foreground/85 hover:bg-sidebar-accent hover:text-sidebar-foreground")}>
       {content}
-    </NavLink>
+    </Link>
   );
 }

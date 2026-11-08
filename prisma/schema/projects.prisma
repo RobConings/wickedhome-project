@@ -11,6 +11,8 @@ enum ProjectStatus {
 /// budget… Tasks, expenses (one-off and recurring), and shopping items (materials) link to it with `projectId`;
 /// the budget (spent / committed / remaining) is computed from those, never stored.
 model Project {
+  purchaseAllocations PurchaseProjectAllocation[]
+  expenseAllocations ExpenseProjectAllocation[]
   id                String             @id @default(cuid())
   householdId       String
   household         Household          @relation(fields: [householdId], references: [id], onDelete: Cascade)

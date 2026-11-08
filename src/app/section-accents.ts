@@ -21,6 +21,7 @@ const ACCENT_BY_SEGMENT: Record<string, SectionAccent> = {
   calendar: "calendar",
   energy: "energy",
   documents: "documents",
+  purchases: "finance",
   expenses: "finance",
   income: "finance",
   money: "finance",

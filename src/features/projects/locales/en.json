@@ -89,7 +89,8 @@
     "unpaid": "Not paid",
     "log": "Log an expense",
     "linkExisting": "Add an existing expense",
-    "linkRecurring": "Add a recurring expense"
+    "linkRecurring": "Add a recurring expense",
+    "shareOf": "Share of {{amount}} total"
   },
   "purchases": {
     "unlogged_one": "{{count}} bought material isn't an expense yet ({{amount}}).",
@@ -303,5 +304,13 @@
     "link": "Open the webshop page of {{name}}",
     "showAll": "Show all {{count}}",
     "showLess": "Show less"
+  },
+  "related": {
+    "label": "Related to this project",
+    "documents": "Documents",
+    "purchases": "Purchases"
+  },
+  "room": {
+    "empty": "No projects linked to this room."
   }
 }

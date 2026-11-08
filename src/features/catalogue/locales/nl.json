@@ -1,0 +1,12 @@
+{
+  "related": "Gekoppeld aan dit product",
+  "needs": "Boodschappenbehoeften",
+  "tasks": "Gekoppelde taken",
+  "projects": "Gekoppelde projecten",
+  "purchases": "Aankoopgeschiedenis",
+  "noNeeds": "Geen open boodschappen voor dit product.",
+  "noTasks": "Geen taken gekoppeld via de behoeften van dit product.",
+  "noProjects": "Geen projecten gekoppeld via de behoeften van dit product.",
+  "loadError": "Gekoppelde productinformatie kon niet worden geladen.",
+  "retry": "Opnieuw proberen"
+}

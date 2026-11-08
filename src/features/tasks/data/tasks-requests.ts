@@ -24,6 +24,7 @@ const taskPath = (id: string) => `/tasks/${encodeURIComponent(id)}`;
 export function fetchTasksOverview(query: TasksQuery = {}) {
   const params = new URLSearchParams();
   if (query.placeId) params.set("placeId", query.placeId);
+  if (query.deviceId) params.set("deviceId", query.deviceId);
   if (query.projectId) params.set("projectId", query.projectId);
   const search = params.toString();
   return api.get<TasksOverview>(search ? `/tasks?${search}` : "/tasks");

@@ -42,7 +42,7 @@ const layer = (files, patterns, paths = []) => ({
 });
 
 export default tseslint.config(
-  { ignores: ["dist", "node_modules", "src/api/generated", "storybook-static"] },
+  { ignores: ["docs/plans/**/site/**", "dist", "node_modules", "src/api/generated", "storybook-static"] },
 
   js.configs.recommended,
   ...tseslint.configs.recommended,

@@ -194,6 +194,7 @@ describe("finance tools", () => {
     }
     assert.deepEqual(getAssistantSkill("income")?.roles, ["owner", "adult"]);
     assert.deepEqual(getAssistantSkill("money")?.roles, ["owner", "adult"]);
-    assert.ok(finance.filter((tool) => tool.skill === "expenses" && tool.permission === "read").every((tool) => tool.roles.includes("child")));
+    assert.equal(finance.find((tool) => tool.name === "expenses.project_allocation")?.roles.includes("child"), false);
+    assert.ok(finance.filter((tool) => tool.skill === "expenses" && tool.permission === "read" && tool.name !== "expenses.project_allocation").every((tool) => tool.roles.includes("child")));
   });
 });

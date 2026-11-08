@@ -202,6 +202,9 @@ model RecurringExpense {
 /// One expense: a one-off (a bill to pay, or everyday spending logged as paid), or an instance of a
 /// RecurringExpense.
 model Expense {
+  /// Explicit project/household allocation; null retains the legacy single-project interpretation.
+  allocationHouseholdCents Int?
+  projectAllocations ExpenseProjectAllocation[]
   shoppingPayment ShoppingPayment?
   id                      String           @id @default(cuid())
   householdId             String
@@ -253,6 +256,21 @@ model Expense {
   @@index([earlyRepaymentForId])
   @@index([projectId])
   @@map("bills")
+}
+
+/// A share of one existing expense. It never creates another payment or bank-account debit.
+model ExpenseProjectAllocation {
+  id String @id @default(cuid())
+  expenseId String
+  expense Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  projectId String?
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectName String
+  amountCents Int
+
+  @@unique([expenseId, projectId])
+  @@index([projectId])
+  @@map("expense_project_allocations")
 }
 
 /// The part of a split expense one habitant pays. Shares of an expense add up to its amount.

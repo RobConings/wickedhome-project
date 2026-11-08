@@ -10,3 +10,7 @@ export {
   type DeferredDashboardData,
 } from "./data/dashboard-loaders";
 export { DashboardScreen } from "./screens/dashboard-screen";
+export { HomeRoomMap, HomeRoomMapSkeleton } from "./components/home-room-map";
+export { fetchHomeMap } from "./data/home-map-loader";
+
+export { HomeRoomSummary, useHomeWorkMarkers } from "./components/home-room-summary";

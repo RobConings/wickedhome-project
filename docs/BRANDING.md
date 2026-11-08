@@ -23,7 +23,7 @@ and switches to the inverse colours in dark mode.
 
 Calm and homely, with life: neutral surfaces, **one** call-to-action colour, the warm peach as the
 highlight, clear status colours and one accent hue per area of the app. Accents are small, purposeful
-touches (icons, chips, edges, active states, numbers), never full-colour backgrounds.
+touches (icons, chips, edges, active states, numbers). Shared cards may use soft token-based tints; avoid large saturated backgrounds that compete with content.
 
 Components only use token names (`bg-primary`, `text-section`, `bg-danger-soft`…), never hex values. All
 tokens live in `src/styles/index.css` (dark values under `.dark`); the Storybook page
@@ -151,3 +151,25 @@ Semantic solids also stay ≥ 4.5:1 on their own 12 % tint (`bg-success/12` etc.
 ## Typography
 
 Inter (variable), loaded locally from `@fontsource-variable/inter`.
+
+## Proposed visual direction
+
+The [annotated wireframes](plans/app-samenhang/preview/walkthrough.html) apply the original household-hub
+reference: warm sand/white surfaces, forest/sage branding, sunny highlights, colourful icon tiles,
+residents and meaningful progress. Warm surface overrides currently belong to the design preview only;
+the token tables above continue to describe production styling.
+
+The redesign should extend central tokens and shared variants. Features must not invent separate colour
+systems or copy local form/list controls. Progress represents actual work; skipped shopping items are
+handled but not purchased. Completion feedback stays brief and respects reduced motion. Financial and
+physical-control actions remain clear rather than rewarding extra spending or consequential commands.
+
+## Recognition through images
+
+Retain recipe/project cover banners and generous image cards during the redesign. Products and devices
+use saved photos when available; lists retain thumbnails and the shared card/list switch remembers the
+chosen view. Missing images use owner icons/colours. See the [media contract](plans/app-samenhang/visual-media.md).
+
+Related-record summaries use compact icon cards with readable labels and counts/amounts. Reuse the same
+Card/IconChip treatment across features, with section colour, a visible current state and a full-card
+touch target. Phones show two columns; desktop uses the available row width.

@@ -24,3 +24,7 @@ export const Empty: Story = { args: { overview: emptyIncomeOverviewFixture } };
 export const Mobile: Story = { globals: { viewport: { value: "mobile1" } } };
 /** While the route loads: the frame's page skeleton. */
 export const Loading: Story = { render: () => <SkeletonPage /> };
+
+export const Expected: Story = { parameters: { router: { initialEntries: ["/income?view=expected"] } } };
+export const Received: Story = { parameters: { router: { initialEntries: ["/income?view=received"] } } };
+export const Sources: Story = { parameters: { router: { initialEntries: ["/income?view=sources"] } } };

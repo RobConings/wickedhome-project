@@ -1,0 +1,12 @@
+{
+  "related": "Connected to this product",
+  "needs": "Shopping needs",
+  "tasks": "Related tasks",
+  "projects": "Related projects",
+  "purchases": "Purchase history",
+  "noNeeds": "No open shopping needs for this product.",
+  "noTasks": "No tasks linked through this product’s requirements.",
+  "noProjects": "No projects linked through this product’s requirements.",
+  "loadError": "Related product information could not be loaded.",
+  "retry": "Try again"
+}

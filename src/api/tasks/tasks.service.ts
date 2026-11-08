@@ -100,10 +100,14 @@ function assertCanComplete(user: SessionUser, row: TaskRow) {
   }
 }
 
-async function assertOwnReferences(householdId: string, input: Pick<TaskInput, "placeId" | "assigneeIds" | "projectId">) {
+async function assertOwnReferences(householdId: string, input: Pick<TaskInput, "placeId" | "assigneeIds" | "projectId" | "deviceId">) {
   if (input.placeId) {
     const place = await db.place.count({ where: { id: input.placeId, householdId } });
     if (!place) throw badRequest("Validation failed", { placeId: ["unknownPlace"] });
+  }
+  if (input.deviceId) {
+    const device = await db.device.count({ where: { id: input.deviceId, householdId } });
+    if (!device) throw badRequest("Validation failed", { deviceId: ["unknownDevice"] });
   }
   if (input.projectId) {
     const project = await db.project.count({ where: { id: input.projectId, householdId } });
@@ -149,8 +153,10 @@ export async function getTasksOverview(user: SessionUser, query: TasksQuery = {}
       where: {
         householdId: user.householdId,
         ...(query.placeId && { placeId: query.placeId }),
-        // A project shows all of its tasks; elsewhere closed ones only for a while.
-        ...(query.projectId ? { projectId: query.projectId } : { OR: [{ status: "OPEN" as const }, { closedAt: { gte: closedSince } }] }),
+        ...(query.deviceId && { deviceId: query.deviceId }),
+        ...(query.projectId && { projectId: query.projectId }),
+        // A project or device shows its complete task history.
+        ...(!query.projectId && !query.deviceId && { OR: [{ status: "OPEN" as const }, { closedAt: { gte: closedSince } }] }),
       },
       include: taskInclude,
     }),
@@ -258,6 +264,7 @@ function fieldsOf(input: TaskInput) {
     rotateAssignees: Boolean(input.rrule) && input.rotateAssignees && input.assigneeIds.length > 1,
     // Left out (undefined): an edit keeps the project; null removes it.
     ...(input.projectId !== undefined && { projectId: input.projectId || null }),
+    ...(input.deviceId !== undefined && { deviceId: input.deviceId || null }),
   };
 }
 
@@ -317,6 +324,7 @@ export async function updateTask(householdId: string, id: string, asked: TaskInp
     placeId: existing.originType ? null : asked.placeId,
     assigneeIds: asked.assigneeIds,
     projectId: asked.projectId,
+    deviceId: asked.deviceId,
   });
   // A new rule or a new first date starts on the rule's first day; a snoozed due date that stays is left alone.
   const restarts = (existing.rrule ?? null) !== (asked.rrule || null) || optionalDate(existing.dueDate) !== (asked.dueDate ?? null);
@@ -331,6 +339,7 @@ export async function updateTask(householdId: string, id: string, asked: TaskInp
           notes: input.notes || null,
           assignees: assigneesCreate(input.assigneeIds),
           ...(input.projectId !== undefined && { projectId: input.projectId || null }),
+          ...(input.deviceId !== undefined && { deviceId: input.deviceId || null }),
         },
         include: taskInclude,
       });

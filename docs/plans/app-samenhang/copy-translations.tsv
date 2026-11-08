@@ -1,0 +1,991 @@
+Eén WickedHome	One WickedHome
+Nieuw ontwerp · fictieve gegevens	New design · fictional data
+Ontwerpatlas bedienen	Browse the design atlas
+Alle onderdelen	All areas
+Onderdeel kiezen	Choose an area
+Zoek een pagina of dialoog	Find a page or dialog
+Voorbeeldformaat	Preview size
+Licht	Light
+Donker	Dark
+Mobiel	Mobile
+Normaal	Normal
+Leeg	Empty
+Laden	Loading
+Fout	Error
+Geen toegang	No access
+Geen toegang tot deze gegevens	You do not have access to these records
+Gelijktijdig gewijzigd	Changed by someone else
+Bron offline	Source offline
+Bron verouderd	Stale source
+Echte shared components	Real shared components
+Eigenaarschap, componenten en bron van dit wireframe	Ownership, components and source for this wireframe
+Gedeelde componenten:	Shared components:
+Geïnventariseerde bronvelden:	Inventoried source fields:
+Volg bijvoorbeeld:	Try this journey:
+Nieuw voorstel	New proposal
+Dialoog of nieuw voorstel	Dialog or proposed view
+Nieuwe compositie. Onderliggende componenten bestaan al.	New composition using existing building blocks.
+Velden komen uit onderliggende domeincomponenten; zie bronbestand.	Fields come from the underlying domain components; see the source file.
+. De atlas importeert ze uit src/components; domeinvalidatie en echte services worden hier niet aangeroepen.	. The atlas imports these from src/components; domain validation and real services are not called here.
+Bronvelden worden in de specificatie behouden; dit wireframe toont de primaire interactie. Voorwaardelijke velden komen onder de passende keuze.	Source fields remain in the specification. This wireframe shows the main interaction; conditional fields appear under the relevant choice.
+Ontwerp met fictieve gegevens; actuele routes, nieuwe views en echte broncomponenten zijn expliciet gemarkeerd.	Design with fictional data; current routes, proposed views and actual source components are explicitly identified.
+Ontwerpvoorbeeld · fictieve gegevens ·	Design preview · fictional data ·
+bestaande route	existing route
+voorgestelde view of dialoog	proposed view or dialog
+Catalogus	Catalogue
+Catalogus (voorgesteld)	Catalogue (proposed)
+Aankopen	Purchases
+Aankopen (voorgesteld)	Purchases (proposed)
+Boodschappen	Shopping
+Voorraad	Inventory
+Projecten	Projects
+Taken	Tasks
+Geldstroom	Cash flow
+Inkomsten	Income
+Uitgaven	Expenses
+Huishouden	Household
+Ruimtes	Spaces
+Toestellen	Devices
+Energie	Energy
+Documenten	Documents
+Recepten	Recipes
+Agenda	Calendar
+Winkels	Shops
+Instellingen	Settings
+Koppelingen	Connections
+Assistent	Assistant
+Toegang	Access
+Meldingen	Notifications
+Activiteit	Activity
+Automatiseringen	Automations
+Weer	Weather
+Afval	Waste
+Contacten	Contacts
+Vandaag	Today
+Dagelijks	Daily life
+Geldzaken	Money
+Huis en bibliotheek	Home and library
+Ons huis	Our home
+Ons huis · live	Our home · live
+Huisoverzicht	Home overview
+Beheer	Manage
+Zoeken of snelle actie	Search or quick action
+Navigatie	Navigation
+Winkels en winkelgroepen	Shops and shop groups
+Winkels en groepen	Shops and groups
+Winkelbeurten	Shopping trips
+Winkelsessies	Shopping trips
+Winkelbeurt starten	Start a shopping trip
+Winkelbeurt afronden	Finish the trip
+Winkelbeurt afgerond	Trip completed
+Nieuwe winkelbeurt plannen	Plan a shopping trip
+Winkel of winkelgroep	Shop or shop group
+Eén winkel of één winkelgroep	One shop or one shop group
+Kies winkel of winkelgroep	Choose a shop or shop group
+Kies waar je gaat winkelen	Choose where you are shopping
+Kies één winkel of één bestaande winkelgroep. De checklist volgt vanzelf.	Choose one shop or an existing shop group. Your checklist follows automatically.
+Favorieten en recent gebruikt staan eerst. Bij een groep zijn de winkels al bepaald. Geen tweede winkellijst om aan te vinken.	Favourites and recently used choices come first. A group already defines its shops; there is no second shop checklist.
+De passende boodschappen vormen automatisch je checklist. Je kunt tijdens het winkelen aantallen wijzigen, alternatieven kiezen, extra producten toevoegen en Nu niet gebruiken.	Matching shopping needs automatically become your checklist. Change quantities, choose alternatives, add extras or skip items as you shop.
+Start winkelen	Start shopping
+Winkelgroepen beheren	Manage shop groups
+Winkelgroep samenstellen	Create a shop group
+Winkelgroepen	Shop groups
+Winkelgroep maken	Create a shop group
+Naam groep	Group name
+Winkels toevoegen via selectie	Add shops using the shared picker
+Volgorde	Order
+Opslaan als favoriete groep	Save as a favourite group
+Een winkel	One shop
+Eén winkel	One shop
+Eén winkel · recent gebruikt	One shop · recently used
+Colruyt-groep	Colruyt group
+Colruyt + Collect&Go · favoriete groep	Colruyt + Collect&Go · favourite group
+Colruyt + Collect&Go · opgeslagen winkelgroep	Colruyt + Collect&Go · saved shop group
+Checklist · Colruyt-groep	Checklist · Colruyt group
+Colruyt-groep · winkelbeurt	Colruyt group · shopping trip
+Colruyt-groep · 3 producten	Colruyt group · 3 items
+Vaste producten	Recurring items
+Vast product toevoegen	Add a recurring item
+Vast product instellen	Set up a recurring item
+Wat keert terug en wanneer wil je het op je lijst?	What repeats, and when should it appear on your list?
+Boodschap toevoegen	Add a shopping item
+Boodschap aanpassen	Edit a shopping item
+Boodschappenlijst beheren	Manage a shopping list
+Boodschappen per winkel	Shopping by shop
+Boodschappen · Gamma	Shopping · Gamma
+Wat willen we meenemen?	What would we like to pick up?
+Start een winkelbeurt of ga verder waar jullie waren.	Start a trip or continue one together.
+Dezelfde behoeften, gefilterd op één winkel of groep.	The same needs, filtered to a shop or group.
+Beheer combinaties eenmaal; kies ze bij een winkelbeurt.	Set up groups once and select them when starting a trip.
+Jullie vaste winkels en handige combinaties.	Your regular shops and useful groups.
+Neem mee wat je wilt kopen; de rest kan Nu niet.	Pick up what you want; skip the rest for now.
+Nu niet	Not now
+Opnieuw opnemen	Restore item
+Aanpassen	Adjust
+Extra product meenemen	Add an extra item
+Aankoopregel aanpassen	Adjust a purchase line
+Gekocht product of gekoppeld alternatief	Purchased product or linked alternative
+Product of variant kiezen	Choose a product or variant
+Werkelijk aantal	Actual quantity
+Voorraadlocatie (optioneel)	Stock location (optional)
+Voor project of huishouden	For a project or the household
+Doel (optioneel)	Purpose (optional)
+Er staan nog producten open	Some items are still open
+De overige producten worden Nu niet. Ze worden niet gekocht en verhogen de voorraad niet.	The remaining items will be marked Not now. They are not purchased and do not increase stock.
+Overige Nu niet en afronden	Skip the rest and finish
+Verder winkelen	Keep shopping
+Klaar voor de kassa	Ready for checkout
+Samen de winkelbeurt afwerken	Finish the trip together
+Bon of uitgave bekijken	View receipt or expense
+Bonnen en betalingen	Receipts and payments
+Bon toevoegen	Add a receipt
+Bon	Receipt
+Uitgave koppelen	Link an expense
+Uitgave aan aankoop koppelen	Link an expense to a purchase
+Wat wil je nu doen?	What would you like to do next?
+Een uitgave of bon koppelen is optioneel. Reeds geboekte goederen worden niet nog eens toegevoegd.	Linking an expense or receipt is optional. Previously recorded goods are not added again.
+Gekocht, overgeslagen en voorraadstatus zijn zichtbaar te controleren.	Review purchased and skipped items and their stock status.
+Controleer de echte aantallen en koppel desgewenst de uitgave.	Review actual quantities and optionally link the expense.
+Aantallen controleren	Review quantities
+Dezelfde aankoop onderbouwen, zonder opnieuw voorraad of geld te boeken.	Add evidence for the same purchase without recording stock or money twice.
+Nieuwe behoefte bepalen	Recalculate needs
+Op	Out
+Bijna op	Nearly out
+Alles	All
+Filters en groeperen	Filters and grouping
+Filters en groepering	Filters and grouping
+Lijst beperken	Filter the list
+Nog niets toegevoegd	Nothing added yet
+Hier staat nog niets	Nothing here yet
+Voeg iets toe of koppel een bestaand gegeven.	Add something or link an existing record.
+Voeg iets toe of koppel een bestaand gegeven. Er worden geen bedragen of aantallen verzonnen.	Add something or link an existing record. Missing amounts or quantities are not invented.
+Dit onderdeel kon niet laden	This area could not load
+Je gegevens blijven behouden. Probeer opnieuw of ga terug.	Your records are preserved. Try again or go back.
+Opnieuw proberen	Try again
+Gegevens laden…	Loading records…
+Dit is intussen gewijzigd	This has changed since you opened it
+Je invoer blijft bewaard. Bekijk de actuele stand vóór je opnieuw bevestigt.	Your input is preserved. Review the current state before confirming again.
+Actuele stand bekijken	Review current state
+Deze gegevens zijn niet beschikbaar voor jouw toegang.	These records are not available with your access.
+De eigenaar bepaalt wat je mag zien. Ook verborgen financiële totalen en relaties worden niet getoond.	The owner controls access. Restricted financial totals and relationships are not displayed.
+Opgeslagen in dit ontwerpvoorbeeld. Er zijn geen echte gegevens gewijzigd.	Saved in this design preview. No real records were changed.
+Terug naar context	Back to context
+Geopend vanuit	Opened from
+Je bent hier	You are here
+Gerelateerde gegevens	Related records
+Geen gewicht verplicht	No weight required
+Household counts suffice	Household counts are enough
+Producten	Products
+Product toevoegen	Add a product
+Product bewerken	Edit a product
+Product bekijken	View product
+Eén product, bruikbaar in jullie hele huishouden.	One product used throughout your household.
+Het product en zijn gebruik in voorraad, projecten en aankopen.	The product and its use in inventory, projects and purchases.
+Catalogus beheert de identiteit; voorraad en projectgebruik komen uit hun eigen feature.	The catalogue owns identity; stock and project use come from their own features.
+Montagekit wit	White mounting adhesive
+Montagekit · voorraad	Mounting adhesive · stock
+Montagekit · gebruik in projecten	Mounting adhesive · project use
+Montagekit · winkels en varianten	Mounting adhesive · shops and variants
+De relatie loopt via benodigdheden en werkelijk gebruik.	The relationship comes from requirements and actual use.
+Dezelfde identiteit, controleerbare varianten en winkelkoppelingen.	The same identity, verified variants and shop links.
+Bekijk de echte aantallen per locatie en hun mutaties.	View actual quantities by location and their movements.
+Winkelkoppeling toevoegen	Add a shop link
+Productvariant koppelen	Link a product variant
+Winkelkoppeling	Shop link
+Voorraadeenheid	Stock unit
+Eenheid: patroon	Unit: cartridge
+Verpakkingsinhoud (optioneel)	Package contents (optional)
+Essentieel	Essential
+Productregels	Product lines
+Voorraad tellen	Count stock
+Voorraadlocatie instellen	Set up a stock location
+Voorraad voor taak gebruiken	Use stock for a task
+Wat is er in huis en waar ligt het?	What is at home, and where is it stored?
+Werk een locatie rustig af en controleer de verschillen.	Work through a location and review the differences.
+Scan een product en kies gebruiken of aanvullen.	Scan a product, then choose use or replenish.
+Tel in je eigen eenheden; controleer verschillen voor je opslaat.	Count in your own units and review differences before saving.
+Telling controleren	Review the count
+Geteld aantal per product	Counted quantity per product
+Verschillen bevestigen	Confirm differences
+Verschil controleren	Review the difference
+Aantal aanpassen	Adjust quantity
+Minimumvoorraad	Minimum stock
+Minimumvoorraad controleren	Check minimum stock
+Echte voorraad	Actual stock
+Werkelijk gebruikt aantal	Actual quantity used
+Product scannen	Scan a product
+Scanner openen	Open scanner
+Scan barcode of QR-code	Scan a barcode or QR code
+De camera staat in dit ontwerp niet aan. Een echt scanresultaat opent hetzelfde product.	The camera is not active in this preview. A real scan opens the same product record.
+Voorbeeldproduct openen	Open sample product
+Gamma · aankoop € 45,00	Gamma · €45.00 purchase
+Aankoop registreren	Record a purchase
+Aankoop verdelen	Allocate a purchase
+Aankoopdatum	Purchase date
+Aankoopregel	Purchase line
+Aankoopregels	Purchase lines
+Aankoopbron	Purchase source
+Wat is werkelijk gekocht, voor wie en waar is het verwerkt?	What was actually bought, for whom, and where was it processed?
+Drie producten, één uitgave, een duidelijke projectverdeling.	Three products, one expense and a clear project allocation.
+Aankoop / uitgave	Purchase / expense
+Eén werkelijk betaalde bon	One actually paid receipt
+Voor badkamer	For the bathroom
+Voor huishouden	For the household
+Kit en schroeven	Adhesive and screws
+Verfroller	Paint roller
+Gekoppeld en gecontroleerd	Linked and checked
+Bon → aankoopregels → voorraad → uitgave → geldstroom. Open een gerelateerd gegeven om de herkomst te zien.	Receipt → purchase lines → stock → expense → cash flow. Open a related record to trace its source.
+Aankoop · Gamma	Purchase · Gamma
+Projectverdeling	Project allocation
+Bonregels en projectverdeling	Receipt lines and project allocation
+Project of huishouden	Project or household
+Toegerekend aantal	Allocated quantity
+Toegerekend bedrag	Allocated amount
+Toerekenen aan project	Allocate to a project
+Totaal controleren	Check the total
+Bestaande uitgave of nieuwe betaling	Existing expense or new payment
+Bestaande uitgave	Existing expense
+Betaalde uitgave registreren	Record a paid expense
+Uitgave registreren	Record an expense
+Uitgave toevoegen	Add an expense
+Uitgave gekoppeld	Expense linked
+Betaling aanpassen	Edit payment
+Betaling bevestigen	Confirm payment
+Eén betaling, met aankoop, bon en projectverdeling.	One payment with its purchase, receipt and project allocation.
+Wat is betaald, wat volgt nog en waarvoor was het?	What has been paid, what is next, and what was it for?
+Bekijk de 3 aankoopregels	View the 3 purchase lines
+Betaalde uitgaven	Paid expenses
+Wat is werkelijk betaald en welke rekening is gebruikt?	What was actually paid, and which account was used?
+Gezamenlijke rekening · betaald door Rob · 7 november 2026	Joint account · paid by Rob · 7 November 2026
+Periodieke uitgaven	Recurring expenses
+Periodieke uitgave toevoegen	Add a recurring expense
+Periodieke uitgave aanpassen	Edit recurring expense
+Periodieke uitgaven openen	Open recurring expenses
+Instellingen en historie van terugkerende kosten.	Settings and history for recurring costs.
+Planning, betaalgegevens en eerdere betalingen.	Schedule, payment details and previous payments.
+Internetabonnement	Internet subscription
+Betaalrekening beheren	Manage a payment account
+Gezamenlijk of persoonlijk	Joint or personal
+Winkel of begunstigde	Shop or payee
+Betaalrekening	Payment account
+Betaler	Payer
+Inkomst registreren	Record income
+Inkomstenbron	Income source
+Inkomstenbron instellen	Set up an income source
+Wat verwachten we en wat is echt ontvangen?	What do we expect, and what has actually arrived?
+Verwacht en daadwerkelijk ontvangen blijven zichtbaar onderscheiden.	Expected and actually received remain clearly distinct.
+Ontvangst aanpassen	Edit receipt of income
+Ontvangstdatum	Received date
+Werkelijk bedrag	Actual amount
+Soort inkomst	Income type
+Ontvanger	Recipient
+Ontvangen inkomsten	Received income
+Salaris Rob	Rob's salary
+Salaris Cindy	Cindy's salary
+Salaris Rob · november	Rob's salary · November
+Maaltijdcheques	Meal vouchers
+Werkelijk bedrag nog invullen · apart van bankgeld	Enter the actual amount · separate from bank money
+Wat staat er op de rekening en wat is nog voorzien?	What is on the account, and what is still planned?
+Herleid het saldo naar ontvangen bijdragen en betaalde uitgaven.	Trace the balance back to received contributions and paid expenses.
+Werkelijk saldo	Actual balance
+Op de gezamenlijke rekening	On the joint account
+Nog te betalen	Still to pay
+Nog geen afschrijving	Not yet debited
+Verwacht na betalingen	Projected after payments
+Vooruitblik, geen echt saldo	Projection, not an actual balance
+Van beginstand tot nu	From opening balance to now
+Beginstand	Opening balance
+Werkelijke rekeningstand	Actual account balance
+Bijdragen	Contributions
+Werkelijk overgeschreven · geen tweede salarisboeking	Actually transferred · not a second salary entry
+Huur € 1.000 + energie € 132 + sanitair € 425 + Gamma € 45	Rent €1,000 + energy €132 + sanitaryware €425 + Gamma €45
+Bijdragen + € 2.800	Contributions + €2,800
+Betaalde uitgaven − € 1.602	Paid expenses − €1,602
+Beginstand € 1.200	Opening balance €1,200
+Overschrijving registreren	Record a transfer
+Bijdrage terugnemen	Return a contribution
+Bijdrageplan instellen	Set up a contribution plan
+Echt saldo vastleggen	Set actual balance
+Overige rekeningmutatie	Other account movement
+Naar rekening	To account
+Van	From
+Naar	To
+Huidig saldo	Current balance
+Gezamenlijke rekening	Joint account
+Projectbudgetten	Project budgets
+Rekeninghistoriek	Account history
+Van idee tot afgewerkt, met taken, benodigdheden en budget.	From idea to completion, with tasks, requirements and a budget.
+Project starten	Start a project
+Project openen	Open project
+Project bewerken	Edit project
+Aan project koppelen	Link to a project
+Badkamer vernieuwen	Bathroom renovation
+Badkamer · taken	Bathroom · tasks
+Badkamer · benodigdheden	Bathroom · requirements
+Badkamer · aankopen	Bathroom · purchases
+Badkamer · kosten	Bathroom · costs
+Badkamer · documenten	Bathroom · documents
+Wat is de volgende stap en hoe staat het met ons budget?	What is next, and how is the budget doing?
+Volg de volgende uitvoerbare stap en wat nog blokkeert.	Follow the next actionable step and see what is blocked.
+Benodigd, aanwezig en gekocht zijn verschillende hoeveelheden.	Required, in stock and purchased are different quantities.
+Bekijk welke aankopen dit project dienen.	See which purchases serve this project.
+€ 460 besteed, € 340 voorzien, € 1.700 nog vrij.	€460 spent, €340 planned, €1,700 remaining.
+Eén bronbestand, vanuit project én aankoop bereikbaar.	One source file, accessible from both project and purchase.
+Bestaande aankoop koppelen	Link an existing purchase
+Materiaal toevoegen	Add a material
+Factuurregels aan materialen koppelen	Link invoice lines to materials
+Samen naar een vernieuwde badkamer	Working towards a renewed bathroom
+Volgende stap: badkamermeubel monteren	Next step: install the bathroom cabinet
+Volgende haalbare stap	Next achievable step
+Volgende taak openen	Open next task
+Besteed	Spent
+Nog voorzien	Still planned
+Nog vrij	Remaining
+Werkelijke projectkosten, één keer geteld	Actual project costs, counted once
+€ 40 factuur + € 300 raming	€40 invoice + €300 estimate
+Van een budget van € 2.500	From a €2,500 budget
+Gamma: € 35 voor dit project	Gamma: €35 for this project
+De bon en uitgave zijn € 45. Kit en schroeven tellen voor € 35 mee; de verfroller van € 10 hoort bij het huishouden. De rekening wordt één keer met € 45 verminderd.	The receipt and expense total €45. Adhesive and screws account for €35; the €10 roller belongs to the household. The account is debited once for €45.
+Het materiaal is gekocht. Rob en Cindy kunnen samen starten.	The materials have been purchased. Rob and Cindy can start together.
+Benodigdheden	Requirements
+Recent gekoppeld	Recently linked
+Badkamermeubel monteren	Install the bathroom cabinet
+Tegels plaatsen	Lay the tiles
+Oude kast verwijderen	Remove the old cabinet
+Tuin opfrissen	Refresh the garden
+Tuin plannen	Plan garden work
+Wat kunnen we vandaag afwerken?	What can we finish today?
+Benodigdheden controleren en samen de taak afwerken.	Check the requirements and complete the task together.
+Taak toevoegen	Add a task
+Taak afronden	Complete task
+Taak bewerken	Edit task
+Taak uitstellen	Put task on hold
+Afhankelijkheid beoordelen	Review dependency
+Afgewerkte taak	Completed task
+Afhankelijkheden	Dependencies
+Taak en project	Task and project
+Wanneer	When
+Toegewezen aan	Assigned to
+Herhaling	Repeat
+Herinnering	Reminder
+Titel	Title
+Doel	Purpose
+Doel (optioneel)	Purpose (optional)
+Doel: huishouden, project of taak	Purpose: household, project or task
+Project of ruimte	Project or room
+Project volgende stap	Next project step
+Materiaal controleren → monteren → resultaat nakijken	Check materials → assemble → review the result
+Benodigdheden en voorraad bekijken	View requirements and stock
+Klaar om te starten	Ready to start
+Rob en Cindy · badkamer · hoort bij Badkamer vernieuwen	Rob and Cindy · bathroom · part of Bathroom renovation
+Vandaag samen	Today together
+Vandaag samen vooruit	Making progress together today
+Taken afwerken, plannen en elkaar helpen — echte voortgang.	Finish tasks, plan and help each other — real progress.
+Volgende stap	Next step
+Verder winkelen	Continue shopping
+Gedeelde checklist	Shared checklist
+Samen met Rob en Cindy	Together with Rob and Cindy
+Wat vraagt vandaag onze aandacht?	What needs our attention today?
+Recept toevoegen	Add a recipe
+Alle recepten	All recipes
+Kies een maaltijd en zie wat al in huis is.	Choose a meal and see what is already at home.
+Bereid je maaltijd voor met gekoppelde producten en voorraad.	Prepare your meal using linked products and stock.
+Kies uit de catalogus en plan daarna de maaltijd.	Choose from the catalogue, then plan the meal.
+Pasta met tomatensaus	Pasta with tomato sauce
+Groentesoep	Vegetable soup
+Aantal personen	Servings
+Ingrediënten	Ingredients
+Bereidingsstappen	Method
+Maaltijd plannen	Plan a meal
+Receptcategorieën beheren	Manage recipe categories
+Benodigdheden controleren	Check requirements
+Koken afronden	Finish cooking
+Maaltijd afgerond	Meal completed
+Samen koken	Cooking together
+Eén stap tegelijk; gebruik alleen de echte hoeveelheden.	One step at a time; record only what was actually used.
+Stap 3: laat de saus rustig sudderen	Step 3: gently simmer the sauce
+Laat de saus 10 minuten sudderen	Simmer the sauce for 10 minutes
+Gebruik 1 potje tomatenpuree. Gewicht is niet nodig om een potje te tellen.	Use 1 jar of tomato paste. No weight is needed to count a jar.
+Stap afronden	Finish step
+Ingrediënt toevoegen	Add an ingredient
+Ingrediënt toevoegen tijdens koken	Add an ingredient while cooking
+Controleer wat werkelijk is gebruikt en bewaar eventuele correcties.	Check actual use and retain any corrections.
+Terug naar recepten	Back to recipes
+Bewaar één bestand en vind de gekoppelde gegevens terug.	Store one file and find its linked records.
+Document toevoegen	Add a document
+Document koppelen	Link a document
+Bestaand document koppelen	Link an existing document
+Document bekijken	View document
+Document verplaatsen	Move document
+Documentmap beheren	Manage a document folder
+Bestand hernoemen	Rename file
+Documenten · Badkamer	Documents · bathroom
+Gekoppelde Drive-map	Linked Drive folder
+Vind bestanden bij hun bron en hun gekoppelde gegevens.	Find files by their source and linked records.
+Bekijk verwijderde bestanden en herstel wat je nodig hebt.	Review deleted files and restore what you need.
+Herstellen	Restore
+Bestand	File
+Map	Folder
+Naam	Name
+Koppelen aan	Link to
+Bij aankoop Gamma en uitgave € 45,00	Linked to Gamma purchase and €45 expense
+Bij project Badkamer vernieuwen	Linked to Bathroom renovation
+Badkamer-plan.pdf	Bathroom-plan.pdf
+Map openen	Open folder
+Afspraken, taken en geplande betalingen in één tijdlijn.	Appointments, tasks and planned payments on one timeline.
+Afspraak toevoegen	Add an appointment
+Afspraak aanpassen	Edit appointment
+Afspraak bewerken	Edit appointment
+Agenda-item bekijken	View calendar item
+Plaatsing badkamermeubel	Bathroom cabinet installation
+Wanneer, waar en met wie?	When, where and with whom?
+Datum en tijd	Date and time
+Deelnemers	Participants
+De agenda toont bronnen; wijzigingen worden verwerkt door de eigenaar van de afspraak, taak of betaling.	The calendar shows source records; changes are handled by the owner of the appointment, task or payment.
+Week van 2–8 november	Week of 2–8 November
+Afval buiten	Put waste out
+Installateur	Installer
+Profiel · wasmachine	Profile · washing machine
+Toestelprofielen	Device profiles
+Herbruikbare instellingen voor gelijkaardige toestellen.	Reusable settings for similar devices.
+Status, locatie en onderhoud van jullie toestellen.	Status, location and maintenance for your devices.
+Actuele status, onderhoud, verbruik en documenten.	Current status, maintenance, consumption and documents.
+Toestel toevoegen	Add a device
+Toestel bewerken	Edit device
+Toestel bedienen	Control device
+Toestel · bediening en bron	Device · controls and source
+Profiel toevoegen	Add a profile
+Profiel opslaan	Save profile
+Kies welke eigenschappen en bediening dit toestel krijgt.	Choose the properties and controls this device provides.
+Onderhoud plannen	Plan maintenance
+Onderhoudstaken bekijken	View maintenance tasks
+Wasmachine	Washing machine
+Koelkast	Refrigerator
+Ruimte	Room
+Ruimte beheren	Manage a room
+Ruimte toevoegen	Add a room
+Ruimte openen	Open room
+Verdieping beheren	Manage a floor
+Verdieping	Floor
+Type ruimte	Room type
+Plattegrond · gelijkvloers	Floor plan · ground floor
+Plattegrond bewerken	Edit floor plan
+Plattegrond importeren	Import floor plan
+Vind ruimtes en toestellen op hun plaats.	Find rooms and devices in their actual locations.
+Voorraad, taken en toestellen in deze ruimte.	Stock, tasks and devices in this room.
+Ruimtes, bewoners en toestellen in één overzicht.	Rooms, residents and devices in one overview.
+Wat gebeurt waar in huis?	What is happening where at home?
+Het plan houdt een eigen werkvlak; ruimtegegevens en gerelateerde inhoud gebruiken dezelfde recordstructuur.	The floor plan keeps its own workspace; room information and related content use the same record structure.
+Woonkamer	Living room
+Badkamer	Bathroom
+Keuken	Kitchen
+Berging	Pantry
+Bewoner bewerken	Edit resident
+Bewoner toevoegen	Add a resident
+Type bewoner	Resident type
+Wie woont hier en wat doen we samen?	Who lives here, and what are we doing together?
+Bewoners	Residents
+Bewoner uitnodigen	Invite a resident
+Account koppelen	Link account
+Bewoners en accounts	Residents and accounts
+Contact toevoegen	Add a contact
+Contact bewerken	Edit contact
+Vind de juiste persoon, leverancier of vakman.	Find the right person, supplier or professional.
+Soort contact	Contact type
+Telefoon	Phone
+E-mailadres	Email address
+Vakmensen en leveranciers	Professionals and suppliers
+Begrijp jullie verbruik, kosten en vooruitblik.	Understand consumption, costs and the outlook.
+Verbruik per toestel	Consumption by device
+Welke toestellen verklaren het verbruik?	Which devices explain the consumption?
+Energie instellen	Set up energy
+Energietoestel instellen	Set up an energy device
+Energiegegevens importeren	Import energy data
+Energie · live en herkomst	Energy · live and source
+Koppel meters en leg de juiste tarieven vast.	Connect meters and configure the correct tariffs.
+Controleer het bestand en de gevonden metergegevens.	Review the file and detected meter data.
+Metingen en actualiteit onderscheiden van tarieframing en echte uitgave.	Separate measurements and freshness from cost estimates and actual expenses.
+Meter bekijken	View meter
+Zonnepanelen instellen	Set up solar panels
+Batterij instellen	Set up battery
+Gasmeting instellen	Set up gas metering
+Meetperiode	Measurement period
+Tarief	Tariff
+Kostenraming	Estimated cost
+Op basis van tarief	Based on the tariff
+Geen geboekte uitgave	Not a recorded expense
+Elektriciteit vandaag	Electricity today
+Gas vandaag	Gas today
+Verloop door de dag	Daily pattern
+Schematische energiegrafiek	Schematic energy chart
+Meetgegevens verklaren het verbruik. Werkelijke uitgaven blijven in Uitgaven.	Measurements explain consumption. Actual expenses remain in Expenses.
+Verbruik uitleggen	Explain consumption
+Metingen, zon en batterij	Measurements, solar and battery
+Bestand kiezen → controleren → verwerken	Choose file → review → process
+Voorbeeldbestand kiezen	Choose sample file
+De preview toont de gevonden gegevens en mogelijke dubbels vóór bevestiging.	The preview shows detected data and possible duplicates before confirmation.
+Huisentiteit kiezen	Choose a home entity
+Huisentiteiten koppelen	Link home entities
+Home Assistant · entiteiten	Home Assistant · entities
+Home Assistant · verbinding	Home Assistant · connection
+Home Assistant · verbonden	Home Assistant · connected
+Koppeling, entiteiten en echte huisstatus.	Connection, entities and actual home status.
+Vind gekoppelde entiteiten op ruimte, type en beschikbaarheid.	Find linked entities by room, type and availability.
+Entiteit koppelen	Link entity
+De echte bronstatus en toegestane bediening, met actualiteit.	Actual source state and permitted controls, with freshness.
+Koppel bestaande entiteiten aan onze toestellen en ruimtes, zonder duplicaten.	Link existing entities to devices and rooms without creating duplicates.
+Home Assistant-entiteit	Home Assistant entity
+Bestaand toestel of nieuw toestel	Existing device or new device
+Ondersteunde bediening controleren	Check supported controls
+Koppeling opslaan	Save link
+Huisstanden	Home modes
+Bestaande Home Assistant-scènes herkenbaar starten met de juiste bevoegdheden.	Run existing Home Assistant scenes using clear choices and appropriate permissions.
+Huisstand kiezen	Choose a home mode
+Huisstand bekijken en starten	Review and run home mode
+Verbinding, synchronisatie en bronproblemen begrijpen.	Understand connection, synchronisation and source issues.
+Verbinding controleren	Check connection
+Verbinding en synchronisatie	Connection and synchronisation
+Verbinding beheren	Manage connection
+Wat is de toestand van het huis en wat kunnen we eenvoudig doen?	How is the home doing, and what can we easily do?
+Klimaat, verlichting en gekoppelde taken in deze ruimte.	Climate, lighting and linked tasks in this room.
+Woonkamer · live	Living room · live
+Lamp woonkamer · bron en status	Living room lamp · source and state
+Alleen bediening tonen die het toestel en de bron werkelijk ondersteunen.	Show only controls supported by the device and its source.
+Bron: Home Assistant	Source: Home Assistant
+Bron: Home Assistant · 15 seconden geleden bijgewerkt	Source: Home Assistant · updated 15 seconds ago
+Bron en mogelijkheden	Source and capabilities
+Bron niet actueel	Source is not current
+Bronnen en toestellen koppelen	Link sources and devices
+Laatste bronstatus kan niet worden bevestigd; bediening is uitgeschakeld.	The current source state cannot be confirmed; controls are disabled.
+Laatste meting 2 uur geleden. Bediening wacht op een actuele verbinding.	Last measurement 2 hours ago. Controls require a current connection.
+Home Assistant is niet bereikbaar. Geen veronderstelde actuele waarden.	Home Assistant is unreachable. Current values are not assumed.
+Home Assistant verbonden · laatst bijgewerkt 15 seconden geleden	Home Assistant connected · updated 15 seconds ago
+Onbekend / niet actueel	Unknown / not current
+Niet actueel	Not current
+Live verbonden	Connected live
+Je huis in één oogopslag	Your home at a glance
+Huisstatus vraagt aandacht	Home status needs attention
+Binnen	Inside
+Buiten	Outside
+Andere bron: weergegevens	Different source: weather provider
+Verlichting	Lighting
+Alarm	Alarm
+Beveiligde bediening blijft apart	Secure controls remain separate
+Licht en klimaat	Lighting and climate
+Bediening volgens mogelijkheden	Controls based on capabilities
+Wie woont hier en doet wat	Who lives here and does what
+Bijvoorbeeld: avond of weg	For example: evening or away
+Ophaalschema en taken	Collection schedule and tasks
+Plannen in en rond het huis	Planning in and around the home
+Herkenbare bediening	Familiar controls
+Alleen getoonde mogelijkheden worden bestuurbaar. Deze knoppen bedienen uitsluitend het ontwerpvoorbeeld.	Only supported capabilities are controllable. These buttons affect the design preview only.
+Lamp schakelen	Toggle lamp
+Huisentiteiten koppelen	Link home entities
+Wasmachine · gekoppeld	Washing machine · linked
+Woonkamer · comfortabel	Living room · comfortable
+Een huisstand kiezen	Choose a home mode
+Licht in de woonkamer	Living room lighting
+Lamp woonkamer	Living room lamp
+Lamp woonkamer openen	Open living room lamp
+Open het toestel voor zijn echte status en ondersteunde bediening.	Open the device for its actual state and supported controls.
+In deze ruimte	In this room
+Status en mogelijkheden per toestel	State and capabilities by device
+Gekoppelde entiteiten	Linked entities
+Ruimtes en toestellen koppelen	Link rooms and devices
+Bestaande gegevens hergebruiken	Reuse existing records
+Bestaande scènes herkenbaar bedienen	Run existing scenes using familiar controls
+Actualiteit, problemen en herstel	Freshness, issues and recovery
+Wat dit toestel ondersteunt	What this device supports
+In dit voorbeeld levert de wasmachine alleen sensorgegevens. Start- en stopbediening verschijnt alleen wanneer de gekoppelde bron dat daadwerkelijk ondersteunt.	This example washing machine provides sensor readings only. Start and stop controls appear only when the linked source actually supports them.
+Aan · dimbaar · 65% helderheid	On · dimmable · 65% brightness
+Licht schakelen in voorbeeld	Toggle light in preview
+Gekoppeld aan woonkamer. Ondersteunt aan/uit en dimmen. Autorisatie en uitvoering lopen via de centrale Home Assistant-service.	Linked to the living room. Supports on/off and dimming. Authorisation and execution use the central Home Assistant service.
+Avond	Evening
+Weg van huis	Away from home
+Woonkamerlichten zachter en de ingestelde avondscène	Dim living room lights and apply the configured evening scene
+Alleen de bestaande, expliciet gekoppelde Home Assistant-scène	Only the existing, explicitly linked Home Assistant scene
+Alarm inschakelen	Arm alarm
+Alarm uitschakelen	Disarm alarm
+Actuele alarmstatus	Current alarm state
+Gewenste actie	Requested action
+Beveiligde bevestiging	Secure confirmation
+AI verbinden	Connect AI
+Bekijk welke gegevens deze AI mag lezen of aanpassen.	Review which records this AI may read or change.
+De AI vraagt toegang om gegevens te lezen en wijzigingen voor te stellen. Bevestigingen voor echte wijzigingen blijven gelden.	The AI requests permission to read records and propose changes. Confirmations for real changes still apply.
+Verbinding toestaan	Allow connection
+Toegestane gegevens	Permitted records
+Lezen of wijzigen	Read or change
+Toepassing	Application
+Nieuw gesprek	New conversation
+Gesprek · badkamer	Conversation · bathroom
+Gesprek over de badkamer	Conversation about the bathroom
+Handel met dezelfde gegevens en regels als in de app.	Work with the same records and rules as the app.
+Je bericht	Your message
+Wat heb ik nodig voor de badkamer?	What do I need for the bathroom?
+Er horen 2 patronen montagekit en 1 doos schroeven bij de taak. In de garage zijn 3 patronen kit aanwezig.	The task needs 2 cartridges of adhesive and 1 box of screws. There are 3 cartridges in the garage.
+Open gekoppelde benodigdheden	Open linked requirements
+Voorkeuren	Preferences
+Instelling	Setting
+Instelling openen	Open setting
+Waarde	Value
+Van toepassing op	Applies to
+Duidelijke ingangen voor huishouden, voorkeuren en beheer.	Clear destinations for household, preferences and management.
+Huishouden instellen	Household settings
+Adres, bewoners en taal op één herkenbaar formulier.	Address, residents and language in one familiar form.
+Adres, bewoners en voorkeuren	Address, residents and preferences
+Meldingsvoorkeuren	Notification preferences
+Kies welke meldingen waar mogen verschijnen.	Choose which notifications appear where.
+Kies kanalen en soorten	Choose channels and types
+Mijn account	My account
+Eigen toegang, sessies en wachtwoord beheren.	Manage your access, sessions and password.
+Accounts en uitnodigingen	Accounts and invitations
+Bepaal wie toegang heeft en met welke rol.	Choose who has access and with which role.
+AI en MCP	AI and MCP
+Verbindingen, rechten en bevestigingen zijn controleerbaar.	Connections, permissions and confirmations are inspectable.
+Toegang, context en bevestiging	Access, context and confirmation
+Weergave en spelplezier	Appearance and playfulness
+Thema, minder beweging en speelse voortgang naar voorkeur.	Theme, reduced motion and playful progress to suit your preferences.
+Thema en minder beweging	Theme and reduced motion
+Verbindingen, geplande taken en hun werking	Connections, scheduled jobs and their operation
+Planning, uitvoering, pauzeren en fouten zichtbaar beheren.	Clearly manage schedules, execution, pausing and errors.
+Planning en resultaat	Schedule and result
+Wie veranderde wat en bij welk gegeven?	Who changed what, and on which record?
+Automatisering · voorraad	Automation · inventory
+Wat doet deze taak, wanneer en wat was het resultaat?	What does this job do, when, and what was its result?
+Eenmalig uitvoeren	Run once
+Laatste uitvoering	Last execution
+Gebeurtenis	Event
+Gekoppeld gegeven	Linked record
+Details openen	Open details
+Afval instellen	Waste settings
+Ophaalschema, fracties en taakherinneringen.	Collection schedule, waste types and task reminders.
+Afvalkalender	Waste calendar
+Wat moet buiten, wanneer en wie doet het?	What goes out, when, and who handles it?
+Weer instellen	Weather settings
+Locatie en eenvoudige weergavevoorkeuren.	Location and simple display preferences.
+Locatie en weergave	Location and display
+Weer voor vandaag	Today's weather
+Nuttige informatie voor plannen in en rond het huis.	Useful context for planning in and around the home.
+E-mailvoorstellen	Email suggestions
+Controleer voorgestelde taken, uitgaven en documenten vóór verwerking.	Review proposed tasks, expenses and documents before processing.
+Koppeling controleren	Check connection
+Verbinding, synchronisatie en eventuele fouten opvolgen.	Monitor connection, synchronisation and errors.
+Koppeling toevoegen	Add connection
+Welke diensten zijn verbonden en wat synchroniseren ze?	Which services are connected, and what do they synchronise?
+E-mailvoorstel controleren	Review email suggestion
+E-mailregels beheren	Manage email rules
+E-mail aan gegeven koppelen	Link email to a record
+Dienst	Service
+Verbinding	Connection
+Wat synchroniseren	What to synchronise
+Toestemming	Permission
+Wie heeft toegang	Who has access
+Wat vraagt aandacht en wat is al afgehandeld?	What needs attention, and what has been handled?
+Alles gelezen	Mark all as read
+Bijbehorend gegeven	Related record
+Welk kanaal	Which channel
+Kanaal	Channel
+Soort melding	Notification type
+Welkom thuis	Welcome home
+Meld je aan bij jullie huishouden.	Sign in to your household.
+Aanmelden	Sign in
+Opnieuw aanmelden	Sign in again
+Afgemeld	Signed out
+Je sessie is afgesloten.	Your session has ended.
+Jullie huishouden starten	Set up your household
+Een paar eenvoudige keuzes om samen te beginnen.	A few simple choices to get started together.
+Doorgaan	Continue
+Toegang tot WickedHome	Access to WickedHome
+Aanvaard je uitnodiging of stel een nieuw wachtwoord in.	Accept your invitation or set a new password.
+Nieuw wachtwoord	New password
+Wachtwoord herhalen	Repeat password
+Wachtwoord	Password
+Jouw huishouden	Your household
+Eén account, gedeelde gegevens, eigen rechten	One account, shared records and individual permissions
+Uitnodigingslink delen	Share invitation link
+Ontvanger	Recipient
+Geldigheid	Validity
+Link delen	Share link
+Deze pagina bestaat niet	This page does not exist
+Ga terug naar een herkenbaar onderdeel van de app.	Return to a familiar part of the app.
+Naar Vandaag	Go to Today
+Doorverwijzing naar uitgaven	Redirect to Expenses
+Bestaande links blijven uitkomen bij dezelfde uitgave.	Existing links still reach the same expense.
+Doorverwijzing naar periodieke uitgaven	Redirect to recurring expenses
+Bestaande links blijven werken.	Existing links keep working.
+Uitgaven openen	Open expenses
+Een korte, herkenbare handeling met dezelfde selectie, validatie en bevestiging.	A short, familiar action using the same selection, validation and confirmation patterns.
+Duidelijke, korte handeling	A clear, short action
+Het formulier gebruikt GeneralFormDialog met dezelfde EntityPicker-selecties als elders.	This form uses GeneralFormDialog with the same EntityPicker selections as elsewhere.
+Dialoog openen	Open dialog
+Kies herkenbare gegevens; de eigenaar verwerkt de actie en bewaart de relaties.	Choose recognisable records; the owner processes the action and preserves its relationships.
+Opslaan	Save
+Bevestigen	Confirm
+Zoeken	Search
+Kiezen	Choose
+Bewerken	Edit
+Openen	Open
+Bewaren als voorkeur	Save as a preference
+Afgehandeld	Handled
+Afgerond	Completed
+Afhankelijkheid	Dependency
+Soort gegeven	Record type
+Groeperen op	Group by
+Periode	Period
+Toelichting	Note
+Notitie (optioneel)	Note (optional)
+Aantal	Quantity
+Aantal personen	Servings
+Naam	Name
+Ruimte	Room
+Locatie	Location
+Einddatum	End date
+Begindatum	Start date
+Soort contact	Contact type
+Type winkel	Shop type
+Website	Website
+Categorie	Category
+Budget (optioneel)	Budget (optional)
+Laatste aankoop	Latest purchase
+Nodig voor taak	Required for task
+In huis	At home
+Voorraadlocatie	Stock location
+Houdbaar tot	Best before
+Benodigdheden	Requirements
+Producten · 3	Products · 3
+Taken · 1	Tasks · 1
+Taken · 3	Tasks · 3
+Materialen · 3	Materials · 3
+Aankopen · 1	Purchases · 1
+Aankopen · 2	Purchases · 2
+Documenten · 2	Documents · 2
+Projecten · 1	Projects · 1
+Voorraad · 3 patronen	Stock · 3 cartridges
+Winkels / varianten	Shops / variants
+Project · € 35	Project · €35
+Kosten · € 460	Costs · €460
+Uitgave · € 45	Expense · €45
+Bon · 1	Receipt · 1
+Project · actief	Project · active
+Gebruikt door taak	Used by task
+Schroeven	Screws
+Tegels	Tiles
+Verfroller	Paint roller
+Tomatenpuree	Tomato paste
+Restafval	Residual waste
+Papier en karton	Paper and cardboard
+Transport badkamer	Bathroom delivery
+Transportfactuur ontvangen	Delivery invoice received
+Cindy heeft melk meegenomen	Cindy picked up milk
+Rob · mijn account	Rob · my account
+Bedrag	Amount
+Bankrekening	Bank account
+Meter	Meter
+Energiedrager	Energy carrier
+Profiel	Profile
+Kleur	Colour
+Type bewoner	Resident type
+Bestandsnaam	File name
+Entiteit	Entity
+Gekoppelde entiteit	Linked entity
+Actief	Active
+Actuele stand	Current state
+Bestaand gegeven	Existing record
+Met voorraad	With stock
+Zonder voorraad	Without stock
+Nog te doen	To do
+Voldoende	Sufficient
+Onderhoud	Maintenance
+Gekoppeld	Linked
+Zonder koppeling	Not linked
+Ontvangen	Received
+Verwacht	Expected
+Lopend	In progress
+Bron	Source
+Status onbekend	State unknown
+Beschikbaar	Available
+Temperatuur	Temperature
+Vermogen	Power
+Beveiligde bevestiging	Secure confirmation
+Wat dit toestel ondersteunt	What this device supports
+In deze ruimte	In this room
++ € 2.800,00 · werkelijk overgeschreven	+ €2,800.00 · actually transferred
+1 doos aanwezig · Badkamer vernieuwen	1 box in stock · Bathroom renovation
+1 doos nodig · gekocht · € 16	1 box required · purchased · €16
+1 doos · € 16 · project badkamer	1 box · €16 · bathroom project
+1 pot · Collect&Go	1 tub · Collect&Go
+1 potje · Colruyt	1 jar · Colruyt
+1 potje · Colruyt · Bijna op	1 jar · Colruyt · Nearly out
+1 stuk · € 10 · huishouden	1 piece · €10 · household
+12,4 kWh vandaag · meetgegevens	12.4 kWh today · measured data
+12° · regen in de namiddag	12° · rain in the afternoon
+2 nodig · 3 aanwezig · 2 gekocht · € 19	2 required · 3 in stock · 2 purchased · €19
+2 pakken · Colruyt	2 packs · Colruyt
+2 pakken · Colruyt · Op	2 packs · Colruyt · Out
+2 patronen kit en 1 doos schroeven. Open de gekoppelde materialen.	2 cartridges of adhesive and 1 box of screws. Open the linked materials.
+2 patronen · Gamma · taak badkamermeubel	2 cartridges · Gamma · bathroom cabinet task
+2 personen · 1 product nog meenemen	2 servings · 1 product still to pick up
+2 × € 9,50 = € 19 · project badkamer	2 × €9.50 = €19 · bathroom project
+3 aanwezig · 2 nodig voor een taak	3 in stock · 2 required for a task
+3 patronen montagekit · 1 project	3 adhesive cartridges · 1 project
+3 taken · 2 toestellen	3 tasks · 2 devices
+3 voorstellen wachten op controle	3 suggestions awaiting review
+4 personen · producten gekoppeld	4 servings · linked products
+4 van 7 taken afgerond	4 of 7 tasks completed
+4,2 m³ vandaag · meetgegevens	4.2 m³ today · measured data
+Aankoop	Purchase
+Actie in deze ruimte	Action in this room
+Actief · 1 van 3 taken klaar · € 1.700 vrij	Active · 1 of 3 tasks completed · €1,700 remaining
+Actief · laatste controle geslaagd	Active · last check succeeded
+Actief · volgende uitvoering morgen	Active · next run tomorrow
+Adres, bewoners en taal	Address, residents and language
+Adres, huishouden en taal op één herkenbaar formulier.	Address, household and language in one familiar form.
+Afgerond · 1 van 3 stappen	Completed · 1 of 3 steps
+Afvalsoort	Waste type
+Bediening openen	Open controls
+Berging · 0 pakken · minimum 2	Pantry · 0 packs · minimum 2
+Betaald · € 425,00 · project badkamer	Paid · €425.00 · bathroom project
+Betaald · € 45,00 · rekening gezamenlijk	Paid · €45.00 · joint account
+Boni Halfvolle Melk 1 l	Boni semi-skimmed milk 1 l
+Buitenactiviteit beter in de voormiddag	Outdoor activities are better planned in the morning
+Cindy · Gamma € 45,00	Cindy · Gamma €45.00
+Cindy · donderdag	Cindy · Thursday
+Controleer uitgave bij Badkamer vernieuwen	Review expense for Bathroom renovation
+Donderdag · taak voor Cindy	Thursday · task for Cindy
+Gamma · 7 november	Gamma · 7 November
+Gamma · € 45,00	Gamma · €45.00
+Garage · 1 doos · minimum 1	Garage · 1 box · minimum 1
+Garage · 3 patronen · minimum 1	Garage · 3 cartridges · minimum 1
+Gepland · budget nog niet ingesteld	Planned · budget not set yet
+Handleiding	Manual
+Home Assistant, Drive en e-mail	Home Assistant, Drive and email
+Keuken · temperatuur bekend via koppeling	Kitchen · temperature from linked source
+Klaar om te starten · Rob en Cindy	Ready to start · Rob and Cindy
+Klusmateriaal · laatst gebruikt	DIY materials · recently used
+Koppelingen en automatisering	Connections and automation
+Kosten zijn een raming op basis van het ingestelde tarief	Costs are estimates based on the configured tariff
+Maandag 9 november · 09:00	Monday 9 November · 09:00
+Nog te betalen · € 40,00	Still to pay · €40.00
+Nog te betalen · € 60,00	Still to pay · €60.00
+Nog te kiezen · raming € 300	Still to choose · €300 estimate
+Op · 2 pakken op de lijst	Out · 2 packs on the list
+Periode kiezen	Choose a period
+Planning	Schedule
+Producten, aankopen en contactgegevens van deze winkel.	Products, purchases and contact details for this shop.
+Rob en Cindy · klaar om te starten	Rob and Cindy · ready to start
+Rob · aankoop en voorraad één keer verwerkt	Rob · purchase and stock processed once
+Sanitair X	Sanitaryware X
+Sanitair X · 3 november	Sanitaryware X · 3 November
+Sanitair X · € 425,00	Sanitaryware X · €425.00
+Status zichtbaar; bediening vraagt bevestiging	State is visible; controls require confirmation
+Terugkerende betalingen	Recurring payments
+Toegang en rollen	Access and roles
+Transport	Delivery
+Uitvoeringen	Runs
+Vakman · Badkamer vernieuwen	Professional · Bathroom renovation
+Vandaag · Rob en Cindy · badkamer	Today · Rob and Cindy · bathroom
+Verbonden · documenten met bronlink	Connected · documents with source links
+Verbonden · laatst gesynchroniseerd 2 minuten geleden	Connected · last synchronised 2 minutes ago
+Verbonden · toestellen en metingen	Connected · devices and measurements
+Volgende week · ophalen	Next week · collection
+Volledig voor badkamer · betaald	Entirely for bathroom · paid
+Volwassene · 2 taken klaar	Adult · 2 tasks completed
+Voorraadtelling controleren	Review stock count
+Wacht op benodigdheden · badkamer	Waiting for requirements · bathroom
+Wacht op materiaal · nog € 300 voorzien	Waiting for materials · €300 still planned
+Wasruimte · beschikbaar · onderhoud gepland	Laundry room · available · maintenance planned
+Weergave, beweging en meldingen	Appearance, motion and notifications
+Werkelijk gebruikte materialen	Materials actually used
+Wie wijzigde wat	Who changed what
+Winkel · 1 aankoop gekoppeld	Shop · 1 linked purchase
+Winkelbeurt is bijgewerkt	Shopping trip updated
+Zoeken in WickedHome	Search WickedHome
+Zoekterm	Search term
+€ 1.200,00 · saldo op 1 november	€1,200.00 · balance on 1 November
+€ 2.050,00 · ontvangen · november	€2,050.00 · received · November
+€ 2.398,00 · gepland nog € 100,00	€2,398.00 · €100.00 still planned
+€ 2.450,00 · ontvangen · november	€2,450.00 · received · November
+€ 300 raming · geen bankbetaling	€300 estimate · no bank payment
+€ 35 besteed van een bon van € 45	€35 spent from a €45 receipt
+€ 35 voor badkamer · € 10 voor huishouden	€35 for bathroom · €10 for household
+€ 40 te betalen	€40 to pay
+€ 425 besteed	€425 spent
+€ 425,00 · project badkamer	€425.00 · bathroom project
+€ 45,00 · 3 producten · betaald	€45.00 · 3 products · paid
+− € 1.602,00 · 4 uitgaven	− €1,602.00 · 4 expenses
+3 patronen	3 cartridges
+2 patronen	2 cartridges
+Garage · echte voorraad	Garage · actual stock
+Klusmateriaal	DIY materials
+Voorzien	Planned
+Vrij	Remaining
+Nog vandaag	Still today
+3 taken	3 tasks
+Materiaal is gekocht	Materials purchased
+2 personen · 25 minuten · gekoppelde producten	2 servings · 25 minutes · linked products
+2 ingrediënten in huis	2 ingredients at home
+1 nog meenemen	1 still to pick up
+Garage controleren	Check the garage
+Week	Week
+Ma	Mon
+Di	Tue
+Wo	Wed
+Do	Thu
+Vr	Fri
+Za	Sat
+Zo	Sun
+Meubel monteren	Install the cabinet
+Woonkamer · bronmeting	Living room · source measurement
+3 lampen aan	3 lights on
+Ingeschakeld	Armed
+Zoek product, project, aankoop, taak…	Search product, project, purchase, task…
+een gekoppeld gegeven	a linked record
+Onderdelen	Sections
+Lampen	Lights
+2 aan	2 on
+3 patronen in garage · 2 nodig voor badkamer	3 cartridges in garage · 2 needed for bathroom
+1 doos · gekoppeld aan badkamer	1 box · linked to bathroom
+2 pakken op boodschappenlijst	2 packs on shopping list
+Gekoppeld alternatief	Linked alternative
+Zelfde productgroep · controleer de eenheid	Same product group · check the unit
+Bewoner	Resident
+van	of
+afgerond	completed
+meegenomen	picked up
+nu niet	not now
+ongedaan maken	undo
+gekocht	purchased
+en	and
+Kiezen	Choose
+voorgesteld / subview	proposed / subview
+eigenaar/paneel:	owner/panel:
+patroon:	pattern:
+Bron:	Source:
+Montagekit wit · 3 patronen verwacht	White mounting adhesive · 3 cartridges expected
+Winkelsessie	Shopping trip
+Navigatie voor elke dag	Daily navigation
+Temperatuur woonkamer	Living room temperature
+Wasruimte	Laundry room
+Geen projecttoerekening	No project allocation
+Bestaande betaalde uitgave	Existing paid expense
+Documentmap	Document folder
+Winkel toevoegen	Add a shop
+Verwijderen	Remove
+Checklist	Checklist
+Boodschappen klaar	Shopping done
+2 gekocht · 1 overgeslagen	2 purchased · 1 skipped
+Je aankopen en voorraad	Your purchases and stock
+2 pakken · voorraad in berging eenmaal bijgewerkt	2 packs · Pantry stock updated once
+1 potje gekocht · nog niet in bijgehouden voorraad	1 jar purchased · not in tracked stock yet
+Voorraadlocatie kiezen	Choose stock location
+Nu niet: yoghurt · blijft op de boodschappenlijst	Not now: yoghurt · stays on the shopping list
+Bon of uitgave? Optioneel.	Receipt or expense? Optional.
+Koppel dezelfde aankoop nu of later. Voorraad wordt niet nogmaals toegevoegd.	Link the same purchase now or later. Stock is not added again.
+Bekijk 9 toegelichte schermen	View 9 annotated screens
+Bekijk 14 toegelichte schermen	View 14 annotated screens
+
+Aantal en gekoppelde variant aanpassen	Adjust quantity and linked variant
+Gepland aantal	Planned quantity
+Gekoppelde variant	Linked variant
+Bekijk 15 toegelichte schermen	View 15 annotated screens
+Bekijk 16 toegelichte schermen	View 16 annotated screens

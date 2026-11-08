@@ -1,0 +1,10 @@
+{
+  "checkedPatterns": 12,
+  "phoneAndDesktop": true,
+  "englishAndDutch": true,
+  "realProductionComponents": true,
+  "roomCyclingAndKeyboard": true,
+  "inPlaceAdjust": true,
+  "realApiRequests": 0,
+  "browserErrors": []
+}

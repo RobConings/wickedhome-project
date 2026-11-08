@@ -1,3 +1,4 @@
+import { RecordImage } from "@/components/shared/record-image";
 import { BarcodeIcon, ExternalLinkIcon, PencilIcon, PlusIcon, QrCodeIcon, ShoppingCartIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
@@ -38,15 +39,11 @@ export function ProductCard({ product, shops, canManage, initialSelections, prod
   const { shopLinks } = actions;
 
   return (
-    <Card className={cn("gap-3 p-4 transition-opacity", actions.deleting && "opacity-60")} aria-busy={actions.busy || undefined}>
+    <Card className={cn("gap-0 overflow-hidden p-0 transition-opacity", actions.deleting && "opacity-60")} aria-busy={actions.busy || undefined}>
+      <RecordImage src={product.imageUrl} alt={product.name} fit="contain" className="aspect-[4/3] w-full rounded-none border-b" fallback={<ProductCategoryIcon category={product.category} className="size-12 text-section" />} />
+      <div className="flex min-w-0 flex-1 flex-col gap-3 p-4">
       <div className="flex items-start justify-between gap-2">
-        {product.imageUrl ? (
-          <img src={product.imageUrl} alt="" referrerPolicy="no-referrer" className="size-11 shrink-0 rounded-lg border bg-white object-contain" />
-        ) : (
-          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-section-soft text-section">
-            <ProductCategoryIcon category={product.category} className="size-5" />
-          </span>
-        )}
+
         <Button
           variant="ghost"
           size="icon"
@@ -162,6 +159,7 @@ export function ProductCard({ product, shops, canManage, initialSelections, prod
           <ProductActions product={product} shops={shops} products={products} onDelete={actions.deleteProduct} initialSelections={initialSelections} />
         </div>
       )}
+      </div>
     </Card>
   );
 }

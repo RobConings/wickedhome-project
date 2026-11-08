@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { Await, useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
-import { DashboardScreen, dashboardLoader } from "@/features/dashboard";
+import { DashboardScreen, dashboardLoader, HomeRoomMap, HomeRoomMapSkeleton, fetchHomeMap } from "@/features/dashboard";
 import { HouseStatusCard, HouseStatusCardSkeleton, fetchHouseStatus } from "@/features/devices";
 import { AlarmCard, canManageHomeAssistant, fetchAlarmOverview } from "@/features/home-assistant";
 
@@ -10,7 +10,7 @@ import { AlarmCard, canManageHomeAssistant, fetchAlarmOverview } from "@/feature
  * with the alarm (Home Assistant) under it when Home Assistant has one.
  */
 export function loader() {
-  return { ...dashboardLoader(), houseStatus: fetchHouseStatus(), alarm: fetchAlarmOverview() };
+  return { ...dashboardLoader(), houseStatus: fetchHouseStatus(), alarm: fetchAlarmOverview(), roomMap: fetchHomeMap() };
 }
 
 export function Component() {
@@ -20,6 +20,13 @@ export function Component() {
     <DashboardScreen
       data={data}
       userName={user.name}
+      roomMap={
+        <Suspense fallback={<HomeRoomMapSkeleton />}>
+          <Await resolve={data.roomMap} errorElement={<HomeRoomMap data={null} />}>
+            {(map) => <HomeRoomMap data={map} />}
+          </Await>
+        </Suspense>
+      }
       homeStatus={
         <div className="flex flex-col gap-3 sm:gap-4">
           <Suspense fallback={<HouseStatusCardSkeleton />}>

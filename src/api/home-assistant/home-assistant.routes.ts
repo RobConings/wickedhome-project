@@ -1,5 +1,7 @@
+import { controlDevice, controlEntity, getDeviceControls, listScenes } from "./ha-control";
 import { Router, type Request } from "express";
 import {
+  haControlInputSchema,
   alarmArmInputSchema,
   alarmDisarmInputSchema,
   haApplianceLinksInputSchema,
@@ -113,4 +115,20 @@ homeAssistantRouter.post("/energy/import", canManage, async (req, res) => {
   if (!(await isHaHousehold(household(req)))) throw mapHaError(new HaNotConnectedError());
   startJobNow(HA_ENERGY_JOB_ID);
   res.status(202).end();
+});
+
+// Capability-backed device controls; physical-security commands retain the existing separate policy.
+homeAssistantRouter.get("/devices/:deviceId/controls", canManage, async (req, res) => {
+  res.json(await getDeviceControls(household(req), String(req.params.deviceId)));
+});
+homeAssistantRouter.post("/devices/:deviceId/control", canManage, async (req, res) => {
+  const { entityId, ...input } = parse(haControlInputSchema, req.body);
+  res.json(await controlDevice(household(req), String(req.params.deviceId), entityId, input));
+});
+homeAssistantRouter.get("/scenes", canManage, async (req, res) => { res.json(await listScenes(household(req))); });
+homeAssistantRouter.post("/scenes/run", canManage, async (req, res) => {
+  const input = parse(haControlInputSchema, req.body);
+  const scenes = await listScenes(household(req));
+  if (input.action !== "on" || !scenes.some((scene) => scene.entityId === input.entityId)) throw new (await import("../lib/http")).HttpError(400, "bad_request", "Scene is not available");
+  res.json(await controlEntity(household(req), input.entityId, { action: "on" }));
 });

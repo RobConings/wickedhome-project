@@ -4,8 +4,8 @@ Format: `## Title | keywords NL and EN`. Each section ≤ ~80 tokens, written fo
 Read at runtime by ai/core/app-map.ts; never part of the system prompt.
 
 ## Home (dashboard) | dashboard, start, overzicht, home, overview, vandaag, today
-- The first page: today's tasks, agenda, bills due, waste collection, weather and quick actions.
-- "+" (phone) or "Quick action" (sidebar) adds a task, shopping item, expense, event or income from any page; Ctrl/Cmd+K searches pages and actions.
+- Home shows today and a room map: choose a floor, tap/cycle rooms, then open their appliances, tasks and projects.
+- "+" or "Quick action" adds records anywhere; Ctrl/Cmd+K searches pages and actions.
 
 ## Household members | gezin, gezinslid, bewoner, habitant, member, kind, child, huisdier, pet, verjaardag, birthday
 - Habitants are the people (adults, children), pets and guests of the house, with colour, emoji and birthday.
@@ -27,8 +27,8 @@ Read at runtime by ai/core/app-map.ts; never part of the system prompt.
 - Children complete their own tasks.
 
 ## Shopping | winkelsessie, winkelbeurt, kassabon, boodschappen, boodschappenlijst, winkel, shopping list, groceries, product, producten, vaste producten, staples
-- Shared visits select needs. Op/out = below minimum or essential at minimum; Bijna op/nearly_out = nonessential at minimum. Forecasts, not zero stock; use toggles and category dividers.
-- Reuse catalogue/shared-stock links. Buying credits known stock once; later receipts reuse it. Staples and custom lists remain.
+- Start a visit, choose one shop or saved group, then use the automatic checklist. Out = below minimum or essential at minimum; Nearly out = nonessential at minimum. These are forecasts.
+- Adjust quantity/linked variant in place; extras are separate. Bought credits stock once; later receipts reuse it. Staples/custom lists remain.
 
 ## Recipes and cooking | recept, recepten, koken, ingredient, recipe, recipes, cooking, meal, to cook
 - Ingredients link to catalogue products and their shared stock. Match and save these links before planning; package sizes convert recipe amounts to stock packs.
@@ -57,6 +57,10 @@ Read at runtime by ai/core/app-map.ts; never part of the system prompt.
 - One-off bills or recurring expenses that create instances. Each has a payee, amount, due date, payment method and payer (joint account, person, or split).
 - Direct debits are paid automatically. Extra loan repayments link to the loan, reducing its balance and schedule. Gmail bills appear as "Suggested from mail"; reuse their links when recording payment.
 
+## Purchases | aankoop, aankopen, gekocht, bon, purchase, purchases, acquisition, receipt
+- Purchases shows existing acquired goods, receipts and linked expenses. Product/project views reuse the same history.
+- Assign goods quantities to projects/household separately from the expense's cost shares. This neither consumes stock nor creates another payment. Unassigned remainders stay visible.
+
 ## Income | inkomen, inkomsten, loon, salaris, maaltijdcheques, income, salary, wage, meal vouchers
 - Incomes per person (salary, benefits, meal vouchers) with their dates and amounts; meal vouchers belong to a person.
 
@@ -64,7 +68,7 @@ Read at runtime by ai/core/app-map.ts; never part of the system prompt.
 - Month by month: income, contributions to the joint accounts, joint outgoings and the balance the app follows; set the real balance when it drifts from the bank.
 
 ## Projects | project, projecten, verbouwing, renovatie, budget, project budget, renovation
-- Budget pots (a renovation, a holiday) that tasks, expenses and shopping materials link to: in or out of budget, and by how much.
+- Projects link tasks, materials, rooms, purchases, costs and documents. Banners remain recognisable; icon cards open related owners. Explicit expense shares affect the project budget; the bank records the original expense once.
 
 ## Contacts | contact, contacten, adresboek, aannemer, loodgieter, leverancier, contractor, plumber, supplier, address book, telefoonnummer, phone number
 - Everyone the household deals with (contractor, plumber, supplier, bank, school), grouped by trade, with phone numbers and email addresses to tap.
@@ -76,7 +80,7 @@ Read at runtime by ai/core/app-map.ts; never part of the system prompt.
 
 ## Home Assistant and the alarm | home assistant, alarm, alarmsysteem, inschakelen, arm, alarm panel
 - Home Assistant connects household-wide (server setup); it feeds device states, energy statistics and the alarm.
-- The alarm can be armed (home or away) by owners and adults; disarming is only done at the panel or in Home Assistant, never by the assistant.
+- The alarm can be armed (home or away) by owners and adults; disarming uses the app’s code dialog, the panel or Home Assistant; never the assistant.
 
 ## Assistant | assistent, chat, spraak, voice, mcp, assistant, ai
 - The assistant runs on a local model in the house and does what you can do in the app, with the same rights. Changes ask for confirmation on a card; money, deletes, roles and the alarm always ask.

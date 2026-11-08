@@ -159,6 +159,7 @@ const compact = (task: Task, names: Map<string, string>, today: string) => ({
   assignment: onDutyIds(task).length ? "assigned" : "unassigned",
   priority: task.priority === "normal" ? null : task.priority,
   place: task.place?.name,
+  device: task.device ?? null,
   recurring: task.rrule ? true : null,
   reminder: reminderText(task),
   onHold: task.hold ? (task.hold.reason ?? true) : null,
@@ -205,9 +206,10 @@ registerAssistantTool({
     filter: z
       .enum(["all", "mine", "today", "overdue", "ready", "waiting", "on_hold", "done"])
       .default("all")
-      .describe("today = tasks due today or overdue, including unassigned tasks (use for tonight); mine = only tasks assigned to you; waiting = materials to buy; done = last 30 days"),
+      .describe("today = tasks due today or overdue, including unassigned tasks (use for tonight); mine = only tasks assigned to you; waiting = materials to buy; done = recent history, or complete history when device is supplied"),
     person: entityRef("habitant").optional(),
     place: entityRef("place").optional(),
+    device: entityRef("device", "The device being maintained").optional(),
     type: z.enum(TASK_TYPES).optional(),
   }),
   permission: "read",
@@ -215,10 +217,10 @@ registerAssistantTool({
   core: true,
   activity: { en: "Checked the tasks", nl: "Taken bekeken" },
   run: async (ctx, input) => {
-    const [overview, names] = await Promise.all([getTasksOverview(ctx.user), entityNames(ctx, "habitant")]);
+    const [overview, names, deviceOverview] = await Promise.all([getTasksOverview(ctx.user), entityNames(ctx, "habitant"), input.device ? getTasksOverview(ctx.user, { deviceId: input.device.id }) : null]);
     const today = overview.today;
     const open = overview.tasks.filter((task) => task.status === "open");
-    const pool = input.filter === "done" ? overview.tasks.filter((task) => task.status !== "open") : open;
+    const pool = input.filter === "done" ? (deviceOverview ?? overview).tasks.filter((task) => task.status !== "open") : open;
     const filtered = pool.filter((task) => {
       const state = dueState(task, today);
       if (input.filter === "overdue" && state !== "overdue") return false;
@@ -229,6 +231,7 @@ registerAssistantTool({
       if (input.filter === "on_hold" && !task.hold) return false;
       if (input.person && !onDutyIds(task).includes(input.person.id)) return false;
       if (input.place && task.place?.id !== input.place.id) return false;
+      if (input.device && task.device?.id !== input.device.id) return false;
       if (input.type && task.type !== input.type) return false;
       return true;
     });
@@ -255,7 +258,7 @@ registerAssistantTool({
           assignment: onDutyIds(task).length ? "assigned" : "unassigned",
         })),
       },
-      filters: { filter: input.filter, person: input.person?.name ?? (input.filter === "mine" ? ctx.user.name : null), place: input.place?.name ?? null, type: input.type ?? null },
+      filters: { filter: input.filter, person: input.person?.name ?? (input.filter === "mine" ? ctx.user.name : null), place: input.place?.name ?? null, device: input.device?.name ?? null, type: input.type ?? null },
       matchingCount: filtered.length,
       note: input.filter === "mine" && !ctx.user.habitantId
         ? "This account is not linked to a household member. The personal list is empty; todayRemaining lists the household's remaining tasks."
@@ -296,6 +299,7 @@ registerAssistantTool({
       priority: task.priority,
       place: task.place?.name,
       project: task.project?.name,
+      device: task.device ?? null,
       estimateMinutes: task.estimatedMinutes,
       notes: task.notes,
       onHold: task.hold ? `since ${day(task.hold.since)}${task.hold.reason ? `: ${task.hold.reason}` : ""}` : null,
@@ -348,6 +352,7 @@ registerAssistantTool({
     remind: remind(),
     assignees: people(),
     place: entityRef("place").optional(),
+    device: entityRef("device", "The device being maintained").optional(),
     priority: z.enum(["low", "normal", "high"]).default("normal"),
     notes: z.string().max(500).optional(),
     repeat: repeat(),
@@ -371,6 +376,7 @@ registerAssistantTool({
       !input.time && input.remind !== undefined && input.remind !== false && say(ctx.locale, "with a reminder", "met herinnering"),
       input.repeat && input.repeat !== "none" && say(ctx.locale, `repeats ${input.repeat}${days ? ` on ${days}` : ""}`, `herhaalt ${input.repeat}${days ? ` op ${days}` : ""}`),
       input.materials?.length && say(ctx.locale, `materials: ${input.materials.join(", ")}`, `materiaal: ${input.materials.join(", ")}`),
+      input.device && say(ctx.locale, `for “${input.device.name}”`, `voor “${input.device.name}”`),
       input.waitsFor && say(ctx.locale, `after “${input.waitsFor.name}”`, `na “${input.waitsFor.name}”`),
     ].filter(Boolean);
     return say(ctx.locale, `Add the task “${input.title}” ${parts.join(", ")}`, `Taak “${input.title}” toevoegen ${parts.join(", ")}`).trim();
@@ -400,6 +406,7 @@ registerAssistantTool({
         reminderMinutes: reminderMinutesOf(input.remind) ?? null,
         assigneeIds: (input.assignees ?? []).map((person) => person.id),
         placeId: input.place?.id ?? null,
+        deviceId: input.device?.id ?? null,
         priority: input.priority,
         notes: input.notes ?? null,
         rrule,
@@ -433,6 +440,8 @@ registerAssistantTool({
     remind: remind(),
     assignees: people(),
     place: entityRef("place").optional(),
+    device: entityRef("device", "The device being maintained").optional(),
+    noDevice: z.boolean().optional().describe("Remove the maintained-device relationship"),
     priority: z.enum(["low", "normal", "high"]).optional(),
     type: z.enum(TASK_TYPES).optional(),
     notes: z.string().max(2000).optional(),
@@ -460,6 +469,7 @@ registerAssistantTool({
         (input.remind === false ? say(ctx.locale, "no reminder", "geen herinnering") : say(ctx.locale, "with a reminder", "met herinnering")),
       input.assignees && (personList(input.assignees) ?? say(ctx.locale, "nobody", "niemand")),
       input.place?.name,
+      input.noDevice ? say(ctx.locale, "remove device link", "toestelkoppeling verwijderen") : input.device?.name,
       input.priority,
       input.repeat && say(ctx.locale, `repeat: ${input.repeat}`, `herhaling: ${input.repeat}`),
       input.weekdays?.length && say(ctx.locale, `on ${weekdayList(input.weekdays)}`, `op ${weekdayList(input.weekdays)}`),
@@ -471,8 +481,8 @@ registerAssistantTool({
   },
   run: async (ctx, input) => {
     const { task } = await getTaskDetail(ctx.user, input.task.id);
-    const onlyLinkedFields = Object.entries(input).every(([key, value]) => value === undefined || ["task", "assignees", "notes", "addMaterials"].includes(key));
-    if (task.origin && !onlyLinkedFields) throw badRequest("A linked task only takes people and notes; the rest follows where it comes from");
+    const onlyLinkedFields = Object.entries(input).every(([key, value]) => value === undefined || ["task", "assignees", "notes", "addMaterials", "device", "noDevice"].includes(key));
+    if (task.origin && !onlyLinkedFields) throw badRequest("A linked task only takes people, notes, materials and device context; the rest follows where it comes from");
     // A time on a task without a date: today.
     const dueDate = input.noDueDate ? null : (input.dueDate ?? (input.time && !task.dueDate ? todayIn() : undefined));
     const hasDate = dueDate === undefined ? Boolean(task.dueDate) : Boolean(dueDate);
@@ -489,6 +499,7 @@ registerAssistantTool({
       remind: input.remind,
       assigneeIds: input.assignees?.map((person) => person.id),
       placeId: input.place?.id,
+      deviceId: input.noDevice ? null : input.device?.id,
       priority: input.priority,
       type: input.type,
       notes: input.notes,

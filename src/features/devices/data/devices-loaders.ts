@@ -14,6 +14,7 @@ import {
   type DevicesOverview,
 } from "../types/devices";
 import {
+  setDeviceCover,
   createDevice,
   createDeviceProfile,
   createProfileFromPreset,
@@ -82,6 +83,8 @@ export function houseShouldRevalidate({ currentUrl, nextUrl, formMethod, default
   const strip = (url: URL) => {
     const params = new URLSearchParams(url.search);
     params.delete("floor");
+    params.delete("device");
+    params.delete("room");
     return params.toString();
   };
   return strip(currentUrl) === strip(nextUrl) ? false : defaultShouldRevalidate;
@@ -119,6 +122,9 @@ export async function devicesAction({ request }: ActionFunctionArgs): Promise<De
 
   try {
     switch (intent) {
+      case "cover":
+        await setDeviceCover(id, text(body.fileId) || null);
+        return { ok: true, intent };
       case "save": {
         const formData = new FormData();
         for (const [key, value] of Object.entries(body)) if (typeof value === "string") formData.set(key, value);

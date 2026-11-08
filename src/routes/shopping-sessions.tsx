@@ -2,10 +2,12 @@ import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import {
   shoppingLoader,
+  sessionsAction,
   SessionsScreen,
   fetchShoppingSession,
   fetchShoppingSessions,
 } from "@/features/shopping";
+export const action = sessionsAction;
 export async function loader({ params }: LoaderFunctionArgs) {
   const [shopping, sessions, session] = await Promise.all([
     shoppingLoader(),

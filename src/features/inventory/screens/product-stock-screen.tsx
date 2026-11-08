@@ -1,7 +1,7 @@
 import * as React from "react";
-import { ArrowLeftIcon, BarcodeIcon, MapPinIcon, PencilIcon, PlusIcon, QrCodeIcon } from "lucide-react";
+import { BarcodeIcon, MapPinIcon, PencilIcon, PlusIcon, QrCodeIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useRevalidator } from "react-router";
+import { useRevalidator } from "react-router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
@@ -21,6 +21,7 @@ import { useStockActions } from "../data/use-stock-actions";
 type ProductStockScreenProps = {
   data: ProductStockPageData;
   canManage: boolean;
+  context?: React.ReactNode;
   initialSelections?: { products?: UseSelectionsOptions["initial"]; places?: UseSelectionsOptions["initial"]; shops?: UseSelectionsOptions["initial"] };
 };
 
@@ -30,7 +31,7 @@ const productPath = (productId: string) => `/inventory/products/${encodeURICompo
  * One product: where it is kept, how much, its minimums, the history of every change, and its alternatives
  * (other brands sharing this stock; an alternative's page redirects here with that brand highlighted).
  */
-export function ProductStockScreen({ data, canManage, initialSelections }: ProductStockScreenProps) {
+export function ProductStockScreen({ data, canManage, initialSelections, context }: ProductStockScreenProps) {
   const { t } = useTranslation("inventory");
   const { t: tCommon } = useTranslation();
   const { t: tShopping } = useTranslation("shopping");
@@ -50,12 +51,7 @@ export function ProductStockScreen({ data, canManage, initialSelections }: Produ
     <PageContainer>
       {confirmation}
       <PageHeader
-        eyebrow={
-          <Link to="/inventory" className="inline-flex items-center gap-1 hover:underline">
-            <ArrowLeftIcon className="size-3.5" aria-hidden="true" />
-            {t("page.title")}
-          </Link>
-        }
+        backTo="/inventory"
         title={
           <span className="flex items-center gap-3">
             {product.imageUrl ? (
@@ -120,6 +116,7 @@ export function ProductStockScreen({ data, canManage, initialSelections }: Produ
         }
       />
 
+      {context}
       <PageGrid columns="main-sidebar" className="items-start">
         <Card>
           <CardHeader>

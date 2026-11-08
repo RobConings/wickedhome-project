@@ -1,0 +1,38 @@
+import { useState, type ComponentProps } from "react";
+import { ShoppingCartIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
+import { GeneralForm, type GeneralFormField } from "@/components/shared/general-form";
+import { IconChip } from "@/components/shared/icon-chip";
+import { ShopDestinationPicker } from "@/features/shops";
+import type { ShoppingPageData } from "../data/shopping-loaders";
+import { sessionStartFormSchema } from "../data/sessions-actions";
+import { requirementsForDestination } from "../types/visit-destination";
+
+/** The ordinary trip starts with one decision. The service selects current needs on submit. */
+export function SessionStartCard({ shopping, destination, onDestinationChange, initialSelections }: {
+  shopping: ShoppingPageData; destination: string | null; onDestinationChange: (value: string | null) => void;
+  initialSelections?: ComponentProps<typeof ShopDestinationPicker>["initialSelections"];
+}) {
+  const { t } = useTranslation("shopping");
+  const [operationId] = useState(() => crypto.randomUUID());
+  const shopIds = destination?.startsWith("group:") ? shopping.shopGroups?.find((group) => group.id === destination.slice(6))?.shopIds ?? [] : destination?.startsWith("shop:") ? [destination.slice(5)] : [];
+  const count = shopIds.length ? requirementsForDestination(shopping.overview.items.filter((item) => item.status === "open"), shopIds, shopping.products).length : 0;
+  const fields: GeneralFormField[] = [{
+    name: "destination", type: "custom", label: t("sessions.destination"), optional: false,
+    render: ({ id, name, value, setValue, invalid, disabled }) => <ShopDestinationPicker id={id} name={name}
+      shops={shopping.shops} groups={shopping.shopGroups ?? []} initialSelections={initialSelections} value={typeof value === "string" ? value : null}
+      onChange={setValue} invalid={invalid} disabled={disabled} />,
+  }];
+  return <Card className="max-w-2xl">
+    <CardHeader><div className="flex items-center gap-3"><IconChip icon={ShoppingCartIcon} tone="shopping" /><div>
+      <CardTitle>{t("sessions.simpleStart")}</CardTitle><CardDescription>{t("sessions.simpleDescription")}</CardDescription>
+    </div></div></CardHeader>
+    <GeneralForm navigate schema={sessionStartFormSchema} fields={fields} intent="start-session"
+      hiddenFields={{ operationId }} defaultValues={{ destination }}
+      onValuesChange={(values) => onDestinationChange(typeof values.destination === "string" ? values.destination : null)}
+      submitLabel={t("sessions.startShopping")}
+    />
+    {destination && <p role="status" className="rounded-xl bg-section-soft p-3 text-sm text-section-foreground">{t("sessions.matchingNeeds", { count })}</p>}
+  </Card>;
+}

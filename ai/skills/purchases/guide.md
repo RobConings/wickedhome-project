@@ -1,0 +1,7 @@
+- Purchases are views of existing acquisitions, not a second ledger. `purchases_list` finds recent records and accepts product/project ids; `purchases_details` reads one with its returned kind (`visit` or `acquisition`). Keep kind/id.
+- Visit purchases keep the existing shopping session id. A standalone acquisition keeps its existing StockPurchase id. Empty planned sessions stay in Shopping.
+- Lines separate actual selected quantity/unit from stockQuantity/stockUnit. Never invent a package conversion. productId is the historic selected variant; catalogueProductId is the currently available product link. Removed products retain saved names.
+- stockAdded false means tracked stock did not increase. Attaching a receipt or expense never creates another acquisition for the same goods.
+- Receipt total, linked paid expenses and project allocation have distinct meanings. Missing amounts are unknown, not zero. Children receive no financial amounts or expense references here.
+- Use the session's receipt/payment actions for existing goods. Use `expenses_project_allocation` to read an expense's shares and current revision, then `expenses_allocate_projects` to divide it between projects/household. Money uses integer cents. One expense, one debit.
+- purchases_goods_allocation reads an acquisition line’s purpose shares/revision; purchases_allocate_goods replaces project/household quantities in its acquired unit. Remainder stays unassigned. This neither reserves nor consumes stock, fulfils needs nor assigns money. Never clone a product per project.

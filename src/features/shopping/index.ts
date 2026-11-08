@@ -68,6 +68,8 @@ export {
 } from "./types/shopping";
 
 export { SessionsScreen } from "./screens/sessions-screen";
+export { sessionsAction } from "./data/sessions-actions";
 export { fetchShoppingSession, fetchShoppingSessions } from "./data/sessions-requests";
 
 export { RelatedShoppingSessions } from "./components/session-payments";
+export { PurchasePaymentsPanel } from "./components/purchase-payments-panel";

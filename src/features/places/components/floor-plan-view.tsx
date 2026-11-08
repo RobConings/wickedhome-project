@@ -18,6 +18,8 @@ type FloorPlanViewProps = {
   markers?: PlanMarker[];
   selectedMarkerId?: string | null;
   onMarkerClick?: (id: string) => void;
+  selectedPlaceId?: string | null;
+  onPlaceClick?: (id: string) => void;
   /** Explains the markers; shown bottom right over the plan (e.g. a `PlanLegend`). */
   legend?: React.ReactNode;
   /** Extra overlays inside the board. */
@@ -63,11 +65,14 @@ export function FloorPlanView(props: FloorPlanViewProps) {
   return <FloorPlanViewBoard key={props.plan.floor.id} {...props} />;
 }
 
-function FloorPlanViewBoard({ plan, markers, selectedMarkerId, onMarkerClick, legend, children, underlayUrl, now, className }: FloorPlanViewProps) {
+function FloorPlanViewBoard({ plan, markers, selectedMarkerId, onMarkerClick, selectedPlaceId, onPlaceClick, legend, children, underlayUrl, now, className }: FloorPlanViewProps) {
   const { t } = useTranslation("places");
   const [state, dispatch] = React.useReducer(planEditorReducer, plan, initPlanEditor);
   const [northUp, setNorthUp] = React.useState(readNorthUp);
   const [sunOn, setSunOn] = React.useState(false);
+  React.useEffect(() => {
+    if (selectedPlaceId !== undefined) dispatch({ type: "select", selection: selectedPlaceId ? { type: "place", key: selectedPlaceId } : null });
+  }, [selectedPlaceId]);
 
   // A reloaded plan of the same floor (revalidation) replaces the drawing without moving the view.
   const shown = React.useRef(plan);
@@ -92,6 +97,7 @@ function FloorPlanViewBoard({ plan, markers, selectedMarkerId, onMarkerClick, le
       markers={markers}
       selectedMarkerId={selectedMarkerId}
       onMarkerClick={onMarkerClick}
+      onPlaceClick={onPlaceClick}
       underlayUrl={underlayUrl}
       rotation={northUp && canTurn ? -north : 0}
       sun={sun?.position ?? null}

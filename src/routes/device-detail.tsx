@@ -1,7 +1,9 @@
 import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { DeviceDetailScreen, canManageDevices, deviceDetailLoader, devicesAction } from "@/features/devices";
-import { HaEntityPickerDialog } from "@/features/home-assistant";
+import { DocumentAttachments, LinkedImagePicker, canManageDocuments } from "@/features/documents";
+import { HaDeviceControlPanel, HaEntityPickerDialog } from "@/features/home-assistant";
+import { DeviceTasksPanel } from "@/features/tasks";
 import { NotifyMeToggle } from "@/features/notifications";
 import { screenHandle } from "@/lib/screen-context";
 
@@ -21,6 +23,10 @@ export function Component() {
       places={places}
       appliances={appliances}
       canManage={canManageDevices(user.role)}
+      controls={canManageDevices(user.role) && <HaDeviceControlPanel deviceId={device.id} />}
+      coverChooser={<LinkedImagePicker entityType="device" entityId={device.id} selectedId={device.coverFileId ?? null} canManage={canManageDevices(user.role)} />}
+      maintenance={<DeviceTasksPanel key={device.id} deviceId={device.id} placeId={device.place?.id} />}
+      attachments={<DocumentAttachments entityType="device" entityId={device.id} canManage={canManageDocuments(user.role)} />}
       // Route-level composition: devices offers a slot, Home Assistant fills it with its entity browser.
       renderEntityPicker={(props) => <HaEntityPickerDialog {...props} />}
       // …and notifications its "Notify me" (when the device's indicator turns orange or red).

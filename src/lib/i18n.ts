@@ -28,9 +28,9 @@ function detectLocale(): Locale {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored && (LOCALES as readonly string[]).includes(stored)) return stored as Locale;
   } catch {
-    // Storage unavailable; fall back to the browser language.
+    // Storage unavailable; use the application default.
   }
-  return navigator.language.toLowerCase().startsWith("nl") ? "nl" : "en";
+  return "en";
 }
 
 function applyLocale(locale: Locale) {

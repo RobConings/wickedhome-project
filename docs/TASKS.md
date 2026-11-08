@@ -200,3 +200,11 @@ chip per source (Expenses, Waste collection, Birthdays, Tasks…) next to the ca
 `src/api/tasks/tasks.test.ts` (recurrence, views, the day list and progress, presets, cycles, linked-task
 changes, pay-task planning) and `src/api/waste/waste-tasks.test.ts` (bins tasks: timing, rotation, moved and
 removed collections, idempotency). Both run with `npm test`.
+
+## Device maintenance
+
+`Task.deviceId` is an optional foreign key to a household-owned Device, with `ON DELETE SET NULL`. Creating or changing the relationship validates household ownership. Omitting `deviceId` in an update preserves it; explicit null clears it. Ordinary task scheduling, reminders, assignments, checklist, materials, dependencies and recurrence remain authoritative. Completing a recurring maintenance task advances its occurrence and retains the device relationship and completion history. Removing a device retains those task/history records.
+
+`GET /api/tasks?deviceId=<id>` returns that device's tasks, including closed tasks of any age. Combining project/place/device filters intersects them. Other household references never reveal tasks. The normal workspace still limits unscoped closed history. Device details compose the Tasks-owned `DeviceTasksPanel`; task forms receive the Devices-owned `DeviceFormField` through routes. Task rows and details link back to the maintained device with return context.
+
+MCP `tasks.add`, `tasks.update`, `tasks.list_open` accept resolved device references. Update omission preserves the relationship; `noDevice: true` clears it. Details return device identity and occurrence history. Existing write confirmation and child completion restrictions apply. There is no parallel maintenance model or automatic HA command.

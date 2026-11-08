@@ -2,8 +2,9 @@ import * as React from "react";
 import { ChevronDownIcon, CornerDownRightIcon, ListChecksIcon, PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { useAsyncResource } from "@/lib/use-async-resource";
+import { InlineAlert } from "@/components/shared/inline-alert";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PendingContent } from "@/components/shared/loading-state";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
 import { fetchPlaces, type Place } from "@/features/places";
 import { cn } from "@/lib/utils";
@@ -19,71 +20,57 @@ type ProjectTasksPanelProps = {
   placeId?: string | null;
   /** After a task was added, completed or changed (e.g. to refresh the project's progress). */
   onChanged?: () => void;
+  placeSelections?: React.ComponentProps<typeof TaskFormDialog>["placeSelections"];
   /** Data instead of fetching it (stories, tests). */
   initialData?: { overview: TasksOverview; habitants: Habitant[]; places: Place[] };
 };
 
-type State =
-  | { status: "loading" }
-  | { status: "error" }
-  | { status: "ready"; overview: TasksOverview; habitants: Habitant[]; places: Place[] };
+type RecordTasksPanelProps = Omit<ProjectTasksPanelProps, "projectId"> & { projectId?: string; deviceId?: string };
 
 /**
  * The tasks of one project, for the project page: open ones as a chain (what can start first, then what waits
  * for it, e.g. "Buy materials" → "Start tiling"), the done ones folded away, and "Add a task" in the project.
  * Loads its own data, so the projects feature only renders it; quick actions post to the tasks route.
  */
-export function ProjectTasksPanel({ projectId, placeId, onChanged, initialData }: ProjectTasksPanelProps) {
+export function ProjectTasksPanel(props: ProjectTasksPanelProps) {
+  return <RecordTasksPanel {...props} />;
+}
+
+/** Maintenance uses the same task records, completion rules and recurrence as the Tasks workspace. */
+export function DeviceTasksPanel(props: Omit<ProjectTasksPanelProps, "projectId"> & { deviceId: string }) {
+  return <RecordTasksPanel {...props} />;
+}
+
+function RecordTasksPanel({ projectId, deviceId, placeId, onChanged, initialData, placeSelections }: RecordTasksPanelProps) {
   const { t } = useTranslation("tasks");
   const { t: tCommon } = useTranslation();
-  const [state, setState] = React.useState<State>(() => (initialData ? { status: "ready", ...initialData } : { status: "loading" }));
-  const [reloads, setReloads] = React.useState(0);
-  const [refreshing, setRefreshing] = React.useState(false);
   const [showDone, setShowDone] = React.useState(false);
-  const reload = React.useCallback(() => {
-    setRefreshing(true);
-    setReloads((value) => value + 1);
-    onChanged?.();
-  }, [onChanged]);
-
-  React.useEffect(() => {
-    if (initialData && reloads === 0) return;
-    let cancelled = false;
-    Promise.all([fetchTasksOverview({ projectId }), fetchHouseholdOverview(), fetchPlaces()])
-      .then(([overview, household, places]) => {
-        if (!cancelled) setState({ status: "ready", overview, habitants: household.habitants, places });
-      })
-      .catch(() => {
-        if (!cancelled) setState((previous) => (previous.status === "ready" ? previous : { status: "error" }));
-      })
-      .finally(() => {
-        if (!cancelled) setRefreshing(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [projectId, reloads, initialData]);
-
-  if (state.status === "loading") {
+  const { data, error, refresh } = useAsyncResource(`${projectId ?? ""}:${deviceId ?? ""}`, async () => {
+    const [overview, household, places] = await Promise.all([fetchTasksOverview({ projectId, deviceId }), fetchHouseholdOverview(), fetchPlaces()]);
+    return { overview, habitants: household.habitants, places };
+  }, { initial: initialData });
+  const reload = () => { refresh(); onChanged?.(); };
+  const labels = deviceId ? "maintenance" : "project";
+  if (!data && !error) {
     return (
-      <div className="flex flex-col gap-2" role="status" aria-label={t("project.loading")}>
+      <div className="flex flex-col gap-2" role="status" aria-label={t(`${labels}.loading`)}>
         <Skeleton className="h-14 rounded-xl" />
         <Skeleton className="h-14 rounded-xl" />
       </div>
     );
   }
-  if (state.status === "error") {
+  if (!data) {
     return (
       <div className="flex flex-col items-start gap-2 text-sm text-muted-foreground">
-        {t("project.error")}
-        <Button variant="outline" size="sm" onClick={() => setReloads((value) => value + 1)}>
+        {t(`${labels}.error`)}
+        <Button variant="outline" size="sm" onClick={() => refresh()}>
           {tCommon("actions.retry")}
         </Button>
       </div>
     );
   }
 
-  const { overview, habitants, places } = state;
+  const { overview, habitants, places } = data;
   const open = overview.tasks.filter((task) => task.status === "open");
   const done = overview.tasks.filter((task) => task.status !== "open").sort((a, b) => (b.closedAt ?? "").localeCompare(a.closedAt ?? ""));
   const depths = chainDepths(open);
@@ -99,25 +86,26 @@ export function ProjectTasksPanel({ projectId, placeId, onChanged, initialData }
 
   return (
     <div className="flex flex-col gap-3">
-      <PendingContent pending={refreshing} label={tCommon("loading.updating")}>
+      {error && <InlineAlert tone="error"><p>{t(`${labels}.error`)}</p><Button variant="outline" size="sm" onClick={refresh}>{tCommon("actions.retry")}</Button></InlineAlert>}
+      <div>
         {open.length === 0 && done.length === 0 ? (
           <p className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-4 text-sm text-muted-foreground">
             <ListChecksIcon className="size-4 shrink-0" aria-hidden="true" />
-            {t("project.empty")}
+            {t(`${labels}.empty`)}
           </p>
         ) : (
           <div className="flex flex-col gap-2">
-            {open.length === 0 && <p className="text-sm text-muted-foreground">{t("project.allDone")}</p>}
+            {open.length === 0 && <p className="text-sm text-muted-foreground">{t(`${labels}.allDone`)}</p>}
             {ordered.map((task) => row(task, Math.min(depths.get(task.id) ?? 0, 2)))}
           </div>
         )}
-      </PendingContent>
+      </div>
 
       {done.length > 0 && (
         <div className="flex flex-col gap-2">
           <Button variant="ghost" size="sm" className="self-start text-muted-foreground" aria-expanded={showDone} onClick={() => setShowDone((value) => !value)}>
             <ChevronDownIcon className={cn("transition-transform", showDone && "rotate-180")} />
-            {t("project.done", { count: done.length })}
+            {t(`${labels}.done`, { count: done.length })}
           </Button>
           {showDone && <div className="flex flex-col gap-2">{done.map((task) => row(task))}</div>}
         </div>
@@ -125,14 +113,15 @@ export function ProjectTasksPanel({ projectId, placeId, onChanged, initialData }
 
       {overview.viewer.canManage && (
         <TaskFormDialog
+          placeSelections={placeSelections}
           habitants={habitants}
           places={places}
           today={overview.today}
-          defaults={{ type: "job", placeId: placeId ?? null, projectId }}
+          defaults={{ type: deviceId ? "maintenance" : "job", placeId: placeId ?? null, projectId, deviceId }}
           trigger={
             <Button variant="outline" size="sm" className="self-start">
               <PlusIcon />
-              {t("project.add")}
+              {t(`${labels}.add`)}
             </Button>
           }
           onOpenChange={(next) => {

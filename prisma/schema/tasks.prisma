@@ -44,6 +44,9 @@ model Task {
   type             TaskType            @default(CHORE)
   placeId          String?
   place            Place?              @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  /// The maintained device. Tasks retain their history if that device is removed.
+  deviceId         String?
+  device           Device?             @relation(fields: [deviceId], references: [id], onDelete: SetNull)
   priority         TaskPriority        @default(NORMAL)
   estimatedMinutes Int?
   status           TaskStatus          @default(OPEN)
@@ -113,6 +116,7 @@ model Task {
   updatedAt        DateTime            @updatedAt
 
   @@unique([householdId, originType, originId])
+  @@index([deviceId])
   @@index([householdId, status, dueDate])
   @@index([placeId])
   @@index([projectId])

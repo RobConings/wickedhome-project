@@ -17,7 +17,7 @@ export function ShoppingStockFilterField({
       role="group"
       aria-label={t("stockFilter.label")}
     >
-      {(["all", "out", "nearly_out"] as const).map((option) => (
+      {(["all", "out", "low", "nearly_out"] as const).map((option) => (
         <Button
           key={option}
           type="button"

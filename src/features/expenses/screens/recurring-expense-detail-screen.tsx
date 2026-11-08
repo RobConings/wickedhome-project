@@ -1,7 +1,7 @@
 import * as React from "react";
-import { ArrowLeftIcon, ExternalLinkIcon, HandCoinsIcon, PauseIcon, PencilIcon, PlayIcon, SquareIcon, Trash2Icon } from "lucide-react";
+import { ExternalLinkIcon, HandCoinsIcon, PauseIcon, PencilIcon, PlayIcon, SquareIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useFetcher } from "react-router";
+import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -140,14 +140,7 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
 
   return (
     <PageContainer>
-      <Button asChild variant="ghost" size="sm" className="-mb-4 self-start">
-        <Link to="/expenses?view=recurring">
-          <ArrowLeftIcon />
-          {t("detail.back")}
-        </Link>
-      </Button>
-
-      <PageHeader
+      <PageHeader backTo="/expenses?view=recurring"
         eyebrow={t(`kinds.${recurring.kind}`)}
         title={recurring.payee}
         description={

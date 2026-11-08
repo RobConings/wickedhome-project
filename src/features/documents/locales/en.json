@@ -202,5 +202,13 @@
       "title": "Move documents to Google Drive",
       "description": "Moves bill documents waiting for Drive (Drive was unavailable, or \"move existing\"), verifies each copy, then removes the server copy."
     }
+  },
+  "images": {
+    "empty": "Attach an image to choose it as the cover.",
+    "clear": "Remove cover",
+    "use": "Use {{name}} as cover",
+    "remove": "Remove {{name}} as cover",
+    "loadError": "Images could not be loaded.",
+    "saveError": "The cover could not be saved."
   }
 }
