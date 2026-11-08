@@ -39,7 +39,7 @@ export function PageHeader({ title, description, eyebrow, icon, breadcrumbs, bac
     <header className={cn("flex min-w-0 flex-col gap-2.5", className)}>
       {trail && trail.length > 0 && <BreadcrumbTrail items={trail} label={t("navigation.breadcrumbs")} />}
       <div className="flex min-w-0 flex-wrap items-start justify-between gap-x-6 gap-y-3">
-      <div className="flex min-w-0 flex-1 items-start gap-2.5 sm:gap-3">
+      <div className="flex min-w-full flex-1 items-start gap-2.5 sm:min-w-[min(100%,20rem)] sm:gap-3">
         {showBack && <PageBackButton to={backTo ?? trail?.slice().reverse().find((item) => item.to)?.to ?? (identity && !identity.isSectionRoot ? identity.section.to : undefined)} />}
         {shownIcon && <IconChip icon={shownIcon} className="mt-1" />}
         <div className="flex min-w-0 flex-col gap-1">
