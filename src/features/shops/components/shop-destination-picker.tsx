@@ -21,7 +21,7 @@ export function ShopDestinationPicker({ shops, groups, initialSelections, ...pro
   const shopSelections = useShopSelections({ initial: initialSelections?.shops });
   const groupSelections = useSelections("shop_group", { initial: initialSelections?.groups });
   const items = useMemo<EntityPickerItem[]>(() => [
-    ...groups.map((group) => ({ id: `group:${group.id}`, label: group.name,
+    ...groups.map((group) => ({ id: `group:${group.id}`, label: group.name, featuredGroup: t("groups.title"),
       description: group.shopIds.map((id) => shops.find((shop) => shop.id === id)?.name).filter(Boolean).join(" · "),
       leading: <IconChip icon={LayersIcon} tone="shopping" size="sm" /> })),
     ...shops.map((shop) => ({ id: `shop:${shop.id}`, label: shop.name, description: t(`types.${shop.type}`), leading: <ShopLogo shop={shop} size="sm" /> })),
