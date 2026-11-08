@@ -34,7 +34,7 @@ function setup(t: TestContext) {
   invalidateEntityCache(user.householdId);
   t.after(() => invalidateEntityCache(user.householdId));
   const product = (id: string, name: string, isEssential: boolean, quantity: number) => ({
-    id, name, isEssential, householdId: user.householdId, unit: "pack", category: "PANTRY",
+    id, name, brand: null as string | null, isEssential, householdId: user.householdId, unit: "pack", category: "PANTRY",
     defaultShopId: null, barcode: null, qrCode: null, imageUrl: null, notes: null,
     packageAmount: null, packageUnit: null, shopLinks: [], alternatives: [], stockProductId: null, stockProduct: null,
     _count: { alternatives: 0 },
@@ -308,10 +308,19 @@ describe("shopping priority over MCP and the assistant", () => {
 
   it("paginates filtered products for the local assistant and rejects invalid page arguments", async (t) => {
     const { products } = setup(t);
-    stub(t, db.product, "findMany", async ({ where, orderBy }: { where: { householdId: string; name?: { contains: string } }; orderBy: unknown }) => {
+    type SearchTerm = { name?: { contains: string }; brand?: { contains: string } };
+    stub(t, db.product, "findMany", async ({ where, orderBy }: {
+      where: { householdId: string; name?: { contains: string }; AND?: { OR: SearchTerm[] }[] };
+      orderBy: unknown;
+    }) => {
       assert.equal(where.householdId, user.householdId);
       assert.deepEqual(orderBy, [{ name: "asc" }, { id: "asc" }]);
-      return products.filter((product) => !where.name || product.name.toLowerCase().includes(where.name.contains.toLowerCase()));
+      // Mirror Prisma's new name-or-brand search, including the AND wrapper used to preserve barcode filters.
+      const terms: SearchTerm[] = where.AND?.flatMap((group) => group.OR) ?? (where.name ? [{ name: where.name }] : []);
+      return products.filter((product) => !terms.length || terms.some((term) =>
+        (term.name && product.name.toLowerCase().includes(term.name.contains.toLowerCase())) ||
+        (term.brand && product.brand?.toLowerCase().includes(term.brand.contains.toLowerCase())),
+      ));
     });
     const tool = getAssistantTool("inventory.products");
     assert.ok(tool);
@@ -324,6 +333,13 @@ describe("shopping priority over MCP and the assistant", () => {
       assert.equal(data.hasMore, hasMore);
       assert.equal(data.nextOffset, hasMore ? 1 : undefined);
     }
+    products[0]!.brand = "Cooperative";
+    const byBrand = await runTool(tool, ctx, { q: "cooperative", offset: 0, limit: 5 });
+    assert.ok(byBrand.ok);
+    const brandPage = JSON.parse(resultForModel(byBrand)) as { data: { count: number; items: { name: string }[] } };
+    assert.equal(brandPage.data.count, 1);
+    assert.deepEqual(brandPage.data.items.map((item) => item.name), ["Milk"]);
+
     for (const args of [{ offset: -1 }, { offset: 0.5 }, { limit: 0 }, { limit: 101 }, { limit: 1.5 }]) {
       const response = await callMcp("inventory_products", args);
       assert.equal(response.result.isError, true);
