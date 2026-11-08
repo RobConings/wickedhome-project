@@ -300,7 +300,12 @@ try {
   await one.waitForURL((url) => url.pathname === "/shopping" && url.searchParams.get("productId") === fixture.productId);
   const afterNeeds = await database.query('SELECT count(*)::int AS n FROM shopping_items WHERE "householdId"=$1', [fixture.householdId]);
   assert.equal(afterNeeds.rows[0].n, beforeNeeds.rows[0].n, "An existing family need is opened without creating another one");
-  await one.getByRole("link", { name: "Terug naar waar je vandaan kwam", exact: true }).click();
+  // waitForURL only confirms the address: React Router may still be showing the previous
+  // product screen while the shopping loader resolves. Never click a stale product Back link.
+  await one.getByRole("heading", { name: "Boodschappen", exact: true }).waitFor();
+  const returnToProduct = one.locator(`a[data-slot="page-back"][href^="/inventory/products/${fixture.productId}"]`);
+  await returnToProduct.waitFor();
+  await returnToProduct.click();
   await one.waitForURL((url) => url.pathname === `/inventory/products/${fixture.productId}`);
   assert.equal(new URL(one.url()).searchParams.get("from"), origin);
   assert.equal(await one.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
