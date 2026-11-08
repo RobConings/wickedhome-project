@@ -20,8 +20,8 @@ import type {
 const path = (id: string) => `/recipes/${encodeURIComponent(id)}`;
 const entryPath = (id: string) => `/recipes/meal-plan/${encodeURIComponent(id)}`;
 
-export const fetchRecipes = (q?: string, categoryId?: string) => {
-  const params = new URLSearchParams({ ...(q ? { q } : {}), ...(categoryId ? { categoryId } : {}) });
+export const fetchRecipes = (q?: string, categoryId?: string, productId?: string) => {
+  const params = new URLSearchParams({ ...(q ? { q } : {}), ...(categoryId ? { categoryId } : {}), ...(productId ? { productId } : {}) });
   return api.get<RecipeSummary[]>(`/recipes${params.size ? `?${params}` : ""}`);
 };
 export const fetchRecipeCategories = () => api.get<RecipeCategory[]>("/recipes/categories");
