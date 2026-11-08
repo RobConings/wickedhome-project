@@ -179,7 +179,7 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
       <PageHeader
         title={t("page.title")}
         description={t("page.description")}
-        actions={canManage && <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 sm:ml-auto">
+        actions={canManage && <div className="grid w-full min-w-0 grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-center xl:justify-end">
           <SplitAction
             icon={ShoppingBasketIcon}
             label={t("actions.log")}
