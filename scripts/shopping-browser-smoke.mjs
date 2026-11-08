@@ -330,6 +330,23 @@ try {
   assert.equal(new URL(one.url()).searchParams.get("from"), origin);
   assert.equal(await one.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
   await one.screenshot({ path: "/tmp/wh-redesign/product-phone.png", fullPage: true });
+  // The approved mobile product wireframe shows facts before the two CTA rows.
+  const mobileProductStats = await one.locator('main [data-slot="product-statistics"]').boundingBox();
+  const mobileProductActions = await one.locator('main [data-slot="product-mobile-actions"]').boundingBox();
+  assert.ok(mobileProductStats && mobileProductActions &&
+    mobileProductActions.y >= mobileProductStats.y + mobileProductStats.height - 1,
+    "Mobile product CTAs appear below product facts, not squeezed beside the title");
+  assert.equal(await one.locator('main [data-slot="product-desktop-actions"]').isVisible(), false);
+  await one.setViewportSize({ width: 1440, height: 900 });
+  const productDesktopActions = one.locator('main [data-slot="product-desktop-actions"]');
+  await productDesktopActions.waitFor({ state: "visible" });
+  const desktopHeading = await one.locator('main [data-slot="product-hero"] h1').boundingBox();
+  const desktopButtons = await productDesktopActions.boundingBox();
+  assert.ok(desktopHeading && desktopButtons &&
+    desktopButtons.x >= desktopHeading.x + desktopHeading.width - 1,
+    "Desktop product actions appear to the right of the title");
+  assert.equal(await one.locator('main [data-slot="product-mobile-actions"]').isVisible(), false);
+  await one.setViewportSize({ width: 390, height: 844 });
 
   await one.getByRole("button", { name: "Meer productacties", exact: true }).click();
   await one.getByRole("menuitem", { name: "Voorraadtelling", exact: true }).click();
