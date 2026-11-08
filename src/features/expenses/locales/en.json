@@ -31,7 +31,9 @@
     "deleteRecurring": "Delete",
     "editRecurring": "Edit recurring expense",
     "openRecurring": "Recurring expense",
-    "website": "Website"
+    "website": "Website",
+    "logMenu": "More expense logging actions",
+    "addMenu": "More expense management actions"
   },
   "status": {
     "upcoming": "Upcoming",
