@@ -800,6 +800,20 @@ try {
       assert.equal(await one.getByText(/Unexpected Application Error|Something went wrong/i).count(), 0, `${modulePath} has no route error`);
       if (width >= 1024) assert.equal(await one.locator("aside nav a[aria-current=page]").count(), 1, `${modulePath} has one active sidebar destination`);
       assert.ok((await one.locator("main h1").first().innerText()).trim(), `${modulePath} has a page identity`);
+      // Every shared header must keep its title readable instead of giving its width to actions.
+      const brokenHeaders = await one.locator('main [data-slot="page-heading-layout"]').evaluateAll((layouts) =>
+        layouts.flatMap((layout) => {
+          const heading = layout.querySelector('[data-slot="page-heading"]');
+          const actions = layout.querySelector('[data-slot="page-header-actions"]');
+          if (!heading || !actions) return [];
+          const h = heading.getBoundingClientRect();
+          const a = actions.getBoundingClientRect();
+          if (!h.width || !a.width) return [];
+          const mobile = window.innerWidth < 1280;
+          const valid = mobile ? a.top >= h.bottom - 1 : a.left >= h.right - 1;
+          return valid ? [] : [{ heading: h.toJSON(), actions: a.toJSON() }];
+        }));
+      assert.deepEqual(brokenHeaders, [], `${modulePath} has responsive title/actions layout at ${width}px`);
     }
   }
   assert.deepEqual(errors, []);
