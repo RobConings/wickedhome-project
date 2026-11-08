@@ -478,16 +478,37 @@ try {
         .filter({ has: optional })
         .count(),
     );
-    await one.getByRole("button", { name: "Op", exact: true }).click();
-    await optional.first().waitFor({ state: "hidden" });
-    await essential.first().waitFor();
-    await one.getByRole("button", { name: "Op", exact: true }).click();
-    await optional.first().waitFor();
-    await one.getByRole("button", { name: "Bijna op", exact: true }).click();
-    await essential.first().waitFor({ state: "hidden" });
-    await optional.first().waitFor();
-    await one.getByRole("button", { name: "Alles", exact: true }).click();
-    await essential.first().waitFor();
+    // The shopping overview keeps stock filters inside its single compact toolbar.
+    // Shop view and advanced session planning still expose their own stock buttons.
+    if (screen === "/shopping") {
+      await one.getByRole("button", { name: "Weergave en filters", exact: true }).click();
+      const chooseStock = async (label) => {
+        await one.getByRole("combobox", { name: "Voorraadfilter" }).click();
+        await one.getByRole("option", { name: label, exact: true }).click();
+      };
+      await chooseStock("Op");
+      await optional.first().waitFor({ state: "hidden" });
+      await essential.first().waitFor();
+      await chooseStock("Alles");
+      await optional.first().waitFor();
+      await chooseStock("Bijna op");
+      await essential.first().waitFor({ state: "hidden" });
+      await optional.first().waitFor();
+      await chooseStock("Alles");
+      await essential.first().waitFor();
+      await one.keyboard.press("Escape");
+    } else {
+      await one.getByRole("button", { name: "Op", exact: true }).click();
+      await optional.first().waitFor({ state: "hidden" });
+      await essential.first().waitFor();
+      await one.getByRole("button", { name: "Op", exact: true }).click();
+      await optional.first().waitFor();
+      await one.getByRole("button", { name: "Bijna op", exact: true }).click();
+      await essential.first().waitFor({ state: "hidden" });
+      await optional.first().waitFor();
+      await one.getByRole("button", { name: "Alles", exact: true }).click();
+      await essential.first().waitFor();
+    }
     assert.equal(
       await one.evaluate(
         () => document.documentElement.scrollWidth > window.innerWidth,
