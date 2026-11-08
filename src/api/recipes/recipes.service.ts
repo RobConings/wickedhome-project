@@ -194,10 +194,29 @@ const recipeFields = (input: RecipeInput) => ({
   notes: input.notes || null,
 });
 
-/** The household's recipes by name; `q` searches names and ingredients. */
-export async function listRecipes(householdId: string, { q, categoryId }: RecipeListQuery = {}): Promise<RecipeSummary[]> {
+/** The household's recipes by name; `q` searches names and ingredients.
+ * An optional product filter resolves all variants sharing the same stock, within this household.
+ */
+export async function listRecipes(householdId: string, { q, categoryId, productId }: RecipeListQuery = {}): Promise<RecipeSummary[]> {
+  let linkedProductIds: string[] | undefined;
+  if (productId) {
+    const product = await db.product.findFirst({
+      where: { householdId, id: productId },
+      select: { id: true, stockProductId: true },
+    });
+    if (!product) throw notFound("Product not found");
+    const ownerId = product.stockProductId ?? product.id;
+    linkedProductIds = (await db.product.findMany({
+      where: { householdId, OR: [{ id: ownerId }, { stockProductId: ownerId }] },
+      select: { id: true },
+    })).map(({ id }) => id);
+  }
   const rows = await db.recipe.findMany({
-    where: { householdId, ...(categoryId ? { categoryId: categoryId === "none" ? null : categoryId } : {}) },
+    where: {
+      householdId,
+      ...(categoryId ? { categoryId: categoryId === "none" ? null : categoryId } : {}),
+      ...(linkedProductIds ? { ingredients: { some: { productId: { in: linkedProductIds } } } } : {}),
+    },
     include: {
       category: { select: { id: true, name: true } },
       ingredients: { select: { name: true }, orderBy: { position: "asc" } },
