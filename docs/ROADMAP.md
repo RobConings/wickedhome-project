@@ -8,6 +8,8 @@ and domain rules live in the linked feature guides. The MVP/later lists and foun
 the original product scope; they are not a current deployment checklist or a claim that built features
 still need to be created. English is the source language; Dutch is fully supported.
 
+**Redesign requirement:** keep all existing user-facing outcomes, business rules, scheduled behaviours and data/relationships. Existing capabilities missing from a wireframe (for example recurring expenses) remain in scope. Screens and workflows may be merged, renamed or greatly simplified as long as the same outcome remains easy to reach and verifiably correct. See the [feature preservation and outcome-parity contract](plans/app-samenhang/feature-preservation.md) and [rollout checklist](plans/app-samenhang/rollout-checklist.md).
+
 Two missions:
 
 - **Functional**: manage places, tasks, shopping, stock, calendar, habitants, bills and subscriptions, and
