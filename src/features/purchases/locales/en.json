@@ -40,5 +40,18 @@
     "loadError": "Could not load projects.",
     "retry": "Try again",
     "conflict": "Someone changed this allocation. Your draft is kept; close and reopen to review the latest shares before saving."
-  }
+  },
+  "shop": {
+    "title": "Recent purchases here",
+    "description": "Recorded visits and acquisitions, with their original receipts and payments.",
+    "empty": "No purchases recorded at this shop yet.",
+    "open": "View purchase history",
+    "loading": "Loading purchases…"
+  },
+  "shopLabel": "Shop",
+  "acquiredQuantity": "Acquired: {{quantity}} {{unit}}",
+  "creditedQuantity": "Added to stock: {{quantity}} {{unit}}",
+  "stockHistory": "View stock history",
+  "sourceNeed": "Original need {{number}}",
+  "openReceipt": "Open receipt file"
 }

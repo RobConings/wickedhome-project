@@ -3,6 +3,7 @@ import type { SessionUser } from "@/features/auth/types/auth";
 import type { PurchaseDetail, PurchaseLine, PurchaseSummary } from "@/features/purchases/types/purchases";
 import { db, type Prisma } from "../lib/db";
 import { getItem } from "../shopping/shopping.service";
+import { getShop } from "../shops/shops.service";
 import { notFound } from "../lib/http";
 
 const lineInclude = { ...goodsAllocationInclude, sessionItem: { select: { requirementIds: true } } } as const;
@@ -24,20 +25,27 @@ function line(row: Acquisition, names: Map<string, string>): PurchaseLine {
     name: row.purchasedProductName ?? names.get(row.productId) ?? null,
     quantity: row.purchasedQuantity?.toNumber() ?? row.quantity.toNumber(), unit: row.purchasedQuantity !== null ? row.purchasedUnit : row.unit,
     stockQuantity: row.quantity.toNumber(), stockUnit: row.unit, stockAdded: row.stockAdded, stockItemId: row.stockItemId,
+    stockProductAvailable: names.has(row.productId),
     sessionItemId: row.sessionItemId, requirementIds: row.sessionItem?.requirementIds ?? (row.shoppingItemId ? [row.shoppingItemId] : []) };
 }
 function summary(row: Header, names: Map<string, string>, canReadMoney: boolean): PurchaseSummary {
   return { id: row.id, kind: "visit", name: row.session.name, sessionId: row.sessionId,
     purchasedAt: row.purchasedAt.toISOString(), shopName: row.shopId ? names.get(row.shopId) ?? null : null,
+    shopId: row.shopId && names.has(row.shopId) ? row.shopId : null,
     lineCount: row.stockPurchases.length, receiptCount: row.receipts.length,
     totalCents: canReadMoney ? row.totalCents : null,
     linkedPaidCents: canReadMoney ? row.payments.reduce((sum, payment) => sum + (payment.expense?.paidOn ? payment.expense.amountCents : 0), 0) : null, canReadMoney };
 }
 
 /** Views of existing acquisitions, not a second purchase ledger. Empty planned visits stay in Shopping. */
-export async function listPurchases(user: SessionUser, filter: { productId?: string; projectId?: string; requirementId?: string } = {}): Promise<PurchaseSummary[]> {
+export async function listPurchases(user: SessionUser, filter: { productId?: string; projectId?: string; requirementId?: string; shopId?: string } = {}): Promise<PurchaseSummary[]> {
   const lineFilters: Prisma.StockPurchaseWhereInput[] = [];
   const headerFilters: Prisma.ShoppingPurchaseWhereInput[] = [];
+  if (filter.shopId) {
+    await getShop(user.householdId, filter.shopId);
+    lineFilters.push({ shopId: filter.shopId });
+    headerFilters.push({ OR: [{ shopId: filter.shopId }, { stockPurchases: { some: { shopId: filter.shopId } } }] });
+  }
   if (filter.productId) {
     const product = await db.product.findFirst({ where: { householdId: user.householdId, id: filter.productId }, select: { id: true, stockProductId: true } });
     if (!product) throw notFound("Product not found");
@@ -69,6 +77,7 @@ export async function listPurchases(user: SessionUser, filter: { productId?: str
   return [...headers.map((row) => summary(row, ctx.shops, user.role !== "child")), ...acquisitions.map((row): PurchaseSummary => ({
     id: row.id, kind: "acquisition", name: row.purchasedProductName ?? ctx.products.get(row.productId) ?? null,
     sessionId: null, purchasedAt: row.purchasedAt.toISOString(), shopName: row.shopId ? ctx.shops.get(row.shopId) ?? null : null,
+    shopId: row.shopId && ctx.shops.has(row.shopId) ? row.shopId : null,
     lineCount: 1, receiptCount: 0, totalCents: null, linkedPaidCents: null, canReadMoney: user.role !== "child",
   }))].sort((a, b) => b.purchasedAt.localeCompare(a.purchasedAt));
 }
@@ -80,7 +89,7 @@ export async function getPurchase(user: SessionUser, id: string, kind: "visit" |
     const ctx = await context(user.householdId, [row], row.shopId ? [row.shopId] : []);
     const item = line(row, ctx.products);
     return { id, kind, name: item.name, purchasedAt: row.purchasedAt.toISOString(), sessionId: null,
-      shopName: row.shopId ? ctx.shops.get(row.shopId) ?? null : null, lineCount: 1, receiptCount: 0,
+      shopName: row.shopId ? ctx.shops.get(row.shopId) ?? null : null, shopId: row.shopId && ctx.shops.has(row.shopId) ? row.shopId : null, lineCount: 1, receiptCount: 0,
       totalCents: null, linkedPaidCents: null, canReadMoney: user.role !== "child", lines: [item], receipts: [], expenses: [] };
   }
   const row = await db.shoppingPurchase.findFirst({ where: { id, householdId: user.householdId }, include });

@@ -62,7 +62,10 @@
   "history": {
     "title": "Geschiedenis",
     "empty": "Nog geen wijzigingen.",
-    "after": "nu {{quantity}}"
+    "after": "nu {{quantity}}",
+    "openPurchase": "Open aankoop",
+    "openNeed": "Open oorspronkelijke behoefte",
+    "openCooking": "Open kooksessie"
   },
   "detail": {
     "total": "{{quantity}} in totaal",

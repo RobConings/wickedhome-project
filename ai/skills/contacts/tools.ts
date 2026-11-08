@@ -75,6 +75,7 @@ registerAssistantTool({
     contact: entityRef("contact", "One contact's full details: name, company or trade").optional(),
     query: z.string().trim().max(100).optional().describe("Name, company or trade words, e.g. 'aannemer' or 'Peeters'"),
     project: entityRef("project", "Only the contacts of this project").optional(),
+    shop: entityRef("shop", "Only contacts linked to this supplier shop").optional(),
     favorites: z.boolean().optional().describe("Only the person's favourite contacts"),
   }),
   permission: "read",
@@ -97,7 +98,7 @@ registerAssistantTool({
       };
     }
     const q = input.query ? searchWords(input.query).join(" ") : undefined;
-    const contacts = (await listContacts(ctx.householdId, { q: q || undefined, projectId: input.project?.id })).filter((contact) => !input.favorites || favorites.has(contact.id));
+    const contacts = (await listContacts(ctx.householdId, { q: q || undefined, projectId: input.project?.id, shopId: input.shop?.id })).filter((contact) => !input.favorites || favorites.has(contact.id));
     contacts.sort((a, b) => Number(favorites.has(b.id)) - Number(favorites.has(a.id)));
     return { count: contacts.length, ...capList(contacts, LIST_LIMIT, (contact) => row(contact, favorites.has(contact.id))) };
   },

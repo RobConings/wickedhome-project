@@ -78,7 +78,7 @@ export function ContactsScreen({ contacts, shops, canManage, initialSelections }
         renderTile={(contact) => (
           <ContactTile contact={contact} isFavorite={favoriteIds.includes(contact.id)} onToggleFavorite={handleToggleFavorite} onEdit={onEdit} />
         )}
-        search={{
+        search={{ param: "q",
           keys: (contact) => [
             contact.name,
             contact.company,
@@ -91,7 +91,7 @@ export function ContactsScreen({ contacts, shops, canManage, initialSelections }
           label: t("filter.search"),
           placeholder: t("filter.search"),
         }}
-        storageKey="contacts"
+        storageKey="contacts" viewParam="view"
         defaultView="list"
         pending={pending}
         groupBy={(contact) => (favoriteIds.includes(contact.id) ? [FAVORITES_GROUP, tradeKey(contact)] : tradeKey(contact))}

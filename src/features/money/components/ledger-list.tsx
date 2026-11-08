@@ -79,7 +79,7 @@ function useLineTitle(accounts: JointAccount[], habitants: Habitant[]) {
   };
 }
 
-function LineRow({ line, title, canManage }: { line: LedgerLine; title: string; canManage: boolean }) {
+function LineRow({ line, title, canManage, accounts, habitants }: { line: LedgerLine; title: string; canManage: boolean; accounts: JointAccount[]; habitants: Habitant[] }) {
   const { t } = useTranslation("money");
   const { t: tCommon } = useTranslation();
   const fetcher = useFetcher<FormResult>();
@@ -90,6 +90,8 @@ function LineRow({ line, title, canManage }: { line: LedgerLine; title: string; 
         ? Undo2Icon
         : ICONS[line.type];
   const correction = line.type === "correction";
+  const counterpart = accounts.find((account) => account.id === line.counterpartAccountId);
+  const person = habitants.find((habitant) => habitant.id === line.habitantId);
 
   React.useEffect(() => {
     if (fetcher.state === "idle" && fetcher.data?.formError) toast.error(fetcher.data.formError);
@@ -106,7 +108,7 @@ function LineRow({ line, title, canManage }: { line: LedgerLine; title: string; 
 
   const titleNode =
     line.source === "expense" || line.source === "income" ? (
-      <RecordLink to={line.source === "expense" ? `/expenses/${line.sourceId}` : `/income/receipts/${encodeURIComponent(line.sourceId)}`} className="truncate text-sm font-medium hover:text-primary hover:underline">
+      <RecordLink to={line.source === "expense" ? `/expenses/${encodeURIComponent(line.sourceId)}` : `/income/receipts/${encodeURIComponent(line.sourceId)}`} className="text-sm font-medium break-words hover:text-primary hover:underline">
         {title}
       </RecordLink>
     ) : (
@@ -124,7 +126,11 @@ function LineRow({ line, title, canManage }: { line: LedgerLine; title: string; 
           {correction && <Badge variant="outline">{t("ledger.correctionBadge")}</Badge>}
           {line.future && <Badge variant="outline">{t("ledger.future")}</Badge>}
         </span>
-        <span className="truncate text-xs text-muted-foreground">{details}</span>
+        <span className="text-xs break-words text-muted-foreground">{details}</span>
+        {(counterpart || person) && <span className="flex flex-wrap gap-x-3 text-xs">
+          {counterpart && <RecordLink to={`/money?tab=history&account=${encodeURIComponent(counterpart.id)}&month=${line.date.slice(0, 7)}`} className="inline-flex min-h-10 items-center text-primary hover:underline">{counterpart.name}</RecordLink>}
+          {person && <RecordLink to={`/habitants/${encodeURIComponent(person.id)}`} className="inline-flex min-h-10 items-center text-primary hover:underline">{person.name}</RecordLink>}
+        </span>}
       </span>
       {!correction && (
         <span className={cn("text-sm font-semibold tabular-nums", line.amountCents >= 0 ? "text-success" : "text-foreground")}>
@@ -162,17 +168,15 @@ export function LedgerList({ lines, accounts, habitants, canManage, pending, sto
       label={t("ledger.label")}
       items={lines}
       getKey={(line) => line.key}
-      renderRow={(line) => <LineRow line={line} title={title(line)} canManage={canManage} />}
+      renderRow={(line) => <LineRow line={line} title={title(line)} canManage={canManage} accounts={accounts} habitants={habitants} />}
       renderTile={(line) => (
-        <Card className={cn("h-full gap-1", line.type === "correction" && "border-warning/40")}>
-          <span className="text-xs text-muted-foreground">{dateText(line.date)}</span>
-          <span className="text-sm font-medium">{title(line)}</span>
-          {line.type !== "correction" && <span className="text-lg font-semibold tabular-nums">{signedMoney(line.amountCents)}</span>}
-          <span className="text-xs text-muted-foreground">{t("ledger.balanceAfter", { amount: money(line.balanceAfterCents) })}</span>
+        <Card className={cn("h-full", line.type === "correction" && "border-warning/40")}>
+          <LineRow line={line} title={title(line)} canManage={canManage} accounts={accounts} habitants={habitants} />
         </Card>
       )}
-      search={{ placeholder: t("ledger.searchPlaceholder"), keys: (line) => [title(line), line.note, line.label] }}
+      search={{ param: "ledgerQ", placeholder: t("ledger.searchPlaceholder"), keys: (line) => [title(line), line.note, line.label] }}
       storageKey={storageKey}
+      viewParam="ledgerView"
       pending={pending}
       emptyState={<EmptyState icon={HistoryIcon} title={t("ledger.empty")} />}
     />

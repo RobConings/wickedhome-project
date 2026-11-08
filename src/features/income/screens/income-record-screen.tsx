@@ -31,7 +31,7 @@ export function IncomeRecordScreen({ income, source, overview, habitants, canMan
     {fetcher.data?.formError && <p role="alert" className="text-destructive">{fetcher.data.formError}</p>}
     <Card className="border-primary/20 bg-primary/5"><p className="text-3xl font-semibold tabular-nums">{money(income.amountCents)}</p><p className="text-sm text-muted-foreground">{t(income.kind === "meal_vouchers" ? "detail.voucherHint" : "detail.moneyHint")}</p></Card>
     <Card><CardTitle>{t("detail.receipt")}</CardTitle><DescriptionList>
-      <DescriptionItem label={t("fields.who")}>{whoName(income.habitantId)}</DescriptionItem>
+      <DescriptionItem label={t("fields.who")}>{income.habitantId && habitants.some((person) => person.id === income.habitantId) ? <RecordLink className="underline" to={`/habitants/${encodeURIComponent(income.habitantId)}`}>{whoName(income.habitantId)}</RecordLink> : whoName(income.habitantId)}</DescriptionItem>
       <DescriptionItem label={t("fields.kind")}>{t(`kinds.${income.kind}`)}</DescriptionItem>
       <DescriptionItem label={t("fields.date")}>{dateText(income.date)}</DescriptionItem>
       <DescriptionItem label={t("detail.period")}>{income.periodDate ? dateText(income.periodDate) : t("month.oneOff")}</DescriptionItem>

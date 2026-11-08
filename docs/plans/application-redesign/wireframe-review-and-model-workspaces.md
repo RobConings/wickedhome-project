@@ -79,7 +79,11 @@ section, filters and scroll position. No copy of the related model's editor is r
 
 **Acceptance sample — product:** from a product, open its linked variant → product workspace, inspect inventory by place → inventory workspace, open the reason it is on a shopping list → shopping need and its source, inspect a purchase → linked expense → account line, then Back through the origin chain. Empty/unknown data must never be fabricated. The same principle generalises to every row above.
 
-## D. Replace the generic quick-action experience
+## D. Earlier generic quick-action proposal (superseded)
+
+**Product-owner correction, 8 November:** keep Quick actions as they were, with optional search. The existing phone + sheet and desktop Quick action menu, role-filtered actions and keyboard shortcuts are retained. Contextual owner-page actions continue alongside them. The replacement proposal below is historical review feedback, not the current requirement.
+
+### Original proposal
 
 The current header's **Quick action** and sidebar **Search or quick action** affordances are not satisfactory as the primary design. Treat this as a **redesign item**, not a request merely to recolour the button.
 

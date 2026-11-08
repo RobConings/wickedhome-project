@@ -46,6 +46,10 @@ type ShopDetailScreenProps = {
    * this shop. Shows an empty state when omitted.
    */
   shoppingItems?: React.ReactNode;
+  /** Owner-supplied catalogue, purchase and contact contributions. */
+  offers?: React.ReactNode;
+  purchases?: React.ReactNode;
+  contacts?: React.ReactNode;
   /** Seed favourites instead of fetching them (stories). */
   initialSelections?: UseSelectionsOptions["initial"];
 };
@@ -60,6 +64,9 @@ export function ShopDetailScreen({
   canRefreshIcon = canEdit,
   canSetIngredientSearch = canRefreshIcon,
   shoppingItems,
+  offers,
+  purchases,
+  contacts,
   initialSelections,
 }: ShopDetailScreenProps) {
   const { t } = useTranslation("shops");
@@ -155,6 +162,9 @@ export function ShopDetailScreen({
             {shoppingItems ?? <EmptyState icon={ShoppingCartIcon} title={t("detail.onTheListEmpty")} />}
           </PageSection>
 
+          {offers}
+          {purchases}
+
           <Card>
             <CardTitle>{t("detail.notes")}</CardTitle>
             <p className={shop.notes ? "whitespace-pre-line" : "text-sm text-muted-foreground"}>
@@ -164,6 +174,7 @@ export function ShopDetailScreen({
         </Stack>
 
         <Stack gap="lg">
+          {contacts}
           <Card>
             <CardTitle>{t("detail.details")}</CardTitle>
             <CardContent className="text-sm">

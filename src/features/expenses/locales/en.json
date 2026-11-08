@@ -399,6 +399,7 @@
     "pagination": "Payment pages",
     "previous": "Previous",
     "next": "Next",
-    "pageOf": "Page {{page}} of {{pages}}"
+    "pageOf": "Page {{page}} of {{pages}}",
+    "originalDocuments": "Original subscription documents"
   }
 }

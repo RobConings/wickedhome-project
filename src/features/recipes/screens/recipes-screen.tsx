@@ -165,12 +165,12 @@ export function RecipesScreen({ recipes, mealPlan, categories = [], products, sh
             renderTile={(recipe) => (
               <RecipeTile recipe={recipe} isFavorite={favoriteIds.includes(recipe.id)} onToggleFavorite={handleToggleFavorite} />
             )}
-            search={{
+            search={{ param: "q",
               keys: (recipe) => [recipe.name, recipe.category?.name, ...recipe.ingredientNames],
               label: t("filter.search"),
               placeholder: t("filter.search"),
             }}
-            storageKey="recipes"
+            storageKey="recipes" viewParam="view"
             defaultView="tiles"
             loading={loading}
             pending={pending}

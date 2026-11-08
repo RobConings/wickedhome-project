@@ -6,6 +6,9 @@ import path from "node:path";
 import { tmpdir } from "node:os";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
+import { createExpense, getRecurringExpenseDetail } from "../src/api/expenses/expenses.service.ts";
+import { expenseCreateInputSchema } from "../src/features/expenses/types/expenses.ts";
+import { todayIn } from "../src/types/dates.ts";
 import { zonedMidnight } from "../src/features/energy/types/energy-time.ts";
 import { db } from "../src/api/lib/db.ts";
 import { hashPassword } from "../src/api/lib/password.ts";
@@ -171,9 +174,16 @@ try {
   const incomeSource = await db.incomeSource.create({ data: { householdId: home.id, habitantId: people[0].id, name: "Historical household salary", kind: "SALARY", rrule: "FREQ=MONTHLY", startDate: new Date("2020-01-01"), amountMode: "FIXED", targetAccountId: account.id, amounts: { create: { effectiveFrom: new Date("2020-01-01"), amountCents: 100000 } } } });
   const incomeReceipt = await db.income.create({ data: { householdId: home.id, habitantId: people[0].id, sourceId: incomeSource.id, kind: "SALARY", periodDate: new Date("2020-01-01"), date: new Date("2020-01-02"), amountCents: 99900, targetAccountId: account.id } });
   const manual = await db.documentFile.create({ data: { householdId: home.id, name: "Product manual.pdf", mimeType: "application/pdf", sizeBytes: 10, sha256: crypto.randomUUID(), uploadedAt: new Date(), uploadedById: users[0].id, links: { create: { householdId: home.id, entityType: "product", entityId: product.id } } } });
+  const loan = await createExpense(home.id, expenseCreateInputSchema.parse({ payee: "Documented browser loan", amountCents: 23000, totalOpenCents: 100000, dueDate: todayIn(), category: "loans", kind: "loan", rrule: "FREQ=MONTHLY", payerType: "joint", paymentAccountId: account.id }));
+  const originalSubscriptionId = `original-${loan.recurringExpenseId}`;
+  await db.recurringExpense.update({ where: { id: loan.recurringExpenseId }, data: { legacySubscriptionId: originalSubscriptionId } });
+  for (const [name, entityId] of [["Loan agreement.pdf", loan.recurringExpenseId], ["Original loan agreement.pdf", originalSubscriptionId]]) {
+    await db.documentFile.create({ data: { householdId: home.id, name, mimeType: "application/pdf", sizeBytes: 10, sha256: crypto.randomUUID(), uploadedAt: new Date(), uploadedById: users[0].id, links: { create: { householdId: home.id, entityType: "subscription", entityId } } } });
+  }
   fixture = {
     householdId: home.id,
     projectId: project.id,
+    loanId: loan.recurringExpenseId,
     contactId: contact.id,
     incomeSourceId: incomeSource.id,
     incomeReceiptId: incomeReceipt.id,
@@ -398,6 +408,52 @@ try {
   await one.getByRole("heading", { name: "Rob", exact: true }).waitFor();
   await one.getByRole("heading", { name: "Toegewezen taken", exact: true }).waitFor();
 
+  // Recurring documents remain readable under their original identity; loan actions use the actual owner forms.
+  const loanPath = `/expenses/recurring/${fixture.loanId}`;
+  await one.goto(`${base}${loanPath}`);
+  await one.getByRole("heading", { name: "Documented browser loan", exact: true }).waitFor();
+  await one.getByRole("link", { name: "Loan agreement.pdf", exact: true }).waitFor();
+  await one.getByRole("link", { name: "Original loan agreement.pdf", exact: true }).click();
+  await one.waitForURL((url) => url.pathname.startsWith("/documents/files/"));
+  await one.getByRole("heading", { name: "Original loan agreement.pdf", exact: true }).waitFor();
+  assert.equal(new URL(one.url()).searchParams.get("from"), loanPath);
+  await one.getByRole("link", { name: "Documented browser loan", exact: true }).waitFor();
+  await one.getByRole("link", { name: "Terug naar waar je vandaan kwam", exact: true }).click();
+  await one.waitForURL((url) => url.pathname === loanPath);
+  await one.getByRole("heading", { name: "Documented browser loan", exact: true }).waitFor();
+  for (const full of [false, true]) {
+    await one.getByRole("button", { name: "Terugbetaling boeken", exact: true }).click();
+    const repayment = one.getByRole("dialog");
+    await repayment.getByRole("heading", { name: "Uitgave noteren", exact: true }).waitFor();
+    if (full) await repayment.getByRole("button", { name: "Resterend saldo afbetalen", exact: true }).click();
+    else await repayment.getByRole("textbox", { name: /^Bedrag/ }).fill("200,00");
+    const savedRepayment = one.waitForResponse((response) => new URL(response.url()).pathname === "/api/expenses" && response.request().method() === "POST");
+    await repayment.getByRole("button", { name: "Opslaan", exact: true }).click();
+    assert.ok((await savedRepayment).ok());
+    await repayment.waitFor({ state: "hidden" });
+    const expected = full ? 0 : 80000;
+    assert.equal((await getRecurringExpenseDetail(fixture.householdId, fixture.loanId)).recurring.totalOpen.remainingCents, expected);
+    // The next click uses the refreshed balance, not the previous render's loan prop.
+    if (!full) await one.getByRole("progressbar", { name: /20/ }).waitFor();
+  }
+  await one.getByRole("button", { name: "Terugbetaling boeken", exact: true }).waitFor({ state: "hidden" });
+  const payoff = await db.expense.findFirstOrThrow({ where: { householdId: fixture.householdId, earlyRepaymentForId: fixture.loanId, amountCents: 80000 } });
+  await one.getByRole("tab", { name: "Betalingen en historiek", exact: true }).click();
+  await one.locator(`a[href^="/expenses/${payoff.id}"]`).click();
+  await one.waitForURL((url) => url.pathname === `/expenses/${payoff.id}`);
+  await one.getByRole("heading", { name: "Documented browser loan", exact: true }).waitFor();
+  const undone = one.waitForResponse((response) => new URL(response.url()).pathname === `/api/expenses/${payoff.id}/payment` && response.request().method() === "DELETE");
+  await one.getByRole("button", { name: "Markeer als onbetaald", exact: true }).click();
+  assert.ok((await undone).ok());
+  await one.getByRole("button", { name: "Markeer als betaald", exact: true }).click();
+  const repay = one.getByRole("dialog");
+  const paidAgain = one.waitForResponse((response) => new URL(response.url()).pathname === `/api/expenses/${payoff.id}/payment` && response.request().method() === "PUT");
+  await repay.getByRole("button", { name: "Markeer als betaald", exact: true }).click();
+  assert.ok((await paidAgain).ok());
+  await repay.waitFor({ state: "hidden" });
+  assert.equal((await getRecurringExpenseDetail(fixture.householdId, fixture.loanId)).recurring.totalOpen.remainingCents, 0);
+  assert.equal(await db.expense.count({ where: { householdId: fixture.householdId, earlyRepaymentForId: fixture.loanId, paidOn: { not: null } } }), 2);
+
   // Verify the same forecast and visible toggles in ordinary groceries, shop view and visit selection.
   for (const screen of [
     "/shopping",
@@ -583,8 +639,8 @@ try {
   const replay = await contexts[0].request.post(`${base}/api/shopping/sessions/${sessionId}/payments`, { headers: { "X-WickedHome": "1" }, data: originalPayment });
   assert.ok(replay.ok(), await replay.text());
   const expenses = await database.query(
-    'SELECT count(*)::int AS n FROM bills WHERE "householdId"=$1',
-    [fixture.householdId],
+    'SELECT count(DISTINCT b.id)::int AS n FROM bills b JOIN shopping_payments p ON p."expenseId"=b.id JOIN shopping_purchases sp ON sp.id=p."purchaseId" WHERE b."householdId"=$1 AND sp."sessionId"=$2',
+    [fixture.householdId, sessionId],
   );
   assert.equal(expenses.rows[0].n, 1);
   stock = await database.query(
@@ -674,7 +730,7 @@ try {
   await costsDialog.getByRole("button", { name: "Annuleren", exact: true }).click();
   await one.getByRole("link", { name: "Terug naar waar je vandaan kwam", exact: true }).click();
   await one.waitForURL(new RegExp(`/purchases/${purchased.id}$`));
-  assert.equal((await database.query('SELECT count(*)::int AS n FROM bills WHERE "householdId"=$1', [fixture.householdId])).rows[0].n, 1);
+  assert.equal((await database.query('SELECT count(DISTINCT b.id)::int AS n FROM bills b JOIN shopping_payments p ON p."expenseId"=b.id JOIN shopping_purchases sp ON sp.id=p."purchaseId" WHERE b."householdId"=$1 AND sp."sessionId"=$2', [fixture.householdId, sessionId])).rows[0].n, 1);
   assert.equal((await database.query('SELECT quantity::text FROM stock_items WHERE id=$1', [fixture.stockId])).rows[0].quantity, "2.000");
 
   // Every top-level module keeps a working entry point under the shared shell.

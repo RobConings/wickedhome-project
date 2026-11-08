@@ -3,6 +3,8 @@ export type PurchaseSummary = {
   id: string; kind: "visit" | "acquisition"; name: string | null; purchasedAt: string;
   sessionId: string | null; shopName: string | null; lineCount: number; receiptCount: number;
   totalCents: number | null; linkedPaidCents: number | null; canReadMoney: boolean;
+  /** Only a visible, recorded shop; older clients/fixtures may omit it. */
+  shopId?: string | null;
 };
 export type PurchaseLine = {
   allocation: GoodsAllocationView;
@@ -11,6 +13,7 @@ export type PurchaseLine = {
   quantity: number; unit: string | null; stockAdded: boolean;
   stockQuantity: number; stockUnit: string | null; stockItemId: string;
   sessionItemId: string | null; requirementIds: string[];
+  stockProductAvailable?: boolean;
 };
 export type PurchaseDetail = PurchaseSummary & {
   lines: PurchaseLine[];

@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { useTranslation } from "react-i18next";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
 import { DateBlock } from "@/components/shared/date-block";

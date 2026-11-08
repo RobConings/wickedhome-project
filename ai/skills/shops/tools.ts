@@ -3,7 +3,9 @@ import { SHOP_TYPES, shopInputSchema, type Shop } from "@/features/shops/types/s
 import { addDays, todayIn } from "@/types/dates";
 import { listStoreVisits } from "@/api/calendar/calendar.service";
 import { addFavorite, getSelections, removeFavorite } from "@/api/selections/selections.service";
-import { listItems } from "@/api/shopping/shopping.service";
+import { listItems, listProducts } from "@/api/shopping/shopping.service";
+import { listContacts } from "@/api/contacts/contacts.service";
+import { listPurchases } from "@/api/purchases/purchases.service";
 import { createShop, deleteShop, getShop, listShops, updateShop } from "@/api/shops/shops.service";
 import { deleteShopGroup, listShopGroups, saveShopGroup } from "@/api/shops/shop-groups.service";
 import { capList, day, done, entityRef, entityNames, registerEntityResolver, registerAssistantSkill, registerAssistantTool, registerScreenContext, say } from "@ai/core/kit";
@@ -61,6 +63,32 @@ registerAssistantTool({
 });
 
 const LIST_LIMIT = 25;
+
+registerAssistantTool({
+  name: "shops.context",
+  description: "Read a shop's household catalogue products and recorded offers, supplier contacts and recent purchases. Preferred shop is not proof of stock or a live offer. Prices can be unknown; child purchase amounts are redacted. Open each returned owner URL for management.",
+  input: z.object({ shop: entityRef("shop") }), permission: "read", confirm: "never",
+  activity: { en: "Checked shop records", nl: "Winkelgegevens bekeken" },
+  run: async (ctx, input) => {
+    const shop = await getShop(ctx.householdId, input.shop.id);
+    const [products, contacts, purchases] = await Promise.all([
+      listProducts(ctx.householdId, { shopId: shop.id }),
+      listContacts(ctx.householdId, { shopId: shop.id }),
+      listPurchases(ctx.user, { shopId: shop.id }),
+    ]);
+    return {
+      shop: { id: shop.id, name: shop.name, url: `/shops/${encodeURIComponent(shop.id)}` },
+      products: capList(products, 30, (product) => ({ id: product.id, name: product.name, brand: product.brand ?? null, unit: product.unit,
+        packageAmount: product.packageAmount, packageUnit: product.packageUnit,
+        url: `/inventory/products/${encodeURIComponent(product.id)}`, preferred: product.defaultShopId === shop.id,
+        offer: product.shopLinks.find((link) => link.shopId === shop.id) ?? null })),
+      contacts: capList(contacts, 20, (contact) => ({ id: contact.id, name: contact.name, trade: contact.trade,
+        company: contact.company, phones: contact.phones, emails: contact.emails, url: `/contacts/${encodeURIComponent(contact.id)}` })),
+      purchases: capList(purchases, 20, (purchase) => ({ ...purchase,
+        url: `/purchases/${purchase.kind === "acquisition" ? "acquisitions/" : ""}${encodeURIComponent(purchase.id)}` })),
+    };
+  },
+});
 
 const row = (shop: Shop, favorite: boolean) => ({
   name: shop.name,

@@ -46,8 +46,8 @@ export function HabitantsScreen({ overview, canManage }: HabitantsScreenProps) {
         getKey={(habitant) => habitant.id}
         renderRow={(habitant) => <HabitantListItem habitant={habitant} canManage={canManage} />}
         renderTile={(habitant) => <HabitantCard habitant={habitant} canManage={canManage} />}
-        search={{ keys: (habitant) => [habitant.name, habitant.emoji, t(`types.${habitant.type}`)] }}
-        storageKey="habitants"
+        search={{ param: "q", keys: (habitant) => [habitant.name, habitant.emoji, t(`types.${habitant.type}`)] }}
+        storageKey="habitants" viewParam="view"
         defaultView="tiles"
         pending={pending}
         emptyState={

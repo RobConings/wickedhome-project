@@ -2,6 +2,7 @@ import i18n from "i18next";
 import { data, redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type ShouldRevalidateFunctionArgs } from "react-router";
 import { fetchProducts, handleProductForm, type Product } from "@/features/shopping";
 import { fetchShops, type Shop } from "@/features/shops";
+import { internalOrigin, withRecordOrigin } from "@/lib/record-navigation";
 import { ApiRequestError } from "@/lib/api-client";
 import { formDataToObject, parseForm, toFormResult, type FormResult } from "@/lib/forms";
 import {
@@ -277,16 +278,22 @@ export async function handleRecipeForm(formData: FormData): Promise<RecipeAction
 
 /** "To cook" + all recipes: starting a meal opens the cooking view. */
 export async function recipesAction({ request }: ActionFunctionArgs) {
-  const result = await handleRecipeForm(await request.formData());
-  if (result.ok && (result.intent === "start" || result.intent === "cook") && result.entryId) return redirect(cookingPath(result.entryId));
+  const form = await request.formData();
+  const result = await handleRecipeForm(form);
+  const url = new URL(request.url);
+  const origin = internalOrigin(String(form.get("recordOrigin") ?? "")) ?? `${url.pathname}${url.search}`;
+  if (result.ok && (result.intent === "start" || result.intent === "cook") && result.entryId) return redirect(withRecordOrigin(cookingPath(result.entryId), origin));
   return result;
 }
 
 /** A recipe's page: the same, but deleting goes back to the list. */
 export async function recipeAction({ request }: ActionFunctionArgs) {
-  const result = await handleRecipeForm(await request.formData());
+  const form = await request.formData();
+  const result = await handleRecipeForm(form);
+  const url = new URL(request.url);
+  const origin = internalOrigin(String(form.get("recordOrigin") ?? "")) ?? `${url.pathname}${url.search}`;
   if (result.ok && result.intent === "delete") return redirect("/recipes");
-  if (result.ok && (result.intent === "start" || result.intent === "cook") && result.entryId) return redirect(cookingPath(result.entryId));
+  if (result.ok && (result.intent === "start" || result.intent === "cook") && result.entryId) return redirect(withRecordOrigin(cookingPath(result.entryId), origin));
   return result;
 }
 

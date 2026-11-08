@@ -1,7 +1,7 @@
 import { ExternalLinkIcon, MapPinOffIcon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Button } from "@/components/ui/button";
 import { PlanMarkerPaletteItem } from "@/features/places";
 import type { Device, DeviceProfile } from "../types/devices";

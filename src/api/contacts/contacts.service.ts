@@ -109,9 +109,10 @@ async function checkProject(householdId: string, projectId: string) {
 }
 
 /** The household's contacts by name, optionally only those of one project and/or matching a search. */
-export async function listContacts(householdId: string, { q, projectId }: ContactListQuery = {}): Promise<Contact[]> {
+export async function listContacts(householdId: string, { q, projectId, shopId }: ContactListQuery = {}): Promise<Contact[]> {
+  await checkShop(householdId, shopId);
   const rows = await db.contact.findMany({
-    where: { householdId, ...(projectId && { projects: { some: { projectId } } }) },
+    where: { householdId, ...(projectId && { projects: { some: { projectId } } }), ...(shopId && { shopId }) },
     include: contactInclude,
     orderBy: { name: "asc" },
   });

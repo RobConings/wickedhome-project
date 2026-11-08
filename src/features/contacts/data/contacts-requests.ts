@@ -8,6 +8,7 @@ export function fetchContacts(query: ContactListQuery = {}) {
   const params = new URLSearchParams();
   if (query.q) params.set("q", query.q);
   if (query.projectId) params.set("projectId", query.projectId);
+  if (query.shopId) params.set("shopId", query.shopId);
   const search = params.toString();
   return api.get<Contact[]>(`/contacts${search ? `?${search}` : ""}`);
 }

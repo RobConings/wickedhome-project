@@ -1,7 +1,8 @@
+import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import { LandmarkIcon, ZapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Await, Link } from "react-router";
+import { Await } from "react-router";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
 import { SkeletonTiles } from "@/components/shared/loading-state";

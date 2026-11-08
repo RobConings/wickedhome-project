@@ -43,7 +43,7 @@ import {
 } from "../lib/db";
 import { badRequest, conflict, forbidden, notFound } from "../lib/http";
 import { forgetEntity } from "../selections/selections.service";
-import { listShops, shopRefSelect, toShopRef } from "../shops/shops.service";
+import { getShop, listShops, shopRefSelect, toShopRef } from "../shops/shops.service";
 import { UnsafeUrlError, bareHost, fetchPage, parsePageMetadata } from "./link-preview";
 import { linkProblem, mergeNote, stockCompatibilityProblem, planStockMerge, promotionCandidate, stockOwnerOf } from "./product-alternatives";
 import { lockStock } from "../inventory/stock-lock";
@@ -934,15 +934,22 @@ async function assertUniqueCodes(householdId: string, input: ProductInput, excep
 }
 
 export async function listProducts(householdId: string, query: ProductQuery = {}): Promise<Product[]> {
+  if (query.shopId) await getShop(householdId, query.shopId);
+  const conditions: Prisma.ProductWhereInput[] = [];
+  if (query.q) conditions.push({ OR: [
+    { name: { contains: query.q, mode: "insensitive" } },
+    { brand: { contains: query.q, mode: "insensitive" } },
+  ] });
+  if (query.shopId) conditions.push({ OR: [
+    { defaultShopId: query.shopId },
+    { shopLinks: { some: { shopId: query.shopId } } },
+  ] });
   const rows = await db.product.findMany({
     where: {
       householdId,
       ...(query.code && { OR: [{ barcode: query.code }, { qrCode: query.code }] }),
-      // AND keeps the barcode/QR code filter if both code and text were provided.
-      ...(query.q && { AND: [{ OR: [
-        { name: { contains: query.q, mode: "insensitive" as const } },
-        { brand: { contains: query.q, mode: "insensitive" as const } },
-      ] }] }),
+      // Keep scan, text and shop constraints together, including each constraint's OR.
+      AND: conditions,
     },
     include: productInclude,
     orderBy: [{ name: "asc" }, { id: "asc" }],

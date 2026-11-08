@@ -1,3 +1,4 @@
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { RelatedRecordCards } from "@/components/shared/related-record-cards";
 import { RecordImage } from "@/components/shared/record-image";
 import * as React from "react";
@@ -13,7 +14,7 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Await, Link, useFetcher } from "react-router";
+import { Await, useLocation, useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
@@ -86,6 +87,8 @@ export function RecipeDetailScreen({
   });
   const isFavorite = favoriteIds.includes(recipe.id);
   const text = useAmountText();
+  const location = useLocation();
+  const origin = `${location.pathname}${location.search}${location.hash}`;
   const coverUrl = recipeCoverUrl(recipe);
 
   React.useEffect(() => {
@@ -95,7 +98,7 @@ export function RecipeDetailScreen({
   const cookButton = (fullOnMobile = false) => (
     <Button
       fullOnMobile={fullOnMobile}
-      onClick={() => void fetcher.submit({ intent: "cook", id: recipe.id }, { method: "post" })}
+      onClick={() => void fetcher.submit({ intent: "cook", id: recipe.id, recordOrigin: origin }, { method: "post" })}
       loading={fetcher.formData?.get("intent") === "cook"}
     >
       <PlayIcon />
@@ -165,7 +168,7 @@ export function RecipeDetailScreen({
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
               <span className="flex flex-wrap items-center gap-x-2">
                 {check ? <IngredientStatusDot status={check.status} /> : <span className="size-2.5 animate-pulse rounded-full bg-muted" aria-hidden="true" />}
-                <span className="font-medium break-words">{ingredient.name}</span>
+                <span className="font-medium break-words">{product && product.name === ingredient.name ? <IngredientProductLink product={product} /> : ingredient.name}</span>
                 {ingredient.quantity !== null && <span className="text-sm text-muted-foreground tabular-nums">{text.amount(ingredient.quantity, ingredient.unit)}</span>}
                 {ingredient.optional && <span className="text-xs text-muted-foreground">{t("ingredients.optionalShort")}</span>}
               </span>
@@ -177,7 +180,6 @@ export function RecipeDetailScreen({
                 </span>
               )}
             </div>
-            {product && product.name === ingredient.name && <IngredientProductLink product={product} className="sr-only" />}
             {product && <IngredientShopLink product={product} />}
           </li>
         );

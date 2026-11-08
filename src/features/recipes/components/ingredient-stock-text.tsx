@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { productPath, type IngredientCheck } from "../types/recipes";
 import { useAmountText } from "./use-amount-text";
 

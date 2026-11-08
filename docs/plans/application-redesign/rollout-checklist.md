@@ -1,6 +1,6 @@
 # Full implementation rollout
 
-**Active continuation:** baseline `2dda61a`; see the [follow-up implementation and validation ledger](followup-implementation-2026-11-08.md) for newly implemented energy, history, account, product and record-owner work and fresh check status. Earlier checkpoint counts below remain historical evidence.
+**Active continuation:** baseline `6f3e1b7` on `rework_features` (passing GitHub CI reported at handover); see the [current implementation ledger](implementation-continuation-2026-11-08.md). Further checks are deferred until implementation is finished, as requested by the product owner. Historical baseline `2dda61a`; see the [follow-up implementation and validation ledger](followup-implementation-2026-11-08.md) for newly implemented energy, history, account, product and record-owner work and fresh check status. Earlier checkpoint counts below remain historical evidence.
 
 **Current execution plan:** [revised implementation phases](implementation-phases.md). Keep the original Stage 1–5 history below as evidence, but apply the newer phase gates to the total rework. A household calendar, floor-plan editor or shopping session is **not** forced into the same record-tab layout as a product. The 78-screen wireframe is a style and flow reference, not a full feature inventory.
 
@@ -53,14 +53,14 @@ The user authorised the complete redesign. This checklist tracks completion acro
 | Projects | Keep banners, progress, tasks/materials, costs, purchases, contacts and documents | Partial; implemented additions and entry-point checks do not complete module conversion |
 | Expenses | Purchase/source links, project shares, payments, receipts and recurring obligations | Partial; recurring schedule/payment workspace and database lifecycle/account/MCP reference added; exhaustive occurrence navigation and full module acceptance remain open |
 | Income | URL-based focused views, expected/received/source forms, vouchers and account contributions | Partial; focused views implemented; implemented additions and entry-point checks do not complete module conversion |
-| Money | URL-selected account activity, transfers, contributions, forecasts and reconciliation | Partial; account navigation implemented; implemented additions and entry-point checks do not complete module conversion |
+| Money | URL-selected account activity, transfers, contributions, forecasts and reconciliation | Account history now includes actual account balance, owners, correction/edit/entry forms and a preselected transfer action; final validation pending |
 | Places | Rooms/zones/floors stay first class, floor plans and owner-contributed related panels | Partial; implemented additions and entry-point checks do not complete module conversion |
 | Devices | Images, profiles, state freshness, supported controls, room and typed maintenance tasks | Partial; maintenance relationship implemented and database-tested; implemented additions and entry-point checks do not complete module conversion |
 | Home Assistant | Actual supported source capabilities, mappings, scenes and source availability | Partial; implemented additions and entry-point checks do not complete module conversion |
 | Energy | Source measurements, appliances, configuration and estimates distinguished from expenses | Partial; implemented additions and entry-point checks do not complete module conversion |
 | Household | Residents, role-aware actions, profiles and linked household context | Partial; implemented additions and entry-point checks do not complete module conversion |
 | Documents | Existing file identity, folders, images and linked-record ownership | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Contacts | Recognisable contact cards and linked work/projects | Partial; implemented additions and entry-point checks do not complete module conversion |
+| Contacts | Recognisable contact cards and linked work/projects | Shop-scoped supplier panel and preselected creation now implemented through Contacts; final validation pending |
 | Integrations | Connection states, reviewed imports and source-owner links | Partial; implemented additions and entry-point checks do not complete module conversion |
 | Settings/auth | Focused owner sections, legacy deep links and existing account/security forms | Partial; section navigation implemented; implemented additions and entry-point checks do not complete module conversion |
 | Assistant/MCP | Current guides, schemas, authorised context and equivalent owner workflows | Partial; implemented additions and entry-point checks do not complete module conversion |
@@ -81,3 +81,13 @@ Stage 4 and whole-app acceptance remain open. The [implementation report](implem
 ## Current local evidence
 
 See [implementation](implementation.md) and the [product/finance outcome matrix](capability-matrix.md) for the 8 November continuation. The first workspace now compiles locally; recurring expenses have a dedicated schedule/payment composition. Neither a successful targeted run nor a bounded history preview completes the module. Phases A–E remain open; deployment is not performed.
+
+## Current implementation decisions
+
+- Keep the established phone + / desktop Quick action interface with optional search, all role-filtered actions and keyboard shortcuts. This follows the latest product-owner direction and supersedes the earlier proposal to replace it with search and Add.
+- Recurring obligations expose documents on both the schedule and its migrated original subscription; MCP reads/detach include both identities.
+- Shops compose real owner-filtered catalogue offers, contacts and recent purchases. Unknown price stays unknown. Purchase money stays redacted for children.
+- Purchases distinguish actual acquired quantity from credited stock, expose recorded source needs/shop, and open receipt document workspaces as well as raw files.
+- Stock history now opens verified surviving purchase, need and cooking records, including through MCP. Ledger tiles retain the same source links/actions as rows.
+- Owner links retain return context; main searchable lists retain query/view and shop/device filters in the URL. Cooking entry retains its recipe/meal-plan origin.
+- These latest implementation additions have **not** received final validation. Do not reuse earlier passing counts as acceptance evidence for them. No deployment or production migration.

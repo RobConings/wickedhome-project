@@ -303,7 +303,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
                 <ProductAlternatives product={product} products={products} canManage={canManage} highlightId={highlightId}
                   productHref={productPath} initialSelections={initialSelections?.products} />
               </Card>
-              <Card>
+              <Card id="product-stock-history" className="scroll-mt-20">
                 <div className="flex items-center gap-2"><IconChip icon={HistoryIcon} tone="tasks" size="sm" /><CardTitle>{t("history.title")}</CardTitle></div>
                 <StockMovementList movements={stock.movements} showPlace={stockItems.length > 1} />
               </Card>

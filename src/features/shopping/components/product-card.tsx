@@ -1,4 +1,5 @@
 import { RecordImage } from "@/components/shared/record-image";
+import { RecordLink } from "@/components/shared/record-link";
 import { BarcodeIcon, ExternalLinkIcon, PencilIcon, PlusIcon, QrCodeIcon, ShoppingCartIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
@@ -43,7 +44,10 @@ export function ProductCard({ product, shops, canManage, initialSelections, prod
       <RecordImage src={product.imageUrl} alt={product.name} fit="contain" className="aspect-[4/3] w-full rounded-none border-b" fallback={<ProductCategoryIcon category={product.category} className="size-12 text-section" />} />
       <div className="flex min-w-0 flex-1 flex-col gap-3 p-4">
       <div className="flex items-start justify-between gap-2">
-
+        <div className="min-w-0">
+          <h3 className="leading-tight font-semibold break-words"><RecordLink to={`/inventory/products/${encodeURIComponent(product.id)}`} className="hover:underline">{product.name}</RecordLink></h3>
+          {product.brand && <p className="mt-1 text-sm break-words text-muted-foreground">{product.brand}</p>}
+        </div>
         <Button
           variant="ghost"
           size="icon"
@@ -58,7 +62,6 @@ export function ProductCard({ product, shops, canManage, initialSelections, prod
       </div>
 
       <div className="flex min-w-0 flex-col gap-1">
-        <h3 className="leading-tight font-semibold break-words">{product.name}</h3>
         <span><ProductEssentialBadge isEssential={product.isEssential} /></span>
         <span className="text-xs text-muted-foreground">
           {[t(`categories.${product.category}`), product.unit].filter(Boolean).join(" · ")}

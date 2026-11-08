@@ -1,7 +1,8 @@
+import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import { CheckIcon, ChefHatIcon, CookingPotIcon, PlayIcon, ShoppingCartIcon, Trash2Icon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useFetcher } from "react-router";
+import { useLocation, useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ export function MealPlanCard({ entry, canManage, action }: MealPlanCardProps) {
   const { t } = useTranslation("recipes");
   const { t: tCommon } = useTranslation();
   const locale = currentLocale();
+  const location = useLocation();
   const fetcher = useFetcher<RecipeActionResult>();
   const [removeItems, setRemoveItems] = React.useState(true);
   const pendingIntent = fetcher.formData?.get("intent");
@@ -47,7 +49,7 @@ export function MealPlanCard({ entry, canManage, action }: MealPlanCardProps) {
   }, [fetcher.state, fetcher.data, t, entry.recipeName]);
 
   const submit = (intent: string, extra: Record<string, string> = {}) =>
-    fetcher.submit({ intent, entryId: entry.id, ...extra }, { method: "post", action });
+    fetcher.submit({ intent, entryId: entry.id, recordOrigin: `${location.pathname}${location.search}${location.hash}`, ...extra }, { method: "post", action });
 
   return (
     <Card className={cn("gap-3 p-4", cooked && "opacity-75")} tone={status === "cooking" ? "featured" : "default"}>

@@ -459,3 +459,17 @@ record again), project cover images, the payment QR.
 An expense remains the account's one gross payment. The explicit allocation editor assigns project and household shares in integer cents and shows any unallocated remainder. Project budgets use their assigned share, including the effective project of task-linked materials; account activity never sums these shares as new payments.
 
 Legacy single-project expenses retain their meaning until deliberately allocated. Explicit shares disable the older single-project picker. A gross-amount reduction below assigned costs is rejected. Removing a project share requires reviewing invoice-material links. Recurring-template edits cannot silently replace allocated unpaid instances. See [Purchases](PURCHASES.md) for locking, retry identity, goods-purpose separation and MCP operations.
+
+## Recurring schedule documents
+
+The recurring expense's Details workspace composes the Documents attachment panel for the schedule
+(`subscription`, schedule ID). A migrated schedule also exposes the documents attached to its recorded
+`legacySubscriptionId`, under “Original subscription documents”. Reading or editing the schedule does not
+move those files, rewrite legacy attachment IDs, create payments or change stock. Document links retain the
+originating schedule and its view/filter context. Children may read/download; existing owner/adult document
+permissions govern upload, attach and detach.
+
+The schedule detail API returns `documentEntityIds` (the current schedule ID and, when present, its original
+subscription ID). MCP `documents_linked` with `on: "recurring_expense"` reads and deduplicates both sets;
+`documents_attach` attaches to the current schedule, or detaches the selected file from both attachment
+identities. Resolver permissions, household scope, write-token requirements and confirmation remain in effect.

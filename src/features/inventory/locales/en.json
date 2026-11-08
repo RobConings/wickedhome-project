@@ -62,7 +62,10 @@
   "history": {
     "title": "History",
     "empty": "No changes yet.",
-    "after": "now {{quantity}}"
+    "after": "now {{quantity}}",
+    "openPurchase": "Open purchase",
+    "openNeed": "Open original need",
+    "openCooking": "Open cooking session"
   },
   "detail": {
     "total": "{{quantity}} in total",

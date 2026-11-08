@@ -1,6 +1,6 @@
 import { ChevronRightIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Card } from "@/components/shared/card";
 import { cn } from "@/lib/utils";
 import { PlanMarkerDot } from "@/features/places";

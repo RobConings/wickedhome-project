@@ -1,7 +1,7 @@
 import * as React from "react";
 import { DownloadIcon, EyeIcon, FolderOpenIcon, MoreVerticalIcon, PaperclipIcon, UnlinkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {

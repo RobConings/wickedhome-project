@@ -70,12 +70,12 @@ export function ProjectsScreen({ overview, places, canManage }: ProjectsScreenPr
         getKey={(project) => project.id}
         renderRow={(project) => <ProjectListItem project={project} />}
         renderTile={(project) => <ProjectTile project={project} />}
-        search={{
+        search={{ param: "q",
           keys: (project) => [project.name, project.tag, project.description, ...project.places.map((place) => place.name)],
           label: t("filter.search"),
           placeholder: t("filter.search"),
         }}
-        storageKey="projects"
+        storageKey="projects" viewParam="view"
         defaultView="tiles"
         pending={pending}
         filtered={filter !== "all" && overview.projects.length > 0}

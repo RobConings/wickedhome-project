@@ -166,6 +166,11 @@ registerAssistantTool({
         recent: stock.movements.slice(0, 8).map(
           (move) => `${day(move.createdAt)} ${move.delta > 0 ? "+" : ""}${formatQuantity(move.delta, ctx.locale)} ${move.placeName} (${move.reason.replace("scan_", "")})${move.userName ? ` ${move.userName}` : ""}`,
         ),
+        movementSources: stock.movements.slice(0, 8).map((move) => ({ id: move.id,
+          purchase: move.purchase ? { ...move.purchase, url: `/purchases/${move.purchase.kind === "acquisition" ? "acquisitions/" : ""}${encodeURIComponent(move.purchase.id)}` } : null,
+          need: move.needId ? { id: move.needId, url: `/shopping/items/${encodeURIComponent(move.needId)}` } : null,
+          cooking: move.cookingEntryId ? { id: move.cookingEntryId, url: `/recipes/cook/${encodeURIComponent(move.cookingEntryId)}` } : null,
+        })),
       };
     }
     const query = input.q?.toLowerCase();

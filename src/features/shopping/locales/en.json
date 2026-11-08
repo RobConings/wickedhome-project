@@ -559,5 +559,16 @@
     "expense": "Recorded expense",
     "openExpense": "View expense",
     "alternatives": "Other products that share this stock"
+  },
+  "shopOffers": {
+    "title": "Products and recorded offers",
+    "description": "Products linked to this shop in your catalogue. Recorded prices may have changed; availability is not checked.",
+    "empty": "No catalogue products linked to this shop yet. Open a product to add its shop or offer.",
+    "search": "Search products, brands or article numbers",
+    "article": "Article {{number}}",
+    "unknownPrice": "Price not recorded",
+    "price": "Recorded price: {{price}}",
+    "preferred": "Preferred shop for this product",
+    "open": "Open recorded product page"
   }
 }

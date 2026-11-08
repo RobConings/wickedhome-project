@@ -559,5 +559,16 @@
     "expense": "Geregistreerde uitgave",
     "openExpense": "Uitgave bekijken",
     "alternatives": "Andere producten met dezelfde voorraad"
+  },
+  "shopOffers": {
+    "title": "Producten en bewaarde aanbiedingen",
+    "description": "Producten uit je catalogus die bij deze winkel horen. Bewaarde prijzen kunnen veranderd zijn; beschikbaarheid wordt niet gecontroleerd.",
+    "empty": "Nog geen catalogusproducten aan deze winkel gekoppeld. Open een product om een winkel of aanbieding toe te voegen.",
+    "search": "Zoek producten, merken of artikelnummers",
+    "article": "Artikel {{number}}",
+    "unknownPrice": "Prijs niet geregistreerd",
+    "price": "Bewaarde prijs: {{price}}",
+    "preferred": "Voorkeurswinkel voor dit product",
+    "open": "Open bewaarde productpagina"
   }
 }

@@ -1,7 +1,8 @@
 import * as React from "react";
 import { FileUpIcon, FlameIcon, ZapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Await, Link, useNavigation, useRevalidator } from "react-router";
+import { Await, useNavigation, useRevalidator } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";

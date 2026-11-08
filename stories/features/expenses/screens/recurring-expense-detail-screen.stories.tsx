@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { DocumentAttachments } from "@/features/documents";
+import { documentFiles } from "../../documents/fixtures";
 import type { ReactNode } from "react";
 import { useSelections } from "@/lib/selections";
 import { SkeletonPage } from "@/components/shared/loading-state";
@@ -40,3 +42,7 @@ export const ReadOnly: Story = { args: { canManage: false } };
 export const Loading: Story = { render: () => <SkeletonPage /> };
 export const Payments: Story = { parameters: { router: { initialEntries: ["/expenses/recurring/fixture?workspace=overview&from=%2Fexpenses%3Fview%3Drecurring%26kind%3Dloan"] } } };
 export const StatusRejected: Story = { parameters: { router: { action: async () => ({ formError: "This schedule changed. Please refresh.", intent: "recurring-status" }) } } };
+
+/** The route composes Documents-owned panels; reading a schedule never moves the original files. */
+export const WithDocuments: Story = { args: { attachments: <DocumentAttachments entityType="subscription" entityId={recurringExpenseDetailFixture.recurring.id} canManage initialFiles={[documentFiles.brandpolis]} /> } };
+export const ReadOnlyDocuments: Story = { args: { canManage: false, attachments: <DocumentAttachments entityType="subscription" entityId={recurringExpenseDetailFixture.recurring.id} canManage={false} initialFiles={[documentFiles.brandpolis]} /> } };

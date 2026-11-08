@@ -1,6 +1,6 @@
 import { WalletIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Card, CardTitle } from "@/components/shared/card";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import { formatCurrency } from "@/lib/format";

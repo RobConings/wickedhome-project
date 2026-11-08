@@ -1,5 +1,6 @@
 import { CookingPotIcon, HistoryIcon, PackageMinusIcon, PackagePlusIcon, PencilIcon, ShoppingCartIcon, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { RecordLink } from "@/components/shared/record-link";
 import { formatQuantity } from "@/features/shopping";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -50,6 +51,11 @@ export function StockMovementList({ movements, showPlace = true }: { movements: 
                   .filter(Boolean)
                   .join(" · ")}
               </span>
+              {(movement.purchase || movement.needId || movement.cookingEntryId) && <div className="flex flex-wrap gap-x-3 text-xs">
+                {movement.purchase && <RecordLink to={`/purchases/${movement.purchase.kind === "acquisition" ? "acquisitions/" : ""}${encodeURIComponent(movement.purchase.id)}`} className="inline-flex min-h-10 items-center text-primary hover:underline">{t("history.openPurchase")}</RecordLink>}
+                {movement.needId && <RecordLink to={`/shopping/items/${encodeURIComponent(movement.needId)}`} className="inline-flex min-h-10 items-center text-primary hover:underline">{t("history.openNeed")}</RecordLink>}
+                {movement.cookingEntryId && <RecordLink to={`/recipes/cook/${encodeURIComponent(movement.cookingEntryId)}`} className="inline-flex min-h-10 items-center text-primary hover:underline">{t("history.openCooking")}</RecordLink>}
+              </div>}
             </div>
             <span className="flex flex-col items-end">
               <span className={cn("font-semibold tabular-nums", positive ? "text-success" : "text-foreground")}>

@@ -26,6 +26,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/shared/ca
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { DescriptionItem, DescriptionList } from "@/components/shared/description-list";
 import { PageHeader } from "@/components/shared/page-header";
+import { RecordLink } from "@/components/shared/record-link";
 import type { Habitant } from "@/features/household";
 import { PlaceBadge, type Place } from "@/features/places";
 import { useSamePagePending } from "@/lib/pending";
@@ -270,7 +271,7 @@ export function TaskDetailScreen({
               </DescriptionItem>
               <DescriptionItem label={t("fields.place")}>
                 {task.place ? (
-                  <PlaceBadge place={task.place} floorName={task.place.floorName} />
+                  <RecordLink to={`/places/${encodeURIComponent(task.place.id)}`} className="inline-flex min-h-11 items-center hover:underline"><PlaceBadge place={task.place} floorName={task.place.floorName} /></RecordLink>
                 ) : (
                   <span className="font-normal text-muted-foreground">{t("detail.noPlace")}</span>
                 )}
@@ -284,7 +285,7 @@ export function TaskDetailScreen({
               <DescriptionItem label={t("fields.assignees")}>
                 {task.assigneeIds.length > 0 ? (
                   <div className="flex flex-col gap-1">
-                    <TaskAssignees task={task} habitants={habitants} withNames />
+                    <TaskAssignees task={task} habitants={habitants} withNames linked />
                     {task.rotateAssignees && (
                       <span className="text-xs font-normal text-muted-foreground">
                         {t("assignees.rotation", {

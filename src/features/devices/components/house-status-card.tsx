@@ -1,7 +1,7 @@
 import type * as React from "react";
 import { ArrowRightIcon, HouseWifiIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/shared/card";
 import { IconChip } from "@/components/shared/icon-chip";

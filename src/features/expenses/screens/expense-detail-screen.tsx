@@ -207,10 +207,10 @@ export function ExpenseDetailScreen({
                 {expense.payerType === "joint"
                   ? t("payer.joint")
                   : expense.payerType === "person"
-                    ? (payerPerson?.name ?? t("detail.unknownHabitant"))
+                    ? (payerPerson ? <Link to={`/habitants/${encodeURIComponent(payerPerson.id)}`} className="underline">{payerPerson.name}</Link> : t("detail.unknownHabitant"))
                     : t("payer.split")}
               </DescriptionItem>
-              {shop && <DescriptionItem label={t("fields.shop")}>{shop.name}</DescriptionItem>}
+              {shop && <DescriptionItem label={t("fields.shop")}><Link to={`/shops/${encodeURIComponent(shop.id)}`} className="underline">{shop.name}</Link></DescriptionItem>}
               <DescriptionItem label={t("fields.category")}>{t(`categories.${expense.category}`)}</DescriptionItem>
               {(expense.iban || expense.structuredCommunication || expense.reference) && (
                 <>

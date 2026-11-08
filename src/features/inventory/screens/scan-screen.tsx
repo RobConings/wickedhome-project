@@ -1,7 +1,8 @@
 import * as React from "react";
 import { CircleHelpIcon, Layers2Icon, PackageMinusIcon, PackagePlusIcon, PackageSearchIcon, PlusIcon, ScanLineIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useRevalidator } from "react-router";
+import { useRevalidator } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";

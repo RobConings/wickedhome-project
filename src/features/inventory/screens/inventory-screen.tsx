@@ -1,7 +1,8 @@
 import * as React from "react";
 import { BoxIcon, CalendarClockIcon, PackageIcon, PencilIcon, PlusIcon, ScanBarcodeIcon, TriangleAlertIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useRevalidator } from "react-router";
+import { useRevalidator } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
@@ -145,8 +146,8 @@ export function InventoryScreen({ data, canManage, initialSelections, today = to
           renderTile={(item) => (
             <StockItemTile item={item} showPlace={false} pending={isPending(item.id)} onAdjust={onAdjust} actions={editButton(item)} />
           )}
-          search={{ keys: (item) => [item.productName, item.placeName, item.unit] }}
-          storageKey="inventory"
+          search={{ param: "q", keys: (item) => [item.productName, item.placeName, item.unit] }}
+          storageKey="inventory" viewParam="view"
           defaultView="list"
           groupBy={(item) => item.placeId}
           groupOrder={places.map((place) => place.id)}

@@ -15,6 +15,7 @@ export { ProductPicker } from "./components/product-picker";
 export { ProductSuggestionCard } from "./components/product-suggestion-card";
 export { PlaceShoppingSection } from "./components/place-shopping-section";
 export { ShopShoppingList } from "./components/shop-shopping-list";
+export { ShopProductOffers } from "./components/shop-product-offers";
 export { ShoppingSourceBadge } from "./components/shopping-source-badge";
 export { TaskMaterialsPanel } from "./components/task-materials-panel";
 // For Projects: `<ProjectMaterialsPanel projectId canManage placeId onChange />` (its items and its tasks' materials,

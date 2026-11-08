@@ -1,5 +1,7 @@
 import { ShoppingCartIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { RecordImage } from "@/components/shared/record-image";
+import { RecordLink } from "@/components/shared/record-link";
 import { Button } from "@/components/ui/button";
 import { ShopBadge, type Shop } from "@/features/shops";
 import { formatCurrency } from "@/lib/format";
@@ -46,15 +48,10 @@ export function ProductListItem({ product, shops, canManage, initialSelections, 
       className={cn("flex items-center gap-3 transition-opacity", actions.deleting && "opacity-60")}
       aria-busy={actions.busy || undefined}
     >
-      {product.imageUrl ? (
-        <img src={product.imageUrl} alt="" referrerPolicy="no-referrer" className="size-16 shrink-0 rounded-lg border bg-white object-contain p-1" />
-      ) : (
-        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-section-soft text-section">
-          <ProductCategoryIcon category={product.category} className="size-5" />
-        </span>
-      )}
+      <RecordImage src={product.imageUrl} shape="avatar" fit="contain" fallback={<ProductCategoryIcon category={product.category} className="size-6 text-section" />} />
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <span className="truncate font-medium">{product.name}</span>
+        <RecordLink to={`/inventory/products/${encodeURIComponent(product.id)}`} className="font-medium break-words hover:underline">{product.name}</RecordLink>
+        {product.brand && <span className="text-sm break-words text-muted-foreground">{product.brand}</span>}
         <span><ProductEssentialBadge isEssential={product.isEssential} /></span>
         <span className="truncate text-xs text-muted-foreground">
           {[

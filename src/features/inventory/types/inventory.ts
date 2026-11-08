@@ -96,6 +96,10 @@ export type StockMovement = {
   note: string | null;
   /** ISO timestamp. */
   createdAt: string;
+  /** Verified surviving owners; soft historical references alone do not create navigation. */
+  purchase?: { id: string; kind: "visit" | "acquisition" } | null;
+  needId?: string | null;
+  cookingEntryId?: string | null;
 };
 
 /** `GET /api/inventory/products/:productId`: where a product is kept and what happened to it. */

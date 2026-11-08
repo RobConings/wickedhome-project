@@ -1,7 +1,8 @@
+import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import { CircleAlertIcon, CircleCheckIcon, CircleDotIcon, ExternalLinkIcon, Redo2Icon, SaveIcon, Undo2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useBeforeUnload, useFetcher } from "react-router";
+import { useBeforeUnload, useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";

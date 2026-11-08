@@ -149,6 +149,8 @@ export const contactListQuerySchema = z.object({
   q: z.string().trim().max(100).optional(),
   /** Only the contacts linked to this project. */
   projectId: idSchema.optional(),
+  /** Only contacts whose recorded supplier shop matches. */
+  shopId: idSchema.optional(),
 });
 export type ContactListQuery = z.infer<typeof contactListQuerySchema>;
 

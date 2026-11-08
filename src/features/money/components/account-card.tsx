@@ -1,6 +1,7 @@
 import * as React from "react";
 import { ArrowLeftRightIcon, HistoryIcon, EllipsisVerticalIcon, LandmarkIcon, PiggyBankIcon, ScaleIcon } from "lucide-react";
-import { Link, type To } from "react-router";
+import { type To } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,8 @@ type AccountCardProps = {
   habitants: Habitant[];
   today: string;
   canManage: boolean;
+  /** A host header can supply the same contextual transfer action. */
+  showTransfer?: boolean;
 };
 
 /** A card action: grows to fill the row, wraps to its own row below ~11rem, and wraps its label if needed. */
@@ -35,7 +38,7 @@ const groupIban = (iban: string) => iban.replace(/(.{4})/g, "$1 ").trim();
  * One joint account: balance today, the latest correction, this month's in and out, and the actions
  * "Set real balance" and "Record transfer" (more: edit, other money in or out).
  */
-export function AccountCard({ account, month, accounts, habitants, today, canManage, activityTo }: AccountCardProps) {
+export function AccountCard({ account, month, accounts, habitants, today, canManage, activityTo, showTransfer = true }: AccountCardProps) {
   const { t } = useTranslation("money");
   const [dialog, setDialog] = React.useState<"edit" | "other" | null>(null);
   const Icon = account.kind === "savings" ? PiggyBankIcon : LandmarkIcon;
@@ -105,7 +108,7 @@ export function AccountCard({ account, month, accounts, habitants, today, canMan
       {canManage && !account.archived && (
         // Side by side when the card is wide enough, else stacked full width; labels wrap instead of overflowing.
         <div className="mt-auto flex flex-wrap gap-2">
-          <RecordTransferDialog
+          {showTransfer && <RecordTransferDialog
             accounts={accounts}
             habitants={habitants}
             today={today}
@@ -116,7 +119,7 @@ export function AccountCard({ account, month, accounts, habitants, today, canMan
                 {t("actions.recordTransfer")}
               </Button>
             }
-          />
+          />}
           <SetBalanceDialog
             account={account}
             today={today}

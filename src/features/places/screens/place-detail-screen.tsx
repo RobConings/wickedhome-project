@@ -1,7 +1,8 @@
+import { RecordLink as Link } from "@/components/shared/record-link";
 import type * as React from "react";
 import { BoxIcon, CpuIcon, FolderKanbanIcon, ListChecksIcon, MapIcon, PencilIcon, PlugIcon, ShoppingCartIcon, Trash2Icon, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useFetcher, useNavigate } from "react-router";
+import { useFetcher, useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";

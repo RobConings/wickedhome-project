@@ -399,6 +399,7 @@
     "pagination": "Betalingspagina’s",
     "previous": "Vorige",
     "next": "Volgende",
-    "pageOf": "Pagina {{page}} van {{pages}}"
+    "pageOf": "Pagina {{page}} van {{pages}}",
+    "originalDocuments": "Documenten van het oorspronkelijke abonnement"
   }
 }

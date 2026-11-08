@@ -1,6 +1,6 @@
 import { PlusIcon, SlidersHorizontalIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -75,13 +75,13 @@ export function DeviceProfilesScreen({ profiles, presets, canManage }: DevicePro
             <PresetCard preset={entry.preset} canManage={canManage} />
           )
         }
-        search={{
+        search={{ param: "q",
           keys: (entry) =>
             entry.kind === "profile"
               ? [entry.profile.name, t(`categories.${entry.profile.category}`)]
               : [entry.preset.name, entry.preset.description, t(`categories.${entry.preset.category}`)],
         }}
-        storageKey="device-profiles"
+        storageKey="device-profiles" viewParam="view"
         defaultView="tiles"
         groupBy={(entry) => (entry.kind === "profile" ? MINE_GROUP : PRESETS_GROUP)}
         groupOrder={GROUP_ORDER}

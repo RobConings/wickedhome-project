@@ -1,5 +1,5 @@
 import type * as React from "react";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { cn } from "@/lib/utils";
 
 type TagChipProps = {

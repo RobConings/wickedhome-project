@@ -219,6 +219,7 @@ export async function getRecurringExpenseDetail(householdId: string, id: string)
   ]);
   const loanInstances = await loadInstancesForProgress([row]);
   return {
+    documentEntityIds: [...new Set([row.id, ...(row.legacySubscriptionId ? [row.legacySubscriptionId] : [])])],
     today: now,
     recurring: toRecurring(row, now, loanInstances.get(row.id)),
     upcoming: upcomingRows.map((expense) => toExpense(expense, now)),

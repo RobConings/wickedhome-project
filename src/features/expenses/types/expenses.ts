@@ -454,6 +454,8 @@ export type ExpenseDetail = {
 
 /** `GET /api/expenses/recurring/:id` */
 export type RecurringExpenseDetail = {
+  /** Subscription attachment identities: this schedule, followed by its original migrated subscription. */
+  documentEntityIds?: string[];
   today: string;
   recurring: RecurringExpense;
   /** Unpaid instances, soonest first (a few). */

@@ -1,6 +1,6 @@
 import { ChevronRightIcon, CircleHelpIcon, LayersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { ShopLogo, type Shop, type SavedShopGroup } from "@/features/shops";
 import { formatCurrency } from "@/lib/format";
 import { currentLocale } from "@/lib/i18n";

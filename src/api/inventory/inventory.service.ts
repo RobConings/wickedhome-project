@@ -262,11 +262,22 @@ export async function getProductStock(householdId: string, requestedId: string):
     listStock(householdId, { productId }),
     db.stockMovement.findMany({
       where: { householdId, stockItem: { productId } },
-      include: { stockItem: { select: { place: { select: { name: true } } } } },
+      include: {
+        stockItem: { select: { place: { select: { name: true } } } },
+        stockPurchase: { select: { id: true, householdId: true, shoppingPurchaseId: true, shoppingPurchase: { select: { householdId: true } } } },
+      },
       orderBy: { createdAt: "desc" },
       take: MOVEMENT_LIMIT,
     }),
   ]);
+  const needIds = [...new Set(rows.flatMap((row) => row.shoppingItemId ? [row.shoppingItemId] : []))];
+  const cookingIds = [...new Set(rows.flatMap((row) => row.mealPlanEntryId ? [row.mealPlanEntryId] : []))];
+  const [needs, meals] = await Promise.all([
+    needIds.length ? db.shoppingItem.findMany({ where: { householdId, id: { in: needIds } }, select: { id: true } }) : [],
+    cookingIds.length ? db.mealPlanEntry.findMany({ where: { householdId, id: { in: cookingIds } }, select: { id: true } }) : [],
+  ]);
+  const visibleNeeds = new Set(needs.map((need) => need.id));
+  const visibleMeals = new Set(meals.map((meal) => meal.id));
   const userIds = [...new Set(rows.flatMap((row) => (row.userId ? [row.userId] : [])))];
   const users = userIds.length
     ? await db.user.findMany({
@@ -286,6 +297,13 @@ export async function getProductStock(householdId: string, requestedId: string):
       userName: row.userId ? (names.get(row.userId) ?? null) : null,
       note: row.note,
       createdAt: row.createdAt.toISOString(),
+      purchase: row.stockPurchase?.householdId === householdId
+        ? row.stockPurchase.shoppingPurchaseId && row.stockPurchase.shoppingPurchase?.householdId === householdId
+          ? { id: row.stockPurchase.shoppingPurchaseId, kind: "visit" }
+          : !row.stockPurchase.shoppingPurchaseId ? { id: row.stockPurchase.id, kind: "acquisition" } : null
+        : null,
+      needId: row.shoppingItemId && visibleNeeds.has(row.shoppingItemId) ? row.shoppingItemId : null,
+      cookingEntryId: row.mealPlanEntryId && visibleMeals.has(row.mealPlanEntryId) ? row.mealPlanEntryId : null,
     }),
   );
   return { productId, stockItems, movements };

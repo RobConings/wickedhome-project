@@ -1,7 +1,8 @@
+import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import { HandCoinsIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Await, Link } from "react-router";
+import { Await } from "react-router";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardTitle } from "@/components/shared/card";

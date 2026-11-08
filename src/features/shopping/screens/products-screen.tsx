@@ -56,12 +56,12 @@ export function ProductsScreen({ data, canManage, initialSelections }: ProductsS
         renderTile={(product) => (
           <ProductCard product={product} shops={shops} products={products} canManage={canManage} initialSelections={initialSelections} />
         )}
-        search={{
-          keys: (product) => [product.name, product.barcode, product.qrCode, t(`categories.${product.category}`)],
+        search={{ param: "q",
+          keys: (product) => [product.name, product.brand, product.barcode, product.qrCode, t(`categories.${product.category}`)],
           label: t("products.search"),
           placeholder: t("products.search"),
         }}
-        storageKey="products"
+        storageKey="products" viewParam="view"
         defaultView="tiles"
         pending={pending}
         emptyState={

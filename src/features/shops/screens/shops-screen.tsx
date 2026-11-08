@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useSearchParams } from "react-router";
 import { LayersIcon, PencilIcon, PlusIcon, StoreIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -33,7 +33,14 @@ const GROUP_ORDER = [FAVORITES_GROUP, ...SHOP_TYPES];
 
 export function ShopsScreen({ shops, groups = [], canAdd, initialSelections }: ShopsScreenProps) {
   const { t } = useTranslation("shops");
-  const [type, setType] = React.useState<ShopType | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedType = searchParams.get("type");
+  const type = SHOP_TYPES.find((candidate) => candidate === requestedType) ?? null;
+  const setType = (value: ShopType | null) => setSearchParams((previous) => {
+    const next = new URLSearchParams(previous);
+    if (value) next.set("type", value); else next.delete("type");
+    return next;
+  }, { replace: true, preventScrollReset: true });
   const { favoriteIds, toggleFavorite } = useShopSelections({ initial: initialSelections });
 
   const availableTypes = SHOP_TYPES.filter((option) => shops.some((shop) => shop.type === option));
@@ -79,8 +86,8 @@ export function ShopsScreen({ shops, groups = [], canAdd, initialSelections }: S
         renderTile={(shop) => (
           <ShopTile shop={shop} isFavorite={favoriteIds.includes(shop.id)} onToggleFavorite={handleToggleFavorite} />
         )}
-        search={{ keys: ["name"], label: t("filter.search"), placeholder: t("filter.search") }}
-        storageKey="shops"
+        search={{ param: "q", keys: ["name"], label: t("filter.search"), placeholder: t("filter.search") }}
+        storageKey="shops" viewParam="view"
         defaultView="list"
         toolbar={<ShopTypeFilter types={availableTypes} value={type} onChange={setType} />}
         filtered={type !== null}

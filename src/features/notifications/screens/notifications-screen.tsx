@@ -1,7 +1,9 @@
 import * as React from "react";
 import { BellIcon, CheckCheckIcon, SettingsIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
+import { withRecordOrigin } from "@/lib/record-navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
@@ -36,11 +38,17 @@ type NotificationsScreenProps = {
 export function NotificationsScreen({ userId, client = notificationsClient, live = true, now }: NotificationsScreenProps) {
   const { t } = useTranslation("notifications");
   const navigate = useNavigate();
+  const location = useLocation();
+  const [search, setSearch] = useSearchParams();
   const [page, setPage] = React.useState<NotificationsPage | null>(null);
   const [failed, setFailed] = React.useState(false);
   const [loadingMore, setLoadingMore] = React.useState(false);
   const [markingAll, setMarkingAll] = React.useState(false);
-  const [show, setShow] = React.useState<Show>("all");
+  const show: Show = search.get("show") === "unread" ? "unread" : "all";
+  const setShow = (value: Show) => setSearch((next) => {
+    if (value === "all") next.delete("show"); else next.set("show", value);
+    return next;
+  }, { preventScrollReset: true });
 
   // Live reloads keep showing the current list until the new one is there (no spinner for a few rows).
   const reload = React.useCallback(() => {
@@ -91,7 +99,7 @@ export function NotificationsScreen({ userId, client = notificationsClient, live
 
   function open(item: NotificationItem) {
     if (item.readAt === null) void markRead([item.id]);
-    if (item.url) void navigate(item.url);
+    if (item.url) void navigate(withRecordOrigin(item.url, `${location.pathname}${location.search}${location.hash}`));
   }
 
   async function loadMore() {

@@ -120,8 +120,8 @@ export function MoneyFlowScreen({ data, contributionHistory, habitants, canManag
   return (
     <PageContainer>
       <PageHeader
-        title={t("page.title")}
-        description={t("page.description")}
+        title={tab === "history" && historyAccount ? historyAccount.name : t("page.title")}
+        description={tab === "history" && historyAccount ? `${t(`kinds.${historyAccount.kind}`)} · ${t("ledger.title")}` : t("page.description")}
         actions={
           canManage && (
             <>
@@ -137,11 +137,12 @@ export function MoneyFlowScreen({ data, contributionHistory, habitants, canManag
                   }
                 />
               )}
-              {active.length > 0 && (
+              {active.length > 0 && (tab !== "history" || !historyAccount?.archived) && (
                 <RecordTransferDialog
                   accounts={data.accounts}
                   habitants={habitants}
                   today={data.today}
+                  defaults={tab === "history" && historyAccount ? { toAccountId: historyAccount.id } : undefined}
                   trigger={
                     <Button>
                       <ArrowLeftRightIcon />
@@ -292,6 +293,7 @@ export function MoneyFlowScreen({ data, contributionHistory, habitants, canManag
                     />
                   </ScrollRow>
                 )}
+                <AccountCard account={historyAccount} month={historyMonth} accounts={data.accounts} habitants={habitants} today={data.today} canManage={canManage} showTransfer={false} />
                 <LedgerList lines={historyMonth.lines} accounts={data.accounts} habitants={habitants} canManage={canManage} />
               </PageSection>
             )}

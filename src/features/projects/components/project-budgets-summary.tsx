@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ArrowRightIcon, FolderKanbanIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PendingContent } from "@/components/shared/loading-state";

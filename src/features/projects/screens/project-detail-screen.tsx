@@ -1,3 +1,4 @@
+import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import {
   BanIcon,
@@ -16,7 +17,7 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useFetcher, useLocation } from "react-router";
+import { useFetcher, useLocation } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {

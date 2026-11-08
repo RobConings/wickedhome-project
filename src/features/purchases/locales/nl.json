@@ -40,5 +40,18 @@
     "loadError": "Kon projecten niet laden.",
     "retry": "Opnieuw proberen",
     "conflict": "Iemand heeft deze verdeling gewijzigd. Je invoer blijft bewaard; sluit en heropen om de nieuwste verdeling te bekijken voordat je opslaat."
-  }
+  },
+  "shop": {
+    "title": "Recente aankopen hier",
+    "description": "Geregistreerde winkelbezoeken en aankopen, met hun oorspronkelijke kassabonnen en betalingen.",
+    "empty": "Nog geen aankopen bij deze winkel geregistreerd.",
+    "open": "Bekijk aankoopgeschiedenis",
+    "loading": "Aankopen laden…"
+  },
+  "shopLabel": "Winkel",
+  "acquiredQuantity": "Gekocht: {{quantity}} {{unit}}",
+  "creditedQuantity": "Aan voorraad toegevoegd: {{quantity}} {{unit}}",
+  "stockHistory": "Bekijk voorraadgeschiedenis",
+  "sourceNeed": "Oorspronkelijke behoefte {{number}}",
+  "openReceipt": "Open kassabonbestand"
 }

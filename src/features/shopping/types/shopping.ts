@@ -113,6 +113,8 @@ export const productQuerySchema = z.object({
   /** Exact barcode or own QR code (scanning). */
   code: z.string().trim().max(64).optional(),
   q: z.string().trim().max(80).optional(),
+  /** Preferred shop or a recorded product offer at this shop. */
+  shopId: idSchema.optional(),
 });
 export type ProductQuery = z.infer<typeof productQuerySchema>;
 

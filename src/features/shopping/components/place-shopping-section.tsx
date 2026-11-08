@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ShoppingCartIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Button } from "@/components/ui/button";
 import { useLiveShoppingItems } from "../data/use-live-shopping";
 import { useShoppingItemActions } from "../data/use-shopping-item-actions";

@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+import { DocumentAttachments, canManageDocuments } from "@/features/documents";
 import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import {
@@ -15,6 +17,7 @@ export const handle = screenHandle<typeof loader>(({ data }) => ({ kind: "recurr
 
 export function Component() {
   const user = useCurrentUser();
+  const { t } = useTranslation("expenses");
   const { detail, habitants, shops } = useLoaderData<typeof recurringExpenseDetailLoader>();
   return (
     <RecurringExpenseDetailScreen
@@ -23,6 +26,10 @@ export function Component() {
       shops={shops}
       canManage={canManageExpenses(user.role)}
       projectField={({ defaultValue }) => <ProjectFormField defaultValue={defaultValue} />}
+      attachments={<>
+        <DocumentAttachments entityType="subscription" entityId={detail.recurring.id} canManage={canManageDocuments(user.role)} />
+        {(detail.documentEntityIds ?? []).filter((id) => id !== detail.recurring.id).map((id) => <DocumentAttachments key={id} title={t("workspace.originalDocuments")} entityType="subscription" entityId={id} canManage={canManageDocuments(user.role)} />)}
+      </>}
     />
   );
 }

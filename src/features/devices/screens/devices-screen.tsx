@@ -1,7 +1,8 @@
 import * as React from "react";
 import { CpuIcon, HouseIcon, PlusIcon, SlidersHorizontalIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { useSearchParams } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageContainer } from "@/components/layout/page-container";
@@ -44,8 +45,16 @@ export function DevicesScreen({ devices: loaded, profiles, places, appliances, c
   const samePagePending = useSamePagePending();
   const pending = forcedPending ?? samePagePending;
   const stateOf = useDeviceStates(profiles, now);
-  const [category, setCategory] = React.useState<string>(ALL);
-  const [profileId, setProfileId] = React.useState<string>(ALL);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedCategory = searchParams.get("category");
+  const category = DEVICE_CATEGORIES.find((value) => value === requestedCategory) ?? ALL;
+  const requestedProfile = searchParams.get("profile");
+  const profileId = profiles.some((profile) => profile.id === requestedProfile) ? requestedProfile! : ALL;
+  const setFilter = (key: "category" | "profile", value: string) => setSearchParams((previous) => {
+    const next = new URLSearchParams(previous);
+    if (value === ALL) next.delete(key); else next.set(key, value);
+    return next;
+  }, { replace: true, preventScrollReset: true });
 
   const profilesById = React.useMemo(() => new Map(profiles.map((profile) => [profile.id, profile])), [profiles]);
   const visible = devices.filter((device) => {
@@ -70,7 +79,7 @@ export function DevicesScreen({ devices: loaded, profiles, places, appliances, c
 
   const filters = (
     <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap" role="group" aria-label={t("filters.label")}>
-      <Select value={category} onValueChange={setCategory}>
+      <Select value={category} onValueChange={(value) => setFilter("category", value)}>
         <SelectTrigger className="w-full sm:w-48" aria-label={t("filters.category")}>
           <SelectValue />
         </SelectTrigger>
@@ -83,7 +92,7 @@ export function DevicesScreen({ devices: loaded, profiles, places, appliances, c
           ))}
         </SelectContent>
       </Select>
-      <Select value={profileId} onValueChange={setProfileId}>
+      <Select value={profileId} onValueChange={(value) => setFilter("profile", value)}>
         <SelectTrigger className="w-full sm:w-56" aria-label={t("filters.profile")}>
           <SelectValue />
         </SelectTrigger>
@@ -147,7 +156,7 @@ export function DevicesScreen({ devices: loaded, profiles, places, appliances, c
           renderTile={(device) => (
             <DeviceTile device={device} profile={profilesById.get(device.profileId)} state={stateOf(device)} />
           )}
-          search={{
+          search={{ param: "q",
             keys: (device) => [
               device.name,
               profilesById.get(device.profileId)?.name,
@@ -156,7 +165,7 @@ export function DevicesScreen({ devices: loaded, profiles, places, appliances, c
               device.appliance?.name,
             ],
           }}
-          storageKey="devices"
+          storageKey="devices" viewParam="view"
           defaultView="list"
           toolbar={filters}
           filtered={category !== ALL || profileId !== ALL}

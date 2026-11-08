@@ -7,8 +7,8 @@ import { capList, entityRef, registerAssistantSkill, registerAssistantTool, regi
 registerAssistantSkill({ id: "purchases", title: { en: "Purchases", nl: "Aankopen" },
   summary: "Existing acquisitions, selected product variants, receipts and linked expenses; product/project purchase context without duplicate stock or payments.",
   keywords: { en: ["purchase", "purchases", "acquisition", "receipt", "bought goods"], nl: ["aankoop", "aankopen", "aankoopgeschiedenis", "kassabon", "gekochte producten"] } });
-registerAssistantTool({ name: "purchases.list", description: "Read recent existing acquisitions and visit purchases, optionally scoped to one product/project. Totals can be unknown. Keep each returned kind and id for details; this creates no purchase or payment.",
-  input: z.object({ productId: idSchema.optional(), projectId: idSchema.optional() }), permission: "read", confirm: "never", activity: { en: "Checked purchase history", nl: "Aankoopgeschiedenis bekeken" },
+registerAssistantTool({ name: "purchases.list", description: "Read recent existing acquisitions and visit purchases, optionally scoped to a product, project, buying need or shop. Totals can be unknown. Keep each returned kind and id for details; this creates no purchase or payment.",
+  input: z.object({ productId: idSchema.optional(), projectId: idSchema.optional(), requirementId: idSchema.optional(), shopId: idSchema.optional() }), permission: "read", confirm: "never", activity: { en: "Checked purchase history", nl: "Aankoopgeschiedenis bekeken" },
   run: async (ctx, input) => capList(await listPurchases(ctx.user, input), 50, (row) => row) });
 registerAssistantTool({ name: "purchases.details", description: "Read a purchase using its kind/id from purchases_list. Actual quantity and credited stock quantity can use different known units. Receipt evidence and linked expenses are separate. No financial details for children.",
   input: z.object({ id: idSchema, kind: z.enum(["visit", "acquisition"]).default("visit") }), permission: "read", confirm: "never", activity: { en: "Opened a purchase", nl: "Aankoop geopend" },

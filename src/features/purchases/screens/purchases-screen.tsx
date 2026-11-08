@@ -29,7 +29,7 @@ export function PurchasesScreen({ purchases, filtered = false }: { purchases: Pu
     <GeneralList label={t("title")} items={purchases} getKey={(purchase) => `${purchase.kind}:${purchase.id}`}
       renderRow={(purchase) => <div className="relative flex min-w-0 items-center gap-3">{content(purchase)}</div>}
       renderTile={(purchase) => <Card className="relative flex-row items-center gap-3">{content(purchase)}</Card>}
-      storageKey="purchases" search={{ keys: (purchase) => [purchase.name, purchase.shopName], label: t("search"), placeholder: t("search") }}
+      storageKey="purchases" viewParam="view" search={{ param: "q", keys: (purchase) => [purchase.name, purchase.shopName], label: t("search"), placeholder: t("search") }}
       emptyState={<EmptyState icon={ReceiptTextIcon} title={t("empty")} description={t("emptyDescription")} />} />
   </PageContainer>;
 }

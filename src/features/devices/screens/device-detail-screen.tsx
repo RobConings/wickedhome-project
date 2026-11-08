@@ -1,7 +1,8 @@
+import { RecordLink as Link } from "@/components/shared/record-link";
 import type * as React from "react";
 import { ActivityIcon, ListChecksIcon, FolderIcon, MapIcon, MapPinIcon, SlidersHorizontalIcon, MapPinOffIcon, PencilIcon, Trash2Icon, ZapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useFetcher } from "react-router";
+import { useFetcher } from "react-router";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";

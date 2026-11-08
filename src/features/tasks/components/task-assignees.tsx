@@ -1,5 +1,6 @@
 import { RotateCwIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { RecordLink } from "@/components/shared/record-link";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import { cn } from "@/lib/utils";
 import { onDutyIds, type Task } from "../types/tasks";
@@ -9,11 +10,13 @@ type TaskAssigneesProps = {
   habitants: Habitant[];
   /** Also show the names next to the avatars. */
   withNames?: boolean;
+  /** Owner detail pages link names; compact rows may already be inside another link. */
+  linked?: boolean;
   className?: string;
 };
 
 /** Who is on duty, as avatars. A rotating task shows whose turn it is and the rotation order. */
-export function TaskAssignees({ task, habitants, withNames = false, className }: TaskAssigneesProps) {
+export function TaskAssignees({ task, habitants, withNames = false, linked = false, className }: TaskAssigneesProps) {
   const { t } = useTranslation("tasks");
   const byId = (id: string) => habitants.find((habitant) => habitant.id === id);
   const onDuty = onDutyIds(task).flatMap((id) => byId(id) ?? []);
@@ -30,7 +33,7 @@ export function TaskAssignees({ task, habitants, withNames = false, className }:
           <HabitantAvatar key={habitant.id} habitant={habitant} size="sm" />
         ))}
       </div>
-      {withNames && <span className="truncate text-sm">{names}</span>}
+      {withNames && (linked ? <span className="flex min-w-0 flex-wrap gap-x-2 text-sm">{onDuty.map((habitant) => <RecordLink key={habitant.id} to={`/habitants/${encodeURIComponent(habitant.id)}`} className="min-h-11 py-2 break-words text-primary hover:underline">{habitant.name}</RecordLink>)}</span> : <span className="truncate text-sm">{names}</span>)}
       {rotation && <RotateCwIcon className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />}
       <span className="sr-only">{rotation ? `${t("assignees.onDuty", { names })} (${rotation})` : t("assignees.label", { names })}</span>
     </div>

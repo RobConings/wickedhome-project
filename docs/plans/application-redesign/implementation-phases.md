@@ -2,7 +2,7 @@
 
 **Latest GitHub continuation:** [product brand, CI and English archive consolidation](github-continuation-2026-11-08.md). The prior **Codex continuation** used baseline `2dda61a`; see the [follow-up implementation and validation ledger](followup-implementation-2026-11-08.md) for newly implemented energy, history, account, product and record-owner work and fresh check status. Earlier checkpoint counts below remain historical evidence.
 
-**Status:** implementation is in progress on `rework_features`; the product workspace has received local validation and the recurring-expense workspace is the next implemented reference slice. Neither module nor the whole redesign is fully accepted. **The 78-screen HTML prototype is a visual and navigation guideline only.** It is not an inventory of all existing capabilities, a universal page renderer, or evidence that a module is complete.
+**Status:** implementation continues from clean commit `6f3e1b7` on `rework_features` (baseline CI passing as reported by the product owner). Product/brand, buying-need and energy source workspaces already exist. The active Phase D continuation implements recurring documents, account management, shop relationships, purchase provenance and contextual navigation; see the [current implementation ledger](implementation-continuation-2026-11-08.md). Neither module nor the whole redesign is fully accepted. **The 78-screen HTML prototype is a visual and navigation guideline only.** It is not an inventory of all existing capabilities, a universal page renderer, or evidence that a module is complete.
 
 ## Core decision: consistent grammar, different workspaces
 
@@ -16,6 +16,8 @@ WickedHome is for people running a household, not ERP administrators. Reuse reco
 | Feed, search, shopping list, accounts, audit, documents | List/grid/detail composition with sorting, grouping, filters and useful previews |
 | Settings, connections, imports, permissions | Task-oriented forms, connection state, confirmations and progress, not artificial dashboards |
 | Assistant and MCP | Conversational context and direct owner-service actions; the same outcomes and permissions as web |
+
+**Current product-owner overrides (8 November):** implement the remaining rework before running further tests, compiler/lint/build or Storybook checks. Preserve the original phone “+” Quick actions sheet and desktop Quick action menu, including the existing role-aware actions/shortcuts and optional search entry. The earlier generic-quick-action replacement proposal is superseded. Do not repeat baseline CI tests during implementation.
 
 **Navigation rules:** a meaningful user-facing record has a stable owner-owned page; related records open their own owner pages, not duplicated CRUD views. Real owner-supplied links and history, not guesses. A record's Details / Overview is optional, not an obligatory pattern for calendars or editors. One primary day-to-day action and one management action may each have contextual dropdowns where appropriate. The desktop header and two-row mobile action positioning follow the approved product example; menus overlay content.
 
@@ -45,6 +47,8 @@ The [29-owner application outcome inventory](application-outcomes.md) now maps t
 **Gate:** real reusable primitives and shared behaviour are validated without replacing feature-specific workflows.
 
 ## Phase C — vertical reference journeys (in progress)
+
+Continuation after `6f3e1b7`: the nullable brand migration is applied only to the disposable local test DB; all 37 shopping/connected-record DB cases pass, including brand search/clear/retention. Seven finance DB cases now cover original/current recurring documents and full loan repayment/undo/re-pay. Those scoped results predate the latest UI changes. At the product owner’s request, further validation is deferred until implementation is finished. No production operation.
 
 **Product → shopping → purchase → inventory → finance** is the first reference, while real finance and recurring obligations form a second independent reference.
 

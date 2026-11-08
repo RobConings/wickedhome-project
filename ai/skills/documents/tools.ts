@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { getRecurringExpenseDetail } from "@/api/expenses/expenses.service";
 import type { DocumentEntityType, DocumentFile } from "@/features/documents/types/documents";
 import { formatDate } from "@/types/date-format";
 import {
@@ -141,6 +142,7 @@ const TARGETS = {
   task: { linkType: "task", entity: "task" },
   project: { linkType: "project", entity: "project" },
   expense: { linkType: "bill", entity: "expense" },
+  recurring_expense: { linkType: "subscription", entity: "recurring_expense" },
 } as const satisfies Record<string, { linkType: DocumentEntityType; entity: EntityType }>;
 type Target = keyof typeof TARGETS;
 const targetSchema = z.enum(Object.keys(TARGETS) as [Target, ...Target[]]);
@@ -148,26 +150,31 @@ const targetSchema = z.enum(Object.keys(TARGETS) as [Target, ...Target[]]);
 async function resolveTarget(ctx: AssistantToolContext, on: Target, name: string) {
   const outcome = await resolveEntity(ctx, TARGETS[on].entity, name);
   if (!outcome.ok) throw new HttpError(400, "bad_request", outcome.error);
-  return { linkType: TARGETS[on].linkType, entity: outcome.entity };
+  const entity = outcome.entity;
+  const entityIds = on === "recurring_expense"
+    ? (await getRecurringExpenseDetail(ctx.householdId, entity.id)).documentEntityIds ?? [entity.id]
+    : [entity.id];
+  return { linkType: TARGETS[on].linkType, entity, entityIds };
 }
 
 registerAssistantTool({
   name: "documents.linked",
-  description: "Documents attached to a room, appliance, task, project or expense (e.g. the manual of the dishwasher, the invoices of an expense).",
-  input: z.object({ on: targetSchema, name: z.string().trim().min(1).max(160).describe("Name of the room, appliance, task, project or expense") }),
+  description: "Documents attached to a room, appliance, task, project, expense or recurring expense (e.g. the manual of the dishwasher, the invoices of an expense).",
+  input: z.object({ on: targetSchema, name: z.string().trim().min(1).max(160).describe("Name of the room, appliance, task, project, expense or recurring expense") }),
   permission: "read",
   confirm: "never",
   activity: { en: "Looked up attached documents", nl: "Bijlagen bekeken" },
   run: async (ctx, input) => {
-    const { linkType, entity } = await resolveTarget(ctx, input.on, input.name);
-    const files = await listLinkedFiles(ctx.householdId, { entityType: linkType, entityId: entity.id });
+    const { linkType, entity, entityIds } = await resolveTarget(ctx, input.on, input.name);
+    const linked = (await Promise.all(entityIds.map((entityId) => listLinkedFiles(ctx.householdId, { entityType: linkType, entityId })))).flat();
+    const files = [...new Map(linked.map((file) => [file.id, file])).values()];
     return { on: entity.name, documents: capList(files, 20, (file) => fileLine(file, ctx.locale)) };
   },
 });
 
 registerAssistantTool({
   name: "documents.attach",
-  description: "Attach a document to a room, appliance, task, project or expense, or detach it (detach true).",
+  description: "Attach a document to a room, appliance, task, project, expense or recurring expense, or detach it (detach true).",
   input: z.object({ document: entityRef("document"), on: targetSchema, name: z.string().trim().min(1).max(160), detach: z.boolean().default(false) }),
   permission: "write",
   confirm: "always",
@@ -182,9 +189,9 @@ registerAssistantTool({
     return null;
   },
   run: async (ctx, input) => {
-    const { linkType, entity } = await resolveTarget(ctx, input.on, input.name);
+    const { linkType, entity, entityIds } = await resolveTarget(ctx, input.on, input.name);
     const link = { fileId: input.document.id, entityType: linkType, entityId: entity.id };
-    if (input.detach) await detachFile(ctx.householdId, link);
+    if (input.detach) await Promise.all(entityIds.map((entityId) => detachFile(ctx.householdId, { ...link, entityId })));
     else await attachFile(ctx.householdId, link);
     return done(input.detach ? `Detached ${input.document.name} from ${entity.name}.` : `Attached ${input.document.name} to ${entity.name}.`);
   },

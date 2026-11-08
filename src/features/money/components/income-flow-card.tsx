@@ -1,6 +1,6 @@
 import { ArrowRightIcon, BanknoteIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/shared/card";
 import { HabitantAvatar, type Habitant } from "@/features/household";

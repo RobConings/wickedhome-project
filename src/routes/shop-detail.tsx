@@ -1,6 +1,8 @@
 import { useLoaderData } from "react-router";
 import { useCurrentUser } from "@/features/auth";
-import { ShopShoppingList } from "@/features/shopping";
+import { ShopContactsPanel, canManageContacts } from "@/features/contacts";
+import { ShopPurchasesPanel } from "@/features/purchases";
+import { ShopProductOffers, ShopShoppingList } from "@/features/shopping";
 import { ShopDetailScreen, canAddShops, canDeleteShop, canEditShop, canSetIngredientSearch, shopAction, shopLoader } from "@/features/shops";
 import { screenHandle } from "@/lib/screen-context";
 
@@ -20,6 +22,9 @@ export function Component() {
       canRefreshIcon={canAddShops(user.role)}
       canSetIngredientSearch={canSetIngredientSearch(user.role)}
       shoppingItems={<ShopShoppingList shopId={shop.id} />}
+      offers={<ShopProductOffers shopId={shop.id} />}
+      purchases={<ShopPurchasesPanel shopId={shop.id} />}
+      contacts={<ShopContactsPanel shop={shop} canManage={canManageContacts(user.role)} />}
     />
   );
 }

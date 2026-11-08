@@ -39,10 +39,12 @@ type RecurringExpenseDetailScreenProps = {
   canManage: boolean;
   /** Optional "Project" field in the edit form, composed by the route. */
   projectField?: ExpenseProjectField;
+  /** Documents stay owned and managed by Documents; the route contributes their panels. */
+  attachments?: React.ReactNode;
 };
 
 /** One recurring expense: rhythm, cost per month/year, status (pause, resume, end), upcoming and history. */
-export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], canManage, projectField }: RecurringExpenseDetailScreenProps) {
+export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], canManage, projectField, attachments }: RecurringExpenseDetailScreenProps) {
   const { t } = useTranslation("expenses");
   const { t: tCommon } = useTranslation();
   const locale = currentLocale();
@@ -274,7 +276,7 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
               )}
             </DescriptionList>
           </Card>
-
+          {attachments}
         </div>
 
         <div className="flex min-w-0 flex-col gap-6">

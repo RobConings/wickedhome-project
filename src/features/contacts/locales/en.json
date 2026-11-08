@@ -106,5 +106,11 @@
     "notRecorded": "Not recorded",
     "noProjects": "No projects linked yet.",
     "projectsHint": "Open a project to manage the contact’s role or project link."
+  },
+  "shop": {
+    "title": "People at this shop",
+    "description": "Recorded supplier contacts. Tap a name for their full details.",
+    "empty": "No supplier contacts recorded for this shop.",
+    "trade": "supplier"
   }
 }

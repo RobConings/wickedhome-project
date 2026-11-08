@@ -106,5 +106,11 @@
     "notRecorded": "Niet vastgelegd",
     "noProjects": "Nog geen projecten gekoppeld.",
     "projectsHint": "Open een project om de rol of projectkoppeling te beheren."
+  },
+  "shop": {
+    "title": "Contactpersonen bij deze winkel",
+    "description": "Gekoppelde leverancierscontacten. Tik op een naam voor alle gegevens.",
+    "empty": "Nog geen leverancierscontacten voor deze winkel.",
+    "trade": "leverancier"
   }
 }

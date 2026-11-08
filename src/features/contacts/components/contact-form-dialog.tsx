@@ -22,6 +22,8 @@ type ContactFormDialogProps = {
   knownTrades?: readonly string[];
   /** Trade preselected for a new contact. */
   defaultTrade?: string;
+  /** Supplier shop preselected for a new contact. */
+  defaultShopId?: string;
   /** A new contact is linked to this project right away (from a project's page), with this role. */
   projectId?: string;
   projectRole?: string;
@@ -44,6 +46,7 @@ export function ContactFormDialog({
   shopSelections,
   knownTrades,
   defaultTrade,
+  defaultShopId,
   projectId,
   projectRole,
   action,
@@ -160,7 +163,7 @@ export function ContactFormDialog({
         emails: contact?.emails ?? [],
         address: contact?.address ?? "",
         websiteUrl: contact?.websiteUrl ?? "",
-        shopId: contact?.shop?.id ?? null,
+        shopId: contact ? contact.shop?.id ?? null : defaultShopId ?? null,
         notes: contact?.notes ?? "",
       }}
       onSuccess={onSaved}
