@@ -142,8 +142,8 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
         onClick={() => void addToShopping()}
         menu={
           <>
-            <DropdownMenuItem onSelect={openAdjust}><BoxesIcon />{t("workspace.adjustStock")}</DropdownMenuItem>
-            <DropdownMenuItem onSelect={showStockManagement}><HistoryIcon />{t("workspace.stockSettings")}</DropdownMenuItem>
+            {canManage ? <DropdownMenuItem onSelect={openAdjust}><BoxesIcon />{t("workspace.adjustStock")}</DropdownMenuItem> : <DropdownMenuItem onSelect={() => navigate("/inventory/scan")}><BoxesIcon />{t("actions.scan")}</DropdownMenuItem>}
+            {canManage && <DropdownMenuItem onSelect={showStockManagement}><HistoryIcon />{t("workspace.stockSettings")}</DropdownMenuItem>}
           </>
         }
       />
@@ -289,7 +289,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
         open={editOpen} onOpenChange={setEditOpen} onSaved={onChanged} />
       <LinkAlternativeDialog product={product} products={products} initialSelections={initialSelections?.products}
         open={linkOpen} onOpenChange={setLinkOpen} onLinked={onChanged} />
-      {places.length > 0 && <StockItemFormDialog
+      {canManage && places.length > 0 && <StockItemFormDialog
         stockItem={stockItems.length === 1 ? stockItems[0] : undefined}
         products={[product]}
         places={stockItems.length === 1 ? places : availablePlaces}
