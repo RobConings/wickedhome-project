@@ -269,6 +269,7 @@ export function SessionsScreen({
                     defaultValue={`${t("sessions.visit")} ${formatDate(todayIn(), locale)}`}
                   />
                 </label>
+                <ShoppingSortField value={sort} onChange={changeSort} />
                 <AutomaticShoppingFilter
                   included={includeLowStock}
                   onChange={setIncludeLowStock}
@@ -339,7 +340,9 @@ export function SessionsScreen({
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold">{t("sessions.checklist")} · {session.items.filter((item) => item.status === "open").length}</p>
                 <div className="flex flex-wrap items-center gap-2">
-                  {active && <SessionExtraDialog products={shopping.products} disabled={busy} />}
+                  {(active || (canManage && session.purchases.some((purchase) => purchase.receipts.length > 0))) && (
+                    <SessionExtraDialog products={shopping.products} disabled={busy} />
+                  )}
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button variant="outline" size="sm" aria-label={t("shopView.filters.viewOptions")}>
