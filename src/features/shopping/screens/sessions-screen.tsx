@@ -2,12 +2,13 @@ import { useShoppingSort } from "../data/use-shopping-sort";
 import { ShoppingSortField } from "../components/shopping-sort-field";
 import { ShoppingNavigation } from "../components/shopping-navigation";
 import { formatCurrency } from "@/lib/format";
-import { CheckIcon, CircleIcon, ShoppingBagIcon } from "lucide-react";
+import { CheckIcon, CircleIcon, PackageIcon, PlusIcon, ShoppingBagIcon, ShoppingCartIcon, SlidersHorizontalIcon } from "lucide-react";
 import { RecordImage } from "@/components/shared/record-image";
 import { RecordProgress } from "@/components/shared/record-progress";
 import { RecordLink } from "@/components/shared/record-link";
 import { SessionExtraDialog } from "../components/session-extra-dialog";
 import { SessionStartCard } from "../components/session-start-card";
+import { SessionVisitCard } from "../components/session-visit-card";
 import { SessionItemAdjustDialog } from "../components/session-item-adjust-dialog";
 import { ShoppingNeedSections } from "../components/shopping-need-sections";
 import { ShoppingStockFilterField } from "../components/shopping-stock-filter";
@@ -16,14 +17,22 @@ import { SessionPayments } from "../components/session-payments";
 import { useLiveEventsStatus } from "@/lib/live-events";
 import { useCategoryOrder } from "../data/use-category-order";
 import * as React from "react";
-import { Link, useNavigate, useRevalidator, useSearchParams } from "react-router";
+import { useNavigate, useRevalidator, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/shared/page-header";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { RecordWorkspaceTabs } from "@/components/shared/record-workspace-tabs";
 import { Card, CardTitle } from "@/components/shared/card";
+import { ShopLogo } from "@/features/shops";
+import { useOptionalCurrentUser } from "@/features/auth";
 import { uploadDocument } from "@/features/documents";
 import { formatDate } from "@/types/date-format";
 import { currentLocale } from "@/lib/i18n";
@@ -42,6 +51,7 @@ import {
   groupChecklistItems,
   parseStockFilter,
   matchesStockFilter,
+  SHOPPING_STOCK_FILTERS,
   type ShoppingStockFilter,
 } from "../components/shopping-grouping";
 import {
@@ -75,6 +85,7 @@ export function SessionsScreen({
   canManage, live = true, initialSelections,
 }: Props) {
   const { t } = useTranslation("shopping");
+  const user = useOptionalCurrentUser();
   const locale = currentLocale();
   const { order, change } = useCategoryOrder();
   const navigate = useNavigate();
@@ -84,6 +95,7 @@ export function SessionsScreen({
   const [busy, setBusy] = React.useState(false);
   const [includeLowStock, setIncludeLowStock] = React.useState(true);
   const [selected, setSelected] = React.useState<string[]>([]);
+  const [startOpen, setStartOpen] = React.useState(false);
 
   const [params, setParams] = useSearchParams();
   const stockFilter = parseStockFilter(params.get("stock"));
@@ -111,6 +123,9 @@ export function SessionsScreen({
   ).filter((item) => matchesStockFilter(item, stockFilter));
   const active = session?.status === "active";
   const title = session?.name ?? t("sessions.title");
+  const sessionShops = session?.shopIds.flatMap((id) => shopping.shops.find((shop) => shop.id === id) ?? []) ?? [];
+  const activeSessions = sessions.filter((visit) => visit.status === "active").sort((a, b) => b.startedAt.localeCompare(a.startedAt));
+  const pastSessions = sessions.filter((visit) => visit.status === "closed").sort((a, b) => b.startedAt.localeCompare(a.startedAt));
   const renderItem = (item: SessionItem) =>
     session && (
       <SessionItemForm
@@ -131,41 +146,84 @@ export function SessionsScreen({
       />
     );
   return (
-    <PageContainer>
-      <PageHeader
-        title={title}
-        description={
-          session
-            ? `${formatDate(session.startedAt, locale)} · ${session.participants.map((part) => part.name).join(", ")}`
-            : t("sessions.description")
-        }
-      />
-      <ShoppingNavigation />
-      <ShoppingSortField value={sort} onChange={changeSort} />
-      <p role="status" className="text-xs text-muted-foreground">
-        {t(`sessions.live_${liveStatus}`)}
-      </p>
-      {session && active && (
-        <ShoppingStockFilterField
-          value={stockFilter}
-          onChange={setStockFilter}
-        />
+    <PageContainer className="gap-3 px-3 py-4 sm:gap-4 sm:px-6 sm:py-6 lg:px-8">
+      {!session && canManage && (
+        <Dialog open={startOpen} onOpenChange={setStartOpen}>
+          <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-visible sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>{t("sessions.simpleStart")}</DialogTitle>
+              <DialogDescription>{t("sessions.simpleDescription")}</DialogDescription>
+            </DialogHeader>
+            <SessionStartCard shopping={shopping} destination={destination} onDestinationChange={setDestination}
+              initialSelections={initialSelections} action="/shopping/sessions" compact />
+          </DialogContent>
+        </Dialog>
       )}
-      {stockFilter !== "all" &&
-        (!session
-          ? open.length === 0
-          : active &&
-            !session.items.some(
-              (item) =>
-                item.status === "open" && matchesStockFilter(item, stockFilter),
-            )) && (
-          <p role="status" className="text-sm text-muted-foreground">
-            {t("shopView.filters.noResults")}
-          </p>
+      <PageHeader
+        backTo={session ? "/shopping/sessions" : "/shopping"}
+        breadcrumbs={[]}
+        title={title}
+        icon={ShoppingCartIcon}
+        description={session ? (
+          <span className="flex flex-wrap items-center gap-2 text-sm">
+            <Badge variant={active ? "success" : "neutral"}>{t(active ? "sessions.active" : "sessions.closed")}</Badge>
+            {sessionShops.slice(0, 3).map((shop) => <ShopLogo key={shop.id} shop={shop} size="sm" />)}
+            {sessionShops.length > 3 && <span>+{sessionShops.length - 3}</span>}
+            <span>{formatDate(session.startedAt, locale)} · {session.participants.map((part) => part.name).join(", ")}</span>
+          </span>
+        ) : t("sessions.overviewDescription")}
+        actions={!session ? (
+          canManage && <Button onClick={() => setStartOpen(true)}><PlusIcon />{t("sessions.startShopping")}</Button>
+        ) : active && (
+          <div className="flex flex-wrap items-center gap-2">
+            {!session.participants.some((participant) => participant.userId === user?.id) && (
+              <Button disabled={busy} variant="outline" onClick={() => void perform(() => joinSession(session.id))}>{t("sessions.join")}</Button>
+            )}
+            {canManage && <ConfirmDialog
+              trigger={<Button disabled={busy} variant="outline">{t("sessions.close")}</Button>}
+              title={t("sessions.closeConfirmTitle")}
+              description={t("sessions.closeConfirmDescription")}
+              confirmLabel={t("sessions.close")}
+              onConfirm={() => perform(() => closeSession(session.id, session.revision))}
+            />}
+          </div>
         )}
+      />
+      {!session && <ShoppingNavigation />}
+      {session && <RecordProgress compact label={t("sessions.progress")}
+        completed={session.items.filter((item) => item.status !== "open").length}
+        total={session.items.length}
+        summary={t("sessions.progressSummary", {
+          bought: session.items.filter((item) => item.status === "bought").length,
+          skipped: session.items.filter((item) => item.status === "skipped").length,
+        })} />}
       {!session ? (
-        <>
-          {canManage && <SessionStartCard shopping={shopping} destination={destination} onDestinationChange={setDestination} initialSelections={initialSelections} />}
+        <div className="flex min-w-0 flex-col gap-4">
+          {activeSessions.length > 0 && (
+            <section className="space-y-2" aria-labelledby="active-sessions">
+              <div className="flex items-baseline justify-between gap-3">
+                <h2 id="active-sessions" className="text-lg font-semibold">{t("sessions.activeSessions")}</h2>
+                <Badge variant="section">{activeSessions.length}</Badge>
+              </div>
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {activeSessions.map((visit) => <SessionVisitCard key={visit.id} visit={visit} shops={shopping.shops} />)}
+              </div>
+            </section>
+          )}
+          {pastSessions.length > 0 && (
+            <section className="space-y-2" aria-labelledby="past-sessions">
+              <h2 id="past-sessions" className="text-lg font-semibold">{t("sessions.pastSessions")}</h2>
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {pastSessions.map((visit) => <SessionVisitCard key={visit.id} visit={visit} shops={shopping.shops} />)}
+              </div>
+            </section>
+          )}
+          {sessions.length === 0 && (
+            <Card tone="section" className="p-5">
+              <p className="font-medium">{t("sessions.noHistory")}</p>
+              <p className="text-sm text-muted-foreground">{t("sessions.simpleDescription")}</p>
+            </Card>
+          )}
           {canManage && (
             <details className="rounded-xl border p-4">
               <summary className="min-h-11 cursor-pointer py-2 font-medium">{t("sessions.advancedPlanning")}</summary>
@@ -268,88 +326,87 @@ export function SessionsScreen({
             </Card>
             </details>
           )}
-          <Card className="space-y-3">
-            <CardTitle>{t("sessions.history")}</CardTitle>
-            {sessions.map((visit) => (
-              <Link
-                className="flex min-h-12 items-center justify-between gap-2 border-b text-sm"
-                key={visit.id}
-                to={`/shopping/sessions/${visit.id}`}
-              >
-                <span>
-                  {visit.name} · {formatDate(visit.startedAt, locale)}
-                </span>
-                <span>{t(`sessions.${visit.status}`)}</span>
-              </Link>
-            ))}
-            {!sessions.length && <p>{t("sessions.noHistory")}</p>}
-          </Card>
-        </>
-      ) : (
-        <>
-          <div className="flex flex-wrap gap-2">
-            <span className="rounded-full border px-3 py-2 text-sm">
-              {t(`sessions.${session.status}`)}
-            </span>
-            {active && (
-              <Button
-                disabled={busy}
-                variant="outline"
-                onClick={() => void perform(() => joinSession(session.id))}
-              >
-                {t("sessions.join")}
-              </Button>
-            )}
-            {active && canManage && (
-              <Button
-                disabled={busy}
-                onClick={() =>
-                  void perform(() => closeSession(session.id, session.revision))
-                }
-              >
-                {t("sessions.close")}
-              </Button>
-            )}
-          </div>
-          <RecordProgress label={t("sessions.progress")} completed={session.items.filter((item) => item.status !== "open").length} total={session.items.length}
-            summary={t("sessions.progressSummary", { bought: session.items.filter((item) => item.status === "bought").length, skipped: session.items.filter((item) => item.status === "skipped").length })} />
-          {active && <CategoryOrder order={order} onChange={change} />}
-          {!active && <Card className="space-y-2"><CardTitle>{t("sessions.finishedTitle")}</CardTitle><p className="text-sm text-muted-foreground">{t("sessions.finishedHint")}</p></Card>}
-          {groupChecklistItems(session.items.filter((item) => item.status === "open" && matchesStockFilter(item, stockFilter)), sort, order, locale).map((group) => (
-            <Card className="space-y-3" key={group.key}>
-              <CardTitle>{group.key === "all" ? t("shopView.sort.name") : t(`categories.${group.key}`)}</CardTitle>
-              <ShoppingNeedSections grouped={sort === "category"} items={group.items}>{(items) => items.map(renderItem)}</ShoppingNeedSections>
-            </Card>
-          ))}
-          {(["bought", "skipped"] as const).map((status) => {
-            const items = session.items.filter(
-              (item) => item.status === status,
-            );
-            return (
-              items.length > 0 && (
-                <details
-                  key={status}
-                  data-item-status={status}
-                  className="space-y-3 rounded-xl border bg-card p-3"
-                >
-                  <summary className="min-h-11 cursor-pointer py-3 font-medium">
-                    {t(`sessions.item_${status}`)} ({items.length})
-                  </summary>
-                  {items
-                    .sort((a, b) => a.name.localeCompare(b.name, locale))
-                    .map(renderItem)}
-                </details>
-              )
-            );
-          })}
-          {(active ||
-            (canManage &&
-              session.purchases.some(
-                (purchase) => purchase.receipts.length > 0,
-              ))) && (
-            <SessionExtraDialog products={shopping.products} disabled={busy} />
-          )}
 
+        </div>
+      ) : (
+        <RecordWorkspaceTabs
+          details={
+            <div className="flex min-w-0 flex-col gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-semibold">{t("sessions.checklist")} · {session.items.filter((item) => item.status === "open").length}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  {active && <SessionExtraDialog products={shopping.products} disabled={busy} />}
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" aria-label={t("shopView.filters.viewOptions")}>
+                        <SlidersHorizontalIcon />{t("shopView.filters.viewOptions")}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent align="end" className="max-h-[75dvh] w-80 max-w-[calc(100vw-2rem)] space-y-3 overflow-y-auto">
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium">{t("shopView.sort.label")}</label>
+                        <ShoppingSortField value={sort} onChange={changeSort} />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium">{t("stockFilter.label")}</label>
+                        <Select value={stockFilter} onValueChange={(value) => setStockFilter(value as ShoppingStockFilter)}>
+                          <SelectTrigger className="w-full" aria-label={t("stockFilter.label")}><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {SHOPPING_STOCK_FILTERS.map((option) => <SelectItem key={option} value={option}>{t("stockFilter." + option)}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <CategoryOrder order={order} onChange={change} />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+              {!active && (
+                <Card tone="section" className="gap-1 p-3">
+                  <CardTitle>{t("sessions.finishedTitle")}</CardTitle>
+                  <p className="text-sm text-muted-foreground">{t("sessions.finishedHint")}</p>
+                </Card>
+              )}
+              {groupChecklistItems(session.items.filter((item) => item.status === "open" && matchesStockFilter(item, stockFilter)), sort, order, locale).map((group) => (
+                <section key={group.key} className="space-y-1">
+                  {sort === "category" && (
+                    <h3 className="px-1 text-sm font-semibold">{t("categories." + group.key)}</h3>
+                  )}
+                  <div className="overflow-hidden rounded-xl border bg-card">
+                    <ShoppingNeedSections grouped={sort === "category"} items={group.items}>
+                      {(items) => items.map(renderItem)}
+                    </ShoppingNeedSections>
+                  </div>
+                </section>
+              ))}
+              {session.items.every((item) => item.status !== "open") && (
+                <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">{t("sessions.noOpenItems")}</p>
+              )}
+              {session.items.some((item) => item.status === "open") &&
+                !session.items.some((item) => item.status === "open" && matchesStockFilter(item, stockFilter)) && (
+                  <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">{t("shopView.filters.noResults")}</p>
+                )}
+              {(["bought", "skipped"] as const).map((status) => {
+                const items = session.items.filter((item) => item.status === status);
+                return items.length > 0 && (
+                  <details key={status} data-item-status={status} className="rounded-xl border bg-card p-3">
+                    <summary className="min-h-10 cursor-pointer py-2 font-medium">{t("sessions.item_" + status)} ({items.length})</summary>
+                    <div className="divide-y border-t">
+                      {items.slice().sort((a, b) => a.name.localeCompare(b.name, locale)).map(renderItem)}
+                    </div>
+                  </details>
+                );
+              })}
+            </div>
+          }
+          overview={
+            <div className="flex min-w-0 flex-col gap-3">
+              {!session.purchases.length && (
+                <Card className="p-4">
+                  <p className="font-medium">{t("sessions.noPurchases")}</p>
+                  <p className="text-sm text-muted-foreground">{t("sessions.stockHint")}</p>
+                </Card>
+              )}
           {session.purchases.map((purchase) => (
             <Card key={purchase.id} className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2"><CardTitle>{t("sessions.purchase")}</CardTitle><Button asChild variant="outline"><RecordLink to={`/purchases/${purchase.id}`}><ShoppingBagIcon />{t("sessions.openPurchase")}</RecordLink></Button></div>
@@ -613,7 +670,12 @@ export function SessionsScreen({
               )}
             </Card>
           ))}
-        </>
+            </div>
+          }
+          detailsLabel={t("sessions.checklist")}
+          overviewLabel={t("sessions.purchasesTab")}
+          label={t("sessions.workspaceNavigation")}
+        />
       )}
     </PageContainer>
   );
