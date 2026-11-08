@@ -554,6 +554,10 @@
     "purchasesHint": "A need is a plan. Purchases and their recorded stock effects remain separate facts.",
     "removeTitle": "Remove this buying position?",
     "removeHint": "All linked reasons for this position are removed from the shopping list. Recorded purchases and stock remain.",
-    "notRecorded": "Not recorded"
+    "notRecorded": "Not recorded",
+    "connected": "Linked household records",
+    "expense": "Recorded expense",
+    "openExpense": "View expense",
+    "alternatives": "Other products that share this stock"
   }
 }
