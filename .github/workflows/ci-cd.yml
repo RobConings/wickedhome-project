@@ -4,7 +4,8 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    # Verify redesign changes without deploying them. The deploy job stays main-only.
+    branches: [main, rework_features]
   workflow_dispatch:
 
 permissions:
