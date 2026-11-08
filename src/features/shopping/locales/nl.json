@@ -5,6 +5,8 @@
   },
   "actions": {
     "addItem": "Boodschap toevoegen",
+    "shoppingMoreActions": "Meer winkelacties",
+    "shoppingManageActions": "Meer boodschappenacties",
     "shopView": "Winkelweergave",
     "products": "Producten",
     "newList": "Nieuwe lijst",
