@@ -178,7 +178,7 @@ export function SessionsScreen({
         actions={!session ? (
           canManage && <Button onClick={() => setStartOpen(true)}><PlusIcon />{t("sessions.startShopping")}</Button>
         ) : active && (
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="grid w-full min-w-0 grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:justify-center xl:justify-end">
             {!session.participants.some((participant) => participant.userId === user?.id) && (
               <Button disabled={busy} variant="outline" onClick={() => void perform(() => joinSession(session.id))}>{t("sessions.join")}</Button>
             )}
