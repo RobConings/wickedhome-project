@@ -222,6 +222,8 @@ export const recipeListQuerySchema = z.object({
   q: z.string().trim().max(100).optional(),
   /** Category id, or "none" for recipes without a category. Omitted means all categories. */
   categoryId: idSchema.optional(),
+  /** Only recipes with an ingredient linked to this product or shared-stock variant. */
+  productId: idSchema.optional(),
 });
 export type RecipeListQuery = z.infer<typeof recipeListQuerySchema>;
 
