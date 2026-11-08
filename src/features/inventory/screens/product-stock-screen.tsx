@@ -182,7 +182,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
   return (
     <PageContainer>
       {confirmation}
-      <div className="rounded-xl border bg-card p-3 shadow-xs sm:p-5">
+      <div data-slot="product-hero" className="rounded-xl border bg-card p-3 shadow-xs sm:p-5">
         <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)]">
           <RecordImage src={product.imageUrl} alt={product.name} shape="banner" fit="contain"
             className="h-56 sm:h-56 lg:h-72" fallback={<ProductCategoryIcon category={product.category} className="size-20 text-section" />} />
@@ -200,9 +200,9 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
                 }
                 className="min-w-0 xl:flex-1"
               />
-              <div className="hidden min-w-0 xl:block xl:max-w-[58%]">{actionButtons}</div>
+              <div data-slot="product-desktop-actions" className="hidden min-w-0 xl:block xl:max-w-[58%]">{actionButtons}</div>
             </div>
-            <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
+            <div data-slot="product-statistics" className="grid grid-cols-2 gap-2 xl:grid-cols-4">
               {stats.map(({ id, icon, tone, value, label }) => (
                 <div key={id} className="flex min-w-0 items-center gap-2 rounded-xl border bg-background p-2.5 sm:p-3">
                   <IconChip icon={icon} tone={tone} size="sm" />
@@ -214,7 +214,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
               ))}
             </div>
             {/* On phones the actions follow the product facts, just like the approved mobile wireframe. */}
-            <div className="min-w-0 xl:hidden">{actionButtons}</div>
+            <div data-slot="product-mobile-actions" className="min-w-0 xl:hidden">{actionButtons}</div>
           </div>
         </div>
       </div>
