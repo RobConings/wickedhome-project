@@ -11,5 +11,6 @@
   "retry": "Try again",
   "viewPurchases": "View this product's purchases",
   "recipes": "Used in recipes",
-  "noRecipes": "No recipes have this product or a shared-stock alternative linked as an ingredient."
+  "noRecipes": "No recipes have this product or a shared-stock alternative linked as an ingredient.",
+  "viewAllRecipes": "View all {{count}} recipes"
 }
