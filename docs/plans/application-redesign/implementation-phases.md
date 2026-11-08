@@ -1,6 +1,6 @@
 # WickedHome total rework — implementation phases
 
-**Active continuation:** baseline `2dda61a`; see the [follow-up implementation and validation ledger](followup-implementation-2026-11-08.md) for newly implemented energy, history, account, product and record-owner work and fresh check status. Earlier checkpoint counts below remain historical evidence.
+**Latest GitHub continuation:** [product brand, CI and English archive consolidation](github-continuation-2026-11-08.md). The prior **Codex continuation** used baseline `2dda61a`; see the [follow-up implementation and validation ledger](followup-implementation-2026-11-08.md) for newly implemented energy, history, account, product and record-owner work and fresh check status. Earlier checkpoint counts below remain historical evidence.
 
 **Status:** implementation is in progress on `rework_features`; the product workspace has received local validation and the recurring-expense workspace is the next implemented reference slice. Neither module nor the whole redesign is fully accepted. **The 78-screen HTML prototype is a visual and navigation guideline only.** It is not an inventory of all existing capabilities, a universal page renderer, or evidence that a module is complete.
 
@@ -19,7 +19,7 @@ WickedHome is for people running a household, not ERP administrators. Reuse reco
 
 **Navigation rules:** a meaningful user-facing record has a stable owner-owned page; related records open their own owner pages, not duplicated CRUD views. Real owner-supplied links and history, not guesses. A record's Details / Overview is optional, not an obligatory pattern for calendars or editors. One primary day-to-day action and one management action may each have contextual dropdowns where appropriate. The desktop header and two-row mobile action positioning follow the approved product example; menus overlay content.
 
-**Data rules:** product quantity is a household total in natural package units wherever recorded, not forced multi-room micromanagement; preserve existing location records, stock movements and historical details in advanced paths until a separately tested migration is approved. Do not add average-use metrics that do not exist. Unrecorded fields (currently including product brand) stay unknown until implemented, never invented.
+**Data rules:** product quantity is a household total in natural package units wherever recorded, not forced multi-room micromanagement; preserve existing location records, stock movements and historical details in advanced paths until a separately tested migration is approved. Do not add average-use metrics that do not exist. Unrecorded values (including brand on older product records) remain unknown rather than being guessed; the nullable brand field has now been added in the redesign branch, with migration/testing acceptance still pending.
 
 ## Phase A — capability inventory and guardrails (inventory expanded, acceptance open)
 
@@ -28,7 +28,7 @@ The [29-owner application outcome inventory](application-outcomes.md) now maps t
 1. Snapshot `main` and `rework_features` business capabilities, existing routes, forms, service APIs, data models, jobs, permissions, MCP tools and migration assumptions. The earlier 65-route/62-dialog atlas is a starting index, **not** outcome-level coverage.
 2. For **every** feature, build a matrix: existing user outcome → current service/API and persistence → intended simple entry point → connected records → edge cases/permissions/automation → test → status. Track missing or risky capabilities explicitly. Preserve history, IDs and source attribution.
 3. **Finance first audit:** recurring expense schedules and individual occurrences, paid/unpaid history, splits, direct debit, loan early repayment, contributions, transfers, vouchers, account corrections and forecasts. Validate no double counting.
-4. Audit existing inventory package/quantity semantics and alternative-product shared stock. Product **brand** is not currently a persisted read-model field and needs a separately reviewed schema/API/form migration before showing a genuine brand value.
+4. Audit existing inventory package/quantity semantics and alternative-product shared stock. A nullable product **brand** field and form/API support are committed; verify the additive migration, old-client omission behaviour and genuine values on a disposable database before accepting this capability.
 5. Preserve release boundaries: no production DB changes, migration or deployment in a presentation/code review. Schema moves need additive migrations on an isolated database.
 
 **Gate:** each existing outcome has an owner and planned path or an explicitly tracked gap; no capability disappears because it is absent from the prototype.
@@ -50,7 +50,7 @@ The [29-owner application outcome inventory](application-outcomes.md) now maps t
 
 - [x] Begin a production product workspace: image + total stock + truthful summary, Details as the default, colored product info/table/notes, linked Overview, primary actions, advanced legacy stock access.
 - [x] Keep the real shopping and alternative-product owner services; added a preflight for already-open shopping needs including variants.
-- [ ] Complete product brand/shop/package/unit accuracy, status/minimum rules and actual photographed media; inspect and test the existing data before introducing changes.
+- [ ] Verify the committed nullable product brand migration/form/read model, plus shop/package/unit accuracy, stock minimum rules and actual photographed media. Implementation is not validated merely by a passing review.
 - [ ] Verify owner-linked context panels, actions, use/adjust/scan/count, stock history, child roles, alternative stock, and shopping provenance end-to-end.
 - [ ] Complete recurring-expense template → occurrence → paid expense → account history, including transfers, projects, attachment and calendar/automation effects.
 - [ ] Run real integration tests on a disposable DB plus browser/Storybook examples for happy paths, permission failures, concurrency, edits, retries, empty and historical records.
