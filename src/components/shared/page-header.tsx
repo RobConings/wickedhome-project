@@ -38,19 +38,19 @@ export function PageHeader({ title, description, eyebrow, icon, breadcrumbs, bac
   return (
     <header className={cn("flex min-w-0 flex-col gap-2.5", className)}>
       {trail && trail.length > 0 && <BreadcrumbTrail items={trail} label={t("navigation.breadcrumbs")} />}
-      <div className="flex min-w-0 flex-wrap items-start justify-between gap-x-6 gap-y-3">
-      <div className="flex min-w-full flex-1 items-start gap-2.5 sm:min-w-[min(100%,20rem)] sm:gap-3">
+      <div data-slot="page-heading-layout" className="flex min-w-0 flex-col gap-4 xl:flex-row xl:items-start xl:justify-between xl:gap-6">
+      <div data-slot="page-heading" className="flex w-full min-w-0 items-start gap-2.5 sm:gap-3 xl:min-w-64 xl:flex-1">
         {showBack && <PageBackButton to={backTo ?? trail?.slice().reverse().find((item) => item.to)?.to ?? (identity && !identity.isSectionRoot ? identity.section.to : undefined)} />}
         {shownIcon && <IconChip icon={shownIcon} className="mt-1" />}
-        <div className="flex min-w-0 flex-col gap-1">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
           <span aria-hidden="true" data-slot="page-accent" className="mb-1 h-1 w-8 rounded-full bg-section" />
           {eyebrow && <p className="text-sm font-medium text-section-foreground">{eyebrow}</p>}
           <h1 className="text-2xl font-semibold tracking-tight break-words text-balance sm:text-3xl">{title}</h1>
           {description && <p className="max-w-prose text-muted-foreground text-pretty">{description}</p>}
         </div>
       </div>
-      {/* Under the title on phones, wrapping onto more lines rather than running off the screen. */}
-      {actions && <div className="flex max-w-full min-w-0 flex-wrap items-center gap-2">{actions}</div>}
+      {/* Below the complete title/description on phones and tablets; alongside it only on wide desktops. */}
+      {actions && <div data-slot="page-header-actions" className="flex w-full min-w-0 flex-col items-stretch justify-center gap-2 sm:flex-row sm:flex-wrap sm:items-center xl:w-auto xl:max-w-[58%] xl:shrink-0 xl:justify-end">{actions}</div>}
       </div>
     </header>
   );
