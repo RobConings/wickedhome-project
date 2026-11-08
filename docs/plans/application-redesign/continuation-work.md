@@ -2,6 +2,10 @@
 
 The full rollout is still in progress; do not infer completion from entry-point checks. An intermediate work-in-progress version was pushed to `rework_features`; this does **not** mean it was tested as a whole or deployed to the server. See the [compact Codex session handoff](codex-session-handoff.md) and [feature preservation contract](feature-preservation.md) before continuing.
 
+## Latest user review — supplied local wireframe exports
+
+The product owner supplied `app-samenhang.zip` (local vplan HTML, built preview and 27 desktop/mobile screenshots) as the latest visual reference. **Do not treat the current atlas as approved or complete.** The reference is not checked into GitHub. Review and iteration requirements are documented in [wireframe review and model workspaces](wireframe-review-and-model-workspaces.md): generic quick actions must be reconsidered, card imagery should visually occupy its media slot, all existing finance and recurrence functionality must receive complete access paths, and every first-class business record needs its own Odoo-like workspace and meaningful links to related models. This requires an end-to-end capability/relationship audit, not simply more counters.
+
 ## Latest user requirements
 
 - Every page uses the same header Back position, including exact originating record/filter context.
