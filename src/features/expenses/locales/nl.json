@@ -31,7 +31,9 @@
     "deleteRecurring": "Verwijderen",
     "editRecurring": "Terugkerende uitgave bewerken",
     "openRecurring": "Terugkerende uitgave",
-    "website": "Website"
+    "website": "Website",
+    "logMenu": "Meer uitgavenregistraties",
+    "addMenu": "Meer uitgavenbeheer"
   },
   "status": {
     "upcoming": "Gepland",
