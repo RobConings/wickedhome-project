@@ -195,7 +195,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
       {actions.confirmation}
       {canManage && <ShoppingListFormDialog open={newListOpen} onOpenChange={setNewListOpen} />}
       <Dialog open={startOpen} onOpenChange={setStartOpen}>
-        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-lg">
+        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-visible sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>{t("sessions.simpleStart")}</DialogTitle>
             <DialogDescription>{t("sessions.simpleDescription")}</DialogDescription>
@@ -216,7 +216,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
 
       <PageGrid columns="main-sidebar" className="items-start">
         <Stack gap="lg" className="gap-3 sm:gap-6">
-          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2 sm:flex sm:items-center" role="group" aria-label={t("shopViewFilters.label")}>
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2 sm:flex sm:items-center" role="group" aria-label={t("shopView.filters.label")}>
             {listViews.length > 1 && (
               <Select value={activeView?.id ?? "all"} onValueChange={(value) => selectList(value === "all" ? null : value)}>
                 <SelectTrigger className="col-span-2 w-full min-w-0 sm:col-auto sm:w-48" aria-label={t("lists.filterLabel")}>
@@ -233,9 +233,9 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
             <SearchField className="min-w-0 sm:flex-1" value={query} onValueChange={search} label={t("lists.searchLabel")} placeholder={t("lists.search")} />
             <Popover>
               <PopoverTrigger asChild>
-                <Button type="button" variant="outline" className="h-10 shrink-0" aria-label={t("shopViewFilters.viewOptions")}>
+                <Button type="button" variant="outline" className="h-10 shrink-0" aria-label={t("shopView.filters.viewOptions")}>
                   <SlidersHorizontalIcon aria-hidden="true" />
-                  <span className="hidden sm:inline">{t("shopViewFilters.viewOptions")}</span>
+                  <span className="hidden sm:inline">{t("shopView.filters.viewOptions")}</span>
                   {advancedFilterCount > 0 && (
                     <span className="rounded-full bg-section-soft px-1.5 text-xs tabular-nums text-section" aria-label={String(advancedFilterCount)}>
                       {advancedFilterCount}
@@ -245,8 +245,8 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
               </PopoverTrigger>
               <PopoverContent align="end" className="max-h-[min(75vh,38rem)] w-80 max-w-[calc(100vw-2rem)] space-y-4 overflow-y-auto">
                 <div>
-                  <p className="font-semibold">{t("shopViewFilters.viewOptions")}</p>
-                  <p className="text-xs text-muted-foreground">{t("shopViewFilters.viewOptionsDescription")}</p>
+                  <p className="font-semibold">{t("shopView.filters.viewOptions")}</p>
+                  <p className="text-xs text-muted-foreground">{t("shopView.filters.viewOptionsDescription")}</p>
                 </div>
                 <div className="space-y-1.5">
                   <label className="block text-sm font-medium">{t("shopView.sort.label")}</label>
