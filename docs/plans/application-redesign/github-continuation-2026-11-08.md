@@ -19,6 +19,12 @@ The approved product Details design requires real **brand** information (not a g
 
 This change does not alter historical stock quantity, linked alternatives, receipts, purchases, expenses, household balances or recurring tasks. The migration is only committed; it has **not** been run against a production database.
 
+## Assistant and MCP parity
+
+The existing `inventory.save_product` / `inventory_save_product` tools can now accept and update an **explicit** brand value. Omitting it retains an existing value; passing `null` clears it. Product search/details and the saved-field verification response expose the stored value. The assistant's completeness check now reports unknown brand when no brand was recorded; a shop offer with no verified brand cannot be described as complete. `productInputOf` retains brand across unrelated recipe/offer updates.
+
+An earlier CI unit failure was traced to a shopping assistant **test double** that assumed catalogue search used only `where.name`; brand-aware Prisma search now wraps name/brand conditions in `AND` to preserve code filters. The test double was updated to match this query structure and an explicit brand-search, persistence, omission and clearing regression was added. **Passing CI for the corrected code is not assumed until GitHub reports it.**
+
 ## Documentation and verification
 
 - Codex's original `docs/plans/app-samenhang/` export (screenshots, built `site/`, HTML and other assets) was moved **intact** to `docs/plans/application-redesign/legacy-wireframe-export/`. This restores the English directory naming convention and keeps its internal relative paths.
