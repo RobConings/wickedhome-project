@@ -6,6 +6,19 @@ Reference supplied by the product owner: local `app-samenhang.zip` containing `p
 
 The direction is promising, but the result is **not the target experience**: generic quick actions feel awkward, many thumbnails do not occupy their media area convincingly, finance and other developed features are incompletely represented, and related-record counters do not yet form a complete, useful Odoo-like business-object experience.
 
+## Shopping visit workspace — owner feedback and release gate (8 November)
+
+The original production shopping-session overview and active checklist fail the product-approved product-page baseline. These are **acceptance blockers**, not optional cosmetic polish:
+
+- **Back in the title row, everywhere:** the shared `PageHeader` must place the existing context-aware Back button beside the page identity, never on its own standalone row. Do not duplicate it in custom records. Explicit exceptions must be reviewed.
+- **Shopping sessions overview:** an active visit is a **fully clickable card**, visually identifiable by actual shop/group names and shop logos, date and active status. Active visits come first; past visits follow. The primary Start shopping action opens the existing destination picker in a compact dialog. Advanced planning is secondary and collapsed, never above active visits.
+- **Focused active checklist:** remove three/four rows of page tabs, sort, live-state copy, stock pseudo-tabs and other scaffolding above the first item. Session detail has a compact title + Back, contextual join/close (close requires confirmation), actual compact progress, and the shared two-tab record treatment (Checklist default, Purchases/receipts). Live state belongs with identity, not as a standalone paragraph.
+- **Real shopping rows:** use actual product/variant images when available, shared media fallback, one compact product row with easy Bought / Not now / Adjust actions, and progressively disclosed acquisition quantity and stock-location options. Keep touch targets usable on phones. A bought item remains part of history; skipping does not add stock.
+- **Preserve workflows and data:** existing start/matching selection, shop-group sessions, favourites, participation/live updates, status/progress, purchase amounts, corrections/variant selection, receipts/reconciliation, stock counted vs later acquired, payments/account expenses and historical links must remain reachable and unaltered by layout. No missing actual image should produce invented media.
+- **Visual acceptance is separate:** compare the redesigned sessions overview and active visit side by side with the accepted product workspace at 320 / 390 / 1440 px, in both languages and themes; verify keyboard navigation, logos/fallbacks, no overlapping menus, exact Back origin, 15-item checklist, multi-shop group, errors, child role, purchase/receipt/payment workflows, and live multi-device updates. Source commits alone do not establish acceptance.
+
+Implementation points: `src/features/shopping/screens/sessions-screen.tsx`, `src/features/shopping/components/session-visit-card.tsx`, `src/components/shared/page-header.tsx`, and `src/components/shared/record-workspace-tabs.tsx`. A failing CI/build or missing screenshot remains an explicit **open blocker**.
+
 ## A. Non-negotiable product direction
 
 1. **Every first-class, user-facing business record has a dedicated, deep-linkable workspace.** It shows the record's identity, state, primary contextual action, meaningful details, and relevant related models. This applies throughout the application, **not only to products or projects**. Avoid a contextless generic list on a record detail screen.
