@@ -366,12 +366,17 @@ export async function listUnpaidExpenses(householdId: string, until: string): Pr
  * paid (joint ones nobody marked paid count for nobody). For the voucher balance of the income feature.
  */
 export async function listMealVoucherSpending(householdId: string, until?: string | null): Promise<{ habitantId: string; amountCents: number; date: string }[]> {
+  return (await listMealVoucherSpendingRecords(householdId, until)).map(({ habitantId, amountCents, date }) => ({ habitantId, amountCents, date }));
+}
+
+/** The same actual payer/share rules, retaining the owning expense for inspection. */
+export async function listMealVoucherSpendingRecords(householdId: string, until?: string | null) {
   const rows = await db.expense.findMany({
     where: { householdId, paymentMethod: "MEAL_VOUCHER", paidOn: until ? { lte: toDate(until) } : { not: null } },
     include: expenseInclude,
   });
   const now = today();
-  return mealVoucherPortions(rows.map((row) => toExpense(row, now)));
+  return rows.flatMap((row) => mealVoucherPortions([toExpense(row, now)]).map((portion) => ({ ...portion, expenseId: row.id, payee: row.payee })));
 }
 
 // ── For the money feature: loans and the timeline ───────────────────────────────────────────────────

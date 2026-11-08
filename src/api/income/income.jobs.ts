@@ -4,6 +4,7 @@ import { syncVoucherTasks } from "./voucher-tasks";
 
 /** Meal vouchers about to expire get a "Use € … meal vouchers before …" task for their owner (voucher-tasks.ts). */
 registerJob({
+  sourcePath: "/income",
   id: "income.voucher-tasks",
   schedule: "45 6 * * *",
   titleKey: "income:jobs.voucherTasks.title",

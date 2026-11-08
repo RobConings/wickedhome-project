@@ -1,4 +1,5 @@
 import { BookUserIcon, PencilIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { PageContainer } from "@/components/layout/page-container";
@@ -17,8 +18,8 @@ import { ContactLinks } from "../components/contact-links";
 import { useContactSelections } from "../data/use-contact-selections";
 import { contactSubtitle, type Contact } from "../types/contacts";
 
-export function ContactDetailScreen({ contact, shops, canManage, initialSelections, shopSelections }: {
-  contact: Contact; shops: Shop[]; canManage: boolean; initialSelections?: UseSelectionsOptions["initial"]; shopSelections?: UseSelectionsOptions["initial"];
+export function ContactDetailScreen({ contact, shops, canManage, initialSelections, shopSelections, projects }: {
+  contact: Contact; shops: Shop[]; canManage: boolean; initialSelections?: UseSelectionsOptions["initial"]; shopSelections?: UseSelectionsOptions["initial"]; projects?: ReactNode;
 }) {
   const { t } = useTranslation("contacts");
   const { t: tc } = useTranslation();
@@ -44,10 +45,10 @@ export function ContactDetailScreen({ contact, shops, canManage, initialSelectio
       <Card className="self-start">
         <CardTitle>{t("projects.label")}</CardTitle>
         <p className="text-sm text-muted-foreground">{t("detail.projectsHint")}</p>
-        {contact.projects.length ? <ul className="divide-y">{contact.projects.map((project) => <li key={project.id} className="flex flex-col gap-1 py-3">
+        {projects ?? (contact.projects.length ? <ul className="divide-y">{contact.projects.map((project) => <li key={project.id} className="flex flex-col gap-1 py-3">
           <RecordLink to={`/projects/${encodeURIComponent(project.id)}`} className="flex min-h-11 items-center gap-2 font-medium underline"><span aria-hidden="true" className="size-3 shrink-0 rounded-full" style={{ backgroundColor: project.color }} />{project.name}</RecordLink>
           {project.role && <p className="text-sm text-muted-foreground">{project.role}</p>}
-        </li>)}</ul> : <p className="text-sm text-muted-foreground">{t("detail.noProjects")}</p>}
+        </li>)}</ul> : <p className="text-sm text-muted-foreground">{t("detail.noProjects")}</p>)}
       </Card>
     </PageGrid>
   </PageContainer>;

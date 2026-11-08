@@ -7,6 +7,7 @@ import type {
   IncomeSourceDetail,
   IncomeSourceCreateInput,
   IncomeSourceUpdateInput,
+  VoucherDetail,
 } from "../types/income";
 
 const sourcePath = (id: string) => `/income/sources/${encodeURIComponent(id)}`;
@@ -27,3 +28,4 @@ export const deleteIncome = (id: string) => api.delete(incomePath(id));
 
 export const fetchIncome = (id: string) => api.get<Income>(incomePath(id));
 export const fetchIncomeSource = (id: string, query: string) => api.get<IncomeSourceDetail>(`${sourcePath(id)}${query}`);
+export const fetchVoucherDetail = (id: string, query = "") => api.get<VoucherDetail>(`/income/vouchers/${encodeURIComponent(id)}${query}`);

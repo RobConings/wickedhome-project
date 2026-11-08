@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { notFound } from "@/api/lib/http";
 import { createHabitant, deleteHabitant, getHouseholdOverview, updateHabitant } from "@/api/household/household.service";
 import { HABITANT_COLORS, HABITANT_TYPES, type Habitant } from "@/features/household/types/household";
 import { daysBetween, todayIn } from "@/types/dates";
@@ -11,6 +12,7 @@ import {
   registerAssistantSkill,
   registerAssistantTool,
   registerEntityResolver,
+  registerScreenContext,
   say,
   type AssistantToolContext,
 } from "@ai/core/kit";
@@ -34,6 +36,15 @@ registerAssistantSkill({
 });
 
 const ageOn = (birthday: string, today: string) => Math.floor(daysBetween(birthday, today) / 365.25);
+
+registerScreenContext({ kind: "habitant", skills: ["household", "tasks"], describe: async (ctx, id) => {
+  if (!id) return null;
+  const { habitants } = await getHouseholdOverview(ctx.householdId);
+  const person = habitants.find((candidate) => candidate.id === id);
+  if (!person) throw notFound("Person not found");
+  return { label: person.name, summary: `Household member ${person.name} (${person.type}); resident identity and login permissions are separate. Task assignments and their history belong to Tasks.` };
+} });
+registerScreenContext({ kind: "household", skills: ["household"], describe: (ctx) => ({ label: say(ctx.locale, "Household", "Huishouden"), summary: "Household members, pets and guests; login accounts remain separately managed" }) });
 
 registerEntityResolver({
   type: "habitant",

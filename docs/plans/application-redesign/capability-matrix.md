@@ -43,3 +43,7 @@ See the [29-owner inventory](application-outcomes.md) for the expanded Phase A a
 ## Remaining acceptance boundaries
 
 Phase A is still open until every feature has an outcome inventory and the `main` comparison is complete. Phase B still needs full accessibility/media/token adoption; targeted keyboard and responsive checks are narrower evidence. Phase C has stronger product and recurring reference evidence, while linked documents, calendar effects, real photographed data and all permission/concurrency cases remain open. Phases D and E remain incomplete. Deployment stays a separate decision.
+
+## Final implementation additions
+
+The code pass now includes contribution-plan workspaces with effective-date versioning and source account/person activity; independently paged voucher credits and actual expense shares using the existing FIFO rules; contact-side project link/role/unlink; person finance; safe assistant owner links; scoped surviving audit targets; automation source navigation; and a task action hierarchy with focus-safe dialogs. See the [implementation ledger](implementation-continuation-2026-11-08.md) for exact delivery/evidence. The remaining open statuses in this matrix describe final acceptance, not missing owner implementations. Existing outcome and permission requirements remain in force.

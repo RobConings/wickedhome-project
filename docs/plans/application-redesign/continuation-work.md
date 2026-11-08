@@ -1,5 +1,7 @@
 # Active implementation continuation — 8 November 2026
 
+**Current status:** the implementation pass following `6f3e1b7` / `8a76def` is delivered. Read the [current implementation ledger](implementation-continuation-2026-11-08.md) and [revised phase status](implementation-phases.md). The map, energy hierarchy/source, product brand, recurring history/documents and connected owner work below are implemented; the older pending notes are historical. The latest instructions authorise commits on `rework_features`, retain original Quick actions with optional search, and limit development checks to the changed feature. Production deployment/migration/main merge remain excluded.
+
 **Active continuation:** baseline `2dda61a`; see the [follow-up implementation and validation ledger](followup-implementation-2026-11-08.md) for newly implemented energy, history, account, product and record-owner work and fresh check status. Earlier checkpoint counts below remain historical evidence.
 
 The full rollout is still in progress; do not infer completion from entry-point checks. An intermediate work-in-progress version was pushed to `rework_features`; this does **not** mean it was tested as a whole or deployed to the server. See the [compact Codex session handoff](codex-session-handoff.md) and [feature preservation contract](feature-preservation.md) before continuing.

@@ -36,7 +36,8 @@
     "never": "Nog niet uitgevoerd",
     "toggle": "\"{{title}}\" volgens planning uitvoeren",
     "runNow": "Nu uitvoeren",
-    "running": "Bezig…"
+    "running": "Bezig…",
+    "openSource": "Open bijbehorende werkruimte"
   },
   "history": {
     "show": "Recente uitvoeringen",

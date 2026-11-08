@@ -7,3 +7,7 @@
 - `income_to_enter`: variable incomes still to enter. Raise "2,450 from January" → `income_update_source` amount + from; stops → endDate.
 - Wrong recorded amount: `income_delete` (id from income_list history) and record again.
 - Meal vouchers are not bank money: never in balances. Every change asks for confirmation; only owners and adults see income.
+
+### Meal-voucher workspace
+
+`income.vouchers` takes a `person`, with independent `receiptPage` and `spendingPage` (25 records each). It returns the same current FIFO/expiry balance and actual source IDs as `/income/vouchers/:personId`. Credit expiry describes the original receipt, not its current unspent remainder. Future-dated income is not received. Spending is the person’s actual expense share. Adult finance permissions apply; this read creates no income, expense or bank entry.

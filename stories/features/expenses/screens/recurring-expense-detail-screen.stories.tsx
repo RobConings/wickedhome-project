@@ -46,3 +46,6 @@ export const StatusRejected: Story = { parameters: { router: { action: async () 
 /** The route composes Documents-owned panels; reading a schedule never moves the original files. */
 export const WithDocuments: Story = { args: { attachments: <DocumentAttachments entityType="subscription" entityId={recurringExpenseDetailFixture.recurring.id} canManage initialFiles={[documentFiles.brandpolis]} /> } };
 export const ReadOnlyDocuments: Story = { args: { canManage: false, attachments: <DocumentAttachments entityType="subscription" entityId={recurringExpenseDetailFixture.recurring.id} canManage={false} initialFiles={[documentFiles.brandpolis]} /> } };
+
+/** Historical links remain detachable; new uploads belong on the current schedule. */
+export const OriginalDocuments: Story = { args: { attachments: <DocumentAttachments entityType="subscription" entityId="original-subscription" canManage canAttach={false} initialFiles={[documentFiles.brandpolis]} /> } };

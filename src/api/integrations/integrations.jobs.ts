@@ -3,6 +3,7 @@ import { syncAllCalendars } from "./google-calendar.service";
 import { scanAllMailboxes } from "./gmail.service";
 
 registerJob({
+  sourcePath: "/integrations",
   id: "integrations.google-calendar",
   schedule: "*/15 * * * *",
   titleKey: "integrations:jobs.google-calendar.title",
@@ -17,6 +18,7 @@ registerJob({
 });
 
 registerJob({
+  sourcePath: "/integrations",
   id: "integrations.google-mail",
   // Every 30 minutes at :10 and :40, away from the quarter-hour calendar sync.
   schedule: "10,40 * * * *",

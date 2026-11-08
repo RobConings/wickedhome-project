@@ -473,3 +473,9 @@ The schedule detail API returns `documentEntityIds` (the current schedule ID and
 subscription ID). MCP `documents_linked` with `on: "recurring_expense"` reads and deduplicates both sets;
 `documents_attach` attaches to the current schedule, or detaches the selected file from both attachment
 identities. Resolver permissions, household scope, write-token requirements and confirmation remain in effect.
+
+## Record workspaces
+
+Contribution agreements open at `/money/plans/:planId`, from the monthly settlement or a household member’s money panel. The page uses the existing plan/transfer/delete forms and ledger. A later effective amount can create a new plan ID; the workspace follows that ID while keeping the old dated plan. Monthly activity belongs to a person/account, not to a single agreement.
+
+Meal-voucher activity opens at `/income/vouchers/:personId`. It shows the existing FIFO/expiry balance, independently paged received credits and actual expense shares, and links back to their original income/expense owners. Future receipts stay expected. Original credit expiry is not a claim that its entire amount remains unused. Web and MCP use `getVoucherDetail`; no bank entry is created by this read.

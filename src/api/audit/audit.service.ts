@@ -1,4 +1,5 @@
 import type { SessionUser } from "@/features/auth/types/auth";
+import { auditTargets } from "./audit-targets";
 import {
   AUDIT_RETENTION_DAYS,
   type auditQuerySchema,
@@ -93,7 +94,7 @@ export async function listAuditEntries(householdId: string, query: z.output<type
   const page = rows.slice(0, query.limit);
   const last = page.at(-1);
   return {
-    entries: page.map(toEntry),
+    entries: await auditTargets(householdId, page.map(toEntry)),
     nextCursor: rows.length > query.limit && last ? encodeAuditCursor(last.createdAt, last.id) : null,
     people: people
       .flatMap((row) => (row.userId ? [{ userId: row.userId, name: row.actorName }] : []))

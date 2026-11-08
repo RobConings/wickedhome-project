@@ -15,7 +15,10 @@ import { Spinner } from "@/components/ui/spinner";
 
 type ConfirmDialogProps = {
   /** The element that opens the dialog, usually a Button. */
-  trigger: React.ReactElement;
+  trigger?: React.ReactElement;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  returnFocusRef?: React.RefObject<HTMLElement | null>;
   title: React.ReactNode;
   description?: React.ReactNode;
   confirmLabel: string;
@@ -38,8 +41,13 @@ export function ConfirmDialog({
   cancelLabel,
   destructive = false,
   onConfirm,
+  open: controlledOpen,
+  onOpenChange,
+  returnFocusRef,
 }: ConfirmDialogProps) {
-  const [open, setOpen] = React.useState(false);
+  const [ownOpen, setOwnOpen] = React.useState(false);
+  const open = controlledOpen ?? ownOpen;
+  const setOpen = (next: boolean) => { if (controlledOpen === undefined) setOwnOpen(next); onOpenChange?.(next); };
   const [busy, setBusy] = React.useState(false);
 
   const confirm = async (event: React.MouseEvent) => {
@@ -57,8 +65,8 @@ export function ConfirmDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={(next) => !busy && setOpen(next)}>
-      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
-      <AlertDialogContent>
+      {trigger && <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>}
+      <AlertDialogContent onCloseAutoFocus={returnFocusRef ? (event) => { event.preventDefault(); returnFocusRef.current?.focus(); } : undefined}>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           {description && <AlertDialogDescription>{description}</AlertDialogDescription>}

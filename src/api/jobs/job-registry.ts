@@ -37,6 +37,8 @@ export type JobContext = {
 export type JobResult = { summary?: string; idle?: boolean } | void;
 
 export type JobDefinition = {
+  /** Existing owner workspace for the result/source of this job. Empty when there is none. */
+  sourcePath?: string;
   /** Stable code id `<feature>.<name>`, e.g. `waste.sync`. Run history and settings are keyed on it. */
   id: string;
   /** 5-field cron expression, evaluated in Europe/Brussels (DST-safe), e.g. `"15 5 * * *"`. */
@@ -62,7 +64,7 @@ export type JobDefinition = {
   run: (ctx: JobContext) => Promise<JobResult> | JobResult;
 };
 
-export type RegisteredJob = Required<JobDefinition>;
+export type RegisteredJob = Required<Omit<JobDefinition, "sourcePath">> & Pick<JobDefinition, "sourcePath">;
 
 export const DEFAULT_JOB_TIMEOUT_MS = 10 * 60 * 1000;
 

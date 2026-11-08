@@ -8,6 +8,7 @@ import {
   occurrencesPerYear,
   upcomingIncomes,
   voucherBalances,
+  voucherExpiry,
   type IncomeFlowItem,
 } from "@/features/income/types/income-calculations";
 import {
@@ -26,10 +27,11 @@ import {
   type IncomeSourceUpdateInput,
   type IncomeTargetAccount,
   type VoucherBalance,
+  type VoucherDetail,
 } from "@/features/income/types/income";
 import { addMonthsClamped, todayIn } from "@/types/dates";
 import { parseRRule } from "@/types/recurrence";
-import { listMealVoucherSpending } from "../expenses/expenses.service";
+import { listMealVoucherSpending, listMealVoucherSpendingRecords } from "../expenses/expenses.service";
 import {
   db,
   type Income as IncomeRow,
@@ -176,6 +178,28 @@ export async function getVoucherBalances(householdId: string, on: string = today
     spending,
     on,
   );
+}
+
+/** Received credits and actual spending remain separate, both using their original owner IDs. */
+export async function getVoucherDetail(householdId: string, personId: string, receiptPage = 1, spendingPage = 1): Promise<VoucherDetail> {
+  if (![receiptPage, spendingPage].every((page) => Number.isSafeInteger(page) && page >= 1 && page <= 100000)) throw badRequest("Invalid page");
+  const person = await db.habitant.findFirst({ where: { householdId, id: personId }, select: { id: true, name: true } });
+  if (!person) throw notFound("Person not found");
+  const on = today();
+  const pageSize = 25;
+  const where = { householdId, habitantId: personId, kind: "MEAL_VOUCHERS" as const, date: { lte: toDate(on) } };
+  const [balances, spending, receipts] = await Promise.all([
+    getVoucherBalances(householdId, on),
+    listMealVoucherSpendingRecords(householdId, on),
+    db.$transaction(async (tx) => ({ total: await tx.income.count({ where }), rows: await tx.income.findMany({ where, orderBy: [{ date: "desc" }, { id: "desc" }], skip: (receiptPage - 1) * pageSize, take: pageSize }) })),
+  ]);
+  const paid = spending.filter((item) => item.habitantId === personId).sort((a, b) => b.date.localeCompare(a.date) || a.expenseId.localeCompare(b.expenseId));
+  return {
+    today: on, person,
+    balance: balances.find((balance) => balance.habitantId === personId) ?? { habitantId: personId, receivedCents: 0, spentCents: 0, availableCents: 0, expiredCents: 0, uncoveredCents: 0, balanceCents: 0, nextExpiry: null, expiringSoon: null },
+    receipts: { total: receipts.total, page: receiptPage, pageSize, items: receipts.rows.map((row) => ({ ...toIncome(row), expiresOn: voucherExpiry(fromDate(row.date)) })) },
+    spending: { total: paid.length, page: spendingPage, pageSize, items: paid.slice((spendingPage - 1) * pageSize, spendingPage * pageSize) },
+  };
 }
 
 /** An income that lands on a joint account, as it affects that account's balance. */

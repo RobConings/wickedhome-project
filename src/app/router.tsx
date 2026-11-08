@@ -64,8 +64,10 @@ export const router = createBrowserRouter([
           // Finance phase 2: incomes and the money flow (joint accounts).
           { path: "income/sources/:sourceId", lazy: () => import("@/routes/income-source") },
           { path: "income/receipts/:incomeId", lazy: () => import("@/routes/income-record") },
+          { path: "income/vouchers/:personId", lazy: () => import("@/routes/income-vouchers") },
           { path: "income", lazy: () => import("@/routes/income") },
           { path: "money", lazy: () => import("@/routes/money") },
+          { path: "money/plans/:planId", lazy: () => import("@/routes/contribution-plan") },
           // Finance phase 3: projects (budget pots).
           { path: "projects", lazy: () => import("@/routes/projects") },
           { path: "projects/:projectId", lazy: () => import("@/routes/project-detail") },

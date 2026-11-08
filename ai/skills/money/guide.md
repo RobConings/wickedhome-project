@@ -8,3 +8,7 @@
 - Interest or bank costs → `money_add_entry`. A wrong line → `money_history` for its id, then `money_delete_entry`.
 - Loans: `money_loans` (still open, payments to go); repayments: `expenses_log` loan + amount. Months ahead or past: `money_timeline`.
 - Meal vouchers never count here. Changes always ask for confirmation; adults only.
+
+### Contribution-plan workspace
+
+`money.plan_details` takes an existing `planId` and optional `month`. Its owner URL is `/money/plans/:planId`. It includes the real agreement, account, person/account/month contributions and other recorded plans for the same pair. Do not assign monthly payments to one plan: the recorded relationship is to the person/account/month. Existing amount changes with a later effective date can create a new plan ID and preserve the older period; use the returned ID.

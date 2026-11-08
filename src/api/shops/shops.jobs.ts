@@ -3,6 +3,7 @@ import { retryMissingShopIcons } from "./shop-icon.service";
 
 /** Retries shop icons whose last fetch failed (websites that were down, blocked us, or had no icon yet). */
 registerJob({
+  sourcePath: "/shops",
   id: "shops.icons",
   schedule: "20 4 * * *",
   titleKey: "shops:jobs.icons.title",

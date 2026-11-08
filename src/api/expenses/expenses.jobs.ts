@@ -6,6 +6,7 @@ import { autoPayDirectDebits } from "./auto-pay";
  * missed in the last few days) are marked paid on their due date. Undo works as for any payment.
  */
 registerJob({
+  sourcePath: "/expenses",
   id: "expenses.auto-pay",
   schedule: "10 6 * * *",
   titleKey: "expenses:jobs.autoPay.title",

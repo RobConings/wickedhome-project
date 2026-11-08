@@ -11,12 +11,13 @@ type TaskHoldDialogProps = {
   task: Pick<Task, "id" | "title" | "hold">;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  returnFocusRef?: React.RefObject<HTMLElement | null>;
   /** Saves the hold; return the fetcher's promise so the dialog stays busy until it's done. */
   onHold: (reason: string) => Promise<unknown> | void;
 };
 
 /** "Put on hold" with an optional reason ("Invoice looks wrong; recalculate first"). The due date stays. */
-export function TaskHoldDialog({ task, open, onOpenChange, onHold }: TaskHoldDialogProps) {
+export function TaskHoldDialog({ task, open, onOpenChange, onHold, returnFocusRef }: TaskHoldDialogProps) {
   const { t } = useTranslation("tasks");
   const { t: tCommon } = useTranslation();
   const [reason, setReason] = React.useState(task.hold?.reason ?? "");
@@ -36,7 +37,7 @@ export function TaskHoldDialog({ task, open, onOpenChange, onHold }: TaskHoldDia
 
   return (
     <Dialog open={open} onOpenChange={(next) => !busy && onOpenChange(next)}>
-      <DialogContent className="sm:max-w-sm">
+      <DialogContent className="sm:max-w-sm" onCloseAutoFocus={returnFocusRef ? (event) => { event.preventDefault(); returnFocusRef.current?.focus(); } : undefined}>
         <form onSubmit={(event) => void submit(event)} noValidate>
           <fieldset disabled={busy} className="min-w-0">
             <Stack gap="lg">

@@ -64,3 +64,7 @@ The job `audit.prune` (daily 03:55, catch-up after a restart, Settings → Autom
 `src/api/audit/audit.test.ts`: cleaning and redaction, cursor, search words, retention, and which tool calls the
 runner records (writes from chat and MCP yes; reads, failures and `auditedByService` tools no; a failing audit
 doesn't fail the action).
+
+## Current owner navigation
+
+Activity entries retain their historical labels and IDs. The read service supplies an optional `targetUrl` only after a supported owner still exists within the household (or is a visible built-in shop). Removed, foreign and unsupported targets remain text. The activity view preserves its search, source, person, action and display filters in the URL, so Back from an owner restores the same context.

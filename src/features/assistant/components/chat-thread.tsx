@@ -11,6 +11,7 @@ import { ConfirmationCard } from "./confirmation-card";
 import { ToolActivityChip } from "./tool-activity-chip";
 
 type ChatThreadProps = {
+  onRecordNavigate?: () => void;
   items: ChatItem[];
   /** An answer is on its way: shows "Thinking…" until text arrives. */
   busy: boolean;
@@ -26,7 +27,7 @@ type ChatThreadProps = {
 const SUGGESTION_KEYS = ["today", "tasks", "pay", "bins", "shopping"] as const;
 
 /** The messages, tool chips, confirmation cards, notices and errors of one conversation, newest at the bottom. */
-export function ChatThread({ items, busy, onDecide, onRetry, suggestions, onSuggestion, className }: ChatThreadProps) {
+export function ChatThread({ items, busy, onDecide, onRetry, suggestions, onSuggestion, className, onRecordNavigate }: ChatThreadProps) {
   const { t } = useTranslation("assistant");
   const end = React.useRef<HTMLDivElement>(null);
   const last = items[items.length - 1];
@@ -75,6 +76,7 @@ export function ChatThread({ items, busy, onDecide, onRetry, suggestions, onSugg
                 images={item.kind === "user" ? item.images : undefined}
                 screen={item.kind === "user" ? item.screen?.label : undefined}
                 streaming={item.kind === "assistant" && item.streaming}
+                onRecordNavigate={onRecordNavigate}
               />
             );
           case "tool":

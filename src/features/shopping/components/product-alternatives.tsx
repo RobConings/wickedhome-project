@@ -1,3 +1,4 @@
+import { RecordImage } from "@/components/shared/record-image";
 import * as React from "react";
 import { Layers2Icon, LinkIcon, PlusIcon, UnlinkIcon } from "lucide-react";
 import { Trans, useTranslation } from "react-i18next";
@@ -82,7 +83,7 @@ export function ProductAlternatives({ product, products, canManage, highlightId,
               className={cn("flex items-center gap-3 py-2", alternative.id === highlightId && "-mx-2 rounded-lg bg-section-soft px-2")}
             >
               {alternative.imageUrl ? (
-                <img src={alternative.imageUrl} alt="" referrerPolicy="no-referrer" className="size-9 shrink-0 rounded-md border bg-white object-contain" />
+                <RecordImage src={alternative.imageUrl} shape="avatar" fit="contain" className="size-12" />
               ) : (
                 <span className="grid size-9 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground">
                   <ProductCategoryIcon category={product.category} className="size-4" />

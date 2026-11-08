@@ -1,4 +1,5 @@
 import * as React from "react";
+import { RecordLink } from "@/components/shared/record-link";
 import { HandCoinsIcon, HandshakeIcon, PencilIcon, PlusIcon, Trash2Icon, Undo2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
@@ -165,9 +166,9 @@ export function ContributionsCard({ rows, plans, accounts, habitants, month, tod
             {monthPlans.map((plan) => (
               <li key={plan.id} className="flex items-start gap-2 py-2">
                 <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="font-medium break-words">
+                  <RecordLink to={`/money/plans/${encodeURIComponent(plan.id)}?month=${month}`} className="font-medium break-words hover:underline">
                     {personName(plan.habitantId)} → {accountName(accounts, plan.accountId)}
-                  </span>
+                  </RecordLink>
                   <span className="text-xs text-muted-foreground">
                     {t("contributions.planAmount", { amount: money(plan.amountCents), day: plan.dayOfMonth })}
                     {" · "}

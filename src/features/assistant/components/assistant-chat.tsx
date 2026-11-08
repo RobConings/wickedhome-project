@@ -16,6 +16,7 @@ import { ChatThread } from "./chat-thread";
 import { VoiceButton } from "./voice-button";
 
 type AssistantChatProps = {
+  onRecordNavigate?: () => void;
   conversationId: string | null;
   initialMessages?: AssistantMessage[];
   /** The conversation is still answering (left mid-answer): the chat attaches and shows the rest. */
@@ -55,6 +56,7 @@ export function AssistantChat({
   client = assistantClient,
   autoFocus = false,
   className,
+  onRecordNavigate,
 }: AssistantChatProps) {
   const { t } = useTranslation("assistant");
   const locale = currentLocale();
@@ -85,6 +87,7 @@ export function AssistantChat({
     <div className={cn("flex min-h-0 flex-1 flex-col", className)}>
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-1 py-3">
         <ChatThread
+          onRecordNavigate={onRecordNavigate}
           items={chat.items}
           busy={chat.busy}
           onDecide={chat.decide}

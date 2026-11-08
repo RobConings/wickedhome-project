@@ -7,3 +7,5 @@ export { canManageIncome, type IncomeOverview, type VoucherBalance } from "./typ
 export { incomeRecordLoader, incomeSourceLoader, incomeRecordAction } from "./data/income-loaders";
 export { IncomeRecordScreen } from "./screens/income-record-screen";
 export { IncomeSourceScreen } from "./screens/income-source-screen";
+export { fetchVoucherDetail } from "./data/income-requests";
+export { VoucherDetailScreen } from "./screens/voucher-detail-screen";

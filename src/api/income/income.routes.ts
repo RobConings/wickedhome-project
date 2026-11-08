@@ -20,6 +20,7 @@ import {
   getIncomeOverview,
   getIncome,
   getIncomeSource,
+  getVoucherDetail,
   updateIncome,
   updateIncomeSource,
 } from "./income.service";
@@ -38,6 +39,10 @@ const monthParam = (value: unknown) => (value === undefined || value === "" ? mo
 
 incomeRouter.get("/", async (req, res) => {
   res.json(await getIncomeOverview(currentUser(req).householdId, monthParam(req.query.month)));
+});
+
+incomeRouter.get("/vouchers/:personId", async (req, res) => {
+  res.json(await getVoucherDetail(currentUser(req).householdId, parse(idSchema, req.params.personId), Number(req.query.receiptPage ?? 1), Number(req.query.spendingPage ?? 1)));
 });
 
 incomeRouter.get("/sources/:id", async (req, res) => {

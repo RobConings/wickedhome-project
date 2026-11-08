@@ -16,35 +16,34 @@ export function SplitAction({
   menu,
   variant = "default",
   className,
+  renderPrimary,
+  menuTriggerRef,
+  onMenuCloseAutoFocus,
 }: {
   icon: LucideIcon;
   label: string;
   menuLabel: string;
-  onClick: () => void;
+  onClick?: () => void;
+  /** Wrap the primary button in an owner form/confirmation without changing its button semantics. */
+  renderPrimary?: (button: React.ReactElement) => React.ReactNode;
+  menuTriggerRef?: React.Ref<HTMLButtonElement>;
+  onMenuCloseAutoFocus?: React.ComponentProps<typeof DropdownMenuContent>["onCloseAutoFocus"];
   busy?: boolean;
   disabled?: boolean;
   menu: React.ReactNode;
   variant?: "default" | "outline";
   className?: string;
 }) {
+  const primary = <Button type="button" variant={variant} loading={busy} disabled={disabled} onClick={onClick} className={cn("h-11 min-w-0 flex-1 px-3 sm:h-9", menu && "rounded-r-none")}><Icon /><span className="truncate">{label}</span></Button>;
   return (
     <div className={cn("flex min-w-0 max-w-full", className)}>
-      <Button
-        type="button"
-        variant={variant}
-        loading={busy}
-        disabled={disabled}
-        onClick={onClick}
-        className="h-11 min-w-0 flex-1 rounded-r-none px-3 sm:h-9"
-      >
-        <Icon />
-        <span className="truncate">{label}</span>
-      </Button>
-      <DropdownMenu>
+      {renderPrimary ? renderPrimary(primary) : primary}
+      {menu && <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             type="button"
             variant={variant}
+            ref={menuTriggerRef}
             disabled={disabled}
             aria-label={menuLabel}
             title={menuLabel}
@@ -53,10 +52,10 @@ export function SplitAction({
             <ChevronDownIcon />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="min-w-52">
+        <DropdownMenuContent align="end" className="min-w-52" onCloseAutoFocus={onMenuCloseAutoFocus}>
           {menu}
         </DropdownMenuContent>
-      </DropdownMenu>
+      </DropdownMenu>}
     </div>
   );
 }

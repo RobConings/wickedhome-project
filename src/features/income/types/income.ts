@@ -322,3 +322,11 @@ export type IncomeSourceDetail = {
   occurrences: IncomeOccurrence[];
   history: { items: Income[]; total: number; page: number; pageSize: number };
 };
+
+export type VoucherDetail = {
+  today: string;
+  person: { id: string; name: string };
+  balance: VoucherBalance;
+  receipts: { items: (Income & { expiresOn: string })[]; total: number; page: number; pageSize: number };
+  spending: { items: { expenseId: string; payee: string; habitantId: string; amountCents: number; date: string }[]; total: number; page: number; pageSize: number };
+};

@@ -13,8 +13,8 @@ import { HabitantAvatar } from "../components/habitant-avatar";
 import { HabitantTypeBadge } from "../components/habitant-type-badge";
 import type { Habitant, Household } from "../types/household";
 
-export function HabitantDetailScreen({ habitant, household, canManage, tasks, attachments }: {
-  habitant: Habitant; household: Household; canManage: boolean; tasks?: ReactNode; attachments?: ReactNode;
+export function HabitantDetailScreen({ habitant, household, canManage, tasks, attachments, finance }: {
+  habitant: Habitant; household: Household; canManage: boolean; tasks?: ReactNode; attachments?: ReactNode; finance?: ReactNode;
 }) {
   const { t } = useTranslation("household");
   return <PageContainer>
@@ -28,6 +28,7 @@ export function HabitantDetailScreen({ habitant, household, canManage, tasks, at
       </DescriptionList>
       {canManage && habitant.type !== "pet" && <div className="flex flex-col gap-1"><RecordLink to={`/income?view=received&person=${encodeURIComponent(habitant.id)}`} className="min-h-11 py-2 font-medium underline">{t("detail.income")}</RecordLink><p className="text-sm text-muted-foreground">{t("detail.incomeHint")}</p></div>}
     </Card>
+    {finance}
     {tasks && <Card><CardTitle>{t("detail.tasks")}</CardTitle>{tasks}</Card>}
     {attachments}
   </PageContainer>;

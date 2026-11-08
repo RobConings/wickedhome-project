@@ -2,7 +2,7 @@
 
 **Latest GitHub continuation:** [product brand, CI and English archive consolidation](github-continuation-2026-11-08.md). The prior **Codex continuation** used baseline `2dda61a`; see the [follow-up implementation and validation ledger](followup-implementation-2026-11-08.md) for newly implemented energy, history, account, product and record-owner work and fresh check status. Earlier checkpoint counts below remain historical evidence.
 
-**Status:** implementation continues from clean commit `6f3e1b7` on `rework_features` (baseline CI passing as reported by the product owner). Product/brand, buying-need and energy source workspaces already exist. The active Phase D continuation implements recurring documents, account management, shop relationships, purchase provenance and contextual navigation; see the [current implementation ledger](implementation-continuation-2026-11-08.md). Neither module nor the whole redesign is fully accepted. **The 78-screen HTML prototype is a visual and navigation guideline only.** It is not an inventory of all existing capabilities, a universal page renderer, or evidence that a module is complete.
+**Status:** the implementation pass for the inventoried redesign is complete, including the final owner workspaces and supporting flows following `8a76def`. Product/brand, buying-need and energy source workspaces from the GitHub handover are retained. The [current implementation ledger](implementation-continuation-2026-11-08.md) distinguishes delivered code from final acceptance. Phase D's interface/owner implementation is present; its acceptance gate and Phase E remain open for the final application review. No deployment or production migration. **The 78-screen HTML prototype is a visual and navigation guideline only**, not a functional inventory or a universal page template.
 
 ## Core decision: consistent grammar, different workspaces
 
@@ -17,7 +17,7 @@ WickedHome is for people running a household, not ERP administrators. Reuse reco
 | Settings, connections, imports, permissions | Task-oriented forms, connection state, confirmations and progress, not artificial dashboards |
 | Assistant and MCP | Conversational context and direct owner-service actions; the same outcomes and permissions as web |
 
-**Current product-owner overrides (8 November):** implement the remaining rework before running further tests, compiler/lint/build or Storybook checks. Preserve the original phone “+” Quick actions sheet and desktop Quick action menu, including the existing role-aware actions/shortcuts and optional search entry. The earlier generic-quick-action replacement proposal is superseded. Do not repeat baseline CI tests during implementation.
+**Current product-owner overrides (8 November):** finish implementation first; checks needed during development stay local to the feature being changed. Final packaging/compilation is performed after the implementation pass. Preserve the original phone “+” Quick actions sheet and desktop Quick action menu, including the existing role-aware actions/shortcuts and optional search entry. The earlier generic-quick-action replacement proposal is superseded. Do not repeat baseline CI tests during implementation.
 
 **Navigation rules:** a meaningful user-facing record has a stable owner-owned page; related records open their own owner pages, not duplicated CRUD views. Real owner-supplied links and history, not guesses. A record's Details / Overview is optional, not an obligatory pattern for calendars or editors. One primary day-to-day action and one management action may each have contextual dropdowns where appropriate. The desktop header and two-row mobile action positioning follow the approved product example; menus overlay content.
 
@@ -35,14 +35,14 @@ The [29-owner application outcome inventory](application-outcomes.md) now maps t
 
 **Gate:** each existing outcome has an owner and planned path or an explicitly tracked gap; no capability disappears because it is absent from the prototype.
 
-## Phase B — optional shared experience foundations (in progress)
+## Phase B — optional shared experience foundations (implemented; final acceptance open)
 
 - [x] Start a reusable **Details / Overview** record section with the active section in the URL, preserving origin/filter parameters.
 - [x] Start accessible primary-action + dropdown controls for everyday actions and management.
 - [x] Locally validate the initial `RecordWorkspaceTabs` / `SplitAction` additions with Storybook, keyboard, 320/390/1440px, EN/NL and both themes, alongside compiler/lint/unit/integration/build/browser checks. See [fresh scoped evidence](workspace-validation-2026-11-08.json). This does not accept every feature or complete Phase B.
-- [ ] Consolidate visual tokens and media slot/crop policy; photograph fills its region, packshot retains label via contain. Avoid text-overflow and empty visual padding.
-- [ ] Extend stable record breadcrumbs, focused return navigation, owner-filtered related-record section composition and permission-aware actions across remaining features.
-- [ ] Ensure component APIs offer opt-in composition without hardcoding business-specific content or forcing every screen into a record template.
+- [x] Implement shared visual tokens and media slot/crop policy; photograph fills its region, packshot retains label via contain. Avoid text-overflow and empty visual padding.
+- [x] Implement stable record breadcrumbs, exact return navigation, owner-filtered related sections and permission-aware actions across the inventoried owner workspaces. Contribution plans and voucher activity now also have owner URLs.
+- [x] Ensure component APIs offer opt-in composition without hardcoding business-specific content or forcing every screen into a record template.
 
 **Gate:** real reusable primitives and shared behaviour are validated without replacing feature-specific workflows.
 
@@ -54,16 +54,16 @@ Continuation after `6f3e1b7`: the nullable brand migration is applied only to th
 
 - [x] Begin a production product workspace: image + total stock + truthful summary, Details as the default, colored product info/table/notes, linked Overview, primary actions, advanced legacy stock access.
 - [x] Keep the real shopping and alternative-product owner services; added a preflight for already-open shopping needs including variants.
-- [ ] Verify the committed nullable product brand migration/form/read model, plus shop/package/unit accuracy, stock minimum rules and actual photographed media. Implementation is not validated merely by a passing review.
+- [x] Deliver the nullable brand migration/form/API/MCP/read model and retain shop/package/unit and minimum-stock rules. The handover and scoped DB evidence are recorded above; final photographed-media and complete business acceptance remain in Phase E.
 - [ ] Verify owner-linked context panels, actions, use/adjust/scan/count, stock history, child roles, alternative stock, and shopping provenance end-to-end.
-- [ ] Complete recurring-expense template → occurrence → paid expense → account history, including transfers, projects, attachment and calendar/automation effects.
+- [x] Deliver recurring-expense template → occurrence → paid expense → account history, retaining transfers, projects, attachments and calendar/automation effects. Final journey acceptance remains below and in Phase E.
 - [ ] Run real integration tests on a disposable DB plus browser/Storybook examples for happy paths, permission failures, concurrency, edits, retries, empty and historical records.
 
 **Gate:** complete real journeys work with the same service results in web, API and authorised MCP before converting every module.
 
-## Phase D — feature-owner conversion (not complete)
+## Phase D — feature-owner conversion (implementation delivered; acceptance gate open)
 
-Group by household use and dependency, but accept each area only after comparing its *actual* implementation with the plan.
+The owner implementations below are present. Preserve the distinction between implementation and acceptance: final review still compares real outcomes with the preservation contract. Delivered work is recorded in the continuation ledger; the remaining open items are acceptance activities, not permission to omit functionality.
 
 | Order | Features | What must survive in a more understandable experience |
 |---|---|---|
@@ -77,7 +77,7 @@ The order does **not** authorise removal or postponement of cross-feature depend
 
 **Gate per feature:** all old outcomes are retained/redesigned and verified, existing URLs and owner links work, web/MCP parity holds, and EN/NL/responsive/keyboard/touch states pass.
 
-## Phase E — interoperability and whole-application acceptance (not started)
+## Phase E — interoperability and whole-application acceptance (final review open)
 
 - Walk complete chains: product → alternative → needs → shopping → purchase → stock change → expense → account; recurring obligation → occurrence → payment → account → forecast; task → project → materials → receipt; device → place → live control → energy.
 - Test owner permissions, child access, household boundaries, duplicate source handling, status/history meaning, offline/unknown HA, unknown versus zero metering.
@@ -90,7 +90,7 @@ Run validated migrations and server/environment checks only through the reviewed
 
 ## Continuation log — 8 November 2026
 
-First committed code: `src/components/shared/record-workspace-tabs.tsx`, `split-action.tsx`, rewritten `src/features/inventory/screens/product-stock-screen.tsx`, simplified `catalogue/components/product-context-panels.tsx`, bilingual inventory copy, shared Storybook examples and `productAlreadyOnList` test. These are **implementation in progress**, not production or whole-module acceptance. The branch's CI workflow currently triggers on `main` push / pull requests targeting `main`, not normal pushes to `rework_features`; fresh full checks are still required in a development checkout.
+First committed code: `src/components/shared/record-workspace-tabs.tsx`, `split-action.tsx`, rewritten `src/features/inventory/screens/product-stock-screen.tsx`, simplified `catalogue/components/product-context-panels.tsx`, bilingual inventory copy, shared Storybook examples and `productAlreadyOnList` test. These are **implementation in progress**, not production or whole-module acceptance. That first checkpoint predates the later `rework_features` CI trigger; use the latest continuation for current verification status.
 
 Related: [rollout checklist](rollout-checklist.md) · [capability preservation](feature-preservation.md) · [wireframe feedback](wireframe-review-and-model-workspaces.md) · [interactive prototype](preview/all-feature-wireframes.html).
 

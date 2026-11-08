@@ -197,5 +197,26 @@
     "previous": "Vorige",
     "next": "Volgende",
     "pageOf": "Pagina {{page}} van {{pages}}"
+  },
+  "voucherDetail": {
+    "title": "Maaltijdcheques van {{name}}",
+    "asOf": "Geregistreerd tot en met {{date}}",
+    "available": "Beschikbaar om te besteden",
+    "received": "In totaal ontvangen",
+    "spent": "In totaal besteed",
+    "expired": "Ongebruikt vervallen",
+    "uncovered": "Bestedingen zonder geregistreerd tegoed",
+    "nextExpiry": "Eerstvolgende ongebruikte cheques die vervallen",
+    "noExpiry": "Geen ongebruikte cheques die vervallen",
+    "meaning": "Het saldo gebruikt de oudste geldige cheques eerst. Bestedingen tonen het werkelijke uitgavenaandeel van deze persoon. Vervaldatums horen bij het oorspronkelijke tegoed; dat kan al volledig besteed zijn. Toekomstige ontvangsten blijven verwacht.",
+    "receipts_one": "{{count}} ontvangen tegoed",
+    "receipts_other": "{{count}} ontvangen tegoeden",
+    "spending_one": "{{count}} geregistreerde betaling",
+    "spending_other": "{{count}} geregistreerde betalingen",
+    "noReceipts": "Geen ontvangen maaltijdcheques geregistreerd.",
+    "noSpending": "Geen maaltijdchequebestedingen voor deze persoon geregistreerd.",
+    "creditExpiry": "Oorspronkelijk tegoed geldig tot en met {{date}}",
+    "receiptPages": "Pagina’s ontvangen tegoeden",
+    "spendingPages": "Pagina’s maaltijdchequebestedingen"
   }
 }

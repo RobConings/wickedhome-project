@@ -4,6 +4,7 @@ import { Card, CardDescription, CardTitle } from "@/components/shared/card";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { HabitantAvatar, type Habitant } from "@/features/household";
 import { cn } from "@/lib/utils";
+import { RecordLink } from "@/components/shared/record-link";
 import type { VoucherBalance } from "../types/income";
 import { dateText, money } from "./use-income-text";
 
@@ -63,7 +64,7 @@ export function VoucherBalances({ balances, habitants, className }: VoucherBalan
               <li key={habitant.id} className="flex min-h-12 items-center gap-3 py-2">
                 <HabitantAvatar habitant={habitant} size="sm" />
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="text-sm font-medium">{habitant.name}</span>
+                  <RecordLink to={`/income/vouchers/${encodeURIComponent(habitant.id)}`} className="min-h-10 py-2 text-sm font-medium hover:underline">{habitant.name}</RecordLink>
                   <span className={cn("text-xs text-muted-foreground", balance.expiringSoon && "font-medium text-foreground")}>{details.join(" · ")}</span>
                   {problems.length > 0 && <span className="text-xs text-muted-foreground">{problems.join(" · ")}</span>}
                 </span>

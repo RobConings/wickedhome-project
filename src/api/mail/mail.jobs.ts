@@ -2,6 +2,7 @@ import { registerJob } from "../jobs/job-registry";
 import { checkAllReplies } from "./mail-replies";
 
 registerJob({
+  sourcePath: "/integrations",
   id: "mail.replies",
   // Every 10 minutes, at :05, :15… (away from the quarter-hour calendar sync).
   schedule: "5-55/10 * * * *",

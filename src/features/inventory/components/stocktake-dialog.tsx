@@ -1,3 +1,4 @@
+import { RecordImage } from "@/components/shared/record-image";
 import * as React from "react";
 import { ArrowLeftIcon, CheckIcon, ClipboardCheckIcon, MapPinIcon, PackageIcon, TrophyIcon, SparklesIcon, XIcon } from "lucide-react";
 import { Link, useLocation } from "react-router";
@@ -124,7 +125,7 @@ export function StocktakeScreen({ items, images = {}, onChanged, onSave = saveSt
           <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground"><span className="flex items-center gap-1"><MapPinIcon className="size-3" />{current.placeName}</span><span>{t("count.roomProgress", { current: roomDone, total: roomItems.length })}</span></div>
         </div>
         <form onSubmit={(event) => { event.preventDefault(); void save(); }} className="flex min-w-0 flex-col gap-4 rounded-3xl border bg-card p-5 shadow-sm sm:p-8">
-          <div className="mx-auto flex size-20 items-center justify-center overflow-hidden rounded-2xl bg-muted">{images[current.productId] ? <img src={images[current.productId]!} alt="" className="size-full object-contain" /> : <PackageIcon className="size-10 text-primary" />}</div>
+          <RecordImage src={images[current.productId]} shape="avatar" fit="contain" className="mx-auto size-20 rounded-2xl" fallback={<PackageIcon className="size-10 text-primary" />} />
           <div className="min-w-0 space-y-1 text-center"><h1 className="text-xl leading-tight font-bold break-words sm:text-2xl">{current.productName}</h1><p className="text-sm text-muted-foreground">{t("count.registered", { quantity: formatQuantity(current.quantity, locale), unit: current.unit ?? "" })}</p></div>
           <div className="space-y-2"><label htmlFor={quantityId} className="block text-center text-sm font-medium">{t("count.actual")}</label><Input ref={input} id={quantityId} inputMode="decimal" autoComplete="off" value={draft} onChange={(event) => { setDraft(event.target.value); setError(null); }} disabled={saving} aria-describedby={error ? errorId : undefined} aria-invalid={Boolean(error)} className="h-16 text-center text-3xl! font-semibold tabular-nums" placeholder={t("count.quantityPlaceholder")} /></div>
           {error && <p id={errorId} role="alert" className="text-sm text-destructive">{error}</p>}

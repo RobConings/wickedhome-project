@@ -5,3 +5,5 @@
 - Pausing or resuming → `automations_set_enabled` (always confirmed). Paused jobs can still be run by hand.
 - Owners and adults run and pause jobs; children can only look.
 - A person's own Google sync (only their calendar or mailbox) is `integrations_sync` instead.
+
+Job reads can include `workspace`, the owner-provided source URL. It is navigation context, not a job command or permission grant. Existing pause/resume/manual-run confirmations, scheduling, leases and run histories are unchanged.

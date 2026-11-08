@@ -197,5 +197,26 @@
     "previous": "Previous",
     "next": "Next",
     "pageOf": "Page {{page}} of {{pages}}"
+  },
+  "voucherDetail": {
+    "title": "{{name}}’s meal vouchers",
+    "asOf": "Recorded through {{date}}",
+    "available": "Available to spend",
+    "received": "Received in total",
+    "spent": "Spent in total",
+    "expired": "Expired unused",
+    "uncovered": "Spending without recorded cover",
+    "nextExpiry": "Next unused vouchers to expire",
+    "noExpiry": "No unused vouchers due to expire",
+    "meaning": "The balance uses the oldest valid vouchers first. Spending shows this person’s actual expense share. Credit expiry dates describe the original credit; its full amount may already have been spent. Future receipts remain expected.",
+    "receipts_one": "{{count}} received credit",
+    "receipts_other": "{{count}} received credits",
+    "spending_one": "{{count}} recorded payment",
+    "spending_other": "{{count}} recorded payments",
+    "noReceipts": "No received meal-voucher credits recorded.",
+    "noSpending": "No meal-voucher spending recorded for this person.",
+    "creditExpiry": "Original credit valid through {{date}}",
+    "receiptPages": "Received credit pages",
+    "spendingPages": "Voucher spending pages"
   }
 }

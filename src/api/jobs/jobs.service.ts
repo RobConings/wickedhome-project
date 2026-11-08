@@ -14,6 +14,7 @@ async function toAutomationJob(job: RegisteredJob, enabled: boolean, now: Date):
     id: job.id,
     titleKey: job.titleKey,
     descriptionKey: job.descriptionKey,
+    sourcePath: job.sourcePath || null,
     schedule: job.schedule,
     timeZone: JOB_TIME_ZONE,
     enabled,

@@ -6,6 +6,7 @@ import { cleanUpBarcodeCache } from "./barcode-lookup.service";
  * except photos a saved product or shopping item still shows (barcode-cache.ts).
  */
 registerJob({
+  sourcePath: "/shopping/products",
   id: "shopping.barcode-cache",
   schedule: "35 4 * * *",
   titleKey: "shopping:jobs.barcodeCache.title",

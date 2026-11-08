@@ -6,3 +6,6 @@ export { MoneyFlowScreen } from "./screens/money-flow-screen";
 export { canManageMoney, type JointAccount, type MoneyLoans, type MoneyMonth, type MoneySummary, type MoneyTimeline } from "./types/money";
 
 export { ExpenseAccountPanel } from "./components/expense-account-panel";
+export { ContributionPlanScreen } from "./screens/contribution-plan-screen";
+export { contributionPlanLoader, contributionPlanAction } from "./data/money-loaders";
+export { HabitantMoneyPanel } from "./components/habitant-money-panel";

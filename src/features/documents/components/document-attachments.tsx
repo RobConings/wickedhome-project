@@ -39,6 +39,8 @@ export type DocumentAttachmentsProps = {
   entityId: string;
   /** Owners and adults upload, attach and detach; children see and download. */
   canManage: boolean;
+  /** A historical owner can permit detaching while directing all new files to its current owner. */
+  canAttach?: boolean;
   /** Heading of the panel; "Documents" by default. */
   title?: string;
   /** Drive folder new uploads go into; the drive root by default. */
@@ -67,6 +69,7 @@ export function DocumentAttachments({
   entityType,
   entityId,
   canManage,
+  canAttach = true,
   title,
   uploadFolderId = null,
   maxUploadBytes = 100_000_000,
@@ -85,6 +88,7 @@ export function DocumentAttachments({
   });
   const uploads = useDocumentUploads({ maxBytes: maxUploadBytes, onUploaded: addUploaded, initial: initialUploads });
   const [attaching, setAttaching] = React.useState(false);
+  const allowAdding = canManage && canAttach;
   const [previewing, setPreviewing] = React.useState<DocumentFile | null>(null);
 
 
@@ -110,7 +114,7 @@ export function DocumentAttachments({
           {title ?? t("attachments.title")}
           {files.length > 0 && <span className="text-sm font-normal text-muted-foreground">{files.length}</span>}
         </CardTitle>
-        {canManage && (
+        {allowAdding && (
           <Button variant="outline" size="sm" disabled={status !== "ready"} onClick={() => setAttaching(true)}>
             {t("attachments.attachExisting")}
           </Button>
@@ -136,7 +140,7 @@ export function DocumentAttachments({
             {t("attachments.retry")}
           </Button>
         </div>
-      ) : files.length === 0 && !canManage ? (
+      ) : files.length === 0 && !allowAdding ? (
         <p className="text-sm text-muted-foreground">{t("attachments.empty")}</p>
       ) : (
         files.length > 0 && (
@@ -212,7 +216,7 @@ export function DocumentAttachments({
         )
       )}
 
-      {canManage && status !== "error" && (
+      {allowAdding && status !== "error" && (
         <>
           <UploadProgressList
             items={uploads.items}
@@ -232,13 +236,13 @@ export function DocumentAttachments({
         </>
       )}
 
-      <AttachDocumentDialog
+      {allowAdding && <AttachDocumentDialog
         open={attaching}
         onOpenChange={setAttaching}
         onSelect={handleAttach}
         attachedIds={files.map((file) => file.id)}
         search={searchFiles}
-      />
+      />}
       <DocumentPreviewDialog file={previewing} onOpenChange={(next) => !next && setPreviewing(null)} />
     </Card>
   );

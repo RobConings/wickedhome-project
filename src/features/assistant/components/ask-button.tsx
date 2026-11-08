@@ -117,6 +117,7 @@ export function AskButton({ client = assistantClient, className, open: openProp,
                 serverTts={Boolean(status.tts?.configured && status.tts.ok)}
                 client={client}
                 onConversationCreated={setConversationId}
+                onRecordNavigate={() => setOpen(false)}
                 autoFocus
               />
             )}

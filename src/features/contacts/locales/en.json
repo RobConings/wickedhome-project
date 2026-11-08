@@ -87,7 +87,13 @@
     "removeConfirm": "Remove",
     "removed": "Contact removed from the project",
     "loading": "Loading contacts…",
-    "error": "Couldn't load the contacts."
+    "error": "Couldn't load the contacts.",
+    "editRole": "Edit role",
+    "roleSaved": "Project role saved",
+    "unlinkTitle": "Unlink {{name}}?",
+    "linkProject": "Link a project",
+    "linkProjectHint": "Choose a project and the role this contact has there. Selecting an already linked project updates its role.",
+    "chooseProject": "Project"
   },
   "empty": {
     "title": "No contacts yet",
@@ -105,7 +111,7 @@
     "about": "Contact details",
     "notRecorded": "Not recorded",
     "noProjects": "No projects linked yet.",
-    "projectsHint": "Open a project to manage the contact’s role or project link."
+    "projectsHint": "Manage project relationships here, or open a project for its work and documents."
   },
   "shop": {
     "title": "People at this shop",

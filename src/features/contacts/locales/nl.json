@@ -87,7 +87,13 @@
     "removeConfirm": "Uit project halen",
     "removed": "Contact uit het project gehaald",
     "loading": "Contacten laden…",
-    "error": "De contacten konden niet geladen worden."
+    "error": "De contacten konden niet geladen worden.",
+    "editRole": "Rol aanpassen",
+    "roleSaved": "Projectrol opgeslagen",
+    "unlinkTitle": "{{name}} ontkoppelen?",
+    "linkProject": "Project koppelen",
+    "linkProjectHint": "Kies een project en de rol van dit contact. Kies je een al gekoppeld project, dan wordt de rol bijgewerkt.",
+    "chooseProject": "Project"
   },
   "empty": {
     "title": "Nog geen contacten",
@@ -105,7 +111,7 @@
     "about": "Contactgegevens",
     "notRecorded": "Niet vastgelegd",
     "noProjects": "Nog geen projecten gekoppeld.",
-    "projectsHint": "Open een project om de rol of projectkoppeling te beheren."
+    "projectsHint": "Beheer projectkoppelingen hier, of open een project voor het werk en de documenten."
   },
   "shop": {
     "title": "Contactpersonen bij deze winkel",

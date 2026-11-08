@@ -38,6 +38,7 @@ export async function deliverHeldPushes(now: Date, log: (message: string) => voi
 }
 
 registerJob({
+  sourcePath: "/notifications",
   id: "notifications.dispatch",
   schedule: "*/5 * * * *",
   titleKey: "notifications:jobs.dispatch.title",
@@ -66,6 +67,7 @@ registerJob({
 });
 
 registerJob({
+  sourcePath: "/notifications",
   id: "notifications.prune",
   schedule: "10 4 * * *",
   titleKey: "notifications:jobs.prune.title",

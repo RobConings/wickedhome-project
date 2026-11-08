@@ -313,5 +313,27 @@
     "failed": "The account history could not be loaded.",
     "retry": "Try again",
     "loading": "Loading account history"
+  },
+  "planWorkspace": {
+    "title": "Monthly contribution plan",
+    "unknownAccount": "Former account",
+    "schedule": "The agreement",
+    "deleteTitle": "Delete this contribution plan?",
+    "deleteHint": "The plan is removed. Recorded transfers and account history stay.",
+    "noEnd": "No end date",
+    "related": "Other plans for this person and account",
+    "noRelated": "No other plans recorded.",
+    "activeMonth": "This plan is active in the selected month.",
+    "inactiveMonth": "This plan is outside the selected month. Recorded activity is still shown.",
+    "planned": "Planned for this person and account",
+    "recorded": "Net contributions recorded",
+    "activityHint": "This activity covers every contribution by this person to this account in the selected month. Payments are not assigned to an individual plan."
+  },
+  "personWorkspace": {
+    "title": "Household money",
+    "contribution": "Planned {{planned}} · recorded {{recorded}}",
+    "noContributions": "No contributions planned or recorded for this month.",
+    "accounts": "Joint accounts owned",
+    "vouchers": "Open meal-voucher activity"
   }
 }

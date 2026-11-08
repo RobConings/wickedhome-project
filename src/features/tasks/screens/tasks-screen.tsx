@@ -65,8 +65,12 @@ export function TasksScreen({ overview, habitants, places, canManage, currentHab
   // `?new=1` (dashboard, a place page) opens the form, with `place` pre-filled; the param is removed at once.
   const [creating, setCreating] = useOpenFromUrl(canManage);
 
-  const setFilters = (next: TaskFilters) =>
-    setSearchParams(taskFiltersToParams(next, currentHabitantId), { replace: true, preventScrollReset: true });
+  const setFilters = (next: TaskFilters) => setSearchParams((previous) => {
+    const params = new URLSearchParams(previous);
+    for (const key of ["view", "assignee", "type", "location", "place", "group"]) params.delete(key);
+    taskFiltersToParams(next, currentHabitantId).forEach((value, key) => params.set(key, value));
+    return params;
+  }, { replace: true, preventScrollReset: true });
 
   const addButton = canManage && (
     <TaskFormDialog

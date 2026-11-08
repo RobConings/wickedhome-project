@@ -86,6 +86,7 @@ registerAssistantTool({
       running: job.running || null,
       next: when(job.nextRunAt, ctx.locale),
       last: runText(job.lastRun, ctx.locale),
+      workspace: job.sourcePath ?? null,
     });
     if (input.job) {
       const job = await getAutomation(input.job.id);

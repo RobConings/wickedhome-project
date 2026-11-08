@@ -1,3 +1,4 @@
+import { RecordImage } from "@/components/shared/record-image";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import { CheckIcon, ChefHatIcon, CookingPotIcon, PlayIcon, ShoppingCartIcon, Trash2Icon, UsersIcon } from "lucide-react";
@@ -55,7 +56,7 @@ export function MealPlanCard({ entry, canManage, action }: MealPlanCardProps) {
     <Card className={cn("gap-3 p-4", cooked && "opacity-75")} tone={status === "cooking" ? "featured" : "default"}>
       <div className="flex items-start gap-3">
         {coverUrl ? (
-          <img src={coverUrl} alt="" className="size-14 shrink-0 rounded-lg object-cover" loading="lazy" />
+          <RecordImage src={coverUrl} shape="avatar" fallback={<ChefHatIcon className="size-7 text-section" />} />
         ) : (
           <span className="grid size-14 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary" aria-hidden="true">
             <ChefHatIcon className="size-6" />

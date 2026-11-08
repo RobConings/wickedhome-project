@@ -33,6 +33,7 @@ export const automationJobSchema = z.object({
   /** i18n keys `namespace:key`, translated with `t(titleKey)`. */
   titleKey: z.string(),
   descriptionKey: z.string(),
+  sourcePath: z.string().nullable().optional(),
   /** 5-field cron expression in `timeZone`. */
   schedule: z.string(),
   timeZone: z.string(),

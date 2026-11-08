@@ -36,7 +36,8 @@
     "never": "Hasn't run yet",
     "toggle": "Run \"{{title}}\" on its schedule",
     "runNow": "Run now",
-    "running": "Running…"
+    "running": "Running…",
+    "openSource": "Open related workspace"
   },
   "history": {
     "show": "Recent runs",

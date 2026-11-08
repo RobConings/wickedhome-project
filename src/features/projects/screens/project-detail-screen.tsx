@@ -1,3 +1,4 @@
+import { RecordImage } from "@/components/shared/record-image";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import {
@@ -185,7 +186,7 @@ export function ProjectDetailScreen({ detail, places, canManage, tasks, material
           actions={actions}
         />
         {project.coverFileId && (
-          <img src={documentContentUrl(project.coverFileId)} alt="" className="h-36 w-full rounded-xl object-cover sm:h-48" />
+          <RecordImage src={documentContentUrl(project.coverFileId)} shape="banner" fallback={<ProjectAvatar project={project} size="lg" />} />
         )}
       </Stack>
       {canManage && editing && (

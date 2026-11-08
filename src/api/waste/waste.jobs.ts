@@ -6,6 +6,7 @@ import { syncAllWasteSetups } from "./waste.service";
  * that missed it). A failed setup keeps its previous collections; the run is marked failed so it shows.
  */
 registerJob({
+  sourcePath: "/calendar",
   id: "waste.sync",
   schedule: "15 5 * * *",
   titleKey: "waste:jobs.sync.title",

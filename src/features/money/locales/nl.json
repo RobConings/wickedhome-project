@@ -313,5 +313,27 @@
     "failed": "De rekeninghistoriek kon niet geladen worden.",
     "retry": "Opnieuw proberen",
     "loading": "Rekeninghistoriek laden"
+  },
+  "planWorkspace": {
+    "title": "Maandelijks bijdrageplan",
+    "unknownAccount": "Voormalige rekening",
+    "schedule": "De afspraak",
+    "deleteTitle": "Dit bijdrageplan verwijderen?",
+    "deleteHint": "Het plan wordt verwijderd. Geregistreerde overschrijvingen en rekeninggeschiedenis blijven behouden.",
+    "noEnd": "Geen einddatum",
+    "related": "Andere plannen voor deze persoon en rekening",
+    "noRelated": "Geen andere plannen geregistreerd.",
+    "activeMonth": "Dit plan is actief in de gekozen maand.",
+    "inactiveMonth": "Dit plan valt buiten de gekozen maand. Geregistreerde activiteit blijft zichtbaar.",
+    "planned": "Gepland voor deze persoon en rekening",
+    "recorded": "Netto geregistreerde bijdragen",
+    "activityHint": "Deze activiteit omvat alle bijdragen van deze persoon aan deze rekening in de gekozen maand. Betalingen zijn niet aan één afzonderlijk plan toegewezen."
+  },
+  "personWorkspace": {
+    "title": "Huishoudgeld",
+    "contribution": "Gepland {{planned}} · geregistreerd {{recorded}}",
+    "noContributions": "Geen bijdragen gepland of geregistreerd voor deze maand.",
+    "accounts": "Gedeelde rekeningen in eigendom",
+    "vouchers": "Open maaltijdchequeactiviteit"
   }
 }

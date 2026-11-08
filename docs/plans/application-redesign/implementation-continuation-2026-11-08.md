@@ -4,7 +4,7 @@ Branch: `rework_features`. Started from a clean local checkout matching the hand
 
 ## Current instructions
 
-Complete implementation before further test runs. No additional compiler, lint, test, Storybook or build runs during the implementation stage. Keep the established Quick actions: phone + sheet, desktop Quick action menu, existing role-filtered actions and shortcuts, optional search. The earlier proposed search/Add replacement was removed after product-owner feedback.
+Finish the implementation pass. The latest product-owner instruction permits very local feature checks when needed; avoid repeating baseline suites. Final compilation/packaging follows the implementation pass. Keep the established Quick actions: phone + sheet, desktop Quick action menu, existing role-filtered actions and shortcuts, optional search. The earlier proposed search/Add replacement was removed after product-owner feedback.
 
 No production deployment, production migration or merge to `main` is authorised. Changes are committed only on the redesign branch.
 
@@ -35,3 +35,29 @@ Before the request to defer testing, scoped validation passed 1,622 unit cases (
 The expanded browser script reached its new recurring document/loan steps successfully, then exposed an older unscoped bill-count assertion. Both assertions now scope through payment → purchase → session; the corrected script has not been rerun. Storybook examples/script changes made before the deferral remain present. Final combined checks must run after implementation, without repeating unchanged baseline checks at every small step.
 
 Whole-application acceptance remains open. Preserve the outcome inventory and phase gates; do not replace outcome evidence with route counts or a passing entry-page smoke test.
+
+## Final owner and support implementation
+
+The remaining inventoried implementation paths are now delivered. This closes the code pass; full application/release acceptance remains a distinct gate.
+
+| Area | Delivered implementation |
+|---|---|
+| Contribution plans | `/money/plans/:planId` shows the real plan, person, account, dated related plans and monthly recorded activity. Existing edit, versioned amount changes, transfers and delete remain. Later effective amounts navigate to the new plan ID and close the old edit dialog. Activity is explicitly for the person/account/month, never falsely assigned to one plan. |
+| Meal vouchers | `/income/vouchers/:personId` exposes the existing FIFO balance, actual received credits and expense shares with independent paging, source owners and expiry. Future income stays expected; uncovered spending remains explicit. `income.vouchers` uses the same read service and adult MCP role rules. |
+| People and contacts | Adults can inspect a person's plans/accounts and voucher activity. Contact workspaces now link/unlink projects and edit project roles through the existing Contacts action. Resident and login identities remain separate; household/person assistant context is looked up within the household. |
+| Assistant | Escaped inline text supports bold and safe internal/external Markdown links. Internal navigation retains owner origin and closes the quick Ask sheet; external web links open separately. Unsupported/executable/credentialed links remain text. Conversation, streaming and confirmation services are retained. |
+| Activity | Surviving targets are resolved in scoped batches and open their owner workspace. Foreign/missing/unsupported targets remain historical text; labels are not rewritten. Search, source/person/action filters and view persist in the URL. |
+| Automations | Job definitions optionally supply their owning workspace; web and MCP expose it alongside existing schedules, state, controls and run history. The scheduler/lease/retry/permission rules are unchanged. |
+| Tasks | Complete and Edit remain primary; Skip, Hold/release, Snooze and Delete share the contextual menu. Source-owned deletion restrictions remain. Dialog cancellation restores focus to the menu, and URL filtering preserves record origins. |
+| Media and legacy documents | Recipe/project photographs fill a deliberate slot with failure fallback; packages retain contain. Original recurring attachments can still be detached, while new attachments/uploads go to the current schedule. |
+
+Local evidence for these changes: two finance workspace DB/MCP cases, one scoped audit-target DB case, two assistant inline-link cases, and the focused record-workspace browser journey. The browser exercises actual contribution versioning, contact project link/role/unlink, audit owner/filtered return and 320px/1280px finance layouts. A separate task-only browser flow verifies menu → Hold/Delete cancellation and focus return, Snooze's real owner mutation and phone overflow. These are deliberately feature-local; they do not replace final whole-application acceptance.
+
+### Final packaging and source checks
+
+- TypeScript validation passed; lint passed for the changed source, stories and focused browser harness after fixes.
+- Application client/server builds passed. The final server bundle includes scoped audit target handling, and the final client bundle includes exact account-to-account return context.
+- Storybook packaging passed with the added contribution-plan, voucher and original-document examples. The exhaustive Storybook matrix was not repeated.
+- Feature-local browser results above passed. No broad baseline unit/integration suites were rerun during this closing pass.
+
+No remaining implementation gap is recorded in the current outcome inventory. Phase E still describes final whole-application acceptance, not additional placeholder implementation. Keep that gate explicit when reviewing or releasing. This branch has not been deployed or migrated in production.

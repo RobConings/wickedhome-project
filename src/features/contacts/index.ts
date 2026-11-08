@@ -6,6 +6,7 @@
 export { ContactPicker } from "./components/contact-picker";
 export { ProjectContactsPanel } from "./components/project-contacts-panel";
 export { ShopContactsPanel } from "./components/shop-contacts-panel";
+export { ContactProjectsPanel } from "./components/contact-projects-panel";
 export { contactsAction, contactsLoader, type ContactActionResult, type ContactsPageData } from "./data/contacts-loaders";
 export { fetchContact, fetchContacts } from "./data/contacts-requests";
 export { useContactSelections } from "./data/use-contact-selections";

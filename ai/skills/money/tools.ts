@@ -1,9 +1,10 @@
 import { z } from "zod";
+import { idSchema } from "@/types/common";
 import { monthBounds, planActiveIn } from "@/features/money/types/money-calculations";
 import { contributionPlanSchema, type JointAccount, type LedgerLine, type MoneyMonth } from "@/features/money/types/money";
 import { addDays, addMonthsClamped, monthOf, todayIn } from "@/types/dates";
 import { db } from "@/api/lib/db";
-import { badRequest } from "@/api/lib/http";
+import { badRequest, notFound } from "@/api/lib/http";
 import {
   addOtherEntry,
   createPlan,
@@ -75,6 +76,29 @@ registerAssistantTool({
 const currentMonth = () => monthOf(todayIn());
 const optionalMonth = monthSchema("Month YYYY-MM (default this month)").optional();
 const accountArg = entityRef("account", "Joint account by name (default the joint current account)").optional();
+
+registerAssistantTool({
+  name: "money.plan_details", description: "Inspect an existing monthly contribution plan and its person/account activity. Activity belongs to that person/account/month, not exclusively to a plan. Later effective amount changes preserve an older plan and create a new plan ID.",
+  input: z.object({ planId: idSchema, month: optionalMonth }), permission: "read", confirm: "never", roles: MONEY_ROLES,
+  activity: { en: "Opened a contribution plan", nl: "Bijdrageplan geopend" },
+  run: async (ctx, input) => {
+    const month = await getMoneyMonth(ctx.householdId, input.month ?? currentMonth());
+    const plan = month.plans.find((candidate) => candidate.id === input.planId);
+    if (!plan) throw notFound("Plan not found");
+    return { plan, month: month.month, url: `/money/plans/${encodeURIComponent(plan.id)}?month=${month.month}`,
+      account: month.accounts.find((candidate) => candidate.id === plan.accountId) ?? null,
+      contributions: month.contributions.filter((row) => row.accountId === plan.accountId && row.habitantId === plan.habitantId),
+      relatedPlans: month.plans.filter((candidate) => candidate.id !== plan.id && candidate.accountId === plan.accountId && candidate.habitantId === plan.habitantId) };
+  },
+});
+
+registerScreenContext({ kind: "contribution_plan", skills: ["money"], describe: async (ctx, id) => {
+  if (!id || ctx.user.role === "child") return null;
+  const month = await getMoneyMonth(ctx.householdId, currentMonth());
+  const plan = month.plans.find((candidate) => candidate.id === id);
+  if (!plan) throw notFound("Plan not found");
+  return { label: say(ctx.locale, "Contribution plan", "Bijdrageplan"), summary: `Plan ${plan.id}: person ${plan.habitantId}, account ${plan.accountId}, ${plan.amountCents} cents monthly on day ${plan.dayOfMonth}; ${plan.activeFrom} to ${plan.activeTo ?? "open"}. Recorded contributions remain separate.` };
+} });
 
 async function accountsOf(ctx: AssistantToolContext) {
   const accounts = await listJointAccounts(ctx.householdId);

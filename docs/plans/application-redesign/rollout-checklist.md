@@ -1,6 +1,6 @@
 # Full implementation rollout
 
-**Active continuation:** baseline `6f3e1b7` on `rework_features` (passing GitHub CI reported at handover); see the [current implementation ledger](implementation-continuation-2026-11-08.md). Further checks are deferred until implementation is finished, as requested by the product owner. Historical baseline `2dda61a`; see the [follow-up implementation and validation ledger](followup-implementation-2026-11-08.md) for newly implemented energy, history, account, product and record-owner work and fresh check status. Earlier checkpoint counts below remain historical evidence.
+**Active continuation:** baseline `6f3e1b7` on `rework_features` (passing GitHub CI reported at handover); see the [current implementation ledger](implementation-continuation-2026-11-08.md). The implementation pass is now delivered; the product owner authorised only feature-local checks during development, with final application review kept separate. Historical baseline `2dda61a`; see the [follow-up implementation and validation ledger](followup-implementation-2026-11-08.md) for newly implemented energy, history, account, product and record-owner work and fresh check status. Earlier checkpoint counts below remain historical evidence.
 
 **Current execution plan:** [revised implementation phases](implementation-phases.md). Keep the original Stage 1–5 history below as evidence, but apply the newer phase gates to the total rework. A household calendar, floor-plan editor or shopping session is **not** forced into the same record-tab layout as a product. The 78-screen wireframe is a style and flow reference, not a full feature inventory.
 
@@ -39,44 +39,44 @@ The user authorised the complete redesign. This checklist tracks completion acro
 - [x] Product → need → project/task → acquisition → receipt → expense allocation → account reconciliation.
 - [x] Web and MCP parity with real-service tests of the implemented reference-journey invariants.
 
-## Stage 4: module conversion
+## Stage 4: module conversion — implementation delivered, acceptance open
 
 | Module | Required review and implementation | Completion |
 |---|---|---|
-| Dashboard | Room map, useful daily progress, connected source states and clear next actions | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Tasks | Related project, materials, room, blockers, documents and consistent action hierarchy | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Shopping | Simple destination, checklist, extras, history, receipts and payments | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Shops | Shops/groups ownership, shared selection, reusable group management | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Inventory/catalogue | Product identity, photos, stock, needs, tasks/projects and acquisition history | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Recipes | Keep covers, photos/card/list modes, meal needs, cooking and actual usage | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Calendar | Events and source overlays, owners and return navigation | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Projects | Keep banners, progress, tasks/materials, costs, purchases, contacts and documents | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Expenses | Purchase/source links, project shares, payments, receipts and recurring obligations | Partial; recurring schedule/payment workspace and database lifecycle/account/MCP reference added; exhaustive occurrence navigation and full module acceptance remain open |
-| Income | URL-based focused views, expected/received/source forms, vouchers and account contributions | Partial; focused views implemented; implemented additions and entry-point checks do not complete module conversion |
-| Money | URL-selected account activity, transfers, contributions, forecasts and reconciliation | Account history now includes actual account balance, owners, correction/edit/entry forms and a preselected transfer action; final validation pending |
-| Places | Rooms/zones/floors stay first class, floor plans and owner-contributed related panels | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Devices | Images, profiles, state freshness, supported controls, room and typed maintenance tasks | Partial; maintenance relationship implemented and database-tested; implemented additions and entry-point checks do not complete module conversion |
-| Home Assistant | Actual supported source capabilities, mappings, scenes and source availability | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Energy | Source measurements, appliances, configuration and estimates distinguished from expenses | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Household | Residents, role-aware actions, profiles and linked household context | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Documents | Existing file identity, folders, images and linked-record ownership | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Contacts | Recognisable contact cards and linked work/projects | Shop-scoped supplier panel and preselected creation now implemented through Contacts; final validation pending |
-| Integrations | Connection states, reviewed imports and source-owner links | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Settings/auth | Focused owner sections, legacy deep links and existing account/security forms | Partial; section navigation implemented; implemented additions and entry-point checks do not complete module conversion |
-| Assistant/MCP | Current guides, schemas, authorised context and equivalent owner workflows | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Notifications | Clear linked source, read/delivery state and preferences | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Automations/audit | Existing jobs, run history, traceable source actions and recovery | Partial; implemented additions and entry-point checks do not complete module conversion |
-| Waste/weather | Source freshness, settings and existing dashboard/calendar/task contributions | Partial; implemented additions and entry-point checks do not complete module conversion |
+| Dashboard | Room map, useful daily progress, connected source states and clear next actions | Implementation present; final outcome/interaction acceptance remains open |
+| Tasks | Related project, materials, room, blockers, documents and consistent action hierarchy | Implementation present; final outcome/interaction acceptance remains open |
+| Shopping | Simple destination, checklist, extras, history, receipts and payments | Implementation present; final outcome/interaction acceptance remains open |
+| Shops | Shops/groups ownership, shared selection, reusable group management | Implementation present; final outcome/interaction acceptance remains open |
+| Inventory/catalogue | Product identity, photos, stock, needs, tasks/projects and acquisition history | Implementation present; final outcome/interaction acceptance remains open |
+| Recipes | Keep covers, photos/card/list modes, meal needs, cooking and actual usage | Implementation present; final outcome/interaction acceptance remains open |
+| Calendar | Events and source overlays, owners and return navigation | Implementation present; final outcome/interaction acceptance remains open |
+| Projects | Keep banners, progress, tasks/materials, costs, purchases, contacts and documents | Implementation present; final outcome/interaction acceptance remains open |
+| Expenses | Purchase/source links, project shares, payments, receipts and recurring obligations | Implementation present; final outcome/interaction acceptance remains open |
+| Income | URL-based focused views, expected/received/source forms, vouchers and account contributions | Implementation present; final outcome/interaction acceptance remains open |
+| Money | URL-selected account activity, transfers, contributions, forecasts and reconciliation | Implementation present; final outcome/interaction acceptance remains open |
+| Places | Rooms/zones/floors stay first class, floor plans and owner-contributed related panels | Implementation present; final outcome/interaction acceptance remains open |
+| Devices | Images, profiles, state freshness, supported controls, room and typed maintenance tasks | Implementation present; final outcome/interaction acceptance remains open |
+| Home Assistant | Actual supported source capabilities, mappings, scenes and source availability | Implementation present; final outcome/interaction acceptance remains open |
+| Energy | Source measurements, appliances, configuration and estimates distinguished from expenses | Implementation present; final outcome/interaction acceptance remains open |
+| Household | Residents, role-aware actions, profiles and linked household context | Implementation present; final outcome/interaction acceptance remains open |
+| Documents | Existing file identity, folders, images and linked-record ownership | Implementation present; final outcome/interaction acceptance remains open |
+| Contacts | Recognisable contact cards and linked work/projects | Implementation present; final outcome/interaction acceptance remains open |
+| Integrations | Connection states, reviewed imports and source-owner links | Implementation present; final outcome/interaction acceptance remains open |
+| Settings/auth | Focused owner sections, legacy deep links and existing account/security forms | Implementation present; final outcome/interaction acceptance remains open |
+| Assistant/MCP | Current guides, schemas, authorised context and equivalent owner workflows | Implementation present; final outcome/interaction acceptance remains open |
+| Notifications | Clear linked source, read/delivery state and preferences | Implementation present; final outcome/interaction acceptance remains open |
+| Automations/audit | Existing jobs, run history, traceable source actions and recovery | Implementation present; final outcome/interaction acceptance remains open |
+| Waste/weather | Source freshness, settings and existing dashboard/calendar/task contributions | Implementation present; final outcome/interaction acceptance remains open |
 
 ## Stage 5: application acceptance — incomplete
 
-- [ ] Finish module conversion before accepting the complete application.
+- [x] Deliver the inventoried module implementations, including the remaining record, finance, contact and supporting workflows. Acceptance remains a separate gate.
 - [ ] Verify all retained capabilities and their resulting owner workflows, beyond opening entry points.
 - [ ] Complete application-wide English/Dutch, theme, phone/desktop, keyboard and touch acceptance.
 - [ ] Complete whole-application checks. Targeted unit/integration/build/Storybook/browser runs for the implemented reference slices are tracked in [implementation](implementation.md).
 - [x] Record implemented evidence separately from remaining scope.
 
-Stage 4 and whole-app acceptance remain open. The [implementation report](implementation.md) records the completed foundation/reference workflows and their passing tests; those tests do not establish completion of every planned screen or feature. Deployment and physical HA checks are separate release/environment operations.
+Stage 4 implementation is delivered; its final acceptance gate and whole-app acceptance remain open. The [implementation report](implementation.md) records the completed foundation/reference workflows and their passing tests; those tests do not establish completion of every planned screen or feature. Deployment and physical HA checks are separate release/environment operations.
 
 ## Current local evidence
 
@@ -91,3 +91,14 @@ See [implementation](implementation.md) and the [product/finance outcome matrix]
 - Stock history now opens verified surviving purchase, need and cooking records, including through MCP. Ledger tiles retain the same source links/actions as rows.
 - Owner links retain return context; main searchable lists retain query/view and shop/device filters in the URL. Cooking entry retains its recipe/meal-plan origin.
 - These latest implementation additions have **not** received final validation. Do not reuse earlier passing counts as acceptance evidence for them. No deployment or production migration.
+
+## Final implementation pass following `8a76def`
+
+- Dedicated contribution-plan workspace: actual schedule, person/account, monthly activity, related dated plans, preserved effective-date versioning and existing edit/transfer/delete actions.
+- Dedicated voucher activity: the existing FIFO/expiry calculation, received credits and actual expense shares with independent history paging; original receipt and expense owner links; future income stays expected.
+- Person finance contribution, contact-side project link/role/unlink, household assistant context, safe assistant answer links and quick-chat navigation.
+- Task action hierarchy uses Complete/Edit with contextual Skip/Hold/Snooze/Delete, retains linked-source restrictions, and returns keyboard focus from dialogs.
+- Audit targets resolve surviving scoped owners; historical labels remain intact. Activity filters stay in the URL. Automation source links preserve all schedules, switches and run/history controls.
+- Recipe/project photography and product/counting media use the shared cover/contain/fallback treatment. Historical recurring documents remain detachable; all new uploads go to the current schedule.
+
+The original Quick actions remain unchanged. No production migration, deployment or main merge. See the continuation ledger for the exact feature-local evidence; no claim of whole-application acceptance is made.

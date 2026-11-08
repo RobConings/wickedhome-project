@@ -1,5 +1,7 @@
 # GitHub continuation — 8 November 2026 (after Codex push)
 
+**Subsequent implementation:** baseline `6f3e1b7` passed GitHub CI as reported at handover. Follow-up `8a76def` and the final owner/support pass are documented in the [current implementation ledger](implementation-continuation-2026-11-08.md). Earlier pending notes below describe their original checkpoints; they do not require rebuilding already delivered features. See the [phase status](implementation-phases.md) for the distinction between completed implementation and final acceptance.
+
 **Scope:** commits on `rework_features` after Codex's pushed `89ec40f`. This is a development continuation, not a deployment or whole-feature acceptance. Existing feature and outcome contracts remain in force.
 
 ## What the preceding Codex push delivered

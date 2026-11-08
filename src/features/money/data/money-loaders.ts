@@ -1,5 +1,6 @@
 import i18n from "i18next";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { data, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
+import { internalOrigin, withRecordOrigin } from "@/lib/record-navigation";
 import { fetchHouseholdOverview, type Habitant } from "@/features/household";
 import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
 import {
@@ -50,7 +51,7 @@ export const MONEY_INTENTS = [
 ] as const;
 export type MoneyIntent = (typeof MONEY_INTENTS)[number];
 
-export type MoneyActionResult = FormResult & { intent?: MoneyIntent };
+export type MoneyActionResult = FormResult & { intent?: MoneyIntent; planId?: string };
 
 export type MoneyPageData = { month: MoneyMonth; habitants: Habitant[] };
 
@@ -66,6 +67,25 @@ export function requestedMonth(request: Request): string | null {
 export async function moneyLoader({ request }: LoaderFunctionArgs): Promise<MoneyPageData> {
   const [month, household] = await Promise.all([fetchMoneyMonth(requestedMonth(request)), fetchHouseholdOverview()]);
   return { month, habitants: household.habitants };
+}
+
+export async function contributionPlanLoader(args: LoaderFunctionArgs) {
+  const page = await moneyLoader(args);
+  const plan = page.month.plans.find((candidate) => candidate.id === args.params.planId);
+  if (!plan) throw data(null, { status: 404 });
+  return { ...page, plan };
+}
+
+export async function contributionPlanAction(args: ActionFunctionArgs) {
+  const result = await moneyAction(args);
+  if (!result.ok) return result;
+  const url = new URL(args.request.url);
+  if (result.intent === "delete-plan") return redirect(internalOrigin(url.searchParams.get("from")) ?? "/money?tab=settlement");
+  // A later effective amount creates a new plan and preserves the old period.
+  if (result.intent === "update-plan" && result.planId && result.planId !== args.params.planId) {
+    return redirect(withRecordOrigin(`/money/plans/${encodeURIComponent(result.planId)}?month=${requestedMonth(args.request) ?? ""}`, `${url.pathname}${url.search}`));
+  }
+  return result;
 }
 
 /** One action for the money flow page; the form's `intent` says what to do. */
@@ -112,14 +132,14 @@ export async function moneyAction({ request }: ActionFunctionArgs): Promise<Mone
       case "create-plan": {
         const { data, errors } = parseForm(contributionPlanSchema, formData);
         if (errors) return { errors, intent };
-        await createPlan(data);
-        return { ok: true, intent };
+        const plan = await createPlan(data);
+        return { ok: true, intent, planId: plan.id };
       }
       case "update-plan": {
         const { data, errors } = parseForm(contributionPlanSchema, formData);
         if (errors) return { errors, intent };
-        await updatePlan(id, data);
-        return { ok: true, intent };
+        const plan = await updatePlan(id, data);
+        return { ok: true, intent, planId: plan.id };
       }
       case "delete-plan":
         await deletePlan(id);

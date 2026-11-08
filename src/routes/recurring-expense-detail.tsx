@@ -28,7 +28,7 @@ export function Component() {
       projectField={({ defaultValue }) => <ProjectFormField defaultValue={defaultValue} />}
       attachments={<>
         <DocumentAttachments entityType="subscription" entityId={detail.recurring.id} canManage={canManageDocuments(user.role)} />
-        {(detail.documentEntityIds ?? []).filter((id) => id !== detail.recurring.id).map((id) => <DocumentAttachments key={id} title={t("workspace.originalDocuments")} entityType="subscription" entityId={id} canManage={canManageDocuments(user.role)} />)}
+        {(detail.documentEntityIds ?? []).filter((id) => id !== detail.recurring.id).map((id) => <DocumentAttachments key={id} title={t("workspace.originalDocuments")} entityType="subscription" entityId={id} canManage={canManageDocuments(user.role)} canAttach={false} />)}
       </>}
     />
   );

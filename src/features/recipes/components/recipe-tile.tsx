@@ -1,3 +1,4 @@
+import { RecordImage } from "@/components/shared/record-image";
 import { ChefHatIcon, ListOrderedIcon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
@@ -46,7 +47,7 @@ export function RecipeTile({ recipe, isFavorite, onToggleFavorite }: RecipeCardP
   return (
     <Card className="relative gap-3 overflow-hidden p-0 has-[a:hover]:bg-accent/30">
       {coverUrl ? (
-        <img src={coverUrl} alt="" className="h-28 w-full object-cover" loading="lazy" />
+        <RecordImage src={coverUrl} className="aspect-[4/3] w-full rounded-none" fallback={<ChefHatIcon className="size-10 text-section" />} />
       ) : (
         <div className="grid h-16 w-full place-items-center bg-primary/10 text-primary" aria-hidden="true">
           <ChefHatIcon className="size-6" />
@@ -83,7 +84,7 @@ export function RecipeListItem({ recipe, isFavorite, onToggleFavorite }: RecipeC
   return (
     <div className="relative flex items-center gap-3">
       {coverUrl ? (
-        <img src={coverUrl} alt="" className="size-12 shrink-0 rounded-lg object-cover" loading="lazy" />
+        <RecordImage src={coverUrl} shape="avatar" fallback={<ChefHatIcon className="size-7 text-section" />} />
       ) : (
         <span className="grid size-12 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary" aria-hidden="true">
           <ChefHatIcon className="size-5" />

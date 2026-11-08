@@ -10,7 +10,7 @@ import {
   type IncomeSource,
 } from "@/features/income/types/income";
 import { monthOf, todayIn } from "@/types/dates";
-import { createIncome, createIncomeSource, deleteIncome, getIncomeMonth, getIncomeOverview, getIncome, getIncomeSource, updateIncomeSource } from "@/api/income/income.service";
+import { createIncome, createIncomeSource, deleteIncome, getIncomeMonth, getIncomeOverview, getIncome, getIncomeSource, getVoucherDetail, updateIncomeSource } from "@/api/income/income.service";
 import { badRequest } from "@/api/lib/http";
 import {
   capList,
@@ -79,6 +79,17 @@ registerEntityResolver({
 });
 
 const optionalMonth = monthSchema("Month YYYY-MM (default this month)").optional();
+
+registerAssistantTool({ name: "income.vouchers", description: "Inspect a person's current meal-voucher FIFO balance, original received credits and actual expense shares with owner IDs. Receipts and spending are independently paged; credit expiry does not imply that the whole original credit is still unused. Future credits are not received yet.",
+  input: z.object({ person: entityRef("habitant"), receiptPage: z.number().int().min(1).max(100000).default(1), spendingPage: z.number().int().min(1).max(100000).default(1) }),
+  permission: "read", confirm: "never", roles: MONEY_ROLES, activity: { en: "Checked meal-voucher activity", nl: "Maaltijdchequeactiviteit bekeken" },
+  run: (ctx, input) => getVoucherDetail(ctx.householdId, input.person.id, input.receiptPage, input.spendingPage) });
+
+registerScreenContext({ kind: "vouchers", skills: ["income", "expenses"], describe: async (ctx, id) => {
+  if (!id || ctx.user.role === "child") return null;
+  const detail = await getVoucherDetail(ctx.householdId, id);
+  return { label: detail.person.name, summary: `Meal vouchers for ${detail.person.name}: ${detail.balance.availableCents} cents available as of ${detail.today}; oldest valid credits spent first, expense shares and bank accounts remain separate.` };
+} });
 const whoOf = (names: Map<string, string>, habitantId: string | null) => (habitantId ? (names.get(habitantId) ?? "?") : "joint");
 const isExpected = (income: Pick<Income, "date">) => income.date > todayIn();
 

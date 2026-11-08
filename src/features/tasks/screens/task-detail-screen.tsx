@@ -18,7 +18,8 @@ import {
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from "@/components/ui/dropdown-menu";
+import { SplitAction } from "@/components/shared/split-action";
 import { Spinner } from "@/components/ui/spinner";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
@@ -86,6 +87,8 @@ export function TaskDetailScreen({
   const viewer: TaskViewer = { habitantId: currentHabitantId ?? null, canManage };
   const { submit, busy, pendingIntent } = useTaskActions(task, { action: "/tasks", canUndo: canManage });
   const [holding, setHolding] = React.useState(false);
+  const [deleting, setDeleting] = React.useState(false);
+  const managementTrigger = React.useRef<HTMLButtonElement>(null);
   const linked = Boolean(task.origin);
   // "Repeat this" (`?repeat=1`) opens the form with Repeats switched on; the param is removed at once.
   const [searchParams, setSearchParams] = useSearchParams();
@@ -125,83 +128,22 @@ export function TaskDetailScreen({
           }
         />
       )}
-      {canManage && open && (
-        <>
-          <Button variant="outline" disabled={busy} loading={pendingIntent === "skip"} onClick={() => submit("skip")}>
-            <SkipForwardIcon />
-            {t("actions.skip")}
-          </Button>
-          {task.hold ? (
-            <Button variant="outline" disabled={busy} loading={pendingIntent === "release"} onClick={() => submit("release")}>
-              <PlayCircleIcon />
-              {t("hold.release")}
-            </Button>
-          ) : (
-            <Button variant="outline" disabled={busy} loading={pendingIntent === "hold"} onClick={() => setHolding(true)}>
-              <PauseCircleIcon />
-              {t("hold.action")}
-            </Button>
-          )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" disabled={busy} loading={pendingIntent === "snooze"}>
-                <AlarmClockIcon />
-                {t("actions.snooze")}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              {SNOOZE_OPTIONS.map((option) => {
-                const date = snoozeDate(option, today);
-                return (
-                  <DropdownMenuItem key={option} onSelect={() => submit("snooze", { until: date })}>
-                    <span className="flex-1">{t(`snooze.${option}`)}</span>
-                    <span className="text-xs text-muted-foreground">{text.day(date, { weekday: "short" })}</span>
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </>
-      )}
-      {canManage && !open && (
-        <Button variant="outline" disabled={busy} loading={pendingIntent === "reopen"} onClick={() => submit("reopen")}>
-          <RotateCcwIcon />
-          {t("actions.reopen")}
-        </Button>
-      )}
-      {canManage && (
-        <>
-          <TaskFormDialog
-            task={task}
-            habitants={habitants}
-            places={places}
-            today={today}
-            projectField={projectField} deviceField={deviceField}
-            trigger={
-              <Button variant="outline">
-                <PencilIcon />
-                {tCommon("actions.edit")}
-              </Button>
-            }
-          />
-          {!linked && (
-          <ConfirmDialog
-            trigger={
-              <Button variant="ghost" className="text-destructive hover:text-destructive" disabled={busy}>
-                <Trash2Icon />
-                {tCommon("actions.delete")}
-              </Button>
-            }
-            title={t("delete.title", { title: task.title })}
-            description={task.materials ? t("delete.withMaterials") : t("delete.description")}
-            confirmLabel={tCommon("actions.delete")}
-            cancelLabel={tCommon("actions.cancel")}
-            destructive
-            onConfirm={() => submit("delete", { redirectTo: "/tasks" })}
-          />
-          )}
-        </>
-      )}
+      {canManage && !open && <Button variant="outline" disabled={busy} loading={pendingIntent === "reopen"} onClick={() => submit("reopen")}><RotateCcwIcon />{t("actions.reopen")}</Button>}
+      {canManage && <SplitAction icon={PencilIcon} label={tCommon("actions.edit")} menuLabel={t("workspace.moreActions")} variant="outline" disabled={busy}
+        menuTriggerRef={managementTrigger} onMenuCloseAutoFocus={(event) => { if (deleting || holding) event.preventDefault(); }}
+        renderPrimary={(button) => <TaskFormDialog task={task} habitants={habitants} places={places} today={today} projectField={projectField} deviceField={deviceField} trigger={button} />}
+        menu={open || !linked ? <>
+          {open && <>
+            <DropdownMenuItem onSelect={() => submit("skip")}><SkipForwardIcon />{t("actions.skip")}</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => task.hold ? submit("release") : setHolding(true)}>{task.hold ? <PlayCircleIcon /> : <PauseCircleIcon />}{t(task.hold ? "hold.release" : "hold.action")}</DropdownMenuItem>
+            <DropdownMenuSub><DropdownMenuSubTrigger><AlarmClockIcon />{t("actions.snooze")}</DropdownMenuSubTrigger><DropdownMenuSubContent>
+              {SNOOZE_OPTIONS.map((option) => { const date = snoozeDate(option, today); return <DropdownMenuItem key={option} onSelect={() => submit("snooze", { until: date })}><span className="flex-1">{t(`snooze.${option}`)}</span><span className="ml-3 text-xs text-muted-foreground">{text.day(date, { weekday: "short" })}</span></DropdownMenuItem>; })}
+            </DropdownMenuSubContent></DropdownMenuSub>
+          </>}
+          {!linked && <>{open && <DropdownMenuSeparator />}<DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => setDeleting(true)}><Trash2Icon />{tCommon("actions.delete")}</DropdownMenuItem></>}
+        </> : null}
+      />}
+      {canManage && !linked && <ConfirmDialog open={deleting} onOpenChange={setDeleting} returnFocusRef={managementTrigger} title={t("delete.title", { title: task.title })} description={task.materials ? t("delete.withMaterials") : t("delete.description")} confirmLabel={tCommon("actions.delete")} cancelLabel={tCommon("actions.cancel")} destructive onConfirm={() => submit("delete", { redirectTo: "/tasks" })} />}
     </>
   );
 
@@ -384,7 +326,7 @@ export function TaskDetailScreen({
         </div>
       </PageGrid>
 
-      {holding && <TaskHoldDialog task={task} open onOpenChange={setHolding} onHold={(reason) => submit("hold", { reason })} />}
+      {holding && <TaskHoldDialog task={task} open onOpenChange={setHolding} returnFocusRef={managementTrigger} onHold={(reason) => submit("hold", { reason })} />}
       {repeating && (
         <TaskFormDialog task={task} habitants={habitants} places={places} today={today} open onOpenChange={setRepeating} startRepeating projectField={projectField} deviceField={deviceField} />
       )}

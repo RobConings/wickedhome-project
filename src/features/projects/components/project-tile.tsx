@@ -1,3 +1,4 @@
+import { RecordImage } from "@/components/shared/record-image";
 import { CalendarIcon, ListChecksIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
@@ -20,7 +21,7 @@ export function ProjectTile({ project }: { project: Project }) {
   return (
     <Card className={cn("relative gap-3 overflow-hidden p-0 has-[a:hover]:bg-accent/30", closed && "opacity-80")}>
       {project.coverFileId ? (
-        <img src={documentContentUrl(project.coverFileId)} alt="" className="aspect-[16/9] w-full object-cover" loading="lazy" />
+        <RecordImage src={documentContentUrl(project.coverFileId)} className="aspect-[16/9] w-full rounded-none" fallback={<ProjectAvatar project={project} size="lg" />} />
       ) : (
         <div className="h-1.5 w-full" style={{ backgroundColor: project.color }} aria-hidden="true" />
       )}

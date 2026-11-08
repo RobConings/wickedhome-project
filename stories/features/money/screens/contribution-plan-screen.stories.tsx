@@ -1,0 +1,10 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { ContributionPlanScreen } from "@/features/money/screens/contribution-plan-screen";
+import { moneyHabitants, moneyMonthFixture, planFixtures } from "../fixtures";
+const plan = planFixtures[0]!;
+const meta = { title: "Features/Money/Screens/ContributionPlanScreen", component: ContributionPlanScreen, parameters: { layout: "fullscreen", router: { initialEntries: [`/money/plans/${plan.id}?month=${moneyMonthFixture.month}`] } }, args: { plan, month: moneyMonthFixture, habitants: moneyHabitants, canManage: true } } satisfies Meta<typeof ContributionPlanScreen>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+export const Default: Story = {};
+export const ReadOnly: Story = { args: { canManage: false } };
+export const EndedPlan: Story = { args: { plan: { ...plan, activeTo: "2026-09-30" } } };

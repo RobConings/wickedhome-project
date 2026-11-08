@@ -2,6 +2,8 @@ import * as React from "react";
 import { MapPinIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { RecordLink } from "@/components/shared/record-link";
+import { messageInline } from "./message-inline";
 import type { ChatImage } from "../data/chat-state";
 
 type ChatMessageBubbleProps = {
@@ -14,17 +16,22 @@ type ChatMessageBubbleProps = {
   /** The answer is still arriving: a blinking caret at the end. */
   streaming?: boolean;
   className?: string;
+  onRecordNavigate?: () => void;
 };
 
-/** `**bold**` as <strong>; everything else stays plain text (models write a little Markdown). */
-function renderInline(text: string): React.ReactNode[] {
-  return text.split(/(\*\*[^*]+\*\*)/g).map((part, index) =>
-    part.startsWith("**") && part.endsWith("**") && part.length > 4 ? <strong key={index}>{part.slice(2, -2)}</strong> : part,
-  );
+/** Bold text and safe record/source links; other model output remains escaped plain text. */
+function renderInline(text: string, onRecordNavigate?: () => void): React.ReactNode[] {
+  return messageInline(text).map((part, index) => {
+    if (part.kind === "strong") return <strong key={index}>{part.text}</strong>;
+    if (part.kind === "text") return part.text;
+    const className = "rounded-sm font-medium underline underline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-ring";
+    return part.external ? <a key={index} href={part.href} target="_blank" rel="noopener noreferrer" className={className}>{part.text}</a>
+      : <RecordLink key={index} to={part.href} className={className} onClick={(event) => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) onRecordNavigate?.(); }}>{part.text}</RecordLink>;
+  });
 }
 
 /** One question or answer in the chat. */
-export function ChatMessageBubble({ role, text, images = [], screen, streaming = false, className }: ChatMessageBubbleProps) {
+export function ChatMessageBubble({ role, text, images = [], screen, streaming = false, className, onRecordNavigate }: ChatMessageBubbleProps) {
   const { t } = useTranslation("assistant");
   const mine = role === "user";
   return (
@@ -55,7 +62,7 @@ export function ChatMessageBubble({ role, text, images = [], screen, streaming =
         )}
       >
         <span className="sr-only">{mine ? t("chat.you") : t("chat.assistant")}: </span>
-        {renderInline(text)}
+        {renderInline(text, onRecordNavigate)}
         {streaming && <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse rounded-sm bg-current align-text-bottom opacity-60" aria-hidden />}
       </div>
       )}

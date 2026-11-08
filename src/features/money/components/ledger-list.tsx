@@ -13,7 +13,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useFetcher } from "react-router";
+import { useFetcher, useLocation } from "react-router";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -83,6 +83,7 @@ function LineRow({ line, title, canManage, accounts, habitants }: { line: Ledger
   const { t } = useTranslation("money");
   const { t: tCommon } = useTranslation();
   const fetcher = useFetcher<FormResult>();
+  const location = useLocation();
   const Icon =
     line.type === "other" && line.amountCents >= 0
       ? ArrowDownLeftIcon
@@ -128,7 +129,7 @@ function LineRow({ line, title, canManage, accounts, habitants }: { line: Ledger
         </span>
         <span className="text-xs break-words text-muted-foreground">{details}</span>
         {(counterpart || person) && <span className="flex flex-wrap gap-x-3 text-xs">
-          {counterpart && <RecordLink to={`/money?tab=history&account=${encodeURIComponent(counterpart.id)}&month=${line.date.slice(0, 7)}`} className="inline-flex min-h-10 items-center text-primary hover:underline">{counterpart.name}</RecordLink>}
+          {counterpart && <RecordLink to={`/money?tab=history&account=${encodeURIComponent(counterpart.id)}&month=${line.date.slice(0, 7)}&from=${encodeURIComponent(`${location.pathname}${location.search}${location.hash}`)}`} className="inline-flex min-h-10 items-center text-primary hover:underline">{counterpart.name}</RecordLink>}
           {person && <RecordLink to={`/habitants/${encodeURIComponent(person.id)}`} className="inline-flex min-h-10 items-center text-primary hover:underline">{person.name}</RecordLink>}
         </span>}
       </span>

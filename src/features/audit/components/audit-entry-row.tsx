@@ -2,6 +2,7 @@ import { BotIcon, MonitorSmartphoneIcon, PlugIcon, WorkflowIcon, type LucideIcon
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/shared/card";
+import { RecordLink } from "@/components/shared/record-link";
 import { currentLocale } from "@/lib/i18n";
 import { formatDateTime } from "@/types/date-format";
 import type { AuditChannel, AuditEntry } from "../types/audit";
@@ -52,7 +53,7 @@ export function AuditEntryRow({ entry }: { entry: AuditEntry }) {
     <div className="flex min-w-0 flex-col gap-1">
       <p className="leading-snug">
         <span className="font-medium">{title}</span>
-        {entry.targetLabel && <span className="text-muted-foreground"> · {entry.targetLabel}</span>}
+        {entry.targetLabel && <span className="text-muted-foreground"> · {entry.targetUrl ? <RecordLink to={entry.targetUrl} className="font-medium text-primary hover:underline">{entry.targetLabel}</RecordLink> : entry.targetLabel}</span>}
       </p>
       {detail && <p className="text-sm break-words text-muted-foreground">{detail}</p>}
       <EntryMeta entry={entry} />
@@ -66,7 +67,7 @@ export function AuditEntryTile({ entry }: { entry: AuditEntry }) {
   return (
     <Card className="flex h-full flex-col gap-2">
       <p className="leading-snug font-medium">{title}</p>
-      {entry.targetLabel && <p className="text-sm">{entry.targetLabel}</p>}
+      {entry.targetLabel && <p className="text-sm">{entry.targetUrl ? <RecordLink to={entry.targetUrl} className="font-medium text-primary hover:underline">{entry.targetLabel}</RecordLink> : entry.targetLabel}</p>}
       {detail && <p className="text-sm break-words text-muted-foreground">{detail}</p>}
       <div className="mt-auto">
         <EntryMeta entry={entry} />

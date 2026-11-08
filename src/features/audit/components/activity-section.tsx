@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useSearchParams } from "react-router";
 import { HistoryIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -38,8 +39,17 @@ type ActivitySectionProps = {
  */
 export function ActivitySection({ client = auditClient }: ActivitySectionProps) {
   const { t, i18n } = useTranslation("audit");
-  const [filters, setFilters] = React.useState<Filters>(NO_FILTERS);
-  const [query, setQuery] = React.useState("");
+  const [search, setSearch] = useSearchParams();
+  const filters = React.useMemo<Filters>(() => ({ channel: search.get("auditChannel") || ALL, userId: search.get("auditPerson") || ALL, action: search.get("auditAction") || ALL }), [search]);
+  const query = search.get("auditQ") ?? "";
+  const setFilters = (next: Filters) => setSearch((previous) => {
+    const params = new URLSearchParams(previous);
+    for (const [field, key] of [["channel", "auditChannel"], ["userId", "auditPerson"], ["action", "auditAction"]] as const) {
+      if (next[field] === ALL) params.delete(key); else params.set(key, next[field]);
+    }
+    return params;
+  }, { replace: true, preventScrollReset: true });
+  const setQuery = (value: string) => setSearch((previous) => { const next = new URLSearchParams(previous); if (value) next.set("auditQ", value); else next.delete("auditQ"); return next; }, { replace: true, preventScrollReset: true });
   const [retry, setRetry] = React.useState(0);
   const [loaded, setLoaded] = React.useState<Loaded | null>(null);
   const [failedKey, setFailedKey] = React.useState<string | null>(null);
@@ -80,7 +90,7 @@ export function ActivitySection({ client = auditClient }: ActivitySectionProps) 
     }
   }
 
-  const setFilter = (name: keyof Filters) => (value: string) => setFilters((current) => ({ ...current, [name]: value }));
+  const setFilter = (name: keyof Filters) => (value: string) => setFilters({ ...filters, [name]: value });
 
   const toolbar = (
     <div className="flex flex-wrap gap-2">
@@ -141,6 +151,7 @@ export function ActivitySection({ client = auditClient }: ActivitySectionProps) 
         renderTile={(entry) => <AuditEntryTile entry={entry} />}
         search={{ query, onSearch: setQuery, placeholder: t("list.search") }}
         storageKey="settings-activity"
+        viewParam="auditView"
         defaultView="list"
         toolbar={toolbar}
         filtered={filtered || query !== ""}

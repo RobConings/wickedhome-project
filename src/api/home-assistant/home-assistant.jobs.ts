@@ -11,6 +11,7 @@ export const HA_ENERGY_JOB_ID = "home-assistant.energy";
  * quiet no-op; configured but unreachable → a failed run, so it shows under Automations.
  */
 registerJob({
+  sourcePath: "/home-assistant",
   id: HA_ENERGY_JOB_ID,
   schedule: "7 * * * *",
   titleKey: "home-assistant:jobs.energy.title",
@@ -29,6 +30,7 @@ registerJob({
  * a steady sensor isn't shown as "no recent data". Live changes don't wait for this (state_changed events).
  */
 registerJob({
+  sourcePath: "/home-assistant",
   id: "home-assistant.refresh-states",
   schedule: "*/15 * * * *",
   titleKey: "home-assistant:jobs.refreshStates.title",

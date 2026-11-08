@@ -1,6 +1,6 @@
 import type * as React from "react";
 import { ChevronRightIcon, type LucideIcon } from "lucide-react";
-import { Link } from "react-router";
+import { RecordLink as Link } from "@/components/shared/record-link";
 import { isSectionAccent } from "@/lib/section-accent";
 import { cn } from "@/lib/utils";
 import { IconChip, type IconChipTone } from "./icon-chip";

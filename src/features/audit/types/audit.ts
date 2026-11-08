@@ -48,6 +48,8 @@ export const auditEntrySchema = z.object({
   targetType: z.string().nullable(),
   targetId: z.string().nullable(),
   targetLabel: z.string().nullable(),
+  /** The current owner exists and is visible; labels still describe the historical action. */
+  targetUrl: z.string().nullable().optional(),
   summary: z.string().nullable(),
 });
 export type AuditEntry = z.infer<typeof auditEntrySchema>;
