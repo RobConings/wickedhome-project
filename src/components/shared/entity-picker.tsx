@@ -17,6 +17,8 @@ export type EntityPickerItem = {
   description?: string;
   /** Icon, avatar or logo before the label. */
   leading?: React.ReactNode;
+  /** Optional dedicated section shown before favorites (e.g. saved shop groups). */
+  featuredGroup?: string;
   /** Extra search terms (synonyms, codes). */
   keywords?: string[];
 };
@@ -240,6 +242,11 @@ export function EntityPicker({
       </CommandGroup>
     );
 
+  // A named featured section makes destinations such as saved shop groups visible immediately,
+  // rather than burying them after dozens of favourite/recent shops.
+  const featuredHeadings = [...new Set(groups.all.map((item) => item.featuredGroup).filter((heading): heading is string => Boolean(heading)))];
+  const ordinary = (items: EntityPickerItem[]) => items.filter((item) => !item.featuredGroup);
+
   const list = (
     <Command
       shouldFilter={false}
@@ -254,7 +261,7 @@ export function EntityPicker({
         placeholder={labels.search}
         className="pointer-coarse:text-base"
       />
-      <CommandList className="max-h-[min(22rem,var(--radix-popover-content-available-height,60vh))] max-sm:max-h-[60vh]">
+      <CommandList className="max-h-72 overflow-y-auto overscroll-contain max-sm:max-h-[60dvh]">
         {!loading && <CommandEmpty>{labels.empty}</CommandEmpty>}
         {loading && (
           <div role="status" aria-label={labels.loading} className="px-2 py-1.5">
@@ -275,9 +282,12 @@ export function EntityPicker({
             )}
           </div>
         )}
-        {renderGroup("favorites", labels.favorites, groups.favorites)}
-        {renderGroup("recent", labels.recent, groups.recent)}
-        {renderGroup("all", labels.all, groups.all)}
+        {featuredHeadings.map((heading, index) =>
+          <React.Fragment key={heading}>{renderGroup(`featured-${index}`, heading, groups.all.filter((item) => item.featuredGroup === heading))}</React.Fragment>
+        )}
+        {renderGroup("favorites", labels.favorites, ordinary(groups.favorites))}
+        {renderGroup("recent", labels.recent, ordinary(groups.recent))}
+        {renderGroup("all", labels.all, ordinary(groups.all))}
       </CommandList>
     </Command>
   );
@@ -339,7 +349,8 @@ export function EntityPicker({
           <PopoverTrigger asChild>{trigger}</PopoverTrigger>
           <PopoverContent
             align="start"
-            className="w-(--radix-popover-trigger-width) min-w-64 p-0"
+            className="w-(--radix-popover-trigger-width) min-w-64 max-w-[calc(100vw-2rem)] overflow-hidden p-0"
+            portalContainer={triggerRef.current?.closest<HTMLElement>('[data-slot="dialog-content"]') ?? undefined}
           >
             {list}
           </PopoverContent>
