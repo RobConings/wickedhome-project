@@ -85,6 +85,7 @@ export function SessionsScreen({
   canManage, live = true, initialSelections,
 }: Props) {
   const { t } = useTranslation("shopping");
+  const { t: tCommon } = useTranslation();
   const user = useOptionalCurrentUser();
   const locale = currentLocale();
   const { order, change } = useCategoryOrder();
@@ -170,6 +171,7 @@ export function SessionsScreen({
             {sessionShops.slice(0, 3).map((shop) => <ShopLogo key={shop.id} shop={shop} size="sm" />)}
             {sessionShops.length > 3 && <span>+{sessionShops.length - 3}</span>}
             <span>{formatDate(session.startedAt, locale)} · {session.participants.map((part) => part.name).join(", ")}</span>
+            <Badge variant={liveStatus === "open" ? "success" : "neutral"}>{t("sessions.live_" + liveStatus)}</Badge>
           </span>
         ) : t("sessions.overviewDescription")}
         actions={!session ? (
@@ -184,6 +186,7 @@ export function SessionsScreen({
               title={t("sessions.closeConfirmTitle")}
               description={t("sessions.closeConfirmDescription")}
               confirmLabel={t("sessions.close")}
+              cancelLabel={tCommon("actions.cancel")}
               onConfirm={() => perform(() => closeSession(session.id, session.revision))}
             />}
           </div>
