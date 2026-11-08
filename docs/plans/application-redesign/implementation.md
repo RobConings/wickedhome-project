@@ -1,5 +1,7 @@
 # Local redesign implementation — partial rollout
 
+**After the latest Codex push:** [GitHub continuation](github-continuation-2026-11-08.md) commits an additive nullable product brand field, real create/edit/read support and optional barcode prefill. The older brand-absence statements below describe a previous checkpoint and are superseded. Its migration and integration flows need new validation; previous passing tests do not cover these new commits. CI verification is now enabled for `rework_features` while deployment remains main-only.
+
 **Active continuation:** baseline `2dda61a`; see the [follow-up implementation and validation ledger](followup-implementation-2026-11-08.md) for newly implemented energy, history, account, product and record-owner work and fresh check status. Earlier checkpoint counts below remain historical evidence.
 
 ## Product and recurring workspace continuation — 8 November 2026
