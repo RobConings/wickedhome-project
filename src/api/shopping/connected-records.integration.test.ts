@@ -86,17 +86,17 @@ it("product brand is a real household record field with safe legacy updates, cle
     packageUnit: original.packageUnit,
   });
   assert.equal(original.brand, null);
-  const withBrand = await updateProduct(f.home.id, f.product.id, { ...input, brand: "Boni" });
-  assert.equal(withBrand.brand, "Boni");
-  assert.deepEqual((await listProducts(f.home.id, { q: "boni" })).map((product) => product.id), [f.product.id]);
+  const withBrand = await updateProduct(f.home.id, f.product.id, { ...input, brand: "Verified Test Brand" });
+  assert.equal(withBrand.brand, "Verified Test Brand");
+  assert.deepEqual((await listProducts(f.home.id, { q: "verified test brand" })).map((product) => product.id), [f.product.id]);
   await updateProduct(f.home.id, f.product.id, { ...input, notes: "An older client changed notes without a brand field" });
-  assert.equal((await getProduct(f.home.id, f.product.id)).brand, "Boni", "Omitted brand must never clear the recorded value");
+  assert.equal((await getProduct(f.home.id, f.product.id)).brand, "Verified Test Brand", "Omitted brand must never clear the recorded value");
   const foreign = await fixture(t);
-  assert.deepEqual(await listProducts(foreign.home.id, { q: "boni" }), []);
+  assert.deepEqual(await listProducts(foreign.home.id, { q: "verified test brand" }), []);
   await assert.rejects(updateProduct(foreign.home.id, f.product.id, { ...input, brand: "Other home" }), /not found/i);
   const cleared = await updateProduct(f.home.id, f.product.id, { ...input, brand: null });
   assert.equal(cleared.brand, null);
-  assert.deepEqual(await listProducts(f.home.id, { q: "boni" }), []);
+  assert.deepEqual(await listProducts(f.home.id, { q: "verified test brand" }), []);
   assert.equal(await f.quantity(), 0, "Brand edits must not change stock");
   assert.equal(await db.stockMovement.count({ where: { householdId: f.home.id } }), 0);
   assert.equal(await db.expense.count({ where: { householdId: f.home.id } }), 0);
