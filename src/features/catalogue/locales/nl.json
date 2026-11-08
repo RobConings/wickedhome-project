@@ -8,5 +8,6 @@
   "noTasks": "Geen taken gekoppeld via de behoeften van dit product.",
   "noProjects": "Geen projecten gekoppeld via de behoeften van dit product.",
   "loadError": "Gekoppelde productinformatie kon niet worden geladen.",
-  "retry": "Opnieuw proberen"
+  "retry": "Opnieuw proberen",
+  "viewPurchases": "Aankopen van dit product bekijken"
 }
