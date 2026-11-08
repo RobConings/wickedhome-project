@@ -1,15 +1,23 @@
 import * as React from "react";
-import { BarcodeIcon, MapPinIcon, PencilIcon, PlusIcon, QrCodeIcon } from "lucide-react";
+import {
+  ArchiveIcon, BarcodeIcon, BoxesIcon, HistoryIcon, LinkIcon, PackageIcon,
+  PencilIcon, PlusIcon, ShoppingCartIcon, StoreIcon, TagIcon,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useRevalidator } from "react-router";
+import { useRevalidator, useSearchParams } from "react-router";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { PageContainer } from "@/components/layout/page-container";
-import { PageGrid } from "@/components/layout/page-grid";
-import { Stack } from "@/components/layout/stack";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
+import { Card, CardTitle } from "@/components/shared/card";
+import { IconChip } from "@/components/shared/icon-chip";
 import { PageHeader } from "@/components/shared/page-header";
-import { ProductAlternatives, ProductCategoryIcon, ProductFormDialog, formatQuantity } from "@/features/shopping";
+import { RecordWorkspaceTabs } from "@/components/shared/record-workspace-tabs";
+import { SplitAction } from "@/components/shared/split-action";
+import {
+  LinkAlternativeDialog, ProductAlternatives, ProductCategoryIcon,
+  ProductFormDialog, createShoppingItem, formatQuantity,
+} from "@/features/shopping";
 import { currentLocale } from "@/lib/i18n";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import { StockItemFormDialog } from "../components/stock-item-form-dialog";
@@ -25,11 +33,12 @@ type ProductStockScreenProps = {
   initialSelections?: { products?: UseSelectionsOptions["initial"]; places?: UseSelectionsOptions["initial"]; shops?: UseSelectionsOptions["initial"] };
 };
 
-const productPath = (productId: string) => `/inventory/products/${encodeURIComponent(productId)}`;
+const productPath = (id: string) => `/inventory/products/${encodeURIComponent(id)}`;
 
 /**
- * One product: where it is kept, how much, its minimums, the history of every change, and its alternatives
- * (other brands sharing this stock; an alternative's page redirects here with that brand highlighted).
+ * Phase 4: a product-first workspace instead of a per-location stock administration page.
+ * No stock/history/API contracts change; existing location records remain editable in Advanced stock.
+ * The shared Details/Overview grammar leaves each owning feature free to compose its own content.
  */
 export function ProductStockScreen({ data, canManage, initialSelections, context }: ProductStockScreenProps) {
   const { t } = useTranslation("inventory");
@@ -38,152 +47,249 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
   const { product, stock, places, shops, products, highlightId } = data;
   const locale = currentLocale();
   const revalidator = useRevalidator();
+  const [, setSearchParams] = useSearchParams();
   const onChanged = React.useCallback(() => revalidator.revalidate(), [revalidator]);
   const { adjust, isPending, show, confirmation } = useStockActions({ onChanged });
-  // Quick −1 / +1 show at once (also in the total) while they are saved.
+
   const stockItems = stock.stockItems.map(show);
   const total = stockItems.reduce((sum, item) => sum + item.quantity, 0);
-  const unit = stock.stockItems[0]?.unit ?? product.unit;
-  const keptAt = new Set(stock.stockItems.map((item) => item.placeId));
-  const freePlaces = places.filter((place) => !keptAt.has(place.id));
+  const unit = stockItems[0]?.unit ?? product.unit;
+  const availablePlaces = places.filter((place) => !stock.stockItems.some((item) => item.placeId === place.id));
+  const preferredShop = shops.find((shop) => shop.id === product.defaultShopId)?.name ?? null;
+
+  const [editOpen, setEditOpen] = React.useState(false);
+  const [adjustOpen, setAdjustOpen] = React.useState(false);
+  const [linkOpen, setLinkOpen] = React.useState(false);
+  const [stockDetailsOpen, setStockDetailsOpen] = React.useState(false);
+  const [adding, setAdding] = React.useState(false);
+
+  function showDetails() {
+    setSearchParams((previous) => {
+      const next = new URLSearchParams(previous);
+      next.delete("workspace");
+      return next;
+    }, { replace: true, preventScrollReset: true });
+  }
+
+  function showStockManagement() {
+    showDetails();
+    setStockDetailsOpen(true);
+  }
+
+  function openAdjust() {
+    // If several historical stock locations exist, let the user choose rather than guessing.
+    if (stockItems.length > 1 || (stockItems.length === 0 && availablePlaces.length === 0)) {
+      showStockManagement();
+    } else {
+      setAdjustOpen(true);
+    }
+  }
+
+  async function addToShopping() {
+    if (adding) return;
+    setAdding(true);
+    try {
+      await createShoppingItem({
+        productId: product.id, quantity: 1, unit: unit ?? undefined,
+        shopId: product.defaultShopId, source: "manual",
+      });
+      toast.success(t("workspace.addedToShopping"));
+      onChanged();
+    } catch {
+      toast.error(t("workspace.addToShoppingFailed"));
+    } finally {
+      setAdding(false);
+    }
+  }
+
+  const count = `${formatQuantity(total, locale)}${unit ? ` ${unit}` : ""}`;
+  const packageSize = product.packageAmount !== null && product.packageUnit
+    ? `${formatQuantity(product.packageAmount, locale)} ${product.packageUnit}`
+    : (unit ?? null);
+  const minimum = stockItems.length === 1 ? stockItems[0].minQuantity : null;
+  const stockPlace = stockItems.length === 1 ? stockItems[0].placeName : null;
+  const detailRows: { label: string; value: string }[] = [
+    { label: t("workspace.category"), value: tShopping(`categories.${product.category}`) },
+    { label: t("workspace.storage"), value: stockPlace ?? (stockItems.length > 1 ? t("workspace.multipleLocations") : t("workspace.notSet")) },
+    { label: t("workspace.minStock"), value: minimum === null ? t("workspace.notSet") : `${formatQuantity(minimum, locale)}${unit ? ` ${unit}` : ""}` },
+    { label: t("workspace.preferredShop"), value: preferredShop ?? t("workspace.notSet") },
+    { label: t("workspace.essential"), value: product.isEssential ? t("workspace.yes") : t("workspace.no") },
+  ];
+
+  const stats = [
+    { id: "stock", icon: PackageIcon, tone: "success" as const, value: count, label: t("workspace.inStock") },
+    { id: "alternatives", icon: LinkIcon, tone: "info" as const, value: product.alternatives.length, label: t("workspace.alternatives") },
+    { id: "shops", icon: StoreIcon, tone: "shopping" as const, value: product.shopLinks.length, label: t("workspace.linkedShops") },
+    { id: "history", icon: HistoryIcon, tone: "tasks" as const, value: stock.movements.length, label: t("workspace.stockChanges") },
+  ];
+
+  const actionButtons = (
+    <div className="grid min-w-0 grid-cols-1 gap-2 lg:flex lg:flex-wrap lg:justify-end">
+      <SplitAction
+        icon={ShoppingCartIcon}
+        label={t("workspace.addToShopping")}
+        menuLabel={t("workspace.moreActions")}
+        busy={adding}
+        onClick={() => void addToShopping()}
+        menu={
+          <>
+            <DropdownMenuItem onSelect={openAdjust}><BoxesIcon />{t("workspace.adjustStock")}</DropdownMenuItem>
+            <DropdownMenuItem onSelect={showStockManagement}><HistoryIcon />{t("workspace.stockSettings")}</DropdownMenuItem>
+          </>
+        }
+      />
+      {canManage && (
+        <SplitAction
+          icon={PencilIcon}
+          label={t("workspace.editProduct")}
+          menuLabel={t("workspace.moreManagement")}
+          onClick={() => setEditOpen(true)}
+          variant="outline"
+          menu={
+            <>
+              <DropdownMenuItem onSelect={() => setLinkOpen(true)}><LinkIcon />{t("workspace.linkAlternative")}</DropdownMenuItem>
+              <DropdownMenuItem onSelect={showStockManagement}><ArchiveIcon />{t("workspace.stockSettings")}</DropdownMenuItem>
+            </>
+          }
+        />
+      )}
+    </div>
+  );
 
   return (
     <PageContainer>
       {confirmation}
-      <PageHeader
-        backTo="/inventory"
-        title={
-          <span className="flex items-center gap-3">
+      <div className="rounded-xl border bg-card p-3 shadow-xs sm:p-5">
+        <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)]">
+          <div className="flex min-h-56 items-center justify-center overflow-hidden rounded-xl bg-muted/40 lg:min-h-72">
             {product.imageUrl ? (
-              <img src={product.imageUrl} alt="" referrerPolicy="no-referrer" className="size-11 shrink-0 rounded-lg border bg-white object-contain" />
+              <img src={product.imageUrl} alt={product.name} referrerPolicy="no-referrer" className="h-56 w-full object-contain p-2 lg:h-72" />
             ) : (
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-section-soft text-section">
-                <ProductCategoryIcon category={product.category} className="size-6" />
-              </span>
+              <ProductCategoryIcon category={product.category} className="size-20 text-section" />
             )}
-            <span className="min-w-0 break-words">{product.name}</span>
-          </span>
-        }
-        description={
-          <span className="flex flex-wrap items-center gap-1.5 pt-1">
-            <span className="font-medium text-foreground tabular-nums">
-              {t("detail.total", { quantity: `${formatQuantity(total, locale)}${unit ? ` ${unit}` : ""}` })}
-            </span>
-            {product.barcode && (
-              <Badge variant="outline" className="gap-1 font-normal tabular-nums">
-                <BarcodeIcon aria-hidden="true" />
-                {product.barcode}
-              </Badge>
-            )}
-            {product.qrCode && (
-              <Badge variant="outline" className="gap-1 font-normal">
-                <QrCodeIcon aria-hidden="true" />
-                {product.qrCode}
-              </Badge>
-            )}
-          </span>
-        }
-        actions={
-          canManage && (
-            <>
-              <ProductFormDialog
-                product={product}
-                shops={shops}
-                initialSelections={initialSelections?.shops}
-                trigger={
-                  <Button variant="outline">
-                    <PencilIcon />
-                    {tCommon("actions.edit")}
-                  </Button>
+          </div>
+          <div className="flex min-w-0 flex-col gap-4">
+            <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+              <PageHeader
+                backTo="/inventory"
+                title={product.name}
+                description={
+                  <span className="flex flex-wrap items-center gap-2 pt-1">
+                    <Badge variant="outline">{total > 0 ? t("workspace.inStock") : t("workspace.outOfStock")}</Badge>
+                    {product.isEssential && <Badge variant="outline">{t("workspace.essential")}</Badge>}
+                    {preferredShop && <Badge variant="outline">{preferredShop}</Badge>}
+                  </span>
                 }
+                className="min-w-0"
               />
-              {freePlaces.length > 0 && (
-                <StockItemFormDialog
-                  products={[product]}
-                  places={freePlaces}
-                  defaults={{ productId: product.id }}
-                  initialSelections={initialSelections}
-                  trigger={
-                    <Button>
-                      <PlusIcon />
-                      {t("actions.keepAt")}
-                    </Button>
-                  }
-                />
-              )}
-            </>
-          )
-        }
-      />
-
-      {context}
-      <PageGrid columns="main-sidebar" className="items-start">
-        <Card>
-          <CardHeader>
-            <div className="flex flex-col gap-1">
-              <CardTitle>{t("detail.places")}</CardTitle>
-              <CardDescription>{t("detail.placesDescription")}</CardDescription>
+              <div className="hidden lg:block">{actionButtons}</div>
             </div>
-          </CardHeader>
-          {stockItems.length === 0 ? (
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPinIcon className="size-4" aria-hidden="true" />
-              {t("detail.notKept")}
-            </p>
-          ) : (
-            <ul className="-my-2 divide-y">
-              {stockItems.map((item) => (
-                <StockItemRow
+            <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
+              {stats.map(({ id, icon, tone, value, label }) => (
+                <div key={id} className="flex min-w-0 items-center gap-2 rounded-xl border bg-background p-2.5 sm:p-3">
+                  <IconChip icon={icon} tone={tone} size="sm" />
+                  <div className="min-w-0">
+                    <p className="break-words text-lg font-semibold leading-tight tabular-nums">{value}</p>
+                    <p className="text-xs text-muted-foreground">{label}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="lg:hidden">{actionButtons}</div>
+          </div>
+        </div>
+      </div>
+
+      <RecordWorkspaceTabs
+        label={t("workspace.navigation")}
+        detailsLabel={t("workspace.details")}
+        overviewLabel={t("workspace.overview")}
+        details={
+          <div className="flex min-w-0 flex-col gap-4">
+            <Card className="gap-3">
+              <div className="flex items-center gap-2"><IconChip icon={BarcodeIcon} tone="info" size="sm" /><CardTitle>{t("workspace.productInfo")}</CardTitle></div>
+              <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {[
+                  { icon: BarcodeIcon, label: t("workspace.barcode"), value: product.barcode },
+                  { icon: PackageIcon, label: t("workspace.packSize"), value: packageSize },
+                  // Brand is not persisted in the current product model. Never infer it from its name.
+                  { icon: TagIcon, label: t("workspace.brand"), value: null },
+                  { icon: StoreIcon, label: t("workspace.preferredShop"), value: preferredShop },
+                ].map(({ icon, label, value }) => {
+                  const Icon = icon;
+                  return <div key={label} className="min-w-0 rounded-lg bg-muted/40 p-3">
+                    <dt className="flex items-center gap-2 text-xs text-muted-foreground"><Icon className="size-4 shrink-0 text-section" aria-hidden="true" />{label}</dt>
+                    <dd className="mt-1 break-words font-medium">{value || t("workspace.notSet")}</dd>
+                  </div>;
+                })}
+              </dl>
+            </Card>
+            <Card className="gap-3">
+              <div className="flex items-center gap-2"><IconChip icon={TagIcon} tone="shopping" size="sm" /><CardTitle>{t("workspace.productDetails")}</CardTitle></div>
+              <dl className="divide-y">
+                {detailRows.map(({ label, value }) => <div key={label} className="grid min-w-0 grid-cols-2 gap-3 py-2.5 text-sm">
+                  <dt className="text-muted-foreground">{label}</dt><dd className="break-words font-medium">{value}</dd>
+                </div>)}
+              </dl>
+              <div className="flex items-center gap-2 border-t pt-4"><IconChip icon={PencilIcon} tone="tasks" size="sm" /><CardTitle>{t("workspace.notes")}</CardTitle></div>
+              <p className="whitespace-pre-wrap rounded-lg bg-muted/40 p-3 text-sm">{product.notes || t("workspace.noNotes")}</p>
+            </Card>
+            <Card className="gap-3" id="product-stock-management">
+              <button type="button" aria-expanded={stockDetailsOpen} className="flex w-full items-center justify-between gap-3 text-left font-semibold" onClick={() => setStockDetailsOpen((value) => !value)}>
+                <span className="inline-flex items-center gap-2"><IconChip icon={BoxesIcon} tone="info" size="sm" />{t("workspace.advancedStock")}</span>
+                <span className="text-xs font-normal text-muted-foreground">{stockDetailsOpen ? t("workspace.collapse") : t("workspace.expand")}</span>
+              </button>
+              {stockDetailsOpen && <div className="flex flex-col gap-3">
+                {stockItems.length ? <ul className="divide-y">{stockItems.map((item) => <StockItemRow
                   key={item.id}
                   item={item}
                   showProduct={false}
                   pending={isPending(item.id)}
                   onAdjust={(target, delta) => void adjust(target, delta, delta < 0 ? "scan_use" : "scan_add")}
-                  actions={
-                    canManage && (
-                      <StockItemFormDialog
-                        stockItem={item}
-                        products={[product]}
-                        places={places}
-                        trigger={
-                          <Button variant="ghost" size="icon-sm" aria-label={t("actions.edit", { name: item.placeName })} title={t("actions.edit", { name: item.placeName })}>
-                            <PencilIcon />
-                          </Button>
-                        }
-                      />
-                    )
-                  }
-                />
-              ))}
-            </ul>
-          )}
-        </Card>
+                  actions={canManage && <StockItemFormDialog stockItem={item} products={[product]} places={places}
+                    trigger={<button type="button" className="min-h-11 rounded-lg px-2 text-sm underline">{tCommon("actions.edit")}</button>} />}
+                />)}</ul> : <p className="text-sm text-muted-foreground">{t("detail.notKept")}</p>}
+                {canManage && availablePlaces.length > 0 && <StockItemFormDialog
+                  products={[product]} places={availablePlaces} defaults={{ productId: product.id }}
+                  initialSelections={initialSelections}
+                  trigger={<button type="button" className="inline-flex min-h-11 items-center gap-2 self-start rounded-lg border px-3 text-sm"><PlusIcon className="size-4" />{t("actions.keepAt")}</button>}
+                />}
+              </div>}
+            </Card>
+          </div>
+        }
+        overview={
+          <div className="flex min-w-0 flex-col gap-4">
+            {context}
+            <div className="grid gap-4 lg:grid-cols-2">
+              <Card>
+                <div className="flex items-center gap-2"><IconChip icon={LinkIcon} tone="info" size="sm" /><CardTitle>{tShopping("alternatives.title")}</CardTitle></div>
+                <ProductAlternatives product={product} products={products} canManage={canManage} highlightId={highlightId}
+                  productHref={productPath} initialSelections={initialSelections?.products} />
+              </Card>
+              <Card>
+                <div className="flex items-center gap-2"><IconChip icon={HistoryIcon} tone="tasks" size="sm" /><CardTitle>{t("history.title")}</CardTitle></div>
+                <StockMovementList movements={stock.movements} showPlace={stockItems.length > 1} />
+              </Card>
+            </div>
+          </div>
+        }
+      />
 
-        <Stack gap="lg">
-          <Card>
-            <CardHeader>
-              <div className="flex flex-col gap-1">
-                <CardTitle>{tShopping("alternatives.title")}</CardTitle>
-                <CardDescription>{tShopping("alternatives.description")}</CardDescription>
-              </div>
-            </CardHeader>
-            <ProductAlternatives
-              product={product}
-              products={products}
-              canManage={canManage}
-              highlightId={highlightId}
-              productHref={productPath}
-              initialSelections={initialSelections?.products}
-            />
-          </Card>
-          <Card>
-            <CardTitle>{t("history.title")}</CardTitle>
-            <StockMovementList movements={stock.movements} showPlace={stock.stockItems.length > 1} />
-          </Card>
-          {/* TODO(inventory): print own QR labels for products and places (sheet of codes like "WH-P-…"
-              that map to Product.qrCode). Scanning such a label already works through the qrCode field. */}
-        </Stack>
-      </PageGrid>
+      <ProductFormDialog product={product} shops={shops} products={products} initialSelections={initialSelections?.shops}
+        open={editOpen} onOpenChange={setEditOpen} onSaved={onChanged} />
+      <LinkAlternativeDialog product={product} products={products} initialSelections={initialSelections?.products}
+        open={linkOpen} onOpenChange={setLinkOpen} onLinked={onChanged} />
+      {places.length > 0 && <StockItemFormDialog
+        stockItem={stockItems.length === 1 ? stockItems[0] : undefined}
+        products={[product]}
+        places={stockItems.length === 1 ? places : availablePlaces}
+        defaults={stockItems.length === 0 ? { productId: product.id } : undefined}
+        initialSelections={initialSelections}
+        open={adjustOpen}
+        onOpenChange={setAdjustOpen}
+        onSaved={onChanged}
+      />}
     </PageContainer>
   );
 }
