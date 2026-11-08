@@ -135,7 +135,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
   ];
 
   const actionButtons = (
-    <div className="grid min-w-0 grid-cols-1 gap-2 lg:flex lg:flex-wrap lg:justify-end">
+    <div className="grid min-w-0 grid-cols-1 gap-2 xl:flex xl:flex-wrap xl:justify-end">
       <SplitAction
         icon={ShoppingCartIcon}
         label={t("workspace.addToShopping")}
@@ -180,7 +180,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
             )}
           </div>
           <div className="flex min-w-0 flex-col gap-4">
-            <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+            <div className="grid min-w-0 gap-3 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
               <PageHeader
                 backTo="/inventory"
                 title={product.name}
@@ -193,7 +193,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
                 }
                 className="min-w-0"
               />
-              <div className="hidden lg:block">{actionButtons}</div>
+              <div className="hidden xl:block">{actionButtons}</div>
             </div>
             <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
               {stats.map(({ id, icon, tone, value, label }) => (
@@ -206,7 +206,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
                 </div>
               ))}
             </div>
-            <div className="lg:hidden">{actionButtons}</div>
+            <div className="xl:hidden">{actionButtons}</div>
           </div>
         </div>
       </div>
