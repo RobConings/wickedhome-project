@@ -67,6 +67,41 @@ it("device photos use attached household images, reject unrelated files and pres
   assert.equal((await getDevicesOverview(f.home.id)).devices.find((item) => item.id === device.id)!.imageUrl, null);
 });
 
+it("product brand is a real household record field with safe legacy updates, clearing and no stock effect", options, async (t) => {
+  const { getProduct, listProducts, updateProduct } = await import("./shopping.service");
+  const { productInputSchema } = await import("@/features/shopping/types/shopping");
+  const f = await fixture(t);
+  const original = await getProduct(f.home.id, f.product.id);
+  const input = productInputSchema.parse({
+    name: original.name,
+    unit: original.unit,
+    category: original.category,
+    isEssential: original.isEssential,
+    defaultShopId: original.defaultShopId,
+    barcode: original.barcode,
+    qrCode: original.qrCode,
+    imageUrl: original.imageUrl,
+    notes: original.notes,
+    packageAmount: original.packageAmount,
+    packageUnit: original.packageUnit,
+  });
+  assert.equal(original.brand, null);
+  const withBrand = await updateProduct(f.home.id, f.product.id, { ...input, brand: "Boni" });
+  assert.equal(withBrand.brand, "Boni");
+  assert.deepEqual((await listProducts(f.home.id, { q: "boni" })).map((product) => product.id), [f.product.id]);
+  await updateProduct(f.home.id, f.product.id, { ...input, notes: "An older client changed notes without a brand field" });
+  assert.equal((await getProduct(f.home.id, f.product.id)).brand, "Boni", "Omitted brand must never clear the recorded value");
+  const foreign = await fixture(t);
+  assert.deepEqual(await listProducts(foreign.home.id, { q: "boni" }), []);
+  await assert.rejects(updateProduct(foreign.home.id, f.product.id, { ...input, brand: "Other home" }), /not found/i);
+  const cleared = await updateProduct(f.home.id, f.product.id, { ...input, brand: null });
+  assert.equal(cleared.brand, null);
+  assert.deepEqual(await listProducts(f.home.id, { q: "boni" }), []);
+  assert.equal(await f.quantity(), 0, "Brand edits must not change stock");
+  assert.equal(await db.stockMovement.count({ where: { householdId: f.home.id } }), 0);
+  assert.equal(await db.expense.count({ where: { householdId: f.home.id } }), 0);
+});
+
 it("purchase history and catalogue context reuse the same requirements, variants and stock credit across projects", options, async (t) => {
   const { getPurchase, listPurchases } = await import("../purchases/purchases.service");
   const { getProductContext } = await import("../catalogue/catalogue.service");
