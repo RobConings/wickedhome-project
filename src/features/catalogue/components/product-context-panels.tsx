@@ -1,7 +1,7 @@
 import { FolderKanbanIcon, ListChecksIcon, ReceiptTextIcon, ShoppingCartIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardTitle } from "@/components/shared/card";
-import { RelatedRecordCards } from "@/components/shared/related-record-cards";
+import { IconChip } from "@/components/shared/icon-chip";
 import { RecordLink } from "@/components/shared/record-link";
 import { RecordImage } from "@/components/shared/record-image";
 import { ErrorState } from "@/components/shared/error-state";
@@ -12,23 +12,54 @@ import { useAsyncResource } from "@/lib/use-async-resource";
 import { fetchProductContext } from "../data/catalogue-requests";
 import type { ProductContext } from "../types/product-context";
 
+/**
+ * The product's Overview contains navigable, owner-filtered records rather than a second
+ * row of counters repeating the cards below. This read view never owns their writes.
+ */
 export function ProductContextPanels({ productId, initial }: { productId: string; initial?: ProductContext }) {
   const { t } = useTranslation("catalogue");
   const resource = useAsyncResource(`product-context:${productId}`, () => fetchProductContext(productId), { initial });
   if (resource.error) return <ErrorState title={t("loadError")} action={<Button onClick={resource.refresh}>{t("retry")}</Button>} />;
   if (!resource.data) return <Skeleton className="h-48" />;
   const data = resource.data;
-  return <div className="flex flex-col gap-5">
-    <RelatedRecordCards label={t("related")} items={[
-      { id: "needs", label: t("needs"), value: data.needs.length, to: "#product-needs", icon: ShoppingCartIcon, accent: "shopping" },
-      { id: "tasks", label: t("tasks"), value: data.tasks.length, to: "#product-tasks", icon: ListChecksIcon, accent: "tasks" },
-      { id: "projects", label: t("projects"), value: data.projects.length, to: "#product-projects", icon: FolderKanbanIcon, accent: "finance" },
-      { id: "purchases", label: t("purchases"), to: `/purchases?productId=${encodeURIComponent(data.productId)}`, icon: ReceiptTextIcon, accent: "finance" },
-    ]} />
+  const productFilter = encodeURIComponent(data.productId);
+
+  return (
     <PageGrid columns="3">
-      <Card id="product-needs" className="scroll-mt-20"><CardTitle>{t("needs")}</CardTitle>{data.needs.length ? <ul>{data.needs.map((need) => <li key={need.id}><RecordLink className="flex min-h-11 items-center justify-between gap-3 rounded-lg p-2 text-sm hover:bg-accent" to={`/shopping?productId=${encodeURIComponent(data.productId)}`}><span>{need.name}</span><span className="shrink-0 text-muted-foreground">{need.quantity} {need.unit}</span></RecordLink></li>)}</ul> : <p className="text-sm text-muted-foreground">{t("noNeeds")}</p>}</Card>
-      <Card id="product-tasks" className="scroll-mt-20"><CardTitle>{t("tasks")}</CardTitle>{data.tasks.length ? <ul>{data.tasks.map((task) => <li key={task.id}><RecordLink className="flex min-h-11 items-center rounded-lg p-2 text-sm hover:bg-accent" to={`/tasks/${encodeURIComponent(task.id)}`}>{task.name}</RecordLink></li>)}</ul> : <p className="text-sm text-muted-foreground">{t("noTasks")}</p>}</Card>
-      <Card id="product-projects" className="scroll-mt-20"><CardTitle>{t("projects")}</CardTitle>{data.projects.length ? <ul>{data.projects.map((project) => <li key={project.id}><RecordLink className="flex min-h-11 items-center gap-2 rounded-lg py-2 text-sm hover:bg-accent" to={`/projects/${encodeURIComponent(project.id)}`}><RecordImage src={project.imageUrl} shape="avatar" fallback={<FolderKanbanIcon className="size-5" />} />{project.name}</RecordLink></li>)}</ul> : <p className="text-sm text-muted-foreground">{t("noProjects")}</p>}</Card>
+      <Card id="product-needs" className="scroll-mt-20">
+        <div className="flex items-center gap-2"><IconChip icon={ShoppingCartIcon} tone="shopping" size="sm" /><CardTitle>{t("needs")} ({data.needs.length})</CardTitle></div>
+        {data.needs.length ? (
+          <ul className="divide-y">{data.needs.map((need) => (
+            <li key={need.id}>
+              <RecordLink className="flex min-h-11 items-center justify-between gap-3 rounded-lg p-2 text-sm hover:bg-accent"
+                to={`/shopping?productId=${productFilter}`}>
+                <span>{need.name}</span>
+                <span className="shrink-0 text-muted-foreground">{need.quantity} {need.unit}</span>
+              </RecordLink>
+            </li>
+          ))}</ul>
+        ) : <p className="text-sm text-muted-foreground">{t("noNeeds")}</p>}
+      </Card>
+      <Card id="product-tasks" className="scroll-mt-20">
+        <div className="flex items-center gap-2"><IconChip icon={ListChecksIcon} tone="tasks" size="sm" /><CardTitle>{t("tasks")} ({data.tasks.length})</CardTitle></div>
+        {data.tasks.length ? <ul className="divide-y">{data.tasks.map((task) => (
+          <li key={task.id}><RecordLink className="flex min-h-11 items-center rounded-lg p-2 text-sm hover:bg-accent"
+            to={`/tasks/${encodeURIComponent(task.id)}`}>{task.name}</RecordLink></li>
+        ))}</ul> : <p className="text-sm text-muted-foreground">{t("noTasks")}</p>}
+      </Card>
+      <Card id="product-projects" className="scroll-mt-20">
+        <div className="flex items-center gap-2"><IconChip icon={FolderKanbanIcon} tone="finance" size="sm" /><CardTitle>{t("projects")} ({data.projects.length})</CardTitle></div>
+        {data.projects.length ? <ul className="divide-y">{data.projects.map((project) => (
+          <li key={project.id}><RecordLink className="flex min-h-11 items-center gap-2 rounded-lg py-2 text-sm hover:bg-accent"
+            to={`/projects/${encodeURIComponent(project.id)}`}><RecordImage src={project.imageUrl} shape="avatar"
+            fallback={<FolderKanbanIcon className="size-5" />} />{project.name}</RecordLink></li>
+        ))}</ul> : <p className="text-sm text-muted-foreground">{t("noProjects")}</p>}
+      </Card>
+      <Card id="product-purchases" className="scroll-mt-20">
+        <div className="flex items-center gap-2"><IconChip icon={ReceiptTextIcon} tone="finance" size="sm" /><CardTitle>{t("purchases")}</CardTitle></div>
+        <RecordLink className="inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-medium underline-offset-4 hover:underline"
+          to={`/purchases?productId=${productFilter}`}>{t("viewPurchases")}</RecordLink>
+      </Card>
     </PageGrid>
-  </div>;
+  );
 }
