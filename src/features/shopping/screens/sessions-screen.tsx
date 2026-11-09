@@ -2,7 +2,7 @@ import { useShoppingSort } from "../data/use-shopping-sort";
 import { ShoppingSortField } from "../components/shopping-sort-field";
 import { ShoppingNavigation } from "../components/shopping-navigation";
 import { formatCurrency } from "@/lib/format";
-import { CheckIcon, PackageIcon, PlusIcon, ShoppingBagIcon, ShoppingCartIcon, SlidersHorizontalIcon } from "lucide-react";
+import { CheckIcon, PackageIcon, PlusIcon, ShoppingBagIcon, ShoppingCartIcon, SlidersHorizontalIcon, Trash2Icon } from "lucide-react";
 import { RecordImage } from "@/components/shared/record-image";
 import { RecordProgress } from "@/components/shared/record-progress";
 import { RecordLink } from "@/components/shared/record-link";
@@ -60,6 +60,7 @@ import {
   attachReceipt,
   addSessionItem,
   closeSession,
+  deleteSession,
   joinSession,
   planShoppingVisit,
   reconcileReceipt,
@@ -191,6 +192,18 @@ export function SessionsScreen({
               confirmLabel={t("sessions.close")}
               cancelLabel={tCommon("actions.cancel")}
               onConfirm={() => perform(() => closeSession(session.id, session.revision))}
+            />}
+            {canManage && <ConfirmDialog
+              trigger={<Button disabled={busy} variant="ghost" className="text-destructive"><Trash2Icon />{t("sessions.delete")}</Button>}
+              title={t("sessions.deleteConfirmTitle")}
+              description={t("sessions.deleteConfirmDescription")}
+              confirmLabel={t("sessions.delete")}
+              cancelLabel={tCommon("actions.cancel")}
+              destructive
+              onConfirm={() => perform(async () => {
+                await deleteSession(session.id, session.revision);
+                await navigate("/shopping/sessions");
+              })}
             />}
           </div>
         )}
