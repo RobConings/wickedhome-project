@@ -59,8 +59,8 @@ export type RegisteredAssistantSkill = Omit<AssistantSkillDefinition, "guide" | 
 
 const SKILL_ID = /^[a-z][a-z0-9-]*$/;
 const ALL_ROLES: readonly Role[] = ["owner", "adult", "child"];
-/** Hard limit for a guide; estimated tokens use a conservative characters-per-token heuristic. */
-export const GUIDE_TOKEN_LIMIT = 700;
+/** Guard against accidental massive skill guides; cloud models are no longer constrained to a 16k local context. */
+export const GUIDE_TOKEN_LIMIT = 4_096;
 
 const skills = new Map<string, RegisteredAssistantSkill>();
 
