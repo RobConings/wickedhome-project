@@ -7,6 +7,7 @@ import { RecordImage } from "@/components/shared/record-image";
 import { RecordProgress } from "@/components/shared/record-progress";
 import { RecordLink } from "@/components/shared/record-link";
 import { SessionExtraDialog } from "../components/session-extra-dialog";
+import { ProductFormDialog } from "../components/product-form-dialog";
 import { SessionStartCard } from "../components/session-start-card";
 import { SessionVisitCard } from "../components/session-visit-card";
 import { SessionItemAdjustDialog } from "../components/session-item-adjust-dialog";
@@ -57,6 +58,7 @@ import {
 } from "../components/shopping-grouping";
 import {
   attachReceipt,
+  addSessionItem,
   closeSession,
   joinSession,
   planShoppingVisit,
@@ -343,6 +345,16 @@ export function SessionsScreen({
                   {(active || (canManage && session.purchases.some((purchase) => purchase.receipts.length > 0))) && (
                     <SessionExtraDialog products={shopping.products} disabled={busy} />
                   )}
+                  {canManage && active && (
+                    <ProductFormDialog
+                      shops={shopping.shops}
+                      products={shopping.products}
+                      onSaved={(productId) => {
+                        void perform(() => addSessionItem(session.id, { productId, quantity: 1 }));
+                      }}
+                      trigger={<Button variant="outline" size="sm" disabled={busy}><PlusIcon />{t("sessions.createProduct")}</Button>}
+                    />
+                  )}
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button variant="outline" size="sm" aria-label={t("shopView.filters.viewOptions")}>
@@ -368,6 +380,7 @@ export function SessionsScreen({
                   </Popover>
                 </div>
               </div>
+              {active && <p className="px-1 text-xs text-muted-foreground">{t("sessions.optionalSuggestions")}</p>}
               {!active && (
                 <Card tone="section" className="gap-1 p-3">
                   <CardTitle>{t("sessions.finishedTitle")}</CardTitle>
@@ -744,9 +757,7 @@ function SessionItemForm({
           <p className="break-words text-sm font-semibold leading-snug">{item.name}</p>
           <p className="mt-0.5 text-xs text-muted-foreground">
             {item.purchasedQuantity}/{item.quantity} {item.unit} · {t(
-              session.status === "closed" && item.status === "open"
-                ? "sessions.pendingReceipt"
-                : "sessions.item_" + item.status,
+              "sessions.item_" + item.status,
             )}
           </p>
         </div>
