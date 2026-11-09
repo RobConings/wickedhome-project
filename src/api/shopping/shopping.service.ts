@@ -823,7 +823,7 @@ const lowStockTopUps = new Map<string, Promise<void>>();
  * the actual stock drops in the future.
  */
 async function clearSatisfiedLowStock(householdId: string): Promise<void> {
-  await db.$transaction(async (tx) => {
+  const removed = await db.$transaction(async (tx) => {
     await lockStock(tx, householdId);
     const suggestions = await tx.shoppingItem.findMany({
       where: { householdId, source: "LOW_STOCK", status: "OPEN", productId: { not: null } },
@@ -849,12 +849,13 @@ async function clearSatisfiedLowStock(householdId: string): Promise<void> {
       return group.some((row) => row.minQuantity !== null) &&
         group.every((row) => row.minQuantity === null || row.quantity.gt(row.minQuantity));
     });
-    if (!satisfied.length) return;
-    await tx.shoppingItem.deleteMany({
+    if (!satisfied.length) return 0;
+    const deleted = await tx.shoppingItem.deleteMany({
       where: { householdId, source: "LOW_STOCK", status: "OPEN", id: { in: satisfied.map((item) => item.id) } },
     });
-    publishShoppingChanged(householdId);
+    return deleted.count;
   });
+  if (removed > 0) publishShoppingChanged(householdId);
 }
 
 /** Reconciles existing low stock on read, even when its quantity hasn't changed. */
