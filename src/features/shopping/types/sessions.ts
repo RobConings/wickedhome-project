@@ -206,6 +206,16 @@ export type SessionView = SessionSummary & {
       stockAdded: boolean;
     }[];
   }[];
+  /** Previously recorded goods from the ordinary list, not yet assigned to a visit. */
+  availableAcquisitions: {
+    id: string;
+    name: string;
+    productId: string;
+    quantity: number;
+    unit: string | null;
+    purchasedAt: string;
+    shopId: string | null;
+  }[];
   stockOptions: {
     id: string;
     productId: string;
