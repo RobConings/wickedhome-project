@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { after, it } from "node:test";
 import { db } from "../lib/db";
+import { HttpError } from "../lib/http";
 import { linkAlternative } from "./shopping.service";
 import { shoppingSessionFixture as fixture } from "./sessions-test-helpers";
 import {
@@ -198,7 +199,8 @@ it("linking FAMA already grouped with Alpro to Boter keeps all products and coun
 
   await assert.rejects(
     linkAlternative(f.user, fama.id, { mainProductId: boter.id }),
-    /Confirm that all existing alternatives/,
+    (error: unknown) => error instanceof HttpError &&
+      error.fields?.confirmGroupMerge?.includes("Confirm that all existing alternatives will share one stock") === true,
     "joining a group with existing alternatives requires explicit consent",
   );
   await linkAlternative(f.user, fama.id, { mainProductId: boter.id, confirmGroupMerge: true });
