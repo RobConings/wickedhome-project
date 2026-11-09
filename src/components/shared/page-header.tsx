@@ -55,8 +55,12 @@ export function PageHeader({ title, description, eyebrow, icon, breadcrumbs, bac
             {eyebrow && <p className="text-sm font-medium text-section-foreground">{eyebrow}</p>}
             <h1 className="text-2xl font-semibold tracking-tight break-words text-balance sm:text-3xl">{title}</h1>
           </div>
-          {description && <p className={cn(
-            "min-w-0 max-w-prose text-muted-foreground text-pretty",
+          {description && <p data-slot="page-description" className={cn(
+            // Secondary copy is the first thing to disappear when header space is limited.
+            // Phone: always hidden. Tablet: show only on pages without actions.
+            // With title actions beside the heading, reserve descriptions for wide desktops.
+            "hidden min-w-0 max-w-prose text-muted-foreground text-pretty",
+            actions ? "2xl:block" : "md:block",
             (showBack || shownIcon) && "col-span-2 sm:col-span-1 sm:col-start-2",
           )}>{description}</p>}
         </div>
