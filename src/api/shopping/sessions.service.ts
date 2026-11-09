@@ -129,10 +129,10 @@ export async function getShoppingSession(
       id: {
         in: row.items.flatMap((item) =>
           item.productId ? [item.productId] : [],
-        ),
+        ).concat(availableAcquisitions.flatMap((line) => [line.purchasedProductId ?? line.productId, line.productId])),
       },
     },
-    select: { id: true, isEssential: true, stockProductId: true },
+    select: { id: true, name: true, isEssential: true, stockProductId: true },
   });
   const byProduct = new Map(products.map((product) => [product.id, product]));
   return {
@@ -202,7 +202,7 @@ export async function getShoppingSession(
     })),
     availableAcquisitions: availableAcquisitions.map((line) => ({
       id: line.id,
-      name: line.purchasedProductName ?? line.productId,
+      name: line.purchasedProductName ?? byProduct.get(line.purchasedProductId ?? line.productId)?.name ?? byProduct.get(line.productId)?.name ?? "Unknown product",
       productId: line.productId,
       quantity: line.purchasedQuantity?.toNumber() ?? line.quantity.toNumber(),
       unit: line.purchasedUnit ?? line.unit,
