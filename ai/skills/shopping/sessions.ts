@@ -154,7 +154,7 @@ registerAssistantTool({
     "Upload an actual PDF/JPEG/PNG/WebP receipt provided by the person to household document storage and attach it to an existing shopping visit in one operation. contentBase64 is the complete base64 of the file (or a matching data URI), not a local path or guessed URL. Use the printed purchase date and optional shop and total. Repeated identical bytes reuse the existing document/receipt; uploads do not add stock or expenses. A receipt is OPTIONAL: shopping without it must work.",
   input: z.object({
     sessionId: idSchema,
-    filename: z.string().trim().min(1).max(200).regex(/^[^/\\\x00-\x1f]+$/),
+    filename: z.string().trim().min(1).max(200).refine((name) => [...name].every((char) => char.charCodeAt(0) >= 32 && char !== "/" && char.charCodeAt(0) !== 92), "Filename must not contain slashes or control characters"),
     mimeType: z.enum(["application/pdf", "image/jpeg", "image/png", "image/webp"]),
     contentBase64: z.string().min(8),
     purchasedAt: z.iso.datetime(),
