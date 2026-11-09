@@ -26,6 +26,8 @@ type ProductAlternativesProps = {
   /** Route to post to; defaults to the current route (its action handles `handleProductAlternativeForm`). */
   action?: string;
   initialSelections?: UseSelectionsOptions["initial"];
+  /** When shown inside another dialog, navigate to a sibling dialog instead of stacking modals. */
+  onLink?: () => void;
 };
 
 /**
@@ -33,7 +35,7 @@ type ProductAlternativesProps = {
  * stock, each with an unlink button, and "Link an alternative". For an alternative itself: the main product
  * it shares stock with. Posts `link-alternative` / `unlink-alternative`.
  */
-export function ProductAlternatives({ product, products, canManage, highlightId, productHref, action, initialSelections }: ProductAlternativesProps) {
+export function ProductAlternatives({ product, products, canManage, highlightId, productHref, action, initialSelections, onLink }: ProductAlternativesProps) {
   const { t } = useTranslation("shopping");
   const main = product.stockProductId ? products.find((candidate) => candidate.id === product.stockProductId) : undefined;
   const nameOf = (id: string, name: string) =>
@@ -102,20 +104,25 @@ export function ProductAlternatives({ product, products, canManage, highlightId,
           ))}
         </ul>
       )}
-      {canManage && (
+      {canManage && (onLink ? (
+        <Button type="button" variant="outline" fullOnMobile className="sm:self-start" onClick={onLink}>
+          <PlusIcon />
+          {t("alternatives.link")}
+        </Button>
+      ) : (
         <LinkAlternativeDialog
           product={product}
           products={products}
           action={action}
           initialSelections={initialSelections}
           trigger={
-            <Button variant="outline" fullOnMobile className="sm:self-start">
+            <Button type="button" variant="outline" fullOnMobile className="sm:self-start">
               <PlusIcon />
               {t("alternatives.link")}
             </Button>
           }
         />
-      )}
+      ))}
     </div>
   );
 }
