@@ -655,7 +655,7 @@ registerAssistantTool({
       if (!item) continue;
       rows.set(step.placeId, { label: item.placeName, detail: amount(step.quantity, item.unit, ctx.locale), tone: step.kind === "move" ? "add" : "change" });
     }
-    const items = mergingGroups ? [
+    const items: { label: string; detail: string; tone?: "add" | "change" }[] = mergingGroups ? [
       { label: say(ctx.locale, "Current linked group", "Bestaande gekoppelde groep"), detail: targetNames.join(", "), tone: undefined },
       { label: say(ctx.locale, "Additional linked group", "Mee te koppelen groep"), detail: sourceNames.join(", "), tone: undefined },
     ] : [];
