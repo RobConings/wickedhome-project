@@ -196,7 +196,12 @@ it("linking FAMA already grouped with Alpro to Boter keeps all products and coun
     { householdId: f.home.id, productId: alpro.id, placeId: f.stock.placeId, quantity: 3, unit: "pak", minQuantity: 1 },
   ] });
 
-  await linkAlternative(f.user, fama.id, { mainProductId: boter.id });
+  await assert.rejects(
+    linkAlternative(f.user, fama.id, { mainProductId: boter.id }),
+    /Confirm that all existing alternatives/,
+    "joining a group with existing alternatives requires explicit consent",
+  );
+  await linkAlternative(f.user, fama.id, { mainProductId: boter.id, confirmGroupMerge: true });
 
   const variants = await db.product.findMany({ where: { id: { in: [boter.id, fama.id, alpro.id] } } });
   assert.equal(variants.length, 3, "no catalogue product is merged or deleted");
