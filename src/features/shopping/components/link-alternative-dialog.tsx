@@ -29,6 +29,17 @@ type LinkAlternativeDialogProps = {
 
 const idOrNull = (value: unknown) => (typeof value === "string" && value !== "" ? value : null);
 
+// Server safeguards intentionally reject incompatible shared-stock merges.
+// Surface the reason beside the visible product picker (including errors
+// returned for the hidden mainProductId field), in the current UI language.
+const stockLinkErrorKey: Record<string, string> = {
+  "Verify product types/categories before sharing stock": "category",
+  "Different package sizes cannot share one package count": "package",
+  "Keep distinct containers as separate product variants; compare verified package content instead": "container",
+  "Stock units differ; quantities cannot be added without a verified conversion": "unit",
+  "These are different product types, not interchangeable stock": "type",
+};
+
 /**
  * Link two products so they share one stock (alternatives): pick the other product, optionally name the
  * shared stock (a new generic product such as "Bacon"). Posts `link-alternative`.
@@ -95,6 +106,10 @@ export function LinkAlternativeDialog({
       title={mode === "add" ? t("alternatives.linkTitle", { name: product.name }) : t("alternatives.linkOfTitle", { name: product.name })}
       description={t("alternatives.linkDescription")}
       successMessage={t("alternatives.linked")}
+      translateError={(message) => {
+        const key = stockLinkErrorKey[message];
+        return key ? t(`alternatives.errors.${key}`) : message;
+      }}
       submitLabel={t("alternatives.submit")}
       fields={fields}
       intent="link-alternative"
