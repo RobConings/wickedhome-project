@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { after, it } from "node:test";
 import { db } from "../lib/db";
+import { linkAlternative } from "./shopping.service";
 import { shoppingSessionFixture as fixture } from "./sessions-test-helpers";
 import {
   closeShoppingSession,
@@ -174,4 +175,42 @@ it("receipt matching reuses pre-session goods from another shop with no second s
   assert.equal(linked.sessionItemId, visit.items[0]!.id);
   assert.equal(await f.quantity(), 2);
   assert.equal(await db.stockPurchase.count({ where: { householdId: f.home.id } }), 1);
+});
+
+it("linking FAMA already grouped with Alpro to Boter keeps all products and counts each pack once", options, async (t) => {
+  const f = await fixture(t);
+  const boter = await db.product.create({ data: {
+    householdId: f.home.id, name: "Boter", category: "DAIRY", unit: "pak",
+    packageAmount: 250, packageUnit: "g",
+  } });
+  const alpro = await db.product.create({ data: {
+    householdId: f.home.id, name: "Alpro bakken & braden 500 g", category: "PANTRY", unit: "pak",
+    packageAmount: 500, packageUnit: "g",
+  } });
+  const fama = await db.product.create({ data: {
+    householdId: f.home.id, name: "FAMA bakken & braden 500 g", category: "PANTRY", unit: "pak",
+    packageAmount: 500, packageUnit: "g", stockProductId: alpro.id,
+  } });
+  await db.stockItem.createMany({ data: [
+    { householdId: f.home.id, productId: boter.id, placeId: f.stock.placeId, quantity: 1, unit: "pak", minQuantity: 1 },
+    { householdId: f.home.id, productId: alpro.id, placeId: f.stock.placeId, quantity: 3, unit: "pak", minQuantity: 1 },
+  ] });
+
+  await linkAlternative(f.user, fama.id, { mainProductId: boter.id });
+
+  const variants = await db.product.findMany({ where: { id: { in: [boter.id, fama.id, alpro.id] } } });
+  assert.equal(variants.length, 3, "no catalogue product is merged or deleted");
+  assert.equal(variants.find((p) => p.id === boter.id)?.stockProductId, null);
+  assert.equal(variants.find((p) => p.id === alpro.id)?.stockProductId, boter.id);
+  assert.equal(variants.find((p) => p.id === fama.id)?.stockProductId, boter.id);
+  assert.equal(variants.find((p) => p.id === boter.id)?.packageAmount?.toNumber(), 250);
+  assert.equal(variants.find((p) => p.id === fama.id)?.packageAmount?.toNumber(), 500);
+  const combined = await db.stockItem.findMany({ where: {
+    householdId: f.home.id, productId: { in: [boter.id, fama.id, alpro.id] },
+  } });
+  assert.equal(combined.length, 1);
+  assert.equal(combined[0]?.productId, boter.id);
+  assert.equal(combined[0]?.quantity.toNumber(), 4, "1 Boter pack + 3 Alpro/FAMA packs = 4 packs");
+  assert.equal(combined[0]?.unit, "pak");
+  assert.equal(await f.quantity(), 0, "unrelated household stock is unchanged");
 });
