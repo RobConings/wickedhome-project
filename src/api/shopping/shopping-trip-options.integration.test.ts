@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { after, it } from "node:test";
 import { db } from "../lib/db";
 import { HttpError } from "../lib/http";
-import { linkAlternative } from "./shopping.service";
+import { linkAlternative, listItems } from "./shopping.service";
 import { shoppingSessionFixture as fixture } from "./sessions-test-helpers";
 import {
   closeShoppingSession,
@@ -220,4 +220,26 @@ it("linking FAMA already grouped with Alpro to Boter keeps all products and coun
   assert.equal(combined[0]?.quantity.toNumber(), 4, "1 Boter pack + 3 Alpro/FAMA packs = 4 packs");
   assert.equal(combined[0]?.unit, "pak");
   assert.equal(await f.quantity(), 0, "unrelated household stock is unchanged");
+});
+
+it("replenishing a linked group clears an obsolete low-stock row without disabling future needs", options, async (t) => {
+  const f = await fixture(t);
+  const alt = await db.product.create({ data: {
+    householdId: f.home.id, name: "Alternative brand", category: "PANTRY",
+    stockProductId: f.product.id, unit: "pak",
+  } });
+  const original = await listItems(f.home.id, { status: "open" });
+  assert.ok(original.some((row) => row.productId === f.product.id));
+  // The purchase could have come through an alternative, a previous grocery
+  // session, or by joining two groups. The current canonical owner has stock.
+  await db.stockItem.update({ where: { id: f.stock.id }, data: { quantity: 3 } });
+  const satisfied = await listItems(f.home.id, { status: "open" });
+  assert.equal(satisfied.some((row) => row.productId === f.product.id), false);
+  assert.equal((await db.product.findUniqueOrThrow({ where: { id: f.product.id } })).shoppingRestockState, "ACTIVE");
+  assert.equal((await db.stockItem.findUniqueOrThrow({ where: { id: f.stock.id } })).quantity.toNumber(), 3);
+  assert.equal((await db.product.findUniqueOrThrow({ where: { id: alt.id } })).stockProductId, f.product.id);
+  // A later genuine stock drop must recreate the normal LOW_STOCK need.
+  await db.stockItem.update({ where: { id: f.stock.id }, data: { quantity: 0 } });
+  const needed = await listItems(f.home.id, { status: "open" });
+  assert.ok(needed.some((row) => row.productId === f.product.id));
 });
