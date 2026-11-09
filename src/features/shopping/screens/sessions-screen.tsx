@@ -545,14 +545,18 @@ export function SessionsScreen({
                           >
                             {purchase.lines.map((line) => (
                               <option key={line.id} value={line.id}>
-                                {
-                                  session.items.find(
-                                    (item) => item.id === line.sessionItemId,
-                                  )?.name
-                                }{" "}
-                                · {line.purchasedQuantity ?? line.quantity} {line.purchasedQuantity != null ? line.purchasedUnit : line.unit}
+                                {line.name} · {line.purchasedQuantity ?? line.quantity} {line.purchasedQuantity != null ? line.purchasedUnit : line.unit}
                               </option>
                             ))}
+                            {session.availableAcquisitions.length > 0 && (
+                              <optgroup label={t("sessions.priorAcquisitions")}>
+                                {session.availableAcquisitions.map((line) => (
+                                  <option key={line.id} value={line.id}>
+                                    {line.name} · {line.quantity} {line.unit} · {formatDate(line.purchasedAt, locale)}
+                                  </option>
+                                ))}
+                              </optgroup>
+                            )}
                           </select>
                         </label>
                         <label className="text-sm">
