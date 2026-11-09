@@ -2,6 +2,7 @@
 enum ShoppingSessionStatus {
   ACTIVE
   CLOSED
+  DELETED
 }
 
 enum ShoppingSessionItemStatus {
@@ -21,6 +22,7 @@ model ShoppingSession {
   createdByUserId String
   startedAt DateTime @default(now())
   closedAt DateTime?
+  deletedAt DateTime?
   revision Int @default(0)
   operations ShoppingSessionOperation[]
   items ShoppingSessionItem[]
