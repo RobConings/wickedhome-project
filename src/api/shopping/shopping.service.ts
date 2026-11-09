@@ -829,7 +829,7 @@ async function clearSatisfiedLowStock(householdId: string): Promise<void> {
       where: { householdId, source: "LOW_STOCK", status: "OPEN", productId: { not: null } },
       select: { id: true, productId: true, product: { select: { stockProductId: true } } },
     });
-    if (!suggestions.length) return;
+    if (!suggestions.length) return 0;
 
     const owners = [...new Set(suggestions.map((item) => item.product?.stockProductId ?? item.productId!))];
     const stocks = await tx.stockItem.findMany({
