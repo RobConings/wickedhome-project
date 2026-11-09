@@ -105,6 +105,11 @@ export type ProductShopLinkInput = z.infer<typeof productShopLinkInputSchema>;
 export const productAlternativeInputSchema = z.object({
   mainProductId: idSchema,
   newMainName: nameSchema.optional().nullable(),
+  /** Required if either side already has alternatives: the entire linked group follows. */
+  confirmGroupMerge: z.preprocess(
+    (value) => value === "true" ? true : value === "false" ? false : value,
+    z.boolean().optional(),
+  ),
 });
 export type ProductAlternativeInput = z.infer<typeof productAlternativeInputSchema>;
 
