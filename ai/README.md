@@ -48,7 +48,7 @@ Implementing a redesigned journey includes updating its help, guide, tool descri
    - the **skill index**: one line per area, so the model knows everything that exists;
    - the **household snapshot**: people, rooms per floor, accounts, today and the next 7 days with weekdays
      (cached 5 minutes, dropped after a write);
-   - the **guides** of the active skills (≤ ~400 tokens each).
+   - the **guides** of the active skills (up to 4,096 estimated tokens per guide; typical guides stay much shorter).
    The clock time and the language to answer in (Dutch or English, from the question's own words; local
    models otherwise drift to Dutch because the household data is Dutch) go with the question, not in the
    system prompt, so the model server can reuse its prompt cache.
