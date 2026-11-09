@@ -8,7 +8,7 @@ import { sessionAdjustFormSchema } from "../data/sessions-actions";
 import type { Product } from "../types/shopping";
 import type { SessionItem } from "../types/sessions";
 
-/** Small editor over the checklist: planned quantity and already-linked variants only. */
+/** Small editor over an optional suggestion: quantity or a different real product. */
 export function SessionItemAdjustDialog({ item, products, open, onOpenChange, initialSelections }: {
   item: SessionItem; products: Product[]; open: boolean; onOpenChange: (open: boolean) => void;
   /** Seed the existing picker for stories/design fixtures without a network request. */
@@ -18,11 +18,16 @@ export function SessionItemAdjustDialog({ item, products, open, onOpenChange, in
   const [operationId] = useState(() => crypto.randomUUID());
   const product = products.find((row) => row.id === item.productId);
   const ownerId = product?.stockProductId ?? product?.id;
-  const variants = ownerId ? products.filter((row) => (row.stockProductId ?? row.id) === ownerId) : [];
+  // An unbought shopping suggestion may be fulfilled by ANY catalogue product.
+  // Once part of the row has been bought, only shared-stock variants can be
+  // changed without losing the original acquisition's identity.
+  const variants = item.purchasedQuantity > 0
+    ? products.filter((row) => (row.stockProductId ?? row.id) === ownerId)
+    : products;
   const fields: GeneralFormField[] = [
     { name: "quantity", type: "number", label: t("sessions.plannedQuantity"), description: item.unit ?? undefined, min: 0.001, max: 100_000, step: 0.001 },
-    ...(variants.length > 1 ? [{
-      name: "productId", type: "custom", label: t("sessions.variant"),
+    ...(variants.length > 0 ? [{
+      name: "productId", type: "custom", label: t("sessions.substituteProduct"),
       render: ({ id, name, value, setValue, invalid, disabled }) => (
         <ProductPicker id={id} name={name} products={variants} value={typeof value === "string" ? value : null} onChange={setValue} invalid={invalid} disabled={disabled} initialSelections={initialSelections} />
       ),
