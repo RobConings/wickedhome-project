@@ -257,6 +257,7 @@ export async function shoppingSessionsForExpense(
     await db.shoppingSession.findMany({
       where: {
         householdId: user.householdId,
+        status: { not: "DELETED" },
         purchases: { some: { payments: { some: { expenseId } } } },
       },
       orderBy: { startedAt: "desc" },
