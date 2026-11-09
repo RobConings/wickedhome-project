@@ -4,6 +4,8 @@ import { db } from "../lib/db";
 import { shoppingSessionFixture as fixture } from "./sessions-test-helpers";
 import {
   closeShoppingSession,
+  deleteShoppingSession,
+  listShoppingSessions,
   getShoppingSession,
   updateShoppingSessionItem,
   attachShoppingReceipt,
@@ -102,4 +104,42 @@ it("a receipt's actual store overrides a planned store without duplicate acquisi
   assert.equal(now.shopConfirmed, true);
   assert.equal(await f.quantity(), 2);
   assert.equal(await db.stockPurchase.count({ where: { householdId: f.home.id } }), 1);
+});
+
+it("removing an unfinished visit hides it but preserves its needs, receipt, acquisition and payment history", options, async (t) => {
+  const f = await fixture(t);
+  let visit = await f.start();
+  visit = await updateShoppingSessionItem(f.user, visit.id, visit.items[0]!.id, {
+    revision: 0,
+    operationId: "remove-fixture-buy",
+    purchasedQuantity: 1,
+    status: "bought",
+  });
+  assert.equal(visit.items[0]?.status, "open"); // still one suggested pack left
+  const file = await f.receipt("remove-fixture-historic-receipt");
+  visit = await attachShoppingReceipt(f.user, visit.id, {
+    documentId: file.id,
+    purchasedAt: new Date().toISOString(),
+    totalCents: 599,
+  });
+  const original = await db.shoppingPurchase.findFirstOrThrow({ where: { sessionId: visit.id } });
+  const before = await db.stockPurchase.count({ where: { shoppingPurchaseId: original.id } });
+  assert.equal(before, 1);
+  await deleteShoppingSession(f.user, visit.id, visit.revision);
+  assert.equal((await listShoppingSessions(f.user)).some((row) => row.id === visit.id), false);
+  await assert.rejects(getShoppingSession(f.user, visit.id), /not found/);
+  await assert.rejects(
+    updateShoppingSessionItem(f.user, visit.id, visit.items[0]!.id, {
+      revision: visit.items[0]!.revision, operationId: "removed-update", status: "bought",
+    }),
+    /not found/,
+  );
+  assert.equal(await f.quantity(), 1);
+  assert.equal(await db.shoppingPurchase.count({ where: { id: original.id } }), 1);
+  assert.equal(await db.shoppingReceipt.count({ where: { purchaseId: original.id } }), 1);
+  assert.equal(await db.stockPurchase.count({ where: { shoppingPurchaseId: original.id } }), 1);
+  const need = await db.shoppingItem.findUniqueOrThrow({ where: { id: f.requirement.id } });
+  assert.equal(need.status, "OPEN");
+  await deleteShoppingSession(f.user, visit.id, visit.revision); // duplicate retry
+  await assert.rejects(closeShoppingSession(f.user, visit.id, visit.revision), /not found/);
 });
