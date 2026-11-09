@@ -12,12 +12,13 @@ export function PageBackButton({ to, fallback = "/" }: { to?: To; fallback?: To 
   const origin = internalOrigin(new URLSearchParams(location.search).get("from"));
   const safeOrigin = origin === `${location.pathname}${location.search}${location.hash}` ? null : origin;
   const destination = safeOrigin ?? to;
-  const content = <><ArrowLeftIcon aria-hidden="true" /><span className="hidden sm:inline">{t("actions.back")}</span></>;
-  const className = "page-back-button shrink-0 self-start px-2.5 sm:px-4";
-  if (destination) return <Button asChild variant="outline" className={className} data-slot="page-back">
+  const content = <ArrowLeftIcon aria-hidden="true" />;
+  // Keep the visual control compact; the accessible name stays on the link/button.
+  const className = "page-back-button shrink-0 self-start";
+  if (destination) return <Button asChild variant="outline" size="icon" className={className} data-slot="page-back">
     <Link to={destination} aria-label={safeOrigin ? t("navigation.returnToContext") : t("actions.back")}>{content}</Link>
   </Button>;
   const hasHistory = typeof window !== "undefined" && Number(window.history.state?.idx) > 0;
   const atHome = location.pathname === "/" && !location.search;
-  return <Button variant="outline" className={className} aria-label={t("actions.back")} data-slot="page-back" disabled={!hasHistory && atHome} onClick={() => hasHistory ? navigate(-1) : navigate(fallback)}>{content}</Button>;
+  return <Button variant="outline" size="icon" className={className} aria-label={t("actions.back")} data-slot="page-back" disabled={!hasHistory && atHome} onClick={() => hasHistory ? navigate(-1) : navigate(fallback)}>{content}</Button>;
 }
