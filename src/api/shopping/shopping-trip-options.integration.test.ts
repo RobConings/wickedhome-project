@@ -143,3 +143,35 @@ it("removing an unfinished visit hides it but preserves its needs, receipt, acqu
   await deleteShoppingSession(f.user, visit.id, visit.revision); // duplicate retry
   await assert.rejects(closeShoppingSession(f.user, visit.id, visit.revision), /not found/);
 });
+
+it("receipt matching reuses pre-session goods from another shop with no second stock credit", options, async (t) => {
+  const f = await fixture(t);
+  const planned = await db.shop.create({ data: {
+    householdId: f.home.id, name: "Collect & Go", type: "SUPERMARKET",
+  } });
+  const actual = await db.shop.create({ data: {
+    householdId: f.home.id, name: "Colruyt Diest", type: "SUPERMARKET",
+  } });
+  const old = await db.stockPurchase.create({ data: {
+    householdId: f.home.id, stockItemId: f.stock.id, productId: f.product.id,
+    shopId: planned.id, shopConfirmed: true, quantity: 2, unit: "pak",
+    purchasedAt: new Date(), stockAdded: true, userId: f.user.id,
+    shoppingItemId: f.requirement.id,
+  } });
+  await db.stockItem.update({ where: { id: f.stock.id }, data: { quantity: 2 } });
+  let visit = await f.start();
+  assert.ok(visit.availableAcquisitions.some((line) => line.id === old.id));
+  const doc = await f.receipt("prior-manual-cross-shop");
+  visit = await attachShoppingReceipt(f.user, visit.id, {
+    documentId: doc.id, purchasedAt: new Date().toISOString(), shopId: actual.id,
+  });
+  await reconcileShoppingReceiptLine(f.user, visit.id, visit.purchases[0]!.receipts[0]!.id, {
+    reference: "on-paper-1", sessionItemId: visit.items[0]!.id,
+    quantity: 2, existingPurchaseIds: [old.id], acceptDifference: false,
+  });
+  const linked = await db.stockPurchase.findUniqueOrThrow({ where: { id: old.id } });
+  assert.equal(linked.shopId, actual.id);
+  assert.equal(linked.sessionItemId, visit.items[0]!.id);
+  assert.equal(await f.quantity(), 2);
+  assert.equal(await db.stockPurchase.count({ where: { householdId: f.home.id } }), 1);
+});
