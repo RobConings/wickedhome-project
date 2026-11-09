@@ -1114,7 +1114,12 @@ async function linkAlternativeImpl(user: Actor, productId: string, input: Produc
       await joinGroup(tx, user, owner.id, main.id);
       mainId = main.id;
     }
-    await joinGroup(tx, user, productId, mainId);
+    // If the chosen variant already belongs to another shared-stock group,
+    // link its OWNER, not just that variant. Moving only the variant would
+    // strand its existing group stock (and its other alternatives). Joining
+    // the owners preserves every product's identity and package information,
+    // and combines their existing package counts exactly once.
+    await joinGroup(tx, user, sourceOwner.id, mainId);
   });
   return getProduct(householdId, productId);
 }
