@@ -676,15 +676,32 @@ export async function updateShoppingSessionItem(
       const variant = await tx.product.findFirst({
         where: { id: input.productId, householdId: user.householdId },
       });
-      if (!current || !variant || (current.stockProductId ?? current.id) !== (variant.stockProductId ?? variant.id))
-        throw badRequest("Choose a linked variant of this product", { productId: ["Choose a linked variant of this product"] });
+      if (!variant) throw notFound("Product not found");
+      // A visit is a plan, not a requirement to buy this exact product. Any catalogue product
+      // may replace an unbought position; its original requirement IDs remain satisfied by
+      // the substitute. After a purchase, only shared-stock variants are interchangeable,
+      // so earlier acquisition identities and their stock locations remain accurate.
+      const sameStock = Boolean(current &&
+        (current.stockProductId ?? current.id) === (variant.stockProductId ?? variant.id));
+      if (!sameStock && item.purchasedQuantity.toNumber() > 0)
+        throw conflict("This item already has purchases. Add a separate extra product instead.");
       await tx.stockPurchase.updateMany({
         where: { householdId: user.householdId, sessionItemId: item.id, purchasedProductName: null },
         data: { purchasedProductId: item.productId, purchasedProductName: item.name },
       });
-      // Preserve the visit position, requirement IDs and stock unit. Earlier acquisitions retain their snapshots.
+      const stockOwner = variant.stockProductId ?? variant.id;
+      const variantsStock = await tx.stockItem.findMany({
+        where: { householdId: user.householdId, productId: stockOwner },
+        select: { unit: true },
+      });
+      // Keep the original requirement IDs and itemKey: this is a substitution, not a
+      // replacement of the shopping need. Don't reuse the old product's stock location.
       item = await tx.shoppingSessionItem.update({ where: { id }, data: {
-        productId: variant.id, name: variant.name, category: variant.category,
+        productId: variant.id,
+        name: variant.name,
+        category: variant.category,
+        unit: sameStock ? undefined : householdStockUnit(variant.unit, variantsStock),
+        stockItemId: sameStock ? undefined : null,
       } });
     }
     await acquire(
@@ -1176,9 +1193,18 @@ export async function reconcileShoppingReceiptLine(
             documentId: receipt.documentId ?? undefined,
           },
           sourceKey,
-          shopId: receipt.shopId ?? receipt.purchase.shopId ?? undefined,
+          // An explicitly selected acquisition can have an old *planned* shop
+          // (e.g. Collect&Go); the physical receipt is the authoritative retailer.
+          // The user explicitly identified these same goods by acquisition id.
+          shopId: input.existingPurchaseIds ? undefined : receipt.shopId ?? receipt.purchase.shopId ?? undefined,
           purchasedAt: receipt.purchasedAt.toISOString(),
           existingPurchaseIds: acquisitions.map((line) => line.id),
+        });
+      }
+      if (input.existingPurchaseIds && receipt.shopId) {
+        await tx.stockPurchase.updateMany({
+          where: { householdId: user.householdId, id: { in: acquisitions.map((line) => line.id) } },
+          data: { shopId: receipt.shopId, shopConfirmed: true },
         });
       }
       if (input.existingPurchaseIds) {
