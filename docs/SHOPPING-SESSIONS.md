@@ -179,3 +179,24 @@ Finishing exposes recorded goods, receipt evidence, a purchase link and the shar
 Date-only receipts use the start of the household's calendar day as a conservative ordering boundary, not an asserted purchase hour. This avoids future-noon timestamps and retains stock-count review when the actual ordering is uncertain. Both winter/summer time and midnight uploads are tested.
 
 The latest validation and additive migrations are listed in the [implementation report](plans/application-redesign/implementation.md) and [Purchases guide](PURCHASES.md). Earlier phase test counts above are historical results, not current totals.
+
+## Update — optional shopping trips and assistant receipts (9 November 2026)
+
+This section supersedes the earlier description that all shopping checklist rows must be resolved before closing. The changes are committed to `rework_features` and **have not yet been verified by a new CI/test run or deployed**. The historical pass counts above refer only to the earlier revision.
+
+- **Suggestions, not obligations:** an active trip may be closed with any number of OPEN suggestions. These remain on the ordinary shopping list; closing records no additional goods, stock movements or expenses. The UI offers a short explanation and continues to show real purchases separately.
+- **Remove an active trip:** the `shopping_delete_session` MCP action and the app's session action hide it using a soft-deleted status. This is intentionally not a cascading SQL delete: an existing purchase, receipt, expense, or recorded stock movement must stay intact. Already-closed trips cannot be removed through this action. A Prisma migration adds `DELETED` and `deletedAt`.
+- **Any substitute, optional cataloguing:** before a shopping row has recorded any goods, its selected product can be swapped for any other catalogue product. This is a per-trip choice, **not** a global shared-stock merge. After a partial purchase, only shared-stock variants can be switched without creating a separate row. Free-text one-off goods remain supported, and the app now provides a create-product action in a visit.
+- **Multiple retailers:** the destination shop or default product shop is a suggested place to buy. Product shop links support more than one retailer. A printed receipt's actual retailer may replace an older confirmed location on acquisitions explicitly matched to that receipt; idempotent evidence and stock/product/unit checks remain in place.
+- **Pre-session purchases:** the receipt matching UI now exposes recent unassigned stock acquisitions from the ordinary shopping list, so a prior check-off can be matched without crediting its stock twice. Purchases from other households cannot be selected.
+- **Optional direct receipt upload through MCP:** `shopping_session_upload_receipt` accepts base64 PDF/JPEG/PNG/WebP bytes (up to 4 MB), stores them using the existing documents provider, and attaches the document to the visit. The normal streamed upload in the web UI remains available for larger files. A receipt has no effect on stock or expense amounts until explicitly matched/recorded.
+- **Regression coverage added (not yet executed):** `shopping-trip-options.integration.test.ts` covers unbought closure, substitution, deletion without losing acquisitions and receipts, cross-shop reconciliation, and manual purchases from before sessions. `receipt-upload.test.ts` covers inline receipt byte/type limits.
+
+### Acceptance flow
+
+1. Start with a shop or group to obtain useful **suggestions**. Nothing is compulsory. A user may create a product, add a one-off without cataloguing it, choose a completely different product, and buy only what is actually in the basket.
+2. When buying, record the selected goods once; known stock increases once. A physical receipt, even from a different store than originally planned, may be added now or later. Matching an existing acquisition reuses it rather than adding more stock.
+3. End the visit with unresolved suggestions left on the ordinary list, or delete an active visit entirely. Both preserve all real historical records, while deletion hides the visit itself.
+4. The assistant can attach a provided receipt using the MCP byte-upload action once the updated connector is deployed. The user never needs to upload a receipt to complete a shopping trip.
+
+Do not conflate per-trip substitute selection with the catalogue's alternative/shared-stock relationship: the latter still has stricter compatibility validation because it changes inventory aggregation.
