@@ -42,7 +42,7 @@ export type AssistantSkillDefinition = {
    * its own (routeParts). Calendar: "morgen", "vandaag", "wanneer", weekdays.
    */
   hints?: { nl: string[]; en: string[] };
-  /** The model's documentation (markdown, ≤ ~400 tokens). Default: `ai/skills/<id>/guide.md`. */
+  /** Short model-facing documentation (up to GUIDE_TOKEN_LIMIT estimated tokens). Default: `ai/skills/<id>/guide.md`. */
   guide?: string;
   /** Who gets this skill. Default: everyone; tools still filter by their own roles. */
   roles?: readonly Role[];
@@ -59,7 +59,7 @@ export type RegisteredAssistantSkill = Omit<AssistantSkillDefinition, "guide" | 
 
 const SKILL_ID = /^[a-z][a-z0-9-]*$/;
 const ALL_ROLES: readonly Role[] = ["owner", "adult", "child"];
-/** Hard limit for a guide; the test suite keeps every guide under ~450 estimated tokens. */
+/** Hard limit for a guide; estimated tokens use a conservative characters-per-token heuristic. */
 export const GUIDE_TOKEN_LIMIT = 700;
 
 const skills = new Map<string, RegisteredAssistantSkill>();
@@ -92,7 +92,7 @@ export function registerAssistantSkill(definition: AssistantSkillDefinition): Re
   if (!definition.summary.trim()) throw new Error(`Assistant skill "${id}" needs a summary`);
   const guide = (definition.guide ?? readSkillGuide(id))?.trim();
   if (!guide) throw new Error(`Assistant skill "${id}" needs a guide (ai/skills/${id}/guide.md)`);
-  if (estimateTokens(guide) > GUIDE_TOKEN_LIMIT) throw new Error(`Assistant skill "${id}": the guide is too long (keep it under ~400 tokens)`);
+  if (estimateTokens(guide) > GUIDE_TOKEN_LIMIT) throw new Error(`Assistant skill "${id}": the guide is too long (max ${GUIDE_TOKEN_LIMIT} estimated tokens)`);
   const toStems = (list: string[]) => list.map((keyword) => words(keyword).map(stem)).filter((stems) => stems.length > 0);
   const skill: RegisteredAssistantSkill = {
     id,
