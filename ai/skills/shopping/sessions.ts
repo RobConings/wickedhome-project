@@ -18,6 +18,7 @@ import {
   attachShoppingReceipt,
   closeShoppingSession,
   createShoppingSession,
+  deleteShoppingSession,
   getShoppingSession,
   joinShoppingSession,
   listShoppingSessions,
@@ -112,6 +113,17 @@ registerAssistantTool({
   roles: everyone,
   run: (ctx, input) =>
     updateShoppingSessionItem(ctx.user, input.sessionId, input.itemId, input),
+});
+registerAssistantTool({
+  name: "shopping.delete_session",
+  description:
+    "Remove an ACTIVE shopping visit from the shopping UI without closing or ticking its remaining suggestions. Uses the current session revision. Stock acquisitions, receipts, payments and ordinary needs are preserved; removal never deletes financial or stock history. Existing closed visits are not removable by this tool.",
+  input: z.object({ sessionId: idSchema, revision: z.number().int().min(0) }),
+  permission: "sensitive",
+  confirm: "always",
+  activity: { en: "Removed shopping visit", nl: "Winkelsessie verwijderd" },
+  roles: adults,
+  run: (ctx, input) => deleteShoppingSession(ctx.user, input.sessionId, input.revision),
 });
 registerAssistantTool({
   name: "shopping.close_session",
