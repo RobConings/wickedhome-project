@@ -5,6 +5,7 @@ import i18n from "i18next";
 import { ApiRequestError } from "@/lib/api-client";
 import { parseForm, toFormResult, type FormResult } from "@/lib/forms";
 import { sessionItemUpdateSchema } from "../types/sessions";
+import { handleProductAlternativeForm, handleProductForm } from "./shopping-loaders";
 import { recordSessionPayment, addSessionItem, startShoppingSession, updateSessionItem } from "./sessions-requests";
 import { recordSelection } from "@/lib/selections";
 
@@ -33,6 +34,12 @@ export const sessionStartFormSchema = z.object({
 /** Adjusting a checklist row never navigates or records an acquisition. */
 export async function sessionsAction({ request, params }: ActionFunctionArgs): Promise<FormResult | Response> {
   const form = await request.formData();
+  // A shopping trip is also a convenient place to create or link catalogue
+  // products. These forms use the same handlers as the main catalogue.
+  if (form.get("intent") === "create-product" || form.get("intent") === "update-product")
+    return handleProductForm(form);
+  if (form.get("intent") === "link-alternative" || form.get("intent") === "unlink-alternative")
+    return handleProductAlternativeForm(form);
   if (form.get("intent") === "start-session") {
     const { data: input, errors } = parseForm(sessionStartFormSchema, form);
     if (errors) return { errors };
