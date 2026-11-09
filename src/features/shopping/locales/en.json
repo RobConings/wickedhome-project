@@ -355,6 +355,12 @@
     "linkTitle": "Link an alternative to {{name}}",
     "linkOfTitle": "{{name}} is an alternative for…",
     "linkDescription": "Products remain distinct but share one stock after linking. When stock counts packs, a 250 g pack and a 500 g pack each count as 1 pack.",
+    "groupMergeTitle": "These products are already linked",
+    "groupMergeDescription": "Continuing will make all products listed below share one stock. Their names, packaging and catalogue details remain separate. One pack counts as one pack.",
+    "currentGroup": "Current group",
+    "selectedGroup": "Group to link",
+    "groupMergeConfirm": "I confirm that all listed products should share one stock.",
+    "groupMergeRequired": "Please confirm that the other linked products should be included.",
     "errors": {
       "category": "These products have different categories and cannot automatically share stock. You can still buy a different product during a shopping visit without merging them.",
       "package": "Package sizes differ. Treating both as one pack would give incorrect stock counts.",
