@@ -355,6 +355,12 @@
     "linkTitle": "Alternatief koppelen aan {{name}}",
     "linkOfTitle": "{{name}} is een alternatief voor…",
     "linkDescription": "Producten blijven afzonderlijk bestaan en delen na koppeling één voorraad. Bij voorraad per pak telt een verpakking van 250 g net als 500 g als 1 pak.",
+    "groupMergeTitle": "Deze producten zijn al gekoppeld",
+    "groupMergeDescription": "Door verder te koppelen gaan alle hieronder vermelde producten één voorraad delen. Hun eigen namen, verpakking en productgegevens blijven behouden. Eén pak telt als één pak.",
+    "currentGroup": "Huidige groep",
+    "selectedGroup": "Te koppelen groep",
+    "groupMergeConfirm": "Ik bevestig dat alle vermelde producten samen één voorraad mogen delen.",
+    "groupMergeRequired": "Bevestig eerst dat de andere gekoppelde producten ook meegaan.",
     "errors": {
       "category": "Deze producten hebben verschillende categorieën en mogen niet automatisch dezelfde voorraad delen. Je kunt wel een ander product kopen tijdens een winkelsessie zonder ze samen te voegen.",
       "package": "De verpakkingsgroottes zijn verschillend. Beide als één pak tellen zou een verkeerde voorraad geven.",
