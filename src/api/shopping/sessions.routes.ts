@@ -21,6 +21,7 @@ import {
   attachShoppingReceipt,
   closeShoppingSession,
   createShoppingSession,
+  deleteShoppingSession,
   getShoppingSession,
   joinShoppingSession,
   listShoppingSessions,
@@ -52,6 +53,10 @@ shoppingSessionsRouter.get("/:id", async (req, res) => {
 });
 shoppingSessionsRouter.post("/:id/join", async (req, res) => {
   res.json(await joinShoppingSession(currentUser(req), id(req.params.id)));
+});
+shoppingSessionsRouter.post("/:id/delete", async (req, res) => {
+  res.json(await deleteShoppingSession(currentUser(req), id(req.params.id),
+    parse(z.object({ revision: z.number().int().min(0) }), req.body).revision));
 });
 shoppingSessionsRouter.post("/:id/close", async (req, res) => {
   res.json(
