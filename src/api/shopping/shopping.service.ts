@@ -1103,6 +1103,16 @@ async function linkAlternativeImpl(user: Actor, productId: string, input: Produc
 
     const sourceOwner = product.stockProductId ? await tx.product.findFirstOrThrow({ where: { id: product.stockProductId, householdId }, select }) : product;
     const chosenOwner = chosen.stockProductId ? await tx.product.findFirstOrThrow({ where: { id: chosen.stockProductId, householdId }, select }) : chosen;
+    // A product may already share stock with several alternatives. Joining it
+    // joins BOTH complete groups, so require explicit consent before modifying
+    // all of their stock links. Existing product identities are never deleted.
+    const [sourceGroupSize, chosenGroupSize] = await Promise.all(
+      [sourceOwner.id, chosenOwner.id].map((id) =>
+        tx.product.count({ where: { householdId, OR: [{ id }, { stockProductId: id }] } }),
+      ),
+    );
+    if ((sourceGroupSize > 1 || chosenGroupSize > 1) && !input.confirmGroupMerge)
+      throw invalid("confirmGroupMerge", "Confirm that all existing alternatives will share one stock");
     const compatibility = stockCompatibilityProblem({ ...sourceOwner, packageAmount: sourceOwner.packageAmount?.toNumber() }, { ...chosenOwner, packageAmount: chosenOwner.packageAmount?.toNumber() });
     if (compatibility) throw invalid("mainProductId", compatibility);
     let mainId = stockOwnerOf(chosen);
