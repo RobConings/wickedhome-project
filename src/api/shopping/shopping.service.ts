@@ -815,6 +815,48 @@ async function automaticShoppingAllowed(tx: Prisma.TransactionClient, householdI
 // Concurrent shopping reads share the same reconciliation so they cannot add the same stock twice.
 const lowStockTopUps = new Map<string, Promise<void>>();
 
+/**
+ * An old LOW_STOCK row is not a permanent request to buy goods. When its
+ * canonical shared-stock group has been replenished above its minimum, remove
+ * only that automatic suggestion. Never touch manual, task or recipe items, and
+ * don't dismiss the group's restock state: it must become buyable again when
+ * the actual stock drops in the future.
+ */
+async function clearSatisfiedLowStock(householdId: string): Promise<void> {
+  await db.$transaction(async (tx) => {
+    await lockStock(tx, householdId);
+    const suggestions = await tx.shoppingItem.findMany({
+      where: { householdId, source: "LOW_STOCK", status: "OPEN", productId: { not: null } },
+      select: { id: true, productId: true, product: { select: { stockProductId: true } } },
+    });
+    if (!suggestions.length) return;
+
+    const owners = [...new Set(suggestions.map((item) => item.product?.stockProductId ?? item.productId!))];
+    const stocks = await tx.stockItem.findMany({
+      where: { householdId, productId: { in: owners } },
+      select: { productId: true, quantity: true, minQuantity: true },
+    });
+    const byOwner = new Map<string, typeof stocks>();
+    for (const row of stocks) {
+      const grouped = byOwner.get(row.productId) ?? [];
+      grouped.push(row);
+      byOwner.set(row.productId, grouped);
+    }
+    const satisfied = suggestions.filter((item) => {
+      const owner = item.product?.stockProductId ?? item.productId!;
+      const group = byOwner.get(owner) ?? [];
+      // Don't remove suggestions when no reliable stock/minimum is recorded.
+      return group.some((row) => row.minQuantity !== null) &&
+        group.every((row) => row.minQuantity === null || row.quantity.gt(row.minQuantity));
+    });
+    if (!satisfied.length) return;
+    await tx.shoppingItem.deleteMany({
+      where: { householdId, source: "LOW_STOCK", status: "OPEN", id: { in: satisfied.map((item) => item.id) } },
+    });
+    publishShoppingChanged(householdId);
+  });
+}
+
 /** Reconciles existing low stock on read, even when its quantity hasn't changed. */
 async function topUpLowStock(householdId: string, locale: Locale): Promise<void> {
   const pending = lowStockTopUps.get(householdId);
@@ -834,6 +876,7 @@ async function topUpLowStock(householdId: string, locale: Locale): Promise<void>
         unit: row.unit ?? row.product.unit,
       }, locale);
     }
+    await clearSatisfiedLowStock(householdId);
   })();
   lowStockTopUps.set(householdId, run);
   try {
