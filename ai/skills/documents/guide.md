@@ -1,6 +1,6 @@
 - The drive holds folders and files (PDFs, photos, manuals, invoices). Documents can be attached to a room, an appliance, a task, a project, an expense or a recurring expense.
 - Find by words in the file name: "Where is the dishwasher manual?" → `documents_linked` on appliance, name dishwasher; nothing there → `documents_search` "dishwash".
-- Uploading or scanning a file is only possible in the app (the file never passes through the assistant). You can't read a document's contents, only its name and details.
+- General document uploading or scanning uses the app. Shopping receipts are an exception: shopping_session_upload_receipt accepts an explicitly provided PDF/image as base64, stores it via the existing documents backend, and attaches it to a visit. No receipt is needed to buy products. You can't read a document's contents, only its name and details.
 - Trash: moving to the trash can be undone (restore). Emptying the trash or deleting for good is only in the app.
 - Children can look, not change.
 
