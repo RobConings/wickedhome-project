@@ -354,7 +354,14 @@
     "linkOf": "This is an alternative for…",
     "linkTitle": "Link an alternative to {{name}}",
     "linkOfTitle": "{{name}} is an alternative for…",
-    "linkDescription": "Both products then share one stock: their stock is added together per place.",
+    "linkDescription": "Only interchangeable products with compatible stock units and package sizes can share one stock.",
+    "errors": {
+      "category": "These products have different categories and cannot automatically share stock. You can still buy a different product during a shopping visit without merging them.",
+      "package": "Package sizes differ. Treating both as one pack would give incorrect stock counts.",
+      "container": "Packages aren't comparable. Don't combine their stock without a verified conversion.",
+      "unit": "Stock units differ and cannot be safely converted.",
+      "type": "These are different product types, not interchangeable stock."
+    },
     "product": "Product",
     "sharedName": "Name for the shared stock",
     "sharedNameDescription": "E.g. \"Bacon\": a new product without a barcode holds the stock, with both as its alternatives.",
