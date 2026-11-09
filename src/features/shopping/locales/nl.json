@@ -348,13 +348,13 @@
   },
   "alternatives": {
     "title": "Alternatieven",
-    "description": "Andere merken van hetzelfde delen één voorraad: wat je ook scant, het telt bij dezelfde voorraad.",
+    "description": "Gekoppelde producten behouden hun eigen naam en verpakking, maar delen de voorraad. Bij voorraad per pak telt iedere verpakking als één pak.",
     "none": "Nog geen alternatieven. Koppel een ander merk van hetzelfde om één voorraad te delen.",
     "link": "Alternatief koppelen",
     "linkOf": "Dit is een alternatief voor…",
     "linkTitle": "Alternatief koppelen aan {{name}}",
     "linkOfTitle": "{{name}} is een alternatief voor…",
-    "linkDescription": "Alleen uitwisselbare producten met dezelfde voorraadeenheid en verpakkingsgrootte kunnen één voorraad delen.",
+    "linkDescription": "Producten blijven afzonderlijk bestaan en delen na koppeling één voorraad. Bij voorraad per pak telt een verpakking van 250 g net als 500 g als 1 pak.",
     "errors": {
       "category": "Deze producten hebben verschillende categorieën en mogen niet automatisch dezelfde voorraad delen. Je kunt wel een ander product kopen tijdens een winkelsessie zonder ze samen te voegen.",
       "package": "De verpakkingsgroottes zijn verschillend. Beide als één pak tellen zou een verkeerde voorraad geven.",
