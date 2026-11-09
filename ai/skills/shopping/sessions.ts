@@ -1,4 +1,5 @@
 import { shoppingPaymentSchema } from "@/features/expenses/types/shopping-payment";
+import { uploadShoppingReceipt } from "@/api/shopping/receipt-upload.service";
 import {
   getShoppingFinanceOptions,
   recordShoppingPayment,
@@ -100,7 +101,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "shopping.session_update_item",
   description:
-    "Update one visit item using its latest revision. operationId is a stable unique action id reused on retry. purchasedQuantity is TOTAL actually bought, including earlier partial purchases, in the item's unit. Bought goods credit known stock once; skipped/remove never credit stock. Unticking never removes real goods. Specify stockItemId if locations are ambiguous. Adjust productId only to a linked variant sharing stock; this changes future purchases, preserving earlier goods. Unrelated extras use session_add_item. Normal full buy: status bought with purchasedQuantity omitted. For 1 bought earlier + 1 now, purchasedQuantity is 2. No gram weight is required for household counts.",
+    "Update one visit item using its latest revision. operationId is a stable unique action id reused on retry. purchasedQuantity is TOTAL actually bought, including earlier partial purchases, in the item's unit. Bought goods credit known stock once; skipped/remove never credit stock. Unticking never removes real goods. Specify stockItemId if locations are ambiguous. Before buying, productId may select ANY other catalogue product without globally sharing stock; this replaces only the unbought shopping position and preserves its original needs. Once partially bought, only variants sharing the same stock may be switched, and earlier goods remain unchanged. Unrelated extras use session_add_item. Normal full buy: status bought with purchasedQuantity omitted. For 1 bought earlier + 1 now, purchasedQuantity is 2. No gram weight is required for household counts.",
   input: sessionItemUpdateSchema.extend({
     sessionId: idSchema,
     itemId: idSchema,
@@ -115,7 +116,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "shopping.close_session",
   description:
-    "Close a visit after every item is bought, skipped or removed. Uses current session revision. Closing never buys missing products or creates expenses.",
+    "Finish a visit at any time, even if items remain open/unbought. Open suggestions stay outstanding on the ordinary shopping list: they are not auto-purchased, skipped or removed. Uses current session revision. Closing never creates expenses.",
   input: z.object({ sessionId: idSchema, revision: z.number().int().min(0) }),
   permission: "write",
   confirm: "always",
@@ -134,6 +135,25 @@ registerAssistantTool({
   activity,
   roles: adults,
   run: (ctx, input) => attachShoppingReceipt(ctx.user, input.sessionId, input),
+});
+registerAssistantTool({
+  name: "shopping.session_upload_receipt",
+  description:
+    "Upload an actual PDF/JPEG/PNG/WebP receipt provided by the person to household document storage and attach it to an existing shopping visit in one operation. contentBase64 is the complete base64 of the file (or a matching data URI), not a local path or guessed URL. Use the printed purchase date and optional shop and total. Repeated identical bytes reuse the existing document/receipt; uploads do not add stock or expenses. A receipt is OPTIONAL: shopping without it must work.",
+  input: z.object({
+    sessionId: idSchema,
+    filename: z.string().trim().min(1).max(200).regex(/^[^/\\\x00-\x1f]+$/),
+    mimeType: z.enum(["application/pdf", "image/jpeg", "image/png", "image/webp"]),
+    contentBase64: z.string().min(8),
+    purchasedAt: z.iso.datetime(),
+    shopId: idSchema.optional(),
+    totalCents: z.number().int().min(0).max(100_000_000).optional(),
+  }),
+  permission: "write",
+  confirm: "always",
+  activity: { en: "Uploaded shopping receipt", nl: "Kassabon geüpload" },
+  roles: adults,
+  run: (ctx, input) => uploadShoppingReceipt(ctx.user, input),
 });
 registerAssistantTool({
   name: "shopping.session_match_receipt",
