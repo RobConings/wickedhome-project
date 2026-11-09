@@ -19,6 +19,7 @@ import { useBarcodeAutofill } from "../data/use-barcode-autofill";
 import { packageSizeOf, type BarcodeLookupResult, type ProductSuggestion } from "../types/barcode-lookup";
 import { PACKAGE_UNITS, PRODUCT_CATEGORIES, type LinkPreview, type Product, type ProductCategory } from "../types/shopping";
 import { ProductAlternatives } from "./product-alternatives";
+import { LinkAlternativeDialog } from "./link-alternative-dialog";
 import { ProductCategoryIcon } from "./product-category-icon";
 import { ProductLinkField } from "./product-link-field";
 import { ProductSuggestionCard } from "./product-suggestion-card";
@@ -67,6 +68,8 @@ export function ProductFormDialog({
 }: ProductFormDialogProps) {
   const { t } = useTranslation("shopping");
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(false);
+  const [linkOpen, setLinkOpen] = React.useState(false);
+  const [linkAfterClose, setLinkAfterClose] = React.useState(false);
   const open = controlledOpen ?? uncontrolledOpen;
   const [session, setSession] = React.useState(0);
   const fetcher = useFetcher<ShoppingActionResult>({ key: `product-form-${product?.id ?? "new"}-${session}` });
@@ -97,10 +100,27 @@ export function ProductFormDialog({
     if (open && controlledOpen !== undefined) setSession((value) => value + 1);
   }
 
+  // Radix modals must not stack: finish closing the product editor before
+  // opening the link dialog. This also returns focus to the proper trigger.
+  function showLinkDialog() {
+    if (fetcher.state !== "idle") return;
+    setLinkAfterClose(true);
+    setOpen(false);
+  }
+
   return (
+    <>
     <Dialog open={open && !saved} onOpenChange={setOpen}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-lg">
+      <DialogContent
+        className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-lg"
+        onCloseAutoFocus={(event) => {
+          if (!linkAfterClose) return;
+          event.preventDefault();
+          setLinkAfterClose(false);
+          setLinkOpen(true);
+        }}
+      >
         {/* Keyed by session: every opening starts from the product, the defaults and the suggestion again. */}
         <ProductForm
           key={session}
@@ -121,11 +141,21 @@ export function ProductFormDialog({
               <h3 className="font-semibold">{t("alternatives.title")}</h3>
               <p className="text-sm text-muted-foreground">{t("alternatives.description")}</p>
             </div>
-            <ProductAlternatives product={product} products={products} canManage />
+            <ProductAlternatives product={product} products={products} canManage onLink={showLinkDialog} />
           </section>
         )}
       </DialogContent>
     </Dialog>
+    {product && products && (
+      <LinkAlternativeDialog
+        product={product}
+        products={products}
+        open={linkOpen}
+        onOpenChange={setLinkOpen}
+        onLinked={() => onSaved?.(product.id)}
+      />
+    )}
+    </>
   );
 }
 
