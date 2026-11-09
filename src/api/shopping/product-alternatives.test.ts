@@ -14,6 +14,7 @@ import {
   planStockMerge,
   promotionCandidate,
   stockOwnerOf,
+  stockCompatibilityProblem,
   type MergeableStock,
 } from "./product-alternatives";
 
@@ -51,6 +52,27 @@ describe("linkProblem", () => {
   it("allows products of different groups, also when the chosen one is an alternative", () => {
     assert.equal(linkProblem({ id: "a", stockProductId: null }, { id: "b", stockProductId: null }), null);
     assert.equal(linkProblem({ id: "a", stockProductId: null }, { id: "b", stockProductId: "other" }), null);
+  });
+});
+
+describe("manual alternative links count packages, not package contents", () => {
+  it("accepts dairy Boter 250 g and pantry FAMA 500 g as 1 pack each", () => {
+    assert.equal(stockCompatibilityProblem(
+      { name: "Boter", category: "DAIRY", unit: "pak", packageAmount: 250, packageUnit: "g" },
+      { name: "FAMA bakken & braden", category: "PANTRY", unit: "pak", packageAmount: 500, packageUnit: "g" },
+    ), null);
+    assert.deepEqual(mergeStockValues(
+      { quantity: 1, unit: "pak", minQuantity: 1, expiresOn: null },
+      { quantity: 3, unit: "pak", minQuantity: 1, expiresOn: null },
+    ), { quantity: 4, unit: "pak", minQuantity: 1, expiresOn: null });
+  });
+
+  it("accepts a count without explicit unit and another known package count", () => {
+    assert.equal(stockCompatibilityProblem({ unit: null }, { unit: "pak" }), null);
+  });
+
+  it("still prevents adding a measured mass directly to a count of packs", () => {
+    assert.match(stockCompatibilityProblem({ unit: "kg" }, { unit: "pak" }) ?? "", /Stock units differ/);
   });
 });
 
