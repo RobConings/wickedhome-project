@@ -7,7 +7,7 @@ import { getShop } from "../shops/shops.service";
 import { notFound } from "../lib/http";
 
 const lineInclude = { ...goodsAllocationInclude, sessionItem: { select: { requirementIds: true } } } as const;
-const include = { session: { select: { name: true } }, stockPurchases: { include: lineInclude }, receipts: true,
+const include = { session: { select: { name: true, status: true } }, stockPurchases: { include: lineInclude }, receipts: true,
   payments: { include: { expense: { select: { id: true, payee: true, amountCents: true, paidOn: true } } } } } as const;
 type Header = Prisma.ShoppingPurchaseGetPayload<{ include: typeof include }>;
 type Acquisition = Prisma.StockPurchaseGetPayload<{ include: typeof lineInclude }>;
@@ -29,7 +29,7 @@ function line(row: Acquisition, names: Map<string, string>): PurchaseLine {
     sessionItemId: row.sessionItemId, requirementIds: row.sessionItem?.requirementIds ?? (row.shoppingItemId ? [row.shoppingItemId] : []) };
 }
 function summary(row: Header, names: Map<string, string>, canReadMoney: boolean): PurchaseSummary {
-  return { id: row.id, kind: "visit", name: row.session.name, sessionId: row.sessionId,
+  return { id: row.id, kind: "visit", name: row.session.name, sessionId: row.session.status === "DELETED" ? null : row.sessionId,
     purchasedAt: row.purchasedAt.toISOString(), shopName: row.shopId ? names.get(row.shopId) ?? null : null,
     shopId: row.shopId && names.has(row.shopId) ? row.shopId : null,
     lineCount: row.stockPurchases.length, receiptCount: row.receipts.length,
