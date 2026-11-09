@@ -702,6 +702,9 @@ export async function updateShoppingSessionItem(
         category: variant.category,
         unit: sameStock ? undefined : householdStockUnit(variant.unit, variantsStock),
         stockItemId: sameStock ? undefined : null,
+        // A shop on the original suggestion is not a restriction on where
+        // the substitute is bought. Actual receipt shop is recorded per purchase.
+        shopId: sameStock ? undefined : (variant.defaultShopId ?? null),
       } });
     }
     await acquire(
@@ -793,14 +796,8 @@ export async function closeShoppingSession(
       if (session.status === "CLOSED") return;
       if (session.revision !== revision)
         throw conflict("The visit changed; refresh before closing it");
-      if (
-        await tx.shoppingSessionItem.count({
-          where: { sessionId, removedAt: null, status: "OPEN" },
-        })
-      )
-        throw conflict(
-          "Buy, skip or remove the remaining items before closing this visit",
-        );
+      // The checklist is advisory. Ending a shopping trip does not turn unbought
+      // suggestions into purchases, skips, or stock movements.
       await tx.shoppingSession.update({
         where: { id: sessionId },
         data: { status: "CLOSED", closedAt: new Date() },
@@ -1196,12 +1193,12 @@ export async function reconcileShoppingReceiptLine(
           // An explicitly selected acquisition can have an old *planned* shop
           // (e.g. Collect&Go); the physical receipt is the authoritative retailer.
           // The user explicitly identified these same goods by acquisition id.
-          shopId: input.existingPurchaseIds ? undefined : receipt.shopId ?? receipt.purchase.shopId ?? undefined,
+          shopId: undefined,
           purchasedAt: receipt.purchasedAt.toISOString(),
           existingPurchaseIds: acquisitions.map((line) => line.id),
         });
       }
-      if (input.existingPurchaseIds && receipt.shopId) {
+      if (receipt.shopId) {
         await tx.stockPurchase.updateMany({
           where: { householdId: user.householdId, id: { in: acquisitions.map((line) => line.id) } },
           data: { shopId: receipt.shopId, shopConfirmed: true },
