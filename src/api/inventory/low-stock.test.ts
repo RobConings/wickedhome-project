@@ -52,9 +52,14 @@ function setup(t: TestContext, quantity = 1, minimum: number | null = 2) {
   stub(t, db.stockItem, "findFirst", async () => stock);
   stub(t, db.stockItem, "findFirstOrThrow", async () => stock);
   stub(t, db.stockItem, "findUnique", async () => null);
-  const reads = stub(t, db.stockItem, "findMany", async ({ where }: { where: { householdId: string; quantity: { lte: unknown } } }) => {
+  const reads = stub(t, db.stockItem, "findMany", async ({ where }: {
+    where: { householdId: string; quantity?: { lte: unknown }; productId?: { in: string[] } };
+  }) => {
     assert.equal(where.householdId, actor.householdId);
-    assert.deepEqual(where.quantity.lte, db.stockItem.fields.minQuantity);
+    // Reconciliation also reads the canonical group stock to clear outdated
+    // automatic needs after a shared-stock group has been replenished.
+    if (where.productId) return where.productId.in.includes(stock.productId) ? [stock] : [];
+    assert.deepEqual(where.quantity?.lte, db.stockItem.fields.minQuantity);
     return isBelowMinimum(stock.quantity.toNumber(), stock.minQuantity?.toNumber() ?? null) ? [stock] : [];
   });
   const save = async ({ data }: { data: { quantity?: number; minQuantity?: number | null; unit?: string | null; expiresOn?: null } }) => {
@@ -81,7 +86,13 @@ function setup(t: TestContext, quantity = 1, minimum: number | null = 2) {
   stub(t, db.shoppingList, "findMany", async () => []);
   stub(t, db.shoppingStaple, "findMany", async () => []);
   stub(t, db.shoppingItem, "groupBy", async () => []);
-  stub(t, db.shoppingItem, "findMany", async () => items.map((item, index) => ({
+  stub(t, db.shoppingItem, "findMany", async ({ where }: {
+    where?: { source?: string; status?: string; productId?: { not: null } };
+  } = {}) => items.map((item, index) => ({ item, index }))
+    .filter(({ item }) => (!where?.source || item.source === where.source) &&
+      (!where?.status || item.status === where.status) &&
+      (!where?.productId || item.productId !== null))
+    .map(({ item, index }) => ({
     id: `item-${index}`, listId: "low-list", list: { name: "Running low" }, name: "Milk",
     unit: null, shopId: null, shop: null, url: null, imageUrl: null, priceCents: null, note: null,
     placeId: "fridge", place: { name: "Fridge" }, category: null, source: "MANUAL", taskId: null,
@@ -94,6 +105,21 @@ function setup(t: TestContext, quantity = 1, minimum: number | null = 2) {
       stockProduct: item.productId === "other-brand" ? { stockItems: [stock] } : null,
     } : null,
   })));
+  stub(t, db.shoppingItem, "deleteMany", async ({ where }: {
+    where: { id: { in: string[] }; source?: string; status?: string };
+  }) => {
+    let removed = 0;
+    for (let index = items.length - 1; index >= 0; index--) {
+      const item = items[index]!;
+      if (where.id.in.includes(`item-${index}`) &&
+        (!where.source || item.source === where.source) &&
+        (!where.status || item.status === where.status)) {
+        items.splice(index, 1);
+        removed++;
+      }
+    }
+    return { count: removed };
+  });
   stub(t, db.shoppingItem, "count", async ({ where }: { where: { productId?: { in: string[] }; stapleId?: string; status: string } }) =>
     items.filter((item) => (!where.productId || (item.productId !== null && where.productId.in.includes(item.productId)))
       && (!where.stapleId || item.stapleId === where.stapleId) && item.status === where.status).length);
@@ -195,7 +221,9 @@ describe("low stock groceries", () => {
   it("repeated and concurrent reads keep a single open item", async (t) => {
     const { items, reads } = setup(t);
     await Promise.all([getShoppingOverview(actor.householdId), listItems(actor.householdId)]);
-    assert.equal(reads.mock.callCount(), 1);
+    assert.equal(reads.mock.calls.filter((call) =>
+      Boolean((call.arguments[0] as { where?: { quantity?: unknown } }).where?.quantity)
+    ).length, 1);
     await listItems(actor.householdId);
     assert.equal(items.length, 1);
   });
