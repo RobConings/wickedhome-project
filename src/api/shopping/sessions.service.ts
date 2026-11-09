@@ -61,7 +61,7 @@ const summary = (row: {
 export async function listShoppingSessions(user: SessionUser) {
   return (
     await db.shoppingSession.findMany({
-      where: { householdId: user.householdId },
+      where: { householdId: user.householdId, status: { not: "DELETED" } },
       orderBy: { startedAt: "desc" },
       take: 100,
     })
@@ -102,7 +102,7 @@ export async function getShoppingSession(
       },
     },
   });
-  if (!row) throw notFound("Shopping visit not found");
+  if (!row || row.status === "DELETED") throw notFound("Shopping visit not found");
   const users = await db.user.findMany({
     where: {
       householdId: user.householdId,
@@ -456,7 +456,7 @@ export async function withShoppingSessionTransaction<T>(
       const session = await tx.shoppingSession.findFirst({
         where: { id: sessionId, householdId: user.householdId },
       });
-      if (!session) throw notFound("Shopping visit not found");
+      if (!session || session.status === "DELETED") throw notFound("Shopping visit not found");
       if (!allowClosed && session.status !== "ACTIVE")
         throw conflict("This shopping visit is closed");
       const result = await work(tx);
@@ -778,6 +778,31 @@ export async function joinShoppingSession(
     }),
   );
   return getShoppingSession(user, sessionId);
+}
+
+/**
+ * Remove an active visit from the shopping UI without deleting goods, receipts,
+ * payments or any underlying shopping needs. Cascading deletion would destroy
+ * legitimate financial/acquisition history, so keep the visit as a tombstone.
+ */
+export async function deleteShoppingSession(user: SessionUser, sessionId: string, revision: number) {
+  manager(user);
+  await db.$transaction(async (tx) => {
+    await lockStock(tx, user.householdId);
+    const visit = await tx.shoppingSession.findFirst({
+      where: { id: sessionId, householdId: user.householdId },
+    });
+    if (!visit) throw notFound("Shopping visit not found");
+    if (visit.status === "DELETED") return; // idempotent retry
+    if (visit.status !== "ACTIVE") throw conflict("Only an active shopping visit can be removed");
+    if (visit.revision !== revision) throw conflict("The visit changed; refresh before removing it");
+    await tx.shoppingSession.update({
+      where: { id: sessionId },
+      data: { status: "DELETED", deletedAt: new Date(), revision: { increment: 1 } },
+    });
+  });
+  publish(user.householdId, "shopping.changed", { scope: "session", sessionId });
+  return { deleted: true, sessionId };
 }
 
 export async function closeShoppingSession(
