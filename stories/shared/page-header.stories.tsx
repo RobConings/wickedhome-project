@@ -33,7 +33,7 @@ export const WithActions: Story = {
   },
 };
 
-/** Regression: a long NL title/description must never share a narrow column with two CTAs on phones. */
+/** Regression: a long Dutch headline keeps both CTAs beneath it; secondary copy is hidden on phones. */
 export const ShoppingMobileTwoActions: Story = {
   globals: { viewport: { value: "mobile1" } },
   args: {
