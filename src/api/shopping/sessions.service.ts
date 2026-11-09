@@ -111,6 +111,18 @@ export async function getShoppingSession(
     select: { id: true, email: true, habitant: { select: { name: true } } },
   });
   const stock = await listStock(user.householdId);
+  // Receipt matching must also find acquisitions from the ordinary shopping list
+  // (which predates shopping sessions). Otherwise the "match" button cannot reuse
+  // those real goods and users are forced to credit their stock a second time.
+  const availableAcquisitions = user.role === "child" ? [] : await db.stockPurchase.findMany({
+    where: {
+      householdId: user.householdId,
+      shoppingPurchaseId: null,
+      purchasedAt: { gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) },
+    },
+    orderBy: { purchasedAt: "desc" },
+    take: 150,
+  });
   const products = await db.product.findMany({
     where: {
       householdId: user.householdId,
@@ -187,6 +199,15 @@ export async function getShoppingSession(
         unit: line.unit,
         stockAdded: line.stockAdded,
       })),
+    })),
+    availableAcquisitions: availableAcquisitions.map((line) => ({
+      id: line.id,
+      name: line.purchasedProductName ?? line.productId,
+      productId: line.productId,
+      quantity: line.purchasedQuantity?.toNumber() ?? line.quantity.toNumber(),
+      unit: line.purchasedUnit ?? line.unit,
+      purchasedAt: line.purchasedAt.toISOString(),
+      shopId: line.shopId,
     })),
     stockOptions: stock.map((item) => ({
       id: item.id,
