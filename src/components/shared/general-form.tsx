@@ -237,9 +237,15 @@ export function GeneralForm<R extends FormResult = FormResult>({
 
   const result = submitting ? undefined : fetcherData;
   const translate = (message: string) => (translateError ? translateError(message) : message);
+  // Custom pickers may submit a different field name from the one the server
+  // validates (for example id vs mainProductId). Display those server errors
+  // beside the visible picker instead of silently swallowing them as "stray".
+  const namesFor = (name: string) => [...new Set([name, ...(allFields.find((field) => field.name === name)?.errorNames ?? [])])];
   const errorsFor = (name: string) => {
-    const messages = clientErrors[name] ?? (dismissed.has(name) ? undefined : result?.errors?.[name]);
-    return messages?.length ? messages.map(translate) : undefined;
+    const messages = namesFor(name).flatMap((key) =>
+      clientErrors[key] ?? (dismissed.has(key) ? [] : (result?.errors?.[key] ?? [])),
+    );
+    return messages.length ? [...new Set(messages)].map(translate) : undefined;
   };
 
   const callbacks = React.useRef({ onSuccess, isSuccess, onSubmittingChange, onValuesChange });
@@ -268,13 +274,16 @@ export function GeneralForm<R extends FormResult = FormResult>({
       const next = { ...previous, [name]: value };
       return adjustValues ? adjustValues(next, previous, name) : next;
     });
+    const relatedNames = namesFor(name);
     setClientErrors((previous) => {
-      if (!(name in previous)) return previous;
+      if (!relatedNames.some((key) => key in previous)) return previous;
       const next = { ...previous };
-      delete next[name];
+      for (const key of relatedNames) delete next[key];
       return next;
     });
-    setDismissed((previous) => (previous.has(name) ? previous : new Set(previous).add(name)));
+    setDismissed((previous) =>
+      relatedNames.every((key) => previous.has(key)) ? previous : new Set([...previous, ...relatedNames]),
+    );
   };
 
   const isVisible = (field: GeneralFormField) => !field.hidden && (!field.when || field.when(values));
