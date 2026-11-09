@@ -354,7 +354,14 @@
     "linkOf": "Dit is een alternatief voor…",
     "linkTitle": "Alternatief koppelen aan {{name}}",
     "linkOfTitle": "{{name}} is een alternatief voor…",
-    "linkDescription": "Beide producten delen dan één voorraad: hun voorraad wordt per plaats samengeteld.",
+    "linkDescription": "Alleen uitwisselbare producten met dezelfde voorraadeenheid en verpakkingsgrootte kunnen één voorraad delen.",
+    "errors": {
+      "category": "Deze producten hebben verschillende categorieën en mogen niet automatisch dezelfde voorraad delen. Je kunt wel een ander product kopen tijdens een winkelsessie zonder ze samen te voegen.",
+      "package": "De verpakkingsgroottes zijn verschillend. Beide als één pak tellen zou een verkeerde voorraad geven.",
+      "container": "De verpakkingen zijn niet vergelijkbaar. Koppel ze niet aan één voorraad zonder gecontroleerde omrekening.",
+      "unit": "De voorraadeenheden verschillen en kunnen niet veilig omgerekend worden.",
+      "type": "Dit zijn verschillende productsoorten en geen uitwisselbare voorraad."
+    },
     "product": "Product",
     "sharedName": "Naam voor de gedeelde voorraad",
     "sharedNameDescription": "Bv. \"Spek\": een nieuw product zonder barcode houdt de voorraad bij, met beide als alternatief.",
