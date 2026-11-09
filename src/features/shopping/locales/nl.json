@@ -484,6 +484,7 @@
     "item_bought": "Gekocht",
     "item_skipped": "Nu niet",
     "matchAcquisitions": "Eerdere aankopen koppelen (optioneel)",
+    "priorAcquisitions": "Eerdere aankopen uit de gewone boodschappenlijst",
     "countDisposition": "Eerdere voorraadtelling",
     "countUnknown": "Nog niet beoordeeld",
     "alreadyCounted": "Goederen zaten al in de telling",
