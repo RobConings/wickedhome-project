@@ -614,11 +614,12 @@ registerAssistantTool({
 registerAssistantTool({
   name: "inventory.link_alternative",
   description:
-    "Let a product share another product's stock (alternatives: another brand of the same thing): its stock merges into the other's, per place. This links existing products; record bought quantities separately with inventory_record_purchase. Check inventory_products first: if they already share stock, no link is needed. Give sharesWith for linking; sharedName optionally names a new generic product for both groups (e.g. \"Bacon\"). Or unlink it from its group (the stock stays). An app/database error is not evidence of a name mismatch: check current data before retrying; do not recreate products to work around it.",
+    "Link separate catalogue products to one shared package-count stock. If either is already linked, their ENTIRE existing groups will be linked too (not just the chosen variant). Each product keeps its own name and package size; one pack still counts as one pack. Check inventory_products and preview all affected products. For a grouped link explicitly ask the person to confirm and set confirmGroupMerge true only after they agree; otherwise the server refuses. sharedName may create a generic main product. Unlink only on request. Never create products to work around a link error.",
   input: z.object({
     product: entityRef("product", "The alternative, e.g. the brand that was bought"),
     sharesWith: entityRef("product", "The product whose stock it shares").optional(),
     sharedName: z.string().trim().min(1).max(120).optional().describe("Name for the shared stock: a new generic product"),
+    confirmGroupMerge: z.boolean().optional().describe("Only true after the person explicitly agrees to link ALL existing alternatives in BOTH groups."),
     unlink: z.boolean().optional().describe("Take the product out of its group instead"),
   }),
   permission: "write",
@@ -632,21 +633,38 @@ registerAssistantTool({
   },
   preview: async (ctx, input) => {
     if (input.unlink || !input.sharesWith) return null;
-    const product = await getProduct(ctx.householdId, input.product.id);
-    // An alternative brings no stock of its own; a main product's stock merges per place.
-    const [mine, theirs] = await Promise.all([
-      product.stockProductId ? [] : listStock(ctx.householdId, { productId: product.id }),
-      listStock(ctx.householdId, { productId: input.sharesWith.id }),
+    const [product, chosen] = await Promise.all([
+      getProduct(ctx.householdId, input.product.id),
+      getProduct(ctx.householdId, input.sharesWith.id),
     ]);
-    if (mine.some((item) => theirs.some((other) => other.id === item.id))) return null;
+    const [source, target] = await Promise.all([
+      product.stockProductId ? getProduct(ctx.householdId, product.stockProductId) : product,
+      chosen.stockProductId ? getProduct(ctx.householdId, chosen.stockProductId) : chosen,
+    ]);
+    if (source.id === target.id) return null;
+    const sourceNames = [source.name, ...source.alternatives.map((item) => item.name)];
+    const targetNames = [target.name, ...target.alternatives.map((item) => item.name)];
+    const mergingGroups = sourceNames.length > 1 || targetNames.length > 1;
+    const [mine, theirs] = await Promise.all([
+      listStock(ctx.householdId, { productId: source.id }),
+      listStock(ctx.householdId, { productId: target.id }),
+    ]);
     const rows = new Map(theirs.map((item) => [item.placeId, { label: item.placeName, detail: amount(item.quantity, item.unit, ctx.locale), tone: undefined as "add" | "change" | undefined }]));
     for (const step of planStockMerge(mine, theirs)) {
       const item = mine.find((candidate) => candidate.id === step.sourceId);
       if (!item) continue;
       rows.set(step.placeId, { label: item.placeName, detail: amount(step.quantity, item.unit, ctx.locale), tone: step.kind === "move" ? "add" : "change" });
     }
-    if (rows.size === 0) return null;
-    return { kind: "list", title: say(ctx.locale, "Shared stock afterwards", "Gedeelde voorraad daarna"), data: { items: [...rows.values()] } };
+    const items = mergingGroups ? [
+      { label: say(ctx.locale, "Current linked group", "Bestaande gekoppelde groep"), detail: targetNames.join(", "), tone: undefined },
+      { label: say(ctx.locale, "Additional linked group", "Mee te koppelen groep"), detail: sourceNames.join(", "), tone: undefined },
+    ] : [];
+    items.push(...rows.values());
+    if (!items.length) return null;
+    return { kind: "list", title: mergingGroups
+      ? say(ctx.locale, "All these products will share ONE stock (confirmation required)", "Al deze producten zullen ÉÉN voorraad delen (bevestiging vereist)")
+      : say(ctx.locale, "Shared stock afterwards", "Gedeelde voorraad daarna"),
+      data: { items } };
   },
   run: async (ctx, input) => {
     if (ctx.user.role === "child") throw forbidden("Only adults link products.");
@@ -655,7 +673,11 @@ registerAssistantTool({
       return done(`${input.product.name} no longer shares stock; the stock stayed with the main product.`);
     }
     if (!input.sharesWith) throw badRequest("Which product does it share stock with?");
-    const product = await linkAlternative(ctx.user, input.product.id, { mainProductId: input.sharesWith.id, newMainName: input.sharedName ?? null });
+    const product = await linkAlternative(ctx.user, input.product.id, {
+      mainProductId: input.sharesWith.id,
+      newMainName: input.sharedName ?? null,
+      confirmGroupMerge: input.confirmGroupMerge ?? false,
+    });
     return done(`${product.name} now shares stock with ${input.sharedName ?? input.sharesWith.name}.`, { id: product.id });
   },
 });
