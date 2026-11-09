@@ -30,6 +30,8 @@ export const updateSessionItem = (
   );
 export const joinSession = (id: string) =>
   api.post<SessionView>(`${path(id)}/join`);
+export const deleteSession = (id: string, revision: number) =>
+  api.post<{ deleted: true; sessionId: string }>(`${path(id)}/delete`, { revision });
 export const closeSession = (id: string, revision: number) =>
   api.post<SessionView>(`${path(id)}/close`, { revision });
 export const attachReceipt = (id: string, input: ReceiptAttachInput) =>
