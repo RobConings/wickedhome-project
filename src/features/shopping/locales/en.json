@@ -484,6 +484,7 @@
     "item_bought": "Bought",
     "item_skipped": "Not now",
     "matchAcquisitions": "Match prior acquisitions (optional)",
+    "priorAcquisitions": "Earlier goods bought outside this visit",
     "countDisposition": "Prior stock count",
     "countUnknown": "Not yet reviewed",
     "alreadyCounted": "Goods were already counted",
