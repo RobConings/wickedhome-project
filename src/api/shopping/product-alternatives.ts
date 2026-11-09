@@ -12,16 +12,25 @@
  */
 
 import type { Locale } from "@/types/common";
-import { convertAmount, incompatiblePackages, normalizeUnit, unitInfo } from "@/types/units";
-import { compatibleProductType } from "@/features/shopping/types/product-identity";
+import { convertAmount, normalizeUnit, unitInfo } from "@/types/units";
 
+/**
+ * Linking keeps all catalogue products and their own package details distinct.
+ * Their shared stock is a count of packages when BOTH are counted as things:
+ * one FAMA 500 g pack and one Boni 250 g pack each add exactly 1 to the count.
+ * The person chooses which products are alternatives; category, brand and
+ * package weight must not silently block an intentional link.
+ *
+ * Only reject links that would add quantities in incomparable stock units
+ * (e.g. 500 g of loose butter to 1 packet without an explicit conversion).
+ */
 export function stockCompatibilityProblem(a: { name?: string; unit?: string | null; category?: string; packageAmount?: number | null; packageUnit?: string | null }, b: typeof a): string | null {
-  if (a.name && b.name && !compatibleProductType(a.name, b.name)) return "These are different product types, not interchangeable stock";
-  if (a.category && b.category && a.category.toUpperCase() !== "OTHER" && b.category.toUpperCase() !== "OTHER" && a.category.toUpperCase() !== b.category.toUpperCase()) return "Verify product types/categories before sharing stock";
-  if (incompatiblePackages(a.unit, b.unit)) return "Keep distinct containers as separate product variants; compare verified package content instead";
+  const first = unitInfo(a.unit);
+  const second = unitInfo(b.unit);
+  if (first?.dimension === "count" && second?.dimension === "count") return null;
   const sameUnit = normalizeUnit(a.unit) === normalizeUnit(b.unit);
-  if (!sameUnit && convertAmount(1, a.unit, b.unit) !== 1) return "Stock units differ; quantities cannot be added without a verified conversion";
-  if ((unitInfo(a.unit)?.dimension === "count" || unitInfo(b.unit)?.dimension === "count") && a.packageAmount && b.packageAmount && convertAmount(a.packageAmount, a.packageUnit, b.packageUnit) !== b.packageAmount) return "Different package sizes cannot share one package count";
+  if (!sameUnit && convertAmount(1, a.unit, b.unit) !== 1)
+    return "Stock units differ; quantities cannot be added without a verified conversion";
   return null;
 }
 
