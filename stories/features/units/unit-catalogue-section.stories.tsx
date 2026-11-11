@@ -12,4 +12,4 @@ export const LinkedUnits: Story = { args: { initialData: { units: [
   { name: "fles 75 cl", referenceUnit: "cl", factor: 75, rounding: 1, aliases: ["wijnfles"] },
   { name: "krat wijn", referenceUnit: "fles 75 cl", factor: 6, rounding: 1, aliases: [] },
   { name: "ton", referenceUnit: "kg", factor: 1000, rounding: 0.001, aliases: ["tonne"] },
-], updatedAt: null } } };
+], usedUnits: ["stronkje", "snuifje", "el", "kg", "flesje"], updatedAt: null } } };

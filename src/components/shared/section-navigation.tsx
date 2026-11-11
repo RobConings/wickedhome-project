@@ -1,6 +1,7 @@
 import * as React from "react";
 import type { LucideIcon } from "lucide-react";
 import { Link, type To } from "react-router";
+import { ScrollRow } from "@/components/layout/scroll-row";
 import { workspaceTabListClassName, workspaceTabTriggerClassName } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
@@ -17,10 +18,10 @@ export type SectionNavigationItem = {
  * Use links here (not ARIA tabs without panels), so URL navigation and browser history remain correct.
  */
 export function SectionNavigation({ items, label, className }: { items: SectionNavigationItem[]; label: string; className?: string }) {
-  const ref = React.useRef<HTMLDivElement>(null);
+  const ref = React.useRef<HTMLElement>(null);
   const currentId = items.find((item) => item.current)?.id;
   React.useEffect(() => {
-    const row = ref.current;
+    const row = ref.current?.querySelector<HTMLDivElement>('[data-slot="scroll-row"]');
     const current = row?.querySelector<HTMLElement>('[aria-current="page"]');
     if (!row || !current || row.scrollWidth <= row.clientWidth) return;
     const bounds = row.getBoundingClientRect();
@@ -30,8 +31,8 @@ export function SectionNavigation({ items, label, className }: { items: SectionN
   }, [currentId]);
 
   return (
-    <nav aria-label={label} className={cn("w-full min-w-0 max-w-full", className)}>
-      <div ref={ref} className={cn(workspaceTabListClassName, "flex gap-1 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden")}>
+    <nav ref={ref} aria-label={label} className={cn("w-full min-w-0 max-w-full", className)}>
+      <ScrollRow focusable={false} className={workspaceTabListClassName}>
         {items.map(({ id, label: itemLabel, to, icon: Icon, current }) => (
           <Link
             key={id}
@@ -40,15 +41,15 @@ export function SectionNavigation({ items, label, className }: { items: SectionN
             preventScrollReset
             className={cn(
               workspaceTabTriggerClassName,
-              "inline-flex min-w-24 flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent text-center text-sm font-medium text-foreground/70 transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+              "inline-flex min-w-44 flex-[1_0_11rem] items-center justify-center gap-2 rounded-md border border-transparent px-4 text-center text-sm font-medium whitespace-nowrap text-foreground/70 transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
               current ? "bg-card text-foreground shadow-sm [&_svg]:text-section dark:border-section-border dark:bg-elevated" : "hover:bg-card/60 hover:text-foreground",
             )}
           >
             <Icon className="size-4 shrink-0" aria-hidden="true" />
-            <span>{itemLabel}</span>
+            <span className="min-w-0 truncate" title={itemLabel}>{itemLabel}</span>
           </Link>
         ))}
-      </div>
+      </ScrollRow>
     </nav>
   );
 }

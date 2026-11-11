@@ -4,6 +4,7 @@ import { Card } from "./card";
 import { IconChip } from "./icon-chip";
 import type { SectionAccent } from "@/lib/section-accent";
 import { withRecordOrigin } from "@/lib/record-navigation";
+import { cn } from "@/lib/utils";
 
 export type RelatedRecordLink = {
   id: string;
@@ -18,11 +19,11 @@ export type RelatedRecordLink = {
 };
 
 /** Whole-card links to related records. Counts and destinations belong to the composing feature. */
-export function RelatedRecordCards({ items, label }: { items: RelatedRecordLink[]; label: string }) {
+export function RelatedRecordCards({ items, label, descriptionMaxLength, className }: { items: RelatedRecordLink[]; label: string; descriptionMaxLength?: number; className?: string }) {
   const location = useLocation();
   const origin = `${location.pathname}${location.search}${location.hash}`;
   return (
-    <nav aria-label={label} className="related-record-grid grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))] sm:gap-3">
+    <nav aria-label={label} className={cn("related-record-grid grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))] sm:gap-3", className)}>
       {items.map((item) => (
         <Link
           key={item.id}
@@ -32,12 +33,12 @@ export function RelatedRecordCards({ items, label }: { items: RelatedRecordLink[
           aria-current={item.current ? "location" : undefined}
           className="group block min-w-0 rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
         >
-          <Card tone={item.current ? "featured" : "default"} className="h-full min-h-[4.75rem] flex-row items-center gap-3 p-3 transition-colors group-hover:border-section-border group-hover:bg-section-soft">
+          <Card tone={item.current ? "featured" : "default"} className={cn("h-full min-h-[4.75rem] flex-row items-center gap-3 p-3 transition-colors group-hover:border-section-border group-hover:bg-section-soft", descriptionMaxLength && "items-start")}>
             <IconChip icon={item.icon} tone={item.accent} size="sm" />
             <span className="min-w-0 break-words">
-              <span className={item.value === undefined ? "block text-sm font-semibold" : "block text-xs font-medium text-muted-foreground"}>{item.label}</span>
+              <span className={cn(item.value === undefined ? "block text-sm font-semibold" : "block text-xs font-medium text-muted-foreground", descriptionMaxLength && "line-clamp-2 min-h-10 leading-5")}>{item.label}</span>
               {item.value !== undefined && <span className="block text-base font-semibold tabular-nums">{item.value}</span>}
-              {item.description && <span className="mt-1 block text-xs text-muted-foreground">{item.description}</span>}
+              {item.description && <span className={cn("mt-1 block text-xs text-muted-foreground", descriptionMaxLength && "line-clamp-3")} title={descriptionMaxLength ? item.description : undefined}>{descriptionMaxLength && Array.from(item.description).length > descriptionMaxLength ? `${Array.from(item.description).slice(0, descriptionMaxLength - 1).join("").trimEnd()}…` : item.description}</span>}
             </span>
           </Card>
         </Link>

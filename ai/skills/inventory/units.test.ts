@@ -23,10 +23,11 @@ function stub(t: TestContext, target: object, key: string, implementation: unkno
   Reflect.set(target, key, implementation);
   t.after(() => Reflect.set(target, key, original));
 }
-function setup(t: TestContext, initial: UnitDefinition[] = [bottle]) {
+function setup(t: TestContext, initial: UnitDefinition[] = [bottle], usedUnits: string[] = []) {
   let units = initial;
   let revision: Date | null = new Date("2026-11-11T12:00:00Z");
   let writes = 0;
+  for (const model of [db.product, db.stockItem, db.recipeIngredient, db.shoppingItem, db.shoppingStaple, db.cookExtraIngredient, db.shoppingSessionItem, db.stockPurchase]) stub(t, model, "groupBy", async () => model === db.recipeIngredient ? usedUnits.map((unit) => ({ unit })) : []);
   stub(t, db.household, "findUnique", async ({ where }: { where: { id: string } }) => {
     assert.equal(where.id, user.householdId);
     return { unitDefinitions: units, unitDefinitionsUpdatedAt: revision };
@@ -64,6 +65,21 @@ it("does not equate unconfigured bags and pieces and keeps zero separate from a 
   assert.equal(unknown.result, null); assert.equal(unknown.comparable, false);
   const zero = data(await call("inventory_units", { fromUnit: "stronkje", toUnit: "kg", quantity: 0 })).conversion as typeof unknown;
   assert.equal(zero.result, 0); assert.equal(zero.comparable, false);
+});
+
+it("exposes built-ins and indirect relationships without mixing them into editable definitions", async (t) => {
+  setup(t, [bottle, { name: "krat wijn", referenceUnit: "fles", factor: 6, rounding: 1, aliases: [] }], ["stronkje"]);
+  const response = data(await call("inventory_units", { fromUnit: "krat wijn" }));
+  assert.equal((response.units as unknown[]).length, 2);
+  assert.ok((response.overview as { name: string }[]).some((unit) => unit.name === "mg"));
+  assert.ok((response.overview as { name: string; source: string }[]).some((unit) => unit.name === "stronkje" && unit.source === "used"));
+  const relationships = response.relationships as { links: { unit: { name: string }; factor: number; path: string[]; direct: boolean }[] };
+  const litres = relationships.links.find((link) => link.unit.name === "l")!;
+  assert.equal(litres.factor, 4.5); assert.equal(litres.direct, false);
+  assert.deepEqual(litres.path, ["krat wijn", "fles", "cl", "ml", "l"]);
+  assert.ok(!relationships.links.some((link) => ["mg", "g", "kg", "stuk", "zak"].includes(link.unit.name)));
+  const bag = data(await call("inventory_units", { fromUnit: "zak" })).relationships as { links: unknown[] };
+  assert.deepEqual(bag.links, []);
 });
 
 it("saves central units through a confirmed, revision-checked MCP write without touching stock", async (t) => {

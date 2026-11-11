@@ -156,8 +156,16 @@ The PUT checks `expectedUpdatedAt` so concurrent settings edits cannot overwrite
 The API stock check and cooking conversions load the same definitions, which travel with the recipe's
 stock-unit metadata for consistent browser calculations. No conversion is stored on a product.
 
-The settings section uses the shared `GeneralList` for searchable, remembered list/tile views. Add/edit
-opens a single-unit dialog; successful saves preserve unrelated definitions and the current revision.
+The settings section uses the shared `GeneralList` for searchable, remembered list/tile views, including
+all built-in measures and container names from the calculation engine. Aliases share one row; undefined
+container content is marked explicitly. `GET /api/household/units?overview=true` also reads distinct unit
+names already used on this household's products, stock, recipes, shopping and purchases. Names without a
+known definition appear as unconfigured, with a prefilled add-conversion action; usage never infers ratios.
+The relationship explorer follows references in both directions,
+shows direct/indirect paths and exact ratios without purchase rounding. Unconfigured containers are not
+linked to pieces or to other containers. `inventory_units` returns the same read-only `overview` and,
+when `fromUnit` is given, `relationships`; only `units` belongs in the editable catalogue.
+Add/edit opens a single-unit dialog; successful saves preserve unrelated definitions and the current revision.
 Renaming updates references to that unit in the same save. Removal requires confirmation and is blocked
 while other units still reference it. Concurrent-change errors retain the draft and offer a latest-list
 reload before retrying.

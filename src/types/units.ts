@@ -111,6 +111,40 @@ export const normalizeUnit = (unit: string | null | undefined) =>
     .replace(/\.$/, "")
     .replace(/\s+/g, " ");
 
+export type StandardUnit = { name: string; aliases: string[]; dimension: UnitDimension; referenceUnit: string | null; factor: number };
+
+/** All named built-ins, grouped by spelling. Containers have no assumed content or piece count. */
+export function standardUnits(): StandardUnit[] {
+  const measures = (values: Record<string, number>, dimension: UnitDimension, base: string): StandardUnit[] => {
+    const factors = [...new Set(Object.values(values))];
+    return factors.map((factor) => {
+      const [name, ...aliases] = Object.keys(values).filter((key) => values[key] === factor);
+      return { name: name!, aliases, dimension, referenceUnit: name === base ? null : base, factor };
+    });
+  };
+  const counts = new Map<string, string[]>();
+  const otherAliases: Record<string, string> = {
+    packs: "pack", package: "pack", packages: "pack", pak: "pack", pakje: "pack", pakjes: "pack", pakken: "pack", verpakking: "pack", verpakkingen: "pack",
+    doosje: "doos", dozen: "doos", box: "doos", boxes: "doos", schaaltje: "schaal", rollen: "rol", roll: "rol", rolls: "rol",
+  };
+  const group = (name: string) => isPieceUnit(name) ? "stuk" : packageForm(name) ?? otherAliases[name] ?? name;
+  // packageForm supplies identity keys; keep the familiar Dutch label in the overview.
+  const labels: Record<string, string> = { jar: "pot", bottle: "fles", can: "blik", bag: "zak" };
+  for (const name of COUNT) {
+    if (!name) continue;
+    const key = group(name);
+    counts.set(key, [...(counts.get(key) ?? []), name]);
+  }
+  return [
+    ...measures(MASS, "mass", "g"), ...measures(VOLUME, "volume", "ml"),
+    ...[...counts].map(([key, names]) => {
+      const name = labels[key] ?? key;
+      return { name, aliases: names.filter((alias) => alias !== name), dimension: "count" as const, referenceUnit: null, factor: 1 };
+    }),
+    { name: "tros", aliases: [...BUNDLE].filter((name) => name !== "tros"), dimension: "bundle", referenceUnit: null, factor: 1 },
+  ];
+}
+
 /** Container aliases describe a physical variant; a jar is never silently a tube or bottle. */
 export function packageForm(unit: string | null | undefined): string | null {
   const key = normalizeUnit(unit);

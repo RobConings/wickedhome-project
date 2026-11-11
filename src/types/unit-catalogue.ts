@@ -30,7 +30,7 @@ export const unitCatalogueInputSchema = z.object({
   }),
 });
 export type UnitCatalogueInput = z.infer<typeof unitCatalogueInputSchema>;
-export type UnitCatalogue = { units: UnitDefinition[]; updatedAt: string | null };
+export type UnitCatalogue = { units: UnitDefinition[]; updatedAt: string | null; usedUnits?: string[] };
 
 export function readUnitDefinitions(value: unknown): UnitDefinition[] {
   const parsed = z.array(unitDefinitionSchema).safeParse(value);

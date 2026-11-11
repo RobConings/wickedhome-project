@@ -5,17 +5,18 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FormField } from "@/components/shared/form-field";
 import { unitDefinitionSchema } from "@/types/unit-catalogue";
+import { unitOverview } from "@/types/unit-overview";
 import type { UnitDefinition } from "@/types/units";
 
-type Props = { unit?: UnitDefinition; units: UnitDefinition[]; busy: boolean; error: string | null; onSave: (unit: UnitDefinition) => Promise<void>; onClose: () => void; onReturnFocus?: () => void; onReload?: () => Promise<void> };
+type Props = { unit?: UnitDefinition; initialName?: string; units: UnitDefinition[]; busy: boolean; error: string | null; onSave: (unit: UnitDefinition) => Promise<void>; onClose: () => void; onReturnFocus?: () => void; onReload?: () => Promise<void> };
 
 /** Edit one readable conversion; the parent validates it against all other central definitions. */
-export function UnitFormDialog({ unit, units, busy, error, onSave, onClose, onReturnFocus, onReload }: Props) {
+export function UnitFormDialog({ unit, initialName, units, busy, error, onSave, onClose, onReturnFocus, onReload }: Props) {
   const { t } = useTranslation("units");
   const { t: common } = useTranslation();
   const prefix = React.useId();
   const references = `${prefix}-references`;
-  const [draft, setDraft] = React.useState({ name: unit?.name ?? "", referenceUnit: unit?.referenceUnit ?? "", factor: unit ? String(unit.factor) : "", rounding: String(unit?.rounding ?? 1), aliases: unit?.aliases.join(", ") ?? "" });
+  const [draft, setDraft] = React.useState({ name: unit?.name ?? initialName ?? "", referenceUnit: unit?.referenceUnit ?? "", factor: unit ? String(unit.factor) : "", rounding: String(unit?.rounding ?? 1), aliases: unit?.aliases.join(", ") ?? "" });
   const [errors, setErrors] = React.useState<Record<string, string[]>>({});
   const amountId = `${prefix}-factor`;
   const referenceId = `${prefix}-referenceUnit`;
@@ -57,7 +58,7 @@ export function UnitFormDialog({ unit, units, busy, error, onSave, onClose, onRe
                 <Input id={referenceId} value={draft.referenceUnit} onChange={(event) => change("referenceUnit", event.target.value)} list={references} autoComplete="off" maxLength={20} placeholder="cl" />
               </FormField>
             </div>
-            <datalist id={references}>{[...new Set(["g", "kg", "ml", "cl", "l", "stuk", "pcs", ...units.filter((item) => item.name !== unit?.name).flatMap((item) => [item.name, ...item.aliases])])].map((name) => <option key={name} value={name} />)}</datalist>
+            <datalist id={references}>{unitOverview(units).filter((item) => item.name !== unit?.name).flatMap((item) => [item.name, ...item.aliases]).map((name) => <option key={name} value={name} />)}</datalist>
           </div>
           <FormField label={t("aliases")} htmlFor={`${prefix}-aliases`} errors={errors.aliases} optionalLabel={common("form.optional")} description={t("aliasesHelp")}>
             <Input id={`${prefix}-aliases`} value={draft.aliases} onChange={(event) => change("aliases", event.target.value)} autoComplete="off" maxLength={500} />

@@ -1,4 +1,5 @@
 import { getProductContext } from "@/api/catalogue/catalogue.service";
+import { linkedUnits, unitOverview } from "@/types/unit-overview";
 import { z } from "zod";
 import { stockPurchaseInputSchema } from "@/features/inventory/types/purchases";
 import { purchaseReview, recordStockPurchase } from "@/api/inventory/purchases.service";
@@ -46,7 +47,7 @@ import { getOffer } from "../recipes/offers";
 import { stockPriority } from "../shopping/stock-priority";
 import { fold } from "@ai/core/text-match";
 import { productSetup } from "./product-setup";
-import { getUnitCatalogue, saveUnitCatalogue } from "@/api/household/units.service";
+import { getUnitCatalogue, getUnitCatalogueOverview, saveUnitCatalogue } from "@/api/household/units.service";
 import { unitCatalogueInputSchema } from "@/types/unit-catalogue";
 import { stockUnitsPer, unitInfo, unitRounding } from "@/types/units";
 import "./prepare-product";
@@ -115,19 +116,21 @@ const noChildren = (ctx: AssistantToolContext) => {
 
 registerAssistantTool({
   name: "inventory.units",
-  description: "Read the household's central units, reference relationships, aliases, purchase rounding and revision. Optionally check a conversion; never infer a bag equals one piece or invent a head's weight. A zero quantity is zero even when a positive conversion is unknown. Read this before inventory_save_units. Definitions are household-wide, not product-specific.",
+  description: "Read all standard and household units, reference relationships, aliases, purchase rounding and revision. overview includes built-ins; units contains only editable definitions. Give fromUnit alone to explore direct and indirect relationships and paths, or also toUnit to check a conversion. Never infer a bag equals one piece or invent a head's weight. A zero quantity is zero even when a positive conversion is unknown. Read this before inventory_save_units. Definitions are household-wide, not product-specific.",
   input: z.object({
     fromUnit: z.string().trim().min(1).max(20).optional(),
     toUnit: z.string().trim().min(1).max(20).optional(),
     quantity: z.number().min(0).max(100_000).default(1),
-  }).refine((input) => Boolean(input.fromUnit) === Boolean(input.toUnit), { message: "Give both fromUnit and toUnit" }),
+  }).refine((input) => !input.toUnit || Boolean(input.fromUnit), { message: "Give fromUnit when specifying toUnit" }),
   permission: "read", confirm: "never",
   activity: { en: "Checked units and conversions", nl: "Eenheden en omzettingen bekeken" },
   run: async (ctx, input) => {
-    const catalogue = await getUnitCatalogue(ctx.householdId);
+    const catalogue = await getUnitCatalogueOverview(ctx.householdId);
     const per = input.fromUnit && input.toUnit ? stockUnitsPer(input.fromUnit, { unit: input.toUnit, packageAmount: null, packageUnit: null, units: catalogue.units }) : null;
     return {
       ...catalogue,
+      overview: unitOverview(catalogue.units, catalogue.usedUnits),
+      ...(input.fromUnit && { relationships: linkedUnits(input.fromUnit, catalogue.units, catalogue.usedUnits) }),
       scope: "household", settingsPath: "/settings?section=units",
       nativeUnits: { mass: ["mg", "g", "kg"], volume: ["ml", "cl", "dl", "l"], count: ["stuk", "pcs"], bundle: ["tros"] },
       ...(input.fromUnit && input.toUnit && { conversion: {

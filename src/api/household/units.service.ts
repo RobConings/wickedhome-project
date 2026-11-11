@@ -8,6 +8,23 @@ export async function getUnitCatalogue(householdId: string): Promise<UnitCatalog
   return { units: readUnitDefinitions(row.unitDefinitions), updatedAt: row.unitDefinitionsUpdatedAt?.toISOString() ?? null };
 }
 
+/** Read-only names already used by this household; no ratios are inferred from usage. */
+export async function getUnitCatalogueOverview(householdId: string): Promise<UnitCatalogue> {
+  const [catalogue, products, stock, ingredients, shopping, staples, extras, sessionItems, purchases] = await Promise.all([
+    getUnitCatalogue(householdId),
+    db.product.groupBy({ by: ["unit", "packageUnit"], where: { householdId } }),
+    db.stockItem.groupBy({ by: ["unit"], where: { householdId } }),
+    db.recipeIngredient.groupBy({ by: ["unit"], where: { recipe: { householdId } } }),
+    db.shoppingItem.groupBy({ by: ["unit"], where: { householdId } }),
+    db.shoppingStaple.groupBy({ by: ["unit"], where: { householdId } }),
+    db.cookExtraIngredient.groupBy({ by: ["unit"], where: { entry: { householdId } } }),
+    db.shoppingSessionItem.groupBy({ by: ["unit"], where: { session: { householdId } } }),
+    db.stockPurchase.groupBy({ by: ["unit", "purchasedUnit"], where: { householdId } }),
+  ]);
+  const names = [...products.flatMap((row) => [row.unit, row.packageUnit]), ...[stock, ingredients, shopping, staples, extras, sessionItems].flatMap((rows) => rows.map((row) => row.unit)), ...purchases.flatMap((row) => [row.unit, row.purchasedUnit])];
+  return { ...catalogue, usedUnits: [...new Set(names.map((name) => name?.trim()).filter((name): name is string => Boolean(name)))].sort() };
+}
+
 /** Shared by recipes, cooking and any caller converting household units. */
 export async function listUnitDefinitions(householdId: string) {
   return (await getUnitCatalogue(householdId)).units;

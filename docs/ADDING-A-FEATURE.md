@@ -156,6 +156,9 @@ write only the parts that are really about your domain (a row, a tile, a picker)
 This also applies to settings and configuration catalogues. Present them as searchable `GeneralList`
 rows/tiles, with add/edit in a focused dialog. Do not expand an edit form for every stored record on the
 overview; the overview should make names, relationships and available actions easy to scan on a phone.
+Settings navigation tiles cap summaries at 90 characters and three lines, align content at the top and
+use equal row heights. Routed `SectionNavigation` links have equal widths and gaps; long rows scroll
+inside the navigation without wrapping labels or squeezing icons into adjacent tabs.
 
 **Lists: `GeneralList`** (`components/shared/general-list.tsx`). Every list gets the same search field
 (debounced, clear button, Esc clears), a **list/tiles switch** that is remembered per list

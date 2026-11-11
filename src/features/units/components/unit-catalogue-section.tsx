@@ -1,5 +1,5 @@
 import * as React from "react";
-import { MoreHorizontalIcon, PencilIcon, PlusIcon, RulerIcon, Trash2Icon } from "lucide-react";
+import { LinkIcon, MoreHorizontalIcon, PencilIcon, PlusIcon, RulerIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -11,11 +11,13 @@ import { GeneralList } from "@/components/shared/general-list";
 import { IconChip } from "@/components/shared/icon-chip";
 import { api, ApiRequestError } from "@/lib/api-client";
 import { currentLocale } from "@/lib/i18n";
+import { unitOverview, type UnitOverviewItem } from "@/types/unit-overview";
 import { unitCatalogueInputSchema, type UnitCatalogue, type UnitCatalogueInput } from "@/types/unit-catalogue";
-import { unitDefinitionKey, unitInfo, type UnitDefinition } from "@/types/units";
+import { unitDefinitionKey, type UnitDefinition } from "@/types/units";
 import { UnitFormDialog } from "./unit-form-dialog";
+import { UnitLinksDialog } from "./unit-links-dialog";
 
-const fetchCatalogue = () => api.get<UnitCatalogue>("/household/units");
+const fetchCatalogue = () => api.get<UnitCatalogue>("/household/units?overview=true");
 const saveCatalogue = (input: UnitCatalogueInput) => api.put<UnitCatalogue>("/household/units", input);
 
 /** Shared list presentation; individual edits still preserve the catalogue's revision and other units. */
@@ -24,12 +26,15 @@ export function UnitCatalogueSection({ canManage, initialData, onSave = saveCata
   const { t: common } = useTranslation();
   const [catalogue, setCatalogue] = React.useState(initialData ?? null);
   const [editing, setEditing] = React.useState<UnitDefinition | "new" | null>(null);
+  const [newUnitName, setNewUnitName] = React.useState("");
   const [deleting, setDeleting] = React.useState<UnitDefinition | null>(null);
+  const [exploring, setExploring] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [loading, setLoading] = React.useState(!initialData);
   const [error, setError] = React.useState<string | null>(null);
   const [conflict, setConflict] = React.useState(false);
   const addRef = React.useRef<HTMLButtonElement>(null);
+  const linksRef = React.useRef<HTMLButtonElement>(null);
   const returnFocus = React.useRef<HTMLElement | null>(null);
   const locale = currentLocale();
   const numbers = React.useMemo(() => new Intl.NumberFormat(locale === "nl" ? "nl-BE" : "en-BE", { maximumFractionDigits: 8 }), [locale]);
@@ -58,7 +63,7 @@ export function UnitCatalogueSection({ canManage, initialData, onSave = saveCata
       return false;
     }
     setBusy(true); setError(null);
-    try { setCatalogue(await onSave(parsed.data)); setConflict(false); return true; }
+    try { const saved = await onSave(parsed.data); setCatalogue({ ...saved, usedUnits: catalogue.usedUnits }); setConflict(false); return true; }
     catch (error) {
       const stale = error instanceof ApiRequestError && error.status === 409;
       setConflict(stale); setError(t(stale ? "conflict" : "saveFailed")); return false;
@@ -74,10 +79,15 @@ export function UnitCatalogueSection({ canManage, initialData, onSave = saveCata
     if (await persist(units)) { setEditing(null); toast.success(t("savedUnit", { name: unit.name })); }
   }
 
-  function edit(unit: UnitDefinition | "new") {
+  function edit(unit: UnitDefinition | "new", initialName = "") {
     if (document.activeElement instanceof HTMLButtonElement) returnFocus.current = document.activeElement;
-    setError(null); setConflict(false); setEditing(unit);
+    setError(null); setConflict(false); setNewUnitName(initialName); setEditing(unit);
   }
+  function explore(name: string) {
+    if (document.activeElement instanceof HTMLElement) returnFocus.current = document.activeElement;
+    setExploring(name);
+  }
+  function restoreFocus() { (returnFocus.current?.isConnected ? returnFocus.current : linksRef.current)?.focus(); }
   const addButton = canManage && <Button ref={addRef} disabled={busy || !catalogue || catalogue.units.length >= 100} onClick={() => edit("new")}><PlusIcon />{t("add")}</Button>;
   const actions = (unit: UnitDefinition) => canManage && <DropdownMenu modal={false} onOpenChange={(open) => { if (open && document.activeElement instanceof HTMLElement) returnFocus.current = document.activeElement; }}>
     <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" disabled={busy} aria-label={t("actionsFor", { name: unit.name })}><MoreHorizontalIcon /></Button></DropdownMenuTrigger>
@@ -86,39 +96,46 @@ export function UnitCatalogueSection({ canManage, initialData, onSave = saveCata
       <DropdownMenuItem variant="destructive" onSelect={() => { setError(null); setDeleting(unit); }}><Trash2Icon />{t("remove")}</DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>;
-  const details = (unit: UnitDefinition) => <div className="min-w-0 flex-1 space-y-1">
-    {canManage ? <button type="button" disabled={busy} onClick={() => edit(unit)} className="text-left font-semibold break-words underline-offset-4 hover:underline focus-visible:underline" aria-label={t("editNamed", { name: unit.name })}>{unit.name}</button> : <p className="font-semibold break-words">{unit.name}</p>}
-    <p className="text-sm break-words tabular-nums">1 {unit.name} = {numbers.format(unit.factor)} {unit.referenceUnit}</p>
-    <p className="text-xs text-muted-foreground">{t(`categories.${unitInfo(unit.name, catalogue?.units)?.dimension ?? "other"}`)} · {t("roundingSummary", { amount: numbers.format(unit.rounding) })}</p>
+  const details = (unit: UnitOverviewItem) => <div className="min-w-0 flex-1 space-y-1">
+    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1"><button type="button" onClick={() => explore(unit.name)} className="text-left font-semibold break-words underline-offset-4 hover:underline focus-visible:underline" aria-label={t("links.forUnit", { name: unit.name })}>{unit.name}</button><span className="text-xs text-muted-foreground">{t(`sources.${unit.source}`)}</span></div>
+    <p className="text-sm break-words tabular-nums">{unit.referenceUnit ? <>1 {unit.name} = {numbers.format(unit.factor)} {unit.referenceUnit}</> : t(unit.source === "used" ? "undefinedConversion" : unit.needsDefinition ? "undefinedContent" : "baseUnit")}</p>
+    <p className="text-xs text-muted-foreground">{t(`categories.${unit.dimension ?? "other"}`)}{unit.source === "custom" && <> · {t("roundingSummary", { amount: numbers.format(unit.rounding) })}</>}</p>
     {unit.aliases.length > 0 && <p className="text-xs break-words text-muted-foreground">{t("aliasesSummary", { names: unit.aliases.join(", ") })}</p>}
   </div>;
+  const rowActions = (unit: UnitOverviewItem) => {
+    const definition = catalogue?.units.find((item) => item.name === unit.name);
+    if (definition) return actions(definition);
+    return canManage && unit.needsDefinition && <Button variant="ghost" size="icon" disabled={busy || !catalogue || catalogue.units.length >= 100} onClick={() => edit("new", unit.name)} aria-label={t("defineNamed", { name: unit.name })}><PencilIcon /></Button>;
+  };
 
   return <div className="space-y-4">
     <p className="text-sm text-muted-foreground">{t("listHint")}</p>
     {error && !editing && catalogue && <div className="space-y-2"><p role="alert" className="text-sm text-destructive">{error}</p>{conflict && <Button variant="outline" disabled={busy} onClick={() => void reload()}>{t("reload")}</Button>}</div>}
     <GeneralList
       label={t("title")}
-      items={[...(catalogue?.units ?? [])].sort((a, b) => a.name.localeCompare(b.name, locale))}
+      items={catalogue ? unitOverview(catalogue.units, catalogue.usedUnits).sort((a, b) => a.name.localeCompare(b.name, locale)) : []}
       getKey={(unit) => unit.name}
-      renderRow={(unit) => <div className="flex items-start gap-3"><IconChip icon={RulerIcon} size="sm" />{details(unit)}{actions(unit)}</div>}
-      renderTile={(unit) => <Card><div className="flex items-start gap-3"><IconChip icon={RulerIcon} size="sm" />{details(unit)}{actions(unit)}</div></Card>}
+      renderRow={(unit) => <div className="flex items-start gap-3"><IconChip icon={RulerIcon} size="sm" />{details(unit)}{rowActions(unit)}</div>}
+      renderTile={(unit) => <Card><div className="flex items-start gap-3"><IconChip icon={RulerIcon} size="sm" />{details(unit)}{rowActions(unit)}</div></Card>}
       search={{ param: "unitQ", label: t("search"), keys: (unit) => [unit.name, unit.referenceUnit, ...unit.aliases] }}
       storageKey="unit-catalogue" viewParam="unitView" defaultView="list"
-      actions={addButton}
+      actions={<><Button ref={linksRef} variant="outline" disabled={!catalogue} onClick={() => explore("")}><LinkIcon />{t("links.title")}</Button>{addButton}</>}
       loading={loading}
       error={!catalogue && error ? error : undefined}
       onRetry={() => void reload()}
       emptyState={<EmptyState icon={RulerIcon} title={t("empty")} description={t("emptyDescription")} action={addButton} />}
     />
     {canManage && editing && catalogue && <UnitFormDialog
-      key={editing === "new" ? "new" : editing.name}
+      key={editing === "new" ? `new-${newUnitName}` : editing.name}
       unit={editing === "new" ? undefined : editing}
+      initialName={newUnitName}
       units={catalogue.units}
       busy={busy} error={error} onSave={saveUnit}
       onClose={() => { if (!busy) { setEditing(null); setError(null); } }}
-      onReturnFocus={() => { (returnFocus.current?.isConnected ? returnFocus.current : addRef.current)?.focus(); }}
+      onReturnFocus={restoreFocus}
       onReload={conflict ? reload : undefined}
     />}
+    {exploring !== null && catalogue && <UnitLinksDialog initialUnit={exploring} units={catalogue.units} usedUnits={catalogue.usedUnits} onClose={() => setExploring(null)} onReturnFocus={restoreFocus} />}
     <ConfirmDialog open={deleting !== null} onOpenChange={(open) => { if (!open) setDeleting(null); }} returnFocusRef={returnFocus}
       title={t("deleteTitle", { name: deleting?.name })} description={t("deleteDescription")}
       confirmLabel={t("remove")} cancelLabel={common("actions.cancel")} destructive
