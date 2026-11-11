@@ -15,6 +15,7 @@ import {
   type StockMovementInput,
   type StockMovementReason,
   type StockCountInput,
+  type StockCountExclusionInput,
 } from "@/features/inventory/types/inventory";
 import type { ProductCategory, RestockInput, RestockSuggestion, ShoppingItem } from "@/features/shopping/types/shopping";
 import { convertAmount, normalizeUnit } from "@/types/units";
@@ -67,6 +68,7 @@ function toStockItem(row: StockRow): StockItem {
     expiresOn: row.expiresOn ? fromDate(row.expiresOn) : null,
     isLow: isBelowMinimum(quantity, minQuantity),
     updatedAt: row.updatedAt.toISOString(),
+    countExcludedUntilEmpty: row.countExcludedUntilEmpty ?? false,
   };
 }
 
@@ -144,11 +146,11 @@ async function applyChangeLogged(
     let next: StockRow;
     if (extra.expectedUpdatedAt) {
       const saved = await tx.stockItem.updateMany({
-        where: { id: row.id, householdId: actor.householdId, updatedAt: extra.expectedUpdatedAt }, data: { quantity: after, ...(extra.counted && { lastCountedAt: new Date() }) },
+        where: { id: row.id, householdId: actor.householdId, updatedAt: extra.expectedUpdatedAt }, data: { quantity: after, ...(after === 0 && { countExcludedUntilEmpty: false }), ...(extra.counted && { lastCountedAt: new Date() }) },
       });
       if (!saved.count) throw conflict("Stock changed during counting. Refresh and check the counted quantity again.");
       next = await tx.stockItem.findFirstOrThrow({ where: { id: row.id, householdId: actor.householdId }, include: stockInclude });
-    } else next = await tx.stockItem.update({ where: { id: row.id }, data: { quantity: after }, include: stockInclude });
+    } else next = await tx.stockItem.update({ where: { id: row.id }, data: { quantity: after, ...(after === 0 && { countExcludedUntilEmpty: false }) }, include: stockInclude });
     const state = row.product.shoppingRestockState ?? "ACTIVE";
     const nextState = nextShoppingRestockState(state, applied);
     if (nextState !== state) {
@@ -369,6 +371,23 @@ async function setStockCountImpl(actor: Actor, id: string, input: StockCountInpu
   return applyChange(actor, row, round(input.quantity - row.quantity.toNumber()), "manual_correction", {
     expectedUpdatedAt: row.updatedAt, counted: true,
     note: input.note ?? (actor.locale === "nl" ? "Voorraadtelling" : "Stock count"),
+  });
+}
+
+/** Persist a counting preference, separately from counts, stock movements and shopping thresholds. */
+export async function setStockCountExclusion(actor: Actor, id: string, input: StockCountExclusionInput): Promise<StockItem> {
+  return db.$transaction(async (tx) => {
+    await lockStock(tx, actor.householdId);
+    const row = await tx.stockItem.findFirst({ where: { id, householdId: actor.householdId }, include: stockInclude });
+    if (!row) throw notFound("Stock item not found");
+    if (row.updatedAt.toISOString() !== input.expectedUpdatedAt) throw conflict("Stock changed during counting. Refresh and try again.");
+    if (input.excluded && row.quantity.toNumber() <= 0) throw badRequest("Empty stock cannot be excluded until empty");
+    const saved = await tx.stockItem.updateMany({
+      where: { id, householdId: actor.householdId, updatedAt: row.updatedAt },
+      data: { countExcludedUntilEmpty: input.excluded },
+    });
+    if (!saved.count) throw conflict("Stock changed during counting. Refresh and try again.");
+    return toStockItem(await tx.stockItem.findFirstOrThrow({ where: { id, householdId: actor.householdId }, include: stockInclude }));
   });
 }
 

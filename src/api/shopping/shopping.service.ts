@@ -1069,7 +1069,7 @@ export async function groupProductIds(householdId: string, ownerId: string): Pro
 
 type Actor = Pick<SessionUser, "id" | "householdId" | "locale">;
 
-const mergeSelect = { id: true, placeId: true, quantity: true, unit: true, minQuantity: true, expiresOn: true, lastCountedAt: true } as const;
+const mergeSelect = { id: true, placeId: true, quantity: true, unit: true, minQuantity: true, expiresOn: true, lastCountedAt: true, countExcludedUntilEmpty: true } as const;
 type MergeRow = Prisma.StockItemGetPayload<{ select: typeof mergeSelect }>;
 const toMergeable = (row: MergeRow) => ({
   id: row.id,
@@ -1113,6 +1113,7 @@ async function joinGroup(tx: Prisma.TransactionClient, actor: Actor, memberId: s
       where: { id: step.targetId },
       data: {
         quantity: step.quantity,
+        countExcludedUntilEmpty: [...source, ...target].some((row) => (row.id === step.sourceId || row.id === step.targetId) && row.quantity.toNumber() > 0 && row.countExcludedUntilEmpty),
         // Conservatively review receipts before either confirmed count after the locations merge.
         lastCountedAt: [...source, ...target].filter((row) => row.id === step.sourceId || row.id === step.targetId).reduce<Date | null>((latest, row) => row.lastCountedAt && (!latest || row.lastCountedAt > latest) ? row.lastCountedAt : latest, null),
         unit: step.unit,

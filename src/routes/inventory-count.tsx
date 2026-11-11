@@ -16,5 +16,5 @@ export function Component() {
   const user = useCurrentUser();
   const data = useLoaderData<typeof loader>();
   if (!canManageStock(user.role)) return <Navigate to="/inventory" replace />;
-  return <StocktakeScreen items={data.stock} images={Object.fromEntries(data.products.map((product) => [product.id, product.imageUrl]))} />;
+  return <StocktakeScreen items={data.stock} products={data.products} images={Object.fromEntries(data.products.map((product) => [product.id, product.imageUrl]))} />;
 }

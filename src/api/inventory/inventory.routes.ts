@@ -6,6 +6,7 @@ import {
   stockItemUpdateSchema,
   stockMovementInputSchema,
   stockCountInputSchema,
+  stockCountExclusionSchema,
 } from "@/features/inventory/types/inventory";
 import { idSchema } from "@/types/common";
 import { badRequest, parse } from "../lib/http";
@@ -19,6 +20,7 @@ import {
   scanCode,
   updateStockItem,
   setStockCount,
+  setStockCountExclusion,
 } from "./inventory.service";
 
 import { stockPurchaseInputSchema } from "@/features/inventory/types/purchases";
@@ -52,6 +54,11 @@ inventoryRouter.put("/stock/:id", canManage, async (req, res) => {
 inventoryRouter.put("/stock/:id/count", canManage, async (req, res) => {
   const id = parse(idSchema, req.params.id);
   res.json(await setStockCount(currentUser(req), id, parse(stockCountInputSchema, req.body)));
+});
+
+inventoryRouter.put("/stock/:id/count-exclusion", canManage, async (req, res) => {
+  const id = parse(idSchema, req.params.id);
+  res.json(await setStockCountExclusion(currentUser(req), id, parse(stockCountExclusionSchema, req.body)));
 });
 
 inventoryRouter.delete("/stock/:id", canManage, async (req, res) => {

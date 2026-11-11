@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { it, type TestContext } from "node:test";
 import { stockCountInputSchema } from "@/features/inventory/types/inventory";
 import { db, Prisma } from "../lib/db";
-import { addMovement, setStockCount } from "./inventory.service";
+import { addMovement, setStockCount, setStockCountExclusion } from "./inventory.service";
 
 const actor = { id: "rob", householdId: "home", locale: "nl" as const };
 const decimal = (value: number) => new Prisma.Decimal(value);
@@ -17,19 +17,25 @@ function setup(t: TestContext, min: number | null = null) {
   let stock = {
     id: "stock", householdId: "home", productId: "milk", placeId: "kitchen", quantity: decimal(2), unit: "pak",
     minQuantity: min === null ? null : decimal(min), expiresOn: new Date("2026-11-10"), updatedAt: new Date("2026-10-31T10:00:00Z"),
+    countExcludedUntilEmpty: false, lastCountedAt: null as Date | null,
     product: { name: "Melk", unit: "pak", shoppingRestockState: "ACTIVE" }, place: { name: "Keuken" },
   };
   const movements: { delta: number; quantityAfter: number; reason: string; note?: string | null }[] = [];
   stub(t, db.stockItem, "findFirst", async ({ where }: { where: { id: string; householdId: string } }) => where.id === stock.id && where.householdId === stock.householdId ? stock : null);
   stub(t, db.stockItem, "findFirstOrThrow", async () => stock);
   stub(t, db, "$queryRaw", async () => []);
-  stub(t, db.stockItem, "update", async ({ data }: { data: { quantity: number } }) => {
-    stock = { ...stock, quantity: decimal(data.quantity), updatedAt: new Date(stock.updatedAt.getTime() + 1) };
+  type Update = { quantity?: number; countExcludedUntilEmpty?: boolean; lastCountedAt?: Date };
+  function apply(data: Update) {
+    stock = { ...stock, ...data, quantity: decimal(data.quantity ?? stock.quantity.toNumber()), updatedAt: new Date(stock.updatedAt.getTime() + 1) };
+    return stock;
+  }
+  stub(t, db.stockItem, "update", async ({ data }: { data: Update }) => {
+    apply(data);
     return stock;
   });
-  const save = stub(t, db.stockItem, "updateMany", async ({ where, data }: { where: { id: string; householdId: string; updatedAt: Date }; data: { quantity: number } }) => {
+  const save = stub(t, db.stockItem, "updateMany", async ({ where, data }: { where: { id: string; householdId: string; updatedAt: Date }; data: Update }) => {
     if (where.id !== stock.id || where.householdId !== stock.householdId || where.updatedAt.getTime() !== stock.updatedAt.getTime()) return { count: 0 };
-    stock = { ...stock, quantity: decimal(data.quantity), updatedAt: new Date(stock.updatedAt.getTime() + 1) };
+    apply(data);
     return { count: 1 };
   });
   stub(t, db.stockMovement, "create", async ({ data }: { data: typeof movements[number] }) => { movements.push(data); return { id: "movement" }; });
@@ -101,4 +107,56 @@ it("a scan that started before a count adds to the new count instead of overwrit
   assert.equal(read().quantity.toNumber(), 6);
   assert.equal(movements[0]?.delta, 1);
   assert.equal(movements[0]?.quantityAfter, 6);
+});
+
+it("persists an exclusion without changing stock, minimum, last count or movements, and can undo it", async (t) => {
+  const { read, movements } = setup(t, 1);
+  const excluded = await setStockCountExclusion(actor, "stock", { excluded: true, expectedUpdatedAt: read().updatedAt.toISOString() });
+  assert.equal(excluded.countExcludedUntilEmpty, true);
+  assert.equal(excluded.quantity, 2);
+  assert.equal(excluded.minQuantity, 1);
+  assert.equal(read().lastCountedAt, null);
+  assert.deepEqual(movements, []);
+  const included = await setStockCountExclusion(actor, "stock", { excluded: false, expectedUpdatedAt: excluded.updatedAt });
+  assert.equal(included.countExcludedUntilEmpty, false);
+  assert.equal(included.quantity, 2);
+});
+
+it("keeps an exclusion through counts and consumption until depletion, then stays included after restocking", async (t) => {
+  const { read } = setup(t);
+  await setStockCountExclusion(actor, "stock", { excluded: true, expectedUpdatedAt: read().updatedAt.toISOString() });
+  const count = await setStockCount(actor, "stock", { quantity: 3, expectedUpdatedAt: read().updatedAt.toISOString() });
+  assert.equal(count.stockItem.countExcludedUntilEmpty, true);
+  const partial = await addMovement(actor, "stock", { delta: -1, reason: "cooked" });
+  assert.equal(partial.stockItem.countExcludedUntilEmpty, true);
+  const empty = await addMovement(actor, "stock", { delta: -2, reason: "scan_use" });
+  assert.equal(empty.stockItem.quantity, 0);
+  assert.equal(empty.stockItem.countExcludedUntilEmpty, false);
+  const restocked = await addMovement(actor, "stock", { delta: 4, reason: "manual_correction" });
+  assert.equal(restocked.stockItem.countExcludedUntilEmpty, false);
+});
+
+it("also clears an exclusion when an explicit count sets the stock to zero", async (t) => {
+  const { read } = setup(t);
+  await setStockCountExclusion(actor, "stock", { excluded: true, expectedUpdatedAt: read().updatedAt.toISOString() });
+  const result = await setStockCount(actor, "stock", { quantity: 0, expectedUpdatedAt: read().updatedAt.toISOString() });
+  assert.equal(result.stockItem.countExcludedUntilEmpty, false);
+});
+
+it("rejects exclusions for stale revisions, empty stock and another household", async (t) => {
+  const { read, externalChange } = setup(t);
+  const expectedUpdatedAt = read().updatedAt.toISOString();
+  externalChange(4);
+  await assert.rejects(setStockCountExclusion(actor, "stock", { excluded: true, expectedUpdatedAt }), /Stock changed/);
+  await assert.rejects(setStockCountExclusion({ ...actor, householdId: "other" }, "stock", { excluded: true, expectedUpdatedAt: read().updatedAt.toISOString() }), /not found/i);
+  externalChange(0);
+  await assert.rejects(setStockCountExclusion(actor, "stock", { excluded: true, expectedUpdatedAt: read().updatedAt.toISOString() }), /Empty stock/);
+  assert.equal(read().countExcludedUntilEmpty, false);
+});
+
+it("does not save an exclusion if the row changes between reading and writing", async (t) => {
+  const { read, externalChange } = setup(t);
+  stub(t, db.stockItem, "updateMany", async () => { externalChange(0); return { count: 0 }; });
+  await assert.rejects(setStockCountExclusion(actor, "stock", { excluded: true, expectedUpdatedAt: read().updatedAt.toISOString() }), /Stock changed/);
+  assert.equal(read().countExcludedUntilEmpty, false);
 });

@@ -9,6 +9,7 @@ import type {
   StockItemUpdateInput,
   StockMovementInput,
   StockCountInput,
+  StockCountExclusionInput,
 } from "../types/inventory";
 
 const enc = encodeURIComponent;
@@ -30,6 +31,8 @@ export const addStockMovement = (id: string, input: StockMovementInput) =>
   api.post<StockChangeResult>(`/inventory/stock/${enc(id)}/movements`, input);
 export const saveStockCount = (id: string, input: StockCountInput) =>
   api.put<StockChangeResult>(`/inventory/stock/${enc(id)}/count`, input);
+export const saveStockCountExclusion = (id: string, input: StockCountExclusionInput) =>
+  api.put<StockItem>(`/inventory/stock/${enc(id)}/count-exclusion`, input);
 export const fetchProductStock = (productId: string) => api.get<ProductStock>(`/inventory/products/${enc(productId)}`);
 export const scanCode = (code: string) => api.get<ScanResult>(`/inventory/scan?code=${enc(code)}`);
 

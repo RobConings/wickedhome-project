@@ -27,6 +27,8 @@ model StockItem {
   expiresOn   DateTime?       @db.Date
   movements   StockMovement[]
   lastCountedAt DateTime?
+  /// Skip physical counts for this location until its quantity next reaches zero.
+  countExcludedUntilEmpty Boolean @default(false)
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
 

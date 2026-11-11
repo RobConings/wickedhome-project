@@ -4,6 +4,16 @@ The stock overview opens `/inventory/count`, a full-page physical-count round fo
 room progress, product photos, encouragement and a completion trophy: choose all locations or one
 location, enter each product's actual count, save and continue, confirm the recorded count, or skip.
 Each confirmed count is saved immediately. Empty input never means zero; an explicit zero is valid.
+The queue resolves catalogue alternatives to their stock owner and counts each shared pool once per
+storage location. Linked brand names are shown together; shared-stock projections are never summed.
+During a count, "Skip until stock runs out" saves `StockItem.countExcludedUntilEmpty` for that location
+without changing its quantity, movement history or `lastCountedAt`. Future rounds omit it; the setup
+screen lists exclusions with an undo action. An actual stock change or count that reaches zero clears
+the preference in the same write, so replenished stock is included again. Group merges preserve active
+exclusions at the merged location. `PUT /api/inventory/stock/:id/count-exclusion` is adult/owner-only and
+checks `expectedUpdatedAt`, including when undoing an exclusion.
+"Add to shopping list" accepts a separate quantity to buy without saving or advancing the count. It
+reuses an existing open need for any linked product; otherwise it adds an explicit manual need.
 `PUT /api/inventory/stock/:id/count` replaces only the quantity and requires the displayed `updatedAt`.
 It preserves unit, minimum and expiry, records the difference as a manual correction, and rejects a
 concurrent change with 409. The screen refreshes that record and keeps the typed count for review.

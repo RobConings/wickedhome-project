@@ -40,6 +40,13 @@ export const stockCountInputSchema = z.object({
 });
 export type StockCountInput = z.infer<typeof stockCountInputSchema>;
 
+/** Excluding a location never changes its quantity or confirms a physical count. */
+export const stockCountExclusionSchema = z.object({
+  excluded: z.boolean(),
+  expectedUpdatedAt: z.iso.datetime(),
+});
+export type StockCountExclusionInput = z.infer<typeof stockCountExclusionSchema>;
+
 /** The edit form as posted (browser validation and the route action): an empty quantity means 0. */
 export const stockItemUpdateFormSchema = stockItemUpdateSchema.extend({
   quantity: z.preprocess((value) => value ?? 0, stockItemUpdateSchema.shape.quantity),
@@ -83,6 +90,8 @@ export type StockItem = {
   isLow: boolean;
   /** ISO timestamp. */
   updatedAt: string;
+  /** Excluded from physical counts until this location next reaches zero. */
+  countExcludedUntilEmpty?: boolean;
 };
 
 export type StockMovement = {
