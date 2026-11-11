@@ -3,10 +3,10 @@ import { ChefHatIcon, ListOrderedIcon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import { Card } from "@/components/shared/card";
-import { Badge } from "@/components/ui/badge";
 import { FavoriteToggle } from "@/components/shared/favorite-toggle";
 import { recipeCoverUrl } from "../data/recipe-cover-url";
 import { recipePath, type RecipeSummary } from "../types/recipes";
+import { RecipeCardCover, RecipeCardStat, RecipeCardTitle } from "./recipe-card-content";
 
 type RecipeCardProps = {
   recipe: RecipeSummary;
@@ -15,57 +15,37 @@ type RecipeCardProps = {
   onToggleFavorite: (id: string) => void | Promise<unknown>;
 };
 
-/** Servings, ingredients and steps as small facts ("4 people · 8 ingredients · 5 steps"). */
-export function RecipeFacts({ recipe }: { recipe: Pick<RecipeSummary, "servings" | "ingredientCount" | "stepCount"> }) {
+/** Labelled facts for detail/list views; cards use compact icon-and-number facts. */
+export function RecipeFacts({ recipe, compact = false }: { recipe: Pick<RecipeSummary, "servings" | "ingredientCount" | "stepCount">; compact?: boolean }) {
   const { t } = useTranslation("recipes");
   return (
     <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
       {recipe.servings && (
-        <span className="flex items-center gap-1">
-          <UsersIcon className="size-3.5" aria-hidden="true" />
-          {t("facts.servings", { count: recipe.servings })}
-        </span>
+        <RecipeCardStat icon={UsersIcon} label={t("facts.servings", { count: recipe.servings })}>{compact ? recipe.servings : t("facts.servings", { count: recipe.servings })}</RecipeCardStat>
       )}
-      <span className="flex items-center gap-1">
-        <ChefHatIcon className="size-3.5" aria-hidden="true" />
-        {t("facts.ingredients", { count: recipe.ingredientCount })}
-      </span>
+      <RecipeCardStat icon={ChefHatIcon} label={t("facts.ingredients", { count: recipe.ingredientCount })}>{compact ? recipe.ingredientCount : t("facts.ingredients", { count: recipe.ingredientCount })}</RecipeCardStat>
       {recipe.stepCount > 0 && (
-        <span className="flex items-center gap-1">
-          <ListOrderedIcon className="size-3.5" aria-hidden="true" />
-          {t("facts.steps", { count: recipe.stepCount })}
-        </span>
+        <RecipeCardStat icon={ListOrderedIcon} label={t("facts.steps", { count: recipe.stepCount })}>{compact ? recipe.stepCount : t("facts.steps", { count: recipe.stepCount })}</RecipeCardStat>
       )}
     </span>
   );
 }
 
-/** A recipe as a tile: cover photo (or a band), name (opens the recipe), facts and a star. */
+/** A recipe as a tile: shared banner, bounded title, compact facts and a star. */
 export function RecipeTile({ recipe, isFavorite, onToggleFavorite }: RecipeCardProps) {
   const { t } = useTranslation("recipes");
   const coverUrl = recipeCoverUrl(recipe);
   return (
-    <Card className="relative gap-3 overflow-hidden p-0 has-[a:hover]:bg-accent/30">
-      {coverUrl ? (
-        <RecordImage src={coverUrl} className="aspect-[4/3] w-full rounded-none" fallback={<ChefHatIcon className="size-10 text-section" />} />
-      ) : (
-        <div className="grid h-16 w-full place-items-center bg-primary/10 text-primary" aria-hidden="true">
-          <ChefHatIcon className="size-6" />
-        </div>
-      )}
-      <div className="flex items-start gap-2 px-4 pb-4">
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <Link
-            to={recipePath(recipe.id)}
-            className="line-clamp-2 font-medium break-words outline-none after:absolute after:inset-0 focus-visible:underline"
-          >
-            {recipe.name}
-          </Link>
-          {recipe.category && <Badge variant="secondary" className="max-w-full self-start whitespace-normal break-words">{recipe.category.name}</Badge>}
-          <RecipeFacts recipe={recipe} />
-        </div>
+    <Card className="relative h-full gap-0 overflow-hidden p-0 has-[a:hover]:bg-accent/30">
+      <RecipeCardCover src={coverUrl} />
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        <RecipeCardTitle name={recipe.name} to={recipePath(recipe.id)} stretched />
+        {recipe.category && <span className="sr-only">{recipe.category.name}</span>}
+        <div className="mt-auto"><RecipeFacts recipe={recipe} compact /></div>
+      </div>
+      <div className="absolute top-2 right-2 rounded-full bg-card/90">
         <FavoriteToggle
-          className="relative z-10 -mr-1"
+          className="relative z-10"
           active={isFavorite}
           label={t(isFavorite ? "favorite.remove" : "favorite.add", {
             name: recipe.name,

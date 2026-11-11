@@ -15,6 +15,9 @@ import type {
 import { compareNeed, toStockUnits } from "@/types/units";
 import { productFixtures, productListFixture, shopListFixture } from "../shopping/fixtures";
 
+/** Offline cover illustration for layout stories; production cards use the recipe's actual photo. */
+export const recipeCoverFixture = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500"><defs><linearGradient id="bg"><stop stop-color="#744829"/><stop offset="1" stop-color="#aab877"/></linearGradient></defs><rect width="800" height="500" fill="url(#bg)"/><ellipse cx="400" cy="260" rx="225" ry="180" fill="#f9f3e7"/><ellipse cx="400" cy="260" rx="175" ry="135" fill="#bc6b31"/><circle cx="340" cy="230" r="40" fill="#557c39"/><circle cx="425" cy="290" r="40" fill="#eab760"/></svg>')}`;
+
 /**
  * Recipes, "To cook" and a cooking session for the stories (made-up data). Amounts are the recipe's own (500 g,
  * 2 pcs, 2 el); checks and cooking lines are computed with the real `compareNeed`, so the stories show the unit

@@ -123,7 +123,7 @@ export function RecipesScreen({ recipes, mealPlan, categories = [], products, sh
                   }
                 />
               ) : (
-                <PageGrid columns="cards">
+                <PageGrid columns="cards" className="auto-rows-fr">
                   {waiting.map((entry) => (
                     <MealPlanCard key={entry.id} entry={entry} canManage={canManage} />
                   ))}
@@ -134,7 +134,7 @@ export function RecipesScreen({ recipes, mealPlan, categories = [], products, sh
                   <h2 id="recently-made" className="text-lg font-semibold">
                     {t("toCook.recentlyMade")}
                   </h2>
-                  <PageGrid columns="cards">
+                  <PageGrid columns="cards" className="auto-rows-fr">
                     {made.map((entry) => (
                       <MealPlanCard key={entry.id} entry={entry} canManage={canManage} />
                     ))}

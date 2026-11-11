@@ -1,14 +1,12 @@
-import { RecordImage } from "@/components/shared/record-image";
-import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
-import { CheckIcon, ChefHatIcon, CookingPotIcon, PlayIcon, ShoppingCartIcon, Trash2Icon, UsersIcon } from "lucide-react";
+import { CheckIcon, CookingPotIcon, ListOrderedIcon, PlayIcon, ShoppingCartIcon, Trash2Icon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useFetcher } from "react-router";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/shared/card";
+import { RecipeCardCover, RecipeCardStat, RecipeCardTitle } from "./recipe-card-content";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -53,100 +51,67 @@ export function MealPlanCard({ entry, canManage, action }: MealPlanCardProps) {
     fetcher.submit({ intent, entryId: entry.id, recordOrigin: `${location.pathname}${location.search}${location.hash}`, ...extra }, { method: "post", action });
 
   return (
-    <Card className={cn("gap-3 p-4", cooked && "opacity-75")} tone={status === "cooking" ? "featured" : "default"}>
-      <div className="flex items-start gap-3">
-        {coverUrl ? (
-          <RecordImage src={coverUrl} shape="avatar" fallback={<ChefHatIcon className="size-7 text-section" />} />
-        ) : (
-          <span className="grid size-14 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary" aria-hidden="true">
-            <ChefHatIcon className="size-6" />
-          </span>
-        )}
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <Link to={recipePath(entry.recipeId)} className="font-medium break-words underline-offset-4 hover:underline">
-            {entry.recipeName}
-          </Link>
-          <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <UsersIcon className="size-3.5" aria-hidden="true" />
-              {t("facts.servings", { count: entry.servings })}
-            </span>
-            {entry.openItemCount > 0 && !cooked && (
-              <span className="flex items-center gap-1">
-                <ShoppingCartIcon className="size-3.5" aria-hidden="true" />
-                {t("toCook.openItems", { count: entry.openItemCount })}
-              </span>
-            )}
-            {entry.addedByName && !cooked && <span>{t("toCook.addedBy", { name: entry.addedByName })}</span>}
-          </span>
-          <span className="flex flex-wrap gap-1.5 pt-0.5">
-            {status === "cooking" && (
-              <Badge variant="outline" className="gap-1 border-primary/40 text-primary">
-                <CookingPotIcon aria-hidden="true" />
-                {entry.stepCount > 0
-                  ? t("toCook.cookingStep", {
-                      step: entry.currentStep + 1,
-                      total: entry.stepCount,
-                    })
-                  : t("toCook.cooking")}
-              </Badge>
-            )}
-            {cooked && (
-              <Badge variant="secondary" className="gap-1">
-                <CheckIcon aria-hidden="true" />
-                {entry.cookedAt
-                  ? t("toCook.madeOn", {
-                      date: formatDate(entry.cookedAt, locale),
-                    })
-                  : t("toCook.made")}
-              </Badge>
-            )}
-          </span>
+    <Card className={cn("h-full gap-0 overflow-hidden p-0", cooked && "opacity-75")} tone={status === "cooking" ? "featured" : "default"}>
+      <RecipeCardCover src={coverUrl} />
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        <RecipeCardTitle name={entry.recipeName} to={recipePath(entry.recipeId)} />
+        <div className="flex min-h-5 flex-wrap items-center gap-x-4 gap-y-2">
+          <RecipeCardStat icon={UsersIcon} label={t("facts.servings", { count: entry.servings })}>{entry.servings}</RecipeCardStat>
+          {!cooked && <RecipeCardStat icon={ShoppingCartIcon} label={t("toCook.openItems", { count: entry.openItemCount })}>{entry.openItemCount}</RecipeCardStat>}
+          {status === "cooking" ? <RecipeCardStat icon={CookingPotIcon} label={entry.stepCount > 0 ? t("toCook.cookingStep", { step: entry.currentStep + 1, total: entry.stepCount }) : t("toCook.cooking")}>
+            {entry.stepCount > 0 ? `${entry.currentStep + 1}/${entry.stepCount}` : "—"}
+          </RecipeCardStat> : entry.stepCount > 0 && <RecipeCardStat icon={ListOrderedIcon} label={t("facts.steps", { count: entry.stepCount })}>{entry.stepCount}</RecipeCardStat>}
+          {cooked && <RecipeCardStat icon={CheckIcon} label={entry.cookedAt ? t("toCook.madeOn", { date: formatDate(entry.cookedAt, locale) }) : t("toCook.made")}>
+            {entry.cookedAt ? <time dateTime={entry.cookedAt}>{formatDate(entry.cookedAt, locale)}</time> : "✓"}
+          </RecipeCardStat>}
         </div>
-      </div>
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-        {!cooked && (
-          <Button fullOnMobile onClick={() => void submit("start")} loading={pendingIntent === "start"} disabled={fetcher.state !== "idle"}>
-            <PlayIcon />
-            {status === "cooking" ? t("toCook.continue") : t("toCook.start")}
-          </Button>
-        )}
-        {!cooked && (
-          <Button variant="outline" fullOnMobile onClick={() => void submit("done")} disabled={fetcher.state !== "idle"}>
-            <CheckIcon />
-            {t("toCook.done")}
-          </Button>
-        )}
-        {canManage && (
-          <ConfirmDialog
-            trigger={
-              <Button variant="ghost" fullOnMobile className="text-destructive hover:text-destructive sm:ml-auto" disabled={fetcher.state !== "idle"}>
-                <Trash2Icon />
-                {cooked ? t("toCook.clear") : t("toCook.remove")}
+        {entry.addedByName && !cooked && <span className="sr-only">{t("toCook.addedBy", { name: entry.addedByName })}</span>}
+        {(!cooked || canManage) && <div className="mt-auto flex flex-col gap-2 pt-2" data-slot="recipe-card-actions">
+          {!cooked && (
+            <Button fullOnMobile className="w-full" onClick={() => void submit("start")} loading={pendingIntent === "start"} disabled={fetcher.state !== "idle"}>
+              <PlayIcon />
+              {status === "cooking" ? t("toCook.continue") : t("toCook.start")}
+            </Button>
+          )}
+          <div className="grid grid-cols-2 gap-2">
+            {!cooked && (
+              <Button variant="outline" fullOnMobile className={cn("w-full min-w-0 gap-1 px-2 text-xs", !canManage && "col-span-2")} onClick={() => void submit("done")} disabled={fetcher.state !== "idle"}>
+                <CheckIcon />
+                {t("toCook.done")}
               </Button>
-            }
-            title={t("toCook.removeTitle", { name: entry.recipeName })}
-            description={
-              <span className="flex flex-col gap-3">
-                <span>{t("toCook.removeDescription")}</span>
-                {entry.openItemCount > 0 && !cooked && (
-                  <label className="flex min-h-10 items-center gap-2 text-foreground">
-                    <Switch checked={removeItems} onCheckedChange={setRemoveItems} />
-                    {t("toCook.removeItems", { count: entry.openItemCount })}
-                  </label>
-                )}
-              </span>
-            }
-            confirmLabel={cooked ? t("toCook.clear") : t("toCook.remove")}
-            cancelLabel={tCommon("actions.cancel")}
-            destructive
-            onConfirm={() =>
-              submit("remove-entry", {
-                removeItems: removeItems && !cooked ? "1" : "",
-              })
-            }
-          />
-        )}
+            )}
+            {canManage && (
+              <ConfirmDialog
+                trigger={
+                  <Button variant="ghost" fullOnMobile className={cn("w-full min-w-0 gap-1 px-2 text-xs text-destructive hover:text-destructive", cooked && "col-span-2")} disabled={fetcher.state !== "idle"}>
+                    <Trash2Icon />
+                    {cooked ? t("toCook.clear") : t("toCook.remove")}
+                  </Button>
+                }
+                title={t("toCook.removeTitle", { name: entry.recipeName })}
+                description={
+                  <span className="flex flex-col gap-3">
+                    <span>{t("toCook.removeDescription")}</span>
+                    {entry.openItemCount > 0 && !cooked && (
+                      <label className="flex min-h-10 items-center gap-2 text-foreground">
+                        <Switch checked={removeItems} onCheckedChange={setRemoveItems} />
+                        {t("toCook.removeItems", { count: entry.openItemCount })}
+                      </label>
+                    )}
+                  </span>
+                }
+                confirmLabel={cooked ? t("toCook.clear") : t("toCook.remove")}
+                cancelLabel={tCommon("actions.cancel")}
+                destructive
+                onConfirm={() =>
+                  submit("remove-entry", {
+                    removeItems: removeItems && !cooked ? "1" : "",
+                  })
+                }
+              />
+            )}
+          </div>
+        </div>}
       </div>
     </Card>
   );

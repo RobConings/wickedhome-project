@@ -33,6 +33,11 @@ Shared changes: `ShoppingItemSource` + `RECIPE` and a soft `ShoppingItem.mealPla
 badge); `StockMovementReason` + `COOKED` and a soft `StockMovement.mealPlanEntryId`. Migration `recipes`.
 
 Recipe tiles, list thumbnails, To cook cards and the detail page show `coverFileId` first, then `imageUrl`.
+Grid cards share a 16:9 cover banner, including a same-size fallback for missing or failed photos. Titles
+reserve two lines and show at most 64 characters; accessible labels and tooltips keep the full name.
+Card facts use icons and numbers with full accessible labels. To cook cards keep Start/Continue above
+Done/Remove in a bottom-aligned footer, and their grids use equal row heights. Recently made cards use
+the same structure with a compact date and Clear action.
 `recipes_read_link` returns the original `Recipe.image` (string, array or ImageObject), falling back to
 `og:image`, including on pages without structured recipes. Relative URLs resolve against the final page URL;
 only HTTP(S) URLs up to 2,000 characters are accepted. Pass this `imageUrl` to `recipes_save`;

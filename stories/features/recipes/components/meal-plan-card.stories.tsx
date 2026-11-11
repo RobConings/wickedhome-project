@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MealPlanCard } from "@/features/recipes/components/meal-plan-card";
-import { mealPlanFixtures } from "../fixtures";
+import { mealPlanFixtures, recipeCoverFixture } from "../fixtures";
 
 const meta = {
   title: "Features/Recipes/Components/MealPlanCard",
@@ -26,3 +26,6 @@ export const Loading: Story = {
   },
 };
 export const Mobile: Story = { globals: { viewport: { value: "mobile1" } } };
+export const LongName: Story = { args: { entry: { ...mealPlanFixtures.open, recipeName: "Kippenpilons uit de airfryer met frietjes en appelmoes en een uitgebreide huisgemaakte groentesalade" } } };
+export const WithCover: Story = { args: { entry: { ...mealPlanFixtures.open, imageUrl: recipeCoverFixture } } };
+export const BrokenCover: Story = { args: { entry: { ...mealPlanFixtures.open, imageUrl: "/missing-recipe-cover.jpg" } } };
