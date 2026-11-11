@@ -156,6 +156,12 @@ The PUT checks `expectedUpdatedAt` so concurrent settings edits cannot overwrite
 The API stock check and cooking conversions load the same definitions, which travel with the recipe's
 stock-unit metadata for consistent browser calculations. No conversion is stored on a product.
 
+The settings section uses the shared `GeneralList` for searchable, remembered list/tile views. Add/edit
+opens a single-unit dialog; successful saves preserve unrelated definitions and the current revision.
+Renaming updates references to that unit in the same save. Removal requires confirmation and is blocked
+while other units still reference it. Concurrent-change errors retain the draft and offer a latest-list
+reload before retrying.
+
 The inventory, recipes and shopping skill guides describe this same contract for built-in chat and MCP.
 `inventory_units` reads the catalogue/revision and can verify a conversion; `inventory_save_units` is an
 adult/owner-only, always-confirmed replacement of the catalogue with the same revision check and schema

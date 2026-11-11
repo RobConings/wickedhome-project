@@ -8,3 +8,8 @@ export const Empty: Story = {};
 export const Requests: Story = { args: { initialData: undefined } };
 export const Configured: Story = { args: { initialData: { units: [{ name: "fles 75 cl", referenceUnit: "cl", factor: 75, rounding: 1, aliases: ["wijnfles"] }, { name: "doos van 6", referenceUnit: "stuk", factor: 6, rounding: 1, aliases: [] }], updatedAt: null } } };
 export const ReadOnly: Story = { ...Configured, args: { ...Configured.args, canManage: false } };
+export const LinkedUnits: Story = { args: { initialData: { units: [
+  { name: "fles 75 cl", referenceUnit: "cl", factor: 75, rounding: 1, aliases: ["wijnfles"] },
+  { name: "krat wijn", referenceUnit: "fles 75 cl", factor: 6, rounding: 1, aliases: [] },
+  { name: "ton", referenceUnit: "kg", factor: 1000, rounding: 0.001, aliases: ["tonne"] },
+], updatedAt: null } } };

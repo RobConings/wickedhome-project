@@ -153,6 +153,10 @@ which opens the Ask chat sheet) gets an `onSelect` handler by id in `toQuickActi
 Most lists and forms are the same; only the data differs. Use the shared building blocks by default and
 write only the parts that are really about your domain (a row, a tile, a picker).
 
+This also applies to settings and configuration catalogues. Present them as searchable `GeneralList`
+rows/tiles, with add/edit in a focused dialog. Do not expand an edit form for every stored record on the
+overview; the overview should make names, relationships and available actions easy to scan on a phone.
+
 **Lists: `GeneralList`** (`components/shared/general-list.tsx`). Every list gets the same search field
 (debounced, clear button, Esc clears), a **list/tiles switch** that is remembered per list
 (`storageKey`, optionally `?view=` with `viewParam`), and the empty, "nothing found for …", loading
