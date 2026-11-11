@@ -46,6 +46,9 @@ import { getOffer } from "../recipes/offers";
 import { stockPriority } from "../shopping/stock-priority";
 import { fold } from "@ai/core/text-match";
 import { productSetup } from "./product-setup";
+import { getUnitCatalogue, saveUnitCatalogue } from "@/api/household/units.service";
+import { unitCatalogueInputSchema } from "@/types/unit-catalogue";
+import { stockUnitsPer, unitInfo, unitRounding } from "@/types/units";
 import "./prepare-product";
 
 /** Skill "inventory": household stock and the product catalogue (guide: guide.md next to this file). */
@@ -53,10 +56,10 @@ import "./prepare-product";
 registerAssistantSkill({
   id: "inventory",
   title: { en: "Stock", nl: "Voorraad" },
-  summary: "Stock and product setup: proactive photos, shop links, package facts and shared-stock alternatives; Op/near-empty forecasts using minima and essential setting, expiry, use/add and barcodes.",
+  summary: "Stock and products: central units and conversions, shared-stock alternatives, photos/shop links, minima/essential forecasts, expiry, use/add and barcodes.",
   keywords: {
-    nl: ["voorraad", "voorraadkast", "bijna op", "vervalt", "vervaldatum", "houdbaar", "diepvries", "koelkast", "kelder", "product", "producten", "hebben we nog", "barcode", "streepjescode", "opgebruikt", "minimum", "nog over", "essentieel", "essentiele", "extraatje"],
-    en: ["stock", "inventory", "pantry", "running low", "run out", "expire", "expiry", "freezer", "fridge", "product", "do we have", "barcode", "used up", "minimum", "left over", "essential", "nice to have"],
+    nl: ["voorraad", "voorraadkast", "bijna op", "vervalt", "vervaldatum", "houdbaar", "diepvries", "koelkast", "kelder", "product", "producten", "hebben we nog", "barcode", "streepjescode", "opgebruikt", "minimum", "nog over", "essentieel", "essentiele", "extraatje", "eenheid", "eenheden", "omzetting", "omrekenen", "referentie-eenheid"],
+    en: ["stock", "inventory", "pantry", "running low", "run out", "expire", "expiry", "freezer", "fridge", "product", "do we have", "barcode", "used up", "minimum", "left over", "essential", "nice to have", "units of measure", "unit conversion", "convert units", "reference unit"],
   },
 });
 
@@ -109,6 +112,55 @@ const noChildren = (ctx: AssistantToolContext) => {
 };
 
 // ── Reads ─────────────────────────────────────────────────────────────────────────────────────────────
+
+registerAssistantTool({
+  name: "inventory.units",
+  description: "Read the household's central units, reference relationships, aliases, purchase rounding and revision. Optionally check a conversion; never infer a bag equals one piece or invent a head's weight. A zero quantity is zero even when a positive conversion is unknown. Read this before inventory_save_units. Definitions are household-wide, not product-specific.",
+  input: z.object({
+    fromUnit: z.string().trim().min(1).max(20).optional(),
+    toUnit: z.string().trim().min(1).max(20).optional(),
+    quantity: z.number().min(0).max(100_000).default(1),
+  }).refine((input) => Boolean(input.fromUnit) === Boolean(input.toUnit), { message: "Give both fromUnit and toUnit" }),
+  permission: "read", confirm: "never",
+  activity: { en: "Checked units and conversions", nl: "Eenheden en omzettingen bekeken" },
+  run: async (ctx, input) => {
+    const catalogue = await getUnitCatalogue(ctx.householdId);
+    const per = input.fromUnit && input.toUnit ? stockUnitsPer(input.fromUnit, { unit: input.toUnit, packageAmount: null, packageUnit: null, units: catalogue.units }) : null;
+    return {
+      ...catalogue,
+      scope: "household", settingsPath: "/settings?section=units",
+      nativeUnits: { mass: ["mg", "g", "kg"], volume: ["ml", "cl", "dl", "l"], count: ["stuk", "pcs"], bundle: ["tros"] },
+      ...(input.fromUnit && input.toUnit && { conversion: {
+        quantity: input.quantity, fromUnit: input.fromUnit, toUnit: input.toUnit,
+        comparable: per !== null,
+        result: input.quantity === 0 ? 0 : per === null ? null : Math.round(input.quantity * per * 1000) / 1000,
+        dimension: unitInfo(input.toUnit, catalogue.units)?.dimension ?? null,
+        purchaseRounding: unitRounding(input.toUnit, catalogue.units),
+        ...((per === null) && { note: "No verified relation for positive quantities. Ask for an explicit definition or a purchase quantity; never assume one bag, one piece or one kg." }),
+      } }),
+    };
+  },
+});
+
+registerAssistantTool({
+  name: "inventory.save_units",
+  description: "Save the central household unit catalogue after inventory_units. This replaces the whole catalogue: preserve every unrelated definition and send its exact updatedAt as expectedUpdatedAt (null only for a never-saved catalogue). Explain and confirm added/changed/removed references, factors, aliases and purchase rounding. Never invent ratios or attach definitions to products. Changes no stock quantities; affects future comparisons. Adults/owners only.",
+  input: unitCatalogueInputSchema,
+  permission: "write", confirm: "always",
+  activity: { en: "Saved central units", nl: "Centrale eenheden bewaard" },
+  describe: (ctx, input) => say(ctx.locale, `Save the household unit catalogue (${input.units.length} definitions)`, `Centrale eenheden bewaren (${input.units.length} definities)`),
+  preview: async (ctx, input) => {
+    const current = await getUnitCatalogue(ctx.householdId);
+    return {
+      kind: "list", title: say(ctx.locale, "Household unit definitions", "Eenheden voor het hele huishouden"),
+      data: { items: [
+        ...input.units.map((unit) => ({ label: unit.name, detail: `1 ${unit.name} = ${unit.factor} ${unit.referenceUnit}; rounding ${unit.rounding}; aliases: ${unit.aliases.join(", ") || "—"}`, tone: current.units.some((entry) => entry.name === unit.name) ? "change" as const : "add" as const })),
+        ...current.units.filter((unit) => !input.units.some((entry) => entry.name === unit.name)).map((unit) => ({ label: unit.name, tone: "remove" as const })),
+      ] },
+    };
+  },
+  run: async (ctx, input) => done("Saved the central household unit catalogue. Stock quantities are unchanged.", await saveUnitCatalogue(ctx.householdId, input)),
+});
 
 registerAssistantTool({
   name: "inventory.low_stock",

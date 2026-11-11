@@ -15,6 +15,7 @@ import {
 } from "@/features/recipes/types/recipes";
 import { formatQuantity } from "@/features/shopping/types/shopping";
 import { defaultRecipePurchase, recipePurchaseQuantity } from "@/features/recipes/types/recipe-shopping";
+import { listUnitDefinitions } from "@/api/household/units.service";
 import { HttpError, badRequest, forbidden } from "@/api/lib/http";
 import { listStock } from "@/api/inventory/inventory.service";
 import {
@@ -232,14 +233,14 @@ const ingredientLines = z
 registerAssistantTool({
   name: "recipes.match",
   description:
-    "Check ingredients against existing catalogue products, alternative brands and shared stock before saving or planning. Persist matched product links with recipes_save. For unknown ingredients check maybe candidates or inventory_products before creating with inventory_save_product (recipes_find_product can find webshop offers). unknown_amount means units/package size cannot be compared, not a confirmed shortage.",
+    "Check ingredients against catalogue products, shared stock and the central household unit catalogue before saving/planning. Persist product links with recipes_save. Inspect maybe/inventory_products before creating products. Recorded zero is a shortage even across units; unknown_amount with positive stock is not. purchaseQuantityRequired means ask how much to buy in the stock unit or inspect inventory_units; never invent a bag-to-piece or head-to-kg ratio.",
   input: z.object({ ingredients: ingredientLines }),
   permission: "read",
   confirm: "never",
   activity: { en: "Matched the ingredients", nl: "Ingrediënten vergeleken" },
   run: async (ctx, input) => {
-    const [products, stock] = await Promise.all([listProducts(ctx.householdId), stockByProduct(ctx.householdId)]);
-    const matches = matchIngredients(input.ingredients, products, stock);
+    const [products, stock, units] = await Promise.all([listProducts(ctx.householdId), stockByProduct(ctx.householdId), listUnitDefinitions(ctx.householdId)]);
+    const matches = matchIngredients(input.ingredients, products, stock, units);
     return {
       ingredients: matches.map((match) => ({
         name: match.name,
@@ -249,6 +250,10 @@ registerAssistantTool({
         maybe: match.maybe.length ? match.maybe : null,
         stock: match.stock === null ? null : amountText(match.stock, match.unit, ctx.locale),
         status: match.status,
+        comparable: match.comparable,
+        stockEmpty: match.stock === 0,
+        purchaseUnit: match.unit,
+        purchaseQuantityRequired: Boolean(match.product && match.status === "short" && match.shortfall === null),
         // Packs to buy; null when it can't be said (unknown_amount: the product has no content per package).
         buy: match.product && match.shortfall ? amountText(match.shortfall, match.unit, ctx.locale) : null,
       })),
@@ -400,7 +405,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "recipes.list",
   description:
-    "The household's recipes and To cook list. Before planning/cooking, give recipe and servings to check ingredient product links, shared stock, shortages and existing groceries (onList). Unlinked ingredients: recipes_match then recipes_save with product links. Plan with recipes_plan to add missing groceries automatically.",
+    "Read recipes and To cook. Give recipe and servings before planning: check shared stock, central units, shortages, onList and purchaseQuantityRequired. Zero is empty in every unit; a bag is not one piece. If purchase quantity is unknown ask for it in purchaseUnit and pass recipes_plan quantities, or inspect inventory_units. Repair unlinked ingredients via recipes_match/recipes_save.",
   input: z.object({
     recipe: entityRef("recipe", "One recipe's details; leave out for the list (on a recipe's page: that one)").optional(),
     q: z.string().trim().max(80).optional().describe("Part of a recipe name or ingredient"),
@@ -423,13 +428,19 @@ registerAssistantTool({
         source: recipe.sourceUrl,
         imageUrl: recipe.imageUrl,
         ingredients: check.ingredients.map((item) => ({
+          ingredientId: item.ingredientId,
           name: item.name,
+          productId: item.productId,
           product: item.productName,
           need: amountText(item.needed, item.unit, ctx.locale),
           stock: item.stock === null ? null : amountText(item.stock, item.product?.unit ?? null, ctx.locale),
           note: item.note,
           optional: item.optional || null,
           status: item.status,
+          comparable: item.comparable,
+          stockEmpty: item.stock === 0,
+          purchaseUnit: item.product?.unit ?? item.unit,
+          purchaseQuantityRequired: Boolean(item.product && recipePurchaseQuantity(item) === null),
           // In packs (the stock unit); null when the units don't convert (unknown_amount).
           buy: item.shortfallPackages ? amountText(item.shortfallPackages, item.product?.unit ?? null, ctx.locale) : !item.product && item.status === "unknown" ? amountText(item.needed, item.unit, ctx.locale) : null,
           onList: item.onList || null,
@@ -649,7 +660,7 @@ registerAssistantTool({
 registerAssistantTool({
   name: "recipes.plan",
   description:
-    "Plan a recipe for servings and automatically add missing groceries (buy defaults to missing). First recipes_list to inspect stock and links; repair unlinked required ingredients with recipes_match and recipes_save, creating missing products first. Checks shared stock and package sizes, skips in-stock, optional and already-listed ingredients. Do not manually copy ingredients to shopping_add_item. Does not consume stock; use recipes_use when actually cooking.",
+    "Plan a recipe and its missing groceries using shared stock and central household units. First recipes_list; repair required product links. Skip in-stock/optional/already-listed. Recorded zero is a shortage even across units. If purchaseQuantityRequired, ask the person for a quantity in purchaseUnit and pass quantities keyed by ingredientId; never invent one kg/package. Positive unknown_amount is not a shortage. Do not copy ingredients with shopping_add_item. Planning consumes no stock.",
   input: z.object({
     recipe: entityRef("recipe", "The recipe; leave out on its page").optional(),
     servings: z.number().int().min(1).max(100).optional().describe("For how many people (default the recipe's)"),

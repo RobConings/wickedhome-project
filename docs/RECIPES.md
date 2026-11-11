@@ -156,6 +156,16 @@ The PUT checks `expectedUpdatedAt` so concurrent settings edits cannot overwrite
 The API stock check and cooking conversions load the same definitions, which travel with the recipe's
 stock-unit metadata for consistent browser calculations. No conversion is stored on a product.
 
+The inventory, recipes and shopping skill guides describe this same contract for built-in chat and MCP.
+`inventory_units` reads the catalogue/revision and can verify a conversion; `inventory_save_units` is an
+adult/owner-only, always-confirmed replacement of the catalogue with the same revision check and schema
+as the UI. Callers must preserve unrelated definitions and confirm the exact ratios. Its preview lists
+references, factors, rounding, aliases and removals; it never edits stock quantities. `recipes_match`
+loads the central definitions too. Match/check tool results expose `comparable`, `stockEmpty`,
+`purchaseUnit` and `purchaseQuantityRequired`, with ingredient IDs in `recipes_list`. If a purchase amount
+is not derivable, ask for it and send `recipes_plan.quantities` keyed by ingredient ID (or name); no
+fallback of one kg/package is allowed. Positive unknown amounts are not selected as automatic shortages.
+
 Count units round up to whole things after scaling. Stock is always shown in its own unit with the content
 ("1 pak (200 g) in stock"); the check says "Needs 300 g · have 200 g → buy 1 pak". The product form has
 "Content per package" (number + g/kg/ml/cl/l/pcs); a barcode lookup fills it (amount × count).

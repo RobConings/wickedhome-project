@@ -1,5 +1,5 @@
 import { compatibleProductType } from "@/features/shopping/types/product-identity";
-import { compareNeed, type NeedComparison } from "@/types/units";
+import { compareNeed, type NeedComparison, type UnitDefinition } from "@/types/units";
 import { scoreCandidates, type EntityCandidate } from "@ai/core/resolve";
 import { fold } from "@ai/core/text-match";
 
@@ -87,6 +87,7 @@ export function matchIngredients(
   lines: readonly { name: string; amount?: string | null; quantity?: number | null; unit?: string | null }[],
   products: readonly MatchProduct[],
   stock: ReadonlyMap<string, number>,
+  units: UnitDefinition[] = [],
 ): IngredientMatch[] {
   const candidates = productCandidates(products);
   return lines.map((line) => {
@@ -110,7 +111,7 @@ export function matchIngredients(
       };
     }
     const data = (best.candidate.data ?? {}) as { unit?: string | null; packageAmount?: number | null; packageUnit?: string | null };
-    const product = { unit: data.unit ?? null, packageAmount: data.packageAmount ?? null, packageUnit: data.packageUnit ?? null };
+    const product = { unit: data.unit ?? null, packageAmount: data.packageAmount ?? null, packageUnit: data.packageUnit ?? null, units };
     const total = stock.get(best.candidate.id) ?? null;
     // The recipe's own amount: given as quantity + unit, else read from the amount text ("300 g").
     const parsed = line.quantity ? { quantity: line.quantity, unit: line.unit ?? parseAmount(line.amount)?.unit ?? null } : parseAmount(line.amount);

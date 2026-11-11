@@ -11,7 +11,7 @@ One import gives you everything: `import { … } from "@ai/core/kit"`.
 ```
 ai/skills/<skill>/
   tools.ts        registerAssistantSkill + tools + resolvers + search sources + snapshot lines
-  guide.md        the model's documentation for this area (≤ ~400 tokens, read on every request while active)
+  guide.md        the model's documentation for this area (within GUIDE_TOKEN_LIMIT, read while active)
   tools.test.ts   optional: rules specific to this skill (the generic checks run for every tool)
 ```
 
@@ -50,7 +50,8 @@ registerAssistantSkill({
 
 ## 3. Write the guide (guide.md)
 
-Markdown bullets, ≤ ~400 tokens (the test suite fails above ~450). It is the model's documentation for the
+Concise Markdown bullets, within the runtime `GUIDE_TOKEN_LIMIT` (currently 4096 estimated tokens). Tests
+use the same constant as registration; do not maintain a separate lower limit. It is the model's documentation for the
 area, so write what a smart newcomer must know to use the tools well:
 
 - the concepts and their words (NL and EN where they differ): "a recurring expense has instances…";

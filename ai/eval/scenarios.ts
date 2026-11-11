@@ -268,6 +268,8 @@ export function scenarios(today: string): Scenario[] {
     { id: "wx-weekend-en", lang: "en", say: "What's the weather like this weekend?", skills: ["weather"], tool: "weather.forecast" },
 
     // ── Inventory ──
+    { id: "inv-units-nl", lang: "nl", say: "Welke eenheden en omzettingen hebben we ingesteld?", skills: ["inventory"], tool: "inventory.units" },
+    { id: "inv-units-convert-en", lang: "en", say: "Check the unit conversion from 2 fles to cl using our configured units", skills: ["inventory"], tool: "inventory.units", args: { fromUnit: "fles", toUnit: "cl", quantity: 2 } },
     { id: "inv-low-nl", lang: "nl", say: "Wat is er bijna op in de voorraad?", skills: ["inventory"], tool: "inventory.low_stock" },
     { id: "inv-expire-en", lang: "en", say: "What in the pantry expires this week?", skills: ["inventory"], tool: "inventory.low_stock" },
     { id: "inv-stock-nl", lang: "nl", say: "Hebben we nog rijst?", skills: ["inventory"], tool: "inventory.stock", args: { product: "rijst" } },

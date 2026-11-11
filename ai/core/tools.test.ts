@@ -23,7 +23,7 @@ import {
 // Every skill's real tools (registered on import, as src/api/app.ts does) and the core tools.
 import "../skills";
 import "./core-tools";
-import { listAssistantSkills, routeMessage } from "./skills";
+import { GUIDE_TOKEN_LIMIT, listAssistantSkills, routeMessage } from "./skills";
 import { estimateTokens } from "./tokens";
 
 const base = (overrides: Partial<AssistantToolDefinition>): AssistantToolDefinition => ({
@@ -199,9 +199,9 @@ describe("skills", () => {
     for (const tool of featureTools()) assert.ok(ids.has(tool.skill), `${tool.name}: skill "${tool.skill}" is registered`);
   });
 
-  it("keeps every guide short (≤ ~450 tokens) and every summary one line", () => {
+  it("keeps every guide within the runtime token limit and every summary one line", () => {
     for (const skill of listAssistantSkills()) {
-      assert.ok(estimateTokens(skill.guide) <= 450, `${skill.id}: guide is ${estimateTokens(skill.guide)} tokens`);
+      assert.ok(estimateTokens(skill.guide) <= GUIDE_TOKEN_LIMIT, `${skill.id}: guide is ${estimateTokens(skill.guide)} tokens (limit ${GUIDE_TOKEN_LIMIT})`);
       assert.doesNotMatch(skill.summary, /\n/, `${skill.id}: summary is one line`);
       assert.ok(skill.title.en && skill.title.nl, `${skill.id}: titles in both languages`);
     }
@@ -228,6 +228,8 @@ describe("skills", () => {
       ["Heeft Clara haar bijdrage al gestort op de gezamenlijke rekening?", "money"],
       ["Zitten we nog binnen budget met de verbouwing?", "projects"],
       ["Wat is er bijna op in de voorraad?", "inventory"],
+      ["Welke eenheden en omzettingen hebben we ingesteld?", "inventory"],
+      ["Check the central units of measure", "inventory"],
       ["Welke winkels hebben een webshop?", "shops"],
       ["Verplaats de tandarts naar vrijdag", "calendar"],
       ["Ik heb de melk gekocht", "shopping"],
