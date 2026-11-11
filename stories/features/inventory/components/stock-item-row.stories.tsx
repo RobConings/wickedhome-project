@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
+import { PencilIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { StockItemRow } from "@/features/inventory/components/stock-item-row";
 import { stockFixtures } from "../fixtures";
 
@@ -40,3 +42,11 @@ export const AsListRow: Story = {
 
 /** A −1 / +1 is being saved: the new amount shows at once with a small spinner; the buttons stay usable. */
 export const Saving: Story = { args: { pending: true } };
+
+export const MobileLongNames: Story = {
+  globals: { viewport: { value: "mobile1" } },
+  args: {
+    item: { ...stockFixtures.pasta, productName: "Volkoren spaghetti met een extra lange productnaam voor de voorraadkast", placeName: "Voorraadkast naast de keuken op het gelijkvloers" },
+    actions: <Button variant="ghost" size="icon-sm" aria-label="Edit stock"><PencilIcon /></Button>,
+  },
+};

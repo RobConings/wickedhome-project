@@ -1,9 +1,10 @@
 import * as React from "react";
 import { BoxIcon, CalendarClockIcon, PencilIcon, PlusIcon, ScanBarcodeIcon, TriangleAlertIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useRevalidator } from "react-router";
+import { useRevalidator, useSearchParams } from "react-router";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
 import { PageSection } from "@/components/layout/page-section";
@@ -41,6 +42,8 @@ export function InventoryScreen({ data, canManage, initialSelections, today = to
   const { t } = useTranslation("inventory");
   const { products, places } = data;
   const revalidator = useRevalidator();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get("tab") === "low" ? "low" : "all";
   const onChanged = React.useCallback(() => revalidator.revalidate(), [revalidator]);
   const { adjust, isPending, show, confirmation } = useStockActions({ onChanged });
   // Quick −1 / +1 show at once (also in the counts and the "low" section) while they are saved.
@@ -105,14 +108,25 @@ export function InventoryScreen({ data, canManage, initialSelections, today = to
       <InventoryNavigation />
       <Stack gap="lg">
         {stock.length > 0 && (
-          <>
-            <PageGrid columns="stats">
-              <StatTile label={t("stats.tracked")} value={stock.length} icon={BoxIcon} tone="featured" />
-              <StatTile label={t("stats.low")} value={low.length} icon={TriangleAlertIcon} tone={low.length > 0 ? "warning" : "positive"} />
-              <StatTile label={t("stats.expiring")} value={expiring.length} icon={CalendarClockIcon} hint={t("stats.expiringHint", { count: EXPIRY_WARNING_DAYS })} tone={expiring.length > 0 ? "soon" : "default"} />
-            </PageGrid>
+          <PageGrid columns="stats">
+            <StatTile label={t("stats.tracked")} value={stock.length} icon={BoxIcon} tone="featured" />
+            <StatTile label={t("stats.low")} value={low.length} icon={TriangleAlertIcon} tone={low.length > 0 ? "warning" : "positive"} />
+            <StatTile label={t("stats.expiring")} value={expiring.length} icon={CalendarClockIcon} hint={t("stats.expiringHint", { count: EXPIRY_WARNING_DAYS })} tone={expiring.length > 0 ? "soon" : "default"} />
+          </PageGrid>
+        )}
 
-            {low.length > 0 && (
+        <Tabs value={tab} onValueChange={(value) => setSearchParams((previous) => {
+          const next = new URLSearchParams(previous);
+          if (value === "all") next.delete("tab");
+          else next.set("tab", value);
+          return next;
+        }, { replace: true, preventScrollReset: true })}>
+          <TabsList aria-label={t("page.title")} className="h-11">
+            <TabsTrigger value="low">{t("sections.low")} <span className="text-xs tabular-nums">({low.length})</span></TabsTrigger>
+            <TabsTrigger value="all">{t("sections.all")} <span className="text-xs tabular-nums">({stock.length})</span></TabsTrigger>
+          </TabsList>
+          <TabsContent value="low">
+            {low.length ? (
               <PageSection aria-labelledby="stock-low">
                 <SectionHeader id="stock-low" title={t("sections.low")} description={t("sections.lowDescription")} />
                 <ul className="divide-y rounded-xl border border-warning/40 bg-card px-3 shadow-xs">
@@ -121,44 +135,46 @@ export function InventoryScreen({ data, canManage, initialSelections, today = to
                   ))}
                 </ul>
               </PageSection>
-            )}
-          </>
-        )}
+            ) : <EmptyState icon={BoxIcon} title={t("sections.lowEmpty")} />}
+          </TabsContent>
 
-        <GeneralList
-          label={t("page.title")}
-          items={stock}
-          getKey={(item) => item.id}
-          renderRow={(item) => (
-            <StockItemRow
-              as="div"
-              item={item}
-              showPlace={false}
-              pending={isPending(item.id)}
-              onAdjust={onAdjust}
-              actions={editButton(item)}
+          <TabsContent value="all">
+            <GeneralList
+              label={t("sections.all")}
+              items={stock}
+              getKey={(item) => item.id}
+              renderRow={(item) => (
+                <StockItemRow
+                  as="div"
+                  item={item}
+                  showPlace={false}
+                  pending={isPending(item.id)}
+                  onAdjust={onAdjust}
+                  actions={editButton(item)}
+                />
+              )}
+              renderTile={(item) => (
+                <StockItemTile item={item} showPlace={false} pending={isPending(item.id)} onAdjust={onAdjust} actions={editButton(item)} />
+              )}
+              search={{ param: "q", keys: (item) => [item.productName, item.placeName, item.unit] }}
+              storageKey="inventory" viewParam="view"
+              defaultView="list"
+              groupBy={(item) => item.placeId}
+              groupOrder={places.map((place) => place.id)}
+              groupColumns={2}
+              renderGroupHeader={(placeId, items) => {
+                const place = placesById.get(placeId);
+                if (!place) return items[0]?.placeName ?? placeId;
+                return (
+                  <Link to={`/places/${encodeURIComponent(place.id)}`} className="hover:underline">
+                    <PlaceBadge place={place} floorName={place.floorName} className="text-sm" />
+                  </Link>
+                );
+              }}
+              emptyState={<EmptyState icon={BoxIcon} title={t("empty.title")} description={t("empty.description")} action={addButton} />}
             />
-          )}
-          renderTile={(item) => (
-            <StockItemTile item={item} showPlace={false} pending={isPending(item.id)} onAdjust={onAdjust} actions={editButton(item)} />
-          )}
-          search={{ param: "q", keys: (item) => [item.productName, item.placeName, item.unit] }}
-          storageKey="inventory" viewParam="view"
-          defaultView="list"
-          groupBy={(item) => item.placeId}
-          groupOrder={places.map((place) => place.id)}
-          groupColumns={2}
-          renderGroupHeader={(placeId, items) => {
-            const place = placesById.get(placeId);
-            if (!place) return items[0]?.placeName ?? placeId;
-            return (
-              <Link to={`/places/${encodeURIComponent(place.id)}`} className="hover:underline">
-                <PlaceBadge place={place} floorName={place.floorName} className="text-sm" />
-              </Link>
-            );
-          }}
-          emptyState={<EmptyState icon={BoxIcon} title={t("empty.title")} description={t("empty.description")} action={addButton} />}
-        />
+          </TabsContent>
+        </Tabs>
       </Stack>
     </PageContainer>
   );

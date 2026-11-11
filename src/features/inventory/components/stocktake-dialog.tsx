@@ -32,6 +32,7 @@ export function StocktakeScreen({ items, images = {}, onChanged, onSave = saveSt
   const origin = internalOrigin(new URLSearchParams(location.search).get("from"));
   const returnTo = origin && origin !== `${location.pathname}${location.search}` ? origin : "/inventory";
   const [placeId, setPlaceId] = React.useState("all");
+  const [inStockOnly, setInStockOnly] = React.useState(false);
   const [started, setStarted] = React.useState(false);
   const [queue, setQueue] = React.useState<Entry[]>([]);
   const [index, setIndex] = React.useState(0);
@@ -45,7 +46,7 @@ export function StocktakeScreen({ items, images = {}, onChanged, onSave = saveSt
   const current = queue[index];
   const finished = started && !current;
   const places = [...new Map(items.map((item) => [item.placeId, item.placeName])).entries()].sort((a, b) => a[1].localeCompare(b[1]));
-  const available = items.filter((item) => placeId === "all" || item.placeId === placeId);
+  const available = items.filter((item) => (placeId === "all" || item.placeId === placeId) && (!inStockOnly || item.quantity > 0));
   const counted = Object.values(answers).filter((answer) => "quantity" in answer).length;
   const skipped = Object.values(answers).filter((answer) => "skipped" in answer).length;
   const changed = queue.filter((item) => {
@@ -108,6 +109,11 @@ export function StocktakeScreen({ items, images = {}, onChanged, onSave = saveSt
           <label className="flex items-center gap-2 text-sm font-medium"><MapPinIcon className="size-4" />{t("count.chooseRoom")}</label>
           <Select value={placeId} onValueChange={setPlaceId}><SelectTrigger className="w-full" aria-label={t("fields.place")}><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">{t("count.allPlaces")}</SelectItem>{places.map(([id, name]) => <SelectItem key={id} value={id}>{name}</SelectItem>)}</SelectContent></Select>
           <p className="text-sm text-muted-foreground">{t("count.locations")}</p>
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border p-3">
+            <input type="checkbox" checked={inStockOnly} onChange={(event) => setInStockOnly(event.target.checked)} className="mt-0.5 size-5 shrink-0 accent-primary" aria-describedby={`${quantityId}-filter`} />
+            <span className="space-y-1"><span className="block text-sm font-medium">{t("count.inStockOnly")}</span><span id={`${quantityId}-filter`} className="block text-xs text-muted-foreground">{t("count.inStockOnlyDescription")}</span></span>
+          </label>
+          {!available.length && <p role="status" className="text-sm text-muted-foreground">{t("count.noProducts")}</p>}
           <Button className="h-12 w-full" disabled={!available.length} onClick={start}>{t("count.start", { count: available.length })}</Button>
         </div>
         <p className="text-center text-xs text-muted-foreground">{t("count.savedImmediately")}</p>

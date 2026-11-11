@@ -37,14 +37,14 @@ export function StockItemTile({ item, showPlace = true, onAdjust, pending, actio
       <div className="flex min-w-0 flex-col gap-1">
         <Link
           to={`/inventory/products/${encodeURIComponent(item.productId)}`}
-          className="line-clamp-2 font-medium break-words underline-offset-4 hover:underline focus-visible:underline"
+          className="font-medium break-words underline-offset-4 hover:underline focus-visible:underline"
         >
           {item.productName}
         </Link>
         {showPlace && (
           <span className="inline-flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
             <MapPinIcon className="size-3 shrink-0" aria-hidden="true" />
-            <span className="truncate">{item.placeName}</span>
+            <span className="min-w-0 break-words">{item.placeName}</span>
           </span>
         )}
       </div>

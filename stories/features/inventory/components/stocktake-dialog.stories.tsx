@@ -15,3 +15,4 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 export const AllProducts: Story = {};
 export const Mobile: Story = { globals: { viewport: { value: "mobile1" } } };
+export const OnlyZeroStock: Story = { args: { items: inventoryPageFixture.stock.filter((item) => item.quantity === 0) } };

@@ -18,6 +18,8 @@
     "expiringHint_other": "Within {{count}} days"
   },
   "sections": {
+    "all": "All products",
+    "lowEmpty": "No products running low",
     "low": "Running low",
     "lowDescription": "At or below their minimum. They are on the shopping list for their usual shop."
   },
@@ -130,6 +132,9 @@
     "description": "Your count replaces the recorded quantity.",
     "locations": "Count each storage location separately so the kitchen and pantry keep their own quantities.",
     "allPlaces": "All locations",
+    "inStockOnly": "Only products in stock",
+    "inStockOnlyDescription": "Skip products with a recorded quantity of 0 at each location.",
+    "noProducts": "No products to count with this selection.",
     "savedImmediately": "Each confirmed count is saved immediately. Skipped products stay unchanged.",
     "start_one": "Start ({{count}} product)",
     "start_other": "Start ({{count}} products)",

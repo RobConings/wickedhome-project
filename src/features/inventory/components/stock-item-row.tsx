@@ -49,26 +49,26 @@ export function StockItemRow({
   ].filter(Boolean);
 
   return (
-    <Element className={cn("flex items-center gap-3", Element === "li" && "py-2.5", className)}>
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
+    <Element className={cn("flex flex-wrap items-center gap-3", Element === "li" && "py-2.5", className)}>
+      <div className="flex w-full min-w-0 flex-auto flex-col gap-1 sm:w-auto sm:flex-1">
         {showProduct ? (
           <Link
             to={`/inventory/products/${encodeURIComponent(item.productId)}`}
-            className="truncate font-medium underline-offset-4 hover:underline focus-visible:underline"
+            className="font-medium break-words underline-offset-4 hover:underline focus-visible:underline"
           >
             {item.productName}
           </Link>
         ) : (
-          <span className="flex items-center gap-1.5 truncate font-medium">
+          <span className="flex items-start gap-1.5 font-medium break-words">
             <MapPinIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-            {item.placeName}
+            <span className="min-w-0">{item.placeName}</span>
           </span>
         )}
         <span className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
           {showProduct && showPlace && (
-            <span className="inline-flex items-center gap-1">
-              <MapPinIcon className="size-3" aria-hidden="true" />
-              {item.placeName}
+            <span className="inline-flex min-w-0 items-center gap-1">
+              <MapPinIcon className="size-3 shrink-0" aria-hidden="true" />
+              <span className="min-w-0 break-words">{item.placeName}</span>
             </span>
           )}
           {meta.map((text) => (
@@ -83,8 +83,8 @@ export function StockItemRow({
         </span>
       </div>
 
-      <span className="flex flex-col items-end gap-1" aria-busy={pending || undefined}>
-        <span className={cn("flex items-center gap-1.5 text-lg font-semibold tabular-nums", item.isLow && "text-warning")}>
+      <span className="flex min-w-0 max-w-full flex-col items-start gap-1 sm:items-end" aria-busy={pending || undefined}>
+        <span className={cn("flex items-center gap-1.5 text-lg font-semibold break-words tabular-nums", item.isLow && "text-warning")}>
           {pending && <Spinner className="size-3.5 text-muted-foreground" label={t("stock.saving")} />}
           {amount}
         </span>
@@ -97,7 +97,7 @@ export function StockItemRow({
       </span>
 
       {onAdjust && (
-        <span className="flex items-center gap-1">
+        <span className="ml-auto flex shrink-0 items-center gap-1 sm:ml-0">
           <Button
             type="button"
             variant="outline"
@@ -123,7 +123,7 @@ export function StockItemRow({
           </Button>
         </span>
       )}
-      {actions}
+      {actions && <span className="flex shrink-0 items-center">{actions}</span>}
     </Element>
   );
 }

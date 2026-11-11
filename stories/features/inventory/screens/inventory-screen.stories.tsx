@@ -23,3 +23,4 @@ export const PantryAndGarage: Story = {};
 export const AsChild: Story = { args: { canManage: false } };
 export const Empty: Story = { args: { data: { ...inventoryPageFixture, stock: [] } } };
 export const Mobile: Story = { globals: { viewport: { value: "mobile1" } } };
+export const NothingRunningLow: Story = { args: { data: { ...inventoryPageFixture, stock: inventoryPageFixture.stock.filter((item) => !item.isLow) } } };

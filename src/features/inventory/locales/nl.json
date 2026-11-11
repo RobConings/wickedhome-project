@@ -18,6 +18,8 @@
     "expiringHint_other": "Binnen {{count}} dagen"
   },
   "sections": {
+    "all": "Alle producten",
+    "lowEmpty": "Geen producten bijna op",
     "low": "Bijna op",
     "lowDescription": "Op of onder hun minimum. Ze staan op de boodschappenlijst voor hun vaste winkel."
   },
@@ -130,6 +132,9 @@
     "description": "Je telling vervangt het geregistreerde aantal.",
     "locations": "Je telt per bewaarlocatie, zodat keuken en voorraadkast elk hun eigen aantal houden.",
     "allPlaces": "Alle locaties",
+    "inStockOnly": "Alleen producten op voorraad",
+    "inStockOnlyDescription": "Sla producten met een geregistreerde voorraad van 0 over op elke locatie.",
+    "noProducts": "Geen producten om te tellen met deze selectie.",
     "savedImmediately": "Elk bevestigd aantal wordt meteen bewaard. Overgeslagen producten blijven ongewijzigd.",
     "start_one": "Start ({{count}} product)",
     "start_other": "Start ({{count}} producten)",
