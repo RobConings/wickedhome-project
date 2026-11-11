@@ -13,6 +13,7 @@ import { Stack } from "@/components/layout/stack";
 import { FormField } from "@/components/shared/form-field";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { ShopPicker, type Shop } from "@/features/shops";
+import { UnitInput } from "@/features/units";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import type { ShoppingActionResult } from "../data/shopping-loaders";
 import { useBarcodeAutofill } from "../data/use-barcode-autofill";
@@ -332,7 +333,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
               </Select>
             </FormField>
             <FormField label={t("fields.unit")} htmlFor="product-unit" optionalLabel={optional} errors={errors?.unit}>
-              <Input
+              <UnitInput
                 id="product-unit"
                 name="unit"
                 defaultValue={product?.unit ?? defaults?.unit ?? ""}

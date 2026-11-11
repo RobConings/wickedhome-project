@@ -1,0 +1,21 @@
+{
+  "title": "Eenheden",
+  "description": "Beheer eenheden en omzettingen voor het hele huishouden. Leg vast hoeveel één eenheid is in een andere eenheid. Producten en recepten gebruiken deze centrale definities.",
+  "examples": "Bijvoorbeeld: fles 75 cl = 75 cl, doos van 6 = 6 stuk. Gebruik aparte namen voor verschillende formaten. g, kg, ml, cl en l zijn al bekend. Een nieuwe omzetting wijzigt geen voorraad­aantallen.",
+  "empty": "Nog geen eigen eenheden ingesteld.",
+  "name": "Naam van de eenheid",
+  "aliases": "Andere namen (komma gescheiden)",
+  "factor": "Hoeveel referentie-eenheden in 1 eenheid?",
+  "reference": "Referentie-eenheid",
+  "rounding": "Te kopen aantal afronden op",
+  "add": "Eenheid toevoegen",
+  "remove": "Verwijderen",
+  "removeNamed": "Eenheid {{name}} verwijderen",
+  "save": "Eenheden bewaren",
+  "saved": "Eenheden bewaard",
+  "loading": "Eenheden laden…",
+  "loadFailed": "Eenheden konden niet worden geladen. Herlaad de pagina om opnieuw te proberen.",
+  "saveFailed": "Eenheden konden niet worden bewaard. Je invoer blijft staan.",
+  "invalid": "Controleer de eenheden: namen moeten uniek zijn, aantallen positief en referenties bekend. Eenheden mogen niet naar zichzelf of in een cirkel verwijzen. Standaardmaten zoals kg mogen niet worden overschreven.",
+  "conflict": "De eenheden zijn intussen elders gewijzigd. Herlaad de pagina voordat je opnieuw bewaart. Je invoer is nog niet overschreven."
+}

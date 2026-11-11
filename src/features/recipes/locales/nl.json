@@ -42,7 +42,9 @@
   "status": {
     "in_stock": "In voorraad",
     "short": "Niet genoeg in voorraad",
-    "unknown": "Voorraad onbekend"
+    "unknown": "Voorraad onbekend",
+    "not_kept": "Niet bijgehouden in voorraad",
+    "unknown_amount": "Hoeveelheid niet vergelijkbaar"
   },
   "toCook": {
     "loading": "Te koken laden…",
@@ -117,6 +119,9 @@
     "newProduct": "Nieuw product"
   },
   "check": {
+    "buyQuantity": "Te kopen: {{name}} ({{unit}})",
+    "quantityPlaceholder": "Aantal",
+    "quantityRequired": "Vul de te kopen hoeveelheid in. De eenheden van recept en voorraad zijn niet automatisch om te rekenen.",
     "title": "{{name}} bij Te koken zetten",
     "description": "Vink aan wat je moet kopen: wat ontbreekt staat al aangevinkt.",
     "servings": "Voor hoeveel personen",
@@ -237,6 +242,9 @@
     "pieces": "stuks"
   },
   "stock": {
+    "setUnitConversion": "Eenheden en omzettingen instellen",
+    "empty": "Niet in voorraad",
+    "purchaseAmountUnknown": "voorraad is op; te kopen hoeveelheid zelf invullen",
     "inStock": "{{amount}} in voorraad",
     "notKept": "Niet in de voorraad",
     "buy": "{{amount}} kopen",

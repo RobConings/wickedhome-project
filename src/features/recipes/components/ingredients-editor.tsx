@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { ProductFormDialog, ProductPicker, type Product } from "@/features/shopping";
+import { UnitInput } from "@/features/units";
 import type { Shop } from "@/features/shops";
 import type { UseSelectionsOptions } from "@/lib/selections";
 import { cn } from "@/lib/utils";
@@ -126,7 +127,7 @@ export function IngredientsEditor({ id, name, value, onChange, products, shops, 
                 </div>
                 <div className="flex min-w-0 flex-col gap-1.5">
                   <Label htmlFor={`${rowId}-unit`}>{t("ingredients.unit")}</Label>
-                  <Input
+                  <UnitInput
                     id={`${rowId}-unit`}
                     value={row.unit}
                     onChange={(event) => update(row.key, { unit: event.target.value })}

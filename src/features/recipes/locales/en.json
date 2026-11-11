@@ -42,7 +42,9 @@
   "status": {
     "in_stock": "In stock",
     "short": "Not enough in stock",
-    "unknown": "Stock unknown"
+    "unknown": "Stock unknown",
+    "not_kept": "Not tracked in stock",
+    "unknown_amount": "Amounts cannot be compared"
   },
   "toCook": {
     "loading": "Loading To cook…",
@@ -117,6 +119,9 @@
     "newProduct": "New product"
   },
   "check": {
+    "buyQuantity": "Quantity to buy: {{name}} ({{unit}})",
+    "quantityPlaceholder": "Quantity",
+    "quantityRequired": "Enter the quantity to buy. The recipe and stock units cannot be converted automatically.",
     "title": "Add {{name}} to To cook",
     "description": "Tick what to buy: missing ingredients are ticked already.",
     "servings": "For how many people",
@@ -237,6 +242,9 @@
     "pieces": "pieces"
   },
   "stock": {
+    "setUnitConversion": "Configure units and conversions",
+    "empty": "Out of stock",
+    "purchaseAmountUnknown": "stock is empty; enter the purchase quantity",
     "inStock": "{{amount}} in stock",
     "notKept": "Not kept in stock",
     "buy": "buy {{amount}}",

@@ -10,6 +10,8 @@
 export type UnitDimension = "mass" | "volume" | "count" | "bundle";
 
 type UnitInfo = { dimension: UnitDimension; /** Base units (g, ml, 1) per one of this unit. */ factor: number };
+/** A centrally managed household unit, independent of products. */
+export type UnitDefinition = { name: string; referenceUnit: string; factor: number; rounding: number; aliases: string[] };
 
 const MASS: Record<string, number> = { mg: 0.001, g: 1, gr: 1, gram: 1, grams: 1, gramm: 1, grammes: 1, kg: 1000, kilo: 1000, kilogram: 1000, kilos: 1000 };
 const VOLUME: Record<string, number> = {
@@ -95,6 +97,11 @@ const BUNDLE = new Set([
   "bunch",
   "bunches",
 ]);
+const PIECES = new Set(["pcs", "pc", "piece", "pieces", "st", "stk", "stuk", "stuks", "x"]);
+export const isPieceUnit = (unit: string | null | undefined) => PIECES.has(normalizeUnit(unit));
+/** Existing container aliases keep identifying the same centrally configured unit. Sized names stay distinct. */
+export const unitDefinitionKey = (unit: string | null | undefined) => packageForm(unit) ? `container:${packageForm(unit)}` : normalizeUnit(unit);
+const configuredUnit = (unit: string | null | undefined, definitions: readonly UnitDefinition[]) => definitions.find((item) => [item.name, ...item.aliases].some((name) => unitDefinitionKey(name) === unitDefinitionKey(unit)));
 
 /** Lower case, no trailing dot, single spaces: "St." → "st", " KG " → "kg". */
 export const normalizeUnit = (unit: string | null | undefined) =>
@@ -123,8 +130,15 @@ export const incompatiblePackages = (a: string | null | undefined, b: string | n
 };
 
 /** The dimension and factor of a unit; null for units that don't convert (el, tl, teentje, snuifje…). */
-export function unitInfo(unit: string | null | undefined): UnitInfo | null {
+export function unitInfo(unit: string | null | undefined, definitions: readonly UnitDefinition[] = [], seen = new Set<string>()): UnitInfo | null {
   const key = normalizeUnit(unit);
+  const custom = configuredUnit(unit, definitions);
+  if (custom) {
+    if (seen.has(custom.name)) return null;
+    const reference = unitInfo(custom.referenceUnit, definitions, new Set([...seen, custom.name]));
+    const factor = reference ? reference.factor * custom.factor : 0;
+    return reference && Number.isFinite(factor) && factor > 0 ? { dimension: reference.dimension, factor } : null;
+  }
   if (key in MASS) return { dimension: "mass", factor: MASS[key]! };
   if (key in VOLUME) return { dimension: "volume", factor: VOLUME[key]! };
   if (COUNT.has(key)) return { dimension: "count", factor: 1 };
@@ -133,13 +147,16 @@ export function unitInfo(unit: string | null | undefined): UnitInfo | null {
 }
 
 /** Counted in whole things (empty, pcs, stuks, pack, pak, can…): needs in these units round up. */
-export const isCountUnit = (unit: string | null | undefined) => ["count", "bundle"].includes(unitInfo(unit)?.dimension ?? "");
+export const isCountUnit = (unit: string | null | undefined, definitions: readonly UnitDefinition[] = []) => ["count", "bundle"].includes(unitInfo(unit, definitions)?.dimension ?? "");
+
+export const unitRounding = (unit: string | null | undefined, definitions: readonly UnitDefinition[] = []) =>
+  configuredUnit(unit, definitions)?.rounding ?? (isCountUnit(unit, definitions) ? 1 : 0.001);
 
 /** Converts between two units of the same dimension; null when they don't convert. */
-export function convertAmount(amount: number, from: string | null | undefined, to: string | null | undefined): number | null {
-  if (incompatiblePackages(from, to)) return null;
-  const a = unitInfo(from);
-  const b = unitInfo(to);
+export function convertAmount(amount: number, from: string | null | undefined, to: string | null | undefined, definitions: readonly UnitDefinition[] = []): number | null {
+  if (incompatiblePackages(from, to) && !(configuredUnit(from, definitions) && configuredUnit(to, definitions))) return null;
+  const a = unitInfo(from, definitions);
+  const b = unitInfo(to, definitions);
   if (!a || !b || a.dimension !== b.dimension) return null;
   return round3((amount * a.factor) / b.factor);
 }
@@ -153,24 +170,40 @@ export type StockUnitInfo = {
   unit: string | null;
   packageAmount: number | null;
   packageUnit: string | null;
+  /** Conversion catalogue supplied by the household, never stored on this product. */
+  units?: UnitDefinition[];
 };
 
 /**
  * Stock units per one of `unit`, for a product: 1 g in a product counted in packs of 200 g = 0.005. Null when
  * they don't convert.
  *
- * - The amount is in a count unit and the stock is counted in things (packs, pieces): 1 to 1.
+ * - Individual pieces and containers differ: pieces per bag require a known piece count per bag.
+ * - Matching count units (pieces to pieces, bottles to bottles) compare directly.
  * - The amount and the stock unit are the same dimension (the product counts grams): a direct conversion.
  * - The amount is mass/volume and the product has a package size of that dimension: via the package size.
  */
 export function stockUnitsPer(unit: string | null | undefined, product: StockUnitInfo): number | null {
-  if (incompatiblePackages(unit, product.unit)) return null;
-  const amount = unitInfo(unit);
-  const stock = unitInfo(product.unit);
+  const definitions = product.units ?? [];
+  if (incompatiblePackages(unit, product.unit) && !(configuredUnit(unit, definitions) && configuredUnit(product.unit, definitions))) return null;
+  const amount = unitInfo(unit, definitions);
+  const stock = unitInfo(product.unit, definitions);
   if (!amount) return null;
+  if (stock && stock.dimension === amount.dimension && (configuredUnit(unit, definitions) || configuredUnit(product.unit, definitions))) return amount.factor / stock.factor;
+  if (amount.dimension === "count" && stock?.dimension === "count") {
+    const fromPiece = PIECES.has(normalizeUnit(unit));
+    const toPiece = PIECES.has(normalizeUnit(product.unit));
+    const fromContainer = COUNT.has(normalizeUnit(unit)) && !fromPiece && Boolean(normalizeUnit(unit));
+    const toContainer = COUNT.has(normalizeUnit(product.unit)) && !toPiece && Boolean(normalizeUnit(product.unit));
+    if (fromPiece && toContainer) {
+      return PIECES.has(normalizeUnit(product.packageUnit)) && product.packageAmount && product.packageAmount > 0
+        ? 1 / product.packageAmount : null;
+    }
+    if (fromContainer && toPiece) return null;
+  }
   if (stock && stock.dimension === amount.dimension) return amount.factor / stock.factor;
   if (amount.dimension === "count") return null;
-  const pack = unitInfo(product.packageUnit);
+  const pack = unitInfo(product.packageUnit, definitions);
   if (stock?.dimension === "count" && pack && pack.dimension === amount.dimension && product.packageAmount && product.packageAmount > 0) {
     return amount.factor / (pack.factor * product.packageAmount);
   }
@@ -215,14 +248,16 @@ export function compareNeed(
   product: StockUnitInfo | null,
 ): NeedComparison {
   const scaled = (ingredient.quantity ?? 1) * scale;
-  const needed = roundUpWhole(scaled, ingredient.unit);
+  const needed = roundUpWhole(scaled, ingredient.unit, product?.units);
   const none = { needed, neededInStockUnits: null, stockInRecipeUnit: null, shortfall: null, shortfallPackages: null, comparable: false };
   if (!product) return { ...none, shortfall: needed, status: "unknown" };
   const per = stockUnitsPer(ingredient.unit, product);
-  if (per === null) return { ...none, status: "unknown_amount" };
+  if (per === null) return stock === 0
+    ? { ...none, stockInRecipeUnit: 0, shortfall: needed, status: "short" }
+    : { ...none, status: "unknown_amount" };
   const neededInStockUnits = round3(needed * per);
-  const packaged = isCountUnit(product.unit) || !product.unit;
-  const buy = (missingStockUnits: number) => (missingStockUnits <= EPSILON ? 0 : packaged ? Math.ceil(missingStockUnits - EPSILON) : round3(missingStockUnits));
+  const increment = unitRounding(product.unit, product.units);
+  const buy = (missingStockUnits: number) => (missingStockUnits <= EPSILON ? 0 : round3(Math.ceil(missingStockUnits / increment - EPSILON) * increment));
   if (stock === null) {
     return { needed, neededInStockUnits, stockInRecipeUnit: null, shortfall: needed, shortfallPackages: buy(neededInStockUnits), comparable: true, status: "not_kept" };
   }
@@ -240,8 +275,8 @@ export function compareNeed(
 }
 
 /** Count units (and the empty unit) need whole things; units that don't convert ("el") stay as scaled. */
-function roundUpWhole(scaled: number, unit: string | null): number {
-  if (!isCountUnit(unit)) return round3(scaled);
+function roundUpWhole(scaled: number, unit: string | null, definitions: readonly UnitDefinition[] = []): number {
+  if (!isCountUnit(unit, definitions)) return round3(scaled);
   return Math.max(1, Math.ceil(round3(scaled) - EPSILON));
 }
 

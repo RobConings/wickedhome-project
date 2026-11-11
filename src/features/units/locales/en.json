@@ -1,0 +1,21 @@
+{
+  "title": "Units of measure",
+  "description": "Manage units and conversions for the whole household. Define one unit in terms of another. Products and recipes use these shared definitions.",
+  "examples": "For example: 75 cl bottle = 75 cl, box of 6 = 6 pcs. Give different sizes distinct names. g, kg, ml, cl and l are already known. New conversions do not change stock quantities.",
+  "empty": "No custom units configured yet.",
+  "name": "Unit name",
+  "aliases": "Other names (comma separated)",
+  "factor": "Reference units per unit",
+  "reference": "Reference unit",
+  "rounding": "Round purchase quantities up to",
+  "add": "Add unit",
+  "remove": "Remove",
+  "removeNamed": "Remove unit {{name}}",
+  "save": "Save units",
+  "saved": "Units saved",
+  "loading": "Loading units…",
+  "loadFailed": "Could not load units. Reload the page to try again.",
+  "saveFailed": "Could not save units. Your changes are still here.",
+  "invalid": "Check the units: names must be unique, amounts positive and references known. References cannot form a cycle. Standard measures such as kg cannot be redefined.",
+  "conflict": "The units changed elsewhere. Reload the page before saving again. Your draft has been preserved."
+}

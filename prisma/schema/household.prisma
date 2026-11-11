@@ -21,6 +21,9 @@ model Household {
   shoppingSessions ShoppingSession[]
   id                  String                   @id @default(cuid())
   name                String
+  /// Central unit catalogue: name, reference unit, factor, purchase rounding and aliases.
+  unitDefinitions Json @default("[]")
+  unitDefinitionsUpdatedAt DateTime?
   /// The home address (Belgian structure). All optional: a household can exist without one.
   addressStreet       String?
   addressNumber       String?

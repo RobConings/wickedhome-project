@@ -14,6 +14,7 @@ import {
   type RecipeInput,
 } from "@/features/recipes/types/recipes";
 import { formatQuantity } from "@/features/shopping/types/shopping";
+import { defaultRecipePurchase, recipePurchaseQuantity } from "@/features/recipes/types/recipe-shopping";
 import { HttpError, badRequest, forbidden } from "@/api/lib/http";
 import { listStock } from "@/api/inventory/inventory.service";
 import {
@@ -654,6 +655,7 @@ registerAssistantTool({
     servings: z.number().int().min(1).max(100).optional().describe("For how many people (default the recipe's)"),
     buy: z.enum(["missing", "none"]).default("missing").describe("none = only put it on To cook"),
     skip: z.array(z.string().trim().min(1).max(120)).max(30).optional().describe("Ingredient names not to buy"),
+    quantities: z.record(z.string(), z.number().min(0.001).max(100_000)).optional().describe("Explicit quantities to buy in the product's stock unit, keyed by ingredient name or id. Ask the person when recipe and stock units cannot be converted; never invent a kg or package count."),
   }),
   permission: "write",
   confirm: "first-time",
@@ -674,7 +676,7 @@ registerAssistantTool({
         items: items.map((item) => ({
           label: item.productName ?? item.name,
           detail: item.product
-            ? `${amountText(Math.ceil(item.shortfallPackages || item.neededInStockUnits || 1), item.product.unit, ctx.locale)}${item.status === "unknown" || item.status === "unknown_amount" ? say(ctx.locale, " (stock amount unverified)", " (voorraadhoeveelheid niet geverifieerd)") : ""}`
+            ? `${amountText(item.purchaseQuantity, item.product.unit, ctx.locale)}${!item.comparable ? say(ctx.locale, " (purchase quantity chosen explicitly)", " (te kopen hoeveelheid expliciet gekozen)") : ""}`
             : amountText(item.needed, item.unit, ctx.locale),
           tone: "add" as const,
         })),
@@ -685,7 +687,7 @@ registerAssistantTool({
     const id = await recipeId(ctx, input.recipe);
     const check = await checkRecipe(ctx.householdId, id, input.servings);
     const items = input.buy === "none" ? [] : await toBuy(ctx, input);
-    const result = await planRecipe(ctx.user, { recipeId: id, servings: check.servings, items: items.map((item) => ({ ingredientId: item.ingredientId })) });
+    const result = await planRecipe(ctx.user, { recipeId: id, servings: check.servings, items: items.map((item) => ({ ingredientId: item.ingredientId, quantity: item.purchaseQuantity })) });
     const listed = result.added + result.merged;
     const unverified = items.filter((item) => item.status === "unknown" || item.status === "unknown_amount").map((item) => item.name);
     return done(
@@ -695,8 +697,8 @@ registerAssistantTool({
   },
 });
 
-/** What planning buys: short or unknown, not optional, not on a list yet, not skipped. */
-async function toBuy(ctx: AssistantToolContext, input: { recipe?: ResolvedEntity; servings?: number; skip?: string[] }) {
+/** Confirmed shortages, or explicitly chosen purchases; no invented package or mass conversions. */
+async function toBuy(ctx: AssistantToolContext, input: { recipe?: ResolvedEntity; servings?: number; skip?: string[]; quantities?: Record<string, number> }) {
   const check = await checkRecipe(ctx.householdId, await recipeId(ctx, input.recipe), input.servings);
   const skipped = (input.skip ?? []).map((name) => fold(ingredientName(name)));
   const required = check.ingredients.filter(
@@ -708,7 +710,11 @@ async function toBuy(ctx: AssistantToolContext, input: { recipe?: ResolvedEntity
   if (unlinked.length) {
     throw badRequest(`Link these recipe ingredients to catalogue products before planning groceries: ${unlinked.map((item) => item.name).join(", ")}. Use recipes_match, check relevant inventory_products, create missing products with inventory_save_product, then recipes_save with ingredient product links. Retry recipes_plan afterwards. Use skip only for ingredients the person does not want to buy; buy none only when they want no groceries.`);
   }
-  return required.filter((item) => item.status !== "in_stock" && !item.onList);
+  return required.filter((item) => !item.onList && (defaultRecipePurchase(item) || input.quantities?.[item.ingredientId] !== undefined || input.quantities?.[item.name] !== undefined)).map((item) => {
+    const purchaseQuantity = input.quantities?.[item.ingredientId] ?? input.quantities?.[item.name] ?? recipePurchaseQuantity(item);
+    if (purchaseQuantity === null) throw badRequest(`Ask how much ${item.productName ?? item.name} to buy in ${item.product?.unit ?? "stock units"}, then pass quantities keyed by ingredient name or id. ${item.needed} ${item.unit ?? ""} cannot be converted safely; never assume one package or one kg.`);
+    return { ...item, purchaseQuantity };
+  });
 }
 
 // ── Cooking ─────────────────────────────────────────────────────────────────────────────────────────

@@ -25,7 +25,9 @@ import {
   type RecipeStep,
   type RecipeSummary,
 } from "@/features/recipes/types/recipes";
-import { compareNeed, toStockUnits, type StockUnitInfo } from "@/types/units";
+import { compareNeed, toStockUnits, type StockUnitInfo, type UnitDefinition } from "@/types/units";
+import { listUnitDefinitions } from "../household/units.service";
+import { recipePurchaseQuantity } from "@/features/recipes/types/recipe-shopping";
 import { db, type Prisma } from "../lib/db";
 import { badRequest, conflict, forbidden, notFound } from "../lib/http";
 import { forgetDocumentLinks } from "../documents/documents.service";
@@ -71,7 +73,7 @@ const productSelect = {
 } satisfies Prisma.ProductSelect;
 type ProductRow = Prisma.ProductGetPayload<{ select: typeof productSelect }>;
 
-export function toIngredientProduct(row: ProductRow): IngredientProduct {
+export function toIngredientProduct(row: ProductRow, units: UnitDefinition[] = []): IngredientProduct {
   const sized = row.packageAmount ? row : (row.stockProduct ?? row);
   const links = row.shopLinks.filter((link) => link.url);
   const link = links.find((candidate) => candidate.shopId === row.defaultShopId) ?? links[0];
@@ -83,6 +85,7 @@ export function toIngredientProduct(row: ProductRow): IngredientProduct {
     unit: householdStockUnit(row.unit ?? row.stockProduct?.unit ?? null, row.stockProduct?.stockItems ?? row.stockItems),
     packageAmount: sized.packageAmount?.toNumber() ?? null,
     packageUnit: sized.packageAmount ? sized.packageUnit : null,
+    ...(units.length > 0 && { units }),
   };
 }
 
@@ -366,7 +369,7 @@ async function isOnList(householdId: string, productId: string | null, name: str
 
 /** Per ingredient: needed for `servings` (default the recipe's), the shared stock, the shortfall and whether it's on a list. */
 export async function checkRecipe(householdId: string, id: string, servings?: number | null): Promise<RecipeCheck> {
-  const row = await findRecipeRow(householdId, id);
+  const [row, units] = await Promise.all([findRecipeRow(householdId, id), listUnitDefinitions(householdId)]);
   const forServings = servings ?? row.servings ?? 1;
   const scale = servingsScale(row.servings, forServings);
   const ingredients = await Promise.all(
@@ -375,7 +378,7 @@ export async function checkRecipe(householdId: string, id: string, servings?: nu
         ingredient.productId ? stockTotal(householdId, ingredient.productId) : Promise.resolve(null),
         isOnList(householdId, ingredient.productId, ingredient.name),
       ]);
-      const product = ingredient.product ? toIngredientProduct(ingredient.product) : null;
+      const product = ingredient.product ? toIngredientProduct(ingredient.product, units) : null;
       const need = compareNeed({ quantity: num(ingredient.quantity), unit: ingredient.unit }, scale, stock, product);
       return {
         ingredientId: ingredient.id,
@@ -511,7 +514,13 @@ export async function planRecipe(user: Actor, input: MealPlanInput): Promise<Pla
   const { householdId } = user;
   const check = await checkRecipe(householdId, input.recipeId, input.servings);
   const byId = new Map(check.ingredients.map((ingredient) => [ingredient.ingredientId, ingredient]));
-  for (const item of input.items) if (!byId.has(item.ingredientId)) throw badRequest("Validation failed", { items: ["unknownIngredient"] });
+  const purchases = input.items.map((item) => {
+    const ingredient = byId.get(item.ingredientId);
+    if (!ingredient) throw badRequest("Validation failed", { items: ["unknownIngredient"] });
+    const quantity = item.quantity ?? recipePurchaseQuantity(ingredient);
+    if (quantity === null) throw badRequest(`Choose a purchase quantity in ${ingredient.product?.unit ?? "stock units"} for ${ingredient.name}; the recipe amount cannot be converted safely.`, { items: ["quantityRequired"] });
+    return { ingredient, quantity };
+  });
 
   const row = await db.mealPlanEntry.create({
     data: {
@@ -523,11 +532,7 @@ export async function planRecipe(user: Actor, input: MealPlanInput): Promise<Pla
   });
   let added = 0;
   let merged = 0;
-  for (const item of input.items) {
-    const ingredient = byId.get(item.ingredientId)!;
-    const quantity = ingredient.product
-      ? (item.quantity ?? (ingredient.shortfallPackages || ingredient.neededInStockUnits ? Math.ceil(ingredient.shortfallPackages || ingredient.neededInStockUnits || 1) : 1))
-      : (item.quantity ?? ingredient.needed);
+  for (const { ingredient, quantity } of purchases) {
     const result = await addRecipeItem(user, {
       productId: ingredient.productId,
       name: ingredient.productName ?? ingredient.name,
@@ -559,7 +564,7 @@ export async function deleteMealPlanEntry(
 /** Everything the cooking view needs: steps, ingredients with needed / used / stock, extras and the taps. */
 export async function getCookingState(householdId: string, id: string): Promise<CookingState> {
   const entryRow = await findEntryRow(householdId, id);
-  const [recipe, extras, usages, [entry]] = await Promise.all([
+  const [recipe, extras, usages, [entry], units] = await Promise.all([
     findRecipeRow(householdId, entryRow.recipeId),
     db.cookExtraIngredient.findMany({
       where: { entryId: id },
@@ -571,6 +576,7 @@ export async function getCookingState(householdId: string, id: string): Promise<
       orderBy: { createdAt: "desc" },
     }),
     toEntries(householdId, [entryRow]),
+    listUnitDefinitions(householdId),
   ]);
   const scale = servingsScale(recipe.servings, entryRow.servings);
   const productIds = [...new Set([...recipe.ingredients, ...extras].flatMap((item) => (item.productId ? [item.productId] : [])))];
@@ -614,7 +620,7 @@ export async function getCookingState(householdId: string, id: string): Promise<
     line(
       { kind: "ingredient", id: ingredient.id, name: ingredient.name, productId: ingredient.productId, note: ingredient.note, optional: ingredient.optional },
       { quantity: num(ingredient.quantity), unit: ingredient.unit },
-      ingredient.product ? toIngredientProduct(ingredient.product) : null,
+      ingredient.product ? toIngredientProduct(ingredient.product, units) : null,
       scale,
       (usage) => usage.ingredientId === ingredient.id,
     ),
@@ -626,7 +632,7 @@ export async function getCookingState(householdId: string, id: string): Promise<
       line(
         { kind: "extra", id: extra.id, name: extra.name, productId: extra.productId, note: null, optional: false },
         { quantity: num(extra.quantity), unit: extra.unit },
-        extra.product ? toIngredientProduct(extra.product) : null,
+        extra.product ? toIngredientProduct(extra.product, units) : null,
         1,
         (usage) => usage.extraId === extra.id,
       ),
@@ -634,8 +640,8 @@ export async function getCookingState(householdId: string, id: string): Promise<
 
   // Per ingredient or extra: its name, the unit its taps are counted in, and the recipe unit to show them in too.
   const lines = new Map<string, { name: string; unit: string | null; recipeUnit: string | null; product: StockUnitInfo | null }>([
-    ...recipe.ingredients.map((ingredient) => [ingredient.id, refOf(ingredient.name, ingredient.unit, ingredient.product)] as const),
-    ...extras.map((extra) => [extra.id, refOf(extra.name, extra.unit, extra.product)] as const),
+    ...recipe.ingredients.map((ingredient) => [ingredient.id, refOf(ingredient.name, ingredient.unit, ingredient.product, units)] as const),
+    ...extras.map((extra) => [extra.id, refOf(extra.name, extra.unit, extra.product, units)] as const),
   ]);
   const deducted = await movementDeltas(
     householdId,
@@ -677,9 +683,9 @@ export async function getCookingState(householdId: string, id: string): Promise<
  * A tap's reference: with a product, taps are counted in its stock unit and also shown in the recipe's unit
  * when that is another unit that converts (300 g = 1.5 packs); without a product, in the ingredient's own unit.
  */
-function refOf(name: string, unit: string | null, product: ProductRow | null) {
+function refOf(name: string, unit: string | null, product: ProductRow | null, units: UnitDefinition[] = []) {
   if (!product) return { name, unit, recipeUnit: null, product: null };
-  const info = toIngredientProduct(product);
+  const info = toIngredientProduct(product, units);
   const differs = Boolean(unit) && toStockUnits(1, unit, info) !== 1;
   return { name, unit: info.unit, recipeUnit: differs ? unit : null, product: info };
 }
@@ -812,7 +818,7 @@ async function stockQuantity(householdId: string, productId: string, quantity: n
   if (!unit) return quantity;
   const row = await db.product.findFirst({ where: { id: productId, householdId }, select: productSelect });
   if (!row) throw notFound("Product not found");
-  const product = toIngredientProduct(row);
+  const product = toIngredientProduct(row, await listUnitDefinitions(householdId));
   const converted = toStockUnits(quantity, unit, product);
   if (converted === null || converted <= 0) {
     throw badRequest(`${quantity} ${unit} can't be converted to ${row.name}'s stock unit (${product.unit ?? "pieces"}): give the amount in that unit, or set the content per package.`, {

@@ -55,6 +55,7 @@ describe("recipe photos through the API and MCP tools", () => {
   });
 
   it("persists a new photo and returns it in recipe list and detail results", async () => {
+    stub(db.household, "findUnique", async () => ({ unitDefinitions: [], unitDefinitionsUpdatedAt: null }));
     const create = stub(db.recipe, "create", async (args: unknown) => { assert.ok(args); return row; });
     await run("save", { name: "Pasta", imageUrl });
     const args = create.mock.calls[0]?.arguments[0] as { data: { imageUrl: string } };

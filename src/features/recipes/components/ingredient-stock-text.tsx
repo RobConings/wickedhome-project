@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
-import { productPath, type IngredientCheck } from "../types/recipes";
+import type { IngredientCheck } from "../types/recipes";
 import { useAmountText } from "./use-amount-text";
 
 type IngredientStockTextProps = {
@@ -24,10 +24,14 @@ export function IngredientStockText({ check, variant }: IngredientStockTextProps
   const need = text.amount(check.needed, check.unit);
   const buy = product && check.shortfallPackages ? t("stock.buy", { amount: text.stockUnits(check.shortfallPackages, product) }) : null;
   const setContent = product && check.status === "unknown_amount" && (
-    <Link to={productPath(product.id)} className="text-primary underline-offset-4 hover:underline">
-      {t("stock.setContent")}
+    <Link to="/settings?section=units" className="text-primary underline-offset-4 hover:underline">
+      {t("stock.setUnitConversion")}
     </Link>
   );
+
+  if (product && check.status === "short" && !check.comparable) {
+    return <span>{variant === "stock" ? t("stock.empty") : `${t("stock.needStock", { need, stock: text.stock(check.stock ?? 0, product) })} · ${t("stock.purchaseAmountUnknown")}`}</span>;
+  }
 
   if (variant === "stock") {
     if (!product) return null;

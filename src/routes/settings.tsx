@@ -1,4 +1,4 @@
-import { BellIcon, HistoryIcon, PlugIcon, UserCogIcon, UsersIcon, WorkflowIcon } from "lucide-react";
+import { BellIcon, HistoryIcon, PlugIcon, RulerIcon, UserCogIcon, UsersIcon, WorkflowIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLoaderData } from "react-router";
 import { ActivitySection } from "@/features/audit";
@@ -8,6 +8,7 @@ import { canManageHouseholdSettings } from "@/features/household";
 import { IntegrationsSettingsLink } from "@/features/integrations";
 import { NotificationSettingsSection } from "@/features/notifications";
 import { SettingsScreen, settingsAction, settingsLoader, type SettingsSectionItem } from "@/features/settings";
+import { UnitCatalogueSection } from "@/features/units";
 
 /** Deferred section data: a skeleton until it arrives; a failure only empties that section. */
 const deferred = <T,>(name: string, promise: Promise<T>): Promise<T | null> =>
@@ -33,6 +34,7 @@ export function Component() {
   const { t: tIntegrations } = useTranslation("integrations");
   const { t: tAudit } = useTranslation("audit");
   const { t: tNotifications } = useTranslation("notifications");
+  const { t: tUnits } = useTranslation("units");
   const data = useLoaderData<typeof loader>();
 
   const accountSections: SettingsSectionItem[] = [
@@ -77,6 +79,7 @@ export function Component() {
       data={data}
       canManage={canManageHouseholdSettings(user.role)}
       extraSections={[
+        { id: "units", icon: RulerIcon, title: tUnits("title"), description: tUnits("description"), content: <UnitCatalogueSection canManage={canManageHouseholdSettings(user.role)} /> },
         ...accountSections,
         {
           id: "automations",

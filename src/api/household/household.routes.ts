@@ -6,6 +6,8 @@ import { currentUser, requireRole, requireUser } from "../lib/session";
 import { createHabitant, deleteHabitant, getHouseholdOverview, updateHabitant } from "./household.service";
 import { householdSettingsInputSchema } from "@/features/household/types/household-settings";
 import { getHouseholdSettings, saveHouseholdSettings } from "./household-settings.service";
+import { unitCatalogueInputSchema } from "@/types/unit-catalogue";
+import { getUnitCatalogue, saveUnitCatalogue } from "./units.service";
 
 export const householdRouter = Router();
 
@@ -43,3 +45,6 @@ householdRouter.put("/settings", canManage, async (req, res) => {
   const input = parse(householdSettingsInputSchema, req.body);
   res.json(await saveHouseholdSettings(currentUser(req).householdId, input));
 });
+
+householdRouter.get("/units", async (req, res) => res.json(await getUnitCatalogue(currentUser(req).householdId)));
+householdRouter.put("/units", canManage, async (req, res) => res.json(await saveUnitCatalogue(currentUser(req).householdId, parse(unitCatalogueInputSchema, req.body))));

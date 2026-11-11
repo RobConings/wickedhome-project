@@ -28,7 +28,7 @@ describe("units", () => {
   });
 
   it("finds stock units per unit: direct, via the package size, or not at all", () => {
-    assert.equal(stockUnitsPer("pcs", pack(null, null)), 1, "count against packs compares directly");
+    assert.equal(stockUnitsPer("pcs", pack(null, null)), null, "pieces need a known count per pack");
     assert.equal(stockUnitsPer("kg", pack(null, null, "g")), 1000, "the product counts grams");
     assert.equal(toStockUnits(300, "g", pack(200, "g")), 1.5);
     assert.equal(stockUnitsPer("g", pack(null, null)), null, "no package size");
@@ -59,17 +59,17 @@ describe("compareNeed", () => {
 
   it("scales by servings and rounds whole things up", () => {
     assert.deepEqual(
-      [compareNeed({ quantity: 3, unit: "pcs" }, 1.5, 2, pack(null, null)).needed, compareNeed({ quantity: 3, unit: "pcs" }, 1.5, 2, pack(null, null)).shortfallPackages],
+      [compareNeed({ quantity: 3, unit: "pcs" }, 1.5, 2, pack(null, null, "pcs")).needed, compareNeed({ quantity: 3, unit: "pcs" }, 1.5, 2, pack(null, null, "pcs")).shortfallPackages],
       [5, 3],
     );
     assert.equal(compareNeed({ quantity: 1, unit: "pack" }, 0.25, 0, pack(null, null)).needed, 1, "never less than one");
     assert.equal(compareNeed({ quantity: 250, unit: "g" }, 1.5, 0, pack(500, "g")).needed, 375);
   });
 
-  it("pcs against packs compares directly; buying fractional stock rounds up to whole packs", () => {
-    const result = compareNeed({ quantity: 2, unit: "pcs" }, 1, 0.5, pack(null, null));
+  it("uses a verified piece count per pack; buying fractional stock rounds up to whole packs", () => {
+    const result = compareNeed({ quantity: 2, unit: "pcs" }, 1, 0.5, pack(2, "pcs"));
     assert.equal(result.status, "short");
-    assert.equal(result.shortfallPackages, 2);
+    assert.equal(result.shortfallPackages, 1);
   });
 
   it("2 el doesn't convert: unknown amount, never a shortfall in the wrong unit", () => {

@@ -112,6 +112,7 @@ function setup(t: TestContext) {
 }
 
 function setupRecipe(t: TestContext) {
+  stub(t, db.household, "findUnique", async () => ({ unitDefinitions: [], unitDefinitionsUpdatedAt: null }));
   const state = setup(t);
   const ingredient = (index: number, quantity: number, unit = "pack") => ({
     id: `ingredient-${index}`, position: index, name: state.products[index]!.name,
@@ -633,6 +634,33 @@ describe("shopping priority over MCP and the assistant", () => {
     assert.equal(added.productId, "milk");
     assert.equal(added.quantity.toNumber(), 2, "600 ml needed minus 250 ml stock = two 250 ml packs");
     assert.equal(added.source, "RECIPE");
+  });
+
+  it("requires an explicit purchase weight for an empty product with a recipe in heads, before creating a meal", async (t) => {
+    const { recipe, products, stock, rows, plan } = setupRecipe(t);
+    Object.assign(products[0]!, { unit: "kg", packageAmount: null, packageUnit: null });
+    Object.assign(stock[0]!, { quantity: new Prisma.Decimal(0), unit: "kg" });
+    recipe.ingredients = [{ ...recipe.ingredients[0]!, name: "witloof", quantity: new Prisma.Decimal(4), unit: "stronkje" }];
+    rows.splice(0, 1);
+    const missing = await callMcp("recipes_plan", { recipe: "Test meal", servings: 4, confirm: true });
+    assert.equal(missing.result.isError, true);
+    assert.match(missing.result.content[0]!.text, /Ask how much.*kg/);
+    assert.equal(plan.mock.callCount(), 0);
+    const explicit = await callMcp("recipes_plan", { recipe: "Test meal", servings: 4, quantities: { witloof: 1.2 }, confirm: true });
+    assert.equal(explicit.result.isError, false, explicit.result.content[0]!.text);
+    assert.equal(rows.at(-1)?.quantity.toNumber(), 1.2);
+  });
+
+  it("applies the central head-to-weight conversion in the API check and MCP plan", async (t) => {
+    const { recipe, products, stock, rows } = setupRecipe(t);
+    stub(t, db.household, "findUnique", async () => ({ unitDefinitions: [{ name: "stronkje", referenceUnit: "g", factor: 150, rounding: 1, aliases: [] }], unitDefinitionsUpdatedAt: null }));
+    Object.assign(products[0]!, { unit: "kg", packageAmount: null, packageUnit: null });
+    Object.assign(stock[0]!, { quantity: new Prisma.Decimal(0), unit: "kg" });
+    recipe.ingredients = [{ ...recipe.ingredients[0]!, name: "witloof", quantity: new Prisma.Decimal(4), unit: "stronkje" }];
+    rows.splice(0, 1);
+    const result = await callMcp("recipes_plan", { recipe: "Test meal", servings: 4, confirm: true });
+    assert.equal(result.result.isError, false, result.result.content[0]!.text);
+    assert.equal(rows.at(-1)?.quantity.toNumber(), 1.2, "8 heads at the configured 150 g per head");
   });
 
   it("MCP recipe saves automatically link existing ingredients and disclose unknown ones", async (t) => {

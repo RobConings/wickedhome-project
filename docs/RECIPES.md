@@ -133,12 +133,28 @@ st, stuk(s), pack, pak, pakje, blik, fles…; Dutch and English, case and a dot 
 `compareNeed(ingredient, scale, stock, product)` → `{ needed, neededInStockUnits, stockInRecipeUnit, shortfall,
 shortfallPackages, comparable, status }`:
 
-- a count unit against stock in things: compared directly (old recipes whose quantity was packs keep working);
+- pieces against pieces and matching containers compare directly; a bag is never silently one onion;
 - mass/volume against a product counted in the same dimension (grams): converted directly;
 - mass/volume against packs with a package size of that dimension: stock × size; packs to buy = ceil(short / size)
   (300 g against 1 pack of 200 g: short 100 g, buy 1);
-- anything else (el, tl, teentje, or no package size): `unknown_amount`. No shortage or stock is ever shown in
-  the wrong unit; the UI shows a neutral ring and "Set the content per package" (a link to the product).
+- other units use the centrally configured household unit catalogue. Without a verified relation, positive
+  stock is `unknown_amount`, shown with a neutral ring and a link to Settings → Units. Recorded zero stock
+  is always `short`, even across units: zero kg of witloof is empty when a recipe asks for heads. This does
+  not invent the weight to buy; the user enters a purchase quantity when no conversion is available.
+
+### Central unit catalogue
+
+Settings → Units (`/settings?section=units`, also linked from Inventory) manages units independently of
+products. A definition has `name`, `aliases`, `referenceUnit`, `factor` and purchase `rounding`: for example
+`fles 75 cl = 75 cl`, rounding 1, or `doos van 6 = 6 stuk`. References can chain through other defined units.
+The native mass/volume reference measures retain their standard meanings. Cycles, unknown references,
+duplicate aliases and redefining standard measures are refused. No conversions are seeded from guesses.
+Distinct sizes should use distinct names; products and recipe ingredients can select these central names.
+`GET/PUT /api/household/units` reads/saves the catalogue on the current household; only adults/owners write.
+The PUT checks `expectedUpdatedAt` so concurrent settings edits cannot overwrite each other. The migration
+`household_unit_catalogue` adds JSON definitions and their revision; existing stock quantities stay intact.
+The API stock check and cooking conversions load the same definitions, which travel with the recipe's
+stock-unit metadata for consistent browser calculations. No conversion is stored on a product.
 
 Count units round up to whole things after scaling. Stock is always shown in its own unit with the content
 ("1 pak (200 g) in stock"); the check says "Needs 300 g · have 200 g → buy 1 pak". The product form has
@@ -155,8 +171,8 @@ Count units round up to whole things after scaling. Stock is always shown in its
   `unknown_amount` / `unknown`: no product), the linked `product` (page, webshop link, photo, unit, package size)
   and `onList` (an open item for any product of the group, or the same free-text name).
 - `POST /api/recipes/meal-plan { recipeId, servings, items: [{ ingredientId, quantity? }] }` creates the entry
-  and adds the chosen items (a product in its stock unit, **whole packages**: the packs to buy, or 1 when the units
-  don't convert; a free-text ingredient with the recipe's amount) with `addRecipeItem` (shopping service): an open item of the same product group gets
+  and adds the chosen items (a product in its stock unit with the configured purchase rounding; an explicit
+  quantity is required when units don't convert; free-text ingredients use the recipe amount) with `addRecipeItem` (shopping service): an open item of the same product group gets
   **more quantity** instead of a second line; an ingredient without a product becomes a free-text item (reused
   by name). New items land on the everyday groceries list (the default list for `manual`, not a second "Groceries"), with source `recipe` and `mealPlanEntryId`.
 - `DELETE /api/recipes/meal-plan/:id?removeItems=1` takes it off the list, optionally with its own open items

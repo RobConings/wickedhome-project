@@ -5,6 +5,7 @@ import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { SkeletonList } from "@/components/shared/loading-state";
@@ -16,6 +17,7 @@ import { IngredientProductLink, IngredientShopLink, IngredientThumbnail } from "
 import { IngredientStatusDot } from "./ingredient-status-dot";
 import { IngredientStockText } from "./ingredient-stock-text";
 import { useAmountText } from "./use-amount-text";
+import { defaultRecipePurchase, parseRecipePurchaseQuantity, recipePurchaseQuantity } from "../types/recipe-shopping";
 
 type RecipeCheckDialogProps = {
   recipe: Pick<Recipe, "id" | "name" | "servings">;
@@ -27,18 +29,6 @@ type RecipeCheckDialogProps = {
   /** Loads the check; defaults to the API (stories pass a fake). */
   load?: (recipeId: string, servings: number) => Promise<RecipeCheck>;
 };
-
-/** Missing ingredients are ticked to buy; in stock, already on a list, optional and unknown ones aren't. */
-const defaultPick = (ingredient: IngredientCheck) => ingredient.status === "short" && !ingredient.onList && !ingredient.optional;
-
-/**
- * What goes on the list when ticked: a product in whole packages (the packages missing, or what the need
- * takes; 1 when the units don't convert); a free-text ingredient with the recipe's amount.
- */
-const toBuyOf = (ingredient: IngredientCheck) =>
-  ingredient.product
-    ? Math.max(1, Math.ceil(ingredient.shortfallPackages || ingredient.neededInStockUnits || 1))
-    : ingredient.needed;
 
 /**
  * "Add to To cook": choose for how many, see per ingredient what's in stock (shared stock of alternatives
@@ -55,7 +45,9 @@ export function RecipeCheckDialog({ recipe, trigger, open: controlledOpen, onOpe
   // The servings whose check failed to load (a newer servings value tries again).
   const [failedFor, setFailedFor] = React.useState<number | null>(null);
   const failed = failedFor === servings;
-  const [picked, setPicked] = React.useState<ReadonlySet<string> | null>(null);
+  const [choices, setChoices] = React.useState<Record<string, boolean>>({});
+  const [quantities, setQuantities] = React.useState<Record<string, string>>({});
+  const quantityPrefix = React.useId();
   const fetcher = useFetcher<RecipeActionResult>();
   const busy = fetcher.state !== "idle";
 
@@ -63,7 +55,8 @@ export function RecipeCheckDialog({ recipe, trigger, open: controlledOpen, onOpe
     if (!next && busy) return;
     // Every opening starts fresh: a new check, missing ones ticked again.
     if (!next) {
-      setPicked(null);
+      setChoices({});
+      setQuantities({});
       setCheck(null);
     }
     if (controlledOpen === undefined) setUncontrolledOpen(next);
@@ -79,7 +72,6 @@ export function RecipeCheckDialog({ recipe, trigger, open: controlledOpen, onOpe
         .then((next) => {
           if (cancelled) return;
           setCheck(next);
-          setPicked((previous) => previous ?? new Set(next.ingredients.filter(defaultPick).map((ingredient) => ingredient.ingredientId)));
         })
         .catch(() => !cancelled && setFailedFor(servings));
     }, 200);
@@ -105,22 +97,23 @@ export function RecipeCheckDialog({ recipe, trigger, open: controlledOpen, onOpe
     } else if (fetcher.data.formError) toast.error(fetcher.data.formError);
   }, [fetcher.state, fetcher.data, t]);
 
-  const selected = picked ?? new Set<string>();
+  const selected = new Set(check?.ingredients.filter((ingredient) => choices[ingredient.ingredientId] ?? defaultRecipePurchase(ingredient)).map((ingredient) => ingredient.ingredientId));
+  const refreshing = Boolean(check && check.servings !== servings);
   const toggle = (id: string) => {
-    const next = new Set(selected);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setPicked(next);
+    setChoices((previous) => ({ ...previous, [id]: !selected.has(id) }));
   };
+  const buyQuantity = (ingredient: IngredientCheck) => quantities[ingredient.ingredientId] !== undefined
+    ? parseRecipePurchaseQuantity(quantities[ingredient.ingredientId]!) : recipePurchaseQuantity(ingredient);
+  const quantityMissing = Boolean(check?.ingredients.some((ingredient) => selected.has(ingredient.ingredientId) && buyQuantity(ingredient) === null));
   const text = useAmountText();
 
   const submit = () => {
-    if (!check) return;
+    if (!check || refreshing || quantityMissing || busy) return;
     const items = check.ingredients
       .filter((ingredient) => selected.has(ingredient.ingredientId))
       .map((ingredient) => ({
         ingredientId: ingredient.ingredientId,
-        quantity: toBuyOf(ingredient),
+        quantity: buyQuantity(ingredient)!,
       }));
     void fetcher.submit(
       {
@@ -183,8 +176,9 @@ export function RecipeCheckDialog({ recipe, trigger, open: controlledOpen, onOpe
           >
             {check.ingredients.map((ingredient) => {
               const on = selected.has(ingredient.ingredientId);
-              const toBuy = toBuyOf(ingredient);
+              const toBuy = buyQuantity(ingredient);
               const product = ingredient.product;
+              const quantityId = `${quantityPrefix}-${ingredient.ingredientId}`;
               return (
                 <li key={ingredient.ingredientId} className="flex items-start gap-3 p-3">
                   <button
@@ -193,7 +187,7 @@ export function RecipeCheckDialog({ recipe, trigger, open: controlledOpen, onOpe
                     aria-checked={on}
                     aria-label={t("check.buy", { name: ingredient.name })}
                     onClick={() => toggle(ingredient.ingredientId)}
-                    disabled={busy}
+                    disabled={busy || refreshing}
                     className={cn(
                       "grid size-10 shrink-0 place-items-center rounded-full border-2 transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 [&_svg]:size-5",
                       on ? "border-primary bg-primary text-primary-foreground" : "border-input",
@@ -212,9 +206,15 @@ export function RecipeCheckDialog({ recipe, trigger, open: controlledOpen, onOpe
                     <span className="text-sm text-muted-foreground tabular-nums">
                       <IngredientStockText check={ingredient} variant="need" />
                     </span>
-                    {on && (
+                    {on && product ? (
+                      <div className="space-y-1 pt-1">
+                        <label htmlFor={quantityId} className="text-xs font-medium">{t("check.buyQuantity", { name: ingredient.name, unit: product.unit ?? "×" })}</label>
+                        <Input id={quantityId} inputMode="decimal" autoComplete="off" className="h-10 max-w-40" disabled={busy || refreshing} value={quantities[ingredient.ingredientId] ?? (toBuy === null ? "" : String(toBuy))} onChange={(event) => setQuantities((previous) => ({ ...previous, [ingredient.ingredientId]: event.target.value }))} aria-invalid={toBuy === null || undefined} placeholder={t("check.quantityPlaceholder")} />
+                        {toBuy === null && <p className="text-xs text-muted-foreground">{t("check.quantityRequired")}</p>}
+                      </div>
+                    ) : on && (
                       <span className="text-sm font-medium tabular-nums">
-                        {t("check.toBuy", { amount: product ? text.stockUnits(toBuy, product) : text.amount(toBuy, ingredient.unit) })}
+                        {t("check.toBuy", { amount: text.amount(toBuy ?? ingredient.needed, ingredient.unit) })}
                       </span>
                     )}
                     {ingredient.note && <span className="text-xs break-words text-muted-foreground">{ingredient.note}</span>}
@@ -231,7 +231,7 @@ export function RecipeCheckDialog({ recipe, trigger, open: controlledOpen, onOpe
           <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>
             {tCommon("actions.cancel")}
           </Button>
-          <Button onClick={submit} loading={busy} disabled={!check}>
+          <Button onClick={submit} loading={busy} disabled={!check || refreshing || quantityMissing}>
             {selected.size ? t("check.submit", { count: selected.size }) : t("check.submitNoItems")}
           </Button>
         </DialogFooter>
