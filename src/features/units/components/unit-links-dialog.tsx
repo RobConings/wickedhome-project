@@ -30,6 +30,7 @@ export function UnitLinksDialog({ initialUnit, units, usedUnits, onClose, onRetu
       </form>
       {!selected.trim() ? <p className="text-sm text-muted-foreground">{t("links.choose")}</p> : !result ? <p role="status" className="text-sm text-muted-foreground">{t("links.unknown", { name: selected })}</p> : <div className="space-y-3" aria-live="polite">
         <p className="font-semibold">{t("links.summary", { name: result.unit.name, count: links.length })}</p>
+        {units.some((unit) => unit.isTerminal) && <p className="text-sm text-muted-foreground">{t("links.terminalHelp")}</p>}
         {result.unit.aliases.length > 0 && <p className="text-sm text-muted-foreground break-words">{t("aliasesSummary", { names: result.unit.aliases.join(", ") })}</p>}
         {links.length ? <Card className="gap-0 divide-y px-4 py-1" role="list" aria-label={t("links.results")}>
           {links.map((link) => <div key={link.unit.name} role="listitem" className="space-y-1 py-3">

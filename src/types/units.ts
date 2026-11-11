@@ -11,7 +11,7 @@ export type UnitDimension = "mass" | "volume" | "count" | "bundle";
 
 type UnitInfo = { dimension: UnitDimension; /** Base units (g, ml, 1) per one of this unit. */ factor: number };
 /** A centrally managed household unit, independent of products. */
-export type UnitDefinition = { name: string; referenceUnit: string; factor: number; rounding: number; aliases: string[] };
+export type UnitDefinition = { name: string; referenceUnit: string; factor: number; rounding: number; aliases: string[]; isTerminal?: boolean };
 
 const MASS: Record<string, number> = { mg: 0.001, g: 1, gr: 1, gram: 1, grams: 1, gramm: 1, grammes: 1, kg: 1000, kilo: 1000, kilogram: 1000, kilos: 1000 };
 const VOLUME: Record<string, number> = {
@@ -101,7 +101,7 @@ const PIECES = new Set(["pcs", "pc", "piece", "pieces", "st", "stk", "stuk", "st
 export const isPieceUnit = (unit: string | null | undefined) => PIECES.has(normalizeUnit(unit));
 /** Existing container aliases keep identifying the same centrally configured unit. Sized names stay distinct. */
 export const unitDefinitionKey = (unit: string | null | undefined) => packageForm(unit) ? `container:${packageForm(unit)}` : normalizeUnit(unit);
-const configuredUnit = (unit: string | null | undefined, definitions: readonly UnitDefinition[]) => definitions.find((item) => [item.name, ...item.aliases].some((name) => unitDefinitionKey(name) === unitDefinitionKey(unit)));
+const configuredUnit = (unit: string | null | undefined, definitions: readonly UnitDefinition[]) => definitions.find((item) => !isStandardUnitSetting(item) && [item.name, ...item.aliases].some((name) => unitDefinitionKey(name) === unitDefinitionKey(unit)));
 
 /** Lower case, no trailing dot, single spaces: "St." → "st", " KG " → "kg". */
 export const normalizeUnit = (unit: string | null | undefined) =>
@@ -143,6 +143,100 @@ export function standardUnits(): StandardUnit[] {
     }),
     { name: "tros", aliases: [...BUNDLE].filter((name) => name !== "tros"), dimension: "bundle", referenceUnit: null, factor: 1 },
   ];
+}
+
+const standardByName = new Map(standardUnits().flatMap((unit) => [unit.name, ...unit.aliases].map((name) => [unitDefinitionKey(name), unit] as const)));
+
+/** Settings for a built-in cannot change its meaning, factor, reference, aliases or rounding. */
+export function standardUnitSetting(name: string, isTerminal: boolean): UnitDefinition | null {
+  const standard = standardByName.get(unitDefinitionKey(name));
+  return standard ? { name: standard.name, referenceUnit: standard.referenceUnit ?? standard.name, factor: standard.factor, rounding: standard.dimension === "count" || standard.dimension === "bundle" ? 1 : 0.001, aliases: [], isTerminal } : null;
+}
+
+export function isStandardUnitSetting(unit: UnitDefinition): boolean {
+  if (typeof unit.isTerminal !== "boolean") return false;
+  const expected = standardUnitSetting(unit.name, unit.isTerminal);
+  return Boolean(expected && unit.name === expected.name && unit.referenceUnit === expected.referenceUnit && unit.factor === expected.factor && unit.rounding === expected.rounding && unit.aliases.length === 0);
+}
+
+export type UnitNode = { name: string; aliases: string[]; referenceUnit: string | null; factor: number; rounding: number; dimension: UnitDimension | null; source: "standard" | "custom"; needsDefinition: boolean; isTerminal: boolean };
+
+/** The same canonical nodes serve conversion checks, the overview and MCP relationship paths. */
+export function unitNodes(definitions: readonly UnitDefinition[]): UnitNode[] {
+  const custom = definitions.filter((unit) => !isStandardUnitSetting(unit));
+  const settings = new Map(definitions.filter(isStandardUnitSetting).map((unit) => [unit.name, unit.isTerminal === true]));
+  const customKeys = new Set(custom.flatMap((unit) => [unit.name, ...unit.aliases].map(unitDefinitionKey)));
+  const builtins = standardUnits().flatMap((unit): UnitNode[] => {
+    const names = [unit.name, ...unit.aliases].filter((name) => !customKeys.has(unitDefinitionKey(name)));
+    return names.length ? [{ ...unit, name: names[0]!, aliases: names.slice(1), rounding: unit.dimension === "count" || unit.dimension === "bundle" ? 1 : 0.001, source: "standard", needsDefinition: unit.dimension === "count" && !isPieceUnit(unit.name), isTerminal: settings.get(unit.name) ?? false }] : [];
+  });
+  const byName = new Map(custom.flatMap((unit) => [unit.name, ...unit.aliases].map((name) => [unitDefinitionKey(name), unit] as const)));
+  const info = new Map<string, UnitInfo | null>();
+  const resolve = (name: string, seen = new Set<string>()): UnitInfo | null => {
+    const target = byName.get(unitDefinitionKey(name));
+    if (!target) return unitInfo(name);
+    if (seen.has(target.name)) return null;
+    if (info.has(target.name)) return info.get(target.name)!;
+    const reference = resolve(target.referenceUnit, new Set([...seen, target.name]));
+    const factor = reference ? reference.factor * target.factor : 0;
+    const result = reference && Number.isFinite(factor) && factor > 0 ? { dimension: reference.dimension, factor } : null;
+    info.set(target.name, result);
+    return result;
+  };
+  return [...builtins, ...custom.map((unit): UnitNode => ({ ...unit, dimension: resolve(unit.name)?.dimension ?? null, source: "custom", needsDefinition: false, isTerminal: unit.isTerminal === true }))];
+}
+
+export type UnitConnection = { unit: UnitNode; factor: number; path: string[]; direct: boolean };
+
+/** A terminal node may be an endpoint, but must never be an interior node of a conversion path. */
+export function unitConnections(name: string, definitions: readonly UnitDefinition[], options: { ignoreTerminals?: boolean; implicitCounts?: boolean } = {}): { unit: UnitNode; links: UnitConnection[] } | null {
+  const items = unitNodes(definitions);
+  const byName = new Map(items.flatMap((unit) => [unit.name, ...unit.aliases].map((name) => [unitDefinitionKey(name), unit] as const)));
+  const unit = byName.get(unitDefinitionKey(name || "stuk"));
+  if (!unit) return null;
+  const chain = (start: UnitNode) => {
+    const path: string[] = [];
+    let current: UnitNode | undefined = start;
+    let factor = 1;
+    while (current) {
+      if (path.includes(current.name)) return null;
+      path.push(current.name);
+      const reference = current.referenceUnit ?? (options.implicitCounts && current.source === "standard" && current.dimension === "count" && !isPieceUnit(current.name) ? "stuk" : null);
+      if (!reference) return { path, factor, root: current.name };
+      factor *= current.factor;
+      if (!Number.isFinite(factor) || factor <= 0) return null;
+      current = byName.get(unitDefinitionKey(reference));
+    }
+    return null;
+  };
+  const source = chain(unit);
+  const links = items.flatMap((target): UnitConnection[] => {
+    if (!source || target.name === unit.name) return [];
+    const destination = chain(target);
+    if (!destination || destination.root !== source.root) return [];
+    const factor = source.factor / destination.factor;
+    if (!Number.isFinite(factor) || factor <= 0) return [];
+    const common = source.path.findIndex((name) => destination.path.includes(name));
+    const path = [...source.path.slice(0, common + 1), ...destination.path.slice(0, destination.path.indexOf(source.path[common]!)).reverse()];
+    if (!options.ignoreTerminals && path.slice(1, -1).some((name) => byName.get(unitDefinitionKey(name))?.isTerminal)) return [];
+    return [{ unit: target, factor, path, direct: path.length === 2 }];
+  });
+  return { unit, links };
+}
+
+const sameUnitNode = (a: string | null | undefined, b: string | null | undefined, definitions: readonly UnitDefinition[]) => {
+  const nodes = unitNodes(definitions);
+  const find = (name: string | null | undefined) => nodes.find((unit) => [unit.name, ...unit.aliases].some((alias) => unitDefinitionKey(alias) === unitDefinitionKey(name || "stuk")));
+  const first = find(a);
+  return Boolean(first && first.name === find(b)?.name);
+};
+
+export function terminalBlocksConversion(from: string | null | undefined, to: string | null | undefined, definitions: readonly UnitDefinition[]) {
+  if (!definitions.some((unit) => unit.isTerminal)) return false;
+  const result = unitConnections(from || "stuk", definitions, { ignoreTerminals: true, implicitCounts: true });
+  const target = result?.links.find((link) => [link.unit.name, ...link.unit.aliases].some((name) => unitDefinitionKey(name) === unitDefinitionKey(to || "stuk")));
+  const terminals = new Set(unitNodes(definitions).filter((unit) => unit.isTerminal).map((unit) => unit.name));
+  return target?.path.slice(1, -1).some((name) => terminals.has(name)) ?? false;
 }
 
 /** Container aliases describe a physical variant; a jar is never silently a tube or bottle. */
@@ -188,6 +282,7 @@ export const unitRounding = (unit: string | null | undefined, definitions: reado
 
 /** Converts between two units of the same dimension; null when they don't convert. */
 export function convertAmount(amount: number, from: string | null | undefined, to: string | null | undefined, definitions: readonly UnitDefinition[] = []): number | null {
+  if (terminalBlocksConversion(from, to, definitions)) return null;
   if (incompatiblePackages(from, to) && !(configuredUnit(from, definitions) && configuredUnit(to, definitions))) return null;
   const a = unitInfo(from, definitions);
   const b = unitInfo(to, definitions);
@@ -219,6 +314,7 @@ export type StockUnitInfo = {
  */
 export function stockUnitsPer(unit: string | null | undefined, product: StockUnitInfo): number | null {
   const definitions = product.units ?? [];
+  if (terminalBlocksConversion(unit, product.unit, definitions)) return null;
   if (incompatiblePackages(unit, product.unit) && !(configuredUnit(unit, definitions) && configuredUnit(product.unit, definitions))) return null;
   const amount = unitInfo(unit, definitions);
   const stock = unitInfo(product.unit, definitions);
@@ -239,6 +335,9 @@ export function stockUnitsPer(unit: string | null | undefined, product: StockUni
   if (amount.dimension === "count") return null;
   const pack = unitInfo(product.packageUnit, definitions);
   if (stock?.dimension === "count" && pack && pack.dimension === amount.dimension && product.packageAmount && product.packageAmount > 0) {
+    if (terminalBlocksConversion(unit, product.packageUnit, definitions)) return null;
+    const terminalContent = unitNodes(definitions).find((item) => item.isTerminal && [item.name, ...item.aliases].some((name) => unitDefinitionKey(name) === unitDefinitionKey(product.packageUnit)));
+    if (terminalContent && !sameUnitNode(unit, product.packageUnit, definitions) && !sameUnitNode(product.unit, product.packageUnit, definitions)) return null;
     return amount.factor / (pack.factor * product.packageAmount);
   }
   return null;

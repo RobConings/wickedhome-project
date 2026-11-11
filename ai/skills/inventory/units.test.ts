@@ -3,7 +3,7 @@ import { it, type TestContext } from "node:test";
 import { db, Prisma } from "@/api/lib/db";
 import { handleMcpMessage } from "@ai/core/mcp.routes";
 import { getAssistantTool, type AssistantToolContext } from "@ai/core/tools";
-import type { UnitDefinition } from "@/types/units";
+import { standardUnitSetting, type UnitDefinition } from "@/types/units";
 import "@ai/skills";
 import "@ai/core/core-tools";
 
@@ -50,6 +50,7 @@ it("exposes unit knowledge through the same MCP guides and built-in chat tool", 
     assert.match(guide.guide, /[Cc]entral/);
     assert.match(guide.guide, /[Rr]ecorded.*0/);
     assert.match(guide.guide, /purchaseQuantityRequired/);
+    assert.match(guide.guide, /isTerminal/);
   }
   assert.ok((response.tools as string[]).includes("inventory_units"));
   const mcp = data(await call("inventory_units", { fromUnit: "flesje", toUnit: "cl", quantity: 2 }));
@@ -80,6 +81,34 @@ it("exposes built-ins and indirect relationships without mixing them into editab
   assert.ok(!relationships.links.some((link) => ["mg", "g", "kg", "stuk", "zak"].includes(link.unit.name)));
   const bag = data(await call("inventory_units", { fromUnit: "zak" })).relationships as { links: unknown[] };
   assert.deepEqual(bag.links, []);
+});
+
+it("MCP and chat enforce terminal boundaries and distinguish them from missing conversions", async (t) => {
+  const piece = standardUnitSetting("stuk", true)!;
+  const definitions = [piece, { name: "doos eieren", referenceUnit: "stuk", factor: 6, rounding: 1, aliases: [] }, { name: "zak appels", referenceUnit: "pcs", factor: 12, rounding: 1, aliases: [] }];
+  setup(t, definitions);
+  const args = { fromUnit: "doos eieren", toUnit: "zak appels" };
+  const result = data(await call("inventory_units", args));
+  const tool = getAssistantTool("inventory.units")!;
+  assert.deepEqual(await tool.run(context, tool.input.parse(args)), result);
+  const conversion = result.conversion as { comparable: boolean; result: number | null; blockedByTerminal?: boolean; note: string };
+  assert.equal(conversion.comparable, false); assert.equal(conversion.result, null); assert.equal(conversion.blockedByTerminal, true);
+  assert.match(conversion.note, /intentionally blocked/);
+  assert.ok(!(result.relationships as { links: { unit: { name: string } }[] }).links.some((link) => link.unit.name === "zak appels"));
+  const endpoint = data(await call("inventory_units", { fromUnit: "doos eieren", toUnit: "stuks" })).conversion as typeof conversion;
+  assert.equal(endpoint.comparable, true); assert.equal(endpoint.result, 6);
+  assert.equal((data(await call("inventory_units", { ...args, quantity: 0 })).conversion as typeof conversion).result, 0);
+  assert.equal((result.overview as { name: string; source: string; isTerminal: boolean }[]).find((unit) => unit.name === "stuk")!.isTerminal, true);
+});
+
+it("previews and saves built-in terminal settings without changing native ratios or stock", async (t) => {
+  const state = setup(t);
+  const input = { expectedUpdatedAt: state.read().revision!.toISOString(), units: [bottle, standardUnitSetting("stuk", true)!] };
+  const preview = await getAssistantTool("inventory.save_units")!.preview!(context, input);
+  assert.match(JSON.stringify(preview), /end unit: yes \(no transit\)/);
+  data(await call("inventory_save_units", { ...input, confirm: true }, "write"));
+  assert.deepEqual(state.read().units, input.units);
+  assert.equal(state.read().writes, 1);
 });
 
 it("saves central units through a confirmed, revision-checked MCP write without touching stock", async (t) => {

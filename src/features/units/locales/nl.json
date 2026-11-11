@@ -1,5 +1,9 @@
 {
   "title": "Eenheden",
+  "terminal": "Eindeenheid",
+  "terminalFor": "Eindeenheid voor {{name}}",
+  "terminalHelp": "Een eindeenheid mag het begin of einde van een omzetting zijn, maar geen tussenstap naar andere eenheden. Bijvoorbeeld: doos → stuk kan, doos → stuk → zak niet.",
+  "terminalSaved": "Instelling voor {{name}} bewaard",
   "listHint": "Standaardmaten, eigen eenheden en eenheden die je al gebruikt. Andere benamingen staan bij dezelfde eenheid. Klik op een naam om ook indirecte koppelingen te zien.",
   "undefinedConversion": "Nog geen omzetting ingesteld",
   "defineNamed": "Omzetting instellen voor {{name}}",
@@ -7,6 +11,7 @@
   "undefinedContent": "Inhoud of aantal nog niet ingesteld",
   "sources": { "standard": "Standaard", "custom": "Eigen", "used": "In gebruik" },
   "links": {
+    "terminalHelp": "Paden via een eindeenheid zijn verborgen. De eindeenheid zelf blijft bereikbaar als begin- of eindpunt.",
     "title": "Koppelingen bekijken",
     "description": "Kies een eenheid om de directe en indirecte omzettingen te zien, samen met het pad dat ze verbindt.",
     "forUnit": "Koppelingen voor {{name}}",

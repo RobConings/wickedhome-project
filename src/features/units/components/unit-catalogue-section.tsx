@@ -3,6 +3,7 @@ import { LinkIcon, MoreHorizontalIcon, PencilIcon, PlusIcon, RulerIcon, Trash2Ic
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Card } from "@/components/shared/card";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -13,7 +14,7 @@ import { api, ApiRequestError } from "@/lib/api-client";
 import { currentLocale } from "@/lib/i18n";
 import { unitOverview, type UnitOverviewItem } from "@/types/unit-overview";
 import { unitCatalogueInputSchema, type UnitCatalogue, type UnitCatalogueInput } from "@/types/unit-catalogue";
-import { unitDefinitionKey, type UnitDefinition } from "@/types/units";
+import { isStandardUnitSetting, standardUnitSetting, unitDefinitionKey, type UnitDefinition } from "@/types/units";
 import { UnitFormDialog } from "./unit-form-dialog";
 import { UnitLinksDialog } from "./unit-links-dialog";
 
@@ -37,6 +38,8 @@ export function UnitCatalogueSection({ canManage, initialData, onSave = saveCata
   const linksRef = React.useRef<HTMLButtonElement>(null);
   const returnFocus = React.useRef<HTMLElement | null>(null);
   const locale = currentLocale();
+  const prefix = React.useId();
+  const atUnitLimit = (catalogue?.units.filter((unit) => !isStandardUnitSetting(unit)).length ?? 0) >= 100;
   const numbers = React.useMemo(() => new Intl.NumberFormat(locale === "nl" ? "nl-BE" : "en-BE", { maximumFractionDigits: 8 }), [locale]);
 
   React.useEffect(() => {
@@ -75,7 +78,8 @@ export function UnitCatalogueSection({ canManage, initialData, onSave = saveCata
     const original = editing === "new" ? null : catalogue.units.find((item) => item.name === editing.name);
     if (editing !== "new" && !original) { setError(t("noLongerExists")); return; }
     const originalNames = new Set(original ? [original.name, ...original.aliases].map(unitDefinitionKey) : []);
-    const units = original ? catalogue.units.map((item) => item.name === original.name ? unit : originalNames.has(unitDefinitionKey(item.referenceUnit)) ? { ...item, referenceUnit: unit.name } : item) : [...catalogue.units, unit];
+    const replacedSetting = standardUnitSetting(unit.name, false);
+    const units = original ? catalogue.units.map((item) => item.name === original.name ? unit : !isStandardUnitSetting(item) && originalNames.has(unitDefinitionKey(item.referenceUnit)) ? { ...item, referenceUnit: unit.name } : item) : [...catalogue.units.filter((item) => !(isStandardUnitSetting(item) && item.name === replacedSetting?.name)), unit];
     if (await persist(units)) { setEditing(null); toast.success(t("savedUnit", { name: unit.name })); }
   }
 
@@ -88,7 +92,14 @@ export function UnitCatalogueSection({ canManage, initialData, onSave = saveCata
     setExploring(name);
   }
   function restoreFocus() { (returnFocus.current?.isConnected ? returnFocus.current : linksRef.current)?.focus(); }
-  const addButton = canManage && <Button ref={addRef} disabled={busy || !catalogue || catalogue.units.length >= 100} onClick={() => edit("new")}><PlusIcon />{t("add")}</Button>;
+  async function toggleTerminal(unit: UnitOverviewItem, isTerminal: boolean) {
+    if (!catalogue) return;
+    const definition = catalogue.units.find((item) => item.name === unit.name && !isStandardUnitSetting(item));
+    const setting = standardUnitSetting(unit.name, isTerminal);
+    const units = definition ? catalogue.units.map((item) => item === definition ? { ...item, isTerminal } : item) : setting ? [...catalogue.units.filter((item) => !(isStandardUnitSetting(item) && item.name === setting.name)), ...(isTerminal ? [setting] : [])] : null;
+    if (units && await persist(units)) toast.success(t("terminalSaved", { name: unit.name }));
+  }
+  const addButton = canManage && <Button ref={addRef} disabled={busy || !catalogue || atUnitLimit} onClick={() => edit("new")}><PlusIcon />{t("add")}</Button>;
   const actions = (unit: UnitDefinition) => canManage && <DropdownMenu modal={false} onOpenChange={(open) => { if (open && document.activeElement instanceof HTMLElement) returnFocus.current = document.activeElement; }}>
     <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" disabled={busy} aria-label={t("actionsFor", { name: unit.name })}><MoreHorizontalIcon /></Button></DropdownMenuTrigger>
     <DropdownMenuContent align="end">
@@ -101,15 +112,17 @@ export function UnitCatalogueSection({ canManage, initialData, onSave = saveCata
     <p className="text-sm break-words tabular-nums">{unit.referenceUnit ? <>1 {unit.name} = {numbers.format(unit.factor)} {unit.referenceUnit}</> : t(unit.source === "used" ? "undefinedConversion" : unit.needsDefinition ? "undefinedContent" : "baseUnit")}</p>
     <p className="text-xs text-muted-foreground">{t(`categories.${unit.dimension ?? "other"}`)}{unit.source === "custom" && <> · {t("roundingSummary", { amount: numbers.format(unit.rounding) })}</>}</p>
     {unit.aliases.length > 0 && <p className="text-xs break-words text-muted-foreground">{t("aliasesSummary", { names: unit.aliases.join(", ") })}</p>}
+    {canManage && unit.source !== "used" ? <div className="flex items-center gap-2 pt-1"><Switch id={`${prefix}-terminal-${encodeURIComponent(unit.name)}`} checked={unit.isTerminal} disabled={busy} onCheckedChange={(checked) => void toggleTerminal(unit, checked)} aria-label={t("terminalFor", { name: unit.name })} title={t("terminalHelp")} /><label htmlFor={`${prefix}-terminal-${encodeURIComponent(unit.name)}`} className="cursor-pointer text-xs text-muted-foreground">{t("terminal")}</label></div> : unit.isTerminal && <p className="text-xs font-medium text-section-foreground">{t("terminal")}</p>}
   </div>;
   const rowActions = (unit: UnitOverviewItem) => {
-    const definition = catalogue?.units.find((item) => item.name === unit.name);
+    const definition = catalogue?.units.find((item) => item.name === unit.name && !isStandardUnitSetting(item));
     if (definition) return actions(definition);
-    return canManage && unit.needsDefinition && <Button variant="ghost" size="icon" disabled={busy || !catalogue || catalogue.units.length >= 100} onClick={() => edit("new", unit.name)} aria-label={t("defineNamed", { name: unit.name })}><PencilIcon /></Button>;
+    return canManage && unit.needsDefinition && <Button variant="ghost" size="icon" disabled={busy || !catalogue || atUnitLimit} onClick={() => edit("new", unit.name)} aria-label={t("defineNamed", { name: unit.name })}><PencilIcon /></Button>;
   };
 
   return <div className="space-y-4">
     <p className="text-sm text-muted-foreground">{t("listHint")}</p>
+    <p className="text-xs text-muted-foreground">{t("terminalHelp")}</p>
     {error && !editing && catalogue && <div className="space-y-2"><p role="alert" className="text-sm text-destructive">{error}</p>{conflict && <Button variant="outline" disabled={busy} onClick={() => void reload()}>{t("reload")}</Button>}</div>}
     <GeneralList
       label={t("title")}

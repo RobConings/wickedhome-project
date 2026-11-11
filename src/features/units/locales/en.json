@@ -1,5 +1,9 @@
 {
   "title": "Units of measure",
+  "terminal": "End unit",
+  "terminalFor": "End unit for {{name}}",
+  "terminalHelp": "An end unit can start or end a conversion, but cannot connect other units. For example: box → piece is allowed; box → piece → bag is not.",
+  "terminalSaved": "Setting for {{name}} saved",
   "listHint": "Standard measures, custom units and units you already use. Alternative names appear with the same unit. Select a name to see its indirect relationships too.",
   "undefinedConversion": "No conversion defined yet",
   "defineNamed": "Define conversion for {{name}}",
@@ -7,6 +11,7 @@
   "undefinedContent": "Content or piece count not defined yet",
   "sources": { "standard": "Standard", "custom": "Custom", "used": "In use" },
   "links": {
+    "terminalHelp": "Paths through an end unit are hidden. The end unit itself remains reachable as a starting or ending point.",
     "title": "Explore relationships",
     "description": "Choose a unit to see its direct and indirect conversions, together with the path connecting them.",
     "forUnit": "Relationships for {{name}}",

@@ -49,7 +49,7 @@ import { fold } from "@ai/core/text-match";
 import { productSetup } from "./product-setup";
 import { getUnitCatalogue, getUnitCatalogueOverview, saveUnitCatalogue } from "@/api/household/units.service";
 import { unitCatalogueInputSchema } from "@/types/unit-catalogue";
-import { stockUnitsPer, unitInfo, unitRounding } from "@/types/units";
+import { isStandardUnitSetting, stockUnitsPer, terminalBlocksConversion, unitInfo, unitRounding } from "@/types/units";
 import "./prepare-product";
 
 /** Skill "inventory": household stock and the product catalogue (guide: guide.md next to this file). */
@@ -116,7 +116,7 @@ const noChildren = (ctx: AssistantToolContext) => {
 
 registerAssistantTool({
   name: "inventory.units",
-  description: "Read all standard and household units, reference relationships, aliases, purchase rounding and revision. overview includes built-ins; units contains only editable definitions. Give fromUnit alone to explore direct and indirect relationships and paths, or also toUnit to check a conversion. Never infer a bag equals one piece or invent a head's weight. A zero quantity is zero even when a positive conversion is unknown. Read this before inventory_save_units. Definitions are household-wide, not product-specific.",
+  description: "Read all standard and household units, reference relationships, aliases, isTerminal, purchase rounding and revision. overview includes built-ins; units contains editable definitions and built-in terminal settings. Give fromUnit alone to explore permitted direct and indirect relationships and paths, or also toUnit to check a conversion. End units may start/end paths but cannot be intermediate nodes, even between sibling branches. Never bypass these boundaries or infer a bag equals one piece. A zero quantity is zero even when a positive conversion is unknown. Read this before inventory_save_units. Definitions are household-wide.",
   input: z.object({
     fromUnit: z.string().trim().min(1).max(20).optional(),
     toUnit: z.string().trim().min(1).max(20).optional(),
@@ -127,6 +127,7 @@ registerAssistantTool({
   run: async (ctx, input) => {
     const catalogue = await getUnitCatalogueOverview(ctx.householdId);
     const per = input.fromUnit && input.toUnit ? stockUnitsPer(input.fromUnit, { unit: input.toUnit, packageAmount: null, packageUnit: null, units: catalogue.units }) : null;
+    const terminalBlocked = input.fromUnit && input.toUnit && terminalBlocksConversion(input.fromUnit, input.toUnit, catalogue.units);
     return {
       ...catalogue,
       overview: unitOverview(catalogue.units, catalogue.usedUnits),
@@ -139,7 +140,7 @@ registerAssistantTool({
         result: input.quantity === 0 ? 0 : per === null ? null : Math.round(input.quantity * per * 1000) / 1000,
         dimension: unitInfo(input.toUnit, catalogue.units)?.dimension ?? null,
         purchaseRounding: unitRounding(input.toUnit, catalogue.units),
-        ...((per === null) && { note: "No verified relation for positive quantities. Ask for an explicit definition or a purchase quantity; never assume one bag, one piece or one kg." }),
+        ...(terminalBlocked ? { blockedByTerminal: true, note: "An end unit is inside this conversion path. This conversion is intentionally blocked; do not bypass it with manual arithmetic or another alias. A recorded zero is still empty." } : (per === null) && { note: "No verified relation for positive quantities. Ask for an explicit definition or a purchase quantity; never assume one bag, one piece or one kg." }),
       } }),
     };
   },
@@ -147,7 +148,7 @@ registerAssistantTool({
 
 registerAssistantTool({
   name: "inventory.save_units",
-  description: "Save the central household unit catalogue after inventory_units. This replaces the whole catalogue: preserve every unrelated definition and send its exact updatedAt as expectedUpdatedAt (null only for a never-saved catalogue). Explain and confirm added/changed/removed references, factors, aliases and purchase rounding. Never invent ratios or attach definitions to products. Changes no stock quantities; affects future comparisons. Adults/owners only.",
+  description: "Save the central household unit catalogue after inventory_units. Replaces the whole units array: preserve every unrelated definition and built-in terminal setting; send the exact updatedAt as expectedUpdatedAt (null only if never saved). isTerminal blocks transit through a unit, while allowing it as either endpoint. For a built-in, keep its canonical name, factor and rounding from overview, referenceUnit = overview.referenceUnit or its own canonical name for a root, aliases = []; only isTerminal may change. Explain and confirm references, factors, aliases, rounding and terminal changes. Never invent ratios or attach definitions to products. Changes no stock quantities. Adults/owners only.",
   input: unitCatalogueInputSchema,
   permission: "write", confirm: "always",
   activity: { en: "Saved central units", nl: "Centrale eenheden bewaard" },
@@ -157,8 +158,8 @@ registerAssistantTool({
     return {
       kind: "list", title: say(ctx.locale, "Household unit definitions", "Eenheden voor het hele huishouden"),
       data: { items: [
-        ...input.units.map((unit) => ({ label: unit.name, detail: `1 ${unit.name} = ${unit.factor} ${unit.referenceUnit}; rounding ${unit.rounding}; aliases: ${unit.aliases.join(", ") || "—"}`, tone: current.units.some((entry) => entry.name === unit.name) ? "change" as const : "add" as const })),
-        ...current.units.filter((unit) => !input.units.some((entry) => entry.name === unit.name)).map((unit) => ({ label: unit.name, tone: "remove" as const })),
+        ...input.units.map((unit) => ({ label: unit.name, detail: `${isStandardUnitSetting(unit) ? "Standard unit setting" : `1 ${unit.name} = ${unit.factor} ${unit.referenceUnit}; rounding ${unit.rounding}; aliases: ${unit.aliases.join(", ") || "—"}`}; end unit: ${unit.isTerminal === true ? "yes (no transit)" : "no"}`, tone: current.units.some((entry) => entry.name === unit.name) ? "change" as const : "add" as const })),
+        ...current.units.filter((unit) => !input.units.some((entry) => entry.name === unit.name)).map((unit) => ({ label: unit.name, ...(isStandardUnitSetting(unit) && { detail: "Remove the built-in end-unit setting; the standard unit remains available." }), tone: "remove" as const })),
       ] },
     };
   },

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { UnitCatalogueSection } from "@/features/units";
+import { standardUnitSetting } from "@/types/units";
 
 const meta = { title: "Features/Units/UnitCatalogueSection", component: UnitCatalogueSection, args: { canManage: true, initialData: { units: [], updatedAt: null } }, decorators: [(Story) => <div className="w-full max-w-2xl p-4"><Story /></div>] } satisfies Meta<typeof UnitCatalogueSection>;
 export default meta;
@@ -13,3 +14,10 @@ export const LinkedUnits: Story = { args: { initialData: { units: [
   { name: "krat wijn", referenceUnit: "fles 75 cl", factor: 6, rounding: 1, aliases: [] },
   { name: "ton", referenceUnit: "kg", factor: 1000, rounding: 0.001, aliases: ["tonne"] },
 ], usedUnits: ["stronkje", "snuifje", "el", "kg", "flesje"], updatedAt: null } } };
+export const EndUnits: Story = { args: { initialData: { units: [
+  standardUnitSetting("stuk", true)!,
+  { name: "doos eieren", referenceUnit: "stuk", factor: 6, rounding: 1, aliases: [] },
+  { name: "zak appels", referenceUnit: "pcs", factor: 12, rounding: 1, aliases: [] },
+  { name: "pallet eieren", referenceUnit: "doos eieren", factor: 10, rounding: 1, aliases: [] },
+], updatedAt: null } } };
+export const EndUnitsReadOnly: Story = { args: { ...EndUnits.args, canManage: false } };

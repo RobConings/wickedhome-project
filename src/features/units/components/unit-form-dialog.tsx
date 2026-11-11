@@ -16,12 +16,12 @@ export function UnitFormDialog({ unit, initialName, units, busy, error, onSave, 
   const { t: common } = useTranslation();
   const prefix = React.useId();
   const references = `${prefix}-references`;
-  const [draft, setDraft] = React.useState({ name: unit?.name ?? initialName ?? "", referenceUnit: unit?.referenceUnit ?? "", factor: unit ? String(unit.factor) : "", rounding: String(unit?.rounding ?? 1), aliases: unit?.aliases.join(", ") ?? "" });
+  const [draft, setDraft] = React.useState({ name: unit?.name ?? initialName ?? "", referenceUnit: unit?.referenceUnit ?? "", factor: unit ? String(unit.factor) : "", rounding: String(unit?.rounding ?? 1), aliases: unit?.aliases.join(", ") ?? "", isTerminal: unit?.isTerminal ?? unitOverview(units).find((item) => item.name === initialName)?.isTerminal ?? false });
   const [errors, setErrors] = React.useState<Record<string, string[]>>({});
   const amountId = `${prefix}-factor`;
   const referenceId = `${prefix}-referenceUnit`;
 
-  function change(field: keyof typeof draft, value: string) {
+  function change<K extends keyof typeof draft>(field: K, value: typeof draft[K]) {
     setDraft((previous) => ({ ...previous, [field]: value }));
     setErrors((previous) => { const next = { ...previous }; delete next[field]; return next; });
   }
@@ -66,6 +66,7 @@ export function UnitFormDialog({ unit, initialName, units, busy, error, onSave, 
           <FormField label={t("rounding")} htmlFor={`${prefix}-rounding`} errors={errors.rounding} description={t("roundingHelp")}>
             <Input id={`${prefix}-rounding`} value={draft.rounding} onChange={(event) => change("rounding", event.target.value)} inputMode="decimal" autoComplete="off" />
           </FormField>
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border p-3"><input type="checkbox" checked={draft.isTerminal} onChange={(event) => change("isTerminal", event.target.checked)} className="mt-1 size-4 shrink-0 accent-primary" /><span className="space-y-1"><span className="block text-sm font-medium">{t("terminal")}</span><span className="block text-xs text-muted-foreground">{t("terminalHelp")}</span></span></label>
         </fieldset>
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
         {onReload && <Button type="button" variant="outline" disabled={busy} onClick={() => void onReload()}>{t("reload")}</Button>}

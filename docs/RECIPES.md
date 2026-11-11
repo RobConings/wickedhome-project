@@ -170,6 +170,18 @@ Renaming updates references to that unit in the same save. Removal requires conf
 while other units still reference it. Concurrent-change errors retain the draft and offer a latest-list
 reload before retrying.
 
+Units can be marked `isTerminal` (default false). Both endpoints of a path may be terminal; any interior
+terminal blocks the conversion, including sibling branches and reverse traversal. For example, marking
+`stuk` still allows `doos → stuk` and `stuk → zak`, but blocks `doos → stuk → zak`. The shared graph powers
+the explorer, MCP, direct conversions and recipe/cooking comparisons; legacy count fallbacks and product
+content bridges cannot bypass a terminal. Recorded zero stock remains empty even when conversion is blocked.
+Custom definitions store the optional flag in the existing JSON catalogue. Built-in terminal settings use
+the canonical standard name, unchanged reference/factor/rounding, empty aliases, and an explicit boolean;
+a root uses its own canonical name as reference. They are recognized as settings, never self-referencing
+conversion edges or editable replacements of standard measures. They do not consume the 100 custom-unit
+slots. No database migration is needed. The UI saves row toggles immediately and retains the flag in edit
+dialogs. MCP previews show end-unit changes and `inventory_units` identifies `blockedByTerminal` pairs.
+
 The inventory, recipes and shopping skill guides describe this same contract for built-in chat and MCP.
 `inventory_units` reads the catalogue/revision and can verify a conversion; `inventory_save_units` is an
 adult/owner-only, always-confirmed replacement of the catalogue with the same revision check and schema
