@@ -27,8 +27,10 @@ not a proposed universal production page renderer.
 | ORM / DB | Prisma 7 + PostgreSQL 14 (local) | Same as other apps on the server |
 | Catalogue | Storybook 10 | Every UI, shared, layout and feature component, in EN/NL and light/dark |
 
-Everything runs on Node 20.19 (the server's system Node, shared with other apps). Node 20 is end of life;
-upgrading is a server-wide decision for later.
+The runtime baseline is Node 24.22.3 LTS or newer, with the exact development/CI version pinned in
+`.nvmrc` and the CI workflow. Existing Node 20 servers need a system runtime upgrade: the server's Node
+installation is shared with other apps, and both PM2 daemons and their managed services must restart
+under the new executable. Verify the live processes as well as `node -v` in the shell.
 
 ## Folder structure
 
