@@ -657,6 +657,23 @@
     "duplicate": "Al in je catalogus: {{name}}",
     "useProduct": "Deze gegevens gebruiken",
     "linkedArticle": "Gekoppeld Colruyt-artikel: {{id}}",
-    "unlink": "Koppeling verwijderen"
+    "unlink": "Koppeling verwijderen",
+    "browserIntro": "Koppel met je gewone Chrome-sessie. Gebruik dit als Colruyt de computerhulp voor aanmelden blokkeert.",
+    "browserSignIn": "Meld je in je gewone Chrome-venster aan op colruyt.be en kies je winkel.",
+    "browserNetwork": "Open Ontwikkelaarstools (op Mac: ⌥⌘I), kies Network en filter op latest-shopping-list. Wis het netwerklogboek en open of vernieuw je Colruyt-boodschappenlijstje. Gebruik alleen geslaagde verzoeken (status 200).",
+    "browserSensitive": "Schakel in DevTools Settings → Preferences → Network de optie “Allow to generate HAR with sensitive data” in.",
+    "browserCopy": "Rechtsklik op het passende verzoek → Copy → Copy all listed as HAR (with sensitive data). Plak het hier, kies hierboven de accounts en klik op Controleren en koppelen.",
+    "browserData": "Gekopieerde browsergegevens",
+    "browserPlaceholder": "Plak de gekopieerde HAR hier. De inhoud wordt meteen gelezen en verborgen.",
+    "browserReady": "Koppelgegevens gelezen. Klaar om te controleren voor de gekozen accounts.",
+    "browserPrivacy": "Plak dit alleen in je eigen WickedHome-instellingen, nooit in een chat of terminal. Het archief wordt in deze browser verwerkt; alleen de nodige koppelgegevens gaan naar je server. Lijstinhoud en andere cookies worden weggegooid. Colruyt moet servertoegang nog steeds toestaan.",
+    "helperAlternative": "Alternatief: computerhulp of bestaand koppelbestand",
+    "browserImportErrors": {
+      "invalid": "De gekopieerde gegevens zijn ongeldig of te groot. Kopieer alleen het gefilterde Colruyt-lijstverzoek als HAR, inclusief gevoelige gegevens.",
+      "noRequest": "Geen geslaagd Colruyt-lijstverzoek gevonden. Wis in gewone Chrome het Network-logboek, open je lijstje en kopieer het passende verzoek met status 200.",
+      "missingSession": "Je aanmeldsessie ontbreekt in de export. Schakel HAR-export met gevoelige gegevens in bij Chrome DevTools en kopieer opnieuw.",
+      "multipleSessions": "De export bevat verschillende sessies of winkels. Wis het Network-logboek en kopieer alleen het Colruyt-lijstverzoek van je huidige account."
+    },
+    "connectionRejected": "Colruyt heeft deze sessie niet aanvaard vanaf je thuisserver. Een werkende browseraanmelding garandeert geen servertoegang. Als een nieuwe sessie ook wordt geweigerd, kan deze koppeling momenteel niet vanaf de server worden gebruikt."
   }
 }

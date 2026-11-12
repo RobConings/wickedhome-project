@@ -24,6 +24,7 @@ try {
   const page = await context.newPage();
   await page.goto("https://www.colruyt.be/nl", { waitUntil: "domcontentloaded" });
   await terminal.question("Sign in to Colruyt yourself, complete SMS/browser verification and choose your store. Search for a product and open your shopping list. Do not place an order. Press Enter here when ready. ");
+  if (/vermoeden dat je een bot was|interrompu votre session|suspect.*(?:a bot|robot)/i.test(await page.locator("body").innerText())) throw new Error("Colruyt blocked this automated login browser. Use your normal Chrome window and the browser-data import in WickedHome Settings → Xtra instead. No connection file was written.");
   const cookies = await context.cookies(["https://apix.colruyt.be/", "https://apip.colruyt.be/"]);
   const input = xtraCredentialsSchema.safeParse({ sessionId: cookies.find((cookie) => cookie.name === "clpbff_session")?.value, apiKey, placeId, reese84: cookies.find((cookie) => cookie.name === "reese84")?.value, userAgent: await page.evaluate(() => navigator.userAgent) });
   if (!input.success) throw new Error("The shop session, store or API header was not observed. Sign in, choose a store, search and open your list before exporting. No connection file was written.");

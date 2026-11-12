@@ -657,6 +657,23 @@
     "duplicate": "Already in your catalogue: {{name}}",
     "useProduct": "Use these details",
     "linkedArticle": "Linked Colruyt article: {{id}}",
-    "unlink": "Remove link"
+    "unlink": "Remove link",
+    "browserIntro": "Connect using your normal Chrome session. Use this method if Colruyt blocks the desktop login helper.",
+    "browserSignIn": "In your normal Chrome window, sign in at colruyt.be and choose your store.",
+    "browserNetwork": "Open Developer Tools (on Mac: ⌥⌘I), select Network and filter for latest-shopping-list. Clear the network log, then open or refresh your Colruyt shopping list. Keep only successful requests (status 200).",
+    "browserSensitive": "In DevTools Settings → Preferences → Network, enable “Allow to generate HAR with sensitive data”.",
+    "browserCopy": "Right-click the matching request → Copy → Copy all listed as HAR (with sensitive data). Paste here, select the accounts above and choose Verify and connect.",
+    "browserData": "Copied browser connection data",
+    "browserPlaceholder": "Paste the copied HAR here. Its contents are read immediately and hidden.",
+    "browserReady": "Connection details read. Ready to verify for the selected accounts.",
+    "browserPrivacy": "Paste only into your own WickedHome settings, never into chat or a terminal. The archive is processed in this browser; only the required connection fields go to your server. List contents and unrelated cookies are discarded. Server access must still pass Colruyt’s checks.",
+    "helperAlternative": "Alternative: desktop helper or existing connection file",
+    "browserImportErrors": {
+      "invalid": "The copied data is invalid or too large. Copy only the filtered Colruyt list request as HAR, including sensitive data.",
+      "noRequest": "No successful Colruyt list request was found. In normal Chrome, clear the Network log, open your list and copy the matching request with status 200.",
+      "missingSession": "The export does not include your login session. Enable HAR export with sensitive data in Chrome DevTools and copy again.",
+      "multipleSessions": "The export contains different sessions or stores. Clear the Network log and copy only the current account’s Colruyt list request."
+    },
+    "connectionRejected": "Colruyt did not accept this session from your home server. A working browser login does not guarantee server access. If a fresh session is also rejected, this connection cannot currently be used from the server."
   }
 }

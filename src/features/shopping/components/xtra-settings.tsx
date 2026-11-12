@@ -2,17 +2,20 @@ import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { ApiRequestError } from "@/lib/api-client";
 import { xtraClient } from "../data/xtra-requests";
 import { xtraCredentialsSchema, type XtraCredentials, type XtraStatus } from "../types/xtra";
+import { importXtraBrowserData, XtraBrowserImportError } from "../types/xtra-browser-import";
 
 export function XtraSettings({ initial, client = xtraClient }: { initial?: XtraStatus; client?: typeof xtraClient }) {
   const { t } = useTranslation("shopping");
   const [status, setStatus] = React.useState(initial ?? null);
   const [userIds, setUserIds] = React.useState(initial?.members.filter((member) => member.allowed).map((member) => member.id) ?? []);
   const [credentials, setCredentials] = React.useState<XtraCredentials | null>(null);
+  const [credentialSource, setCredentialSource] = React.useState<"file" | "browser" | null>(null);
   const [fileKey, setFileKey] = React.useState(0);
   const [error, setError] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
@@ -24,11 +27,17 @@ export function XtraSettings({ initial, client = xtraClient }: { initial?: XtraS
     void client.status().then((next) => { if (active) { setStatus(next); setUserIds(next.members.filter((member) => member.allowed).map((member) => member.id)); } }).catch(() => { if (active) setError("error"); });
     return () => { active = false; };
   }, [client, initial]);
-  async function perform(work: () => Promise<XtraStatus>) {
+  async function perform(work: () => Promise<XtraStatus>, connecting = false) {
     setBusy(true); setError(null);
     try { accept(await work()); }
-    catch (cause) { setError(cause instanceof ApiRequestError && cause.code === "xtra_reconnect" ? "reconnect" : "error"); }
+    catch (cause) { setError(cause instanceof ApiRequestError && cause.code === "xtra_reconnect" ? connecting ? "connectionRejected" : "reconnect" : "error"); }
     finally { setBusy(false); }
+  }
+  function readBrowserData(text: string) {
+    ++fileRead.current;
+    setCredentials(null); setCredentialSource(null); setError(null); setFileKey((key) => key + 1);
+    try { setCredentials(importXtraBrowserData(text)); setCredentialSource("browser"); }
+    catch (cause) { setError(`browserImportErrors.${cause instanceof XtraBrowserImportError ? cause.code : "invalid"}`); }
   }
   return <section aria-label="Xtra" className="flex min-w-0 flex-col gap-4">
     <p className="text-sm text-muted-foreground">{t("xtra.description")}</p>
@@ -45,20 +54,36 @@ export function XtraSettings({ initial, client = xtraClient }: { initial?: XtraS
       {status.configured && <details open={!status.connected || status.needsReconnect} className="rounded-lg border p-3">
         <summary className="cursor-pointer text-sm font-medium">{t("xtra.connectTitle")}</summary>
         <div className="mt-3 flex flex-col gap-3 text-sm">
-          <p>{t("xtra.desktop")}</p>
-          <pre className="overflow-x-auto rounded-md bg-muted p-3 text-xs"><code>npm run xtra:login</code></pre>
-          <p>{t("xtra.uploadHelp")}</p>
-          <label htmlFor="xtra-connection-file" className="font-medium">{t("xtra.file")}</label>
-          <Input key={fileKey} id="xtra-connection-file" type="file" accept=".json,application/json" disabled={busy} onChange={(event) => {
-            const read = ++fileRead.current;
-            setCredentials(null); setError(null);
-            const file = event.target.files?.[0];
-            if (!file) return;
-            if (file.size > 32_000) { setError("invalidFile"); return; }
-            void file.text().then((value) => { const parsed = xtraCredentialsSchema.safeParse(JSON.parse(value)); if (!parsed.success) throw new Error("invalid"); if (read === fileRead.current) setCredentials(parsed.data); }).catch(() => { if (read === fileRead.current) setError("invalidFile"); });
-          }} />
-          <Button type="button" disabled={busy || !credentials} onClick={() => { if (!credentials) return; void perform(async () => { const next = await client.connect(credentials, userIds); setCredentials(null); setFileKey((key) => key + 1); return next; }); }}>{t("xtra.connect")}</Button>
-          <p className="text-xs text-muted-foreground">{t("xtra.secretFile")}</p>
+          <p>{t("xtra.browserIntro")}</p>
+          <ol className="list-decimal space-y-2 pl-5">
+            <li>{t("xtra.browserSignIn")}</li>
+            <li>{t("xtra.browserNetwork")}</li>
+            <li>{t("xtra.browserSensitive")}</li>
+            <li>{t("xtra.browserCopy")}</li>
+          </ol>
+          <label htmlFor="xtra-browser-data" className="font-medium">{t("xtra.browserData")}</label>
+          <Textarea id="xtra-browser-data" value="" autoComplete="off" spellCheck={false} disabled={busy} placeholder={t("xtra.browserPlaceholder")} className="min-h-20" onPaste={(event) => { event.preventDefault(); readBrowserData(event.clipboardData.getData("text/plain")); }} onChange={(event) => { if (event.target.value) readBrowserData(event.target.value); }} />
+          {credentialSource === "browser" && <p role="status" className="text-sm text-primary">{t("xtra.browserReady")}</p>}
+          <p className="text-xs text-muted-foreground">{t("xtra.browserPrivacy")}</p>
+          <details className="rounded-md border p-3">
+            <summary className="cursor-pointer font-medium">{t("xtra.helperAlternative")}</summary>
+            <div className="mt-3 flex flex-col gap-3">
+              <p>{t("xtra.desktop")}</p>
+              <pre className="overflow-x-auto rounded-md bg-muted p-3 text-xs"><code>npm run xtra:login</code></pre>
+              <p>{t("xtra.uploadHelp")}</p>
+              <label htmlFor="xtra-connection-file" className="font-medium">{t("xtra.file")}</label>
+              <Input key={fileKey} id="xtra-connection-file" type="file" accept=".json,application/json" disabled={busy} onChange={(event) => {
+                const read = ++fileRead.current;
+                setCredentials(null); setCredentialSource(null); setError(null);
+                const file = event.target.files?.[0];
+                if (!file) return;
+                if (file.size > 32_000) { setError("invalidFile"); return; }
+                void file.text().then((value) => { const parsed = xtraCredentialsSchema.safeParse(JSON.parse(value)); if (!parsed.success) throw new Error("invalid"); if (read === fileRead.current) { setCredentials(parsed.data); setCredentialSource("file"); } }).catch(() => { if (read === fileRead.current) setError("invalidFile"); });
+              }} />
+            </div>
+          </details>
+          <Button type="button" disabled={busy || !credentials} onClick={() => { if (!credentials) return; void perform(async () => { const next = await client.connect(credentials, userIds); setCredentials(null); setCredentialSource(null); setFileKey((key) => key + 1); return next; }, true); }}>{t("xtra.connect")}</Button>
+          {credentialSource === "file" && <p className="text-xs text-muted-foreground">{t("xtra.secretFile")}</p>}
         </div>
       </details>}
       {status.connected && <div className="flex flex-wrap gap-2">

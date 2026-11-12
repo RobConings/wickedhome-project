@@ -24,11 +24,11 @@ try {
   const page = await browser.newPage(); page.on("pageerror", (error) => errors.push(error.message));
   const status = { configured: true, connected: true, canUse: true, canManage: true, needsReconnect: false, connectedAt: "2026-11-12T12:00:00Z", checkedAt: "2026-11-12T12:00:00Z", placeId: "1234", members: [{ id: "owner", name: "Rob", role: "owner", allowed: true }, { id: "wife", name: "Partner", role: "adult", allowed: true }] };
   const product = { offer: "xt-123456789012345678901234", productId: "123456", name: "BONI Melk halfvol 6 x 1 l", brand: "BONI", content: "6 x 1 l", imageUrl: null, barcode: "5449000000996", priceCents: 645, unit: "P", url: null, existingProduct: null };
-  let savedAccess = null, imports = 0, searches = 0, productSaves = 0;
+  let savedAccess = null, imports = 0, searches = 0, productSaves = 0, lastConnection = null;
   await page.route("**/api/shopping/xtra/**", async (route) => {
     const req = route.request(), url = new URL(req.url());
     if (url.pathname.endsWith("/access")) { savedAccess = req.postDataJSON().userIds; return route.fulfill({ json: { ...status, members: status.members.map((member) => ({ ...member, allowed: savedAccess.includes(member.id) })) } }); }
-    if (url.pathname.endsWith("/connection")) { imports++; assert.ok(req.postDataJSON().userIds.includes("owner")); return route.fulfill({ json: status }); }
+    if (url.pathname.endsWith("/connection")) { imports++; lastConnection = req.postDataJSON(); assert.ok(lastConnection.userIds.includes("owner")); return route.fulfill({ json: status }); }
     if (url.pathname.endsWith("/products")) { searches++; return route.fulfill({ json: { products: [product, { ...product, offer: "xt-223456789012345678901234", name: "Existing milk", existingProduct: { id: "existing", name: "Household milk" } }], placeId: "1234", observedAt: "2026-11-12T12:00:00Z" } }); }
     return route.fulfill({ json: status });
   });
@@ -68,9 +68,19 @@ try {
     assert.equal(await page.locator('input[name="colruytProductId"]').inputValue(), "");
   }
   await open("Features/Shopping/Components/XtraSettings", "Reconnect", "en", "dark", 390);
+  const archive = JSON.stringify({ log: { entries: [{ request: { method: "GET", url: "https://apix.colruyt.be/gateway/emec.colruyt.bffsvc/cg/latest-shopping-list?placeId=1234", headers: [{ name: "Cookie", value: "clpbff_session=normal-browser-session; analytics=discard-analytics" }, { name: "x-cg-apikey", value: "browser-key" }] }, response: { status: 200, content: { text: "PRIVATE LIST CONTENT" } } }] } });
+  await page.locator("#xtra-browser-data").evaluate((element, data) => { const clipboard = new DataTransfer(); clipboard.setData("text/plain", data); element.dispatchEvent(new ClipboardEvent("paste", { clipboardData: clipboard, bubbles: true, cancelable: true })); }, archive);
+  await page.getByText("Connection details read. Ready to verify for the selected accounts.", { exact: true }).waitFor();
+  assert.equal(await page.locator("#xtra-browser-data").inputValue(), "");
+  await page.getByRole("button", { name: "Verify and connect" }).click();
+  await page.getByText("Shared connection available on your devices", { exact: true }).waitFor();
+  assert.deepEqual(lastConnection.credentials, { sessionId: "normal-browser-session", apiKey: "browser-key", placeId: "1234" });
+  assert.ok(!JSON.stringify(lastConnection).includes("PRIVATE LIST CONTENT")); assert.ok(!JSON.stringify(lastConnection).includes("discard-analytics"));
+  await open("Features/Shopping/Components/XtraSettings", "Reconnect", "en", "dark", 390);
+  await page.getByText("Alternative: desktop helper or existing connection file", { exact: true }).click();
   await page.locator("#xtra-connection-file").setInputFiles({ name: "xtra-connection.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify({ sessionId: "test-session", apiKey: "test-api-key", placeId: "1234" })) });
   await page.getByRole("button", { name: "Verify and connect" }).click();
   await page.getByText("Shared connection available on your devices", { exact: true }).waitFor();
-  assert.equal(imports, 1); assert.equal(searches, 12); assert.equal(productSaves, 0); assert.deepEqual(errors, []);
-  console.log(`Xtra UI: 24 English/Dutch mobile/desktop light/dark renders, shared account revocation, session import and product autofill passed. Screenshots: ${output}`);
+  assert.equal(imports, 2); assert.equal(searches, 12); assert.equal(productSaves, 0); assert.deepEqual(errors, []);
+  console.log(`Xtra UI: 24 English/Dutch mobile/desktop light/dark renders, shared account revocation, normal-browser import with minimal server payload, file import and product autofill passed. Screenshots: ${output}`);
 } finally { await browser.close(); await new Promise((done) => server.close(done)); }

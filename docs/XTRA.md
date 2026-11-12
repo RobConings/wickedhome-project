@@ -9,21 +9,44 @@ retailer account, selected store and shopping list on all their devices. Owners 
 access; selected children may search/read, but only selected owners/adults may change the list.
 An owner does not automatically receive usage access. This keeps the account picker authoritative.
 
-## Connect
+## Connect using normal Chrome
 
-1. Configure the existing `INTEGRATIONS_KEY` on the server (32 random bytes, base64). Install Chromium on
-   the desktop if it isn't available: `npx playwright install chromium`.
-2. In a local terminal on your Mac/desktop, run `npm run xtra:login` from its WickedHome checkout.
-   Do not run it in an SSH session on `home-server`: that server has no visible browser for login.
-   The helper uses an installed desktop Chrome when Playwright's own browser is not installed.
-   Sign in yourself on the real Colruyt
-   website, complete SMS/browser verification, select your store, search and open your shopping list.
-   Press Enter in the terminal. Optional `-- --browser /path/to/chrome` selects an installed browser;
-   `-- --output /protected/new-connection.json` chooses a fresh file when reconnecting.
-3. The helper saves an owner-only JSON file at `~/.config/wickedhome/xtra-connection.json`. Select the
-   permitted WickedHome accounts in Settings and upload it there. The server verifies the connection
-   by reading the list before replacing any existing connection. There is no server terminal import.
-4. Delete the plaintext export after successful import. Do not paste it in chats or commit it.
+Configure the existing `INTEGRATIONS_KEY` on the server (32 random bytes, base64). An owner then
+connects the retailer account in **Settings → Xtra · Colruyt** and selects the permitted accounts.
+Use your regular Chrome window if Colruyt blocks the automated desktop helper:
+
+1. Sign in normally at Colruyt, choose your store and open Chrome Developer Tools (`⌥⌘I` on Mac).
+2. In Network, filter for `latest-shopping-list`, clear the log and open/refresh your Colruyt list.
+   Use only matching successful requests (HTTP 200).
+3. In DevTools Settings → Preferences → Network enable **Allow to generate HAR with sensitive data**.
+4. Right-click the matching request → Copy → **Copy all listed as HAR (with sensitive data)**.
+5. In your own WickedHome Settings → Xtra, paste into **Copied browser connection data**, choose the
+   permitted accounts and click **Verify and connect**. Never paste the export in chat or a terminal.
+
+The HAR is parsed entirely in your browser; it is never executed or sent to the server. The paste field
+immediately hides its contents. Only the minimal shop session/API header/store/user-agent fields go to
+WickedHome's existing connection endpoint; response bodies, list contents and unrelated cookies are
+discarded. Only the two known HTTPS Colruyt list/search endpoints, GET requests with status 200 and a
+valid session are accepted. Mixed sessions/stores and sanitized exports without cookies are rejected.
+The server must still verify retailer access before saving anything. A working ordinary browser does
+not guarantee Colruyt will allow server-side requests. The import does not bypass a retailer block.
+
+Chrome documents [network exports and the sensitive-data export option](https://developer.chrome.com/docs/devtools/network/reference#save-all-as-har).
+
+### Alternative: desktop helper or an existing connection file
+
+Install Chromium on the desktop if needed (`npx playwright install chromium`), or use installed Chrome.
+In a local desktop terminal, run `npm run xtra:login` from its WickedHome checkout. Do not run it in an
+SSH session on `home-server`: that server has no visible browser for login. Sign in yourself, complete
+SMS/browser verification, choose your store, search and open the shopping list, then press Enter.
+Optional `-- --browser /path/to/chrome` selects a browser, and `-- --output /protected/new-connection.json`
+chooses a new export filename. The helper refuses to overwrite existing files.
+
+The owner-only file defaults to `~/.config/wickedhome/xtra-connection.json`. In Settings, expand
+**Alternative: desktop helper or existing connection file**, choose it, select the permitted accounts
+and verify. The server reads the list before replacing any existing connection. Delete the plaintext
+file after import. There is no server terminal import. If Colruyt blocks the helper, use the normal
+browser method above; changing Node or installing a virtual display does not establish retailer access.
 
 The helper exports only the shop's `clpbff_session`, optional browser-verification cookie, observed API
 header, browser user agent and store ID. It never asks WickedHome to handle your Xtra password or SMS code. The server stores
@@ -89,12 +112,16 @@ Run `npm run db:deploy` before starting the updated app: migration
 `20261112160000_xtra_product_reference` adds the nullable, household-unique product reference. Existing
 products require no backfill. Rebuild and restart the app through the normal deployment procedure.
 
-`DATABASE_URL=postgresql://test@localhost/test npx tsx --test src/api/shopping/xtra.test.ts src/api/shopping/xtra.routes.test.ts ai/skills/shopping/xtra.test.ts`
+`DATABASE_URL=postgresql://test@localhost/test npx tsx --test src/api/shopping/xtra.test.ts src/api/shopping/xtra.routes.test.ts ai/skills/shopping/xtra.test.ts src/features/shopping/types/xtra-browser-import.test.ts`
 checks encryption/user isolation, owner-only sharing, revocation, upstream validation, expiry, uncertain
 writes and idempotent retries with a fake upstream. `npm run build-storybook` followed by
 `node scripts/xtra-browser-smoke.mjs` checks the English/Dutch form and settings on mobile/desktop in
 both themes. These are fixture checks; a real account connection and authenticated live list changes
 still require the owner to sign in. No real retailer account or list was used during development.
+
+The normal-browser import follow-up passed all 28 targeted tests and the browser checks, including
+HAR paste, immediate hiding of the copied contents, minimal server payload and the existing file import.
+Malformed/oversized exports, lookalike origins, missing session cookies and mixed sessions are rejected.
 
 Development verification: all 22 targeted tests and 24 UI renders passed, as did TypeScript, lint,
 Prisma schema validation, application build and Storybook build. The full unit run (before the last
