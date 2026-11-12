@@ -46,6 +46,15 @@ Search flags existing catalogue matches; selecting a result never automatically 
 Unrecognized package sizes stay blank for the person to enter. Prices are displayed as observations,
 not silently saved as permanent catalogue prices. Categories and dietary equivalence are not guessed.
 
+When preparing a shopping list, the assistant is instructed to search online for current promotions
+separately, using its own browsing or WickedHome's `web_search` / `web_read` tools. Xtra search is not
+a complete promotions feed. The assistant must check dates, exact packages, quantities and loyalty or
+coupon conditions, cite the sources, and flag unverified offers or unavailable browsing. A promotion
+does not automatically apply when an item is added to the Xtra list; substitutions and extra quantities
+still need the person's agreement. This guidance appears in MCP initialization, the shopping workflow
+guide and Xtra search/add tool descriptions; it is an assistant instruction, not an automatic web crawl
+or a server-enforced prerequisite for every list write.
+
 The same assistant registry exposes these names to both chat and MCP:
 
 | Tool | Behavior |

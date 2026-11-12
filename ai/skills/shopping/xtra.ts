@@ -4,7 +4,7 @@ import { money, registerAssistantTool, say } from "@ai/core/kit";
 
 registerAssistantTool({
   name: "shopping.xtra_search", input: xtraSearchSchema, permission: "read", confirm: "never", available: xtraAvailable,
-  description: "Search Colruyt products using the household's shared Xtra connection. Access is limited to accounts selected by a household owner. Returns observed store-specific prices, package sizes and IDs. These aren't guaranteed Collect&Go prices or dietary equivalents. Choose a returned offer before changing the Xtra shopping list.",
+  description: "Search Colruyt products using the household's shared Xtra connection. Access is limited to accounts selected by a household owner. Returns observed store-specific prices, package sizes and IDs. These aren't guaranteed Collect&Go prices or dietary equivalents. This is not a complete promotions feed: when preparing a list, separately search current promotions online with your own browsing or web_search then web_read. Verify dates, exact packages and quantity/loyalty conditions, cite sources, and flag anything unverified. Choose a returned offer before changing the Xtra shopping list.",
   activity: { en: "Searched Colruyt products", nl: "Colruyt-producten gezocht" },
   run: (ctx, input) => searchXtra(ctx.user, input, ctx.signal),
   present: (_ctx, _input, data) => {
@@ -24,7 +24,7 @@ registerAssistantTool({
 });
 registerAssistantTool({
   name: "shopping.xtra_add", input: xtraAddSchema, permission: "sensitive", confirm: "always", available: xtraAvailable,
-  description: "Add a chosen, recently searched whole-piece product to the household's Xtra shopping list after confirmation. Quantity is the amount added, not a final basket quantity. Use a new operationId UUID for each intended addition and keep it for retries. Never orders or records a purchase. An uncertain result requires inspecting the list before any new attempt.",
+  description: "Add a chosen, recently searched whole-piece product to the household's Xtra shopping list after confirmation. Before proposing the list, separately search online for current promotions using your own browsing or web_search then web_read; verify and cite dates/package/quantity/loyalty conditions, or state that promotions remain unverified. Never assume this tool applies a discount. Quantity is the amount added, not a final basket quantity; extra quantities or substitutions for deals need agreement. Use a new operationId UUID for each intended addition and keep it for retries. Never orders or records a purchase. An uncertain result requires inspecting the list before any new attempt.",
   activity: { en: "Added to the shared Xtra list", nl: "Toegevoegd aan het gedeelde Xtra-lijstje" },
   describe: async (ctx, input) => { const product = await xtraAdditionPreview(ctx.user, input.offer); return say(ctx.locale, `Add ${input.quantity} × ${product.name} to the shared Xtra list`, `${input.quantity} × ${product.name} toevoegen aan het gedeelde Xtra-lijstje`); },
   preview: async (ctx, input) => { const product = await xtraAdditionPreview(ctx.user, input.offer); return { kind: "fields", title: "Xtra", data: { fields: [{ label: "Product", value: product.name }, { label: say(ctx.locale, "Added quantity", "Toe te voegen hoeveelheid"), value: String(input.quantity) }, { label: say(ctx.locale, "Package", "Verpakking"), value: product.content ?? "?" }, { label: say(ctx.locale, "Observed unit price", "Bekeken stukprijs"), value: money(product.priceCents) ?? "?" }] } }; },

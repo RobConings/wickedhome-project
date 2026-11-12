@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import "../skills";
 import "./core-tools";
-import { handleMcpMessage } from "./mcp.routes";
+import { handleMcpMessage, mcpToolOf } from "./mcp.routes";
+import { getAssistantTool } from "./tools";
 import { skillsForRole } from "./skills";
 import type { TokenIdentity } from "./assistant.service";
 
@@ -39,6 +40,19 @@ describe("MCP workflow knowledge", () => {
     const result = await call("app_help", { skill: "shopping" });
     assert.match(result.guide, /unlinkedReason/);
     assert.ok(result.tools.some((tool: { name: string }) => tool.name === "shopping_add_item"));
+  });
+
+  it("delivers separate online promotion research instructions through MCP and Xtra tools", async () => {
+    const init = await rpc("initialize") as { result: { instructions: string } };
+    const loaded = await call("skills_load", { skills: ["shopping"] });
+    const guidance = [init.result.instructions, loaded.guides[0].guide, ...["shopping.xtra_search", "shopping.xtra_add"].map((name) => mcpToolOf(getAssistantTool(name)!).description)];
+    for (const text of guidance) {
+      assert.match(text, /separately search|separate lookup/);
+      assert.match(text, /promotions/);
+      assert.match(text, /web_search/);
+      assert.match(text, /web_read/);
+      assert.match(text, /unverified/);
+    }
   });
 
   it("does not expose restricted guides to children", async () => {
