@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ShoppingScreen } from "@/features/shopping/screens/shopping-screen";
 import { emptyShoppingPageFixture, fakeLinkPreview, productSelectionsFixture, shopSelectionsFixture, shoppingPageFixture } from "../fixtures";
+import { connectedXtra, disconnectedXtra } from "../xtra-fixtures";
 
 const meta = {
   title: "Features/Shopping/Screens/ShoppingScreen",
@@ -11,6 +12,7 @@ const meta = {
     canManage: true,
     previewLink: fakeLinkPreview,
     refreshIntervalMs: null,
+    xtraInitial: disconnectedXtra,
     initialSelections: { products: productSelectionsFixture, shops: shopSelectionsFixture },
   },
 } satisfies Meta<typeof ShoppingScreen>;
@@ -19,6 +21,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const AllLists: Story = {};
+export const WithXtra: Story = { args: { xtraInitial: connectedXtra } };
 export const OneList: Story = { parameters: { router: { initialEntries: ["/shopping?list=l-weekly"] } } };
 export const Search: Story = { parameters: { router: { initialEntries: ["/shopping?q=melk"] } } };
 export const SearchWithinList: Story = { parameters: { router: { initialEntries: ["/shopping?list=l-weekly&q=melk"] } } };

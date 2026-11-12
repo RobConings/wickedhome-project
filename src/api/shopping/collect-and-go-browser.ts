@@ -17,12 +17,23 @@ export async function disconnectCollectAndGoBrowser(userId: string) {
   await locks.get(userId)?.catch(() => undefined);
   await disconnectCollectAndGo(userId);
 }
+export async function importCollectAndGoSession(userId: string, state: unknown) {
+  const generation = (generations.get(userId) ?? 0) + 1;
+  generations.set(userId, generation);
+  const previous = locks.get(userId) ?? Promise.resolve();
+  const current = previous.catch(() => undefined).then(() => {
+    if (generation !== generations.get(userId)) throw conflict("Collect&Go session changed during import");
+    return saveCollectAndGoSession(userId, state);
+  });
+  locks.set(userId, current);
+  try { await activeBrowsers.get(userId)?.close(); await current; } finally { if (locks.get(userId) === current) locks.delete(userId); }
+}
 export const collectAndGoEnabled = () => process.env.COLLECTANDGO_ENABLED === "1";
 const fail = (code: string, message: string) => new HttpError(409, code, message);
 export async function checkCollectAndGoPage(page: Page) {
   const content = (await page.locator("body").innerText()).slice(0,12000);
-  if (/captcha|vermoeden dat je een bot|suspected.*bot|access denied|unusual traffic/i.test(content)) throw fail("collectandgo_challenge", "Collect&Go requires a human browser check. Open the desktop login helper, complete it yourself and import the session again.");
-  if (/sessie.*verlopen|opnieuw aanmelden|session.*expired/i.test(content)) throw fail("collectandgo_login", "Sign in again using the Collect&Go desktop helper.");
+  if (/captcha|vermoeden dat je een bot|suspected.*bot|access denied|unusual traffic/i.test(content)) throw fail("collectandgo_challenge", "Collect&Go requires a human browser check; server browser access was blocked. Use a normal browser and Settings → Collect&Go to import a session. A successful browser login does not guarantee server access.");
+  if (/sessie.*verlopen|opnieuw aanmelden|session.*expired/i.test(content)) throw fail("collectandgo_login", "Sign in again in your normal browser and import the session in Settings → Collect&Go.");
   return content;
 }
 async function browserWork<T>(userId: string, signal: AbortSignal, work: (page: Page) => Promise<T>): Promise<T> {
@@ -39,7 +50,7 @@ async function browserWork<T>(userId: string, signal: AbortSignal, work: (page: 
     signal.addEventListener("abort", abort, { once: true });
     const timeout = setTimeout(abort, 90000);
     try {
-      const context = await browser.newContext({ locale: "nl-BE", ...(saved && { storageState: saved.state }), serviceWorkers: "block", acceptDownloads: false });
+      const context = await browser.newContext({ locale: "nl-BE", ...(saved && { storageState: { cookies: saved.state.cookies, origins: saved.state.origins }, ...(saved.state.userAgent && { userAgent: saved.state.userAgent }) }), serviceWorkers: "block", acceptDownloads: false });
       // A model cannot choose browser destinations. Block arbitrary origins and private network requests.
       await context.route("**/*", async (route) => {
         const u = new URL(route.request().url());
@@ -49,7 +60,7 @@ async function browserWork<T>(userId: string, signal: AbortSignal, work: (page: 
       const page = await context.newPage();
       page.setDefaultTimeout(12000); page.setDefaultNavigationTimeout(30000);
       const result = await work(page);
-      if (saved && generation === (generations.get(userId) ?? 0)) await saveCollectAndGoSession(userId, await context.storageState());
+      if (saved && generation === (generations.get(userId) ?? 0)) await saveCollectAndGoSession(userId, { ...await context.storageState(), ...(saved.state.userAgent && { userAgent: saved.state.userAgent }) });
       return result;
     } catch (error) {
       if (error instanceof HttpError) throw error;

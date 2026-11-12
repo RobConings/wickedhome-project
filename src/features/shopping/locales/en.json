@@ -607,19 +607,25 @@
     "open": "Open recorded product page"
   },
   "collectAndGo": {
-    "description": "Find products and current promotions through the AI assistant. Basket changes always require confirmation; complete orders yourself.",
-    "serverSetup": "Administrator: enable the integration on the server, configure INTEGRATIONS_KEY and install the browser. Restart WickedHome afterward.",
-    "desktopLogin": "Run this from the WickedHome checkout in a local terminal on your Mac or desktop computer, not an SSH session on the server. Sign in to Collect&Go yourself and select your pickup point in the browser window.",
-    "importInstructions": "Transfer the protected session file to your server over SSH and import it with this command. Replace the example path. Delete the plaintext copies after import.",
-    "challenge": "Automation stops for a CAPTCHA or expired session. Complete the check yourself with the desktop helper and import again. Prices and promotion conditions can differ by pickup point.",
+    "description": "Import a personal Collect&Go browser session to prepare its basket. Complete orders yourself.",
     "disabled": "Browser integration disabled",
-    "imported": "Personal browser session imported",
     "notImported": "No personal browser session imported",
     "refresh": "Refresh status",
     "disconnect": "Remove session",
     "disconnectDescription": "Remove the saved session from WickedHome. Review active sessions in Collect&Go too.",
     "open": "Open Collect&Go",
-    "error": "Collect&Go settings could not be loaded."
+    "error": "Collect&Go settings could not be loaded.",
+    "xtraSeparate": "Shared Colruyt/Xtra list and product search → Xtra settings",
+    "importedUnverified": "Browser session imported; signed-in basket access has not been verified.",
+    "adminEnable": "The server administrator must enable the Collect&Go browser integration before its basket tools can run.",
+    "browserSignIn": "Use your normal Chrome window to sign in at collectandgo.be and select your pickup point.",
+    "browserNetwork": "Open Developer Tools → Network. Select Doc and filter for collectandgo.be/nl/. Clear the log, then reload the Collect&Go page. Use a successful page request (status 200).",
+    "browserCopy": "Right-click the matching request → Copy → Copy all listed as HAR (with sensitive data). Paste it below.",
+    "browserInvalid": "No usable Collect&Go session was found. Copy only a successful Collect&Go page with sensitive data included. An Xtra export cannot connect Collect&Go.",
+    "browserReady": "Shop cookies read. Ready to import; retailer access is not yet verified.",
+    "existingFile": "Import an existing browser-session file",
+    "saveSession": "Import browser session",
+    "browserPrivacy": "Paste only into your own WickedHome settings. The archive stays in your browser; only Collect&Go cookies are imported and stored encrypted for your account. This cookie export does not contain local storage and cannot guarantee pickup-point or signed-in basket access. Colruyt may still block server browsers."
   },
   "xtra": {
     "description": "Use a shared Colruyt connection for product suggestions and the Xtra shopping list.",
@@ -675,5 +681,23 @@
       "multipleSessions": "The export contains different sessions or stores. Clear the Network log and copy only the current account’s Colruyt list request."
     },
     "connectionRejected": "Colruyt did not accept this session from your home server. A working browser login does not guarantee server access. If a fresh session is also rejected, this connection cannot currently be used from the server."
+  },
+  "xtraList": {
+    "title": "Already on your Xtra list",
+    "description": "Products on the shared Colruyt/Xtra shopping list.",
+    "refresh": "Refresh Xtra list",
+    "loading": "Loading the Xtra list",
+    "checked": "Last checked: {{date}}",
+    "empty": "No unchecked items on the Xtra list.",
+    "completed": "Checked-off items ({{count}})",
+    "completedLimit": "Showing the 100 most recent checked-off items.",
+    "more": "Show more ({{count}} remaining)",
+    "pieces": "pcs",
+    "settings": "Manage Xtra connection",
+    "noAccess": "Your account has not been selected to use this connection. Manage access in Settings.",
+    "unavailable": "The Xtra list could not be refreshed.",
+    "reconnect": "Xtra needs a new login or browser verification. Open Settings to reconnect.",
+    "stale": "Showing the last successfully retrieved list; it may have changed.",
+    "truncated": "This is a partial list because the retailer returned too many items. Open Colruyt to inspect the full list."
   }
 }

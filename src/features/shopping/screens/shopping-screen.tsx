@@ -47,6 +47,8 @@ import { useLiveRevalidation } from "../data/use-live-shopping";
 import { useProductSelections } from "../data/use-product-selections";
 import { useShoppingItemActions } from "../data/use-shopping-item-actions";
 import type { LinkPreview, ShoppingItem } from "../types/shopping";
+import { XtraListPanel } from "../components/xtra-list-panel";
+import type { XtraListInitial } from "../data/use-xtra-list";
 
 type ShoppingScreenProps = {
   data: ShoppingPageData;
@@ -58,10 +60,12 @@ type ShoppingScreenProps = {
   previewLink?: (url: string) => Promise<LinkPreview>;
   /** Refresh interval in ms; `null` turns polling off (stories). */
   refreshIntervalMs?: number | null;
+  /** Seed the external list in stories; production reads it separately from household needs. */
+  xtraInitial?: XtraListInitial;
 };
 
 /** All shopping lists: add items, tick them off, see where to buy them, and manage weekly staples. */
-export function ShoppingScreen({ data, canManage, initialSelections, previewLink, refreshIntervalMs = 30_000 }: ShoppingScreenProps) {
+export function ShoppingScreen({ data, canManage, initialSelections, previewLink, refreshIntervalMs = 30_000, xtraInitial }: ShoppingScreenProps) {
   const { t } = useTranslation("shopping");
   const { t: tCommon } = useTranslation();
   const { overview, shops, products } = data;
@@ -216,6 +220,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
 
       <PageGrid columns="main-sidebar" className="items-start">
         <Stack gap="lg" className="gap-3 sm:gap-6">
+          <XtraListPanel initial={xtraInitial} intervalMs={refreshIntervalMs} />
           <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2 sm:flex sm:items-center" role="group" aria-label={t("shopView.filters.label")}>
             {listViews.length > 1 && (
               <Select value={activeView?.id ?? "all"} onValueChange={(value) => selectList(value === "all" ? null : value)}>

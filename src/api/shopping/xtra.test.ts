@@ -11,7 +11,8 @@ import { db } from "../lib/db";
 import { decryptSecret } from "../lib/secrets";
 import { XtraClient, parseXtraList } from "./xtra-client";
 import { readXtraConnection } from "./xtra-store";
-import { addXtra, checkXtra, connectXtra, disconnectXtra, listXtra, removeXtra, searchXtra, setXtraAccess, xtraAdditionPreview, xtraStatus } from "./xtra.service";
+import { addXtra, checkXtra, connectXtra, disconnectXtra, listXtra, removeXtra, searchXtra, setXtraAccess, snapshotXtra, xtraAdditionPreview, xtraStatus } from "./xtra.service";
+import { subscribe } from "../lib/events";
 
 const user = (id: string, householdId = id, role: SessionUser["role"] = "owner"): SessionUser => ({ id, householdId, role, email: `${id}@example.test`, name: id, locale: "en", householdName: "Home", habitantId: null });
 const credentials = { sessionId: "private-session", apiKey: "private-api-key", placeId: "1234" };
@@ -32,7 +33,7 @@ before(async () => {
 afterEach(() => mock.restoreAll());
 after(async () => { for (const restore of restored.reverse()) restore(); config.STORAGE_DIR = original.storage; config.INTEGRATIONS_KEY = original.key; await rm(directory, { recursive: true, force: true }); });
 function upstream() {
-  const items: { id: string; description: string; productData: { productId: string; quantity: number; unitCode: string }; completedAt: null }[] = [];
+  const items: { id: string; description: string; productData: { productId: string; quantity: number; unitCode: string }; completedAt: string | null }[] = [];
   let writes = 0;
   const fetch = mock.method(globalThis, "fetch", async (target: unknown, init?: RequestInit) => {
     const url = new URL(String(target));
@@ -42,7 +43,8 @@ function upstream() {
     if (url.pathname.endsWith("product-search-prs")) return json({ products: [remoteProduct] });
     if (url.pathname.endsWith("add-items-to-list")) { writes++; const body = JSON.parse(String(init?.body)); items.push(body.items[0]); return json({ data: { items } }, 201); }
     if (init?.method === "DELETE") { writes++; const index = items.findIndex((item) => item.id === url.pathname.split("/").at(-1)); if (index >= 0) items.splice(index, 1); return new Response(null, { status: 204 }); }
-    return json({ getListItems: { data: items } });
+    const offset = Number(url.searchParams.get("offset") ?? 0), limit = Number(url.searchParams.get("limit") ?? 255);
+    return json({ getListItems: { data: items.slice(offset, offset + limit) } });
   });
   return { items, fetch, writes: () => writes };
 }
@@ -201,4 +203,47 @@ it("does not contact the retailer for an already-cancelled request", async () =>
   const before = remote.fetch.mock.callCount();
   await assert.rejects(searchXtra(owner, { query: "milk" }, AbortSignal.abort()));
   assert.equal(remote.fetch.mock.callCount(), before);
+});
+it("loads later pages so completed history cannot hide current grocery items", async () => {
+  const remote = upstream(), owner = user("snapshot-pages");
+  for (let index = 0; index < 256; index++) remote.items.push({ id: randomUUID(), description: index === 255 ? "Still needed" : `Completed ${index}`, productData: { productId: String(index), quantity: 1, unitCode: "P" }, completedAt: index === 255 ? null : "2026-11-12T12:00:00Z" });
+  await connectXtra(owner, { credentials, userIds: [owner.id] }, signal());
+  const result = await snapshotXtra(owner, signal());
+  assert.equal(result.items.length, 256); assert.equal(result.items.filter((item) => !item.completed)[0]?.name, "Still needed");
+  assert.equal(result.truncated, false); assert.equal(remote.writes(), 0);
+});
+it("shares a short-lived snapshot between granted accounts but still checks revocation on cache hits", async () => {
+  const remote = upstream(), owner = user("snapshot-access"), wife = user("snapshot-access-wife", "snapshot-access", "adult");
+  await connectXtra(owner, { credentials, userIds: [owner.id, wife.id] }, signal());
+  const before = remote.fetch.mock.callCount(), result = await snapshotXtra(owner, signal());
+  assert.deepEqual(await snapshotXtra(wife, signal()), result);
+  assert.equal(remote.fetch.mock.callCount(), before + 1);
+  await setXtraAccess(owner, [owner.id]);
+  await assert.rejects(snapshotXtra(wife, signal()), /don't have access/);
+  assert.equal(remote.fetch.mock.callCount(), before + 1);
+});
+it("refreshes cached data explicitly and invalidates it after MCP list changes", async () => {
+  const remote = upstream(), owner = user("snapshot-mutation");
+  await connectXtra(owner, { credentials, userIds: [owner.id] }, signal());
+  assert.equal((await snapshotXtra(owner, signal())).items.length, 0);
+  remote.items.push({ id: randomUUID(), description: "Added in normal browser", productData: { productId: "999", quantity: 1, unitCode: "P" }, completedAt: null });
+  assert.equal((await snapshotXtra(owner, signal())).items.length, 0);
+  assert.equal((await snapshotXtra(owner, signal(), true)).items.length, 1);
+  const result = await searchXtra(owner, { query: "milk" }, signal());
+  const events: unknown[] = [], stop = subscribe(owner.householdId, (event) => events.push(event));
+  try { await addXtra(owner, { offer: result.products[0]!.offer, quantity: 2, operationId: randomUUID() }, signal()); } finally { stop(); }
+  assert.equal((await snapshotXtra(owner, signal())).items.length, 2);
+  assert.ok(JSON.stringify(events).includes("shopping.xtra_changed")); assert.ok(!JSON.stringify(events).includes(credentials.sessionId));
+});
+it("does not publish an empty or partial snapshot when a later page fails", async () => {
+  upstream(); const owner = user("snapshot-error");
+  await connectXtra(owner, { credentials, userIds: [owner.id] }, signal());
+  mock.restoreAll();
+  mock.method(globalThis, "fetch", async (target: unknown) => {
+    if (new URL(String(target)).searchParams.get("offset") !== "0") throw new Error("network lost");
+    return json({ items: Array.from({ length: 255 }, (_, index) => ({ id: randomUUID(), description: `Item ${index}`, productData: { productId: String(index), quantity: 1, unitCode: "P" } })) });
+  });
+  await assert.rejects(snapshotXtra(owner, signal()), /could not be reached/);
+  mock.restoreAll(); upstream();
+  assert.equal((await snapshotXtra(owner, signal())).items.length, 0);
 });

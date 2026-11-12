@@ -5,28 +5,36 @@ assistant/MCP registry. It reuses existing role checks, mandatory sensitive-acti
 audit and typed response rendering. This integration does not create a separate shopping list, purchase
 ledger or assistant. It prepares an external basket; completing the order remains on Collect&Go.
 
-## Setup
+## Browser connection
 
-1. On the home server, set `COLLECTANDGO_ENABLED=1`, retain the existing `INTEGRATIONS_KEY`, and run
-   `npx playwright install chromium` (Linux may also require Playwright's documented system dependencies).
-   Restart WickedHome. An optional `COLLECTANDGO_BROWSER_PATH` selects an installed Chromium executable.
-2. For public product discovery no account import is required, subject to the shop's human verification.
-3. For personal pickup-point prices and basket access, run `npm run collectandgo:login` in a desktop
-   WickedHome checkout, in a local terminal on your Mac/computer rather than an SSH session on the server.
-   The helper uses an installed desktop Chrome when Playwright's own browser isn't installed.
-   This opens a normal browser. Sign in yourself, complete any CAPTCHA, select the
-   pickup point, then press Enter in the terminal. No password is sent to WickedHome.
-4. The helper writes a new owner-only `~/.config/wickedhome/collect-and-go.json`. It refuses to overwrite
-   an existing file. Keep it private. Only shop cookies/local storage are retained.
-5. Transfer this file to the home server over SSH, retaining mode 0600, then run there:
+Collect&Go has a separate personal browser session; importing a shared Xtra/Colruyt connection does
+not automatically authenticate a Collect&Go basket. Settings → Collect&Go now uses normal-browser
+import, without asking household users to run a login helper or server import command:
 
-   ```sh
-   npm run collectandgo:import -- --user 'your@email.example' --file /protected/collect-and-go.json
-   ```
+1. In normal Chrome, sign in at Collect&Go and choose your pickup point.
+2. Open DevTools → Network, select Doc, filter for `collectandgo.be/nl/`, clear the log and reload the
+   signed-in shop page. Use a successful (200) page request.
+3. In DevTools Settings → Preferences → Network enable HAR export with sensitive data. Copy the
+   filtered requests with **Copy all listed as HAR (with sensitive data)**.
+4. Paste only into Settings → Collect&Go and click **Import browser session**. Alternatively, upload
+   an existing browser storage-state JSON file there. No raw archive is sent to the server.
 
-6. Delete both plaintext transfer copies after successful import. The server stores a per-user encrypted
-   session under `data/collect-and-go/`, relative to the parent of `STORAGE_DIR`. Review/remove it through
-   **Settings → Collect&Go**. Removing it locally does not log out every session at Collect&Go.
+The browser extracts only cookies observed on successful `https://www.collectandgo.be/nl/` HTML/JSON
+requests and the recorded user agent. Cookie credentials are bound to that exact host; no cookie domain
+or local-storage state is invented. Blocked/error pages, unrelated origins, sanitized cookie-free exports
+and conflicting sessions are rejected. The normal-browser cookie import does not include local storage,
+so some shop/pickup/account state may still require a complete storage-state file. An import is explicitly
+labelled **unverified**: it cannot guarantee signed-in basket access or overcome a retailer block.
+
+POST `/api/shopping/collect-and-go/session` requires the logged-in adult/owner, the app's normal CSRF
+header and a configured integration encryption key. It saves only that person's encrypted session and
+never opens a browser during import. Replacing/removing a session invalidates queued browser work.
+
+Administrator setup remains on the server: `COLLECTANDGO_ENABLED=1`, a valid `INTEGRATIONS_KEY`, and an
+installed Playwright Chromium (or `COLLECTANDGO_BROWSER_PATH`). Restart after configuration changes.
+The existing `collectandgo:login` and `collectandgo:import` scripts remain optional legacy tools, not the
+normal settings workflow. Login automation may be blocked even when regular Chrome works.
+
 
 ## Search, promotions and basket behavior
 
@@ -63,7 +71,7 @@ Observed the public Collect&Go homepage/product tile markup on 12 November 2026.
 search was challenged with a CAPTCHA. No signed-in basket or live order was modified during development.
 The authenticated quantity controls therefore still need acceptance testing with the account holder's
 session. A transferred session may also be challenged again by the shop. If that happens, the integration
-stops and provides the desktop-helper recovery instructions.
+stops and points to the normal-browser import in Settings.
 
 Pricing, URL allowlists, restriction matching and browser state transitions have deterministic tests.
 Run persisted-page browser checks with:
@@ -74,3 +82,9 @@ DATABASE_URL=postgresql://test@localhost/test COLLECTANDGO_BROWSER_TESTS=1 npx t
 
 These prove price-change refusal, persisted absolute quantities, retry behavior and challenge handling
 against local browser fixtures; they are not certification that the live website accepts automation.
+
+The normal-browser import and groceries-panel update passed 44 targeted service/contract/workflow tests,
+three persisted-browser basket fixtures, and 24 English/Dutch mobile/desktop UI renders. The UI check
+also verifies the absence of terminal commands, minimal import payload, automatic Xtra reads, live
+updates, stale data and revocation during an in-flight read. Run it after `npm run build-storybook` with
+`node scripts/groceries-retailer-browser-smoke.mjs`.

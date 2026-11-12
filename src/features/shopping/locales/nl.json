@@ -607,19 +607,25 @@
     "open": "Open bewaarde productpagina"
   },
   "collectAndGo": {
-    "description": "Zoek producten en actuele promoties via de AI-assistent. Een winkelmand wijzigen vraagt altijd bevestiging; bestellingen rond je zelf af.",
-    "serverSetup": "Beheerder: activeer de integratie op de server, stel INTEGRATIONS_KEY in en installeer de browser. Herstart WickedHome daarna.",
-    "desktopLogin": "Voer dit uit vanuit de WickedHome-projectmap in een lokale terminal op je Mac of computer, niet via SSH op de server. Meld je zelf aan bij Collect&Go en kies je afhaalpunt in het browservenster.",
-    "importInstructions": "Kopieer het beschermde sessiebestand via SSH naar je server en importeer het met dit commando. Vervang het voorbeeldpad. Verwijder de niet-versleutelde bestanden na import.",
-    "challenge": "Bij een CAPTCHA of verlopen sessie stopt de automatisering. Voltooi de controle zelf met de desktophelper en importeer opnieuw. Prijzen en promotievoorwaarden kunnen per afhaalpunt verschillen.",
+    "description": "Importeer een persoonlijke Collect&Go-browsersessie om de winkelmand voor te bereiden. Rond bestellingen zelf af.",
     "disabled": "Browserintegratie uitgeschakeld",
-    "imported": "Persoonlijke browsersessie geïmporteerd",
     "notImported": "Geen persoonlijke browsersessie geïmporteerd",
     "refresh": "Status vernieuwen",
     "disconnect": "Sessie verwijderen",
     "disconnectDescription": "De opgeslagen sessie wordt van WickedHome verwijderd. Controleer actieve sessies ook bij Collect&Go.",
     "open": "Collect&Go openen",
-    "error": "Collect&Go-instellingen konden niet geladen worden."
+    "error": "Collect&Go-instellingen konden niet geladen worden.",
+    "xtraSeparate": "Gedeeld Colruyt/Xtra-lijstje en producten zoeken → Xtra-instellingen",
+    "importedUnverified": "Browsersessie geïmporteerd; toegang tot je aangemelde winkelmand is nog niet gecontroleerd.",
+    "adminEnable": "De serverbeheerder moet de Collect&Go-browserintegratie inschakelen voordat de winkelmandhulpmiddelen kunnen werken.",
+    "browserSignIn": "Meld je in je gewone Chrome-venster aan op collectandgo.be en kies je afhaalpunt.",
+    "browserNetwork": "Open Ontwikkelaarstools → Network. Kies Doc en filter op collectandgo.be/nl/. Wis het logboek en vernieuw de Collect&Go-pagina. Gebruik een geslaagd paginaverzoek (status 200).",
+    "browserCopy": "Rechtsklik op het passende verzoek → Copy → Copy all listed as HAR (with sensitive data). Plak dit hieronder.",
+    "browserInvalid": "Geen bruikbare Collect&Go-sessie gevonden. Kopieer alleen een geslaagde Collect&Go-pagina met gevoelige gegevens. Een Xtra-export koppelt Collect&Go niet.",
+    "browserReady": "Winkelcookies gelezen. Klaar om te importeren; winkeltoegang is nog niet gecontroleerd.",
+    "existingFile": "Bestaand browsersessiebestand importeren",
+    "saveSession": "Browsersessie importeren",
+    "browserPrivacy": "Plak dit alleen in je eigen WickedHome-instellingen. Het archief blijft in je browser; alleen Collect&Go-cookies worden geïmporteerd en versleuteld bewaard voor jouw account. Deze cookie-export bevat geen lokale opslag en garandeert geen toegang tot je afhaalpunt of aangemelde winkelmand. Colruyt kan serverbrowsers nog steeds blokkeren."
   },
   "xtra": {
     "description": "Gebruik een gedeelde Colruyt-koppeling voor productsuggesties en het Xtra-boodschappenlijstje.",
@@ -675,5 +681,23 @@
       "multipleSessions": "De export bevat verschillende sessies of winkels. Wis het Network-logboek en kopieer alleen het Colruyt-lijstverzoek van je huidige account."
     },
     "connectionRejected": "Colruyt heeft deze sessie niet aanvaard vanaf je thuisserver. Een werkende browseraanmelding garandeert geen servertoegang. Als een nieuwe sessie ook wordt geweigerd, kan deze koppeling momenteel niet vanaf de server worden gebruikt."
+  },
+  "xtraList": {
+    "title": "Al op je Xtra-lijstje",
+    "description": "Producten op het gedeelde Colruyt/Xtra-boodschappenlijstje.",
+    "refresh": "Xtra-lijstje vernieuwen",
+    "loading": "Xtra-lijstje laden",
+    "checked": "Laatst bekeken: {{date}}",
+    "empty": "Geen onafgevinkte items op het Xtra-lijstje.",
+    "completed": "Afgevinkte items ({{count}})",
+    "completedLimit": "De 100 recentste afgevinkte items worden getoond.",
+    "more": "Meer tonen (nog {{count}})",
+    "pieces": "st.",
+    "settings": "Xtra-koppeling beheren",
+    "noAccess": "Jouw account is niet geselecteerd voor deze koppeling. Beheer de toegang bij Instellingen.",
+    "unavailable": "Het Xtra-lijstje kon niet worden vernieuwd.",
+    "reconnect": "Opnieuw aanmelden of browserverificatie nodig voor Xtra. Koppel opnieuw bij Instellingen.",
+    "stale": "Het laatst opgehaalde lijstje wordt getoond; dit kan inmiddels gewijzigd zijn.",
+    "truncated": "Dit is een gedeeltelijk lijstje omdat de winkel te veel items terugstuurde. Open Colruyt voor de volledige lijst."
   }
 }

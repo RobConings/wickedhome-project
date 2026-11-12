@@ -61,6 +61,20 @@ the integration and show reconnect instructions; they are never treated as empty
 check, renew, revoke selected users or disconnect everyone. Disconnect removes WickedHome's copy; it
 does not log out other retailer browser sessions. No automatic CAPTCHA bypass is attempted.
 
+## Groceries page
+
+The groceries page automatically reads the shared Xtra list for selected accounts. It refreshes on entry,
+focus/visibility return and every 30 seconds while visible, with a manual refresh button. Xtra changes
+made through assistant/MCP tools trigger the same panel through household live events. Settings access
+changes clear displayed data immediately; every server read rechecks the saved ACL even on cache hits.
+
+The server follows list pages so checked-off history cannot hide later active items, up to 5,100 items.
+A bounded result is labelled partial. A shared 15-second cache limits duplicate retailer calls from family
+members; explicit refresh and list writes invalidate it. The panel shows an observed timestamp, active
+quantities, checked-off history, and stale/reconnect errors. A failed read is never presented as an empty
+list. External list reads do not change WickedHome needs, purchases or stock. This is the Xtra/Colruyt
+list; the separate Collect&Go order basket still needs its own browser session.
+
 ## Products and tools
 
 Product creation/editing offers **Search Colruyt products** to selected accounts. Results include name,
@@ -119,14 +133,13 @@ writes and idempotent retries with a fake upstream. `npm run build-storybook` fo
 both themes. These are fixture checks; a real account connection and authenticated live list changes
 still require the owner to sign in. No real retailer account or list was used during development.
 
-The normal-browser import follow-up passed all 28 targeted tests and the browser checks, including
-HAR paste, immediate hiding of the copied contents, minimal server payload and the existing file import.
-Malformed/oversized exports, lookalike origins, missing session cookies and mixed sessions are rejected.
-
-Development verification: all 22 targeted tests and 24 UI renders passed, as did TypeScript, lint,
-Prisma schema validation, application build and Storybook build. The full unit run (before the last
-three targeted cases were added) passed 1,723 tests with 61 skipped; the two previously recorded
-failures in `receipt-upload.test.ts` and `shared-stock-group-preview.test.ts` remained unchanged.
+The groceries/session follow-up passed all 44 targeted service/contract/workflow tests, three persisted
+basket-browser fixtures and 24 English/Dutch mobile/desktop renders. The latter also checks normal-browser
+imports, minimal server payloads, automatic list reads, focus/visibility polling, MCP events, stale/expired
+reads and permission revocation during an in-flight request. Run `node scripts/groceries-retailer-browser-smoke.mjs`
+after the Storybook build. TypeScript, lint, the application build and Storybook build also passed.
+The full unit suite passed 1,743 tests with 61 skipped; the two previously recorded failures in
+`receipt-upload.test.ts` and `shared-stock-group-preview.test.ts` remain unchanged.
 
 Protocol reference: [ddvlamin/xtra-mcp](https://github.com/ddvlamin/xtra-mcp), inspected at development time.
 Its protocol observations informed this independent implementation; no source code is vendored.

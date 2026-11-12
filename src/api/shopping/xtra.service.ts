@@ -1,11 +1,12 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import type { SessionUser } from "@/features/auth/types/auth";
 import { normalizeBarcode } from "@/features/shopping/types/barcode-lookup";
-import { xtraAddSchema, xtraConnectSchema, xtraCredentialsSchema, xtraListSchema, xtraRemoveSchema, xtraSearchSchema, type XtraListItem, type XtraProduct, type XtraStatus } from "@/features/shopping/types/xtra";
+import { xtraAddSchema, xtraConnectSchema, xtraCredentialsSchema, xtraListSchema, xtraRemoveSchema, xtraSearchSchema, type XtraListItem, type XtraListSnapshot, type XtraProduct, type XtraStatus } from "@/features/shopping/types/xtra";
 import { db } from "../lib/db";
 import { appActor, audit } from "../audit/audit.service";
 import { forbidden, HttpError } from "../lib/http";
 import { createRateLimiter } from "../lib/rate-limit";
+import { publish } from "../lib/events";
 import { secretsAvailable } from "../lib/secrets";
 import { XtraClient } from "./xtra-client";
 import { deleteXtraConnection, readXtraConnection, saveXtraConnection, withXtraLock, type XtraConnection } from "./xtra-store";
@@ -15,6 +16,7 @@ const rate = createRateLimiter({ limit: 40, windowMs: 60_000 });
 type Observation = { householdId: string; userId: string; revision: string; expiresAt: number; product: XtraProduct };
 const offers = new Map<string, Observation>();
 const observedItems = new Map<string, { revision: string; expiresAt: number; items: Map<string, XtraListItem> }>();
+const snapshots = new Map<string, { revision: string; expiresAt: number; value: XtraListSnapshot }>();
 const itemKey = (user: SessionUser) => `${user.householdId}:${user.id}`;
 function manager(user: SessionUser) { if (user.role !== "owner") throw forbidden("Only household owners can manage the shared Xtra connection."); }
 async function permitted(user: SessionUser) {
@@ -56,7 +58,9 @@ export async function connectXtra(user: SessionUser, raw: unknown, signal: Abort
     // A verified replacement also repairs an unreadable old file after an encryption-key change.
     const previous = await readXtraConnection(user.householdId).catch(() => null);
     await saveXtraConnection(user.householdId, { version: 1, revision: randomUUID(), credentials: input.credentials, userIds: [...new Set(input.userIds)], connectedAt: now, checkedAt: now, needsReconnect: false, operations: previous?.operations ?? [] });
+    snapshots.delete(user.householdId);
   });
+  publish(user.householdId, "shopping.xtra_changed", { reason: "connection" });
   await audit(appActor(user), { action: "xtra.connected", targetLabel: "Xtra", summary: `Shared connection; access for ${input.userIds.length} selected accounts` });
   return xtraStatus(user);
 }
@@ -70,11 +74,13 @@ export async function setXtraAccess(user: SessionUser, userIds: string[]) {
     await saveXtraConnection(user.householdId, connection);
   });
   await audit(appActor(user), { action: "xtra.access_changed", targetLabel: "Xtra", summary: `Access for ${userIds.length} selected accounts` });
+  publish(user.householdId, "shopping.xtra_changed", { reason: "access" });
   return xtraStatus(user);
 }
 export async function disconnectXtra(user: SessionUser) {
   manager(user);
-  await withXtraLock(user.householdId, () => deleteXtraConnection(user.householdId));
+  await withXtraLock(user.householdId, async () => { await deleteXtraConnection(user.householdId); snapshots.delete(user.householdId); });
+  publish(user.householdId, "shopping.xtra_changed", { reason: "connection" });
   for (const [key, offer] of offers) if (offer.householdId === user.householdId) offers.delete(key);
   await audit(appActor(user), { action: "xtra.disconnected", targetLabel: "Xtra" });
 }
@@ -146,6 +152,24 @@ export async function listXtra(user: SessionUser, raw: unknown, signal: AbortSig
     return { items, nextOffset: items.length >= input.limit ? input.offset + input.limit : null, placeId: connection.credentials.placeId, observedAt: new Date().toISOString() };
   });
 }
+/** Shared short-lived cache; access is rechecked inside the connection lock before every cache hit. */
+export async function snapshotXtra(user: SessionUser, signal: AbortSignal, fresh = false): Promise<XtraListSnapshot> {
+  return useConnection(user, signal, async (connection, client) => {
+    const cached = snapshots.get(user.householdId);
+    if (!fresh && cached?.revision === connection.revision && cached.expiresAt > Date.now()) return cached.value;
+    snapshots.delete(user.householdId);
+    const items = new Map<string, XtraListItem>();
+    let truncated = true;
+    for (let offset = 0; offset < 5100; offset += 255) {
+      const page = await client.list(255, offset);
+      for (const item of page) items.set(item.id, item);
+      if (page.length < 255) { truncated = false; break; }
+    }
+    const value: XtraListSnapshot = { items: [...items.values()], placeId: connection.credentials.placeId, observedAt: new Date().toISOString(), truncated };
+    snapshots.set(user.householdId, { revision: connection.revision, expiresAt: Date.now() + 15_000, value });
+    return value;
+  });
+}
 async function mutate<T>(user: SessionUser, connection: XtraConnection, operationId: string, payload: unknown, write: () => Promise<T>): Promise<T> {
   if (user.role === "child") throw forbidden("Children can search Xtra but cannot change its shopping list.");
   const fingerprint = createHash("sha256").update(JSON.stringify({ user: user.id, revision: connection.revision, payload })).digest("hex");
@@ -160,6 +184,7 @@ async function mutate<T>(user: SessionUser, connection: XtraConnection, operatio
   const operation: XtraConnection["operations"][number] = { id: operationId, fingerprint, state: "pending" };
   connection.operations.push(operation);
   await saveXtraConnection(user.householdId, connection);
+  snapshots.delete(user.householdId);
   try {
     const result = await write();
     operation.state = "done"; operation.result = result;
@@ -170,6 +195,9 @@ async function mutate<T>(user: SessionUser, connection: XtraConnection, operatio
     if (error instanceof HttpError && error.code === "xtra_reconnect") connection.needsReconnect = true;
     await saveXtraConnection(user.householdId, connection);
     throw new HttpError(409, "xtra_write_uncertain", "The Xtra change could not be verified and may already have happened. Inspect the list before retrying; reconnect in Settings if Colruyt requests login.");
+  } finally {
+    snapshots.delete(user.householdId);
+    publish(user.householdId, "shopping.xtra_changed", { reason: "list" });
   }
 }
 export async function addXtra(user: SessionUser, raw: unknown, signal: AbortSignal) {

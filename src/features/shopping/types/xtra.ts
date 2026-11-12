@@ -36,6 +36,9 @@ export type XtraProduct = {
 export type XtraSearchResult = { products: XtraProduct[]; placeId: string; observedAt: string };
 export type XtraListItem = { id: string; name: string; productId: string | null; quantity: number | null; unit: string | null; completed: boolean };
 export type XtraListResult = { items: XtraListItem[]; nextOffset: number | null; placeId: string; observedAt: string };
+/** Bounded, paginated retailer read for the groceries screen; never a purchase or basket checkout. */
+export type XtraListSnapshot = { items: XtraListItem[]; placeId: string; observedAt: string; truncated: boolean };
+export const xtraSnapshotQuerySchema = z.object({ fresh: z.literal("1").optional() });
 export type XtraStatus = {
   configured: boolean;
   connected: boolean;

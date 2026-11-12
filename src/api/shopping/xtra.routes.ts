@@ -1,8 +1,8 @@
 import { Router, type Request, type Response } from "express";
-import { xtraAccessSchema, xtraConnectSchema, xtraSearchSchema } from "@/features/shopping/types/xtra";
+import { xtraAccessSchema, xtraConnectSchema, xtraSearchSchema, xtraSnapshotQuerySchema } from "@/features/shopping/types/xtra";
 import { parse } from "../lib/http";
 import { currentUser, requireUser } from "../lib/session";
-import { checkXtra, connectXtra, disconnectXtra, searchXtra, setXtraAccess, xtraStatus } from "./xtra.service";
+import { checkXtra, connectXtra, disconnectXtra, searchXtra, setXtraAccess, snapshotXtra, xtraStatus } from "./xtra.service";
 
 export const xtraRouter = Router();
 xtraRouter.use(requireUser);
@@ -23,3 +23,4 @@ xtraRouter.put("/access", async (req, res) => { const input = parse(xtraAccessSc
 xtraRouter.post("/check", async (req, res) => { await connectedRequest(req, res, (signal) => checkXtra(currentUser(req), signal)); });
 xtraRouter.delete("/connection", async (req, res) => { await disconnectXtra(currentUser(req)); res.status(204).end(); });
 xtraRouter.get("/products", async (req, res) => { const input = parse(xtraSearchSchema, req.query); await connectedRequest(req, res, (signal) => searchXtra(currentUser(req), input, signal)); });
+xtraRouter.get("/list", async (req, res) => { const input = parse(xtraSnapshotQuerySchema, req.query); await connectedRequest(req, res, (signal) => snapshotXtra(currentUser(req), signal, input.fresh === "1")); });

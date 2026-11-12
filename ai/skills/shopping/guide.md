@@ -51,6 +51,7 @@ match is not a dietary or quantity equivalence guarantee. Never invent savings f
 service costs or loyalty offers. Show the products and ask the person to choose an offer. Use
 `shopping_collectandgo_basket` only for that observed offer and an explicit final quantity; it always
 asks for confirmation and never places an order. If an offer expired or the price changed, search again.
-On CAPTCHA/login errors, direct the person to Settings → Collect&Go and the desktop login helper.
+On CAPTCHA/login errors, direct the person to Settings → Collect&Go to import from their normal browser.
+An imported cookie session is not proof of signed-in basket access, and a retailer block may still prevent server access.
 On an unverified write, say the basket may have changed and ask them to inspect it before retrying.
 Preparing a basket does not mark WickedHome needs bought or create a purchase, expense or stock entry.

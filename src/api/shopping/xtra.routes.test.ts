@@ -44,11 +44,14 @@ it("connects once for selected accounts and keeps secrets out of API responses",
   const status = await call("/status", "GET", undefined, "wife"); assert.equal(status.headers.get("cache-control"), "no-store");
   assert.equal((await status.json()).canUse, true);
   assert.equal((await call("/products?query=milk", "GET", undefined, "wife")).status, 200);
+  const list = await call("/list", "GET", undefined, "wife"); assert.equal(list.status, 200); assert.equal(list.headers.get("cache-control"), "no-store");
+  assert.deepEqual((await list.json()).items, []);
   assert.equal((await call("/products?query=milk", "GET", undefined, "stranger")).status, 403);
 });
 it("enforces saved access changes for the product-form endpoint", async () => {
   assert.equal((await call("/access", "PUT", { userIds: ["owner"] }, "owner", false)).status, 403);
   assert.equal((await call("/access", "PUT", { userIds: ["owner"] }, "owner")).status, 200);
   assert.equal((await call("/products?query=milk", "GET", undefined, "wife")).status, 403);
+  assert.equal((await call("/list?fresh=1", "GET", undefined, "wife")).status, 403);
   assert.equal((await call("/connection", "DELETE", undefined, "wife")).status, 403);
 });

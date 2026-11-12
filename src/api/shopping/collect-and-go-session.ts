@@ -1,13 +1,11 @@
 import { createHash, randomBytes } from "node:crypto";
 import { mkdir, readFile, rename, writeFile, unlink } from "node:fs/promises";
 import { resolve, join } from "node:path";
-import { z } from "zod";
+import { collectAndGoStateSchema, type CollectAndGoState } from "@/features/shopping/types/collect-and-go";
 import { config } from "../lib/config";
 import { decryptSecret, encryptSecret } from "../lib/secrets";
 
-const cookieSchema = z.object({ name: z.string(), value: z.string(), domain: z.string().refine((v) => /(^|\.)(collectandgo\.be|colruytgroup\.com|xtra\.be)$/.test(v)), path: z.string(), expires: z.number(), httpOnly: z.boolean(), secure: z.boolean(), sameSite: z.enum(["Strict", "Lax", "None"]) });
-export const collectAndGoStateSchema = z.object({ cookies: z.array(cookieSchema).max(500), origins: z.array(z.object({ origin: z.url().refine((v) => /^https:\/\/([\w-]+\.)?(collectandgo\.be|colruytgroup\.com|xtra\.be)$/.test(v)), localStorage: z.array(z.object({ name: z.string(), value: z.string() })).max(100) })).max(20) });
-export type CollectAndGoState = z.infer<typeof collectAndGoStateSchema>;
+export { collectAndGoStateSchema, type CollectAndGoState } from "@/features/shopping/types/collect-and-go";
 const root = () => resolve(config.STORAGE_DIR, "..", "collect-and-go");
 const pathOf = (userId: string) => join(root(), `${createHash("sha256").update(userId).digest("hex")}.enc`);
 export async function saveCollectAndGoSession(userId: string, raw: unknown) {

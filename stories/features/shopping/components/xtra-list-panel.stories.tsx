@@ -1,0 +1,11 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { XtraListPanel } from "@/features/shopping/components/xtra-list-panel";
+import { connectedXtra } from "../xtra-fixtures";
+const meta = { title: "Features/Shopping/Components/XtraListPanel", component: XtraListPanel, decorators: [(Story) => <div className="mx-auto max-w-2xl p-3"><Story /></div>], args: { initial: connectedXtra, intervalMs: null } } satisfies Meta<typeof XtraListPanel>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+export const Connected: Story = {};
+export const Empty: Story = { args: { initial: { ...connectedXtra, snapshot: { ...connectedXtra.snapshot, items: [] } } } };
+export const Stale: Story = { args: { initial: { ...connectedXtra, error: "unavailable" } } };
+export const Reconnect: Story = { args: { initial: { status: { ...connectedXtra.status, needsReconnect: true }, error: "reconnect" } } };
+export const Live: Story = { args: { initial: undefined, intervalMs: 30000 } };

@@ -1,5 +1,5 @@
 import { api } from "@/lib/api-client";
-import type { XtraCredentials, XtraSearchResult, XtraStatus } from "../types/xtra";
+import type { XtraCredentials, XtraListSnapshot, XtraSearchResult, XtraStatus } from "../types/xtra";
 
 export const xtraClient = {
   status: () => api.get<XtraStatus>("/shopping/xtra/status"),
@@ -8,4 +8,5 @@ export const xtraClient = {
   check: () => api.post<XtraStatus>("/shopping/xtra/check"),
   disconnect: () => api.delete("/shopping/xtra/connection"),
   search: (query: string) => api.get<XtraSearchResult>(`/shopping/xtra/products?${new URLSearchParams({ query })}`),
+  list: (fresh = false) => api.get<XtraListSnapshot>(`/shopping/xtra/list${fresh ? "?fresh=1" : ""}`),
 };
