@@ -4,8 +4,11 @@ import { Text } from "@/components/ui/text";
 import { Stack } from "@/components/layout/stack";
 import { Inline } from "@/components/layout/inline";
 import * as React from "react";
+import { Link } from "react-router";
+import { StoreIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { RetailerBrowserImport } from "./retailer-browser-import";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -44,8 +47,10 @@ export function XtraSettings({ initial, client = xtraClient }: { initial?: XtraS
     try { setCredentials(importXtraBrowserData(text)); setCredentialSource("browser"); }
     catch (cause) { setError(`browserImportErrors.${cause instanceof XtraBrowserImportError ? cause.code : "invalid"}`); }
   }
-  return <PageSection aria-label="Xtra">
+  return <PageSection aria-label={t("xtra.sectionTitle")}>
+    <Badge variant="outline"><StoreIcon aria-hidden="true" />{t("xtra.channel")}</Badge>
     <Text size="sm" tone="muted">{t("xtra.description")}</Text>
+    <Link to="/settings?section=collect-and-go" className="inline-flex min-h-10 items-center text-sm underline">{t("xtra.collectAndGoSeparate")}</Link>
     {error && <InlineAlert tone="error">{t(`xtra.${error}`)}</InlineAlert>}
     {status && <Text role="status">{t(!status.configured ? "xtra.notConfigured" : status.needsReconnect ? "xtra.reconnect" : status.canUse ? "xtra.ready" : status.connected ? "xtra.noAccess" : "xtra.notConnected")}</Text>}
     {status?.placeId && <Text size="sm" tone="muted">{t("xtra.store", { id: status.placeId })}</Text>}

@@ -42,6 +42,8 @@ try {
   }
   for (const locale of ["en", "nl"]) for (const theme of ["light", "dark"]) for (const width of [320, 390, 1440]) {
     await open("Features/Shopping/Components/XtraSettings", "Shared", locale, theme, width);
+    await page.getByText(locale === "en" ? "In-store shopping" : "Winkelen in de winkel", { exact: true }).waitFor();
+    await page.getByRole("link", { name: locale === "en" ? "For online orders: manage the separate Collect&Go basket" : "Online bestellen: beheer de aparte Collect&Go-winkelmand", exact: true }).waitFor();
     await page.getByRole("checkbox").nth(1).uncheck();
     await page.getByRole("button", { name: locale === "en" ? "Save access" : "Toegang opslaan" }).click();
     await page.waitForFunction(() => !document.querySelector("fieldset")?.disabled);
@@ -50,7 +52,7 @@ try {
     await page.screenshot({ path: `${output}/settings-${locale}-${theme}-${width}.png` });
     await open("Features/Shopping/Components/ProductFormDialog", "Create", locale, theme, width);
     await page.getByRole("button", { name: "Add product" }).click();
-    await page.getByText(locale === "en" ? "Search Colruyt products" : "Colruyt-producten zoeken", { exact: true }).click();
+    await page.getByText(locale === "en" ? "Search Colruyt products · in-store" : "Colruyt-producten zoeken · in de winkel", { exact: true }).click();
     await page.locator("#xtra-product-query").fill("Boni melk");
     await page.locator("#xtra-product-query").press("Enter");
     await page.getByText(locale === "en" ? "Already in your catalogue: Household milk" : "Al in je catalogus: Household milk").waitFor();

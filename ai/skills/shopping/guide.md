@@ -4,12 +4,22 @@
 
 **Regular shopping list:** Below minimum = out; essential at minimum = out / "Op"; nonessential at minimum = nearly_out / "Bijna op". These are forecasts, not necessarily zero on hand. The person decides what to buy. Recipe requirements and explicit needs can coexist with minimum restocking. Skip / "Not now" without changing inventory or minimums; reopening restores a need. When buying, record known stock exactly once and suppress a duplicate immediate replenishment. Do not create duplicate list rules merely because minimum-stock forecasting produces a new suggestion.
 
+**Choose the retailer channel:** Xtra/Colruyt is the in-store shopping list for a physical store visit
+(winkellijstje / zelf naar de winkel). Collect&Go is the online ordering basket (online bestellen),
+including orders collected at a pickup point. They belong to the same retail group but have separate
+lists/baskets, connections and account access. For an in-store list use `shopping_xtra_search/list/add/remove`;
+for an online basket use `shopping_collectandgo_search/basket`. If the intended channel is unclear,
+ask which one before changing an external list or basket. Never copy or transfer items between channels
+without an explicit request and confirmation. WickedHome's own needs remain a third, independent record.
+
 **Separate promotion research:** When building or updating a shopping list, proactively search online
 for current promotions at the relevant retailers as a separate lookup, including when using Xtra.
 Xtra product search supplies product matches and observed prices, not a complete promotions feed.
 Use the connected assistant's own browsing, or `web_search` then `web_read` when available. Prefer
 retailer promotion pages and leaflets; verify the requested shopping date, exact brand/variant and
 package, minimum quantities, multi-buy rules, Xtra membership and any coupon/activation requirements.
+Verify the channel too: a Colruyt in-store offer or price does not establish the Collect&Go online price
+or eligibility, and an online promotion does not establish an in-store discount.
 Report source links, validity dates and conditions with each suggested deal. Keep ordinary prices,
 verified offers and estimated savings distinct; never invent eligibility, stack discounts or imply
 a promotion is already applied to the Xtra list. Suggest substitutions or extra quantities only with
@@ -29,7 +39,7 @@ Use shopping_sessions and shopping_session to obtain IDs and latest session/item
 **Payments:** Get valid expenses, payment accounts and payers from shopping_payment_options. Record each actual split with shopping_session_record_payment and a distinct stable reference, correct payer, method, and date. Linking an existing paid expense must not create another one. Receipts alone do not create expenses. Do not infer a paid amount from stock quantities. Preserve unrelated recurring expenses and household cost allocations.
 
 
-## Xtra / Colruyt
+## Xtra / Colruyt — in-store shopping
 
 Use `shopping_xtra_search` and `shopping_xtra_list` for the household's shared retailer connection.
 Only accounts explicitly selected by a household owner have access. On access/expiry errors, refer
@@ -43,7 +53,7 @@ after an uncertain result, inspect the list before attempting a new operation. X
 separate from Collect&Go baskets/orders and WickedHome needs. Never record purchases or change stock
 just because you prepared a retailer list. See docs/XTRA.md.
 
-## Collect&Go
+## Collect&Go — online ordering
 
 When the browser integration is enabled and a household owner has selected your account, use `shopping_collectandgo_search` for live product matches or
 promotion-page results. Use Dutch product search words for the Dutch storefront. Read the observed date, price context, package name and conditions. A lexical

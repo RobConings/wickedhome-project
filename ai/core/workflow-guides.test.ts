@@ -55,6 +55,31 @@ describe("MCP workflow knowledge", () => {
     }
   });
 
+  it("keeps in-store Xtra lists and online Collect&Go baskets distinct in published guidance", async () => {
+    const init = await rpc("initialize") as { result: { instructions: string } };
+    const loaded = await call("skills_load", { skills: ["shopping", "shops"] });
+    for (const text of [init.result.instructions, ...loaded.guides.map((guide: { guide: string }) => guide.guide)]) {
+      assert.match(text, /Xtra\/Colruyt|Colruyt\/Xtra/);
+      assert.match(text, /in-store|physical store/);
+      assert.match(text, /Collect&Go/);
+      assert.match(text, /online order|ordering online/);
+      assert.match(text, /same retail group/);
+      assert.match(text, /separate/);
+    }
+    for (const text of [init.result.instructions, loaded.guides[0].guide]) {
+      assert.match(text, /intended channel is unclear/);
+      assert.match(text, /explicit request and confirmation/);
+    }
+    for (const name of ["shopping.xtra_search", "shopping.xtra_list", "shopping.xtra_add", "shopping.xtra_remove"]) {
+      assert.match(mcpToolOf(getAssistantTool(name)!).description, /in-store shopping/);
+    }
+    for (const name of ["shopping.collectandgo_search", "shopping.collectandgo_basket"]) {
+      const tool = getAssistantTool(name)!;
+      assert.match(mcpToolOf(tool).description, /online order/);
+      if (name.endsWith("basket")) assert.equal(tool.confirm, "always");
+    }
+  });
+
   it("does not expose restricted guides to children", async () => {
     const child: TokenIdentity = { ...identity, user: { ...identity.user, role: "child" } };
     const restricted = skillsForRole("adult").find((skill) => !skill.roles.includes("child"));

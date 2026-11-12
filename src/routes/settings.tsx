@@ -1,4 +1,4 @@
-import { ShoppingBasketIcon, BotIcon, BellIcon, HistoryIcon, PlugIcon, RulerIcon, UserCogIcon, UsersIcon, WorkflowIcon } from "lucide-react";
+import { StoreIcon, ShoppingCartIcon, BotIcon, BellIcon, HistoryIcon, PlugIcon, RulerIcon, UserCogIcon, UsersIcon, WorkflowIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLoaderData } from "react-router";
 import { AssistantProviderSettings } from "@/features/assistant";
@@ -38,11 +38,12 @@ export function Component() {
   const { t: tNotifications } = useTranslation("notifications");
   const { t: tUnits } = useTranslation("units");
   const { t: tAssistant } = useTranslation("assistant");
+  const { t: tShopping } = useTranslation("shopping");
   const data = useLoaderData<typeof loader>();
 
   const accountSections: SettingsSectionItem[] = [
-    { id: "xtra", icon: ShoppingBasketIcon, title: "Xtra · Colruyt", content: <XtraSettings /> },
-    { id: "collect-and-go", icon: ShoppingBasketIcon, title: "Collect&Go", content: <CollectAndGoSettings /> },
+    { id: "xtra", icon: StoreIcon, title: tShopping("xtra.sectionTitle"), description: tShopping("xtra.sectionDescription"), content: <XtraSettings /> },
+    { id: "collect-and-go", icon: ShoppingCartIcon, title: tShopping("collectAndGo.sectionTitle"), description: tShopping("collectAndGo.sectionDescription"), content: <CollectAndGoSettings /> },
     { id: "assistant", icon: BotIcon, title: tAssistant("provider.title"), description: tAssistant("provider.description"), content: <AssistantProviderSettings /> },
     {
       id: "account",

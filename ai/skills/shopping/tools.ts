@@ -149,7 +149,7 @@ registerAssistantTool({
   input: z.object({
     q: z.string().trim().min(1).max(120).optional().describe("Part of the item name; use to retrieve all copies of a suspected duplicate, including their unique ids"),
     shop: entityRef("shop", "Only items for this shop").optional(),
-    shops: z.array(entityRef("shop")).min(1).max(50).optional().describe("Combine shops for one trip, e.g. Colruyt, Collect&Go and OKay. Items appear once; their original shop and price are retained"),
+    shops: z.array(entityRef("shop")).min(1).max(50).optional().describe("Combine physical shops for one trip, e.g. Colruyt and OKay. Items appear once; their original shop and price are retained. Collect&Go remains a separate online ordering destination"),
     shopGroup: entityRef("shop_group", "Saved household shop group (shops_groups lists them); combine all its members").optional(),
     list: entityRef("shopping_list", "List view; default groceries includes automatic replenishments. Stock level is a separate stockStatus filter").optional(),
     task: entityRef("task", "The materials of this task").optional(),

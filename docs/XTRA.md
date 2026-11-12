@@ -1,10 +1,23 @@
-# Shared Xtra / Colruyt connection
+# Shared Xtra / Colruyt connection — in-store shopping
+
+Colruyt and Collect&Go belong to the same retail group, but serve different shopping channels:
+
+| Destination | Purpose | WickedHome tools |
+| --- | --- | --- |
+| Xtra / Colruyt shopping list | Buy products yourself during a visit to a physical Colruyt store. | `shopping_xtra_search`, `shopping_xtra_list`, `shopping_xtra_add`, `shopping_xtra_remove` |
+| Collect&Go online basket | Prepare an online order, including orders collected at a pickup point. | `shopping_collectandgo_search`, `shopping_collectandgo_basket` |
+
+Connections and permitted accounts are selected separately for each channel. Prices and promotions
+must be verified for the chosen channel. Preparing one destination does not populate the other.
+The assistant asks which channel is intended when unclear before changing either destination, and
+only transfers items after an explicit request and confirmation. WickedHome's own shopping needs
+are independent of both retailer destinations.
 
 WickedHome owns a native TypeScript connector. The product form and the existing assistant/MCP registry
 call the same shopping service. No Python MCP sidecar is installed.
 
 An owner connects one Colruyt account for the household and explicitly selects the WickedHome accounts
-allowed to use it in **Settings → Xtra · Colruyt** (`/settings?section=xtra`). Those people use the same
+allowed to use it in **Settings → In-store · Xtra / Colruyt** (`/settings?section=xtra`). Those people use the same
 retailer account, selected store and shopping list on all their devices. Owners manage connection and
 access; selected children may search/read, but only selected owners/adults may change the list.
 An owner does not automatically receive usage access. This keeps the account picker authoritative.
@@ -12,7 +25,7 @@ An owner does not automatically receive usage access. This keeps the account pic
 ## Connect using normal Chrome
 
 Configure the existing `INTEGRATIONS_KEY` on the server (32 random bytes, base64). An owner then
-connects the retailer account in **Settings → Xtra · Colruyt** and selects the permitted accounts.
+connects the retailer account in **Settings → In-store · Xtra / Colruyt** and selects the permitted accounts.
 Use your regular Chrome window if Colruyt blocks the automated desktop helper:
 
 1. Sign in normally at Colruyt, choose your store and open Chrome Developer Tools (`⌥⌘I` on Mac).

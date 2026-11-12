@@ -1,4 +1,10 @@
-# Collect&Go shopping assistant
+# Collect&Go online ordering assistant
+
+Collect&Go is the online ordering channel, including orders collected at a pickup point. Xtra/Colruyt
+is the shopping list for buying products yourself in a physical store. They belong to the same retail
+group but use separate lists/baskets, connections, account selections and channel-specific prices and
+promotions. An Xtra list is not an online basket. Do not transfer items unless explicitly requested
+and confirmed; if the intended channel is unclear, ask before changing either destination.
 
 The Shopping skill adds `shopping_collectandgo_search` and `shopping_collectandgo_basket` to the existing
 assistant/MCP registry. It reuses existing role checks, mandatory sensitive-action confirmation, progress,

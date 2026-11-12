@@ -57,14 +57,31 @@ try {
   }
   for (const locale of ["en", "nl"]) for (const theme of ["light", "dark"]) for (const width of [320, 390, 1440]) {
     await open("Features/Shopping/Screens/ShoppingScreen", "WithXtra", locale, theme, width);
-    await page.getByRole("region", { name: locale === "en" ? "Already on your Xtra list" : "Al op je Xtra-lijstje" }).waitFor();
+    await page.getByRole("region", { name: locale === "en" ? "Xtra / Colruyt · In-store list" : "Xtra / Colruyt · Winkellijstje" }).waitFor();
+    await page.getByText(locale === "en" ? "For buying products yourself in a Colruyt store. The Collect&Go online order basket is separate." : "Om zelf producten te kopen in een Colruyt-winkel. De online bestelmand van Collect&Go staat hier los van.", { exact: true }).waitFor();
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     await page.screenshot({ path: `${output}/groceries-${locale}-${theme}-${width}.png` });
     await open("Features/Shopping/Components/CollectAndGoSettings", "Default", locale, theme, width);
+    await page.getByText(locale === "en" ? "Online ordering" : "Online bestellen", { exact: true }).waitFor();
+    await page.getByRole("link", { name: locale === "en" ? "For shopping in a Colruyt store: manage the separate Xtra list" : "Boodschappen in een Colruyt-winkel: beheer het aparte Xtra-lijstje", exact: true }).waitFor();
     assert.doesNotMatch(await page.locator("body").innerText(), /npm run|npx playwright|COLLECTANDGO_ENABLED/);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     await page.screenshot({ path: `${output}/collectandgo-${locale}-${theme}-${width}.png` });
+    await open("Features/Settings/Screens/SettingsScreen", "RetailerConnections", locale, theme, width);
+    await page.getByRole("link", { name: locale === "en" ? /In-store · Xtra \/ Colruyt/ : /In de winkel · Xtra \/ Colruyt/ }).waitFor();
+    await page.getByRole("link", { name: /Online · Collect&Go/ }).waitFor();
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    await page.screenshot({ path: `${output}/retailer-settings-${locale}-${theme}-${width}.png` });
   }
+  await open("Features/Settings/Screens/SettingsScreen", "XtraInStore");
+  await page.getByRole("heading", { name: "In-store · Xtra / Colruyt", exact: true }).waitFor();
+  await page.getByText("In-store shopping", { exact: true }).waitFor();
+  await page.getByRole("link", { name: "For online orders: manage the separate Collect&Go basket", exact: true }).click();
+  await page.getByRole("heading", { name: "Online · Collect&Go", exact: true }).waitFor();
+  await page.getByText("Online ordering", { exact: true }).waitFor();
+  assert.equal(await page.getByText("In-store shopping", { exact: true }).count(), 0);
+  await page.getByRole("link", { name: "For shopping in a Colruyt store: manage the separate Xtra list", exact: true }).click();
+  await page.getByRole("heading", { name: "In-store · Xtra / Colruyt", exact: true }).waitFor();
   const archive = JSON.stringify({ log: { entries: [{ request: { method: "GET", url: "https://www.collectandgo.be/nl/home", headers: [{ name: "cookie", value: "shop-session=private-shop-cookie" }] }, response: { status: 200, content: { mimeType: "text/html", text: "DO NOT FORWARD THIS PRIVATE PAGE" } } }] } });
   await open("Features/Shopping/Components/CollectAndGoSettings", "Default");
   await page.locator("#collectandgo-browser-data").evaluate((element, data) => { const clipboard = new DataTransfer(); clipboard.setData("text/plain", data); element.dispatchEvent(new ClipboardEvent("paste", { clipboardData: clipboard, bubbles: true, cancelable: true })); }, archive);
@@ -118,8 +135,8 @@ try {
   for (let tries = 0; !held && tries < 100; tries++) await new Promise((done) => setTimeout(done, 10));
   assert.equal(held, true);
   allowed = false; emit("access"); release(); hold = null;
-  await page.getByRole("region", { name: "Already on your Xtra list" }).waitFor({ state: "hidden" });
+  await page.getByRole("region", { name: "Xtra / Colruyt · In-store list" }).waitFor({ state: "hidden" });
   assert.equal(await page.getByText(name, { exact: true }).count(), 0);
   assert.deepEqual(errors, []);
-  console.log(`Retailer groceries UI: 24 EN/NL mobile/desktop renders; automatic reads, visible-only polling, focus refresh, MCP events, stale/expired reads, revoked in-flight reads, and Collect&Go shared grants, explicit legacy adoption and import without CLI passed. Screenshots: ${output}`);
+  console.log(`Retailer groceries UI: 36 EN/NL mobile/desktop renders; in-store/online channel labels and settings navigation, automatic reads, visible-only polling, focus refresh, MCP events, stale/expired reads, revoked in-flight reads, and Collect&Go shared grants, explicit legacy adoption and import without CLI passed. Screenshots: ${output}`);
 } finally { await browser.close(); for (const stream of streams) stream.end(); await new Promise((done) => server.close(done)); }

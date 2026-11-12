@@ -119,7 +119,7 @@ export function SettingsScreen({ data, canManage, extraSections = [] }: Settings
           </PageSection>
         </>
       ) : (
-        <RelatedRecordCards label={t("jumpTo")} descriptionMaxLength={90} className="auto-rows-fr" items={sections.map((section) => ({
+        <RelatedRecordCards label={t("jumpTo")} descriptionMaxLength={90} className="auto-rows-fr grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(14rem,1fr))]" items={sections.map((section) => ({
           id: section.id, label: section.title, description: section.description,
           to: sectionLink(section.id), icon: section.icon, accent: section.accent ?? "home",
         }))} />

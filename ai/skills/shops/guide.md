@@ -3,4 +3,5 @@
 - "Add De Smet bakery" → `shops_save` name + type; edits: give the shop and only what changes.
 - Built-in shops: only the owner edits them, nobody deletes them. Adding, editing, deleting shops is for adults; children may star favourites.
 - Product links per shop (webshop page, price) are on products (inventory skill); a planned shopping trip is a calendar event with a shop.
-- Combine a trip: shopping_list shops [Colruyt, Collect&Go, OKay]. Saved groups: shops_groups / shops_save_group name + shops, then shopping_list shopGroup. Groups are shared by the household; shops/products/prices remain distinct. shops_delete_group removes only the group.
+- Combine a physical trip: shopping_list shops [Colruyt, OKay]. Saved groups: shops_groups / shops_save_group name + shops, then shopping_list shopGroup. Groups are shared by the household; shops/products/prices remain distinct. shops_delete_group removes only the group.
+- Colruyt/Xtra is for shopping in a physical store; Collect&Go is for ordering online, including pickup orders. They belong to the same retail group but have separate lists/baskets and prices. Do not treat Collect&Go as another physical stop or merge it into an in-store list merely because of the retail group. Load the shopping guide for the appropriate retailer tools.

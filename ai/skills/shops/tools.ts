@@ -42,7 +42,7 @@ registerAssistantTool({
 
 registerAssistantTool({
   name: "shops.save_group",
-  description: "Save a household-wide group of at least two existing shops (e.g. Colruyt, Collect&Go and OKay), or replace the members/name of a group. Does not merge shops, products, stock or prices. For a single trip shopping_list shops accepts an ad-hoc combination without saving a group.",
+  description: "Save a household-wide group of at least two existing shops (e.g. Colruyt and OKay), or replace the members/name of a group. Does not merge shops, products, stock or prices. For a single trip shopping_list shops accepts an ad-hoc combination without saving a group. Retailer group membership does not merge Xtra in-store lists with Collect&Go online baskets.",
   input: z.object({ group: entityRef("shop_group").optional(), name: z.string().trim().min(1).max(80), shops: z.array(entityRef("shop")).min(2).max(50) }),
   permission: "write", confirm: "always",
   activity: { en: "Saved a shop group", nl: "Winkelgroep bewaard" },

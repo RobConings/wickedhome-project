@@ -3,10 +3,12 @@ import { PageSection } from "@/components/layout/page-section";
 import { Text } from "@/components/ui/text";
 import { Inline } from "@/components/layout/inline";
 import * as React from "react";
+import { ShoppingCartIcon } from "lucide-react";
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { api } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { RetailerBrowserImport } from "./retailer-browser-import";
 import { InlineAlert } from "@/components/shared/inline-alert";
@@ -29,7 +31,8 @@ export function CollectAndGoSettings({ initial }: { initial?: CollectAndGoStatus
     ++fileRead.current; setState(null); setError(null);
     try { setState(importCollectAndGoBrowserData(text)); } catch { setError("browserInvalid"); }
   }
-  return <PageSection aria-label="Collect&Go">
+  return <PageSection aria-label={t("collectAndGo.sectionTitle")}>
+    <Badge variant="outline"><ShoppingCartIcon aria-hidden="true" />{t("collectAndGo.channel")}</Badge>
     <Text size="sm" tone="muted">{t("collectAndGo.description")}</Text>
     <Link to="/settings?section=xtra" className="inline-flex min-h-10 items-center text-sm underline">{t("collectAndGo.xtraSeparate")}</Link>
     {error && <InlineAlert tone="error">{t(`collectAndGo.${error}`)}</InlineAlert>}
