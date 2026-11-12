@@ -79,6 +79,8 @@ export async function handleProductForm(formData: FormData): Promise<ShoppingAct
   try {
     const { data, errors } = parseForm(productInputSchema, formData);
     if (errors) return { errors, intent };
+    // An explicitly removed retailer reference is null; older forms that omit it keep the saved link.
+    if (formData.has("colruytProductId")) data.colruytProductId = String(formData.get("colruytProductId") ?? "").trim() || null;
     // The form's webshop link (one shop: the URL's own shop or the default shop), checked before anything is saved.
     const link = productLinkFromForm(formData);
     if (link && "error" in link) return { errors: { linkUrl: [link.error] }, intent };

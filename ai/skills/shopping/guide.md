@@ -17,6 +17,19 @@ Use shopping_sessions and shopping_session to obtain IDs and latest session/item
 **Payments:** Get valid expenses, payment accounts and payers from shopping_payment_options. Record each actual split with shopping_session_record_payment and a distinct stable reference, correct payer, method, and date. Linking an existing paid expense must not create another one. Receipts alone do not create expenses. Do not infer a paid amount from stock quantities. Preserve unrelated recurring expenses and household cost allocations.
 
 
+## Xtra / Colruyt
+
+Use `shopping_xtra_search` and `shopping_xtra_list` for the household's shared retailer connection.
+Only accounts explicitly selected by a household owner have access. On access/expiry errors, refer
+the person to Settings → Xtra; never ask for cookies, API keys, passwords or connection files in chat.
+Search uses Dutch product words and returns store-specific observed prices, package sizes and opaque
+offer IDs. Ask the person to choose an exact product; never assume dietary equivalence. `shopping_xtra_add`
+adds the specified quantity (not a final total) of an observed whole-piece product after confirmation.
+`shopping_xtra_remove` removes a recently read item after confirmation. Preserve operationId on retries;
+after an uncertain result, inspect the list before attempting a new operation. Xtra shopping lists are
+separate from Collect&Go baskets/orders and WickedHome needs. Never record purchases or change stock
+just because you prepared a retailer list. See docs/XTRA.md.
+
 ## Collect&Go
 
 When the browser integration is enabled, use `shopping_collectandgo_search` for live product matches or

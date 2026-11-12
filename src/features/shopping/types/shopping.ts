@@ -83,6 +83,7 @@ export const productInputSchema = z.object({
   defaultShopId: idSchema.optional().nullable(),
   /** EAN/UPC: digits only. */
   barcode: z.string().trim().regex(/^\d{6,14}$/).optional().nullable(),
+  colruytProductId: z.string().regex(/^\d{1,24}$/).optional().nullable(),
   qrCode: z.string().trim().max(64).optional().nullable(),
   imageUrl: productImageUrlSchema.optional().nullable(),
   notes: z.string().trim().max(1000).optional().nullable(),
@@ -291,6 +292,7 @@ export type ProductShopLink = {
 };
 
 export type Product = {
+  colruytProductId?: string | null;
   id: string;
   name: string;
   /** Persisted brand, if recorded; older fixture data may omit this field. */

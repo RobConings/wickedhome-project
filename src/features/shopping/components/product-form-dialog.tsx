@@ -24,6 +24,7 @@ import { LinkAlternativeDialog } from "./link-alternative-dialog";
 import { ProductCategoryIcon } from "./product-category-icon";
 import { ProductLinkField } from "./product-link-field";
 import { ProductSuggestionCard } from "./product-suggestion-card";
+import { XtraProductSearch } from "./xtra-product-search";
 
 type ProductFormDialogProps = {
   /** Edit this product; omit to add one. */
@@ -178,6 +179,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
   const initialBarcode = product?.barcode ?? defaults?.barcode ?? "";
   const [name, setName] = React.useState(product?.name ?? suggestion?.productName ?? defaults?.name ?? "");
   const [brand, setBrand] = React.useState(product?.brand ?? suggestion?.brand ?? defaults?.brand ?? "");
+  const [colruytProductId, setColruytProductId] = React.useState(product?.colruytProductId ?? "");
   const [category, setCategory] = React.useState<ProductCategory>(product?.category ?? suggestion?.category ?? defaults?.category ?? "other");
   const [imageUrl, setImageUrl] = React.useState(product?.imageUrl ?? suggestion?.imageUrl ?? defaults?.imageUrl ?? "");
   const [photoFailed, setPhotoFailed] = React.useState(false);
@@ -199,6 +201,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
   });
 
   function applySuggestion(next: ProductSuggestion, code: string) {
+    setColruytProductId("");
     setName(next.productName);
     if (next.brand) setBrand(next.brand);
     if (next.category) setCategory(next.category);
@@ -233,7 +236,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
             name="barcode"
             inputMode="numeric"
             value={barcode}
-            onChange={(event) => setBarcode(event.target.value)}
+            onChange={(event) => { setBarcode(event.target.value); setColruytProductId(""); }}
             autoComplete="off"
             className="tabular-nums"
           />
@@ -308,6 +311,18 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
 
           {/* A new product starts from its barcode: typing one fills in the rest when it is known. */}
           {!product && codes}
+
+          <XtraProductSearch editingId={product?.id} onSelect={(selected) => {
+            setName(selected.name); setBrand(selected.brand ?? "");
+            setBarcode(selected.barcode ?? ""); setFilledFrom(selected.barcode);
+            setImageUrl(selected.imageUrl ?? ""); setPhotoFailed(false);
+            setColruytProductId(selected.productId);
+            const size = selected.content?.match(/^(?:(\d+)\s*[x×]\s*)?(\d+(?:[.,]\d+)?)\s*(kg|g|ml|cl|l|pcs)\s*$/i);
+            const amount = size ? Number(size[2]!.replace(",", ".")) * Number(size[1] ?? 1) : null;
+            setPackageAmount(amount && amount <= 1_000_000 ? String(amount) : ""); setPackageUnit(amount && amount <= 1_000_000 ? size![3]!.toLowerCase() : "");
+          }} />
+          <input type="hidden" name="colruytProductId" value={colruytProductId} />
+          {colruytProductId && <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground"><span>{t("xtra.linkedArticle", { id: colruytProductId })}</span><Button type="button" variant="ghost" size="sm" onClick={() => setColruytProductId("")}>{t("xtra.unlink")}</Button></div>}
 
           <FormField label={t("fields.name")} htmlFor="product-name" errors={errors?.name}>
             <Input id="product-name" name="name" value={name} onChange={(event) => setName(event.target.value)} autoComplete="off" required />
@@ -408,7 +423,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
             onDefaultShop={setDefaultShopFromLink}
             empty={{ name: !name.trim(), imageUrl: !imageUrl.trim() }}
             onFill={(fill) => {
-              if (fill.name) setName(fill.name);
+                if (fill.name) { setName(fill.name); setColruytProductId(""); }
               if (fill.imageUrl) {
                 setImageUrl(fill.imageUrl);
                 setPhotoFailed(false);

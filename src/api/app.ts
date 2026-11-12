@@ -31,6 +31,7 @@ import { projectsRouter } from "./projects/projects.routes";
 import { recipesRouter } from "./recipes/recipes.routes";
 import { selectionsRouter } from "./selections/selections.routes";
 import { collectAndGoRouter } from "./shopping/collect-and-go.routes";
+import { xtraRouter } from "./shopping/xtra.routes";
 import { shoppingRouter } from "./shopping/shopping.routes";
 import { shopsRouter } from "./shops/shops.routes";
 import { tasksRouter } from "./tasks/tasks.routes";
@@ -91,6 +92,7 @@ export function createApp() {
   api.use("/selections", selectionsRouter);
   api.use("/shops", shopsRouter);
   api.use("/shopping/collect-and-go", collectAndGoRouter);
+  api.use("/shopping/xtra", xtraRouter);
   api.use("/shopping", shoppingRouter);
   api.use("/purchases", purchasesRouter);
   api.use("/catalogue", catalogueRouter);

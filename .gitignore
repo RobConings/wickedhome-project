@@ -23,3 +23,4 @@ src/api/generated/
 # Server-only assistant credentials and browser profiles
 data/assistant-private/
 data/collect-and-go/
+data/xtra-private/

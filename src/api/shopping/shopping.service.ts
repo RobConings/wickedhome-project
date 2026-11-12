@@ -245,6 +245,7 @@ function toProduct(row: ProductRow): Product {
     isEssential: row.isEssential,
     defaultShopId: row.defaultShopId,
     barcode: row.barcode,
+    colruytProductId: row.colruytProductId,
     qrCode: row.qrCode,
     imageUrl: row.imageUrl,
     notes: row.notes,
@@ -956,6 +957,7 @@ const productData = (input: ProductInput) => ({
   name: input.name,
   // Older integrations omit brand: keep the previous value on update rather than clearing it.
   ...(input.brand !== undefined && { brand: input.brand }),
+  ...(input.colruytProductId !== undefined && { colruytProductId: input.colruytProductId }),
   unit: input.unit || null,
   category: fromCategory(input.category),
   ...(input.isEssential !== undefined && { isEssential: input.isEssential }),
@@ -969,7 +971,7 @@ const productData = (input: ProductInput) => ({
 });
 
 async function assertUniqueCodes(householdId: string, input: ProductInput, exceptId?: string) {
-  for (const field of ["barcode", "qrCode"] as const) {
+  for (const field of ["barcode", "qrCode", "colruytProductId"] as const) {
     const value = input[field];
     if (!value) continue;
     const clash = await db.product.findFirst({ where: { householdId, [field]: value, NOT: exceptId ? { id: exceptId } : undefined } });

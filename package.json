@@ -32,7 +32,8 @@
     "collectandgo:login": "tsx scripts/collect-and-go-login.ts",
     "collectandgo:import": "tsx --env-file=.env scripts/collect-and-go-import.ts",
     "test:assistant-browser": "node scripts/assistant-browser-smoke.mjs",
-    "test:collectandgo-browser": "DATABASE_URL=${DATABASE_URL:-postgresql://test@localhost/test} COLLECTANDGO_BROWSER_TESTS=1 tsx --test src/api/shopping/collect-and-go-browser.test.ts"
+    "test:collectandgo-browser": "DATABASE_URL=${DATABASE_URL:-postgresql://test@localhost/test} COLLECTANDGO_BROWSER_TESTS=1 tsx --test src/api/shopping/collect-and-go-browser.test.ts",
+    "xtra:login": "tsx scripts/xtra-login.ts"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

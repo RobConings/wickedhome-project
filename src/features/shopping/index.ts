@@ -81,3 +81,4 @@ export { ShoppingItemScreen } from "./screens/shopping-item-screen";
 export { useLiveRevalidation as useShoppingRecordUpdates } from "./data/use-live-shopping";
 
 export { CollectAndGoSettings } from "./components/collect-and-go-settings";
+export { XtraSettings } from "./components/xtra-settings";

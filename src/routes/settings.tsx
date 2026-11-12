@@ -9,7 +9,7 @@ import { canManageHouseholdSettings } from "@/features/household";
 import { IntegrationsSettingsLink } from "@/features/integrations";
 import { NotificationSettingsSection } from "@/features/notifications";
 import { SettingsScreen, settingsAction, settingsLoader, type SettingsSectionItem } from "@/features/settings";
-import { CollectAndGoSettings } from "@/features/shopping";
+import { CollectAndGoSettings, XtraSettings } from "@/features/shopping";
 import { UnitCatalogueSection } from "@/features/units";
 
 /** Deferred section data: a skeleton until it arrives; a failure only empties that section. */
@@ -41,6 +41,7 @@ export function Component() {
   const data = useLoaderData<typeof loader>();
 
   const accountSections: SettingsSectionItem[] = [
+    { id: "xtra", icon: ShoppingBasketIcon, title: "Xtra · Colruyt", content: <XtraSettings /> },
     { id: "collect-and-go", icon: ShoppingBasketIcon, title: "Collect&Go", content: <CollectAndGoSettings email={user.email} /> },
     { id: "assistant", icon: BotIcon, title: tAssistant("provider.title"), description: tAssistant("provider.description"), content: <AssistantProviderSettings /> },
     {

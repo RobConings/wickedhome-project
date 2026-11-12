@@ -67,6 +67,8 @@ model Product {
   defaultShop   Shop?             @relation("ProductDefaultShop", fields: [defaultShopId], references: [id], onDelete: SetNull)
   /// EAN/UPC barcode printed on the packaging.
   barcode       String?
+  /// Colruyt technical article number selected through the Xtra product search.
+  colruytProductId String?
   /// Value encoded in our own printed QR label (e.g. "WH-P-7K2Q9X").
   qrCode        String?
   imageUrl      String?
@@ -91,6 +93,7 @@ model Product {
   updatedAt     DateTime          @updatedAt
 
   @@unique([householdId, barcode])
+  @@unique([householdId, colruytProductId])
   @@unique([householdId, qrCode])
   @@index([householdId])
   @@index([stockProductId])
