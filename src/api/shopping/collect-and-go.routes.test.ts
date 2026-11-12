@@ -6,32 +6,54 @@ import { join } from "node:path";
 import express from "express";
 import type { SessionUser } from "@/features/auth/types/auth";
 import { config } from "../lib/config";
+import { db } from "../lib/db";
 import { requireAppHeader, errorHandler } from "../lib/http";
 import { collectAndGoRouter } from "./collect-and-go.routes";
-import { readCollectAndGoSession } from "./collect-and-go-session";
+import { readCollectAndGoConnection } from "./collect-and-go-connection";
+import { saveCollectAndGoSession } from "./collect-and-go-session";
 const app = express(); app.use(express.json()); app.use(requireAppHeader);
-app.use((req, _res, next) => { const id = req.header("test-user"); if (id) req.user = { id, householdId: "home", role: id === "child" ? "child" : "adult", email: `${id}@example.test`, name: id, locale: "en", householdName: "Home", habitantId: null } satisfies SessionUser; next(); });
+app.use((req, _res, next) => { const id = req.header("test-user"); if (id) req.user = { id, householdId: "home", role: id === "owner" ? "owner" : id === "child" ? "child" : "adult", email: `${id}@example.test`, name: id, locale: "en", householdName: "Home", habitantId: null } satisfies SessionUser; next(); });
 app.use("/collect", collectAndGoRouter); app.use(errorHandler);
 const server = app.listen(); let origin = "", directory = "";
-const previous = { storage: config.STORAGE_DIR, key: config.INTEGRATIONS_KEY };
+const previous = { storage: config.STORAGE_DIR, key: config.INTEGRATIONS_KEY, members: Reflect.get(db.user, "findMany"), audit: Reflect.get(db.auditEntry, "create") };
 const state = { cookies: [{ name: "shop-session", value: "private-import-value", domain: "www.collectandgo.be", path: "/", expires: -1, httpOnly: true, secure: true, sameSite: "Lax" }], origins: [] };
+const input = { state, userIds: ["owner", "wife"] };
 const call = (path: string, method = "GET", body?: unknown, user?: string, csrf = true) => fetch(`${origin}/collect${path}`, { method, headers: { "Content-Type": "application/json", ...(user && { "test-user": user }), ...(csrf && { "X-WickedHome": "1" }) }, ...(body !== undefined && { body: JSON.stringify(body) }) });
-before(async () => { if (!server.listening) await new Promise<void>((done) => server.once("listening", done)); const address = server.address(); if (!address || typeof address === "string") throw new Error("address"); origin = `http://127.0.0.1:${address.port}`; directory = await mkdtemp(join(tmpdir(), "collectandgo-http-")); config.STORAGE_DIR = join(directory, "files"); config.INTEGRATIONS_KEY = Buffer.alloc(32, 2).toString("base64"); });
-after(async () => { await new Promise<void>((done) => server.close(() => done())); config.STORAGE_DIR = previous.storage; config.INTEGRATIONS_KEY = previous.key; await rm(directory, { recursive: true, force: true }); });
-it("requires authentication, CSRF and an adult role for browser-session imports", async () => {
-  assert.equal((await call("/session", "POST", state)).status, 401);
-  assert.equal((await call("/session", "POST", state, "alice", false)).status, 403);
-  assert.equal((await call("/session", "POST", state, "child")).status, 403);
+before(async () => {
+  if (!server.listening) await new Promise<void>((done) => server.once("listening", done)); const address = server.address(); if (!address || typeof address === "string") throw new Error("address"); origin = `http://127.0.0.1:${address.port}`;
+  directory = await mkdtemp(join(tmpdir(), "collectandgo-http-")); config.STORAGE_DIR = join(directory, "files"); config.INTEGRATIONS_KEY = Buffer.alloc(32, 2).toString("base64");
+  Reflect.set(db.user, "findMany", async () => ["owner", "wife", "child"].map((id) => ({ id, email: `${id}@example.test`, role: id === "child" ? "CHILD" : id === "owner" ? "OWNER" : "ADULT", habitant: { name: id } })));
+  Reflect.set(db.auditEntry, "create", async () => ({}));
 });
-it("imports through the app without opening a browser and keeps sessions personal and out of responses", async () => {
-  const result = await call("/session", "POST", state, "alice"); assert.equal(result.status, 200);
+after(async () => { await new Promise<void>((done) => server.close(() => done())); config.STORAGE_DIR = previous.storage; config.INTEGRATIONS_KEY = previous.key; Reflect.set(db.user, "findMany", previous.members); Reflect.set(db.auditEntry, "create", previous.audit); await rm(directory, { recursive: true, force: true }); });
+it("requires authentication, CSRF and an owner for shared-session imports", async () => {
+  assert.equal((await call("/session", "POST", input)).status, 401);
+  assert.equal((await call("/session", "POST", input, "owner", false)).status, 403);
+  assert.equal((await call("/session", "POST", input, "wife")).status, 403);
+  assert.equal((await call("/session", "POST", input, "child")).status, 403);
+});
+it("imports once for the selected accounts without exposing credentials or claiming verified basket access", async () => {
+  assert.equal((await call("/session", "POST", state, "owner")).status, 400, "old clients cannot silently create a shared connection without explicit grants");
+  const result = await call("/session", "POST", input, "owner"); assert.equal(result.status, 200);
   const text = await result.text(); assert.ok(!text.includes("private-import-value")); assert.equal(JSON.parse(text).verified, undefined);
-  assert.equal((await readCollectAndGoSession("alice"))?.state.cookies[0]?.value, "private-import-value");
-  assert.equal(await readCollectAndGoSession("bob"), null);
-  assert.equal((await call("/status", "GET", undefined, "bob").then((response) => response.json())).connected, false);
+  assert.equal((await readCollectAndGoConnection("home"))?.state.cookies[0]?.value, "private-import-value");
+  const wife = await call("/status", "GET", undefined, "wife").then((response) => response.json());
+  assert.equal(wife.canUse, true); assert.equal(wife.canManage, false); assert.deepEqual(wife.members, []);
+  assert.equal((await call("/status", "GET", undefined, "child").then((response) => response.json())).canUse, false);
 });
-it("refuses unrelated cookie domains and removes the imported session on disconnect", async () => {
-  assert.equal((await call("/session", "POST", { ...state, cookies: [{ ...state.cookies[0], domain: "attacker.test" }] }, "alice")).status, 400);
-  assert.equal((await call("/session", "DELETE", undefined, "alice")).status, 204);
-  assert.equal(await readCollectAndGoSession("alice"), null);
+it("changes access only for active household members and only through an owner", async () => {
+  assert.equal((await call("/access", "PUT", { userIds: [] }, "wife")).status, 403);
+  assert.equal((await call("/access", "PUT", { userIds: ["foreign"] }, "owner")).status, 400);
+  assert.equal((await call("/access", "PUT", { userIds: ["owner"] }, "owner")).status, 200);
+  assert.equal((await call("/status", "GET", undefined, "wife").then((response) => response.json())).canUse, false);
+  assert.equal((await call("/session", "DELETE", undefined, "wife")).status, 403);
+});
+it("does not automatically share a legacy session, and lets an owner adopt it explicitly", async () => {
+  assert.equal((await call("/session", "DELETE", undefined, "owner")).status, 204);
+  await saveCollectAndGoSession("owner", state);
+  const status = await call("/status", "GET", undefined, "owner").then((response) => response.json());
+  assert.equal(status.connected, false); assert.equal(status.legacyAvailable, true);
+  assert.equal((await call("/session/adopt", "POST", { userIds: ["owner", "wife"] }, "wife")).status, 403);
+  assert.equal((await call("/session/adopt", "POST", { userIds: ["owner", "wife"] }, "owner")).status, 200);
+  assert.equal((await call("/status", "GET", undefined, "wife").then((response) => response.json())).canUse, true);
 });

@@ -10,6 +10,6 @@ try {
   const user = await db.user.findUnique({ where: { email: values.user }, select: { id: true, disabledAt: true } });
   if (!user || user.disabledAt) throw new Error("No active WickedHome user with that email");
   await saveCollectAndGoSession(user.id, JSON.parse(await readFile(values.file, "utf8")));
-  console.log("Collect&Go session encrypted and imported. Delete the transferred plaintext session file.");
+  console.log("Personal Collect&Go session encrypted and imported. An owner must explicitly share it and choose accounts in Settings → Collect&Go before tools can use it. Delete the transferred plaintext session file.");
 } catch { console.error("Import failed. Check the user, session file permissions, allowed cookie domains and INTEGRATIONS_KEY."); process.exitCode = 1; }
 finally { await db.$disconnect(); }

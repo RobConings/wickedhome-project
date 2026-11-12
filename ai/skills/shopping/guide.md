@@ -45,13 +45,15 @@ just because you prepared a retailer list. See docs/XTRA.md.
 
 ## Collect&Go
 
-When the browser integration is enabled, use `shopping_collectandgo_search` for live product matches or
+When the browser integration is enabled and a household owner has selected your account, use `shopping_collectandgo_search` for live product matches or
 promotion-page results. Use Dutch product search words for the Dutch storefront. Read the observed date, price context, package name and conditions. A lexical
 match is not a dietary or quantity equivalence guarantee. Never invent savings from mix-and-match,
 service costs or loyalty offers. Show the products and ask the person to choose an offer. Use
 `shopping_collectandgo_basket` only for that observed offer and an explicit final quantity; it always
 asks for confirmation and never places an order. If an offer expired or the price changed, search again.
-On CAPTCHA/login errors, direct the person to Settings → Collect&Go to import from their normal browser.
+The session is shared across selected accounts. Only owners can import, share an older personal session,
+change grants or disconnect everyone in Settings → Collect&Go. Selected children can only search/read.
+On CAPTCHA/login errors, ask an owner to renew the shared session from their normal browser.
 An imported cookie session is not proof of signed-in basket access, and a retailer block may still prevent server access.
 On an unverified write, say the basket may have changed and ask them to inspect it before retrying.
 Preparing a basket does not mark WickedHome needs bought or create a purchase, expense or stock entry.

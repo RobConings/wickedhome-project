@@ -607,12 +607,12 @@
     "open": "Open bewaarde productpagina"
   },
   "collectAndGo": {
-    "description": "Importeer een persoonlijke Collect&Go-browsersessie om de winkelmand voor te bereiden. Rond bestellingen zelf af.",
+    "description": "Gebruik één gedeelde Collect&Go-browsersessie om de winkelmand van het huishouden voor te bereiden. Rond bestellingen zelf af.",
     "disabled": "Browserintegratie uitgeschakeld",
-    "notImported": "Geen persoonlijke browsersessie geïmporteerd",
+    "notImported": "Geen gedeelde Collect&Go-koppeling beschikbaar voor jouw account.",
     "refresh": "Status vernieuwen",
-    "disconnect": "Sessie verwijderen",
-    "disconnectDescription": "De opgeslagen sessie wordt van WickedHome verwijderd. Controleer actieve sessies ook bij Collect&Go.",
+    "disconnect": "Iedereen ontkoppelen",
+    "disconnectDescription": "Verwijder de gedeelde sessie uit WickedHome voor alle geselecteerde accounts. Andere browseraanmeldingen blijven actief.",
     "open": "Collect&Go openen",
     "error": "Collect&Go-instellingen konden niet geladen worden.",
     "xtraSeparate": "Gedeeld Colruyt/Xtra-lijstje en producten zoeken → Xtra-instellingen",
@@ -625,7 +625,11 @@
     "browserReady": "Winkelcookies gelezen. Klaar om te importeren; winkeltoegang is nog niet gecontroleerd.",
     "existingFile": "Bestaand browsersessiebestand importeren",
     "saveSession": "Browsersessie importeren",
-    "browserPrivacy": "Plak dit alleen in je eigen WickedHome-instellingen. Het archief blijft in je browser; alleen Collect&Go-cookies worden geïmporteerd en versleuteld bewaard voor jouw account. Deze cookie-export bevat geen lokale opslag en garandeert geen toegang tot je afhaalpunt of aangemelde winkelmand. Colruyt kan serverbrowsers nog steeds blokkeren."
+    "browserPrivacy": "Plak dit alleen in je eigen WickedHome-instellingen. Alleen de koppelgegevens van deze winkel worden geïmporteerd en versleuteld bewaard voor de geselecteerde accounts. Sommige account- of afhaalinstellingen kunnen ontbreken. Colruyt kan servertoegang nog steeds blokkeren.",
+    "sharing": "Kies welke WickedHome-accounts hetzelfde winkelaccount en dezelfde winkelmand mogen gebruiken. Eigenaars beheren de toegang; geselecteerde kinderen kunnen alleen zoeken en lezen.",
+    "legacyHelp": "Voor jouw account is een persoonlijke sessie uit de vorige instelling opgeslagen. Kies hierboven de toegelaten accounts en deel die sessie daarna uitdrukkelijk.",
+    "shareSaved": "Mijn opgeslagen sessie delen",
+    "reconnect": "Opnieuw aanmelden of browserverificatie nodig voor de gedeelde Collect&Go-sessie. Vraag een eigenaar om de koppeling hier te vernieuwen."
   },
   "xtra": {
     "description": "Gebruik een gedeelde Colruyt-koppeling voor productsuggesties en het Xtra-boodschappenlijstje.",

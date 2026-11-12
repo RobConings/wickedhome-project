@@ -607,12 +607,12 @@
     "open": "Open recorded product page"
   },
   "collectAndGo": {
-    "description": "Import a personal Collect&Go browser session to prepare its basket. Complete orders yourself.",
+    "description": "Use one shared Collect&Go browser session to prepare the household basket. Complete orders yourself.",
     "disabled": "Browser integration disabled",
-    "notImported": "No personal browser session imported",
+    "notImported": "No shared Collect&Go connection is available for your account.",
     "refresh": "Refresh status",
-    "disconnect": "Remove session",
-    "disconnectDescription": "Remove the saved session from WickedHome. Review active sessions in Collect&Go too.",
+    "disconnect": "Disconnect everyone",
+    "disconnectDescription": "Remove the shared session from WickedHome for all selected accounts. Other browser logins remain active.",
     "open": "Open Collect&Go",
     "error": "Collect&Go settings could not be loaded.",
     "xtraSeparate": "Shared Colruyt/Xtra list and product search → Xtra settings",
@@ -625,7 +625,11 @@
     "browserReady": "Shop cookies read. Ready to import; retailer access is not yet verified.",
     "existingFile": "Import an existing browser-session file",
     "saveSession": "Import browser session",
-    "browserPrivacy": "Paste only into your own WickedHome settings. The archive stays in your browser; only Collect&Go cookies are imported and stored encrypted for your account. This cookie export does not contain local storage and cannot guarantee pickup-point or signed-in basket access. Colruyt may still block server browsers."
+    "browserPrivacy": "Paste only into your own WickedHome settings. Only this shop’s connection data is imported and stored encrypted for the selected accounts. Some account or pickup settings may be missing, and Colruyt may still block server access.",
+    "sharing": "Select which WickedHome accounts may use this same retailer account and basket. Owners manage access; selected children can only search and read.",
+    "legacyHelp": "A personal session from the previous setup is saved for your account. Select the permitted accounts above, then explicitly share that session.",
+    "shareSaved": "Share my saved session",
+    "reconnect": "The shared Collect&Go session needs a new login or browser verification. Ask a household owner to renew it here."
   },
   "xtra": {
     "description": "Use a shared Colruyt connection for product suggestions and the Xtra shopping list.",

@@ -26,6 +26,8 @@ const output = "/tmp/wickedhome-retailer-groceries-ui"; await mkdir(output, { re
 try {
   const page = await browser.newPage(), errors = []; await page.clock.install(); page.on("pageerror", (error) => errors.push(error.message));
   let allowed = true, expired = false, failure = false, reads = 0, fresh = false, imported = null, hold = null, held = false;
+  let collectConnected = false, collectAccess = ["owner", "wife"], adopted = null;
+  const collectStatus = () => ({ enabled: true, configured: true, connected: collectConnected, canManage: true, canUse: collectAccess.includes("owner"), needsReconnect: false, legacyAvailable: false, importedAt: collectConnected ? "2026-11-12T12:00:00Z" : null, members: [{ id: "owner", name: "Rob", role: "owner", allowed: collectAccess.includes("owner") }, { id: "wife", name: "Partner", role: "adult", allowed: collectAccess.includes("wife") }, { id: "child", name: "Child", role: "child", allowed: collectAccess.includes("child") }] });
   let name = "Milk already on Xtra";
   const status = () => ({ configured: true, connected: true, canUse: allowed, canManage: false, needsReconnect: expired, connectedAt: "2026-11-12T12:00:00Z", checkedAt: "2026-11-12T12:00:00Z", placeId: "1234", members: [] });
   const snapshot = () => ({ placeId: "1234", observedAt: "2026-11-12T12:00:00Z", truncated: false, items: [{ id: "retailer-item", name, productId: "123456", quantity: 2, unit: "P", completed: false }] });
@@ -40,8 +42,12 @@ try {
     return route.fulfill({ json: {} });
   });
   await page.route("**/api/shopping/collect-and-go/**", async (route) => {
-    if (route.request().method() === "POST") imported = route.request().postDataJSON();
-    return route.fulfill({ json: { connected: Boolean(imported), enabled: true, importedAt: imported ? "2026-11-12T12:00:00Z" : null } });
+    const request = route.request(), url = new URL(request.url());
+    if (request.method() === "POST" && url.pathname.endsWith("/adopt")) { adopted = request.postDataJSON(); collectAccess = adopted.userIds; collectConnected = true; }
+    else if (request.method() === "POST") { imported = request.postDataJSON(); collectAccess = imported.userIds; collectConnected = true; }
+    else if (request.method() === "PUT") collectAccess = request.postDataJSON().userIds;
+    else if (request.method() === "DELETE") collectConnected = false;
+    return route.fulfill({ json: collectStatus() });
   });
   async function open(title, exported, locale = "en", theme = "dark", width = 390) {
     await page.setViewportSize({ width, height: 900 });
@@ -66,7 +72,23 @@ try {
   assert.equal(await page.locator("#collectandgo-browser-data").inputValue(), "");
   await page.getByRole("button", { name: "Import browser session", exact: true }).click();
   await page.getByText("Browser session imported; signed-in basket access has not been verified.", { exact: true }).waitFor();
-  assert.equal(imported.cookies[0].domain, "www.collectandgo.be"); assert.ok(!JSON.stringify(imported).includes("PRIVATE PAGE"));
+  assert.equal(imported.state.cookies[0].domain, "www.collectandgo.be"); assert.ok(!JSON.stringify(imported).includes("PRIVATE PAGE"));
+  assert.deepEqual(imported.userIds, ["owner", "wife"]);
+  await page.screenshot({ path: `${output}/collectandgo-shared-imported.png`, fullPage: true });
+  await page.getByRole("checkbox").nth(1).uncheck();
+  await page.getByRole("button", { name: "Save access", exact: true }).click();
+  await page.waitForFunction(() => !document.querySelector("fieldset")?.disabled);
+  assert.deepEqual(collectAccess, ["owner"]);
+  collectConnected = false; collectAccess = ["owner", "wife"];
+  await open("Features/Shopping/Components/CollectAndGoSettings", "LegacySession");
+  await page.getByRole("button", { name: "Share my saved session", exact: true }).click();
+  await page.getByText("Browser session imported; signed-in basket access has not been verified.", { exact: true }).waitFor();
+  assert.deepEqual(adopted, { userIds: ["owner", "wife"] });
+  assert.equal(await page.getByRole("button", { name: "Share my saved session", exact: true }).count(), 0);
+  await open("Features/Shopping/Components/CollectAndGoSettings", "SelectedAccount");
+  assert.equal(await page.getByRole("checkbox").count(), 0);
+  assert.equal(await page.getByRole("button", { name: "Import browser session", exact: true }).count(), 0);
+  assert.equal(await page.getByRole("button", { name: "Disconnect everyone", exact: true }).count(), 0);
   await open("Features/Shopping/Components/XtraListPanel", "Live");
   await page.getByText(name, { exact: true }).waitFor();
   assert.equal(fresh, true);
@@ -99,5 +121,5 @@ try {
   await page.getByRole("region", { name: "Already on your Xtra list" }).waitFor({ state: "hidden" });
   assert.equal(await page.getByText(name, { exact: true }).count(), 0);
   assert.deepEqual(errors, []);
-  console.log(`Retailer groceries UI: 24 EN/NL mobile/desktop renders; automatic reads, visible-only polling, focus refresh, MCP events, stale/expired reads, revoked in-flight reads, and Collect&Go import without CLI passed. Screenshots: ${output}`);
+  console.log(`Retailer groceries UI: 24 EN/NL mobile/desktop renders; automatic reads, visible-only polling, focus refresh, MCP events, stale/expired reads, revoked in-flight reads, and Collect&Go shared grants, explicit legacy adoption and import without CLI passed. Screenshots: ${output}`);
 } finally { await browser.close(); for (const stream of streams) stream.end(); await new Promise((done) => server.close(done)); }

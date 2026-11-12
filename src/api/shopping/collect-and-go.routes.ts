@@ -1,32 +1,26 @@
 import { Router } from "express";
-import { currentUser, requireUser } from "../lib/session";
-import { collectAndGoEnabled, disconnectCollectAndGoBrowser, importCollectAndGoSession } from "./collect-and-go-browser";
-import { readCollectAndGoSession } from "./collect-and-go-session";
-import { collectAndGoStateSchema } from "@/features/shopping/types/collect-and-go";
-import { HttpError, parse } from "../lib/http";
-import { secretsAvailable } from "../lib/secrets";
-import { requireRole } from "../lib/session";
+import { currentUser, requireRole, requireUser } from "../lib/session";
+import { adoptCollectAndGoSession, disconnectCollectAndGoBrowser, importCollectAndGoSession, setCollectAndGoAccess } from "./collect-and-go-browser";
+import { collectAndGoStatus } from "./collect-and-go-connection";
+import { collectAndGoAccessSchema, collectAndGoConnectionInputSchema } from "@/features/shopping/types/collect-and-go";
+import { parse } from "../lib/http";
 import { createRateLimiter } from "../lib/rate-limit";
-const imports = createRateLimiter({ limit: 10, windowMs: 60000 });
+const changes = createRateLimiter({ limit: 20, windowMs: 60000 });
 export const collectAndGoRouter = Router();
 collectAndGoRouter.use(requireUser);
-collectAndGoRouter.get("/status", async (req, res) => {
-  const session = await readCollectAndGoSession(currentUser(req).id);
-  res.setHeader("Cache-Control", "no-store");
-  res.json({ enabled: collectAndGoEnabled(), connected: Boolean(session), importedAt: session?.importedAt ?? null });
+collectAndGoRouter.use((_req, res, next) => { res.setHeader("Cache-Control", "no-store"); next(); });
+collectAndGoRouter.get("/status", async (req, res) => { res.json(await collectAndGoStatus(currentUser(req))); });
+collectAndGoRouter.use(requireRole("owner"));
+collectAndGoRouter.post("/session", async (req, res) => {
+  const user = currentUser(req); changes.hit(user.id);
+  res.json(await importCollectAndGoSession(user, parse(collectAndGoConnectionInputSchema, req.body)));
 });
-collectAndGoRouter.delete("/session", async (req, res) => {
-  await disconnectCollectAndGoBrowser(currentUser(req).id);
-  res.status(204).end();
+collectAndGoRouter.put("/access", async (req, res) => {
+  const user = currentUser(req); changes.hit(user.id);
+  res.json(await setCollectAndGoAccess(user, parse(collectAndGoAccessSchema, req.body).userIds));
 });
-collectAndGoRouter.post("/session", requireRole("owner", "adult"), async (req, res) => {
-  const user = currentUser(req);
-  imports.hit(user.id);
-  if (!secretsAvailable()) throw new HttpError(503, "collectandgo_not_configured", "Integration encryption is not configured.");
-  const state = parse(collectAndGoStateSchema, req.body);
-  if (!state.cookies.some((cookie) => /(^|\.)collectandgo\.be$/.test(cookie.domain))) throw new HttpError(400, "collectandgo_session", "No Collect&Go cookies were found.");
-  await importCollectAndGoSession(user.id, state);
-  const saved = await readCollectAndGoSession(user.id);
-  res.setHeader("Cache-Control", "no-store");
-  res.json({ enabled: collectAndGoEnabled(), connected: true, importedAt: saved?.importedAt ?? null });
+collectAndGoRouter.post("/session/adopt", async (req, res) => {
+  const user = currentUser(req); changes.hit(user.id);
+  res.json(await adoptCollectAndGoSession(user, parse(collectAndGoAccessSchema, req.body).userIds));
 });
+collectAndGoRouter.delete("/session", async (req, res) => { const user = currentUser(req); changes.hit(user.id); await disconnectCollectAndGoBrowser(user); res.status(204).end(); });

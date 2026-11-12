@@ -133,12 +133,12 @@ writes and idempotent retries with a fake upstream. `npm run build-storybook` fo
 both themes. These are fixture checks; a real account connection and authenticated live list changes
 still require the owner to sign in. No real retailer account or list was used during development.
 
-The groceries/session follow-up passed all 44 targeted service/contract/workflow tests, three persisted
+The groceries/session follow-up passed all 54 targeted service/contract/workflow tests, three persisted
 basket-browser fixtures and 24 English/Dutch mobile/desktop renders. The latter also checks normal-browser
 imports, minimal server payloads, automatic list reads, focus/visibility polling, MCP events, stale/expired
 reads and permission revocation during an in-flight request. Run `node scripts/groceries-retailer-browser-smoke.mjs`
 after the Storybook build. TypeScript, lint, the application build and Storybook build also passed.
-The full unit suite passed 1,743 tests with 61 skipped; the two previously recorded failures in
+The full unit suite passed 1,754 tests with 61 skipped; the two previously recorded failures in
 `receipt-upload.test.ts` and `shared-stock-group-preview.test.ts` remain unchanged.
 
 Protocol reference: [ddvlamin/xtra-mcp](https://github.com/ddvlamin/xtra-mcp), inspected at development time.
