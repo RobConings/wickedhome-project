@@ -13,7 +13,10 @@ An owner does not automatically receive usage access. This keeps the account pic
 
 1. Configure the existing `INTEGRATIONS_KEY` on the server (32 random bytes, base64). Install Chromium on
    the desktop if it isn't available: `npx playwright install chromium`.
-2. On the desktop, run `npm run xtra:login` from this checkout. Sign in yourself on the real Colruyt
+2. In a local terminal on your Mac/desktop, run `npm run xtra:login` from its WickedHome checkout.
+   Do not run it in an SSH session on `home-server`: that server has no visible browser for login.
+   The helper uses an installed desktop Chrome when Playwright's own browser is not installed.
+   Sign in yourself on the real Colruyt
    website, complete SMS/browser verification, select your store, search and open your shopping list.
    Press Enter in the terminal. Optional `-- --browser /path/to/chrome` selects an installed browser;
    `-- --output /protected/new-connection.json` chooses a fresh file when reconnecting.

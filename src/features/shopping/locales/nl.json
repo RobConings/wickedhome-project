@@ -609,7 +609,7 @@
   "collectAndGo": {
     "description": "Zoek producten en actuele promoties via de AI-assistent. Een winkelmand wijzigen vraagt altijd bevestiging; bestellingen rond je zelf af.",
     "serverSetup": "Beheerder: activeer de integratie op de server, stel INTEGRATIONS_KEY in en installeer de browser. Herstart WickedHome daarna.",
-    "desktopLogin": "Voer dit uit in de WickedHome-projectmap op je computer. Meld je zelf aan bij Collect&Go en kies je afhaalpunt in het geopende browservenster.",
+    "desktopLogin": "Voer dit uit vanuit de WickedHome-projectmap in een lokale terminal op je Mac of computer, niet via SSH op de server. Meld je zelf aan bij Collect&Go en kies je afhaalpunt in het browservenster.",
     "importInstructions": "Kopieer het beschermde sessiebestand via SSH naar je server en importeer het met dit commando. Vervang het voorbeeldpad. Verwijder de niet-versleutelde bestanden na import.",
     "challenge": "Bij een CAPTCHA of verlopen sessie stopt de automatisering. Voltooi de controle zelf met de desktophelper en importeer opnieuw. Prijzen en promotievoorwaarden kunnen per afhaalpunt verschillen.",
     "disabled": "Browserintegratie uitgeschakeld",
@@ -633,7 +633,7 @@
     "noAccess": "Je kan deze koppeling beheren, maar jouw account heeft nog geen gebruikstoegang.",
     "reconnect": "Opnieuw aanmelden of browserverificatie nodig. Vraag een eigenaar om Xtra hier opnieuw te koppelen.",
     "connectTitle": "Gedeeld account koppelen of vernieuwen",
-    "desktop": "Open op je computer de WickedHome-projectmap en voer dit commando uit. Meld je zelf aan in het browservenster, kies je winkel, zoek een product en open je Colruyt-boodschappenlijstje.",
+    "desktop": "Open een lokale terminal op je Mac of computer, geen SSH-sessie op home-server. Voer dit commando uit vanuit de lokale WickedHome-projectmap. Meld je zelf aan in het browservenster, kies je winkel, zoek een product en open je Colruyt-boodschappenlijstje.",
     "uploadHelp": "Kies hierboven de WickedHome-accounts en upload daarna het aangemaakte bestand xtra-connection.json. De geselecteerde accounts kunnen de koppeling daarna ook op hun telefoon gebruiken.",
     "file": "Koppelbestand",
     "connect": "Controleren en koppelen",

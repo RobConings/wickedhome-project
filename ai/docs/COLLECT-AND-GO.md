@@ -12,7 +12,9 @@ ledger or assistant. It prepares an external basket; completing the order remain
    Restart WickedHome. An optional `COLLECTANDGO_BROWSER_PATH` selects an installed Chromium executable.
 2. For public product discovery no account import is required, subject to the shop's human verification.
 3. For personal pickup-point prices and basket access, run `npm run collectandgo:login` in a desktop
-   WickedHome checkout. This opens a normal browser. Sign in yourself, complete any CAPTCHA, select the
+   WickedHome checkout, in a local terminal on your Mac/computer rather than an SSH session on the server.
+   The helper uses an installed desktop Chrome when Playwright's own browser isn't installed.
+   This opens a normal browser. Sign in yourself, complete any CAPTCHA, select the
    pickup point, then press Enter in the terminal. No password is sent to WickedHome.
 4. The helper writes a new owner-only `~/.config/wickedhome/collect-and-go.json`. It refuses to overwrite
    an existing file. Keep it private. Only shop cookies/local storage are retained.

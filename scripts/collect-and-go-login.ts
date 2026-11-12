@@ -1,4 +1,4 @@
-import { chromium } from "playwright";
+import { launchDesktopBrowser } from "./lib/desktop-browser";
 import { createInterface } from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import { mkdir, writeFile } from "node:fs/promises";
@@ -6,7 +6,7 @@ import { dirname, resolve } from "node:path";
 import { homedir } from "node:os";
 import { parseArgs } from "node:util";
 const { values } = parseArgs({ options: { output: { type: "string", default: `${homedir()}/.config/wickedhome/collect-and-go.json` }, browser: { type: "string" } } });
-const browser = await chromium.launch({ headless: false, ...(values.browser && { executablePath: values.browser }) });
+const browser = await launchDesktopBrowser("npm run collectandgo:login", values.browser).catch((error: Error) => { console.error(error.message); process.exit(1); });
 const terminal = createInterface({ input: stdin, output: stdout });
 try {
   const context = await browser.newContext({ locale: "nl-BE" });

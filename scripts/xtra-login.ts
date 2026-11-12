@@ -1,4 +1,4 @@
-import { chromium } from "playwright";
+import { launchDesktopBrowser } from "./lib/desktop-browser";
 import { createInterface } from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import { mkdir, writeFile } from "node:fs/promises";
@@ -8,7 +8,7 @@ import { parseArgs } from "node:util";
 import { xtraCredentialsSchema } from "../src/features/shopping/types/xtra";
 
 const { values } = parseArgs({ options: { output: { type: "string", default: `${homedir()}/.config/wickedhome/xtra-connection.json` }, browser: { type: "string" } } });
-const browser = await chromium.launch({ headless: false, ...(values.browser && { executablePath: values.browser }) });
+const browser = await launchDesktopBrowser("npm run xtra:login", values.browser).catch((error: Error) => { console.error(error.message); process.exit(1); });
 const terminal = createInterface({ input: stdin, output: stdout });
 try {
   const context = await browser.newContext({ locale: "nl-BE", acceptDownloads: false, serviceWorkers: "block" });

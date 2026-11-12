@@ -609,7 +609,7 @@
   "collectAndGo": {
     "description": "Find products and current promotions through the AI assistant. Basket changes always require confirmation; complete orders yourself.",
     "serverSetup": "Administrator: enable the integration on the server, configure INTEGRATIONS_KEY and install the browser. Restart WickedHome afterward.",
-    "desktopLogin": "Run this from the WickedHome checkout on your desktop. Sign in to Collect&Go yourself and select your pickup point in the browser window.",
+    "desktopLogin": "Run this from the WickedHome checkout in a local terminal on your Mac or desktop computer, not an SSH session on the server. Sign in to Collect&Go yourself and select your pickup point in the browser window.",
     "importInstructions": "Transfer the protected session file to your server over SSH and import it with this command. Replace the example path. Delete the plaintext copies after import.",
     "challenge": "Automation stops for a CAPTCHA or expired session. Complete the check yourself with the desktop helper and import again. Prices and promotion conditions can differ by pickup point.",
     "disabled": "Browser integration disabled",
@@ -633,7 +633,7 @@
     "noAccess": "You can manage this connection, but your account has not been granted usage access.",
     "reconnect": "The connection needs a new login or browser verification. Ask a household owner to reconnect here.",
     "connectTitle": "Connect or renew the shared account",
-    "desktop": "On your computer, open the WickedHome project and run this command. Sign in yourself in the browser window, choose your store, search for a product and open your Colruyt shopping list.",
+    "desktop": "Open a local terminal on your Mac or desktop computer, not an SSH session on home-server. From the local WickedHome project folder, run this command. Sign in yourself in the browser window, choose your store, search for a product and open your Colruyt shopping list.",
     "uploadHelp": "Choose the WickedHome accounts above, then upload the generated xtra-connection.json file. Your selected accounts can then use it from their phones too.",
     "file": "Connection file",
     "connect": "Verify and connect",
