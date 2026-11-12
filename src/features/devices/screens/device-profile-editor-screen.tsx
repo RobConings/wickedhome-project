@@ -1,3 +1,10 @@
+import { FormField } from "@/components/shared/form-field";
+import { FormGrid } from "@/components/layout/form-grid";
+import { CardHeading } from "@/components/shared/card";
+import { Inline } from "@/components/layout/inline";
+import { PageGrid } from "@/components/layout/page-grid";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { SaveIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -8,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageContainer } from "@/components/layout/page-container";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
+import { Card, CardHeader, CardTitle } from "@/components/shared/card";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { PageHeader } from "@/components/shared/page-header";
@@ -98,7 +105,7 @@ export function DeviceProfileEditorScreen({ profile, canManage, initialSampleVal
         description={profile ? t("profiles.deviceCount", { count: profile.deviceCount }) : t("editor.newDescription")}
         actions={
           canManage && (
-            <div className="flex flex-wrap items-center gap-2">
+            <Inline gap="sm" align="center" wrap>
               <span className="text-sm text-muted-foreground" aria-live="polite">
                 {saving ? tCommon("form.saving") : dirty ? t("editor.unsaved") : ""}
               </span>
@@ -122,7 +129,7 @@ export function DeviceProfileEditorScreen({ profile, canManage, initialSampleVal
                 <SaveIcon />
                 {saving ? tCommon("form.saving") : tCommon("actions.save")}
               </Button>
-            </div>
+            </Inline>
           )
         }
       />
@@ -140,15 +147,14 @@ export function DeviceProfileEditorScreen({ profile, canManage, initialSampleVal
       )}
       {remove.data?.formError && <InlineAlert tone="error">{remove.data.formError}</InlineAlert>}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <PageGrid gap="lg" className="lg:grid-cols-[minmax(0,1fr)_22rem]">
         <fieldset disabled={saving} aria-busy={saving || undefined} className="flex min-w-0 flex-col gap-6">
           <Card>
             <CardHeader>
               <CardTitle>{t("editor.general")}</CardTitle>
             </CardHeader>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <Label htmlFor="profile-name">{t("fields.name")}</Label>
+            <FormGrid>
+              <FormField htmlFor="profile-name" label={<>{t("fields.name")}</>} className="sm:col-span-2">
                 <Input
                   id="profile-name"
                   value={draft.name}
@@ -157,12 +163,12 @@ export function DeviceProfileEditorScreen({ profile, canManage, initialSampleVal
                   disabled={readOnly}
                   onChange={(event) => setDraft({ ...draft, name: event.target.value })}
                 />
-              </div>
-              <div className="flex flex-col gap-1.5">
+              </FormField>
+              <Stack gap="1.5">
                 <Label htmlFor="profile-icon">{t("editor.icon")}</Label>
                 <DeviceIconSelect id="profile-icon" value={draft.icon} disabled={readOnly} onChange={(icon) => icon && setDraft({ ...draft, icon })} />
-              </div>
-              <div className="flex flex-col gap-1.5">
+              </Stack>
+              <Stack gap="1.5">
                 <Label htmlFor="profile-category">{t("editor.category")}</Label>
                 <Select value={draft.category} disabled={readOnly} onValueChange={(category) => setDraft({ ...draft, category: category as DeviceCategory })}>
                   <SelectTrigger id="profile-category" className="w-full">
@@ -176,9 +182,8 @@ export function DeviceProfileEditorScreen({ profile, canManage, initialSampleVal
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="profile-stale">{t("editor.staleAfter")}</Label>
+              </Stack>
+              <FormField htmlFor="profile-stale" label={<>{t("editor.staleAfter")}</>} description={<>{t("editor.staleHint")}</>}>
                 <DraftNumberInput
                   id="profile-stale"
                   value={draft.staleAfterMinutes}
@@ -186,32 +191,28 @@ export function DeviceProfileEditorScreen({ profile, canManage, initialSampleVal
                   disabled={readOnly}
                   onChange={(value) => setDraft({ ...draft, staleAfterMinutes: value === null ? null : Math.max(1, Math.round(value)) })}
                 />
-                <p className="text-xs text-muted-foreground">{t("editor.staleHint")}</p>
-              </div>
-            </div>
+              </FormField>
+            </FormGrid>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>{t("editor.fields.title")}</CardTitle>
-              <CardDescription>{t("editor.fields.description")}</CardDescription>
+              <CardHeading title={<>{t("editor.fields.title")}</>} description={<>{t("editor.fields.description")}</>} />
             </CardHeader>
             <ProfileFieldsEditor draft={draft} onChange={setDraft} disabled={readOnly} />
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>{t("editor.rules.title")}</CardTitle>
-              <CardDescription>{t("editor.rules.description")}</CardDescription>
+              <CardHeading title={<>{t("editor.rules.title")}</>} description={<>{t("editor.rules.description")}</>} />
             </CardHeader>
             <ProfileRulesEditor draft={draft} onChange={setDraft} matchedRuleId={result.ruleId} disabled={readOnly} />
-            <div className="grid gap-4 border-t pt-4 sm:grid-cols-[10rem_1fr]">
-              <div className="flex flex-col gap-1.5">
+            <PageGrid gap="md" className="border-t pt-4 sm:grid-cols-[10rem_1fr]">
+              <Stack gap="1.5">
                 <Label htmlFor="profile-fallback-tone">{t("editor.fallbackTone")}</Label>
                 <ToneSelect id="profile-fallback-tone" value={draft.fallbackTone} disabled={readOnly} onChange={(fallbackTone) => setDraft({ ...draft, fallbackTone })} />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="profile-fallback-label">{t("editor.fallbackLabel")}</Label>
+              </Stack>
+              <FormField htmlFor="profile-fallback-label" label={<>{t("editor.fallbackLabel")}</>}>
                 <Input
                   id="profile-fallback-label"
                   value={draft.fallbackLabel ?? ""}
@@ -220,20 +221,19 @@ export function DeviceProfileEditorScreen({ profile, canManage, initialSampleVal
                   disabled={readOnly}
                   onChange={(event) => setDraft({ ...draft, fallbackLabel: event.target.value || null })}
                 />
-              </div>
-              <p className="text-xs text-muted-foreground sm:col-span-2">{t("editor.fallbackHint")}</p>
-            </div>
+              </FormField>
+              <Text size="xs" tone="muted" className="sm:col-span-2">{t("editor.fallbackHint")}</Text>
+            </PageGrid>
           </Card>
         </fieldset>
 
         <Card className="h-fit lg:sticky lg:top-6">
           <CardHeader>
-            <CardTitle>{t("editor.preview.title")}</CardTitle>
-            <CardDescription>{t("editor.preview.description")}</CardDescription>
+            <CardHeading title={<>{t("editor.preview.title")}</>} description={<>{t("editor.preview.description")}</>} />
           </CardHeader>
           <ProfilePreview draft={draft} values={samples} onValuesChange={setSamples} result={result} />
         </Card>
-      </div>
+      </PageGrid>
     </PageContainer>
   );
 }

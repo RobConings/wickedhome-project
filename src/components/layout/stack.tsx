@@ -11,6 +11,11 @@ const stackVariants = cva("flex flex-col", {
       md: "gap-4",
       lg: "gap-6",
       xl: "gap-10",
+      "0.5": "gap-0.5",
+      "1.5": "gap-1.5",
+      "3": "gap-3",
+      "5": "gap-5",
+      "8": "gap-8",
     },
     align: {
       stretch: "items-stretch",

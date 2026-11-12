@@ -1,3 +1,4 @@
+import { Inline } from "@/components/layout/inline";
 import type * as React from "react";
 import { CheckIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -47,7 +48,7 @@ function OwnersField({
   const toggle = (habitantId: string) =>
     setValue(selected.includes(habitantId) ? selected.filter((item) => item !== habitantId) : [...selected, habitantId]);
   return (
-    <div id={id} className="flex flex-wrap gap-2">
+    <Inline gap="sm" align="stretch" wrap id={id}>
       <input type="hidden" name={name} value={selected.join(",")} />
       {habitants.map((habitant) => {
         const active = selected.includes(habitant.id);
@@ -69,7 +70,7 @@ function OwnersField({
           </button>
         );
       })}
-    </div>
+    </Inline>
   );
 }
 

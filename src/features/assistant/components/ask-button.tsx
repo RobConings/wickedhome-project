@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { BotIcon, Maximize2Icon, Minimize2Icon, MessagesSquareIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -102,7 +104,7 @@ export function AskButton({ client = assistantClient, className, open: openProp,
             <div className="min-w-0 flex-1"><SheetTitle className="truncate">{t("ask.title")}</SheetTitle><SheetDescription className="sr-only">{t("ask.description")}</SheetDescription></div>
             <Button variant="ghost" size="icon" aria-label={t(expanded ? "chat.collapse" : "chat.openFull")} onClick={() => { const next = !expanded; setExpanded(next); setHistoryOpen(next && window.matchMedia("(min-width: 1024px)").matches); }}>{expanded ? <Minimize2Icon /> : <Maximize2Icon />}</Button>
           </SheetHeader>
-          <div className="flex min-h-0 flex-1">
+          <Inline gap="none" align="stretch" className="min-h-0 flex-1">
           {expanded && <aside className={cn("min-h-0 w-72 shrink-0 flex-col border-r p-3", historyOpen ? "flex w-full sm:w-72" : "hidden")}>
             <ConversationList search={client.listConversations} conversations={conversations} activeId={conversationId} onNavigate={() => setOpen(false)} onRename={async (id, title) => { await client.renameConversation(id, title); setConversations(await client.listConversations()); }} onDelete={async (id) => { await client.deleteConversation(id); setConversations(await client.listConversations()); }} className="flex-1" />
           </aside>}
@@ -115,12 +117,12 @@ export function AskButton({ client = assistantClient, className, open: openProp,
                 {t("errors.generic")}
               </InlineAlert>
             ) : !status.configured ? (
-              <div className="flex flex-col gap-3 py-4">
+              <Stack gap="3" className="py-4">
                 <InlineAlert tone="info">{t("ask.notConfigured")}</InlineAlert>
                 <Button asChild variant="outline" onClick={() => setOpen(false)}>
                   <Link to="/settings?section=assistant">{t("ask.setup")}</Link>
                 </Button>
-              </div>
+              </Stack>
             ) : (
               <AssistantChat
                 key={session}
@@ -136,7 +138,7 @@ export function AskButton({ client = assistantClient, className, open: openProp,
               />
             )}
           </div>
-          </div>
+          </Inline>
         </SheetContent>
       </Sheet>
     </>

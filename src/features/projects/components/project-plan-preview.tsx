@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { AlertTriangleIcon, CalendarIcon, CircleCheckIcon, ClockIcon, CornerDownRightIcon, ExternalLinkIcon, ListChecksIcon, MapPinIcon, TrendingUpIcon, UserIcon, UsersIcon, WalletIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -21,7 +24,7 @@ import { useProjectText } from "./use-project-text";
 export default function ProjectPlanPreview({ preview }: AssistantPreviewRendererProps) {
   const { t } = useTranslation("projects");
   const parsed = projectPlanDataSchema.safeParse(preview.data);
-  if (!parsed.success) return <p className="text-sm text-muted-foreground">{t("plan.invalid")}</p>;
+  if (!parsed.success) return <Text size="sm" tone="muted">{t("plan.invalid")}</Text>;
   return <PlanBody data={parsed.data} />;
 }
 
@@ -30,12 +33,12 @@ const COLLAPSED = 12;
 function PlanBody({ data }: { data: ProjectPlanData }) {
   const { t } = useTranslation("projects");
   return (
-    <div className="flex min-w-0 flex-col gap-4 text-sm">
+    <Stack gap="md" className="min-w-0 text-sm">
       <PlanHeader data={data} />
       <PlanTotals data={data} />
       {data.warnings.length > 0 && (
         <InlineAlert tone="warning">
-          <p className="font-medium">{t("plan.warnings")}</p>
+          <Text weight="medium">{t("plan.warnings")}</Text>
           <ul className="mt-1 list-disc pl-4">
             {data.warnings.map((warning, index) => (
               <li key={index} className="break-words">
@@ -47,7 +50,7 @@ function PlanBody({ data }: { data: ProjectPlanData }) {
       )}
       {data.tasks.length > 0 && <PlanTasks data={data} />}
       {data.materials.length > 0 && <PlanMaterials data={data} />}
-    </div>
+    </Stack>
   );
 }
 
@@ -66,19 +69,19 @@ function PlanHeader({ data }: { data: ProjectPlanData }) {
   const { project } = data;
   const period = text.period({ startDate: project.start, endDate: project.end });
   return (
-    <div className="flex min-w-0 flex-col gap-1.5">
-      <div className="flex min-w-0 flex-wrap items-center gap-2">
+    <Stack gap="1.5" className="min-w-0">
+      <Inline gap="sm" align="center" wrap className="min-w-0">
         <h3 className="min-w-0 text-base font-semibold break-words">{project.name}</h3>
         <Badge variant={project.existing ? "neutral" : "info"}>{project.existing ? t("plan.existingProject") : t("plan.newProject")}</Badge>
-      </div>
-      <div className="flex flex-col gap-1 text-muted-foreground">
+      </Inline>
+      <Stack gap="xs" className="text-muted-foreground">
         <Meta icon={WalletIcon}>{project.budgetCents === null ? t("plan.noBudget") : t("plan.budget", { amount: text.money(project.budgetCents) })}</Meta>
         {period && <Meta icon={CalendarIcon}>{period}</Meta>}
         {project.places.length > 0 && <Meta icon={MapPinIcon}>{project.places.join(", ")}</Meta>}
         {project.contact && <Meta icon={UserIcon}>{t("plan.contact", { name: project.contact })}</Meta>}
-      </div>
-      {project.notes && <p className="whitespace-pre-line break-words text-muted-foreground">{project.notes}</p>}
-    </div>
+      </Stack>
+      {project.notes && <Text tone="muted" className="whitespace-pre-line break-words">{project.notes}</Text>}
+    </Stack>
   );
 }
 
@@ -87,10 +90,10 @@ function PlanTotals({ data }: { data: ProjectPlanData }) {
   const text = useProjectText();
   const totals = planTotals(data);
   const row = (label: string, cents: number, strong = false) => (
-    <div className="flex items-baseline justify-between gap-3">
+    <Inline gap="md" align="baseline" justify="between">
       <span className={cn(strong ? "font-medium" : "text-muted-foreground")}>{label}</span>
       <span className={cn("shrink-0 tabular-nums", strong && "font-semibold")}>{text.money(cents)}</span>
-    </div>
+    </Inline>
   );
   const StatusIcon = totals.status === "over_budget" ? TrendingUpIcon : totals.status === "at_risk" ? AlertTriangleIcon : CircleCheckIcon;
   return (
@@ -108,8 +111,8 @@ function PlanTotals({ data }: { data: ProjectPlanData }) {
           </span>
         </div>
       )}
-      {totals.unpriced > 0 && <p className="text-xs text-muted-foreground">{t("plan.unpriced", { count: totals.unpriced })}</p>}
-      <p className="text-xs text-muted-foreground">{t("plan.estimateNote")}</p>
+      {totals.unpriced > 0 && <Text size="xs" tone="muted">{t("plan.unpriced", { count: totals.unpriced })}</Text>}
+      <Text size="xs" tone="muted">{t("plan.estimateNote")}</Text>
     </section>
   );
 }
@@ -146,7 +149,7 @@ function PlanTasks({ data }: { data: ProjectPlanData }) {
               <span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary tabular-nums">
                 {index + 1}
               </span>
-              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <Stack gap="0.5" className="min-w-0 flex-1">
                 <span className="font-medium break-words">
                   <span className="sr-only">{index + 1}. </span>
                   {task.title}
@@ -171,7 +174,7 @@ function PlanTasks({ data }: { data: ProjectPlanData }) {
                     </span>
                   </span>
                 )}
-              </div>
+              </Stack>
             </li>
           );
         })}
@@ -202,7 +205,7 @@ function PlanMaterials({ data }: { data: ProjectPlanData }) {
 
   return (
     <section className="flex flex-col gap-2">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <Inline gap="sm" align="center" justify="between" wrap>
         <h4 className="font-medium">{t("plan.materials", { count: data.materials.length })}</h4>
         {hasShops && (
           <SegmentedControl
@@ -216,11 +219,11 @@ function PlanMaterials({ data }: { data: ProjectPlanData }) {
             ]}
           />
         )}
-      </div>
-      <div className="flex flex-col gap-3">
+      </Inline>
+      <Stack gap="3">
         {visible.map((group) => (
-          <div key={group.key} className="flex flex-col gap-1">
-            <p className="text-xs font-medium break-words text-muted-foreground">{group.label}</p>
+          <Stack gap="xs" key={group.key}>
+            <Text size="xs" tone="muted" weight="medium" className="break-words">{group.label}</Text>
             <ul className="flex flex-col divide-y rounded-md border bg-background">
               {group.materials.map((material, index) => {
                 const line = planMaterialCents(material);
@@ -258,9 +261,9 @@ function PlanMaterials({ data }: { data: ProjectPlanData }) {
                 );
               })}
             </ul>
-          </div>
+          </Stack>
         ))}
-      </div>
+      </Stack>
       <ShowAll total={data.materials.length} expanded={expanded} onToggle={() => setExpanded((value) => !value)} />
     </section>
   );

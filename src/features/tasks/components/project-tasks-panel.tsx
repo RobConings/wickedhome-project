@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { ChevronDownIcon, CornerDownRightIcon, ListChecksIcon, PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -57,20 +59,20 @@ function RecordTasksPanel({ projectId, deviceId, assigneeId, placeId, onChanged,
   const labels = assigneeId ? "person" : deviceId ? "maintenance" : "project";
   if (!data && !error) {
     return (
-      <div className="flex flex-col gap-2" role="status" aria-label={t(`${labels}.loading`)}>
+      <Stack gap="sm"  role="status" aria-label={t(`${labels}.loading`)}>
         <Skeleton className="h-14 rounded-xl" />
         <Skeleton className="h-14 rounded-xl" />
-      </div>
+      </Stack>
     );
   }
   if (!data) {
     return (
-      <div className="flex flex-col items-start gap-2 text-sm text-muted-foreground">
+      <Stack gap="sm" align="start" className="text-sm text-muted-foreground">
         {t(`${labels}.error`)}
         <Button variant="outline" size="sm" onClick={() => refresh()}>
           {tCommon("actions.retry")}
         </Button>
-      </div>
+      </Stack>
     );
   }
 
@@ -89,30 +91,30 @@ function RecordTasksPanel({ projectId, deviceId, assigneeId, placeId, onChanged,
   );
 
   return (
-    <div className="flex flex-col gap-3">
-      {error && <InlineAlert tone="error"><p>{t(`${labels}.error`)}</p><Button variant="outline" size="sm" onClick={refresh}>{tCommon("actions.retry")}</Button></InlineAlert>}
+    <Stack gap="3">
+      {error && <InlineAlert tone="error"><Text>{t(`${labels}.error`)}</Text><Button variant="outline" size="sm" onClick={refresh}>{tCommon("actions.retry")}</Button></InlineAlert>}
       <div>
         {open.length === 0 && done.length === 0 ? (
-          <p className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-4 text-sm text-muted-foreground">
+          <Text size="sm" tone="muted" className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-4">
             <ListChecksIcon className="size-4 shrink-0" aria-hidden="true" />
             {t(`${labels}.empty`)}
-          </p>
+          </Text>
         ) : (
-          <div className="flex flex-col gap-2">
-            {open.length === 0 && <p className="text-sm text-muted-foreground">{t(`${labels}.allDone`)}</p>}
+          <Stack gap="sm">
+            {open.length === 0 && <Text size="sm" tone="muted">{t(`${labels}.allDone`)}</Text>}
             {ordered.map((task) => row(task, Math.min(depths.get(task.id) ?? 0, 2)))}
-          </div>
+          </Stack>
         )}
       </div>
 
       {done.length > 0 && (
-        <div className="flex flex-col gap-2">
+        <Stack gap="sm">
           <Button variant="ghost" size="sm" className="self-start text-muted-foreground" aria-expanded={showDone} onClick={() => setShowDone((value) => !value)}>
             <ChevronDownIcon className={cn("transition-transform", showDone && "rotate-180")} />
             {t(`${labels}.done`, { count: done.length })}
           </Button>
-          {showDone && <div className="flex flex-col gap-2">{done.map((task) => row(task))}</div>}
-        </div>
+          {showDone && <Stack gap="sm">{done.map((task) => row(task))}</Stack>}
+        </Stack>
       )}
 
       {overview.viewer.canManage && (
@@ -133,6 +135,6 @@ function RecordTasksPanel({ projectId, deviceId, assigneeId, placeId, onChanged,
           }}
         />
       )}
-    </div>
+    </Stack>
   );
 }

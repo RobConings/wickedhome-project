@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import { RecordLink } from "@/components/shared/record-link";
 import * as React from "react";
 import { BatteryFullIcon, PencilIcon, Trash2Icon } from "lucide-react";
@@ -41,11 +43,11 @@ export function BatteryCard({ battery, today, canManage, linkName = true }: Batt
         <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-section-soft text-section">
           <BatteryFullIcon className="size-5" aria-hidden="true" />
         </span>
-        <div className="flex min-w-0 flex-col items-start gap-1">
+        <Stack gap="xs" align="start" className="min-w-0">
           <CardTitle className="break-words">{linkName ? <RecordLink to={`/energy/batteries/${encodeURIComponent(battery.id)}`}>{battery.name}</RecordLink> : battery.name}</CardTitle>
           {planned && <Badge variant="outline">{t("battery.planned")}</Badge>}
-        </div>
-        <p className="ml-auto text-xl font-semibold">{formatKwh(battery.capacityWh, locale)}</p>
+        </Stack>
+        <Text size="xl" weight="semibold" className="ml-auto">{formatKwh(battery.capacityWh, locale)}</Text>
       </CardHeader>
 
       <DescriptionList>

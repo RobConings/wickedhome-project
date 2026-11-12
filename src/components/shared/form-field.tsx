@@ -20,7 +20,7 @@ export function FormField({ label, htmlFor, description, errors, optionalLabel, 
   const descriptionId = `${htmlFor}-description`;
   const errorId = `${htmlFor}-error`;
   const hasError = Boolean(errors?.length);
-  const describedBy = [description && descriptionId, hasError && errorId].filter(Boolean).join(" ") || undefined;
+  const describedBy = [children.props["aria-describedby"], description && !hasError && descriptionId, hasError && errorId].filter(Boolean).join(" ") || undefined;
 
   return (
     <div className={cn("flex flex-col gap-2", className)}>
@@ -28,7 +28,7 @@ export function FormField({ label, htmlFor, description, errors, optionalLabel, 
         {label}
         {optionalLabel && <span className="font-normal text-muted-foreground">({optionalLabel})</span>}
       </Label>
-      {React.cloneElement(children, { "aria-invalid": hasError || undefined, "aria-describedby": describedBy })}
+      {React.cloneElement(children, { "aria-invalid": hasError || children.props["aria-invalid"], "aria-describedby": describedBy })}
       {description && !hasError && (
         <p id={descriptionId} className="text-xs text-muted-foreground">
           {description}

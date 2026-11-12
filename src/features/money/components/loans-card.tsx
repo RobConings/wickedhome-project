@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import { HandCoinsIcon } from "lucide-react";
@@ -23,7 +26,7 @@ type LoansCardProps = {
  */
 export function LoansCard({ data, className }: LoansCardProps) {
   const { t } = useTranslation("money");
-  const failed = <p className="text-sm text-muted-foreground">{t("loans.error")}</p>;
+  const failed = <Text size="sm" tone="muted">{t("loans.error")}</Text>;
   const content =
     data instanceof Promise ? (
       <React.Suspense fallback={<LoansSkeleton label={t("loans.loading")} />}>
@@ -39,14 +42,14 @@ export function LoansCard({ data, className }: LoansCardProps) {
 
   return (
     <Card className={cn("gap-3", className)}>
-      <div className="flex items-center gap-2">
+      <Inline gap="sm" align="center">
         <HandCoinsIcon className="size-4 text-muted-foreground" aria-hidden="true" />
         <CardTitle>
           <Link to="/expenses?view=recurring&kind=loan" className="hover:underline">
             {t("loans.title")}
           </Link>
         </CardTitle>
-      </div>
+      </Inline>
       {content}
     </Card>
   );
@@ -54,11 +57,11 @@ export function LoansCard({ data, className }: LoansCardProps) {
 
 function LoansSkeleton({ label }: { label: string }) {
   return (
-    <div className="flex flex-col gap-3" role="status" aria-label={label}>
+    <Stack gap="3"  role="status" aria-label={label}>
       <Skeleton className="h-14 rounded-lg" />
       <Skeleton className="h-10 rounded-lg" />
       <Skeleton className="h-10 rounded-lg" />
-    </div>
+    </Stack>
   );
 }
 
@@ -66,58 +69,58 @@ function LoansSkeleton({ label }: { label: string }) {
 export function LoansSummary({ data }: { data: MoneyLoans }) {
   const { t } = useTranslation("money");
   const { loans, totals } = data;
-  if (loans.length === 0) return <p className="text-sm text-muted-foreground">{t("loans.empty")}</p>;
+  if (loans.length === 0) return <Text size="sm" tone="muted">{t("loans.empty")}</Text>;
   const percent = totalOpenPaidPercent({ totalCents: totals.totalCents, remainingCents: totals.remainingCents });
 
   return (
-    <div className="flex flex-col gap-4">
+    <Stack gap="md">
       {totals.trackedCount > 0 && (
-        <div className="flex flex-col gap-2">
+        <Stack gap="sm">
           <dl className="grid grid-cols-3 gap-2 text-sm">
-            <div className="flex min-w-0 flex-col">
+            <Stack gap="none" className="min-w-0">
               <dt className="text-xs text-muted-foreground">{t("loans.open")}</dt>
               <dd className="text-lg font-semibold tabular-nums">{money(totals.remainingCents)}</dd>
-            </div>
-            <div className="flex min-w-0 flex-col">
+            </Stack>
+            <Stack gap="none" className="min-w-0">
               <dt className="text-xs text-muted-foreground">{t("loans.repaid")}</dt>
               <dd className="text-lg font-semibold tabular-nums">{money(totals.repaidCents)}</dd>
-            </div>
-            <div className="flex min-w-0 flex-col">
+            </Stack>
+            <Stack gap="none" className="min-w-0">
               <dt className="text-xs text-muted-foreground">{t("loans.perMonth")}</dt>
               <dd className="text-lg font-semibold tabular-nums">{money(totals.monthlyCents)}</dd>
-            </div>
+            </Stack>
           </dl>
           <Progress value={percent} label={t("loans.progress", { percent })} />
-          <p className="text-xs text-muted-foreground">{t("loans.ofTotal", { total: money(totals.totalCents), percent })}</p>
-        </div>
+          <Text size="xs" tone="muted">{t("loans.ofTotal", { total: money(totals.totalCents), percent })}</Text>
+        </Stack>
       )}
       {totals.trackedCount === 0 && (
-        <p className="text-sm">
+        <Text size="sm">
           <span className="text-muted-foreground">{t("loans.perMonth")}: </span>
           <span className="font-semibold tabular-nums">{money(totals.monthlyCents)}</span>
-        </p>
+        </Text>
       )}
 
       <ul className="flex flex-col divide-y">
         {loans.map((loan) => (
           <li key={loan.id} className="flex flex-col gap-1.5 py-2.5 first:pt-0 last:pb-0">
-            <div className="flex min-w-0 items-baseline justify-between gap-3">
+            <Inline gap="md" align="baseline" justify="between" className="min-w-0">
               <Link to={`/expenses/recurring/${encodeURIComponent(loan.id)}`} className="truncate text-sm font-medium hover:underline">
                 {loan.payee}
               </Link>
               <span className="shrink-0 text-sm font-semibold tabular-nums">
                 {loan.totalOpen ? money(loan.totalOpen.remainingCents) : t("loans.monthly", { amount: money(loan.monthlyCents) })}
               </span>
-            </div>
+            </Inline>
             {loan.totalOpen ? (
               <TotalOpenProgressBar progress={loan.totalOpen} />
             ) : (
-              <p className="text-xs text-muted-foreground">{t("loans.noTotal")}</p>
+              <Text size="xs" tone="muted">{t("loans.noTotal")}</Text>
             )}
-            {loan.status === "paused" && <p className="text-xs font-medium text-warning">{t("loans.paused")}</p>}
+            {loan.status === "paused" && <Text size="xs" tone="warning" weight="medium">{t("loans.paused")}</Text>}
           </li>
         ))}
       </ul>
-    </div>
+    </Stack>
   );
 }

@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { GeneralList } from "@/components/shared/general-list";
+import { Text } from "@/components/ui/text";
 import { ChevronLeftIcon, ChevronRightIcon, PencilIcon, RepeatIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useFetcher, useSearchParams } from "react-router";
@@ -37,7 +40,7 @@ export function IncomeSourceScreen({ detail, overview, habitants, canManage }: {
       <IncomeSourceFormDialog source={source} habitants={habitants} accounts={overview.accounts} today={overview.today} trigger={<Button><PencilIcon />{t("actions.edit")}</Button>} />
       <ConfirmDialog trigger={<Button variant="outline"><Trash2Icon />{t("actions.delete")}</Button>} title={t("form.deleteSourceTitle", { name: source.name })} description={t("form.deleteSourceDescription")} confirmLabel={t("actions.delete")} cancelLabel={tc("actions.cancel")} destructive onConfirm={() => fetcher.submit({ intent: "delete-source", id: source.id }, { method: "post" })} />
     </>} />
-    {fetcher.data?.formError && <p role="alert" className="text-destructive">{fetcher.data.formError}</p>}
+    {fetcher.data?.formError && <Text tone="danger" role="alert">{fetcher.data.formError}</Text>}
     <Card><CardTitle>{t("detail.schedule")}</CardTitle><DescriptionList>
       <DescriptionItem label={t("detail.schedule")}>{recurrence(source.rrule)}</DescriptionItem>
       <DescriptionItem label={t("detail.amountMode")}>{t(`modes.${source.amountMode}`)}</DescriptionItem>
@@ -47,14 +50,14 @@ export function IncomeSourceScreen({ detail, overview, habitants, canManage }: {
       <DescriptionItem label={t("fields.targetAccount")}>{account ? <RecordLink className="underline" to={`/money?tab=history&account=${encodeURIComponent(account.id)}`}>{account.name}</RecordLink> : t("detail.noAccount")}</DescriptionItem>
       {source.notes && <DescriptionItem wide label={t("fields.notes")}><span className="whitespace-pre-wrap">{source.notes}</span></DescriptionItem>}
     </DescriptionList></Card>
-    {source.amounts.length > 0 && <Card><CardTitle>{t("sources.history")}</CardTitle><ul className="divide-y">{[...source.amounts].reverse().map((amount) => <li className="py-3 text-sm" key={amount.id}>{t("sources.amountFrom", { date: dateText(amount.effectiveFrom), amount: money(amount.amountCents) })}</li>)}</ul></Card>}
+    {source.amounts.length > 0 && <Card><CardTitle>{t("sources.history")}</CardTitle><GeneralList variant="embedded" label={t("sources.history")} items={[...source.amounts].reverse()} getKey={(amount) => amount.id} renderRow={(amount) => <Stack gap="none" className="text-sm">{t("sources.amountFrom", { date: dateText(amount.effectiveFrom), amount: money(amount.amountCents) })}</Stack>} emptyState={null} /></Card>}
     <PeriodNavigator label={monthLabel(detail.month)} onPrevious={() => month(shiftMonth(detail.month, -1))} onNext={() => month(shiftMonth(detail.month, 1))} onToday={() => month(overview.today.slice(0, 7))} previousLabel={t("month.previous")} nextLabel={t("month.next")} todayLabel={t("month.today")} isCurrent={detail.month === overview.today.slice(0, 7)} />
     <IncomeOccurrenceList occurrences={detail.occurrences} habitants={habitants} accounts={overview.accounts} today={overview.today} canManage={canManage} />
     <Card><CardTitle>{t("detail.history", { count: history.total })}</CardTitle>
-      {history.items.length ? <ul className="divide-y">{history.items.map((income) => <li className="py-3" key={income.id}><IncomeRow income={income} sources={[source]} habitants={habitants} accounts={overview.accounts} today={overview.today} /></li>)}</ul> : <p className="text-sm text-muted-foreground">{t("detail.noReceipts")}</p>}
+      {history.items.length ? <GeneralList variant="embedded" label={t("detail.history", { count: history.total })} items={history.items} getKey={(income) => income.id} renderRow={(income) => <><IncomeRow income={income} sources={[source]} habitants={habitants} accounts={overview.accounts} today={overview.today} /></>} emptyState={null} /> : <Text size="sm" tone="muted">{t("detail.noReceipts")}</Text>}
       <nav aria-label={t("detail.pagination")} className="flex flex-wrap items-center justify-between gap-3">
         {history.page > 1 ? <Button asChild variant="outline"><Link to={pageHref(history.page - 1)}><ChevronLeftIcon />{t("detail.previous")}</Link></Button> : <span />}
-        <p className="text-sm text-muted-foreground">{t("detail.pageOf", { page: history.page, pages })}</p>
+        <Text size="sm" tone="muted">{t("detail.pageOf", { page: history.page, pages })}</Text>
         {history.page < pages ? <Button asChild variant="outline"><Link to={pageHref(history.page + 1)}>{t("detail.next")}<ChevronRightIcon /></Link></Button> : <span />}
       </nav>
     </Card>

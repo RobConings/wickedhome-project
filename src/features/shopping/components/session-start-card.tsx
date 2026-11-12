@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import { useState, type ComponentProps } from "react";
 import { ShoppingCartIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -34,13 +37,13 @@ export function SessionStartCard({ shopping, destination, onDestinationChange, i
       onValuesChange={(values) => onDestinationChange(typeof values.destination === "string" ? values.destination : null)}
       submitLabel={t("sessions.startShopping")}
     />
-    {destination && <p role="status" className="rounded-xl bg-section-soft p-3 text-sm text-section-foreground">{t("sessions.matchingNeeds", { count })}</p>}
+    {destination && <Text size="sm" role="status" className="rounded-xl bg-section-soft p-3 text-section-foreground">{t("sessions.matchingNeeds", { count })}</Text>}
   </>;
-  if (compact) return <div className="flex min-w-0 flex-col gap-3">{content}</div>;
+  if (compact) return <Stack gap="3" className="min-w-0">{content}</Stack>;
   return <Card className="max-w-2xl">
-    <CardHeader><div className="flex items-center gap-3"><IconChip icon={ShoppingCartIcon} tone="shopping" /><div>
+    <CardHeader><Inline gap="md" align="center"><IconChip icon={ShoppingCartIcon} tone="shopping" /><div>
       <CardTitle>{t("sessions.simpleStart")}</CardTitle><CardDescription>{t("sessions.simpleDescription")}</CardDescription>
-    </div></div></CardHeader>
+    </div></Inline></CardHeader>
     {content}
   </Card>;
 }

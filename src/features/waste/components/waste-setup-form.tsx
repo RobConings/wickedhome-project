@@ -1,3 +1,7 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { PageGrid } from "@/components/layout/page-grid";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { CheckIcon, SearchIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -83,7 +87,7 @@ export function WasteSetupForm({
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <Stack gap="5">
       <lookup.Form method="post" noValidate className="flex flex-col gap-4">
         <input type="hidden" name="intent" value="waste-lookup" />
         <fieldset disabled={searching || saving} className="flex flex-col gap-4">
@@ -108,9 +112,9 @@ export function WasteSetupForm({
               </SelectContent>
             </Select>
           </FormField>
-          {provider && <p className="-mt-2 text-sm text-muted-foreground">{t(`providers.${provider.id}.hint`)}</p>}
+          {provider && <Text size="sm" tone="muted" className="-mt-2">{t(`providers.${provider.id}.hint`)}</Text>}
 
-          <div className="grid grid-cols-6 gap-3">
+          <PageGrid gap="3" className="grid-cols-6">
             <FormField label={t("setup.fields.street")} htmlFor="waste-street" errors={errors?.street} className="col-span-6 sm:col-span-4">
               <Input id="waste-street" name="street" defaultValue={defaults.street ?? ""} maxLength={120} autoComplete="off" />
             </FormField>
@@ -137,10 +141,10 @@ export function WasteSetupForm({
             >
               <Input id="waste-municipality" name="municipality" defaultValue={defaults.municipality ?? ""} maxLength={80} />
             </FormField>
-          </div>
+          </PageGrid>
         </fieldset>
         {lookup.data?.formError && <InlineAlert tone="error">{lookup.data.formError}</InlineAlert>}
-        <div className="flex flex-wrap gap-2">
+        <Inline gap="sm" align="stretch" wrap>
           <Button type="submit" variant={matches.length ? "outline" : "default"} loading={searching}>
             <SearchIcon />
             {searching ? t("setup.searching") : t("setup.find")}
@@ -150,15 +154,15 @@ export function WasteSetupForm({
               {tCommon("actions.cancel")}
             </Button>
           )}
-        </div>
+        </Inline>
       </lookup.Form>
 
       {problem && <InlineAlert tone="error">{t(`setup.problems.${problem}`, { provider: provider?.name ?? "" })}</InlineAlert>}
 
       {matches.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <p className="text-sm font-medium">{matches.length === 1 ? t("setup.foundOne") : t("setup.foundMany")}</p>
-          <div role="radiogroup" aria-label={t("setup.matches")} className="flex flex-col gap-2">
+        <Stack gap="3">
+          <Text size="sm" weight="medium">{matches.length === 1 ? t("setup.foundOne") : t("setup.foundMany")}</Text>
+          <Stack gap="sm" role="radiogroup" aria-label={t("setup.matches")}>
             {matches.map((match, index) => (
               <button
                 key={`${match.label}-${index}`}
@@ -183,15 +187,15 @@ export function WasteSetupForm({
                 {match.label}
               </button>
             ))}
-          </div>
+          </Stack>
           {save.data?.formError && <InlineAlert tone="error">{save.data.formError}</InlineAlert>}
           <div>
             <Button type="button" onClick={confirm} loading={saving}>
               {saving ? t("setup.saving") : t("setup.use")}
             </Button>
           </div>
-        </div>
+        </Stack>
       )}
-    </div>
+    </Stack>
   );
 }

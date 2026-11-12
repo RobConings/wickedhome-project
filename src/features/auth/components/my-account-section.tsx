@@ -1,3 +1,5 @@
+import { Text } from "@/components/ui/text";
+import { PageGrid } from "@/components/layout/page-grid";
 import * as React from "react";
 import { LaptopIcon, LogOutIcon, SmartphoneIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -119,17 +121,17 @@ function EmailForm({ user, client }: { user: MyAccountSectionProps["user"]; clie
         <Stack gap="md">
           <Stack gap="xs">
             <h3 className="font-semibold">{t("myAccount.email.title")}</h3>
-            <p className="text-sm text-muted-foreground">{t("myAccount.email.description")}</p>
+            <Text size="sm" tone="muted">{t("myAccount.email.description")}</Text>
           </Stack>
           {state.formError && <InlineAlert tone="error">{state.formError}</InlineAlert>}
-          <div className="grid gap-4 sm:grid-cols-2">
+          <PageGrid gap="md" className="sm:grid-cols-2">
             <FormField label={t("fields.email")} htmlFor="my-email" errors={state.errors.email}>
               <Input id="my-email" name="email" type="email" inputMode="email" autoComplete="email" defaultValue={user.email} className="h-10" />
             </FormField>
             <FormField label={t("myAccount.currentPassword")} htmlFor="my-email-password" errors={state.errors.currentPassword}>
               <Input id="my-email-password" name="currentPassword" type="password" autoComplete="current-password" className="h-10" />
             </FormField>
-          </div>
+          </PageGrid>
           <div>
             <Button type="submit" size="lg" loading={state.busy} className="w-full sm:w-auto">
               {state.busy ? t("myAccount.saving") : t("myAccount.email.submit")}
@@ -174,20 +176,20 @@ function PasswordForm({ client }: { client: MyAccountClient }) {
         <Stack gap="md">
           <Stack gap="xs">
             <h3 className="font-semibold">{t("myAccount.password.title")}</h3>
-            <p className="text-sm text-muted-foreground">{t("myAccount.password.description")}</p>
+            <Text size="sm" tone="muted">{t("myAccount.password.description")}</Text>
           </Stack>
           {state.formError && <InlineAlert tone="error">{state.formError}</InlineAlert>}
           <FormField label={t("myAccount.currentPassword")} htmlFor="my-current-password" errors={state.errors.currentPassword}>
             <Input id="my-current-password" name="currentPassword" type="password" autoComplete="current-password" className="h-10" />
           </FormField>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <PageGrid gap="md" className="sm:grid-cols-2">
             <FormField label={t("myAccount.password.new")} htmlFor="my-new-password" description={t("setup.passwordHint")} errors={state.errors.newPassword}>
               <Input id="my-new-password" name="newPassword" type="password" autoComplete="new-password" minLength={10} className="h-10" />
             </FormField>
             <FormField label={t("fields.confirmPassword")} htmlFor="my-confirm-password" errors={state.errors.confirmPassword}>
               <Input id="my-confirm-password" name="confirmPassword" type="password" autoComplete="new-password" className="h-10" />
             </FormField>
-          </div>
+          </PageGrid>
           <div>
             <Button type="submit" size="lg" loading={state.busy} className="w-full sm:w-auto">
               {state.busy ? t("myAccount.saving") : t("myAccount.password.submit")}
@@ -228,7 +230,7 @@ function LanguagePicker({ value, onLocaleChange }: { value: Locale; onLocaleChan
     <Stack gap="md">
       <Stack gap="xs">
         <h3 className="font-semibold">{tCommon("language.label")}</h3>
-        <p className="text-sm text-muted-foreground">{t("myAccount.languageDescription")}</p>
+        <Text size="sm" tone="muted">{t("myAccount.languageDescription")}</Text>
       </Stack>
       <SegmentedControl
         label={tCommon("language.label")}
@@ -299,7 +301,7 @@ function Devices({ data, client }: { data?: MyAccount | null; client: MyAccountC
   const header = (
     <Stack gap="xs">
       <h3 className="font-semibold">{t("myAccount.devices.title")}</h3>
-      <p className="text-sm text-muted-foreground">{t("myAccount.devices.description")}</p>
+      <Text size="sm" tone="muted">{t("myAccount.devices.description")}</Text>
     </Stack>
   );
 
@@ -350,7 +352,7 @@ function Devices({ data, client }: { data?: MyAccount | null; client: MyAccountC
           return (
             <li key={session.key} className="flex min-w-0 items-center gap-3 px-3 py-2.5">
               <Icon className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
-              <div className="flex min-w-0 flex-1 flex-col">
+              <Stack gap="none" className="min-w-0 flex-1">
                 <span className="flex flex-wrap items-center gap-2 text-sm font-medium">
                   {label}
                   {session.current && <Badge variant="secondary">{t("myAccount.devices.thisDevice")}</Badge>}
@@ -360,7 +362,7 @@ function Devices({ data, client }: { data?: MyAccount | null; client: MyAccountC
                     ? t("myAccount.devices.activeNow")
                     : t("myAccount.devices.lastSeen", { when: relativeTime(session.lastSeenAt, locale, now) })}
                 </span>
-              </div>
+              </Stack>
             </li>
           );
         })}

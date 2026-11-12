@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import type { ReactNode } from "react";
 import { UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -20,13 +23,13 @@ export function HabitantDetailScreen({ habitant, household, canManage, tasks, at
   return <PageContainer>
     <PageHeader title={habitant.name} eyebrow={household.name} icon={UsersIcon} backTo="/habitants" actions={canManage && <HabitantActions habitant={habitant} />} />
     <Card style={{ borderTopColor: habitant.color, borderTopWidth: 4 }}>
-      <div className="flex items-center gap-4"><HabitantAvatar habitant={habitant} size="lg" /><CardTitle>{t("detail.about")}</CardTitle></div>
+      <Inline gap="4" align="center"><HabitantAvatar habitant={habitant} size="lg" /><CardTitle>{t("detail.about")}</CardTitle></Inline>
       <DescriptionList>
         <DescriptionItem label={t("fields.type")}><HabitantTypeBadge type={habitant.type} /></DescriptionItem>
         <DescriptionItem label={t("fields.birthday")}>{habitant.birthday ? formatDate(habitant.birthday, currentLocale()) : t("detail.birthdayUnknown")}</DescriptionItem>
         <DescriptionItem label={t("card.hasAccount")}>{t(habitant.hasAccount ? "card.hasAccount" : "detail.noAccount")}</DescriptionItem>
       </DescriptionList>
-      {canManage && habitant.type !== "pet" && <div className="flex flex-col gap-1"><RecordLink to={`/income?view=received&person=${encodeURIComponent(habitant.id)}`} className="min-h-11 py-2 font-medium underline">{t("detail.income")}</RecordLink><p className="text-sm text-muted-foreground">{t("detail.incomeHint")}</p></div>}
+      {canManage && habitant.type !== "pet" && <Stack gap="xs"><RecordLink to={`/income?view=received&person=${encodeURIComponent(habitant.id)}`} className="min-h-11 py-2 font-medium underline">{t("detail.income")}</RecordLink><Text size="sm" tone="muted">{t("detail.incomeHint")}</Text></Stack>}
     </Card>
     {finance}
     {tasks && <Card><CardTitle>{t("detail.tasks")}</CardTitle>{tasks}</Card>}

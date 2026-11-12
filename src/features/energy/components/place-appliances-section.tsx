@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import { RecordLink } from "@/components/shared/record-link";
 import * as React from "react";
 import { GaugeIcon, PlugZapIcon } from "lucide-react";
@@ -50,25 +52,25 @@ export function PlaceAppliancesSection({ placeId, initialData }: PlaceAppliances
 
   if (state.status === "loading") {
     return (
-      <div className="flex flex-col gap-2" aria-busy="true">
+      <Stack gap="sm"  aria-busy="true">
         <span className="sr-only" role="status">
           {t("loading.appliances")}
         </span>
         <div className="rounded-xl border bg-card px-3">
           <SkeletonList rows={2} />
         </div>
-      </div>
+      </Stack>
     );
   }
 
   if (state.status === "error") {
     return (
-      <div className="flex flex-col items-start gap-2">
-        <p className="text-sm text-muted-foreground">{t("appliances.place.error")}</p>
+      <Stack gap="sm" align="start">
+        <Text size="sm" tone="muted">{t("appliances.place.error")}</Text>
         <Button variant="outline" size="sm" onClick={() => setReloads((value) => value + 1)}>
           {t("appliances.place.retry")}
         </Button>
-      </div>
+      </Stack>
     );
   }
 
@@ -77,9 +79,9 @@ export function PlaceAppliancesSection({ placeId, initialData }: PlaceAppliances
     .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <div className="flex flex-col gap-2">
+    <Stack gap="sm">
       {here.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("appliances.place.empty")}</p>
+        <Text size="sm" tone="muted">{t("appliances.place.empty")}</Text>
       ) : (
         <ul className="divide-y rounded-xl border bg-card px-3">
           {here.map((appliance) => (
@@ -87,7 +89,7 @@ export function PlaceAppliancesSection({ placeId, initialData }: PlaceAppliances
               <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-section-soft text-section">
                 <ApplianceCategoryIcon category={appliance.category} />
               </span>
-              <div className="flex min-w-0 flex-1 flex-col">
+              <Stack gap="none" className="min-w-0 flex-1">
                 <RecordLink to={`/energy/appliances/${encodeURIComponent(appliance.id)}`} className="min-h-11 truncate py-2 text-sm font-medium hover:underline">{appliance.name}</RecordLink>
                 <span className="truncate text-xs text-muted-foreground">
                   {[
@@ -97,7 +99,7 @@ export function PlaceAppliancesSection({ placeId, initialData }: PlaceAppliances
                     .filter(Boolean)
                     .join(" · ")}
                 </span>
-              </div>
+              </Stack>
               {appliance.measured ? (
                 <Badge variant="secondary" className="shrink-0 gap-1 font-normal">
                   <GaugeIcon aria-hidden="true" />
@@ -118,6 +120,6 @@ export function PlaceAppliancesSection({ placeId, initialData }: PlaceAppliances
           {here.length > 0 ? t("appliances.place.manage") : t("appliances.place.add")}
         </Link>
       </Button>
-    </div>
+    </Stack>
   );
 }

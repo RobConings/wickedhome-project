@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { Link2Icon, PlusIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -169,14 +172,14 @@ export function AddShoppingItemForm({
       noValidate
     >
       {inDialog && (
-        <div className="flex flex-col gap-2">
+        <Stack gap="sm">
           <label htmlFor={`${idPrefix}-product`} className="text-sm font-medium">{t("add.existingProduct")}</label>
           {productPicker}
-          <p className="text-xs text-muted-foreground">{t("add.productHint")}</p>
-        </div>
+          <Text size="xs" tone="muted">{t("add.productHint")}</Text>
+        </Stack>
       )}
-      <div className="flex gap-2">
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
+      <Inline gap="sm" align="stretch">
+        <Stack gap="sm" className="min-w-0 flex-1">
           {inDialog && <label htmlFor={`${idPrefix}-name`} className="text-sm font-medium">{t("add.nameOrLink")}</label>}
           <div className="relative">
             {isUrl && (
@@ -196,15 +199,15 @@ export function AddShoppingItemForm({
               className={cn("pointer-coarse:h-11 pointer-coarse:text-base", isUrl && "pl-9")}
             />
           </div>
-        </div>
+        </Stack>
         {!inDialog && <Button type="submit" loading={submitting} disabled={!trimmed && !productId} className="pointer-coarse:h-11">
           <PlusIcon />
           <span className="max-sm:sr-only">{submitting ? t("add.adding") : t("add.submit")}</span>
         </Button>}
-      </div>
+      </Inline>
 
       {isUrl && (previewing || preview) && (
-        <div className="flex items-center gap-3 rounded-lg border bg-muted/40 p-2 text-sm" aria-live="polite">
+        <Inline gap="md" align="center" className="rounded-lg border bg-muted/40 p-2 text-sm" aria-live="polite">
           {previewing ? (
             <span className="flex items-center gap-2 text-muted-foreground">
               <Spinner />
@@ -226,7 +229,7 @@ export function AddShoppingItemForm({
               </Button>
             </>
           ) : null}
-        </div>
+        </Inline>
       )}
 
       <div
@@ -270,10 +273,10 @@ export function AddShoppingItemForm({
           autoComplete="off"
         />)}
       </div>
-      {inDialog && <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
+      {inDialog && <Stack gap="sm" className="flex-col-reverse pt-2 sm:flex-row sm:justify-end">
         {onCancel && <Button type="button" variant="outline" disabled={submitting} onClick={onCancel}>{common("actions.cancel")}</Button>}
         <Button type="submit" loading={submitting} disabled={!trimmed && !productId}><PlusIcon />{submitting ? t("add.adding") : t("add.submit")}</Button>
-      </div>}
+      </Stack>}
     </form>
   );
 }

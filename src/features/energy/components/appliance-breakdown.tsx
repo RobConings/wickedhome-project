@@ -1,7 +1,9 @@
+import { CardHeading } from "@/components/shared/card";
+import { Text } from "@/components/ui/text";
 import { CircleHelpIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { BreakdownBars, type BreakdownItem } from "@/components/shared/breakdown-bars";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
+import { Card, CardHeader } from "@/components/shared/card";
 import { InlineAlert } from "@/components/shared/inline-alert";
 import { currentLocale } from "@/lib/i18n";
 import type { EnergyBreakdown } from "../types/energy";
@@ -45,14 +47,13 @@ export function ApplianceBreakdown({ breakdown, className }: ApplianceBreakdownP
   return (
     <Card className={className}>
       <CardHeader className="flex-col gap-1">
-        <CardTitle>{t("breakdown.title")}</CardTitle>
-        <CardDescription>{t("breakdown.description")}</CardDescription>
+        <CardHeading title={<>{t("breakdown.title")}</>} description={<>{t("breakdown.description")}</>} />
       </CardHeader>
       {total === null && <InlineAlert>{t("breakdown.noConsumption")}</InlineAlert>}
-      {total === 0 && <p className="text-sm text-muted-foreground">{t("breakdown.noData")}</p>}
+      {total === 0 && <Text size="sm" tone="muted">{t("breakdown.noData")}</Text>}
       {items.length > 0 && <BreakdownBars items={items} max={total || undefined} label={t("breakdown.label")} />}
       {total !== null && total > 0 && breakdown.appliances.length === 0 && (
-        <p className="text-sm text-muted-foreground">{t("breakdown.allUnknown")}</p>
+        <Text size="sm" tone="muted">{t("breakdown.allUnknown")}</Text>
       )}
     </Card>
   );

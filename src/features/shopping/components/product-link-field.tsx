@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { PageGrid } from "@/components/layout/page-grid";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { LinkIcon, SparklesIcon, Undo2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -100,8 +103,8 @@ export function ProductLinkField({ product, shops, defaultShopId, onDefaultShop,
   };
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_8rem]">
+    <Stack gap="3">
+      <PageGrid gap="md" className="sm:grid-cols-[minmax(0,1fr)_8rem]">
         <FormField
           label={t("productLink.label")}
           htmlFor="product-link-url"
@@ -124,39 +127,39 @@ export function ProductLinkField({ product, shops, defaultShopId, onDefaultShop,
         <FormField label={t("productLink.price")} htmlFor="product-link-price" optionalLabel={tCommon("form.optional")}>
           <MoneyInput key={priceKey} id="product-link-price" name="linkPriceCents" defaultValueCents={priceCents} onValueChange={setPriceCents} />
         </FormField>
-      </div>
+      </PageGrid>
       <input type="hidden" name="linkShopId" value={target?.shopId ?? ""} />
       {removing && initial && <input type="hidden" name="removeLinkShopId" value={initial.shopId} />}
 
-      <div aria-live="polite" className="flex flex-col gap-2">
+      <Stack gap="sm" aria-live="polite">
         {valid && target && (
-          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Text size="sm" tone="muted" className="flex items-center gap-2">
             <LinkIcon className="size-4 shrink-0" aria-hidden="true" />
             {target.shopId
               ? target.matched
                 ? t("productLink.forShop", { shop: shopName(target.shopId) ?? "?" })
                 : t("productLink.forDefaultShop", { shop: shopName(target.shopId) ?? "?", host: urlHost(trimmed) ?? "" })
               : t("productLink.chooseShop")}
-          </p>
+          </Text>
         )}
         {loading && (
-          <p className="flex min-h-10 items-center gap-2 text-sm text-muted-foreground">
+          <Text size="sm" tone="muted" className="flex min-h-10 items-center gap-2">
             <Spinner />
             {t("productLink.reading")}
-          </p>
+          </Text>
         )}
         {offers && fill && (
-          <div className="flex flex-col gap-3 rounded-lg border bg-muted/40 p-3 sm:flex-row sm:items-center">
+          <Stack gap="3" className="rounded-lg border bg-muted/40 p-3 sm:flex-row sm:items-center">
             {found?.imageUrl && <img src={found.imageUrl} alt="" referrerPolicy="no-referrer" className="size-12 shrink-0 rounded-md border bg-white object-contain p-0.5" />}
-            <div className="flex min-w-0 flex-1 flex-col text-sm">
+            <Stack gap="none" className="min-w-0 flex-1 text-sm">
               <span className="font-medium break-words">{found?.title}</span>
               {found?.priceCents !== null && found?.priceCents !== undefined && <span className="text-muted-foreground tabular-nums">{formatCurrency(found.priceCents, locale)}</span>}
-            </div>
+            </Stack>
             <Button type="button" fullOnMobile onClick={apply}>
               <SparklesIcon />
               {t("productLink.fill")}
             </Button>
-          </div>
+          </Stack>
         )}
         {removing && initial && (
           <InlineAlert tone="warning">
@@ -169,7 +172,7 @@ export function ProductLinkField({ product, shops, defaultShopId, onDefaultShop,
             </span>
           </InlineAlert>
         )}
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   );
 }

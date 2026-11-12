@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import { RecordImage } from "@/components/shared/record-image";
 import type * as React from "react";
 import { CalendarClockIcon, MapPinIcon, MinusIcon, PlusIcon, TriangleAlertIcon } from "lucide-react";
@@ -33,8 +35,8 @@ export function StockItemTile({ item, showPlace = true, onAdjust, pending, actio
   return (
     <Card className={cn("gap-0 overflow-hidden p-0", item.isLow && "border-warning/40")}>
       {item.productImageUrl && <RecordImage src={item.productImageUrl} alt={item.productName} fit="contain" className="aspect-[4/3] w-full rounded-none border-b" />}
-      <div className="flex min-w-0 flex-1 flex-col gap-3 p-4">
-      <div className="flex min-w-0 flex-col gap-1">
+      <Stack gap="3" className="min-w-0 flex-1 p-4">
+      <Stack gap="xs" className="min-w-0">
         <Link
           to={`/inventory/products/${encodeURIComponent(item.productId)}`}
           className="font-medium break-words underline-offset-4 hover:underline focus-visible:underline"
@@ -47,9 +49,9 @@ export function StockItemTile({ item, showPlace = true, onAdjust, pending, actio
             <span className="min-w-0 break-words">{item.placeName}</span>
           </span>
         )}
-      </div>
+      </Stack>
 
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1" aria-busy={pending || undefined}>
+      <Inline gap="none" align="center" wrap className="gap-x-2 gap-y-1" aria-busy={pending || undefined}>
         <span className={cn("flex items-center gap-1.5 text-2xl font-semibold tabular-nums", item.isLow && "text-warning")}>
           {pending && <Spinner className="size-3.5 text-muted-foreground" label={t("stock.saving")} />}
           {formatQuantity(item.quantity, locale)}
@@ -61,10 +63,10 @@ export function StockItemTile({ item, showPlace = true, onAdjust, pending, actio
             {t("stock.low")}
           </Badge>
         )}
-      </div>
+      </Inline>
 
       {(item.minQuantity !== null || item.expiresOn) && (
-        <div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
+        <Stack gap="0.5" className="text-xs text-muted-foreground">
           {item.minQuantity !== null && <span>{t("stock.minimum", { quantity: formatQuantity(item.minQuantity, locale) })}</span>}
           {item.expiresOn && (
             <span className="inline-flex items-center gap-1">
@@ -72,11 +74,11 @@ export function StockItemTile({ item, showPlace = true, onAdjust, pending, actio
               {t("stock.expires", { date: formatDate(item.expiresOn, locale) })}
             </span>
           )}
-        </div>
+        </Stack>
       )}
 
       {(onAdjust || actions) && (
-        <div className="mt-auto flex flex-wrap items-center gap-1">
+        <Inline gap="xs" align="center" wrap className="mt-auto">
           {onAdjust && (
             <>
               <Button
@@ -106,9 +108,9 @@ export function StockItemTile({ item, showPlace = true, onAdjust, pending, actio
           )}
           <span className="flex-1" />
           {actions}
-        </div>
+        </Inline>
       )}
-      </div>
+      </Stack>
     </Card>
   );
 }

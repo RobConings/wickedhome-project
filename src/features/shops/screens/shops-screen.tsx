@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
+import { PageGrid } from "@/components/layout/page-grid";
 import { useSearchParams } from "react-router";
 import { LayersIcon, PencilIcon, PlusIcon, StoreIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -65,16 +68,16 @@ export function ShopsScreen({ shops, groups = [], canAdd, initialSelections }: S
       <PageHeader title={t("page.title")} description={t("page.description")} actions={addButton} />
 
       <Card className="space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3"><CardTitle><LayersIcon className="mr-2 inline size-5 text-section" />{t("groups.title")}</CardTitle>
+        <Inline gap="md" align="center" justify="between" wrap><CardTitle><LayersIcon className="mr-2 inline size-5 text-section" />{t("groups.title")}</CardTitle>
           {canAdd && <ShopGroupFormDialog shops={shops} trigger={<Button variant="outline"><PlusIcon />{t("groups.add")}</Button>} />}
-        </div>
-        <p className="text-sm text-muted-foreground">{t("groups.description")}</p>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{groups.map((group) => <div key={group.id} className="flex min-w-0 items-center gap-2 rounded-xl border p-3">
+        </Inline>
+        <Text size="sm" tone="muted">{t("groups.description")}</Text>
+        <PageGrid gap="3" className="sm:grid-cols-2 xl:grid-cols-3">{groups.map((group) => <Inline gap="sm" align="center" key={group.id} className="min-w-0 rounded-xl border p-3">
           <RecordLink to={`/shopping/sessions?destination=${encodeURIComponent(`group:${group.id}`)}`} className="min-h-12 min-w-0 flex-1 rounded-lg focus-visible:ring-2 focus-visible:ring-ring">
             <span className="block font-medium">{group.name}</span><span className="block text-sm text-muted-foreground">{group.shopIds.map((id) => shops.find((shop) => shop.id === id)?.name).filter(Boolean).join(" · ")}</span>
           </RecordLink>
           {canAdd && <ShopGroupFormDialog shops={shops} group={group} trigger={<Button variant="ghost" size="icon" aria-label={`${t("groups.edit")}: ${group.name}`}><PencilIcon /></Button>} />}
-        </div>)}</div>
+        </Inline>)}</PageGrid>
       </Card>
       <GeneralList
         label={t("page.title")}

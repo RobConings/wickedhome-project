@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
@@ -68,7 +69,7 @@ export type ExpenseFormDefaults = Partial<
   Pick<
     Expense,
     "payee" | "amountCents" | "dueDate" | "category" | "description" | "paymentMethod" | "beneficiaryName" | "iban" | "structuredCommunication" | "reference"
-  >
+   >
 >;
 
 /**
@@ -517,11 +518,11 @@ function NormalisedCost({ amountCents, rrule, locale }: { amountCents: number; r
   const yearly = exactYearlyCents(amountCents, rrule);
   if (yearly === 0) return null;
   return (
-    <p className="text-xs text-muted-foreground">
+    <Text size="xs" tone="muted">
       {t("form.normalised", {
         monthly: formatCurrency(Math.round(yearly / 12), locale),
         yearly: formatCurrency(Math.round(yearly), locale),
       })}
-    </p>
+    </Text>
   );
 }

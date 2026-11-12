@@ -1,3 +1,7 @@
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
+import { PageGrid } from "@/components/layout/page-grid";
+import { Stack } from "@/components/layout/stack";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import { CircleAlertIcon, CircleCheckIcon, CircleDotIcon, ExternalLinkIcon, Redo2Icon, SaveIcon, Undo2Icon } from "lucide-react";
@@ -321,7 +325,7 @@ export function FloorPlanEditor({
       {canManage && !wide && <InlineAlert>{t("editor.smallScreen")}</InlineAlert>}
       {overlaps.length > 0 && (
         <InlineAlert tone="warning">
-          <p>{t("editor.overlapsHint", { count: overlaps.length })}</p>
+          <Text>{t("editor.overlapsHint", { count: overlaps.length })}</Text>
           <ul className="mt-1 list-inside list-disc">
             {overlaps.slice(0, 10).map((overlap) => (
               <li key={JSON.stringify([overlap.kind, overlap.first, overlap.second])}>
@@ -336,12 +340,12 @@ export function FloorPlanEditor({
               </li>
             ))}
           </ul>
-          {overlaps.length > 10 && <p>{t("editor.moreOverlaps", { count: overlaps.length - 10 })}</p>}
+          {overlaps.length > 10 && <Text>{t("editor.moreOverlaps", { count: overlaps.length - 10 })}</Text>}
         </InlineAlert>
       )}
       {!readOnly && (
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p
+        <Inline gap="sm" align="center" justify="between" wrap>
+          <Text
             className={cn("flex items-center gap-1.5 text-sm text-muted-foreground", saveFailed && "text-destructive")}
             aria-live="polite"
           >
@@ -361,8 +365,8 @@ export function FloorPlanEditor({
                 : dirty
                   ? t("editor.unsaved")
                   : t("editor.allSaved")}
-          </p>
-          <div className="flex items-center gap-1">
+          </Text>
+          <Inline gap="xs" align="center">
             <Button
               type="button"
               variant="ghost"
@@ -396,13 +400,13 @@ export function FloorPlanEditor({
               <SaveIcon />
               {saving ? t("editor.saving") : t("editor.save")}
             </Button>
-          </div>
-        </div>
+          </Inline>
+        </Inline>
       )}
 
       {!readOnly && markerPalette && (
         <section aria-label={t("editor.markers.palette")} className="flex flex-col gap-2 rounded-xl border border-dashed bg-muted/40 p-3">
-          <p className="text-xs text-muted-foreground">{t("editor.markers.paletteHint")}</p>
+          <Text size="xs" tone="muted">{t("editor.markers.paletteHint")}</Text>
           {markerPalette}
         </section>
       )}
@@ -437,12 +441,12 @@ export function FloorPlanEditor({
         {importing && (
           <React.Suspense
             fallback={
-              <div role="status" className="absolute inset-0 z-20 grid place-items-center bg-background/40">
+              <PageGrid gap="none" role="status" className="absolute inset-0 z-20 place-items-center bg-background/40">
                 <span className="inline-flex items-center gap-2 rounded-full border bg-popover px-4 py-2 text-sm shadow-md">
                   <Spinner className="size-4" />
                   {t("editor.import.opening")}
                 </span>
-              </div>
+              </PageGrid>
             }
           >
             <PlanImportDialog
@@ -456,15 +460,15 @@ export function FloorPlanEditor({
           </React.Suspense>
         )}
         {selectedPlace && (
-          <div className="absolute inset-x-4 bottom-16 z-10 mx-auto flex max-w-xl flex-wrap items-center justify-between gap-3 rounded-xl border bg-popover/95 p-3 shadow-md backdrop-blur">
-            <div className="flex min-w-0 flex-col gap-1">
+          <Inline gap="md" align="center" justify="between" wrap className="absolute inset-x-4 bottom-16 z-10 mx-auto max-w-xl rounded-xl border bg-popover/95 p-3 shadow-md backdrop-blur">
+            <Stack gap="xs" className="min-w-0">
               <PlaceBadge place={{ ...selectedPlace, kind: placeKindForFloor(floorKind) }} />
               {selectedPlace.polygon && (
                 <span className="text-xs text-muted-foreground">
                   {formatArea(polygonAreaM2(selectedPlace.polygon), currentLocale())}
                 </span>
               )}
-            </div>
+            </Stack>
             {!readOnly && selectedPlace.id && renderPlaceActions?.(selectedPlace.id)}
             {selectedPlace.id && (
               <Button asChild size="sm" variant="secondary">
@@ -474,7 +478,7 @@ export function FloorPlanEditor({
                 </Link>
               </Button>
             )}
-          </div>
+          </Inline>
         )}
       </FloorPlanCanvas>
     </div>

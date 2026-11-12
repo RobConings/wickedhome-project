@@ -29,6 +29,16 @@ const pageGridVariants = cva("grid min-w-0 grid-cols-1 gap-6 *:min-w-0", {
        */
       chips: "grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(8rem,1fr))]",
     },
+    gap: {
+      none: "gap-0",
+      xs: "gap-1",
+      sm: "gap-2",
+      "3": "gap-3",
+      md: "gap-4",
+      "5": "gap-5",
+      lg: "gap-6",
+      "8": "gap-8",
+    },
   },
   defaultVariants: { columns: "1" },
 });
@@ -40,6 +50,6 @@ type PageGridProps = React.ComponentProps<"div"> &
   };
 
 /** Column structure of a page. Knows how many columns there are, never what is in them. */
-export function PageGrid({ columns, as: Element = "div", className, ...props }: PageGridProps) {
-  return <Element className={cn(pageGridVariants({ columns }), className)} {...props} />;
+export function PageGrid({ columns, gap, as: Element = "div", className, ...props }: PageGridProps) {
+  return <Element className={cn(pageGridVariants({ columns, gap }), className)} {...props} />;
 }

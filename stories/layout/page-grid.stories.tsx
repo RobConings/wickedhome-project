@@ -100,3 +100,6 @@ export const Chips: Story = {
 
 /** Phones: every variant is a single column (cards and tiles stacked full width). */
 export const Mobile: Story = { ...Tiles, globals: { viewport: { value: "mobile1" } } };
+
+/** Calendars and compact action rows must be able to opt out of the page-level spacing. */
+export const NoGap: Story = { args: { gap: "none" }, render: (args) => <PageGrid {...args} className="grid-cols-7">{Array.from({ length: 7 }, (_, i) => <Box key={i} label={String(i + 1)} />)}</PageGrid> };

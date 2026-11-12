@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { BanknoteIcon, BellIcon, CpuIcon, ListChecksIcon, MailIcon, ShieldAlertIcon, Trash2Icon, UserPlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
@@ -41,7 +43,7 @@ function Content({ notification, now }: NotificationRowProps) {
   const { t } = useTranslation("notifications");
   const unread = notification.readAt === null;
   return (
-    <div className="flex min-w-0 items-start gap-3">
+    <Inline gap="md" align="start" className="min-w-0">
       <span
         className={cn(
           "mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full",
@@ -52,15 +54,15 @@ function Content({ notification, now }: NotificationRowProps) {
         <NotificationKindIcon kind={notification.kind} className="size-4.5" />
       </span>
       <div className="min-w-0 flex-1">
-        <div className="flex items-baseline gap-2">
-          <p className={cn("min-w-0 flex-1 truncate", unread ? "font-semibold" : "font-medium text-muted-foreground")}>{notification.title}</p>
+        <Inline gap="sm" align="baseline">
+          <Text className={cn("min-w-0 flex-1 truncate", unread ? "font-semibold" : "font-medium text-muted-foreground")}>{notification.title}</Text>
           <time dateTime={notification.createdAt} className="shrink-0 text-xs text-muted-foreground tabular-nums">
             {formatNotificationTime(notification.createdAt, currentLocale(), now)}
           </time>
-        </div>
-        {notification.body && <p className="line-clamp-2 text-sm text-muted-foreground">{notification.body}</p>}
+        </Inline>
+        {notification.body && <Text size="sm" tone="muted" className="line-clamp-2">{notification.body}</Text>}
         {(unread || notification.urgent) && (
-          <div className="mt-1 flex gap-1.5">
+          <Inline gap="1.5" align="stretch" className="mt-1">
             {notification.urgent && <Badge variant="destructive">{t("list.urgent")}</Badge>}
             {unread && (
               <Badge variant="secondary" className="gap-1">
@@ -68,10 +70,10 @@ function Content({ notification, now }: NotificationRowProps) {
                 {t("list.new")}
               </Badge>
             )}
-          </div>
+          </Inline>
         )}
       </div>
-    </div>
+    </Inline>
   );
 }
 

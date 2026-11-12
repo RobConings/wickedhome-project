@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import type * as React from "react";
 import { CalendarClockIcon, MapPinIcon, MinusIcon, PlusIcon, TriangleAlertIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -50,7 +51,7 @@ export function StockItemRow({
 
   return (
     <Element className={cn("flex flex-wrap items-center gap-3", Element === "li" && "py-2.5", className)}>
-      <div className="flex w-full min-w-0 flex-auto flex-col gap-1 sm:w-auto sm:flex-1">
+      <Stack gap="xs" className="w-full min-w-0 flex-auto sm:w-auto sm:flex-1">
         {showProduct ? (
           <Link
             to={`/inventory/products/${encodeURIComponent(item.productId)}`}
@@ -81,7 +82,7 @@ export function StockItemRow({
             </span>
           )}
         </span>
-      </div>
+      </Stack>
 
       <span className="flex min-w-0 max-w-full flex-col items-start gap-1 sm:items-end" aria-busy={pending || undefined}>
         <span className={cn("flex items-center gap-1.5 text-lg font-semibold break-words tabular-nums", item.isLow && "text-warning")}>

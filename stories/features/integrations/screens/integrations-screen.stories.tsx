@@ -8,6 +8,7 @@ import { connectedGoogleFixture, fakeGoogleClient, notConfiguredGoogleFixture } 
 const meta = {
   title: "Features/Integrations/Screens/IntegrationsScreen",
   component: IntegrationsScreen,
+  parameters: { layout: "fullscreen" },
   args: { children: null },
 } satisfies Meta<typeof IntegrationsScreen>;
 

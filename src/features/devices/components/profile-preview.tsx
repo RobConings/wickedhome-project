@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -38,24 +41,24 @@ export function ProfilePreview({ draft, values, onValuesChange, result, classNam
 
   return (
     <div className={cn("flex flex-col gap-4", className)}>
-      <div className="flex items-center gap-3 rounded-xl border bg-muted/40 p-4" aria-live="polite">
+      <Inline gap="md" align="center" className="rounded-xl border bg-muted/40 p-4" aria-live="polite">
         <PlanMarkerDot tone={result.tone} color={result.color} pulse={result.pulse} icon={deviceIconComponent(result.icon ?? draft.icon)} size="md" className="scale-125" />
-        <div className="flex min-w-0 flex-col">
+        <Stack gap="none" className="min-w-0">
           <span className="font-semibold">{label}</span>
           <span className="text-xs text-muted-foreground">
             {matchedIndex >= 0 ? t("editor.preview.matched", { number: matchedIndex + 1 }) : t("editor.preview.fallback")}
             {primary && ` · ${primary}`}
           </span>
-        </div>
-      </div>
+        </Stack>
+      </Inline>
 
-      <div className="flex flex-col gap-3">
-        <p className="text-sm font-medium">{t("editor.preview.sampleValues")}</p>
+      <Stack gap="3">
+        <Text size="sm" weight="medium">{t("editor.preview.sampleValues")}</Text>
         {draft.fields.map((field) => {
           const id = `preview-${field.key}`;
           const value = values[field.key] ?? null;
           return (
-            <div key={field.key} className="flex flex-col gap-1.5">
+            <Stack gap="1.5" key={field.key}>
               <Label htmlFor={id} className="flex items-center gap-2">
                 {field.label || field.key}
                 {field.unit && <span className="text-muted-foreground">({field.unit})</span>}
@@ -100,15 +103,15 @@ export function ProfilePreview({ draft, values, onValuesChange, result, classNam
               ) : (
                 <Input id={id} value={typeof value === "string" ? value : ""} placeholder={t("state.unknown")} onChange={(event) => set(field.key, event.target.value || null)} />
               )}
-            </div>
+            </Stack>
           );
         })}
-      </div>
+      </Stack>
 
-      <div className="flex flex-col gap-2 border-t pt-4">
-        <p className="text-sm font-medium">{t("legend.title")}</p>
+      <Stack gap="sm" className="border-t pt-4">
+        <Text size="sm" weight="medium">{t("legend.title")}</Text>
         <DeviceLegend profiles={[legendProfile]} layout="list" />
-      </div>
+      </Stack>
     </div>
   );
 }

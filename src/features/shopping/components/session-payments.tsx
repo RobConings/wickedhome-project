@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import { todayIn } from "@/types/dates";
 import { useState } from "react";
 import { PlusIcon } from "lucide-react";
@@ -45,15 +46,15 @@ export function SessionPayments({ session, purchase, disabled, payeeDefault, ini
     picker("receiptId", t("payments.receipt"), purchase.receipts.map((receipt) => ({ id: receipt.id, label: receipt.filename }))),
   ];
   return <section className="space-y-3 border-t pt-4"><h3 className="font-medium">{t("payments.title")}</h3>
-    <p className="text-sm">{t("payments.recorded", { total: formatCurrency(total, locale) })}{purchase.totalCents !== null ? ` / ${formatCurrency(purchase.totalCents, locale)}` : ""}</p>
-    {purchase.payments.map((payment) => <p className="text-sm" key={payment.id}>{payment.expenseId ? <RecordLink className="inline-flex min-h-11 items-center gap-2 rounded-lg font-medium underline" to={`/expenses/${encodeURIComponent(payment.expenseId)}`}>{payment.payee} · {formatCurrency(payment.amountCents, locale)}</RecordLink> : <span>{t("payments.deletedExpense")} · {formatCurrency(payment.amountCents, locale)}</span>}</p>)}
+    <Text size="sm">{t("payments.recorded", { total: formatCurrency(total, locale) })}{purchase.totalCents !== null ? ` / ${formatCurrency(purchase.totalCents, locale)}` : ""}</Text>
+    {purchase.payments.map((payment) => <Text size="sm"  key={payment.id}>{payment.expenseId ? <RecordLink className="inline-flex min-h-11 items-center gap-2 rounded-lg font-medium underline" to={`/expenses/${encodeURIComponent(payment.expenseId)}`}>{payment.payee} · {formatCurrency(payment.amountCents, locale)}</RecordLink> : <span>{t("payments.deletedExpense")} · {formatCurrency(payment.amountCents, locale)}</span>}</Text>)}
     {resource.error && <InlineAlert tone="error">{t("errors.generic")} <Button variant="outline" onClick={resource.refresh}>{t("payments.retry")}</Button></InlineAlert>}
     {options ? <GeneralFormDialog trigger={<Button variant="outline" disabled={disabled}><PlusIcon />{t("payments.manage")}</Button>}
       title={t("payments.manage")} description={t("payments.splitHint")} intent="record-payment" action={`/shopping/sessions/${encodeURIComponent(session.id)}`}
       schema={sessionPaymentFormSchema} fields={fields} hiddenFields={{ reference, shopId: purchase.shopId }} submitLabel={t("payments.save")}
       onOpenChange={(open) => { if (open) setReference(crypto.randomUUID()); }} onSuccess={resource.refresh}
       defaultValues={{ mode: "new", payee: payeeDefault.slice(0, 64), amountCents: purchase.totalCents === null ? undefined : Math.max(0, purchase.totalCents - total), date: todayIn(undefined, new Date(purchase.purchasedAt)), method: "card", category: "groceries", payerType: "joint", receiptId: purchase.receipts.length === 1 ? purchase.receipts[0]!.id : undefined }}
-    /> : !resource.error && <p className="text-sm text-muted-foreground">{t("payments.loading")}</p>}
+    /> : !resource.error && <Text size="sm" tone="muted">{t("payments.loading")}</Text>}
   </section>;
 }
 

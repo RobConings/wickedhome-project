@@ -1,3 +1,7 @@
+import { PageGrid } from "@/components/layout/page-grid";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { CheckIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
@@ -22,7 +26,7 @@ type ControlProps<T> = {
 export function ProjectIconPicker({ id, name, value, onChange, color, disabled }: ControlProps<string> & { color: string }) {
   const { t } = useTranslation("projects");
   return (
-    <div id={id} role="radiogroup" aria-label={t("fields.icon")} className="grid grid-cols-8 gap-1.5">
+    <PageGrid gap="none" id={id} role="radiogroup" aria-label={t("fields.icon")} className="grid-cols-8 gap-1.5">
       <input type="hidden" name={name} value={value} />
       {PROJECT_ICONS.map((icon) => {
         const Icon = PROJECT_ICON_COMPONENTS[icon];
@@ -47,7 +51,7 @@ export function ProjectIconPicker({ id, name, value, onChange, color, disabled }
           </button>
         );
       })}
-    </div>
+    </PageGrid>
   );
 }
 
@@ -56,7 +60,7 @@ export function ProjectTagField({ id, name, value, onChange, ownTags = [], disab
   const { t } = useTranslation("projects");
   const suggestions = [...new Set([...ownTags, ...PROJECT_TAG_SUGGESTIONS.map((key) => t(`tags.${key}`))])].slice(0, 12);
   return (
-    <div className="flex flex-col gap-2">
+    <Stack gap="sm">
       <Input
         id={id}
         name={name}
@@ -68,7 +72,7 @@ export function ProjectTagField({ id, name, value, onChange, ownTags = [], disab
         disabled={disabled}
         className="text-base sm:text-sm"
       />
-      <div className="flex flex-wrap gap-1.5">
+      <Inline gap="1.5" align="stretch" wrap>
         {suggestions.map((tag) => (
           <button
             key={tag}
@@ -84,8 +88,8 @@ export function ProjectTagField({ id, name, value, onChange, ownTags = [], disab
             {tag}
           </button>
         ))}
-      </div>
-    </div>
+      </Inline>
+    </Stack>
   );
 }
 
@@ -95,9 +99,9 @@ type PlaceOption = { id: string; name: string; color: string; icon: string | nul
 export function ProjectPlacesField({ id, name, value, onChange, places, disabled }: ControlProps<string[]> & { places: PlaceOption[] }) {
   const { t } = useTranslation("projects");
   const toggle = (placeId: string) => onChange(value.includes(placeId) ? value.filter((idValue) => idValue !== placeId) : [...value, placeId]);
-  if (places.length === 0) return <p className="text-sm text-muted-foreground">{t("form.noPlaces")}</p>;
+  if (places.length === 0) return <Text size="sm" tone="muted">{t("form.noPlaces")}</Text>;
   return (
-    <div id={id} className="flex flex-wrap gap-1.5" role="group" aria-label={t("fields.places")}>
+    <Inline gap="1.5" align="stretch" wrap id={id}  role="group" aria-label={t("fields.places")}>
       <input type="hidden" name={name} value={value.join(",")} />
       {places.map((place) => {
         const selected = value.includes(place.id);
@@ -124,6 +128,6 @@ export function ProjectPlacesField({ id, name, value, onChange, places, disabled
           </button>
         );
       })}
-    </div>
+    </Inline>
   );
 }

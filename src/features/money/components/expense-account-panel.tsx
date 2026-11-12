@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { WalletIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardTitle } from "@/components/shared/card";
@@ -16,11 +18,11 @@ export function ExpenseAccountPanel({ expenseId, initial }: { expenseId: string;
   const { t } = useTranslation("money");
   const resource = useAsyncResource(`expense-account:${expenseId}`, () => fetchExpenseAccountEffect(expenseId), { initial });
   return <Card>
-    <div className="flex items-center gap-2"><IconChip icon={WalletIcon} tone="finance" size="sm" /><CardTitle>{t("expenseEffect.title")}</CardTitle></div>
-    {resource.error ? <div role="alert"><p className="text-sm text-muted-foreground">{t("expenseEffect.failed")}</p><Button onClick={resource.refresh} variant="outline">{t("expenseEffect.retry")}</Button></div>
+    <Inline gap="sm" align="center"><IconChip icon={WalletIcon} tone="finance" size="sm" /><CardTitle>{t("expenseEffect.title")}</CardTitle></Inline>
+    {resource.error ? <div role="alert"><Text size="sm" tone="muted">{t("expenseEffect.failed")}</Text><Button onClick={resource.refresh} variant="outline">{t("expenseEffect.retry")}</Button></div>
       : !resource.data ? <Skeleton role="status" aria-label={t("expenseEffect.loading")} className="h-20" />
-      : <><p className="text-sm text-muted-foreground">{t(`expenseEffect.${resource.data.status}`)}</p>
-        {resource.data.amountCents !== null && <p className="text-xl font-semibold tabular-nums">{formatCurrency(resource.data.amountCents, currentLocale())}</p>}
+      : <><Text size="sm" tone="muted">{t(`expenseEffect.${resource.data.status}`)}</Text>
+        {resource.data.amountCents !== null && <Text size="xl" weight="semibold" className="tabular-nums">{formatCurrency(resource.data.amountCents, currentLocale())}</Text>}
         {resource.data.account && resource.data.month && <RecordLink className="flex min-h-11 items-center break-words font-medium underline" to={`/money?tab=history&account=${encodeURIComponent(resource.data.account.id)}&month=${resource.data.month}`}>{resource.data.account.name}</RecordLink>}
       </>}
   </Card>;

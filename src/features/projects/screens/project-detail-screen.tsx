@@ -1,3 +1,4 @@
+import { DescriptionList, DescriptionItem } from "@/components/shared/description-list";
 import { RecordImage } from "@/components/shared/record-image";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
@@ -277,13 +278,11 @@ export function ProjectDetailScreen({ detail, places, canManage, tasks, material
         </Stack>
 
         <Stack gap="lg">
-          <div id="project-budget" tabIndex={-1} className="scroll-mt-20 outline-none"><ProjectBudgetCard budget={project.budget} /></div>
+          <PageSection id="project-budget" tabIndex={-1} className="scroll-mt-20 outline-none"><ProjectBudgetCard budget={project.budget} /></PageSection>
           <Card>
             <CardTitle>{t("detail.details")}</CardTitle>
-            <dl className="flex flex-col gap-3 text-sm">
-              <div className="flex flex-col">
-                <dt className="text-xs text-muted-foreground">{t("fields.places")}</dt>
-                <dd>
+            <DescriptionList columns="1" className="flex flex-col gap-3 text-sm">
+              <DescriptionItem  label={<>{t("fields.places")}</>}>
                   {project.places.length > 0 ? (
                     <span className="flex flex-wrap gap-1.5 pt-1">
                       {project.places.map((place) => (
@@ -304,19 +303,12 @@ export function ProjectDetailScreen({ detail, places, canManage, tasks, material
                   ) : (
                     <span className="text-muted-foreground">{t("detail.noPlaces")}</span>
                   )}
-                </dd>
-              </div>
-              <div className="flex flex-col">
-                <dt className="text-xs text-muted-foreground">{t("detail.dates")}</dt>
-                <dd className={period ? undefined : "text-muted-foreground"}>{period ?? t("detail.noDates")}</dd>
-              </div>
-              <div className="flex flex-col">
-                <dt className="text-xs text-muted-foreground">{t("fields.description")}</dt>
-                <dd className={project.description ? "whitespace-pre-line" : "text-muted-foreground"}>
+                </DescriptionItem>
+              <DescriptionItem  label={<>{t("detail.dates")}</>}>{period ?? t("detail.noDates")}</DescriptionItem>
+              <DescriptionItem  label={<>{t("fields.description")}</>}>
                   {project.description ?? t("detail.noDescription")}
-                </dd>
-              </div>
-            </dl>
+                </DescriptionItem>
+            </DescriptionList>
           </Card>
           {contacts}
           {mail}

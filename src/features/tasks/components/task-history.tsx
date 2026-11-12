@@ -1,3 +1,5 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
 import { CircleCheckIcon, SkipForwardIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { HabitantAvatar, type Habitant } from "@/features/household";
@@ -14,7 +16,7 @@ export function TaskHistory({ history, habitants }: TaskHistoryProps) {
   const { t } = useTranslation("tasks");
   const text = useTaskText();
 
-  if (history.length === 0) return <p className="text-sm text-muted-foreground">{t("history.empty")}</p>;
+  if (history.length === 0) return <Text size="sm" tone="muted">{t("history.empty")}</Text>;
 
   return (
     <ol className="flex flex-col gap-4">
@@ -31,8 +33,8 @@ export function TaskHistory({ history, habitants }: TaskHistoryProps) {
                 <Icon className="size-4" aria-hidden="true" />
               </span>
             )}
-            <div className="flex min-w-0 flex-col gap-0.5 text-sm">
-              <p>
+            <Stack gap="0.5" className="min-w-0 text-sm">
+              <Text>
                 <span className="font-medium">
                   {entry.outcome === "done"
                     ? who
@@ -43,12 +45,12 @@ export function TaskHistory({ history, habitants }: TaskHistoryProps) {
                       : t("history.skipped")}
                 </span>
                 <span className="text-muted-foreground"> · {when}</span>
-              </p>
+              </Text>
               {entry.occurrenceDate && (
-                <p className="text-xs text-muted-foreground">{t("history.forDate", { date: text.day(entry.occurrenceDate) })}</p>
+                <Text size="xs" tone="muted">{t("history.forDate", { date: text.day(entry.occurrenceDate) })}</Text>
               )}
-              {entry.note && <p className="whitespace-pre-line text-muted-foreground">“{entry.note}”</p>}
-            </div>
+              {entry.note && <Text tone="muted" className="whitespace-pre-line">“{entry.note}”</Text>}
+            </Stack>
           </li>
         );
       })}

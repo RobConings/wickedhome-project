@@ -1,3 +1,4 @@
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -31,7 +32,7 @@ export function PayeeField({ id, name = "payee", defaultValue = "", payees, onPi
   const { favoriteIds, recentIds, toggleFavorite, loading } = useSelections("payee");
 
   return (
-    <div className="flex gap-2">
+    <Inline gap="sm" align="stretch">
       <Input
         {...aria}
         id={id}
@@ -68,6 +69,6 @@ export function PayeeField({ id, name = "payee", defaultValue = "", payees, onPi
           labels={{ placeholder: t("fields.previousPayees") }}
         />
       )}
-    </div>
+    </Inline>
   );
 }

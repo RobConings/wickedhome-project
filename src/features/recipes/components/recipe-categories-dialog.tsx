@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { PencilIcon, PlusIcon, TagsIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -33,7 +34,7 @@ export function RecipeCategoriesDialog({ categories }: { categories: RecipeCateg
                 </li>
               ))}
             </ul>
-          ) : <p className="text-sm text-muted-foreground">{t("categories.empty")}</p>}
+          ) : <Text size="sm" tone="muted">{t("categories.empty")}</Text>}
         </DialogContent>
       </Dialog>
       <GeneralFormDialog<RecipeActionResult>

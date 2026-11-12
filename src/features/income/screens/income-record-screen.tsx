@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import { BanknoteIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
@@ -28,8 +29,8 @@ export function IncomeRecordScreen({ income, source, overview, habitants, canMan
       <IncomeFormDialog income={income} sourceName={source?.name} habitants={habitants} accounts={overview.accounts} today={overview.today} trigger={<Button><PencilIcon />{t("actions.editIncome")}</Button>} />
       <ConfirmDialog trigger={<Button variant="outline"><Trash2Icon />{t("actions.delete")}</Button>} title={t("form.deleteIncomeTitle")} description={t("form.deleteIncomeDescription")} confirmLabel={t("actions.delete")} cancelLabel={tc("actions.cancel")} destructive onConfirm={() => fetcher.submit({ intent: "delete-income", id: income.id }, { method: "post" })} />
     </>} />
-    {fetcher.data?.formError && <p role="alert" className="text-destructive">{fetcher.data.formError}</p>}
-    <Card className="border-primary/20 bg-primary/5"><p className="text-3xl font-semibold tabular-nums">{money(income.amountCents)}</p><p className="text-sm text-muted-foreground">{t(income.kind === "meal_vouchers" ? "detail.voucherHint" : "detail.moneyHint")}</p></Card>
+    {fetcher.data?.formError && <Text tone="danger" role="alert">{fetcher.data.formError}</Text>}
+    <Card className="border-primary/20 bg-primary/5"><Text size="3xl" weight="semibold" className="tabular-nums">{money(income.amountCents)}</Text><Text size="sm" tone="muted">{t(income.kind === "meal_vouchers" ? "detail.voucherHint" : "detail.moneyHint")}</Text></Card>
     <Card><CardTitle>{t("detail.receipt")}</CardTitle><DescriptionList>
       <DescriptionItem label={t("fields.who")}>{income.habitantId && habitants.some((person) => person.id === income.habitantId) ? <RecordLink className="underline" to={`/habitants/${encodeURIComponent(income.habitantId)}`}>{whoName(income.habitantId)}</RecordLink> : whoName(income.habitantId)}</DescriptionItem>
       <DescriptionItem label={t("fields.kind")}>{t(`kinds.${income.kind}`)}</DescriptionItem>

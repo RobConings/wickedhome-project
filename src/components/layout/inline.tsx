@@ -10,8 +10,12 @@ const inlineVariants = cva("flex flex-row", {
       sm: "gap-2",
       md: "gap-3",
       lg: "gap-6",
+      "1.5": "gap-1.5",
+      "2.5": "gap-2.5",
+      "4": "gap-4",
     },
     align: {
+      stretch: "items-stretch",
       start: "items-start",
       center: "items-center",
       end: "items-end",

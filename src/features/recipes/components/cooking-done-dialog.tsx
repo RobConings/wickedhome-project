@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { CheckIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -60,7 +61,7 @@ export function CookingDoneDialog({ entryId, recipeName, usages, trigger, action
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-muted-foreground">{t("cooking.nothingUsed")}</p>
+          <Text size="sm" tone="muted">{t("cooking.nothingUsed")}</Text>
         )}
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>

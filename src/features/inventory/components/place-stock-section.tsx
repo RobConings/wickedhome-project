@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { BoxIcon, RotateCwIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -71,16 +74,16 @@ export function PlaceStockSection({ placeId, initialItems }: PlaceStockSectionPr
   if (items === null) {
     if (failed) {
       return (
-        <div
+        <Inline gap="md" align="center" justify="between" wrap
           role="alert"
-          className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground"
+          className="rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground"
         >
           <span>{t("loading.stockFailed")}</span>
           <Button type="button" variant="outline" size="sm" loading={retrying} onClick={() => void retry()}>
             <RotateCwIcon />
             {tCommon("actions.retry")}
           </Button>
-        </div>
+        </Inline>
       );
     }
     return (
@@ -91,10 +94,10 @@ export function PlaceStockSection({ placeId, initialItems }: PlaceStockSectionPr
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <Stack gap="sm">
       {confirmation}
       {items.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("place.empty")}</p>
+        <Text size="sm" tone="muted">{t("place.empty")}</Text>
       ) : (
         <ul className="divide-y rounded-xl border bg-card px-3">
           {items.map((item) => (
@@ -114,6 +117,6 @@ export function PlaceStockSection({ placeId, initialItems }: PlaceStockSectionPr
           {t("page.title")}
         </Link>
       </Button>
-    </div>
+    </Stack>
   );
 }

@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import { PencilIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
@@ -34,11 +35,11 @@ export function ContactTile({ contact, isFavorite, onToggleFavorite, onEdit }: C
           onToggle={() => onToggleFavorite(contact.id)}
         />
       </Inline>
-      <div className="flex min-w-0 flex-col">
+      <Stack gap="none" className="min-w-0">
         <ContactName contact={contact} onEdit={onEdit} className="font-medium break-words" />
         {subtitle && <span className="text-sm break-words text-muted-foreground">{subtitle}</span>}
         {contact.address && <span className="pt-1 text-sm break-words text-muted-foreground">{contact.address}</span>}
-      </div>
+      </Stack>
       <ContactLinks contact={contact} all website />
       {onEdit && <Button variant="outline" className="h-auto min-h-11 whitespace-normal" onClick={() => onEdit(contact)}><PencilIcon />{t("actions.edit", { name: contact.name })}</Button>}
       <ContactProjectChips projects={contact.projects} />

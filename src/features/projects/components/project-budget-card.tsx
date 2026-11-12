@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import { InfoIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardTitle } from "@/components/shared/card";
@@ -14,31 +17,31 @@ export function ProjectBudgetCard({ budget, className }: { budget: ProjectBudget
   const { breakdown } = budget;
 
   const row = (label: string, cents: number, detail?: string, strong = false) => (
-    <div className="flex items-baseline justify-between gap-3">
+    <Inline gap="md" align="baseline" justify="between">
       <span className="flex min-w-0 flex-col">
         <span className={cn(strong ? "font-medium" : "text-muted-foreground")}>{label}</span>
         {detail && <span className="text-xs text-muted-foreground">{detail}</span>}
       </span>
       <span className={cn("shrink-0 tabular-nums", strong && "font-semibold")}>{text.money(cents)}</span>
-    </div>
+    </Inline>
   );
 
   return (
     <Card className={cn("gap-4", className)}>
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <Inline gap="sm" align="center" justify="between" wrap>
         <CardTitle>{t("budget.title")}</CardTitle>
         <ProjectBudgetBadge budget={budget} />
-      </div>
+      </Inline>
 
       {budget.budgetCents !== null && (
-        <div className="flex items-baseline justify-between gap-3">
+        <Inline gap="md" align="baseline" justify="between">
           <span className="text-muted-foreground">{t("budget.label")}</span>
           <span className="text-2xl font-semibold tabular-nums">{text.money(budget.budgetCents)}</span>
-        </div>
+        </Inline>
       )}
       <ProjectBudgetBar budget={budget} showLegend={false} />
 
-      <div className="flex flex-col gap-2.5 text-sm">
+      <Stack gap="none" className="gap-2.5 text-sm">
         {row(
           t("budget.spent"),
           budget.spentCents,
@@ -53,21 +56,21 @@ export function ProjectBudgetCard({ budget, className }: { budget: ProjectBudget
           {budget.remainingCents === null ? (
             row(t("budget.total"), budget.spentCents + budget.committedCents, t("budget.noBudgetHint"), true)
           ) : budget.remainingCents < 0 ? (
-            <div className="flex items-baseline justify-between gap-3 text-destructive">
+            <Inline gap="md" align="baseline" justify="between" className="text-destructive">
               <span className="font-medium">{t("budget.over")}</span>
               <span className="font-semibold tabular-nums">{text.money(-budget.remainingCents)}</span>
-            </div>
+            </Inline>
           ) : (
             row(t("budget.remaining"), budget.remainingCents, undefined, true)
           )}
         </div>
-      </div>
+      </Stack>
 
       {budget.unpricedMaterials > 0 && (
-        <p className="flex items-start gap-2 text-xs text-muted-foreground">
+        <Text size="xs" tone="muted" className="flex items-start gap-2">
           <InfoIcon className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
           {t("budget.unpriced", { count: budget.unpricedMaterials })}
-        </p>
+        </Text>
       )}
     </Card>
   );

@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -33,8 +35,8 @@ function CopyButton({ text }: { text: string }) {
  */
 export function IntegrationSetupSteps({ intro, steps, outro }: { intro?: string; steps: IntegrationSetupStep[]; outro?: string }) {
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-dashed p-3 text-sm sm:p-4">
-      {intro && <p className="text-muted-foreground">{intro}</p>}
+    <Stack gap="3" className="rounded-lg border border-dashed p-3 text-sm sm:p-4">
+      {intro && <Text tone="muted">{intro}</Text>}
       <ol className="flex list-decimal flex-col gap-2 pl-5">
         {steps.map((step, index) => (
           <li key={index} className="pl-1">
@@ -54,7 +56,7 @@ export function IntegrationSetupSteps({ intro, steps, outro }: { intro?: string;
           </li>
         ))}
       </ol>
-      {outro && <p className="text-muted-foreground">{outro}</p>}
-    </div>
+      {outro && <Text tone="muted">{outro}</Text>}
+    </Stack>
   );
 }

@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import type { ReactNode } from "react";
 import { BatteryFullIcon, SunIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -18,10 +19,10 @@ export function EnergySourceScreen({ solar, battery, meters, today, canManage, a
   return <PageContainer>
     <PageHeader title={solar?.name ?? battery!.name} icon={solar ? SunIcon : BatteryFullIcon} backTo="/energy/setup" description={t("sourceRecord.configurationHint")} actions={<Button asChild><RecordLink to="/energy">{t("detail.openEnergy")}</RecordLink></Button>} />
     <PageGrid columns="main-sidebar">
-      <div className="flex min-w-0 flex-col gap-6">
+      <Stack gap="lg" className="min-w-0">
         {solar ? <SolarInstallationCard installation={solar} canManage={canManage} linkName={false} /> : <BatteryCard battery={battery!} today={today} canManage={canManage} linkName={false} />}
         {attachments}
-      </div>
+      </Stack>
       <EnergyMeterList meters={meters} appliances={[]} />
     </PageGrid>
   </PageContainer>;

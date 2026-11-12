@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import { ReceiptTextIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardDescription, CardTitle } from "@/components/shared/card";
@@ -21,16 +23,16 @@ export function ShopPurchasesPanel({ shopId, initialData }: { shopId: string; in
   return <Card>
     <div><CardTitle>{t("shop.title")}</CardTitle><CardDescription>{t("shop.description")}</CardDescription></div>
     {loading && <Skeleton className="h-24 rounded-xl" aria-label={t("shop.loading")} />}
-    {error && <div role="status" className="flex flex-col items-start gap-2 text-sm"><p>{common("errors.generic")}</p><Button variant="outline" size="sm" onClick={refresh}>{common("actions.retry")}</Button></div>}
+    {error && <Stack gap="sm" align="start" role="status" className="text-sm"><Text>{common("errors.generic")}</Text><Button variant="outline" size="sm" onClick={refresh}>{common("actions.retry")}</Button></Stack>}
     {data && (data.length ? <ul className="divide-y">{data.slice(0, 5).map((purchase) => <li key={`${purchase.kind}:${purchase.id}`} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
       <IconChip icon={ReceiptTextIcon} tone="finance" />
-      <div className="min-w-0 flex-1 space-y-1">
+      <Stack gap="xs" className="min-w-0 flex-1">
         <RecordLink to={purchasePath(purchase)} className="font-medium break-words text-primary hover:underline">{purchase.name ?? t("unnamed")}</RecordLink>
-        <p className="text-sm text-muted-foreground">{formatDate(purchase.purchasedAt, locale)}</p>
-        <p className="text-xs text-muted-foreground">{t("lines", { count: purchase.lineCount })} · {t("receipts", { count: purchase.receiptCount })}</p>
-        {purchase.canReadMoney && <p className="text-sm tabular-nums">{purchase.totalCents === null ? t("unknownAmount") : formatCurrency(purchase.totalCents, locale)}</p>}
-      </div>
-    </li>)}</ul> : <p className="text-sm text-muted-foreground">{t("shop.empty")}</p>)}
+        <Text size="sm" tone="muted">{formatDate(purchase.purchasedAt, locale)}</Text>
+        <Text size="xs" tone="muted">{t("lines", { count: purchase.lineCount })} · {t("receipts", { count: purchase.receiptCount })}</Text>
+        {purchase.canReadMoney && <Text size="sm" className="tabular-nums">{purchase.totalCents === null ? t("unknownAmount") : formatCurrency(purchase.totalCents, locale)}</Text>}
+      </Stack>
+    </li>)}</ul> : <Text size="sm" tone="muted">{t("shop.empty")}</Text>)}
     <Button asChild variant="outline" size="sm" fullOnMobile><RecordLink to={`/purchases?shopId=${encodeURIComponent(shopId)}`}>{t("shop.open")}</RecordLink></Button>
   </Card>;
 }

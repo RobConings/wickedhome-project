@@ -1,3 +1,4 @@
+import { PageGrid } from "@/components/layout/page-grid";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -58,7 +59,7 @@ export function RecurringExtraFields({ recurring, errors }: RecurringExtraFields
           autoComplete="off"
         />
       </FormField>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <PageGrid gap="md" className="sm:grid-cols-2">
         <FormField
           label={t("fields.trialEndsOn")}
           htmlFor="expense-trial"
@@ -85,7 +86,7 @@ export function RecurringExtraFields({ recurring, errors }: RecurringExtraFields
             placeholder="3"
           />
         </FormField>
-      </div>
+      </PageGrid>
       <label className="flex cursor-pointer items-start gap-2.5 rounded-lg border p-3 text-sm">
         <input
           type="checkbox"

@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { PlusIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -37,7 +38,7 @@ export function ChecklistEditor({ name, defaultValue = [], id }: ChecklistEditor
   }
 
   return (
-    <div id={id} className="flex flex-col gap-2">
+    <Stack gap="sm" id={id}>
       <input type="hidden" name={name} value={value} />
       {rows.length > 0 && (
         <ol className="flex flex-col gap-1.5">
@@ -81,6 +82,6 @@ export function ChecklistEditor({ name, defaultValue = [], id }: ChecklistEditor
         <PlusIcon />
         {t("checklist.add")}
       </Button>
-    </div>
+    </Stack>
   );
 }

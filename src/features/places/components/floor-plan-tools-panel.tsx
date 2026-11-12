@@ -1,3 +1,7 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { PageGrid } from "@/components/layout/page-grid";
 import * as React from "react";
 import {
   AppWindowIcon,
@@ -142,7 +146,7 @@ export function FloorPlanToolsPanel(props: FloorPlanToolsPanelProps) {
             {!compact && state.tool !== "calibrate" && state.tool !== "north" && <OrientationSection state={state} dispatch={dispatch} />}
 
             {!compact && (
-              <p className="border-t pt-2 text-[11px] leading-relaxed text-muted-foreground">{t("editor.panel.shortcuts")}</p>
+              <Text tone="muted" className="border-t pt-2 text-[11px] leading-relaxed">{t("editor.panel.shortcuts")}</Text>
             )}
           </>
         );
@@ -177,8 +181,8 @@ function ToolContext(props: ContextProps) {
 function Hint({ title, children, detail }: { title?: React.ReactNode; children?: React.ReactNode; detail?: string }) {
   return (
     <div className={cn("flex flex-col gap-1", detail)}>
-      {title && <p className="text-sm font-semibold">{title}</p>}
-      {children && <p className="text-xs text-muted-foreground">{children}</p>}
+      {title && <Text size="sm" weight="semibold">{title}</Text>}
+      {children && <Text size="xs" tone="muted">{children}</Text>}
     </div>
   );
 }
@@ -190,8 +194,8 @@ function OutlineToolContext({ state, dispatch, floorKind, onCompleteOutline, det
   const missing = Math.max(3 - state.draft.length, 0);
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-1.5">
+    <Stack gap="3">
+      <Stack gap="1.5">
         <Label htmlFor="plan-outline-target" className={cn("text-xs", detail)}>
           {t("editor.outline.target")}
         </Label>
@@ -213,11 +217,11 @@ function OutlineToolContext({ state, dispatch, floorKind, onCompleteOutline, det
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </Stack>
       <Hint detail={detail} title={missing > 0 ? t("editor.outline.missing", { count: missing }) : t("editor.outline.ready", { count: state.draft.length })}>
         {t("editor.hints.outline")}
       </Hint>
-      <div className="flex flex-wrap gap-2">
+      <Inline gap="sm" align="stretch" wrap>
         <Button type="button" size="sm" onClick={onCompleteOutline} disabled={state.draft.length < 3} title={t("editor.outline.complete")}>
           <CheckIcon />
           <span className={detail}>{t("editor.outline.complete")}</span>
@@ -244,8 +248,8 @@ function OutlineToolContext({ state, dispatch, floorKind, onCompleteOutline, det
           <EraserIcon />
           <span className={detail}>{t("editor.outline.clear")}</span>
         </Button>
-      </div>
-    </div>
+      </Inline>
+    </Stack>
   );
 }
 
@@ -266,7 +270,7 @@ function SizeSelect({
 }) {
   const values = options.includes(value) ? options : [...options, value].sort((a, b) => a - b);
   return (
-    <div className="flex flex-col gap-1.5">
+    <Stack gap="1.5">
       <Label htmlFor={id} className={cn("text-xs", detail)}>
         {label}
       </Label>
@@ -282,7 +286,7 @@ function SizeSelect({
           ))}
         </SelectContent>
       </Select>
-    </div>
+    </Stack>
   );
 }
 
@@ -291,12 +295,12 @@ function WallToolContext({ state, dispatch, detail }: ContextProps) {
   const [custom, setCustom] = React.useState(WALL_PRESETS.includes(state.wallThickness) ? "" : String(state.wallThickness));
   const setThickness = (value: number) => dispatch({ type: "setOption", option: "wallThickness", value });
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-1.5">
+    <Stack gap="3">
+      <Stack gap="1.5">
         <span id="plan-wall-thickness" className={cn("text-xs font-medium", detail)}>
           {t("editor.fields.thickness")}
         </span>
-        <div role="group" aria-labelledby="plan-wall-thickness" className="flex flex-wrap items-center gap-1">
+        <Inline gap="xs" align="center" wrap role="group" aria-labelledby="plan-wall-thickness">
           {WALL_PRESETS.map((preset) => (
             <Button
               key={preset}
@@ -328,9 +332,9 @@ function WallToolContext({ state, dispatch, detail }: ContextProps) {
             }}
           />
           <span className="text-xs text-muted-foreground">cm</span>
-        </div>
-      </div>
-      <div className="flex flex-col gap-1.5">
+        </Inline>
+      </Stack>
+      <Stack gap="1.5">
         <span className={cn("text-xs font-medium", detail)}>{t("editor.wall.alignment")}</span>
         <SegmentedControl
           label={t("editor.wall.alignment")}
@@ -339,7 +343,7 @@ function WallToolContext({ state, dispatch, detail }: ContextProps) {
           value={state.wallAlignment}
           onChange={(alignment) => dispatch({ type: "setWallAlignment", alignment })}
         />
-      </div>
+      </Stack>
       <Hint detail={detail} title={state.draft.length > 0 ? t("editor.wall.drawing") : t("editor.wall.start")}>
         {state.wallAlignment === "center" ? t("editor.hints.wall") : t("editor.hints.wallFace")}
       </Hint>
@@ -349,7 +353,7 @@ function WallToolContext({ state, dispatch, detail }: ContextProps) {
           <span className={detail}>{t("editor.wall.finish")}</span>
         </Button>
       )}
-    </div>
+    </Stack>
   );
 }
 
@@ -366,12 +370,12 @@ function FillToolContext({ state, dispatch, detail }: ContextProps) {
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       <Hint detail={detail} title={t("editor.fill.title")}>
         {t("editor.hints.fill")}
         {hasLabels && ` ${t("editor.fill.labels")}`}
       </Hint>
-      <div className="flex flex-col gap-1.5">
+      <Stack gap="1.5">
         <Label htmlFor="plan-gap-tolerance" className={cn("text-xs", detail)}>
           {t("editor.fill.gapTolerance")}
         </Label>
@@ -387,7 +391,7 @@ function FillToolContext({ state, dispatch, detail }: ContextProps) {
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </Stack>
 
       {feedback && (
         <div
@@ -399,19 +403,19 @@ function FillToolContext({ state, dispatch, detail }: ContextProps) {
         >
           {feedback.type === "filled" && place && (
             <>
-              <p className="flex items-center gap-2 font-medium">
+              <Text weight="medium" className="flex items-center gap-2">
                 <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: place.color }} aria-hidden="true" />
                 {feedback.reused ? t("editor.fill.reused", { name: place.name }) : t("editor.fill.filled", { name: place.name })}
-              </p>
+              </Text>
               <AreaCheck areaM2={feedback.areaM2} planAreaM2={feedback.planAreaM2} />
             </>
           )}
-          {feedback.type === "existing" && place && <p>{t("editor.fill.existing", { name: place.name })}</p>}
+          {feedback.type === "existing" && place && <Text>{t("editor.fill.existing", { name: place.name })}</Text>}
           {feedback.type === "open" && (
-            <p>{feedback.gaps.length > 0 ? t("editor.fill.open", { count: feedback.gaps.length }) : t("editor.fill.outside")}</p>
+            <Text>{feedback.gaps.length > 0 ? t("editor.fill.open", { count: feedback.gaps.length }) : t("editor.fill.outside")}</Text>
           )}
-          {feedback.type === "on-wall" && <p>{t("editor.fill.onWall")}</p>}
-          {feedback.type === "no-walls" && <p>{t("editor.fill.noWalls")}</p>}
+          {feedback.type === "on-wall" && <Text>{t("editor.fill.onWall")}</Text>}
+          {feedback.type === "no-walls" && <Text>{t("editor.fill.noWalls")}</Text>}
           {place && (
             <Button type="button" size="xs" variant="secondary" className="self-start" onClick={openPlace}>
               <PencilRulerIcon />
@@ -420,7 +424,7 @@ function FillToolContext({ state, dispatch, detail }: ContextProps) {
           )}
         </div>
       )}
-    </div>
+    </Stack>
   );
 }
 
@@ -428,7 +432,7 @@ function OpeningToolContext({ state, dispatch, detail }: ContextProps) {
   const { t } = useTranslation("places");
   const door = state.tool === "door";
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       <SizeSelect
         id="plan-opening-width"
         label={t("editor.fields.width")}
@@ -438,7 +442,7 @@ function OpeningToolContext({ state, dispatch, detail }: ContextProps) {
         detail={detail}
       />
       <Hint detail={detail}>{door ? t("editor.hints.door") : t("editor.hints.window")}</Hint>
-    </div>
+    </Stack>
   );
 }
 
@@ -458,9 +462,9 @@ function PlaceProperties({
   const planLabel = labelInside(state.doc.underlay, polygon);
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-2">
-        <div className="flex flex-col gap-1.5">
+    <Stack gap="3">
+      <PageGrid gap="sm" className="grid-cols-[3.5rem_minmax(0,1fr)]">
+        <Stack gap="1.5">
           <Label htmlFor="plan-place-icon" className={cn("text-xs", detail)}>
             {t("fields.icon")}
           </Label>
@@ -473,8 +477,8 @@ function PlaceProperties({
             value={place.icon ?? ""}
             onChange={(event) => change({ icon: event.target.value.trim() || null }, `icon-${place.key}`)}
           />
-        </div>
-        <div className="flex flex-col gap-1.5">
+        </Stack>
+        <Stack gap="1.5">
           <Label htmlFor="plan-place-name" className={cn("text-xs", detail)}>
             {t("fields.name")}
           </Label>
@@ -487,9 +491,9 @@ function PlaceProperties({
             value={place.name}
             onChange={(event) => change({ name: event.target.value }, `name-${place.key}`)}
           />
-        </div>
-      </div>
-      <div className="flex flex-col gap-1.5">
+        </Stack>
+      </PageGrid>
+      <Stack gap="1.5">
         <span className={cn("text-xs font-medium", detail)}>{t("fields.color")}</span>
         <ColorSwatchPicker
           key={`color-${place.key}-${place.color}`}
@@ -500,7 +504,7 @@ function PlaceProperties({
           onChange={(color) => change({ color })}
           className="gap-1.5 [&_span]:size-6"
         />
-      </div>
+      </Stack>
       {planLabel?.areaM2 != null && <AreaCheck areaM2={polygonAreaM2(polygon)} planAreaM2={planLabel.areaM2} />}
       <Hint
         detail={detail}
@@ -510,7 +514,7 @@ function PlaceProperties({
           ? t("editor.place.vertexSelected", { index: vertex + 1, count: polygon.length })
           : t("editor.place.vertices", { count: polygon.length })}
       </Hint>
-      <div className="flex flex-wrap gap-2">
+      <Inline gap="sm" align="stretch" wrap>
         {place.id && (
           <Button asChild size="sm" variant="secondary" title={t("editor.place.open")}>
             <Link to={placeHref(place.id)}>
@@ -544,8 +548,8 @@ function PlaceProperties({
           <Trash2Icon />
           <span className={detail}>{t("editor.place.removeOutline")}</span>
         </Button>
-      </div>
-    </div>
+      </Inline>
+    </Stack>
   );
 }
 
@@ -555,7 +559,7 @@ function ElementProperties({ state, dispatch, detail, element }: ContextProps & 
   const wall = element.kind === "wall" ? element : state.doc.elements.find((candidate) => candidate.id === element.wallId);
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       <Hint
         detail={detail}
         title={t(`editor.elements.${element.kind}`)}
@@ -586,7 +590,7 @@ function ElementProperties({ state, dispatch, detail, element }: ContextProps & 
           detail={detail}
         />
       )}
-      <div className="flex flex-wrap gap-2">
+      <Inline gap="sm" align="stretch" wrap>
         {element.kind === "door" && (
           <>
             <Button type="button" size="sm" variant="secondary" title={t("editor.door.flipHinge")} onClick={() => change({ hingeAtEnd: !element.hingeAtEnd })}>
@@ -610,8 +614,8 @@ function ElementProperties({ state, dispatch, detail, element }: ContextProps & 
           <Trash2Icon />
           <span className={detail}>{t("editor.elements.delete")}</span>
         </Button>
-      </div>
-    </div>
+      </Inline>
+    </Stack>
   );
 }
 
@@ -620,9 +624,9 @@ function NothingSelected({ state, dispatch, floorKind, detail }: ContextProps) {
   const unplaced = state.doc.places.filter((place) => !place.polygon);
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       <Hint detail={detail}>{t("editor.hints.select")}</Hint>
-      <div className="flex flex-col gap-1.5">
+      <Stack gap="1.5">
         <Label htmlFor="plan-grid-size" className={cn("text-xs", detail)}>
           {t("editor.fields.grid")}
         </Label>
@@ -641,10 +645,10 @@ function NothingSelected({ state, dispatch, floorKind, detail }: ContextProps) {
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </Stack>
       {unplaced.length > 0 && (
         <div className={cn("flex flex-col gap-1.5", detail)}>
-          <p className="text-xs font-medium">{t(`editor.unplaced.${floorKind}`)}</p>
+          <Text size="xs" weight="medium">{t(`editor.unplaced.${floorKind}`)}</Text>
           <ul className="flex flex-col gap-1">
             {unplaced.map((place) => (
               <li key={place.key} className="flex items-center gap-2 text-sm">
@@ -664,6 +668,6 @@ function NothingSelected({ state, dispatch, floorKind, detail }: ContextProps) {
           </ul>
         </div>
       )}
-    </div>
+    </Stack>
   );
 }

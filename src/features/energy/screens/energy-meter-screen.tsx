@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import type { ReactNode } from "react";
 import { ChevronLeftIcon, ChevronRightIcon, GaugeIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -40,7 +41,7 @@ export function EnergyMeterScreen({ detail, appliances, now, canManage, attachme
     <MeterReadingForm key={meter.id} readings={readings.items} appliances={appliances} now={now} canManage={canManage && meter.source === "manual" && meter.carrier !== "water"} defaults={{ meter: inputMeter, register: meter.register, applianceId: meter.applianceId }} historyLabel={t("sourceRecord.readingCount", { count: readings.total })} />
     <nav aria-label={t("sourceRecord.pagination")} className="flex flex-wrap items-center justify-between gap-3">
       {readings.page > 1 ? <Button asChild variant="outline"><Link to={href(readings.page - 1)}><ChevronLeftIcon />{t("sourceRecord.previous")}</Link></Button> : <span />}
-      <p className="text-sm text-muted-foreground">{t("sourceRecord.pageOf", { page: readings.page, pages })}</p>
+      <Text size="sm" tone="muted">{t("sourceRecord.pageOf", { page: readings.page, pages })}</Text>
       {readings.page < pages ? <Button asChild variant="outline"><Link to={href(readings.page + 1)}>{t("sourceRecord.next")}<ChevronRightIcon /></Link></Button> : <span />}
     </nav>
     {attachments}

@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { CalendarDaysIcon, FolderIcon, MailIcon, PlugIcon, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -222,9 +225,9 @@ function GooglePanel({ initial, client, allFeatures }: { initial: GoogleStatus |
         </InlineAlert>
       )}
       {connection && (
-        <p className="text-xs text-muted-foreground">
+        <Text size="xs" tone="muted">
           {t("google.connectedSince", { date: formatDate(connection.connectedAt, currentLocale()) })}
-        </p>
+        </Text>
       )}
 
       <ul className="flex flex-col divide-y rounded-lg border">
@@ -232,20 +235,20 @@ function GooglePanel({ initial, client, allFeatures }: { initial: GoogleStatus |
           const on = granted.has(feature);
           return (
             <li key={feature} className="flex flex-col gap-3 p-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex min-w-0 items-start gap-2.5">
+              <Inline gap="md" align="start" justify="between">
+                <Inline gap="2.5" align="start" className="min-w-0">
                   <Icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-                  <div className="flex min-w-0 flex-col gap-0.5">
+                  <Stack gap="0.5" className="min-w-0">
                     <span className="text-sm font-medium">{t(`google.features.${feature}.title`)}</span>
                     <span className="text-xs text-muted-foreground">{t(`google.features.${feature}.description`)}</span>
-                  </div>
-                </div>
+                  </Stack>
+                </Inline>
                 {!on && (
                   <Button size="sm" variant={connection ? "outline" : "default"} onClick={() => connect([feature])} loading={featureBusy(feature)} disabled={wrongOrigin || busy !== null}>
                     {connection ? t("google.turnOn") : t("google.connect")}
                   </Button>
                 )}
-              </div>
+              </Inline>
               {on && connection?.status === "connected" && feature === "calendar" && status.calendar && (
                 <GoogleCalendarPanel settings={status.calendar} client={client} onStatus={setStatus} onConnect={connect} canPublish={granted.has("calendar_publish")} connectDisabled={wrongOrigin} />
               )}
@@ -265,7 +268,7 @@ function GooglePanel({ initial, client, allFeatures }: { initial: GoogleStatus |
           );
         })}
       </ul>
-      {!connection && <p className="text-xs text-muted-foreground">{t("google.privacy")}</p>}
+      {!connection && <Text size="xs" tone="muted">{t("google.privacy")}</Text>}
     </IntegrationCard>
   );
 }

@@ -1,3 +1,7 @@
+import { CanvasOverlay } from "@/components/layout/canvas-overlay";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { NavigationIcon, SunIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -128,9 +132,9 @@ function FloorPlanViewBoard({ plan, markers, selectedMarkerId, onMarkerClick, se
       className={cn("min-h-[24rem]", className)}
     >
       {legend && (
-        <div className="absolute right-4 bottom-4 z-10 max-h-[60%] max-w-[60%] overflow-y-auto rounded-xl border bg-popover/95 p-3 shadow-sm backdrop-blur">
+        <CanvasOverlay corner="bottom-end" className="right-4 bottom-4 max-h-[60%] max-w-[60%] overflow-y-auto rounded-xl border bg-popover/95 p-3 shadow-sm backdrop-blur">
           {legend}
-        </div>
+        </CanvasOverlay>
       )}
       {children}
     </FloorPlanCanvas>
@@ -171,15 +175,15 @@ function SunTimePanel({ sun }: { sun: SunForToday }) {
   const { azimuth, elevation } = sun.position;
 
   return (
-    <div data-accent="energy" className="flex w-full basis-full flex-col gap-1.5 rounded-xl border bg-popover/95 p-3 shadow-sm backdrop-blur sm:w-72 sm:basis-auto">
-      <div className="flex items-center justify-between gap-2">
+    <Stack gap="1.5" data-accent="energy" className="w-full basis-full rounded-xl border bg-popover/95 p-3 shadow-sm backdrop-blur sm:w-72 sm:basis-auto">
+      <Inline gap="sm" align="center" justify="between">
         <label htmlFor={sliderId} className="text-xs font-medium">
           {t("orientation.view.time", { time })}
         </label>
         <Button type="button" size="xs" variant="ghost" disabled={sun.isNow} onClick={sun.resetToNow}>
           {t("orientation.view.now")}
         </Button>
-      </div>
+      </Inline>
       <input
         id={sliderId}
         type="range"
@@ -191,7 +195,7 @@ function SunTimePanel({ sun }: { sun: SunForToday }) {
         onChange={(event) => sun.setMinutes(Number(event.target.value))}
         className="h-6 w-full accent-[var(--section)]"
       />
-      <p className="text-xs text-muted-foreground" aria-live="polite">
+      <Text size="xs" tone="muted"  aria-live="polite">
         {elevation > 0
           ? t("orientation.view.sunAt", {
               azimuth: number.format(azimuth),
@@ -199,7 +203,7 @@ function SunTimePanel({ sun }: { sun: SunForToday }) {
               elevation: number.format(elevation),
             })
           : t("orientation.view.belowHorizon")}
-      </p>
-    </div>
+      </Text>
+    </Stack>
   );
 }

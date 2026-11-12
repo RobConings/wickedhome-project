@@ -1,3 +1,5 @@
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import { useTranslation } from "react-i18next";
 import { currentLocale } from "@/lib/i18n";
 import type { JobRun } from "../types/automations";
@@ -15,13 +17,13 @@ export function AutomationRunHistory({ runs, now }: AutomationRunHistoryProps) {
   const { t } = useTranslation("automations");
   const locale = currentLocale();
 
-  if (runs.length === 0) return <p className="text-sm text-muted-foreground">{t("history.empty")}</p>;
+  if (runs.length === 0) return <Text size="sm" tone="muted">{t("history.empty")}</Text>;
 
   return (
     <ol className="flex flex-col divide-y rounded-lg border">
       {runs.map((run) => (
         <li key={run.id} className="flex flex-col gap-1.5 px-3 py-2.5 text-sm">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <Inline gap="none" align="center" wrap className="gap-x-2 gap-y-1">
             <JobRunStatusBadge status={run.status} />
             <time dateTime={run.startedAt} title={dateTimeText(run.startedAt, locale)} className="text-foreground">
               {relativeTime(run.startedAt, locale, now)}
@@ -30,11 +32,11 @@ export function AutomationRunHistory({ runs, now }: AutomationRunHistoryProps) {
               · {t(`trigger.${run.trigger}`)}
               {run.durationMs !== null && run.status !== "skipped" && <> · {durationText(t, run.durationMs)}</>}
             </span>
-          </div>
+          </Inline>
           {run.error && (
-            <p className={run.status === "failed" ? "break-words text-destructive" : "break-words text-muted-foreground"}>{run.error}</p>
+            <Text className={run.status === "failed" ? "break-words text-destructive" : "break-words text-muted-foreground"}>{run.error}</Text>
           )}
-          {run.summary && <p className="break-words text-muted-foreground">{run.summary}</p>}
+          {run.summary && <Text tone="muted" className="break-words">{run.summary}</Text>}
           {run.log && (
             <details className="group">
               <summary className="inline-flex min-h-8 cursor-pointer items-center text-xs text-muted-foreground underline-offset-4 hover:underline">

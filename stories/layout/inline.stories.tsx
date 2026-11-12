@@ -13,7 +13,7 @@ const meta = {
   title: "Layout/Inline",
   component: Inline,
   argTypes: {
-    gap: { control: "select", options: ["none", "xs", "sm", "md", "lg"] },
+    gap: { control: "select", options: ["none", "xs", "sm", "md", "lg", "1.5", "2.5", "4"] },
     justify: { control: "select", options: ["start", "center", "end", "between"] },
   },
   args: { gap: "sm" },

@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { RecordLink } from "@/components/shared/record-link";
 import type * as React from "react";
 import { cn } from "@/lib/utils";
@@ -33,14 +36,14 @@ export function ApplianceRow({ appliance, appliances, places, canManage, documen
       <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-section-soft text-section">
         <ApplianceCategoryIcon category={appliance.category} className="size-5" />
       </span>
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
+      <Stack gap="0.5" className="min-w-0 flex-1">
+        <Inline gap="sm" align="center" wrap className="min-w-0">
           <RecordLink to={`/energy/appliances/${encodeURIComponent(appliance.id)}`} className="truncate font-medium hover:underline">{appliance.name}</RecordLink>
           <ApplianceMarkers appliance={appliance} />
-        </div>
+        </Inline>
         <ApplianceSummary appliance={appliance} className="truncate" />
-        {appliance.notes && <p className="line-clamp-1 text-xs text-muted-foreground">{appliance.notes}</p>}
-      </div>
+        {appliance.notes && <Text size="xs" tone="muted" className="line-clamp-1">{appliance.notes}</Text>}
+      </Stack>
       <ApplianceActions appliances={appliances} appliance={appliance} places={places} canManage={canManage} documents={documents} />
     </div>
   );

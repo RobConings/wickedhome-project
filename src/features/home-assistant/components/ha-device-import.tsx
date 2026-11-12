@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { DownloadIcon, LinkIcon, MapPinIcon, SparklesIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -64,7 +67,7 @@ export function HaDeviceImport({ suggestions, canManage }: HaDeviceImportProps) 
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       {error && !busy && <InlineAlert tone="error">{error}</InlineAlert>}
       <fieldset disabled={busy || !canManage} className="contents">
         <ul className="flex flex-col divide-y rounded-lg border">
@@ -120,14 +123,14 @@ export function HaDeviceImport({ suggestions, canManage }: HaDeviceImportProps) 
         </ul>
       </fieldset>
       {canManage && (
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs text-muted-foreground">{t("import.hint")}</p>
+        <Inline gap="sm" align="center" justify="between" wrap>
+          <Text size="xs" tone="muted">{t("import.hint")}</Text>
           <Button onClick={() => void submit()} loading={busy} disabled={chosen.length === 0}>
             <DownloadIcon />
             {busy ? t("import.importing") : t("import.action", { count: chosen.length })}
           </Button>
-        </div>
+        </Inline>
       )}
-    </div>
+    </Stack>
   );
 }

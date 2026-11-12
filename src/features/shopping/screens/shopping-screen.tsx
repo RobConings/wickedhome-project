@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import { useShoppingSort } from "../data/use-shopping-sort";
 import { ShoppingSortField } from "../components/shopping-sort-field";
 import { ShoppingNavigation } from "../components/shopping-navigation";
@@ -152,7 +153,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
     : listIds.includes(item.listId));
 
   const headerActions = (
-    <div className="grid w-full min-w-0 grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-end">
+    <PageGrid gap="sm" className="w-full min-w-0 sm:flex sm:w-auto sm:flex-wrap sm:justify-end">
       {canManage && (
         <SplitAction
           icon={ShoppingCartIcon}
@@ -191,7 +192,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
           </>
         }
       />
-    </div>
+    </PageGrid>
   );
 
   return (
@@ -221,7 +222,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
       <PageGrid columns="main-sidebar" className="items-start">
         <Stack gap="lg" className="gap-3 sm:gap-6">
           <XtraListPanel initial={xtraInitial} intervalMs={refreshIntervalMs} />
-          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2 sm:flex sm:items-center" role="group" aria-label={t("shopView.filters.label")}>
+          <PageGrid gap="sm" className="min-w-0 grid-cols-[minmax(0,1fr)_auto] sm:flex sm:items-center" role="group" aria-label={t("shopView.filters.label")}>
             {listViews.length > 1 && (
               <Select value={activeView?.id ?? "all"} onValueChange={(value) => selectList(value === "all" ? null : value)}>
                 <SelectTrigger className="col-span-2 w-full min-w-0 sm:col-auto sm:w-48" aria-label={t("lists.filterLabel")}>
@@ -249,15 +250,15 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
                 </Button>
               </PopoverTrigger>
               <PopoverContent align="end" className="max-h-[min(75vh,38rem)] w-80 max-w-[calc(100vw-2rem)] space-y-4 overflow-y-auto">
-                <div>
-                  <p className="font-semibold">{t("shopView.filters.viewOptions")}</p>
-                  <p className="text-xs text-muted-foreground">{t("shopView.filters.viewOptionsDescription")}</p>
-                </div>
-                <div className="space-y-1.5">
+                <Stack gap="none">
+                  <Text weight="semibold">{t("shopView.filters.viewOptions")}</Text>
+                  <Text size="xs" tone="muted">{t("shopView.filters.viewOptionsDescription")}</Text>
+                </Stack>
+                <Stack gap="1.5">
                   <label className="block text-sm font-medium">{t("shopView.sort.label")}</label>
                   <ShoppingSortField value={sort} onChange={changeSort} />
-                </div>
-                <div className="space-y-1.5">
+                </Stack>
+                <Stack gap="1.5">
                   <label className="block text-sm font-medium">{t("stockFilter.label")}</label>
                   <Select value={stockFilter} onValueChange={(value) => setSearchParams((params) => {
                     if (value === "all") params.delete("stock"); else params.set("stock", value);
@@ -270,18 +271,18 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
+                </Stack>
                 <AutomaticShoppingFilter included={includeLowStock} onChange={setIncludeLowStock} />
                 <CategoryOrder order={order} onChange={change} />
                 {totalOpen > 0 && <ShoppingGuidance />}
               </PopoverContent>
             </Popover>
-          </div>
+          </PageGrid>
 
           {filtering && (
-            <p role="status" className="sr-only">
+            <Text role="status" className="sr-only">
               {tCommon("list.results", { count: visibleItems.length })}
-            </p>
+            </Text>
           )}
 
           {filtering && visibleItems.length === 0 ? (
@@ -364,24 +365,24 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
         <Stack gap="lg" className="gap-3 sm:gap-6">
           <Card>
             <CardHeader>
-              <div className="flex flex-col gap-1">
+              <Stack gap="xs">
                 <CardTitle>{t("shops.title")}</CardTitle>
                 <CardDescription>{t("shops.description")}</CardDescription>
-              </div>
+              </Stack>
             </CardHeader>
             {totalOpen > 0 ? (
               <ShopSummaryList items={actions.items} shops={shops} savedGroups={data.shopGroups} className="-mx-2" />
             ) : (
-              <p className="text-sm text-muted-foreground">{t("shopView.nothingAnywhere")}</p>
+              <Text size="sm" tone="muted">{t("shopView.nothingAnywhere")}</Text>
             )}
           </Card>
 
           <Card>
             <CardHeader>
-              <div className="flex flex-col gap-1">
+              <Stack gap="xs">
                 <CardTitle>{t("staples.title")}</CardTitle>
                 <CardDescription>{t("staples.description")}</CardDescription>
-              </div>
+              </Stack>
               {canManage && overview.lists.length > 0 && (
                 <StapleFormDialog
                   lists={overview.lists}

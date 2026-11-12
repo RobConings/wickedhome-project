@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -40,7 +41,7 @@ function AmountHistory({ source }: { source: IncomeSource }) {
   if (source.amountMode !== "fixed" || source.amounts.length === 0) return null;
   const removing = fetcher.state !== "idle" ? fetcher.formData?.get("amountId") : null;
   return (
-    <div className="flex flex-col gap-1 rounded-lg border p-3">
+    <Stack gap="xs" className="rounded-lg border p-3">
       <span className="text-sm font-semibold">{t("sources.history")}</span>
       <ul className="flex flex-col divide-y text-sm">
         {[...source.amounts].reverse().map((amount) => (
@@ -61,7 +62,7 @@ function AmountHistory({ source }: { source: IncomeSource }) {
           </li>
         ))}
       </ul>
-    </div>
+    </Stack>
   );
 }
 

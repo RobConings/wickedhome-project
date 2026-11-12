@@ -1,3 +1,5 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { PaperclipIcon, SearchIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -87,20 +89,20 @@ export function AttachDocumentDialog({ open, onOpenChange, onSelect, attachedIds
         </div>
         <div className="min-h-32 overflow-y-auto" aria-live="polite">
           {!trimmed ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">{t("attachments.searchHint")}</p>
+            <Text size="sm" tone="muted" className="py-8 text-center">{t("attachments.searchHint")}</Text>
           ) : current?.failed ? (
-            <div className="flex flex-col items-center gap-3 py-8 text-center">
-              <p className="text-sm text-destructive">{t("attachments.searchFailed")}</p>
+            <Stack gap="3" align="center" className="py-8 text-center">
+              <Text size="sm" tone="danger">{t("attachments.searchFailed")}</Text>
               <Button size="sm" variant="outline" onClick={retry}>
                 {t("attachments.retry")}
               </Button>
-            </div>
+            </Stack>
           ) : !shown ? (
             <LoadingState label={t("attachments.searching")} />
           ) : (
             <PendingContent pending={searching} label={t("attachments.searching")}>
               {shown.files.length === 0 ? (
-                <p className="py-8 text-center text-sm text-muted-foreground">{t("attachments.noResults")}</p>
+                <Text size="sm" tone="muted" className="py-8 text-center">{t("attachments.noResults")}</Text>
               ) : (
                 <ul className="divide-y rounded-lg border">
                   {shown.files.map((file) => {
@@ -108,12 +110,12 @@ export function AttachDocumentDialog({ open, onOpenChange, onSelect, attachedIds
                     return (
                       <li key={file.id} className="flex items-center gap-3 px-3 py-2">
                         <FileTypeIcon mimeType={file.mimeType} name={file.name} size="sm" />
-                        <div className="flex min-w-0 flex-1 flex-col">
+                        <Stack gap="none" className="min-w-0 flex-1">
                           <span className="truncate text-sm font-medium">{file.name}</span>
                           <span className="truncate text-xs text-muted-foreground">
                             {[file.path?.map((crumb) => crumb.name).join(" / ") || t("page.title"), fileSize(file.sizeBytes)].join(" · ")}
                           </span>
-                        </div>
+                        </Stack>
                         <Button size="sm" variant="outline" disabled={attached} onClick={() => onSelect(file)}>
                           <PaperclipIcon />
                           {attached ? t("attachments.attached") : t("attachments.attach")}

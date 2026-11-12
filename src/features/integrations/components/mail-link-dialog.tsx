@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { ArrowLeftIcon, ArrowRightIcon, CalendarClockIcon, ChevronRightIcon, Link2Icon, PaperclipIcon, RepeatIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -91,7 +94,7 @@ function TargetRow({ target, onSelect, extra, selected }: { target: MailLinkTarg
       </span>
     </>
   );
-  if (!onSelect) return <div className="flex min-w-0 items-start gap-3">{content}</div>;
+  if (!onSelect) return <Inline gap="md" align="start" className="min-w-0">{content}</Inline>;
   return (
     <button
       type="button"
@@ -320,7 +323,7 @@ export function MailLinkDialog({
       ) : options === "error" ? (
         loadError(load)
       ) : (
-        <div className="flex min-w-0 flex-col gap-3">
+        <Stack gap="3" className="min-w-0">
           <SegmentedControl
             label={t("link.tabsLabel")}
             value={tab}
@@ -335,7 +338,7 @@ export function MailLinkDialog({
           />
           {tab === "matches" &&
             (options.matches.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t("link.noMatches")}</p>
+              <Text size="sm" tone="muted">{t("link.noMatches")}</Text>
             ) : (
               <ul className="flex flex-col">
                 {options.matches.map((match) => (
@@ -377,25 +380,25 @@ export function MailLinkDialog({
               emptyState={<EmptyState icon={RepeatIcon} title={t("link.noRecurring")} />}
             />
           )}
-        </div>
+        </Stack>
       );
   } else if (step.kind === "occurrence") {
     const list = occurrences !== null && occurrences !== "error" ? occurrences : null;
     const picked = list?.occurrences.find((item) => item.dueDate === occurrenceDate) ?? null;
     body = (
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-0.5">
-          <p className="text-sm font-medium">{t("link.occurrenceTitle", { payee: step.recurring.payee })}</p>
-          <p className="text-xs text-muted-foreground">{t("link.occurrenceHint")}</p>
-        </div>
+      <Stack gap="3">
+        <Stack gap="0.5">
+          <Text size="sm" weight="medium">{t("link.occurrenceTitle", { payee: step.recurring.payee })}</Text>
+          <Text size="xs" tone="muted">{t("link.occurrenceHint")}</Text>
+        </Stack>
         {occurrences === null ? (
           loading
         ) : occurrences === "error" ? (
           loadError(() => chooseRecurring(step.recurring))
         ) : occurrences.occurrences.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t("link.noOccurrences")}</p>
+          <Text size="sm" tone="muted">{t("link.noOccurrences")}</Text>
         ) : (
-          <div role="radiogroup" aria-label={t("link.occurrenceTitle", { payee: step.recurring.payee })} className="flex flex-col divide-y rounded-lg border">
+          <Stack gap="none" role="radiogroup" aria-label={t("link.occurrenceTitle", { payee: step.recurring.payee })} className="divide-y rounded-lg border">
             {occurrences.occurrences.map((item) => (
               <label key={item.dueDate} className="flex min-h-12 cursor-pointer items-center gap-3 px-3 py-2">
                 <input
@@ -418,10 +421,10 @@ export function MailLinkDialog({
                 </span>
               </label>
             ))}
-          </div>
+          </Stack>
         )}
         {picked?.expenseId === null && <InlineAlert>{t("link.notCreated")}</InlineAlert>}
-      </div>
+      </Stack>
     );
     footer = (
       <>
@@ -442,7 +445,7 @@ export function MailLinkDialog({
     const paidTicked = rows.some((row) => row.paidWarning && apply.has(row.field));
     const recurringPayee = template?.payee ?? target.payee;
     body = (
-      <div className="flex min-w-0 flex-col gap-4">
+      <Stack gap="md" className="min-w-0">
         <section className="flex flex-col gap-1.5" aria-label={t("link.target")}>
           <h3 className="text-xs font-medium text-muted-foreground uppercase">{t("link.target")}</h3>
           <Card className="p-3">
@@ -454,7 +457,7 @@ export function MailLinkDialog({
         <section className="flex flex-col gap-1.5">
           <h3 className="text-xs font-medium text-muted-foreground uppercase">{t("link.changesTitle")}</h3>
           {rows.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t("link.noChanges")}</p>
+            <Text size="sm" tone="muted">{t("link.noChanges")}</Text>
           ) : (
             <DiffRows
               rows={rows}
@@ -478,7 +481,7 @@ export function MailLinkDialog({
         {target.recurringExpenseId && templateRows.length > 0 && (
           <section className="flex flex-col gap-1.5">
             <h3 className="text-xs font-medium text-muted-foreground uppercase">{t("link.recurringTitle")}</h3>
-            <p className="text-xs text-muted-foreground">{t("link.recurringHint", { payee: recurringPayee })}</p>
+            <Text size="xs" tone="muted">{t("link.recurringHint", { payee: recurringPayee })}</Text>
             <DiffRows
               rows={templateRows}
               chosen={templateFields}
@@ -506,13 +509,13 @@ export function MailLinkDialog({
         )}
 
         {suggestion.attachmentName && (
-          <p className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
+          <Text size="xs" tone="muted" className="flex min-w-0 items-center gap-1.5">
             <PaperclipIcon className="size-3.5 shrink-0" aria-hidden="true" />
             <span className="truncate">{t("link.pdf", { name: suggestion.attachmentName })}</span>
-          </p>
+          </Text>
         )}
         {error && <InlineAlert tone="error">{error}</InlineAlert>}
-      </div>
+      </Stack>
     );
     footer = (
       <>

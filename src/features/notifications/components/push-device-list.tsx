@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import { SmartphoneIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +21,7 @@ export function PushDeviceList({ devices, currentEndpoint, onRemove }: PushDevic
   const { t } = useTranslation("notifications");
   const { t: tCommon } = useTranslation();
   const locale = currentLocale();
-  if (devices.length === 0) return <p className="text-sm text-muted-foreground">{t("devices.empty")}</p>;
+  if (devices.length === 0) return <Text size="sm" tone="muted">{t("devices.empty")}</Text>;
   return (
     <ul className="divide-y rounded-lg border">
       {devices.map((device) => {
@@ -29,18 +30,18 @@ export function PushDeviceList({ devices, currentEndpoint, onRemove }: PushDevic
           <li key={device.id} className="flex items-center gap-3 px-3 py-2.5">
             <SmartphoneIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
             <div className="min-w-0 flex-1">
-              <p className="flex flex-wrap items-center gap-2 font-medium">
+              <Text weight="medium" className="flex flex-wrap items-center gap-2">
                 <span className="truncate">{device.label}</span>
                 {mine && <Badge variant="secondary">{t("devices.thisDevice")}</Badge>}
                 {device.failureCount > 0 && <Badge variant="destructive">{t("devices.failing", { count: device.failureCount })}</Badge>}
-              </p>
-              <p className="text-sm text-muted-foreground">
+              </Text>
+              <Text size="sm" tone="muted">
                 {device.lastSuccessAt
                   ? t("devices.lastDelivered", { date: formatDateTime(device.lastSuccessAt, locale) })
                   : t("devices.neverDelivered")}
                 {" · "}
                 {t("devices.added", { date: formatDate(device.createdAt, locale) })}
-              </p>
+              </Text>
             </div>
             <ConfirmDialog
               trigger={

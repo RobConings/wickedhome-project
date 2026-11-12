@@ -1,5 +1,6 @@
+import { CardHeading } from "@/components/shared/card";
 import { useTranslation } from "react-i18next";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
+import { Card, CardHeader } from "@/components/shared/card";
 import { StackedBarChart, type StackedBarDatum, type StackedBarSeries } from "@/components/shared/stacked-bar-chart";
 import { currentLocale } from "@/lib/i18n";
 import type { EnergySummary } from "../types/energy";
@@ -62,8 +63,7 @@ export function EnergyFlowChart({ summary, className }: EnergyFlowChartProps) {
   return (
     <Card className={className}>
       <CardHeader className="flex-col gap-1">
-        <CardTitle>{t(summary.carrier === "electricity" ? "chart.title" : "chart.consumptionTitle")}</CardTitle>
-        <CardDescription>
+        <CardHeading title={<>{t(summary.carrier === "electricity" ? "chart.title" : "chart.consumptionTitle")}</>} description={<>
           {summary.carrier === "gas"
             ? t("chart.descriptionGas")
             : summary.carrier === "total"
@@ -71,7 +71,7 @@ export function EnergyFlowChart({ summary, className }: EnergyFlowChartProps) {
               : solarMeasured
                 ? t("chart.description")
                 : t("chart.descriptionGridOnly")}
-        </CardDescription>
+        </>} />
       </CardHeader>
       <StackedBarChart
         title={t("chart.title")}

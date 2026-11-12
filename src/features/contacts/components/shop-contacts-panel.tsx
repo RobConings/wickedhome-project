@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import { PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardDescription, CardTitle } from "@/components/shared/card";
@@ -20,15 +22,15 @@ export function ShopContactsPanel({ shop, canManage, initialData }: { shop: Shop
   return <Card tone="section">
     <div><CardTitle>{t("shop.title")}</CardTitle><CardDescription>{t("shop.description")}</CardDescription></div>
     {loading && <Skeleton className="h-20 rounded-xl" aria-label={t("project.loading")} />}
-    {error && <div role="status" className="flex flex-col items-start gap-2 text-sm"><p>{t("project.error")}</p><Button size="sm" variant="outline" onClick={refresh}>{common("actions.retry")}</Button></div>}
+    {error && <Stack gap="sm" align="start" role="status" className="text-sm"><Text>{t("project.error")}</Text><Button size="sm" variant="outline" onClick={refresh}>{common("actions.retry")}</Button></Stack>}
     {data && (data.length ? <ul className="divide-y">{data.map((contact) => <li key={contact.id} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
       <ContactAvatar name={contact.name} />
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
+      <Stack gap="sm" className="min-w-0 flex-1">
         <div><ContactName contact={contact} className="font-medium break-words text-primary hover:underline" />
-          {contactSubtitle(contact) && <p className="text-sm break-words text-muted-foreground">{contactSubtitle(contact)}</p>}</div>
+          {contactSubtitle(contact) && <Text size="sm" tone="muted" className="break-words">{contactSubtitle(contact)}</Text>}</div>
         <ContactLinks contact={contact} />
-      </div>
-    </li>)}</ul> : <p className="text-sm text-muted-foreground">{t("shop.empty")}</p>)}
+      </Stack>
+    </li>)}</ul> : <Text size="sm" tone="muted">{t("shop.empty")}</Text>)}
     {canManage && <ContactFormDialog shops={[shop]} defaultShopId={shop.id} defaultTrade={t("shop.trade")} action="/contacts" onSaved={refresh}
       trigger={<Button variant="outline" size="sm" fullOnMobile><PlusIcon />{t("project.new")}</Button>} />}
   </Card>;

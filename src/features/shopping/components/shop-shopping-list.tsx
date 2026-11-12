@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { StoreIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -36,10 +39,10 @@ export function ShopShoppingList({ shopId, limit, initialItems }: ShopShoppingLi
   const hidden = actions.items.length - visible.length;
 
   return (
-    <div className="flex flex-col gap-2">
+    <Stack gap="sm">
       {actions.confirmation}
       {visible.length === 0 ? (
-        <p className="rounded-xl border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">{t("storeVisit.empty")}</p>
+        <Text size="sm" tone="muted" className="rounded-xl border border-dashed px-4 py-6 text-center">{t("storeVisit.empty")}</Text>
       ) : (
         <ul className="divide-y rounded-xl border bg-card px-3">
           {visible.map((item) => (
@@ -47,7 +50,7 @@ export function ShopShoppingList({ shopId, limit, initialItems }: ShopShoppingLi
           ))}
         </ul>
       )}
-      <div className="flex items-center justify-between gap-2">
+      <Inline gap="sm" align="center" justify="between">
         {hidden > 0 ? <span className="text-sm text-muted-foreground">{t("storeVisit.more", { count: hidden })}</span> : <span />}
         <Button asChild variant="outline" size="sm">
           <Link to={`/shopping/shops/${encodeURIComponent(shopId)}`}>
@@ -55,8 +58,8 @@ export function ShopShoppingList({ shopId, limit, initialItems }: ShopShoppingLi
             {t("storeVisit.openShopView")}
           </Link>
         </Button>
-      </div>
-    </div>
+      </Inline>
+    </Stack>
   );
 }
 

@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { Link } from "react-router";
 import { ChevronRightIcon, FolderIcon, FolderPlusIcon } from "lucide-react";
@@ -138,13 +141,13 @@ export function DriveFolderPickerDialog({
             ))}
           </ul>
         )}
-        <div className="flex justify-end gap-2">
+        <Inline gap="sm" align="stretch" justify="end">
           <Button onClick={link} disabled={!current} loading={linking}>
             {current
               ? (pick?.confirmLabel(current.name) ?? t("google.drive.linkThis", { name: current.name }))
               : (pick?.openLabel ?? t("google.drive.openAFolder"))}
           </Button>
-        </div>
+        </Inline>
       </DialogContent>
     </Dialog>
   );
@@ -155,8 +158,8 @@ export function GoogleDrivePanel({ settings, client = googleClient }: { settings
   const { t } = useTranslation("integrations");
   const [count, setCount] = React.useState(settings.linkCount);
   return (
-    <div className="flex flex-col gap-3 pl-0 sm:pl-6">
-      <p className="text-sm text-muted-foreground">
+    <Stack gap="3" className="pl-0 sm:pl-6">
+      <Text size="sm" tone="muted">
         {count > 0 ? (
           <>
             {t("google.drive.linkCount", { count })}{" "}
@@ -167,7 +170,7 @@ export function GoogleDrivePanel({ settings, client = googleClient }: { settings
         ) : (
           t("google.drive.noLinks")
         )}
-      </p>
+      </Text>
       <DriveFolderPickerDialog
         client={client}
         onLinked={() => setCount((value) => value + 1)}
@@ -178,7 +181,7 @@ export function GoogleDrivePanel({ settings, client = googleClient }: { settings
           </Button>
         }
       />
-      <p className="text-xs text-muted-foreground">{t("google.drive.privacy")}</p>
-    </div>
+      <Text size="xs" tone="muted">{t("google.drive.privacy")}</Text>
+    </Stack>
   );
 }

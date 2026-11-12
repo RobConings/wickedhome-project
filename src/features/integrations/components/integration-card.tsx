@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import type * as React from "react";
 import type { LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -44,21 +47,21 @@ export function IntegrationCard({ icon, title, description, status, statusLabel,
   const { t } = useTranslation("integrations");
   return (
     <Card className={cn("gap-4", className)}>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex min-w-0 items-start gap-3">
+      <Stack gap="3" className="sm:flex-row sm:items-start sm:justify-between">
+        <Inline gap="md" align="start" className="min-w-0">
           <IconChip icon={icon} tone={STATUS_TONE[status]} />
-          <div className="flex min-w-0 flex-col gap-1">
-            <div className="flex flex-wrap items-center gap-2">
+          <Stack gap="xs" className="min-w-0">
+            <Inline gap="sm" align="center" wrap>
               <h2 className="text-base font-semibold">{title}</h2>
               <Badge variant={STATUS_BADGE[status]} className="max-w-full truncate">
                 {statusLabel ?? t(`status.${status}`)}
               </Badge>
-            </div>
-            <p className="text-sm text-muted-foreground text-pretty">{description}</p>
-          </div>
-        </div>
-        {actions && <div className="flex shrink-0 flex-wrap gap-2">{actions}</div>}
-      </div>
+            </Inline>
+            <Text size="sm" tone="muted" className="text-pretty">{description}</Text>
+          </Stack>
+        </Inline>
+        {actions && <Inline gap="sm" align="stretch" wrap className="shrink-0">{actions}</Inline>}
+      </Stack>
       {children}
     </Card>
   );
@@ -69,12 +72,12 @@ export function IntegrationCardSkeleton({ icon, title }: { icon: LucideIcon; tit
   const { t } = useTranslation("integrations");
   return (
     <Card className="gap-4" aria-busy="true" aria-label={t("loading.card", { name: title })}>
-      <div className="flex items-start gap-3">
+      <Inline gap="md" align="start">
         <IconChip icon={icon} tone="neutral" />
-        <div className="flex flex-col gap-1">
+        <Stack gap="xs">
           <h2 className="text-base font-semibold">{title}</h2>
-        </div>
-      </div>
+        </Stack>
+      </Inline>
       <SkeletonList rows={2} />
     </Card>
   );

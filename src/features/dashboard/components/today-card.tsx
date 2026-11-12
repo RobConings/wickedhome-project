@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import { ArrowRightIcon, SunIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
@@ -60,10 +61,10 @@ export function TodayCard({ today, agenda, tasks }: TodayCardProps) {
               }))}
             />
           ) : (
-            <p className="flex items-center gap-2 py-2 text-sm text-muted-foreground">
+            <Text size="sm" tone="muted" className="flex items-center gap-2 py-2">
               <SunIcon className="size-4" aria-hidden="true" />
               {t("today.empty")}
-            </p>
+            </Text>
           )}
         </>
       )}

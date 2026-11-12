@@ -1,3 +1,6 @@
+import { GeneralList } from "@/components/shared/general-list";
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
 import { HandCoinsIcon, PencilIcon, Trash2Icon, ArrowLeftRightIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher, useSearchParams } from "react-router";
@@ -40,10 +43,10 @@ export function ContributionPlanScreen({ plan, month, habitants, canManage }: { 
       <ContributionPlanDialog plan={plan} accounts={month.accounts} habitants={habitants} monthStart={`${month.month}-01`} trigger={<Button variant="outline"><PencilIcon />{t("actions.editPlan")}</Button>} />
       <ConfirmDialog trigger={<Button variant="outline"><Trash2Icon />{common("actions.delete")}</Button>} title={t("planWorkspace.deleteTitle")} description={t("planWorkspace.deleteHint")} destructive confirmLabel={common("actions.delete")} cancelLabel={common("actions.cancel")} onConfirm={() => fetcher.submit({ intent: "delete-plan", id: plan.id }, { method: "post" })} />
     </>} />
-    {fetcher.data?.formError && <p role="alert" className="text-destructive">{fetcher.data.formError}</p>}
+    {fetcher.data?.formError && <Text tone="danger" role="alert">{fetcher.data.formError}</Text>}
     <PageGrid columns="main-sidebar">
-      <div className="flex min-w-0 flex-col gap-5">
-        <Card tone="featured"><CardTitle>{t("planWorkspace.schedule")}</CardTitle><p className="text-3xl font-semibold tabular-nums">{money(plan.amountCents)}</p><p className="text-sm">{t("contributions.planAmount", { amount: money(plan.amountCents), day: plan.dayOfMonth })}</p>
+      <Stack gap="5" className="min-w-0">
+        <Card tone="featured"><CardTitle>{t("planWorkspace.schedule")}</CardTitle><Text size="3xl" weight="semibold" className="tabular-nums">{money(plan.amountCents)}</Text><Text size="sm">{t("contributions.planAmount", { amount: money(plan.amountCents), day: plan.dayOfMonth })}</Text>
           <DescriptionList>
             <DescriptionItem label={t("fields.who")}>{person ? <RecordLink to={`/habitants/${encodeURIComponent(person.id)}`} className="underline">{person.name}</RecordLink> : t("history.unknownPerson")}</DescriptionItem>
             <DescriptionItem label={t("fields.account")}>{account ? <RecordLink to={`/money?tab=history&account=${encodeURIComponent(account.id)}&month=${month.month}`} className="underline">{account.name}</RecordLink> : t("planWorkspace.unknownAccount")}</DescriptionItem>
@@ -52,12 +55,12 @@ export function ContributionPlanScreen({ plan, month, habitants, canManage }: { 
           </DescriptionList>
         </Card>
         <PeriodNavigator label={monthLabel(month.month)} onPrevious={() => shift(-1)} onNext={() => shift(1)} onToday={() => changeMonth(month.today.slice(0, 7))} previousLabel={t("month.previous")} nextLabel={t("month.next")} todayLabel={t("month.today")} isCurrent={month.month === month.today.slice(0, 7)} />
-        <p className="text-sm text-muted-foreground">{t(active ? "planWorkspace.activeMonth" : "planWorkspace.inactiveMonth")}</p>
+        <Text size="sm" tone="muted">{t(active ? "planWorkspace.activeMonth" : "planWorkspace.inactiveMonth")}</Text>
         <PageGrid columns="2"><StatTile label={t("planWorkspace.planned")} value={money(row?.plannedCents ?? 0)} /><StatTile label={t("planWorkspace.recorded")} value={money(row?.recordedCents ?? 0)} /></PageGrid>
-        <p className="text-sm text-muted-foreground">{t("planWorkspace.activityHint")}</p>
+        <Text size="sm" tone="muted">{t("planWorkspace.activityHint")}</Text>
         <LedgerList lines={activity} accounts={month.accounts} habitants={habitants} canManage={canManage} storageKey="plan-activity" />
-      </div>
-      <Card className="self-start"><CardTitle>{t("planWorkspace.related")}</CardTitle>{related.length ? <ul className="divide-y">{related.map((candidate) => <li key={candidate.id} className="py-2"><RecordLink to={`/money/plans/${encodeURIComponent(candidate.id)}?month=${month.month}`} className="flex min-h-11 flex-col justify-center gap-1 text-sm hover:underline"><span className="font-medium">{money(candidate.amountCents)}</span><span className="text-muted-foreground">{dateText(candidate.activeFrom)} – {candidate.activeTo ? dateText(candidate.activeTo) : t("planWorkspace.noEnd")}</span></RecordLink></li>)}</ul> : <p className="text-sm text-muted-foreground">{t("planWorkspace.noRelated")}</p>}</Card>
+      </Stack>
+      <Card className="self-start"><CardTitle>{t("planWorkspace.related")}</CardTitle>{related.length ? <GeneralList variant="embedded" label={t("planWorkspace.related")} items={related} getKey={(candidate) => candidate.id} renderRow={(candidate) => <><RecordLink to={`/money/plans/${encodeURIComponent(candidate.id)}?month=${month.month}`} className="flex min-h-11 flex-col justify-center gap-1 text-sm hover:underline"><span className="font-medium">{money(candidate.amountCents)}</span><span className="text-muted-foreground">{dateText(candidate.activeFrom)} – {candidate.activeTo ? dateText(candidate.activeTo) : t("planWorkspace.noEnd")}</span></RecordLink></>} emptyState={null} /> : <Text size="sm" tone="muted">{t("planWorkspace.noRelated")}</Text>}</Card>
     </PageGrid>
   </PageContainer>;
 }

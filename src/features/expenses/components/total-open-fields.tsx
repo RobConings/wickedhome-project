@@ -1,3 +1,4 @@
+import { PageGrid } from "@/components/layout/page-grid";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { FormField } from "@/components/shared/form-field";
@@ -45,7 +46,7 @@ export function TotalOpenFields({
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <PageGrid gap="md" className="sm:grid-cols-2">
         <FormField
           label={t("totalOpen.label")}
           htmlFor="expense-total-open"
@@ -71,7 +72,7 @@ export function TotalOpenFields({
             onChange={(event) => onAsOfChange(event.target.value)}
           />
         </FormField>
-      </div>
+      </PageGrid>
       <div id="expense-total-open-hint" aria-live="polite" className="text-xs text-muted-foreground">
         {totalCents === null ? (
           t("totalOpen.hint")

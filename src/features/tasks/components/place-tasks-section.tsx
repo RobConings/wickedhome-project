@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { ArrowRightIcon, PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -72,9 +75,9 @@ export function PlaceTasksSection({ placeId, initialData }: PlaceTasksSectionPro
 
   // Content only: the place page draws the card and the "Tasks" heading around it.
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex min-h-8 items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground" role={state.status === "loading" ? "status" : undefined}>
+    <Stack gap="3">
+      <Inline gap="md" align="center" justify="between" className="min-h-8">
+        <Text size="sm" tone="muted"  role={state.status === "loading" ? "status" : undefined}>
           {state.status === "ready"
             ? open.length > 0
               ? t("place.count", { count: open.length })
@@ -82,7 +85,7 @@ export function PlaceTasksSection({ placeId, initialData }: PlaceTasksSectionPro
             : state.status === "error"
               ? t("place.error")
               : t("place.loading")}
-        </p>
+        </Text>
         {canManage && (
           <Button asChild variant="ghost" size="icon-sm" aria-label={t("place.add")} title={t("place.add")}>
             <Link to={`/tasks?new=1&${placeQuery}`}>
@@ -90,13 +93,13 @@ export function PlaceTasksSection({ placeId, initialData }: PlaceTasksSectionPro
             </Link>
           </Button>
         )}
-      </div>
+      </Inline>
 
       {state.status === "loading" && (
-        <div className="flex flex-col gap-2" aria-hidden="true">
+        <Stack gap="sm"  aria-hidden="true">
           <Skeleton className="h-14 rounded-xl" />
           <Skeleton className="h-14 rounded-xl" />
-        </div>
+        </Stack>
       )}
 
       {state.status === "error" && (
@@ -131,6 +134,6 @@ export function PlaceTasksSection({ placeId, initialData }: PlaceTasksSectionPro
           </Button>
         </>
       )}
-    </div>
+    </Stack>
   );
 }

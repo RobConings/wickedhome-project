@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import type { ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
 import { PageHeader } from "@/components/shared/page-header";
@@ -20,7 +21,7 @@ export function FloorPlanScreen({ plan, canManage, ...markerProps }: FloorPlanSc
   const { floor } = plan;
 
   return (
-    <div className="flex h-[calc(100dvh-3.5rem)] min-h-[36rem] flex-col gap-4 px-4 py-4 sm:px-6 lg:h-dvh lg:px-8 lg:py-6">
+    <Stack gap="md" className="h-[calc(100dvh-3.5rem)] min-h-[36rem] px-4 py-4 sm:px-6 lg:h-dvh lg:px-8 lg:py-6">
       <PageHeader
         backTo="/places"
         title={floor.name}
@@ -28,6 +29,6 @@ export function FloorPlanScreen({ plan, canManage, ...markerProps }: FloorPlanSc
       />
       {/* Keyed by floor: switching floors starts a fresh editor. */}
       <FloorPlanEditor key={floor.id} plan={plan} canManage={canManage} className="flex-1" {...markerProps} />
-    </div>
+    </Stack>
   );
 }

@@ -1,8 +1,11 @@
+import { FormField } from "@/components/shared/form-field";
+import { Inline } from "@/components/layout/inline";
+import { PageGrid } from "@/components/layout/page-grid";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { CalendarClockIcon, CalendarIcon, CalendarOffIcon, CalendarRangeIcon, ClockIcon, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { TASK_WHEN_KINDS, type TaskWhenKind } from "../types/tasks";
 import { TASK_WHEN_NAMES, switchWhenKind, whenColumns, withStartDate, withStartTime, type TaskWhenValue } from "../types/task-when";
@@ -42,8 +45,7 @@ export function TaskWhenField({ id, value, onChange, today, errorsFor, disabled 
   const describedBy = errors.length ? errorId : undefined;
 
   const dateInput = (inputId: string, inputLabel: string, inputValue: string, set: (next: string) => void, name: (typeof TASK_WHEN_NAMES)[number], min?: string) => (
-    <div className="flex min-w-0 flex-col gap-1.5">
-      <Label htmlFor={inputId}>{inputLabel}</Label>
+    <FormField htmlFor={inputId} label={<>{inputLabel}</>} className="min-w-0">
       <Input
         id={inputId}
         type="date"
@@ -54,12 +56,11 @@ export function TaskWhenField({ id, value, onChange, today, errorsFor, disabled 
         aria-invalid={invalid(name)}
         aria-describedby={describedBy}
       />
-    </div>
+    </FormField>
   );
 
   const timeInput = (inputId: string, inputLabel: string, inputValue: string, set: (next: string) => void, name: (typeof TASK_WHEN_NAMES)[number]) => (
-    <div className="flex min-w-0 flex-col gap-1.5">
-      <Label htmlFor={inputId}>{inputLabel}</Label>
+    <FormField htmlFor={inputId} label={<>{inputLabel}</>} className="min-w-0">
       <Input
         id={inputId}
         type="time"
@@ -70,7 +71,7 @@ export function TaskWhenField({ id, value, onChange, today, errorsFor, disabled 
         aria-invalid={invalid(name)}
         aria-describedby={describedBy}
       />
-    </div>
+    </FormField>
   );
 
   return (
@@ -79,7 +80,7 @@ export function TaskWhenField({ id, value, onChange, today, errorsFor, disabled 
       {TASK_WHEN_NAMES.map((name) => (
         <input key={name} type="hidden" name={name} value={columns[name]} />
       ))}
-      <div role="radiogroup" aria-label={t("when.label")} className="flex flex-wrap gap-1.5">
+      <Inline gap="1.5" align="stretch" wrap role="radiogroup" aria-label={t("when.label")}>
         {TASK_WHEN_KINDS.map((kind) => {
           const Icon = KIND_ICONS[kind];
           const active = value.kind === kind;
@@ -101,10 +102,10 @@ export function TaskWhenField({ id, value, onChange, today, errorsFor, disabled 
             </button>
           );
         })}
-      </div>
+      </Inline>
 
       {value.kind !== "none" && (
-        <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+        <PageGrid gap="3" className="min-w-0 sm:grid-cols-2">
           {value.kind === "days" ? (
             <>
               {dateInput(`${id}-start`, t("when.from"), value.startDate, (next) => onChange(withStartDate(value, next)), "startDate")}
@@ -122,14 +123,14 @@ export function TaskWhenField({ id, value, onChange, today, errorsFor, disabled 
               {timeInput(`${id}-end-time`, t("when.endTime"), value.endTime, (next) => onChange({ ...value, endTime: next }), "endTime")}
             </>
           )}
-        </div>
+        </PageGrid>
       )}
 
-      <p className="text-xs text-muted-foreground">{t(`when.hints.${value.kind}`)}</p>
+      <Text size="xs" tone="muted">{t(`when.hints.${value.kind}`)}</Text>
       {errors.length > 0 && (
-        <p id={errorId} className="text-xs font-medium text-destructive">
+        <Text size="xs" tone="danger" weight="medium" id={errorId}>
           {errors.join(" ")}
-        </p>
+        </Text>
       )}
     </fieldset>
   );

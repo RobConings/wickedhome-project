@@ -1,3 +1,4 @@
+import { Inline } from "@/components/layout/inline";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import type { ShoppingStockFilter } from "./shopping-grouping";
@@ -12,8 +13,8 @@ export function ShoppingStockFilterField({
 }) {
   const { t } = useTranslation("shopping");
   return (
-    <div
-      className="flex flex-wrap gap-1"
+    <Inline gap="xs" align="stretch" wrap
+
       role="group"
       aria-label={t("stockFilter.label")}
     >
@@ -30,6 +31,6 @@ export function ShoppingStockFilterField({
           {t(`stockFilter.${option}`)}
         </Button>
       ))}
-    </div>
+    </Inline>
   );
 }

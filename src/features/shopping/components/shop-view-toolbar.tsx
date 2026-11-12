@@ -1,3 +1,6 @@
+import { PageGrid } from "@/components/layout/page-grid";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import { ArrowDownUpIcon, SlidersHorizontalIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SearchField } from "@/components/shared/search-field";
@@ -33,7 +36,7 @@ export function ShopViewToolbar({ sort, onSortChange, filters, onFiltersChange, 
   const { t: common } = useTranslation();
   const filterCount = [filters.category !== "all", filters.listId !== "all", filters.priority !== "all", (filters.stock ?? "all") !== "all"].filter(Boolean).length;
   const controls = (
-    <div className="grid min-w-0 grid-cols-1 gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-2">
+    <PageGrid gap="3" className="min-w-0 sm:flex sm:flex-wrap sm:items-center sm:gap-2">
         <Select value={sort} onValueChange={(value) => onSortChange(value as ShopViewSort)}>
           <SelectTrigger className="w-full min-w-0 sm:w-48" aria-label={t("shopView.sort.label")}>
             <ArrowDownUpIcon aria-hidden="true" />
@@ -83,12 +86,12 @@ export function ShopViewToolbar({ sort, onSortChange, filters, onFiltersChange, 
             {t("shopView.filters.clear")}
           </Button>
         )}
-    </div>
+    </PageGrid>
   );
 
   return (
-    <div className="flex min-w-0 flex-col gap-2" role="group" aria-label={t("shopView.filters.label")}>
-      <div className="flex min-w-0 items-center gap-2">
+    <Stack gap="sm" className="min-w-0" role="group" aria-label={t("shopView.filters.label")}>
+      <Inline gap="sm" align="center" className="min-w-0">
         <SearchField className="min-w-0 flex-1" value={filters.query} onValueChange={(query) => set({ query })} placeholder={t("shopView.filters.search")} />
         <Dialog>
           <DialogTrigger asChild><Button variant="outline" size="icon" className="size-10 shrink-0 sm:hidden" aria-label={t("shopView.filters.viewOptions")}><SlidersHorizontalIcon />{filterCount > 0 && <span className="text-xs">{filterCount}</span>}</Button></DialogTrigger>
@@ -98,9 +101,9 @@ export function ShopViewToolbar({ sort, onSortChange, filters, onFiltersChange, 
             <DialogFooter><DialogClose asChild><Button>{common("actions.close")}</Button></DialogClose></DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
+      </Inline>
       <ShoppingStockFilterField value={filters.stock ?? "all"} onChange={(stock) => set({ stock })} />
       <div className="hidden sm:block">{controls}</div>
-    </div>
+    </Stack>
   );
 }

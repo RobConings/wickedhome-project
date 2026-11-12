@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import { CheckIcon, ChevronLeftIcon, ChevronRightIcon, ClockIcon, ListIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
@@ -33,11 +34,11 @@ export function RecurringPaymentsScreen({ payments, habitants }: { payments: Rec
       { id: "unpaid", label: t("detail.notPaid"), to: href("unpaid"), icon: ClockIcon, current: status === "unpaid" },
     ]} />
     <Card><CardTitle>{t("workspace.paymentCount", { count: payments.total })}</CardTitle>
-      {payments.items.length ? <HistoryList items={payments.items} habitants={habitants} /> : <p className="text-sm text-muted-foreground">{t("detail.noHistory")}</p>}
+      {payments.items.length ? <HistoryList items={payments.items} habitants={habitants} /> : <Text size="sm" tone="muted">{t("detail.noHistory")}</Text>}
     </Card>
     <nav aria-label={t("workspace.pagination")} className="flex flex-wrap items-center justify-between gap-3">
       {payments.page > 1 ? <Button asChild variant="outline"><RecordLink to={href(status, payments.page - 1)}><ChevronLeftIcon />{t("workspace.previous")}</RecordLink></Button> : <span />}
-      <p className="text-sm text-muted-foreground">{t("workspace.pageOf", { page: payments.page, pages })}</p>
+      <Text size="sm" tone="muted">{t("workspace.pageOf", { page: payments.page, pages })}</Text>
       {payments.page < pages ? <Button asChild variant="outline"><RecordLink to={href(status, payments.page + 1)}>{t("workspace.next")}<ChevronRightIcon /></RecordLink></Button> : <span />}
     </nav>
   </PageContainer>;

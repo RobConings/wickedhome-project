@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import { RecordImage } from "@/components/shared/record-image";
 import { RecordLink } from "@/components/shared/record-link";
 import { shoppingStockNeed } from "../types/shopping";
@@ -171,22 +174,22 @@ export function ShoppingItemRow({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {detailsOpen && <div id={detailsId} className="col-span-3 mt-2 flex min-w-0 flex-col gap-2 rounded-lg bg-muted/30 p-3 text-sm">
-        <p className="font-medium break-words">{item.name}</p>
-        {item.amounts && <p className="break-words tabular-nums">{quantity}</p>}
-        {item.note && <p className="text-xs whitespace-pre-line text-muted-foreground">{item.note}</p>}
-        {item.requirements && <div className="flex flex-col gap-1 text-xs text-muted-foreground">{item.requirements.map((part) => <p key={part.id} className="break-words">{part.recipe?.name ?? part.listName} · {shoppingItemQuantity(part, locale)}</p>)}</div>}
-        {badges.length > 0 && <div className="flex min-w-0 flex-wrap items-center gap-1.5">{badges}</div>}
-        {item.alternatives.length > 0 && <div className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
+      {detailsOpen && <Stack gap="sm" id={detailsId} className="col-span-3 mt-2 min-w-0 rounded-lg bg-muted/30 p-3 text-sm">
+        <Text weight="medium" className="break-words">{item.name}</Text>
+        {item.amounts && <Text className="break-words tabular-nums">{quantity}</Text>}
+        {item.note && <Text size="xs" tone="muted" className="whitespace-pre-line">{item.note}</Text>}
+        {item.requirements && <Stack gap="xs" className="text-xs text-muted-foreground">{item.requirements.map((part) => <Text key={part.id} className="break-words">{part.recipe?.name ?? part.listName} · {shoppingItemQuantity(part, locale)}</Text>)}</Stack>}
+        {badges.length > 0 && <Inline gap="1.5" align="center" wrap className="min-w-0">{badges}</Inline>}
+        {item.alternatives.length > 0 && <Stack gap="xs" className="min-w-0 text-xs text-muted-foreground">
           <span>{t("alternatives.or")}</span>
-          {item.alternatives.map((alternative) => <div key={alternative.productId} className="flex min-w-0 flex-wrap items-center gap-1">
+          {item.alternatives.map((alternative) => <Inline gap="xs" align="center" wrap key={alternative.productId} className="min-w-0">
             <span className="break-words">{alternative.name}</span>
             {alternative.links.map((link) => link.url ? <a key={link.shop.id} href={link.url} target="_blank" rel="noopener noreferrer" title={t("item.openLink")} className="rounded-full outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"><ShopBadge shop={link.shop} /></a> : <ShopBadge key={link.shop.id} shop={link.shop} />)}
-          </div>)}
-        </div>}
-        {bought && item.boughtByName && <p className="text-xs text-muted-foreground">{t("item.boughtBy", { name: item.boughtByName })}</p>}
-        {actions && <div className="flex min-w-0 flex-wrap items-center gap-2">{actions}</div>}
-      </div>}
+          </Inline>)}
+        </Stack>}
+        {bought && item.boughtByName && <Text size="xs" tone="muted">{t("item.boughtBy", { name: item.boughtByName })}</Text>}
+        {actions && <Inline gap="sm" align="center" wrap className="min-w-0">{actions}</Inline>}
+      </Stack>}
     </li>
   );
 }

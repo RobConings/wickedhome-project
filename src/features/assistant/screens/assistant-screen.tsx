@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { ArrowLeftIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, MessagesSquareIcon, PlusIcon, SettingsIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -85,7 +87,7 @@ export function AssistantScreen({ data, client = assistantClient }: AssistantScr
   return (
     // Exactly the screen below the top bar: the negative margin takes back <main>'s safe-area padding (the
     // question field pads the safe area itself), which otherwise made the page taller than the screen.
-    <div ref={viewportRef} className={`-mb-[env(safe-area-inset-bottom)] flex h-[calc(var(--chat-viewport-height,100dvh)-3.5rem-env(safe-area-inset-top))] overflow-hidden lg:grid lg:h-[var(--chat-viewport-height,100dvh)] ${sidebarOpen ? "lg:grid-cols-[17rem_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,1fr)]"}`}>
+    <Inline gap="none" align="stretch" ref={viewportRef} className={`-mb-[env(safe-area-inset-bottom)] flex h-[calc(var(--chat-viewport-height,100dvh)-3.5rem-env(safe-area-inset-top))] overflow-hidden lg:grid lg:h-[var(--chat-viewport-height,100dvh)] ${sidebarOpen ? "lg:grid-cols-[17rem_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,1fr)]"}`}>
       <aside className={`hidden min-h-0 flex-col gap-3 border-r p-3 ${sidebarOpen ? "lg:flex" : ""}`}>
         <h2 className="px-1 text-sm font-semibold">{t("conversations.title")}</h2>
         {list()}
@@ -110,7 +112,7 @@ export function AssistantScreen({ data, client = assistantClient }: AssistantScr
             <SettingsIcon />
           </Button>
         </header>
-        <div className="min-w-0 pb-2"><AssistantProviderSettings compact /></div>
+        <Stack gap="none" className="min-w-0 pb-2"><AssistantProviderSettings compact /></Stack>
         {/* A new key per conversation: the chat starts from that conversation's stored messages. */}
         <AssistantChat
           key={activeId ?? "new"}
@@ -156,7 +158,7 @@ export function AssistantScreen({ data, client = assistantClient }: AssistantScr
           <AssistantIntegrationCard data={data.status} client={client} showOpenLink={false} />
         </SheetContent>
       </Sheet>
-    </div>
+    </Inline>
   );
 }
 

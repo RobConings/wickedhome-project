@@ -5,6 +5,7 @@ import { connectedGoogleFixture, driveListingFixture, fakeGoogleClient } from ".
 const meta = {
   title: "Features/Integrations/Screens/DriveFolderScreen",
   component: DriveFolderScreen,
+  parameters: { layout: "fullscreen" },
   args: { linkId: "l1", listing: driveListingFixture, canManage: true, client: fakeGoogleClient(connectedGoogleFixture) },
 } satisfies Meta<typeof DriveFolderScreen>;
 

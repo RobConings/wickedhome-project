@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import type * as React from "react";
 import type { LucideIcon } from "lucide-react";
 import { CardDescription, CardTitle } from "@/components/shared/card";
@@ -16,15 +18,15 @@ type MoneyCardHeaderProps = {
  */
 export function MoneyCardHeader({ icon: Icon, title, description, actions }: MoneyCardHeaderProps) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
-      <div className="flex min-w-[min(100%,14rem)] flex-1 flex-col gap-1">
-        <div className="flex items-center gap-2">
+    <Inline gap="none" align="start" justify="between" wrap className="gap-x-4 gap-y-2">
+      <Stack gap="xs" className="min-w-[min(100%,14rem)] flex-1">
+        <Inline gap="sm" align="center">
           <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
           <CardTitle>{title}</CardTitle>
-        </div>
+        </Inline>
         {description && <CardDescription>{description}</CardDescription>}
-      </div>
-      {actions && <div className="flex max-w-full flex-wrap items-center gap-2 max-sm:w-full max-sm:[&>*]:flex-1">{actions}</div>}
-    </div>
+      </Stack>
+      {actions && <Inline gap="sm" align="center" wrap className="max-w-full max-sm:w-full max-sm:[&>*]:flex-1">{actions}</Inline>}
+    </Inline>
   );
 }

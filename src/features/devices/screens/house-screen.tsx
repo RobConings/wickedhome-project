@@ -1,3 +1,6 @@
+import { CanvasOverlay } from "@/components/layout/canvas-overlay";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { MapIcon, MapPinOffIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -79,7 +82,7 @@ export function HouseScreen({ plans, devices: loaded, profiles, canSetValues, li
 
   if (!plan) {
     return (
-      <div className="flex flex-col gap-4 px-4 py-6 sm:px-6 lg:px-8">
+      <Stack gap="md" className="px-4 py-6 sm:px-6 lg:px-8">
         {asideTop}
         <EmptyState
           icon={MapIcon}
@@ -91,7 +94,7 @@ export function HouseScreen({ plans, devices: loaded, profiles, canSetValues, li
             </Button>
           }
         />
-      </div>
+      </Stack>
     );
   }
 
@@ -102,29 +105,28 @@ export function HouseScreen({ plans, devices: loaded, profiles, canSetValues, li
   };
   const selectedOnFloor = selected && (selected.floorId === floorId || selected.place?.floorId === floorId || !selected.floorId) ? selected : undefined;
   return (
-    <div className="flex h-[calc(100dvh-3.5rem-var(--mobile-nav-height,0px)-env(safe-area-inset-bottom))] min-h-[32rem] flex-col gap-3 p-3 sm:p-4 lg:h-dvh">
+    <Stack gap="3" className="h-[calc(100dvh-3.5rem-var(--mobile-nav-height,0px)-env(safe-area-inset-bottom))] min-h-[32rem] p-3 sm:p-4 lg:h-dvh">
       <PageHeader title={t("house.title")} actions={<>
         {(live || liveStatus) && <LiveStatusBadge status={liveStatus} refreshing={refreshing} />}
         {canSetValues && <Button asChild variant="outline"><Link to={`/places/floors/${plan.floor.id}/plan`}>{t("placement.placeOnPlan")}</Link></Button>}
       </>} />
-      <div className="flex min-w-0 flex-wrap items-center gap-3">
+      <Inline gap="md" align="center" wrap className="min-w-0">
         <SegmentedControl label={t("house.floors")} value={plan.floor.id} onChange={selectFloor} options={plans.map((item) => ({ value: item.floor.id, label: item.floor.name, icon: MapIcon }))} />
         {unplaced.length > 0 && <Button variant="ghost" onClick={() => setShowUnplaced((value) => !value)}><MapPinOffIcon />{t("house.unplaced", { count: unplaced.length })}</Button>}
-      </div>
-      <div className="relative min-h-0 flex-1 overflow-hidden rounded-2xl border bg-muted/30">
+      </Inline>
         <FloorPlanView plan={plan} markers={[...markers, ...(roomMarkers?.[plan.floor.id] ?? [])]} selectedMarkerId={selectedOnFloor?.id} selectedPlaceId={selectedRoom?.id}
           onPlaceClick={selectRoom} onMarkerClick={(id) => {
             if (id.startsWith("room:")) { selectRoom(id.slice(5)); return; }
             setSelectedId(id);
             setSearchParams((params) => { params.delete("room"); params.set("device", id); return params; }, { preventScrollReset: true });
-          }} className="h-full min-h-0 rounded-none border-0" legend={legendProfiles.length > 0 ? <DeviceLegend profiles={legendProfiles} /> : undefined} />
+          }} className="min-h-0 flex-1 rounded-2xl border bg-muted/30" legend={legendProfiles.length > 0 ? <DeviceLegend profiles={legendProfiles} /> : undefined}>
         <MapInspector title={selectedOnFloor?.name ?? selectedRoom?.name ?? t("house.unplaced", { count: unplaced.length })} open={Boolean(selectedOnFloor || selectedRoom || showUnplaced)} onClose={closeInspector}>
           {selectedOnFloor && selectedProfile ? <DeviceSidePanel device={selectedOnFloor} profile={selectedProfile} state={stateOf(selectedOnFloor)} canSetValues={canSetValues} now={now} hideHeading className="border-0 bg-transparent p-0 shadow-none" />
             : selectedRoom ? <>{renderRoomPanel?.(selectedRoom.id)}<Button asChild><RecordLink to={`/places/${encodeURIComponent(selectedRoom.id)}`}>{t("house.openRoom")}</RecordLink></Button></>
-            : <div className="flex flex-col gap-2">{unplaced.map((device) => <Button key={device.id} variant="outline" onClick={() => { setShowUnplaced(false); setSelectedId(device.id); }}>{device.name}</Button>)}</div>}
+            : <Stack gap="sm">{unplaced.map((device) => <Button key={device.id} variant="outline" onClick={() => { setShowUnplaced(false); setSelectedId(device.id); }}>{device.name}</Button>)}</Stack>}
         </MapInspector>
-        {asideTop && <div className="absolute bottom-3 left-3 z-10 max-w-[min(22rem,calc(100%-1.5rem))]">{asideTop}</div>}
-      </div>
-    </div>
+        {asideTop && <CanvasOverlay>{asideTop}</CanvasOverlay>}
+      </FloorPlanView>
+    </Stack>
   );
 }

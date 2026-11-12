@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import { ExternalLinkIcon, PencilIcon, Trash2Icon } from "lucide-react";
@@ -66,13 +68,13 @@ export function CalendarEntryDialog({
     <Dialog open={entry !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
-          <div className="flex items-start gap-3">
+          <Inline gap="md" align="start">
             <span className="mt-1.5 size-3 shrink-0 rounded-full" style={{ backgroundColor: current.color }} aria-hidden="true" />
-            <div className="flex min-w-0 flex-col gap-1">
+            <Stack gap="xs" className="min-w-0">
               <DialogTitle className="text-xl">{title}</DialogTitle>
               <DialogDescription className="sr-only">{t(`kinds.${current.kind}`)}</DialogDescription>
-            </div>
-          </div>
+            </Stack>
+          </Inline>
         </DialogHeader>
 
         <CalendarEntryDetails
@@ -104,7 +106,7 @@ export function CalendarEntryDialog({
             )
           )}
           {editable && (
-            <div className="flex gap-2">
+            <Inline gap="sm" align="stretch">
               <ConfirmDialog
                 trigger={
                   <Button variant="outline" disabled={deleting}>
@@ -123,7 +125,7 @@ export function CalendarEntryDialog({
                 <PencilIcon />
                 {t("actions.edit")}
               </Button>
-            </div>
+            </Inline>
           )}
         </DialogFooter>
       </DialogContent>

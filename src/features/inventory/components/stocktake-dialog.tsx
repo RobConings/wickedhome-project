@@ -1,3 +1,7 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { PageGrid } from "@/components/layout/page-grid";
 import { RecordImage } from "@/components/shared/record-image";
 import * as React from "react";
 import { ArrowLeftIcon, CheckIcon, ClipboardCheckIcon, MapPinIcon, PackageIcon, ShoppingCartIcon, TrophyIcon, SparklesIcon, XIcon } from "lucide-react";
@@ -152,66 +156,66 @@ export function StocktakeScreen({ items, products = [], images = {}, onChanged, 
   const roomDone = roomItems.filter((entry) => answers[entry.id]).length;
   return <main className="fixed inset-0 z-[100] flex flex-col overflow-y-auto bg-background text-foreground" aria-label={t("count.title")}>
     <header className="sticky top-0 z-10 flex shrink-0 items-center justify-between gap-3 border-b bg-background/95 px-4 py-3 backdrop-blur sm:px-8">
-      <div className="flex items-center gap-2 text-sm font-semibold"><ClipboardCheckIcon className="size-5 text-primary" />{t("count.title")}</div>
+      <Inline gap="sm" align="center" className="text-sm font-semibold"><ClipboardCheckIcon className="size-5 text-primary" />{t("count.title")}</Inline>
       <Button asChild variant="ghost" size="sm" disabled={saving}><Link to={returnTo} aria-disabled={saving} onClick={(event) => { if (saving) event.preventDefault(); }}><XIcon />{t("count.stop")}</Link></Button>
     </header>
-    <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center gap-6 px-4 py-6 sm:px-8 sm:py-10">
+    <Stack gap="lg" className="mx-auto w-full max-w-2xl flex-1 justify-center px-4 py-6 sm:px-8 sm:py-10">
       {!started ? <>
-        <div className="mx-auto flex size-24 items-center justify-center rounded-3xl bg-primary/15"><SparklesIcon className="size-12 text-primary" /></div>
-        <div className="space-y-2 text-center"><p className="text-xs font-semibold tracking-widest text-primary uppercase">{t("count.mission")}</p><h1 className="text-3xl font-bold sm:text-4xl">{t("count.hero")}</h1><p className="text-sm text-muted-foreground">{t("count.description")}</p></div>
-        <div className="space-y-4 rounded-2xl border bg-card p-5">
+        <Inline gap="none" align="center" justify="center" className="mx-auto size-24 rounded-3xl bg-primary/15"><SparklesIcon className="size-12 text-primary" /></Inline>
+        <Stack gap="sm" className="text-center"><Text size="xs" tone="primary" weight="semibold" className="tracking-widest uppercase">{t("count.mission")}</Text><h1 className="text-3xl font-bold sm:text-4xl">{t("count.hero")}</h1><Text size="sm" tone="muted">{t("count.description")}</Text></Stack>
+        <Stack gap="md" className="rounded-2xl border bg-card p-5">
           <label className="flex items-center gap-2 text-sm font-medium"><MapPinIcon className="size-4" />{t("count.chooseRoom")}</label>
           <Select value={placeId} onValueChange={setPlaceId} disabled={saving}><SelectTrigger className="w-full" aria-label={t("fields.place")}><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">{t("count.allPlaces")}</SelectItem>{places.map(([id, name]) => <SelectItem key={id} value={id}>{name}</SelectItem>)}</SelectContent></Select>
-          <p className="text-sm text-muted-foreground">{t("count.locations")}</p>
+          <Text size="sm" tone="muted">{t("count.locations")}</Text>
           <label className="flex cursor-pointer items-start gap-3 rounded-xl border p-3">
             <input type="checkbox" checked={inStockOnly} disabled={saving} onChange={(event) => setInStockOnly(event.target.checked)} className="mt-0.5 size-5 shrink-0 accent-primary" aria-describedby={`${quantityId}-filter`} />
             <span className="space-y-1"><span className="block text-sm font-medium">{t("count.inStockOnly")}</span><span id={`${quantityId}-filter`} className="block text-xs text-muted-foreground">{t("count.inStockOnlyDescription")}</span></span>
           </label>
-          {!available.length && <p role="status" className="text-sm text-muted-foreground">{t("count.noProducts")}</p>}
+          {!available.length && <Text size="sm" tone="muted" role="status">{t("count.noProducts")}</Text>}
           {excludedItems.length > 0 && <details className="rounded-xl border p-3">
             <summary className="cursor-pointer text-sm font-medium">{t("count.excludedProducts", { count: excludedItems.length })}</summary>
-            <p className="mt-2 text-xs text-muted-foreground">{t("count.excludeDescription")}</p>
+            <Text size="xs" tone="muted" className="mt-2">{t("count.excludeDescription")}</Text>
             <ul className="mt-2 divide-y">{excludedItems.map((item) => <li key={item.id} className="flex flex-wrap items-center justify-between gap-2 py-2"><span className="min-w-0 text-sm break-words">{item.productName} · {item.placeName}</span><Button type="button" variant="outline" size="sm" disabled={saving} onClick={() => void setExclusion(item, false)}>{t("count.includeAgain")}</Button></li>)}</ul>
           </details>}
-          {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+          {error && <Text size="sm" tone="danger" role="alert">{error}</Text>}
           <Button className="h-12 w-full" disabled={saving || !available.length} onClick={start}>{t("count.start", { count: available.length })}</Button>
-        </div>
-        <p className="text-center text-xs text-muted-foreground">{t("count.savedImmediately")}</p>
+        </Stack>
+        <Text size="xs" tone="muted" className="text-center">{t("count.savedImmediately")}</Text>
       </> : finished ? <>
-        <div className="mx-auto flex size-28 items-center justify-center rounded-full bg-primary/15"><TrophyIcon className="size-14 text-primary" /></div>
-        <div className="space-y-2 text-center"><h1 className="text-3xl font-bold">{t(skipped || excluded ? "count.finishPartial" : "count.finishAll")}</h1><p role="status" className="text-sm text-muted-foreground">{t("count.summary", { counted, changed, skipped })}</p>{excluded > 0 && <p className="text-sm text-muted-foreground">{t("count.excludedProducts", { count: excluded })}</p>}</div>
-        <div className="grid grid-cols-3 gap-2 text-center">{[[counted, "count.counted"], [changed, "count.changed"], [skipped, "count.skipped"]].map(([value, label]) => <div key={label} className="rounded-2xl border bg-card p-4"><p className="text-3xl font-bold tabular-nums">{value}</p><p className="text-xs text-muted-foreground">{t(String(label))}</p></div>)}</div>
-        <p className="text-center text-xs text-muted-foreground">{t("count.savedImmediately")}</p>
+        <Inline gap="none" align="center" justify="center" className="mx-auto size-28 rounded-full bg-primary/15"><TrophyIcon className="size-14 text-primary" /></Inline>
+        <Stack gap="sm" className="text-center"><h1 className="text-3xl font-bold">{t(skipped || excluded ? "count.finishPartial" : "count.finishAll")}</h1><Text size="sm" tone="muted" role="status">{t("count.summary", { counted, changed, skipped })}</Text>{excluded > 0 && <Text size="sm" tone="muted">{t("count.excludedProducts", { count: excluded })}</Text>}</Stack>
+        <PageGrid gap="sm" className="grid-cols-3 text-center">{[[counted, "count.counted"], [changed, "count.changed"], [skipped, "count.skipped"]].map(([value, label]) => <div key={label} className="rounded-2xl border bg-card p-4"><Text size="3xl" weight="bold" className="tabular-nums">{value}</Text><Text size="xs" tone="muted">{t(String(label))}</Text></div>)}</PageGrid>
+        <Text size="xs" tone="muted" className="text-center">{t("count.savedImmediately")}</Text>
         {skipped > 0 && <Button variant="outline" onClick={() => { setQueue(queue.filter((entry) => answers[entry.id] && "skipped" in answers[entry.id]!)); setAnswers({}); setIndex(0); setDraft(""); }}>{t("count.retrySkipped")}</Button>}
         <Button asChild className="h-12"><Link to={returnTo}><CheckIcon />{origin ? t("count.returnToRecord") : t("count.back")}</Link></Button>
       </> : current && <>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-2"><p role="status" className="text-sm font-medium">{t("count.progress", { current: index + 1, total: queue.length })}</p><span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">{percent}%</span></div>
+        <Stack gap="3">
+          <Inline gap="sm" align="center" justify="between"><Text size="sm" weight="medium" role="status">{t("count.progress", { current: index + 1, total: queue.length })}</Text><span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">{percent}%</span></Inline>
           <div role="progressbar" aria-label={t("count.title")} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} className="h-2 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-all motion-reduce:transition-none" style={{ width: `${percent}%` }} /></div>
-          <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground"><span className="flex items-center gap-1"><MapPinIcon className="size-3" />{current.placeName}</span><span>{t("count.roomProgress", { current: roomDone, total: roomItems.length })}</span></div>
-        </div>
+          <Inline gap="sm" align="center" justify="between" className="text-xs text-muted-foreground"><span className="flex items-center gap-1"><MapPinIcon className="size-3" />{current.placeName}</span><span>{t("count.roomProgress", { current: roomDone, total: roomItems.length })}</span></Inline>
+        </Stack>
         <form onSubmit={(event) => { event.preventDefault(); void save(); }} className="flex min-w-0 flex-col gap-4 rounded-3xl border bg-card p-5 shadow-sm sm:p-8">
           <RecordImage src={images[current.productId] ?? current.productImageUrl} shape="avatar" fit="contain" className="mx-auto size-20 rounded-2xl" fallback={<PackageIcon className="size-10 text-primary" />} />
-          <div className="min-w-0 space-y-1 text-center"><h1 className="text-xl leading-tight font-bold break-words sm:text-2xl">{current.productName}</h1><p className="text-sm text-muted-foreground">{t("count.registered", { quantity: formatQuantity(current.quantity, locale), unit: current.unit ?? "" })}</p></div>
-          {current.alternativeNames.length > 0 && <p className="text-center text-xs break-words text-muted-foreground">{t("count.sharedWith", { names: current.alternativeNames.join(", ") })}</p>}
-          <div className="space-y-2"><label htmlFor={quantityId} className="block text-center text-sm font-medium">{t("count.actual")}</label><Input ref={input} id={quantityId} inputMode="decimal" autoComplete="off" value={draft} onChange={(event) => { setDraft(event.target.value); setError(null); }} disabled={saving} aria-describedby={error ? errorId : undefined} aria-invalid={Boolean(error)} className="h-16 text-center text-3xl! font-semibold tabular-nums" placeholder={t("count.quantityPlaceholder")} /></div>
-          {error && <p id={errorId} role="alert" className="text-sm text-destructive">{error}</p>}
+          <Stack gap="xs" className="min-w-0 text-center"><h1 className="text-xl leading-tight font-bold break-words sm:text-2xl">{current.productName}</h1><Text size="sm" tone="muted">{t("count.registered", { quantity: formatQuantity(current.quantity, locale), unit: current.unit ?? "" })}</Text></Stack>
+          {current.alternativeNames.length > 0 && <Text size="xs" tone="muted" className="text-center break-words">{t("count.sharedWith", { names: current.alternativeNames.join(", ") })}</Text>}
+          <Stack gap="sm"><label htmlFor={quantityId} className="block text-center text-sm font-medium">{t("count.actual")}</label><Input ref={input} id={quantityId} inputMode="decimal" autoComplete="off" value={draft} onChange={(event) => { setDraft(event.target.value); setError(null); }} disabled={saving} aria-describedby={error ? errorId : undefined} aria-invalid={Boolean(error)} className="h-16 text-center text-3xl! font-semibold tabular-nums" placeholder={t("count.quantityPlaceholder")} /></Stack>
+          {error && <Text size="sm" tone="danger" id={errorId} role="alert">{error}</Text>}
           <Button type="submit" className="h-12 w-full" loading={saving}><CheckIcon />{t("count.saveNext")}</Button>
           <Button type="button" variant="outline" className="h-11 w-full" disabled={saving} onClick={() => void save(current.quantity)}>{t("count.correct")}</Button>
-          <div className="space-y-2 border-t pt-4">
-            {shoppingAdded[current.productId] ? <p role="status" className="flex items-center justify-center gap-2 text-sm text-primary"><CheckIcon className="size-4 shrink-0" />{t(shoppingAdded[current.productId] === "added" ? "count.shoppingAdded" : "count.shoppingAlreadyListed")}</p> : shoppingFor === current.id ? <div className="space-y-2 rounded-xl border p-3">
+          <Stack gap="sm" className="border-t pt-4">
+            {shoppingAdded[current.productId] ? <Text size="sm" tone="primary" role="status" className="flex items-center justify-center gap-2"><CheckIcon className="size-4 shrink-0" />{t(shoppingAdded[current.productId] === "added" ? "count.shoppingAdded" : "count.shoppingAlreadyListed")}</Text> : shoppingFor === current.id ? <Stack gap="sm" className="rounded-xl border p-3">
               <label htmlFor={shoppingQuantityId} className="text-sm font-medium">{t("count.shoppingQuantity")}{current.unit && ` (${current.unit})`}</label>
               <Input id={shoppingQuantityId} inputMode="decimal" autoComplete="off" value={shoppingQuantity} disabled={saving} onChange={(event) => { setShoppingQuantity(event.target.value); setError(null); }} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); void addToShopping(); } }} />
-              <div className="flex flex-wrap gap-2"><Button type="button" disabled={saving} onClick={() => void addToShopping()}><ShoppingCartIcon />{t("count.shoppingConfirm")}</Button><Button type="button" variant="ghost" disabled={saving} onClick={() => { setShoppingFor(null); setError(null); }}>{t("count.shoppingCancel")}</Button></div>
-            </div> : <Button type="button" variant="outline" className="min-h-11 w-full whitespace-normal" disabled={saving} onClick={() => { setShoppingFor(current.id); setShoppingQuantity("1"); setError(null); }}><ShoppingCartIcon />{t("count.addToShopping")}</Button>}
+              <Inline gap="sm" align="stretch" wrap><Button type="button" disabled={saving} onClick={() => void addToShopping()}><ShoppingCartIcon />{t("count.shoppingConfirm")}</Button><Button type="button" variant="ghost" disabled={saving} onClick={() => { setShoppingFor(null); setError(null); }}>{t("count.shoppingCancel")}</Button></Inline>
+            </Stack> : <Button type="button" variant="outline" className="min-h-11 w-full whitespace-normal" disabled={saving} onClick={() => { setShoppingFor(current.id); setShoppingQuantity("1"); setError(null); }}><ShoppingCartIcon />{t("count.addToShopping")}</Button>}
             <Button type="button" variant="ghost" className="min-h-11 w-full whitespace-normal" disabled={saving || current.quantity <= 0} onClick={() => void setExclusion(current, !excludedFromStocktake(current))}>{t(excludedFromStocktake(current) ? "count.includeAgain" : "count.excludeUntilEmpty")}</Button>
-            <p className="text-center text-xs text-muted-foreground">{t("count.excludeDescription")}</p>
-          </div>
-          <div className="flex justify-between gap-2"><Button type="button" variant="ghost" disabled={saving || index === 0} onClick={() => move(index - 1)}><ArrowLeftIcon />{t("count.previous")}</Button><Button type="button" variant="ghost" disabled={saving} onClick={() => { if (!answers[current.id]) setAnswers((answers) => ({ ...answers, [current.id]: { skipped: true } })); move(index + 1); }}>{t("count.skip")}</Button></div>
+            <Text size="xs" tone="muted" className="text-center">{t("count.excludeDescription")}</Text>
+          </Stack>
+          <Inline gap="sm" align="stretch" justify="between"><Button type="button" variant="ghost" disabled={saving || index === 0} onClick={() => move(index - 1)}><ArrowLeftIcon />{t("count.previous")}</Button><Button type="button" variant="ghost" disabled={saving} onClick={() => { if (!answers[current.id]) setAnswers((answers) => ({ ...answers, [current.id]: { skipped: true } })); move(index + 1); }}>{t("count.skip")}</Button></Inline>
         </form>
-        <p className="text-center text-xs text-muted-foreground">{counted > 0 ? t("count.encourage", { count: counted }) : t("count.savedImmediately")}</p>
+        <Text size="xs" tone="muted" className="text-center">{counted > 0 ? t("count.encourage", { count: counted }) : t("count.savedImmediately")}</Text>
       </>}
-    </div>
+    </Stack>
   </main>;
 }
 

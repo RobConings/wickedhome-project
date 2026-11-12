@@ -1,3 +1,7 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
+import { PageGrid } from "@/components/layout/page-grid";
 import * as React from "react";
 import { RefreshCwIcon, SendIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -95,9 +99,9 @@ export function GoogleCalendarPanel({ settings, client, onStatus, onConnect, can
     (settings.publish.calendarId ?? OFF) !== target || [...settings.publish.categories].sort().join() !== [...categories].sort().join();
 
   return (
-    <div className="flex flex-col gap-4 pl-0 sm:pl-6">
+    <Stack gap="md" className="pl-0 sm:pl-6">
       {calendars.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("google.calendar.none")}</p>
+        <Text size="sm" tone="muted">{t("google.calendar.none")}</Text>
       ) : (
         <ul className="flex flex-col gap-2" aria-label={t("google.calendar.listLabel")}>
           {calendars.map((calendar) => (
@@ -130,7 +134,7 @@ export function GoogleCalendarPanel({ settings, client, onStatus, onConnect, can
         <InlineAlert tone="error">{t("google.calendar.failing", { names: failing.map((calendar) => calendar.name).join(", ") })}</InlineAlert>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
+      <Inline gap="sm" align="center" wrap>
         <Button size="sm" variant="outline" onClick={() => run("sync")} loading={busy === "sync"} disabled={busy !== null}>
           <RefreshCwIcon />
           {t("google.calendar.syncNow")}
@@ -141,23 +145,23 @@ export function GoogleCalendarPanel({ settings, client, onStatus, onConnect, can
         <span className="text-xs text-muted-foreground">
           {lastSynced ? t("google.calendar.lastSynced", { time: when(lastSynced) }) : t("google.calendar.neverSynced")}
         </span>
-      </div>
+      </Inline>
 
-      <div className="flex flex-col gap-3 border-t pt-4">
-        <div className="flex flex-col gap-0.5">
+      <Stack gap="3" className="border-t pt-4">
+        <Stack gap="0.5">
           <span className="flex items-center gap-2 text-sm font-medium">
             <SendIcon className="size-4 text-muted-foreground" aria-hidden="true" />
             {t("google.publish.title")}
           </span>
           <span className="text-xs text-muted-foreground">{t("google.publish.description")}</span>
-        </div>
+        </Stack>
         {!canPublish ? (
           <Button size="sm" variant="outline" className="w-fit" onClick={() => onConnect(["calendar_publish"])} disabled={connectDisabled}>
             {t("google.publish.allow")}
           </Button>
         ) : (
           <>
-            <div className="flex flex-col gap-1.5">
+            <Stack gap="1.5">
               <Label htmlFor="google-publish-target">{t("google.publish.target")}</Label>
               <Select value={target} onValueChange={setTarget}>
                 <SelectTrigger id="google-publish-target" className="w-full sm:w-72">
@@ -172,11 +176,11 @@ export function GoogleCalendarPanel({ settings, client, onStatus, onConnect, can
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </Stack>
             {target !== OFF && (
               <fieldset className="flex flex-col gap-2">
                 <legend className="mb-1 text-sm font-medium">{t("google.publish.categories")}</legend>
-                <div className="grid grid-cols-1 gap-1 sm:grid-cols-2">
+                <PageGrid gap="xs" className="sm:grid-cols-2">
                   {CALENDAR_CATEGORIES.map((category) => (
                     <label key={category} className="flex min-h-10 cursor-pointer items-center gap-2.5 text-sm">
                       <input
@@ -190,21 +194,21 @@ export function GoogleCalendarPanel({ settings, client, onStatus, onConnect, can
                       {tCalendar(`categories.${category}`)}
                     </label>
                   ))}
-                </div>
+                </PageGrid>
               </fieldset>
             )}
             {settings.publish.lastError && <InlineAlert tone="error">{t("google.publish.failed", { error: settings.publish.lastError })}</InlineAlert>}
             {settings.publish.calendarId && settings.publish.lastPublishedAt && (
-              <p className="text-xs text-muted-foreground">
+              <Text size="xs" tone="muted">
                 {t("google.publish.status", { count: settings.publish.publishedCount, time: when(settings.publish.lastPublishedAt) })}
-              </p>
+              </Text>
             )}
             <Button size="sm" className="w-fit" onClick={savePublish} loading={busy === "publish"} disabled={!publishChanged || busy !== null || (target !== OFF && categories.length === 0)}>
               {tCommon("actions.save")}
             </Button>
           </>
         )}
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   );
 }

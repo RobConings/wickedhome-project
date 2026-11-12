@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { AppWindowIcon, KeyRoundIcon, LinkIcon, PencilIcon, PlugIcon, PlusIcon, Trash2Icon, UnplugIcon, WandSparklesIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -89,15 +90,15 @@ function ConnectedApps({ apps, onDisconnect }: { apps: McpConnectedApp[]; onDisc
         label={t("oauth.connected.title")}
         storageKey="assistant-connected-apps"
         search={{ keys: (app) => [app.clientName, app.redirectHost, app.person] }}
-        emptyState={<p className="text-sm text-muted-foreground">{t("oauth.connected.empty")}</p>}
+        emptyState={<Text size="sm" tone="muted">{t("oauth.connected.empty")}</Text>}
         renderRow={(app) => (
-          <div className="flex items-center gap-2">
-            <div className="flex min-w-0 flex-1 flex-col">
+          <Inline gap="sm" align="center">
+            <Stack gap="none" className="min-w-0 flex-1">
               <span className="truncate text-sm font-medium">{app.clientName}</span>
               <span className="text-xs text-muted-foreground break-words">{meta(app).join(" · ")}</span>
-            </div>
+            </Stack>
             {revoke(app)}
-          </div>
+          </Inline>
         )}
         renderTile={(app) => (
           <Card className="gap-2 p-4">
@@ -148,22 +149,22 @@ function DcrSection({ overview, onSettings, client }: { overview: McpOAuthOvervi
           <Inline gap="md" justify="between" align="start">
             <Stack gap="xs" className="min-w-0">
               <Label htmlFor={`${id}-dcr`}>{t("oauth.dcr.switch")}</Label>
-              <p className="text-xs text-muted-foreground text-pretty">{t("oauth.dcr.switchHelp")}</p>
+              <Text size="xs" tone="muted" className="text-pretty">{t("oauth.dcr.switchHelp")}</Text>
             </Stack>
             <Switch id={`${id}-dcr`} checked={settings.dcrEnabled} disabled={saving} onCheckedChange={(checked) => void toggle(checked)} />
           </Inline>
           <Stack gap="xs">
             <span className="text-sm font-medium">{t("oauth.dcr.hostsLabel")}</span>
             {settings.allowedHosts.length ? (
-              <div className="flex flex-wrap gap-1.5">
+              <Inline gap="1.5" align="stretch" wrap>
                 {settings.allowedHosts.map((host) => (
                   <Badge key={host} variant="outline">
                     {host}
                   </Badge>
                 ))}
-              </div>
+              </Inline>
             ) : (
-              <p className="text-sm text-muted-foreground">{t("oauth.dcr.noHosts")}</p>
+              <Text size="sm" tone="muted">{t("oauth.dcr.noHosts")}</Text>
             )}
           </Stack>
           <GeneralFormDialog<McpOAuthActionResult>
@@ -240,7 +241,7 @@ function AppsSection({ overview, onCreated, onDeleted, client }: { overview: Mcp
 
   return (
     <Stack gap="sm">
-      <p className="text-sm text-pretty">{t("oauth.apps.howTo")}</p>
+      <Text size="sm" className="text-pretty">{t("oauth.apps.howTo")}</Text>
       <GeneralList
         items={overview.apps}
         getKey={(app) => app.id}
@@ -249,13 +250,13 @@ function AppsSection({ overview, onCreated, onDeleted, client }: { overview: Mcp
         search={{ keys: (app) => [app.name, app.clientId, ...app.redirectUris] }}
         emptyState={<EmptyState icon={AppWindowIcon} title={t("oauth.apps.empty")} className="py-4" />}
         renderRow={(app) => (
-          <div className="flex items-center gap-2">
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <Inline gap="sm" align="center">
+            <Stack gap="0.5" className="min-w-0 flex-1">
               <span className="truncate text-sm font-medium">{app.name}</span>
               {details(app)}
-            </div>
+            </Stack>
             {remove(app)}
-          </div>
+          </Inline>
         )}
         renderTile={(app) => (
           <Card className="gap-2 p-4">
@@ -367,17 +368,17 @@ export function McpConnectionsPanel({ client = assistantClient, oauthClient = mc
 
   return (
     <section className="flex flex-col gap-3 rounded-lg border px-3 py-3" aria-labelledby={`${id}-title`}>
-      <div className="flex flex-col gap-1">
+      <Stack gap="xs">
         <h3 id={`${id}-title`} className="flex items-center gap-2 text-sm font-semibold">
           <PlugIcon className="size-4" aria-hidden />
           {t("connect.title")}
         </h3>
-        <p className="text-sm text-muted-foreground text-pretty">{t("connect.description")}</p>
-      </div>
+        <Text size="sm" tone="muted" className="text-pretty">{t("connect.description")}</Text>
+      </Stack>
       <SegmentedControl options={methods} value={method} onChange={setMethod} label={t("connect.title")} className="max-w-full" />
-      <p className="text-sm text-pretty" aria-live="polite">
+      <Text size="sm" className="text-pretty" aria-live="polite">
         <span className="font-medium">{t("connect.whenLabel")}</span> {t(`connect.when.${method}`)}
-      </p>
+      </Text>
 
       {method === "token" && <McpTokensPanel client={client} />}
       {method === "dcr" && oauthBody((data) => <DcrSection overview={data} client={oauthClient} onSettings={(settings) => update((current) => ({ ...current, settings }))} />)}

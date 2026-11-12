@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { DownloadIcon, EyeIcon, FolderOpenIcon, MoreVerticalIcon, PaperclipIcon, UnlinkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -122,26 +125,26 @@ export function DocumentAttachments({
       </CardHeader>
 
       {status === "loading" ? (
-        <div className="flex flex-col" role="status" aria-label={t("loading.attachments")}>
+        <Stack gap="none"  role="status" aria-label={t("loading.attachments")}>
           {[55, 40].map((width) => (
-            <div key={width} className="flex items-center gap-3 px-1 py-1.5">
+            <Inline gap="md" align="center" key={width} className="px-1 py-1.5">
               <Skeleton className="size-8 shrink-0 rounded-lg" />
-              <div className="flex flex-1 flex-col gap-1.5">
+              <Stack gap="1.5" className="flex-1">
                 <Skeleton className="h-4" style={{ width: `${width + 20}%` }} />
                 <Skeleton className="h-3" style={{ width: `${width}%` }} />
-              </div>
-            </div>
+              </Stack>
+            </Inline>
           ))}
-        </div>
+        </Stack>
       ) : status === "error" ? (
-        <div className="flex items-center justify-between gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm">
+        <Inline gap="sm" align="center" justify="between" className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm">
           {t("attachments.loadFailed")}
           <Button size="sm" variant="outline" onClick={reload}>
             {t("attachments.retry")}
           </Button>
-        </div>
+        </Inline>
       ) : files.length === 0 && !allowAdding ? (
-        <p className="text-sm text-muted-foreground">{t("attachments.empty")}</p>
+        <Text size="sm" tone="muted">{t("attachments.empty")}</Text>
       ) : (
         files.length > 0 && (
           <ul className="flex flex-col">
@@ -155,7 +158,7 @@ export function DocumentAttachments({
                 )}
               >
                 <FileTypeIcon mimeType={file.mimeType} name={file.name} size="sm" />
-                <div className="flex min-w-0 flex-1 flex-col">
+                <Stack gap="none" className="min-w-0 flex-1">
                   <Link to={`/documents/files/${encodeURIComponent(file.id)}`} className="truncate text-left text-sm font-medium outline-none after:absolute after:inset-0 after:rounded-lg focus-visible:after:ring-[3px] focus-visible:after:ring-ring/50" title={file.name}>
                     {file.name}
                   </Link>
@@ -166,7 +169,7 @@ export function DocumentAttachments({
                       {fileNote?.(file) ? <> · {fileNote(file)}</> : null}
                     </span>
                   </span>
-                </div>
+                </Stack>
                 {busyIds.has(file.id) ? (
                   // Being attached or detached: no menu until the server answered.
                   <span className="relative z-[1] grid size-8 shrink-0 place-items-center">

@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { PackageIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -56,16 +59,16 @@ export function TaskMaterialsPanel({ taskId, canManage, placeId, onChange, initi
   const bought = visible.filter((item) => item.status === "bought").length;
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       {actions.confirmation}
-      <div className="flex items-center justify-between gap-3">
+      <Inline gap="md" align="center" justify="between">
         <h3 className="font-semibold">{t("task.title")}</h3>
         {visible.length > 0 && (
           <span className="text-sm text-muted-foreground tabular-nums">
             {t("task.progress", { bought, total: visible.length })}
           </span>
         )}
-      </div>
+      </Inline>
 
       {items === null ? (
         failed ? (
@@ -74,10 +77,10 @@ export function TaskMaterialsPanel({ taskId, canManage, placeId, onChange, initi
           <ShoppingItemsSkeleton className="rounded-lg" />
         )
       ) : visible.length === 0 ? (
-        <p className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-4 text-sm text-muted-foreground">
+        <Text size="sm" tone="muted" className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-4">
           <PackageIcon className="size-4 shrink-0" aria-hidden="true" />
           {canManage ? t("task.emptyManage") : t("task.empty")}
-        </p>
+        </Text>
       ) : (
         <ul className="divide-y rounded-lg border bg-card px-3">
           {visible.map((item) => (
@@ -102,7 +105,7 @@ export function TaskMaterialsPanel({ taskId, canManage, placeId, onChange, initi
           previewLink={previewLink}
         />
       )}
-    </div>
+    </Stack>
   );
 }
 

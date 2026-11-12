@@ -1,3 +1,5 @@
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { FileUpIcon, FlameIcon, ZapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -83,10 +85,10 @@ export function EnergyOverviewScreen({
       <PageHeader title={t("page.overview.title")} description={t("page.overview.description")} actions={importButton} />
       <Stack gap="lg">
         <EnergyNav />
-        <div className="flex flex-col gap-3">
+        <Stack gap="3">
           <EnergyCarrierTabs carrier={carrier} period={period} date={date} />
           <EnergyPeriodNav period={period} date={date} today={today} carrier={carrier} pending={pending} />
-        </div>
+        </Stack>
       </Stack>
 
       <PendingContent pending={pending} label={pendingLabel}>
@@ -106,19 +108,19 @@ export function EnergyOverviewScreen({
 function EnergyOverviewSkeleton({ carrier }: { carrier: SummaryView }) {
   const { t } = useTranslation("energy");
   return (
-    <div className="flex flex-col gap-8">
-      <p role="status" className="sr-only">
+    <Stack gap="8">
+      <Text role="status" className="sr-only">
         {t("loading.overview")}
-      </p>
+      </Text>
       <SkeletonTiles count={carrier === "gas" ? 2 : 4} />
       <PageGrid columns="main-sidebar">
-        <div className="flex min-w-0 flex-col gap-6">
+        <Stack gap="lg" className="min-w-0">
           <SkeletonBlock className="h-[22rem]" />
           {carrier === "electricity" && <SkeletonBlock className="h-48" />}
-        </div>
+        </Stack>
         <SkeletonBlock className={carrier === "electricity" ? "h-[26rem]" : "h-48"} />
       </PageGrid>
-    </div>
+    </Stack>
   );
 }
 
@@ -167,7 +169,7 @@ function EnergyOverviewContent({ summary, setup, canManage, importButton }: Ener
         description={t("empty.overview.description")}
         action={
           canManage && (
-            <div className="flex flex-wrap justify-center gap-2">
+            <Inline gap="sm" align="stretch" justify="center" wrap>
               {importButton}
               {!status.hasSolar && (
                 <Button asChild variant="outline">
@@ -179,7 +181,7 @@ function EnergyOverviewContent({ summary, setup, canManage, importButton }: Ener
                   <Link to="/energy/appliances">{t("empty.overview.appliances")}</Link>
                 </Button>
               )}
-            </div>
+            </Inline>
           )
         }
       />
@@ -187,17 +189,17 @@ function EnergyOverviewContent({ summary, setup, canManage, importButton }: Ener
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <Stack gap="8">
       {electricityCounts && status.hasSolar && !status.solarMeasured && (
         <InlineAlert>
-          <p className="font-medium">{t("notices.solarNotMeasured.title")}</p>
-          <p className="text-muted-foreground">{t("notices.solarNotMeasured.description")}</p>
+          <Text weight="medium">{t("notices.solarNotMeasured.title")}</Text>
+          <Text tone="muted">{t("notices.solarNotMeasured.description")}</Text>
         </InlineAlert>
       )}
       {electricityCounts && status.hasBattery && !status.batteryMeasured && (
         <InlineAlert>
-          <p className="font-medium">{t("notices.batteryNotMeasured.title")}</p>
-          <p className="text-muted-foreground">{t("notices.batteryNotMeasured.description")}</p>
+          <Text weight="medium">{t("notices.batteryNotMeasured.title")}</Text>
+          <Text tone="muted">{t("notices.batteryNotMeasured.description")}</Text>
         </InlineAlert>
       )}
       {carrier === "total" && (!status.hasElectricityData || !status.hasGasData) && (
@@ -222,6 +224,6 @@ function EnergyOverviewContent({ summary, setup, canManage, importButton }: Ener
           <ApplianceBreakdown breakdown={summary.breakdown} className="min-w-0 self-start" />
         </PageGrid>
       )}
-    </div>
+    </Stack>
   );
 }

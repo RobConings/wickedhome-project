@@ -1,3 +1,4 @@
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { BookOpenIcon, ChefHatIcon, PackageIcon, PlusIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -146,7 +147,7 @@ export function RecipesScreen({ recipes, mealPlan, categories = [], products, sh
         </TabsContent>
 
         <TabsContent value="all" className="flex min-w-0 flex-col gap-3">
-          {productId && <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-section-border bg-section-soft px-3 py-2">
+          {productId && <Inline gap="sm" align="center" justify="between" wrap className="rounded-xl border border-section-border bg-section-soft px-3 py-2">
             <span className="inline-flex min-w-0 items-center gap-2 text-sm font-medium"><PackageIcon className="size-4 shrink-0 text-section" />
               {t("filter.linkedProduct", { name: linkedProduct?.name ?? t("filter.unknownProduct") })}
             </span>
@@ -155,7 +156,7 @@ export function RecipesScreen({ recipes, mealPlan, categories = [], products, sh
             }, { replace: true, preventScrollReset: true })}>
               <XIcon />{t("filter.clearProduct")}
             </Button>
-          </div>}
+          </Inline>}
           <GeneralList
             label={t("tabs.all")}
             items={visibleRecipes}

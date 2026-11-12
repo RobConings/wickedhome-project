@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import { HaScenesPanel } from "../components/ha-scenes-panel";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
@@ -66,10 +67,10 @@ export function HomeAssistantScreen({ status, entities, suggestions, energy, ala
           {canManage && (
             <Card>
               <CardHeader>
-                <div className="flex flex-col gap-1">
+                <Stack gap="xs">
                   <CardTitle>{t("import.title")}</CardTitle>
                   <CardDescription>{t("import.description")}</CardDescription>
-                </div>
+                </Stack>
               </CardHeader>
               <React.Suspense fallback={<SkeletonList rows={4} />}>
                 <Await resolve={suggestions} errorElement={failed}>
@@ -83,10 +84,10 @@ export function HomeAssistantScreen({ status, entities, suggestions, energy, ala
 
           <Card>
             <CardHeader>
-              <div className="flex flex-col gap-1">
+              <Stack gap="xs">
                 <CardTitle>{t("energy.title")}</CardTitle>
                 <CardDescription>{t("energy.description")}</CardDescription>
-              </div>
+              </Stack>
             </CardHeader>
             <React.Suspense fallback={<SkeletonBlock className="h-48" />}>
               <Await resolve={energyData} errorElement={failed}>
@@ -98,10 +99,10 @@ export function HomeAssistantScreen({ status, entities, suggestions, energy, ala
           {canManage && (
             <Card>
               <CardHeader>
-                <div className="flex flex-col gap-1">
+                <Stack gap="xs">
                   <CardTitle>{t("entities.title")}</CardTitle>
                   <CardDescription>{t("entities.description")}</CardDescription>
-                </div>
+                </Stack>
               </CardHeader>
               <React.Suspense fallback={<SkeletonList rows={6} />}>
                 <Await resolve={entities} errorElement={failed}>
@@ -114,18 +115,18 @@ export function HomeAssistantScreen({ status, entities, suggestions, energy, ala
           {canManage && (
             <Card>
               <CardHeader>
-                <div className="flex flex-col gap-1">
+                <Stack gap="xs">
                   <CardTitle>{t("alarm.log.title")}</CardTitle>
                   <CardDescription>{t("alarm.log.description")}</CardDescription>
-                </div>
+                </Stack>
               </CardHeader>
               <React.Suspense fallback={<SkeletonList rows={3} />}>
                 <Await resolve={alarm} errorElement={failed}>
                   {(overview) => (
-                    <div className="flex flex-col gap-4">
+                    <Stack gap="md">
                       {overview && overview.panels.length > 1 && <AlarmPanelSelect overview={overview} />}
                       <AlarmLogList entries={overview?.log ?? []} />
-                    </div>
+                    </Stack>
                   )}
                 </Await>
               </React.Suspense>
@@ -143,7 +144,7 @@ function AlarmPanelSelect({ overview }: { overview: AlarmOverview }) {
   const fetcher = useFetcher<HomeAssistantActionResult>({ key: "ha-alarm-panel" });
   const pending = (fetcher.json as { settings?: { alarmEntityId?: string } } | undefined)?.settings?.alarmEntityId;
   return (
-    <div className="flex flex-col gap-1.5 sm:max-w-sm">
+    <Stack gap="1.5" className="sm:max-w-sm">
       <Label htmlFor="ha-alarm-panel">{t("alarm.panel")}</Label>
       <Select
         value={pending ?? overview.panel?.entityId}
@@ -160,6 +161,6 @@ function AlarmPanelSelect({ overview }: { overview: AlarmOverview }) {
           ))}
         </SelectContent>
       </Select>
-    </div>
+    </Stack>
   );
 }

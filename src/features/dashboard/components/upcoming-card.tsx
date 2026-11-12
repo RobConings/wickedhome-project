@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import { useTranslation } from "react-i18next";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
@@ -27,10 +29,10 @@ export function UpcomingCard({ today, expenses, tasks }: UpcomingCardProps) {
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-col gap-1">
+        <Stack gap="xs">
           <CardTitle>{t("upcoming.title")}</CardTitle>
           <CardDescription>{t("upcoming.description")}</CardDescription>
-        </div>
+        </Stack>
       </CardHeader>
 
       {failures === sources.length ? (
@@ -43,7 +45,7 @@ export function UpcomingCard({ today, expenses, tasks }: UpcomingCardProps) {
               {items.map((item) => (
                 <li key={item.id} className="flex items-center gap-3">
                   <DateBlock date={item.date} />
-                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <Stack gap="0.5" className="min-w-0 flex-1">
                     <Link to={item.href} className="truncate text-sm font-medium outline-none hover:underline focus-visible:underline">
                       {item.title}
                     </Link>
@@ -56,12 +58,12 @@ export function UpcomingCard({ today, expenses, tasks }: UpcomingCardProps) {
                         .filter(Boolean)
                         .join(" · ")}
                     </span>
-                  </div>
+                  </Stack>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="py-2 text-sm text-muted-foreground">{t("upcoming.empty")}</p>
+            <Text size="sm" tone="muted" className="py-2">{t("upcoming.empty")}</Text>
           )}
         </>
       )}

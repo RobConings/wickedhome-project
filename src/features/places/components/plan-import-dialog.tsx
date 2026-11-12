@@ -1,3 +1,7 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { PageGrid } from "@/components/layout/page-grid";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { ArrowLeftIcon, CropIcon, FileUpIcon, MaximizeIcon, MinusIcon, PlusIcon, RotateCcwIcon, RotateCwIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -275,7 +279,7 @@ export function PlanImportDialog({
         </DialogHeader>
 
         {step.type === "file" && (
-          <div className="flex flex-col gap-3">
+          <Stack gap="3">
             {step.error && <InlineAlert tone="error">{step.error}</InlineAlert>}
             <FileDropZone
               accept={PLAN_IMPORT_ACCEPT}
@@ -285,8 +289,8 @@ export function PlanImportDialog({
               description={t("editor.import.dropDescription")}
               buttonLabel={t("editor.import.choose")}
             />
-            <p className="text-xs text-muted-foreground">{t("editor.import.privacy")}</p>
-          </div>
+            <Text size="xs" tone="muted">{t("editor.import.privacy")}</Text>
+          </Stack>
         )}
 
         {step.type === "opening" && (
@@ -304,7 +308,7 @@ export function PlanImportDialog({
         )}
 
         {(step.type === "crop" || step.type === "importing") && source && (
-          <div className="relative flex min-h-0 flex-col gap-3">
+          <Stack gap="3" className="relative min-h-0">
             <PlanCropStep
               key={`${step.page}`}
               source={source}
@@ -318,7 +322,7 @@ export function PlanImportDialog({
               north={north}
             />
             {step.type === "importing" && (
-              <div className="absolute inset-0 grid place-items-center rounded-lg bg-background/70 backdrop-blur-sm">
+              <PageGrid gap="none" className="absolute inset-0 place-items-center rounded-lg bg-background/70 backdrop-blur-sm">
                 <PlanImportBusy
                   className="w-full max-w-sm rounded-xl border bg-popover p-4 shadow-md"
                   label={t(`editor.import.stage.${step.stage}`)}
@@ -326,10 +330,10 @@ export function PlanImportDialog({
                   onCancel={() => abort.current?.abort()}
                   cancelLabel={t("editor.import.cancel")}
                 />
-              </div>
+              </PageGrid>
             )}
             {importError && <InlineAlert tone="error">{importError}</InlineAlert>}
-          </div>
+          </Stack>
         )}
 
         {(step.type === "crop" || step.type === "importing" || step.type === "pages") && (
@@ -344,7 +348,7 @@ export function PlanImportDialog({
               {step.type === "crop" && pageCount > 1 ? t("editor.import.otherPage") : t("editor.import.otherFile")}
             </Button>
             {step.type !== "pages" && (
-              <div className="flex flex-wrap gap-2">
+              <Inline gap="sm" align="stretch" wrap>
                 <Button
                   type="button"
                   variant="secondary"
@@ -363,7 +367,7 @@ export function PlanImportDialog({
                   <CropIcon />
                   {t("editor.import.importCrop")}
                 </Button>
-              </div>
+              </Inline>
             )}
           </DialogFooter>
         )}
@@ -390,11 +394,11 @@ export function PlanImportBusy({
 }) {
   return (
     <div role="status" aria-live="polite" className={cn("flex flex-col gap-3 py-6", className)}>
-      <p className="flex items-center gap-2 text-sm font-medium">
+      <Text size="sm" weight="medium" className="flex items-center gap-2">
         <Spinner className="size-4" />
         {label}
         {progress !== null && <span className="ml-auto text-muted-foreground tabular-nums">{Math.round(progress * 100)} %</span>}
-      </p>
+      </Text>
       <Progress value={progress === null ? null : progress * 100} label={label} />
       {onCancel && (
         <Button type="button" variant="outline" size="sm" className="self-end" onClick={onCancel}>
@@ -430,12 +434,12 @@ export function PlanPagePicker({ pdf, onPick }: { pdf: PDFDocumentProxy; onPick:
   }, [pdf]);
 
   return (
-    <div className="flex min-h-0 flex-col gap-3">
+    <Stack gap="3" className="min-h-0">
       {done < thumbs.length && (
-        <div className="flex flex-col gap-1.5" role="status">
-          <p className="text-xs text-muted-foreground">{t("editor.import.renderingPages", { done, count: thumbs.length })}</p>
+        <Stack gap="1.5"  role="status">
+          <Text size="xs" tone="muted">{t("editor.import.renderingPages", { done, count: thumbs.length })}</Text>
           <Progress value={(done / thumbs.length) * 100} label={t("editor.import.renderingPages", { done, count: thumbs.length })} />
-        </div>
+        </Stack>
       )}
       <ul className="grid min-h-0 grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-4">
         {thumbs.map((thumb, index) => (
@@ -455,7 +459,7 @@ export function PlanPagePicker({ pdf, onPick }: { pdf: PDFDocumentProxy; onPick:
           </li>
         ))}
       </ul>
-    </div>
+    </Stack>
   );
 }
 
@@ -624,10 +628,10 @@ export function PlanCropStep({
       : undefined;
 
   return (
-    <div className="flex min-h-0 flex-col gap-2">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="min-w-0 text-xs text-muted-foreground">{value ? t("editor.import.cropSelected") : t("editor.import.cropHint")}</p>
-        <div className="flex flex-wrap items-center gap-2">
+    <Stack gap="sm" className="min-h-0">
+      <Inline gap="sm" align="center" justify="between" wrap>
+        <Text size="xs" tone="muted" className="min-w-0">{value ? t("editor.import.cropSelected") : t("editor.import.cropHint")}</Text>
+        <Inline gap="sm" align="center" wrap>
         {onRotate && (
           <div role="group" aria-label={t("editor.import.rotation", { degrees: quarter })} className="inline-flex items-center gap-0.5 rounded-lg border p-0.5">
             <Button
@@ -669,14 +673,14 @@ export function PlanCropStep({
             {t("editor.zoom.fit")}
           </Button>
         </div>
-        </div>
-      </div>
+        </Inline>
+      </Inline>
       <div className="relative">
       {north !== null && (
-        <div className="pointer-events-none absolute top-2 right-2 z-10 flex flex-col items-center gap-1">
+        <Stack gap="xs" align="center" className="pointer-events-none absolute top-2 right-2 z-10">
           <PlanCompass north={north} size="sm" />
           <span className="rounded-full bg-popover/95 px-2 py-0.5 text-[11px] text-muted-foreground shadow-sm">{t("orientation.importHint")}</span>
-        </div>
+        </Stack>
       )}
       <div ref={scrollRef} className="relative h-[min(60vh,40rem)] overflow-auto rounded-lg border bg-muted">
         <div
@@ -723,17 +727,17 @@ export function PlanCropStep({
             style={canvasStyle}
           />
           {status === "rendering" && (
-            <div className="absolute inset-0 grid min-h-48 place-items-center">
+            <PageGrid gap="none" className="absolute inset-0 min-h-48 place-items-center">
               <span role="status" className="inline-flex items-center gap-2 text-sm text-muted-foreground">
                 <Spinner className="size-4" />
                 {t("editor.import.renderingPage")}
               </span>
-            </div>
+            </PageGrid>
           )}
           {status === "error" && (
-            <div className="absolute inset-0 grid min-h-48 place-items-center p-4">
+            <PageGrid gap="none" className="absolute inset-0 min-h-48 place-items-center p-4">
               <InlineAlert tone="error">{t("editor.import.renderFailed")}</InlineAlert>
-            </div>
+            </PageGrid>
           )}
           {shown && (
             <div
@@ -744,6 +748,6 @@ export function PlanCropStep({
         </div>
       </div>
       </div>
-    </div>
+    </Stack>
   );
 }

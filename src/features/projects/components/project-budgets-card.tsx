@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import { FolderKanbanIcon } from "lucide-react";
@@ -21,15 +24,15 @@ type ProjectBudgetsCardProps = {
 /** "Projects" card for the money flow page: the running projects of the month and their budget status. */
 export function ProjectBudgetsCard({ data, month }: ProjectBudgetsCardProps) {
   const { t } = useTranslation("projects");
-  const failed = <p className="text-sm text-muted-foreground">{t("summary.error")}</p>;
+  const failed = <Text size="sm" tone="muted">{t("summary.error")}</Text>;
   const content =
     data instanceof Promise ? (
       <React.Suspense
         fallback={
-          <div className="flex flex-col gap-3" role="status" aria-label={t("summary.loading")}>
+          <Stack gap="3"  role="status" aria-label={t("summary.loading")}>
             <Skeleton className="h-12 rounded-lg" />
             <Skeleton className="h-12 rounded-lg" />
-          </div>
+          </Stack>
         }
       >
         <Await resolve={data} errorElement={failed}>
@@ -44,14 +47,14 @@ export function ProjectBudgetsCard({ data, month }: ProjectBudgetsCardProps) {
 
   return (
     <Card className="gap-3">
-      <div className="flex items-center gap-2">
+      <Inline gap="sm" align="center">
         <FolderKanbanIcon className="size-4 text-muted-foreground" aria-hidden="true" />
         <CardTitle>
           <Link to="/projects" className="hover:underline">
             {t("page.title")}
           </Link>
         </CardTitle>
-      </div>
+      </Inline>
       {content}
     </Card>
   );

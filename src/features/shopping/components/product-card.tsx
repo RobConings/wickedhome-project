@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { RecordImage } from "@/components/shared/record-image";
 import { RecordLink } from "@/components/shared/record-link";
 import { BarcodeIcon, ExternalLinkIcon, PencilIcon, PlusIcon, QrCodeIcon, ShoppingCartIcon, XIcon } from "lucide-react";
@@ -42,11 +45,11 @@ export function ProductCard({ product, shops, canManage, initialSelections, prod
   return (
     <Card className={cn("gap-0 overflow-hidden p-0 transition-opacity", actions.deleting && "opacity-60")} aria-busy={actions.busy || undefined}>
       <RecordImage src={product.imageUrl} alt={product.name} fit="contain" className="aspect-[4/3] w-full rounded-none border-b" fallback={<ProductCategoryIcon category={product.category} className="size-12 text-section" />} />
-      <div className="flex min-w-0 flex-1 flex-col gap-3 p-4">
-      <div className="flex items-start justify-between gap-2">
+      <Stack gap="3" className="min-w-0 flex-1 p-4">
+      <Inline gap="sm" align="start" justify="between">
         <div className="min-w-0">
           <h3 className="leading-tight font-semibold break-words"><RecordLink to={`/inventory/products/${encodeURIComponent(product.id)}`} className="hover:underline">{product.name}</RecordLink></h3>
-          {product.brand && <p className="mt-1 text-sm break-words text-muted-foreground">{product.brand}</p>}
+          {product.brand && <Text size="sm" tone="muted" className="mt-1 break-words">{product.brand}</Text>}
         </div>
         <Button
           variant="ghost"
@@ -59,9 +62,9 @@ export function ProductCard({ product, shops, canManage, initialSelections, prod
         >
           <ShoppingCartIcon />
         </Button>
-      </div>
+      </Inline>
 
-      <div className="flex min-w-0 flex-col gap-1">
+      <Stack gap="xs" className="min-w-0">
         <span><ProductEssentialBadge isEssential={product.isEssential} /></span>
         <span className="text-xs text-muted-foreground">
           {[t(`categories.${product.category}`), product.unit].filter(Boolean).join(" · ")}
@@ -83,9 +86,9 @@ export function ProductCard({ product, shops, canManage, initialSelections, prod
             )}
           </span>
         )}
-      </div>
+      </Stack>
 
-      <div className="flex min-w-0 flex-col gap-1.5">
+      <Stack gap="1.5" className="min-w-0">
         <span className="text-xs font-medium text-muted-foreground">{t("products.links")}</span>
         {shopLinks.length === 0 && !defaultShop ? (
           <span className="text-sm text-muted-foreground">{t("products.noLinks")}</span>
@@ -143,10 +146,10 @@ export function ProductCard({ product, shops, canManage, initialSelections, prod
             })}
           </ul>
         )}
-      </div>
+      </Stack>
 
       {canManage && (
-        <div className="mt-auto flex flex-wrap items-center gap-2 border-t pt-3">
+        <Inline gap="sm" align="center" wrap className="mt-auto border-t pt-3">
           <ProductLinkFormDialog
             product={product}
             shops={shops}
@@ -160,9 +163,9 @@ export function ProductCard({ product, shops, canManage, initialSelections, prod
           />
           <span className="flex-1" />
           <ProductActions product={product} shops={shops} products={products} onDelete={actions.deleteProduct} initialSelections={initialSelections} />
-        </div>
+        </Inline>
       )}
-      </div>
+      </Stack>
     </Card>
   );
 }

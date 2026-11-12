@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import { FolderKanbanIcon, ListChecksIcon, PlugIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RecordLink } from "@/components/shared/record-link";
@@ -22,8 +24,8 @@ export function HomeRoomSummary({ data, roomId, live = true, now }: { data: Home
     { id: "tasks", title: t("rooms.tasks"), icon: ListChecksIcon, unknown: !data.tasks, empty: t("rooms.noTasks"), rows: tasks?.map((task) => <li key={task.id}><RecordLink to={`/tasks/${encodeURIComponent(task.id)}`} className="flex min-h-11 items-center rounded-lg px-2 hover:bg-muted">{task.title}</RecordLink></li>) ?? [] },
     { id: "projects", title: t("rooms.projects"), icon: FolderKanbanIcon, unknown: !data.projects, empty: t("rooms.noProjects"), rows: projects?.map((project) => <li key={project.id}><RecordLink to={`/projects/${encodeURIComponent(project.id)}`} className="flex min-h-11 items-center gap-2 rounded-lg px-2 hover:bg-muted"><ProjectAvatar project={project} size="sm" />{project.name}</RecordLink></li>) ?? [] },
   ];
-  return <div className="flex flex-col gap-4">{groups.map(({ id, title, icon: Icon, unknown, empty, rows }) => <section key={id} aria-label={title}>
+  return <Stack gap="md">{groups.map(({ id, title, icon: Icon, unknown, empty, rows }) => <section key={id} aria-label={title}>
     <h3 className="mb-1 flex items-center gap-2 font-semibold"><Icon className="size-4 text-section" aria-hidden="true" />{title}</h3>
-    {rows.length > 0 ? <ul>{rows}</ul> : <p className="text-sm text-muted-foreground">{unknown ? t("loadError") : empty}</p>}
-  </section>)}</div>;
+    {rows.length > 0 ? <ul>{rows}</ul> : <Text size="sm" tone="muted">{unknown ? t("loadError") : empty}</Text>}
+  </section>)}</Stack>;
 }

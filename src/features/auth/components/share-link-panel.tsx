@@ -1,3 +1,5 @@
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { CheckIcon, CopyIcon, Share2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -83,8 +85,8 @@ export function ShareLinkPanel({ url, kind, personName, householdName, expiresAt
           <LinkQrCode value={url} label={t("share.qrLabel", { name: personName })} className="aspect-square w-full border" />
         </React.Suspense>
       </div>
-      <p className="text-center text-sm text-muted-foreground">{t(`${prefix}.scanHint`, { name: personName })}</p>
-      <div className="flex min-w-0 gap-2">
+      <Text size="sm" tone="muted" className="text-center">{t(`${prefix}.scanHint`, { name: personName })}</Text>
+      <Inline gap="sm" align="stretch" className="min-w-0">
         <Input
           ref={inputRef}
           readOnly
@@ -97,19 +99,19 @@ export function ShareLinkPanel({ url, kind, personName, householdName, expiresAt
           {copied ? <CheckIcon /> : <CopyIcon />}
           {copied ? t("share.copiedShort") : t("share.copy")}
         </Button>
-      </div>
+      </Inline>
       {canShare && (
         <Button type="button" size="lg" onClick={() => void share()}>
           <Share2Icon />
           {t("share.share")}
         </Button>
       )}
-      <p className="text-xs text-muted-foreground">
+      <Text size="xs" tone="muted">
         {t(`${prefix}.expires`, {
           date: formatDateTime(expiresAt, currentLocale()),
         })}{" "}
         {t("share.once")}
-      </p>
+      </Text>
     </Stack>
   );
 }

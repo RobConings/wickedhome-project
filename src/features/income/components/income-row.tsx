@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import { RecordLink } from "@/components/shared/record-link";
 import { CalendarClockIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -45,16 +47,16 @@ export function IncomeRow({ income, habitants, sources, accounts, today, tile = 
 
   if (tile) {
     return (
-      <div className="flex h-full flex-col gap-1">
+      <Stack gap="xs" className="h-full">
         <span className={cn("text-lg font-semibold tabular-nums", !received && "text-muted-foreground")}>{money(income.amountCents)}</span>
         <RecordLink to={`/income/receipts/${encodeURIComponent(income.id)}`} className="break-words text-sm font-medium underline">{title}</RecordLink>
         {received ? <span className="text-xs text-muted-foreground">{dateText(income.date)}</span> : <span>{upcomingBadge}</span>}
         <span className="line-clamp-2 text-xs text-muted-foreground">{details}</span>
-      </div>
+      </Stack>
     );
   }
   return (
-    <div className="flex min-h-11 items-center gap-3">
+    <Inline gap="md" align="center" className="min-h-11">
       <span className="grid size-8 shrink-0 place-items-center">{habitant && <HabitantAvatar habitant={habitant} size="sm" />}</span>
       <span className="flex min-w-0 flex-1 flex-col">
         <RecordLink to={`/income/receipts/${encodeURIComponent(income.id)}`} className="break-words text-sm font-medium underline">{title}</RecordLink>
@@ -67,6 +69,6 @@ export function IncomeRow({ income, habitants, sources, accounts, today, tile = 
         {received ? "+" : ""}
         {money(income.amountCents)}
       </span>
-    </div>
+    </Inline>
   );
 }

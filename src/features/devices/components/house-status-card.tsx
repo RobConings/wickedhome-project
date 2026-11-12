@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import type * as React from "react";
 import { ArrowRightIcon, HouseWifiIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -45,22 +48,22 @@ export function HouseStatusCard({ status, live = true, liveStatus, now: fixedNow
   return (
     // In the devices colour wherever it is shown (e.g. on the dashboard); a status edge when something needs attention.
     <Card data-accent="devices" tone={tone} className={cn("gap-4", className)} aria-labelledby="house-status-title">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <Inline gap="sm" align="center" justify="between" wrap>
         <h2 id="house-status-title" className="flex items-center gap-2 font-semibold">
           <IconChip icon={HouseWifiIcon} size="sm" />
           {t("houseStatus.title")}
         </h2>
         {(live || liveStatus) && devices.length > 0 && <LiveStatusBadge status={liveStatus} />}
-      </div>
+      </Inline>
 
       {devices.length === 0 ? (
-        <div className="flex min-w-0 flex-col items-start gap-2 break-words">
-          <p className="font-medium">{t("houseStatus.empty.title")}</p>
-          <p className="text-sm text-muted-foreground">{t("houseStatus.empty.description")}</p>
+        <Stack gap="sm" align="start" className="min-w-0 break-words">
+          <Text weight="medium">{t("houseStatus.empty.title")}</Text>
+          <Text size="sm" tone="muted">{t("houseStatus.empty.description")}</Text>
           <Button asChild size="sm" variant="outline" fullOnMobile>
             <Link to="/devices">{t("houseStatus.empty.action")}</Link>
           </Button>
-        </div>
+        </Stack>
       ) : (
         <>
           {summary.alerts.length > 0 ? (
@@ -73,10 +76,10 @@ export function HouseStatusCard({ status, live = true, liveStatus, now: fixedNow
               )}
             </ul>
           ) : (
-            <p className="flex items-center gap-2 text-sm">
+            <Text size="sm" className="flex items-center gap-2">
               <PlanMarkerDot tone="success" />
               {t("houseStatus.allQuiet")}
-            </p>
+            </Text>
           )}
 
           {/* Phones: one fact per line (label left, value right); three columns from `sm`. */}
@@ -140,10 +143,10 @@ function DeviceLine({ entry }: { entry: DeviceWithState }) {
 
 function Fact({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex min-w-0 items-baseline justify-between gap-3 sm:flex-col sm:items-start sm:justify-start sm:gap-1">
+    <Inline gap="md" align="baseline" justify="between" className="min-w-0 sm:flex-col sm:items-start sm:justify-start sm:gap-1">
       <dt className="shrink-0 text-xs text-muted-foreground">{label}</dt>
       {/* Wraps: the running appliances are only listed here, so nothing may be cut off. */}
       <dd className="min-w-0 text-right font-medium break-words sm:text-left">{children}</dd>
-    </div>
+    </Inline>
   );
 }

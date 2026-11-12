@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { CircleAlertIcon, CircleCheckIcon, CircleSlashIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -57,9 +60,9 @@ export function UploadProgressList({ items, onCancel, onCancelAll, onClear, clas
       aria-label={t("upload.title")}
       className={cn("flex flex-col gap-2 rounded-xl border bg-card p-3 shadow-xs", className)}
     >
-      <div className="flex flex-col gap-2 px-1">
-        <div className="flex min-h-8 items-center justify-between gap-2">
-          <p className="flex min-w-0 items-center gap-2 text-sm font-medium" aria-live="polite">
+      <Stack gap="sm" className="px-1">
+        <Inline gap="sm" align="center" justify="between" className="min-h-8">
+          <Text size="sm" weight="medium" className="flex min-w-0 items-center gap-2" aria-live="polite">
             {active > 0 ? (
               <Spinner className="size-3.5 shrink-0 text-muted-foreground" />
             ) : failed > 0 ? (
@@ -68,8 +71,8 @@ export function UploadProgressList({ items, onCancel, onCancelAll, onClear, clas
               <CircleCheckIcon className="size-4 shrink-0 text-success" aria-hidden="true" />
             ) : null}
             <span className="truncate">{summary}</span>
-          </p>
-          <div className="flex shrink-0 items-center gap-1">
+          </Text>
+          <Inline gap="xs" align="center" className="shrink-0">
             {active > 1 && onCancelAll && (
               <Button variant="ghost" size="sm" onClick={onCancelAll}>
                 {t("upload.cancelAll")}
@@ -80,28 +83,28 @@ export function UploadProgressList({ items, onCancel, onCancelAll, onClear, clas
                 {t("upload.clear")}
               </Button>
             )}
-          </div>
-        </div>
+          </Inline>
+        </Inline>
         {active > 0 && items.length > 1 && (
-          <div className="flex items-center gap-3">
+          <Inline gap="md" align="center">
             <Progress value={overall} label={t("upload.overall")} className="h-1.5" />
             <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
               {t("upload.bytes", { loaded: fileSize(loadedBytes), total: fileSize(totalBytes) })}
             </span>
-          </div>
+          </Inline>
         )}
-      </div>
+      </Stack>
       <ul className="flex flex-col gap-1">
         {items.map((item) => (
           <li key={item.key} className="flex items-center gap-3 rounded-lg px-1 py-1.5">
             <FileTypeIcon mimeType={item.mimeType} name={item.name} size="sm" />
-            <div className="flex min-w-0 flex-1 flex-col gap-1">
-              <div className="flex items-baseline justify-between gap-2">
+            <Stack gap="xs" className="min-w-0 flex-1">
+              <Inline gap="sm" align="baseline" justify="between">
                 <span className="truncate text-sm">{item.name}</span>
                 <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
                   {item.status === "uploading" ? `${Math.round(item.progress * 100)}%` : fileSize(item.sizeBytes)}
                 </span>
-              </div>
+              </Inline>
               {item.status === "error" || item.status === "cancelled" ? (
                 <span className={cn("text-xs", item.status === "error" ? "text-destructive" : "text-muted-foreground")}>
                   {item.status === "error" ? item.error : t("upload.cancelled")}
@@ -125,7 +128,7 @@ export function UploadProgressList({ items, onCancel, onCancelAll, onClear, clas
                   </span>
                 </>
               )}
-            </div>
+            </Stack>
             <StatusIcon item={item} onCancel={onCancel} cancelLabel={t("upload.cancel", { name: item.name })} />
           </li>
         ))}

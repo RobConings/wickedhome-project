@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -28,17 +31,17 @@ export function UnitLinksDialog({ initialUnit, units, usedUnits, onClose, onRetu
         <datalist id={`${id}-names`}>{unitOverview(units, usedUnits).flatMap((unit) => [unit.name, ...unit.aliases]).map((name) => <option key={name} value={name} />)}</datalist>
         <Button type="submit">{t("links.show")}</Button>
       </form>
-      {!selected.trim() ? <p className="text-sm text-muted-foreground">{t("links.choose")}</p> : !result ? <p role="status" className="text-sm text-muted-foreground">{t("links.unknown", { name: selected })}</p> : <div className="space-y-3" aria-live="polite">
-        <p className="font-semibold">{t("links.summary", { name: result.unit.name, count: links.length })}</p>
-        {units.some((unit) => unit.isTerminal) && <p className="text-sm text-muted-foreground">{t("links.terminalHelp")}</p>}
-        {result.unit.aliases.length > 0 && <p className="text-sm text-muted-foreground break-words">{t("aliasesSummary", { names: result.unit.aliases.join(", ") })}</p>}
+      {!selected.trim() ? <Text size="sm" tone="muted">{t("links.choose")}</Text> : !result ? <Text size="sm" tone="muted" role="status">{t("links.unknown", { name: selected })}</Text> : <Stack gap="3"  aria-live="polite">
+        <Text weight="semibold">{t("links.summary", { name: result.unit.name, count: links.length })}</Text>
+        {units.some((unit) => unit.isTerminal) && <Text size="sm" tone="muted">{t("links.terminalHelp")}</Text>}
+        {result.unit.aliases.length > 0 && <Text size="sm" tone="muted" className="break-words">{t("aliasesSummary", { names: result.unit.aliases.join(", ") })}</Text>}
         {links.length ? <Card className="gap-0 divide-y px-4 py-1" role="list" aria-label={t("links.results")}>
-          {links.map((link) => <div key={link.unit.name} role="listitem" className="space-y-1 py-3">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1"><p className="text-sm font-medium break-words tabular-nums">1 {result.unit.name} = {numbers.format(link.factor)} {link.unit.name}</p><span className="text-xs text-muted-foreground">{t(link.direct ? "links.direct" : "links.indirect")}</span></div>
-            <p className="text-xs text-muted-foreground break-words">{link.path.join(" → ")}</p>
-          </div>)}
-        </Card> : <p className="text-sm text-muted-foreground">{t(result.unit.source === "used" ? "links.unconfigured" : result.unit.needsDefinition ? "links.undefined" : "links.none")}</p>}
-      </div>}
+          {links.map((link) => <Stack gap="xs" key={link.unit.name} role="listitem" className="py-3">
+            <Inline gap="none" align="baseline" justify="between" wrap className="gap-x-3 gap-y-1"><Text size="sm" weight="medium" className="break-words tabular-nums">1 {result.unit.name} = {numbers.format(link.factor)} {link.unit.name}</Text><span className="text-xs text-muted-foreground">{t(link.direct ? "links.direct" : "links.indirect")}</span></Inline>
+            <Text size="xs" tone="muted" className="break-words">{link.path.join(" → ")}</Text>
+          </Stack>)}
+        </Card> : <Text size="sm" tone="muted">{t(result.unit.source === "used" ? "links.unconfigured" : result.unit.needsDefinition ? "links.undefined" : "links.none")}</Text>}
+      </Stack>}
     </DialogContent>
   </Dialog>;
 }

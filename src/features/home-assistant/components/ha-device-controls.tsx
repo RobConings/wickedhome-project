@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import { formatDateTime } from "@/types/date-format";
 import { currentLocale } from "@/lib/i18n";
 import { useLiveEvents } from "@/lib/live-events";
@@ -27,10 +30,10 @@ export function HaDeviceControlPanel({ deviceId, initial }: { deviceId: string; 
     <CardTitle><PowerIcon className="mr-2 inline size-5 text-section" />{t("controls.title")}</CardTitle>
     {resource.error ? <InlineAlert tone="error">{t("controls.loadError")} <Button variant="outline" onClick={resource.refresh}>{t("controls.retry")}</Button></InlineAlert> : !data?.connected ? <CardDescription>{t("controls.offline")}</CardDescription> : <>
       <CardDescription>{t("controls.description")}</CardDescription>
-      {!data.controls.length && <p className="text-sm text-muted-foreground">{t("controls.none")}</p>}
-      {data.controls.map((control) => <div key={control.entityId} className="space-y-3 rounded-xl border p-3">
-        <div><p className="font-medium">{control.name}</p><p className="text-sm text-muted-foreground">{control.state}{control.updatedAt && <> · <time dateTime={control.updatedAt}>{formatDateTime(control.updatedAt, currentLocale())}</time></>}</p></div>
-        <div className="flex flex-wrap gap-2">{control.actions.map((action) => <Button key={action} variant="outline" disabled={busy}
+      {!data.controls.length && <Text size="sm" tone="muted">{t("controls.none")}</Text>}
+      {data.controls.map((control) => <Stack gap="3" key={control.entityId} className="rounded-xl border p-3">
+        <div><Text weight="medium">{control.name}</Text><Text size="sm" tone="muted">{control.state}{control.updatedAt && <> · <time dateTime={control.updatedAt}>{formatDateTime(control.updatedAt, currentLocale())}</time></>}</Text></div>
+        <Inline gap="sm" align="stretch" wrap>{control.actions.map((action) => <Button key={action} variant="outline" disabled={busy}
           onClick={async () => { setBusy(true); setError(null); try { await sendDeviceControl(deviceId, { entityId: control.entityId, action }); resource.refresh(); } catch { setError(t("controls.failed")); } finally { setBusy(false); } }}>{t(`controls.${action}`)}</Button>)}
           {control.adjustment && <GeneralFormDialog trigger={<Button variant="outline" disabled={busy}><SlidersHorizontalIcon />{t(`controls.${control.adjustment.action}`)}</Button>}
             title={`${control.name} · ${t(`controls.${control.adjustment.action}`)}`} description={t("controls.adjustHint")}
@@ -39,9 +42,9 @@ export function HaDeviceControlPanel({ deviceId, initial }: { deviceId: string; 
             schema={z.object({ value: z.coerce.number().min(control.adjustment.min).max(control.adjustment.max).refine((value) => { const steps = (value - control.adjustment!.min) / control.adjustment!.step; return Math.abs(steps - Math.round(steps)) < 0.000001; }) })}
             defaultValues={{ value: control.adjustment.value ?? undefined }} fields={[{ name: "value", type: "number", label: `${t(`controls.${control.adjustment.action}`)} (${control.adjustment.unit})`, min: control.adjustment.min, max: control.adjustment.max, step: control.adjustment.step }]}
             onSuccess={() => resource.refresh()} />}
-        </div>
-        {!control.actions.length && !control.adjustment && <p className="text-sm text-muted-foreground">{t("controls.unavailable")}</p>}
-      </div>)}
+        </Inline>
+        {!control.actions.length && !control.adjustment && <Text size="sm" tone="muted">{t("controls.unavailable")}</Text>}
+      </Stack>)}
     </>}
     {error && <InlineAlert tone="error">{error}</InlineAlert>}
   </Card>;

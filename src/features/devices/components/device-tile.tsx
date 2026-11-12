@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import { MapPinOffIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
@@ -24,8 +26,8 @@ export function DeviceTile({ device, profile, state, href = `/devices/${device.i
   return (
     <Card className={cn("relative gap-0 overflow-hidden p-0 transition-colors hover:bg-accent/50", className)}>
       {device.imageUrl && <RecordImage src={device.imageUrl} fallback={<DeviceIcon icon={profile?.icon} className="size-10" />} className="w-full rounded-none border-b" />}
-      <div className="flex min-w-0 flex-1 flex-col gap-3 p-4">
-      <div className="flex items-start justify-between gap-2">
+      <Stack gap="3" className="min-w-0 flex-1 p-4">
+      <Inline gap="sm" align="start" justify="between">
         <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
           <DeviceIcon icon={profile?.icon} className="size-5" />
         </span>
@@ -35,8 +37,8 @@ export function DeviceTile({ device, profile, state, href = `/devices/${device.i
             <span className="sr-only">{t("placement.notPlaced")}</span>
           </span>
         )}
-      </div>
-      <div className="flex min-w-0 flex-col gap-0.5">
+      </Inline>
+      <Stack gap="0.5" className="min-w-0">
         <Link
           to={href}
           className="line-clamp-2 font-medium break-words outline-none after:absolute after:inset-0 after:rounded-xl focus-visible:after:ring-[3px] focus-visible:after:ring-ring/50"
@@ -44,9 +46,9 @@ export function DeviceTile({ device, profile, state, href = `/devices/${device.i
           {device.name}
         </Link>
         <span className="truncate text-xs text-muted-foreground">{profile?.name ?? t("profiles.missing")}</span>
-      </div>
+      </Stack>
       {state && <DeviceStateChip state={state} className="mt-auto self-start" />}
-      </div>
+      </Stack>
     </Card>
   );
 }

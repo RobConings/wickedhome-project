@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import type * as React from "react";
 import { ArrowRightIcon, CloudSunIcon, DropletsIcon, MapPinIcon, UmbrellaIcon, WindIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -67,22 +70,22 @@ function Forecast({ forecast, hours, days }: { forecast: WeatherForecast; hours:
 
   return (
     <>
-      <div className="flex items-center gap-4">
+      <Inline gap="4" align="center">
         <WeatherIcon condition={current.condition} isDay={current.isDay} className="size-12 text-info" />
-        <div className="flex min-w-0 flex-col">
+        <Stack gap="none" className="min-w-0">
           <span className="text-3xl font-semibold tracking-tight tabular-nums">{degrees(current.temperature)}</span>
           <span className="text-sm text-muted-foreground">
             {condition(current.condition)}
             {current.apparentTemperature !== null && ` · ${t("feelsLike", { temperature: degrees(current.apparentTemperature) })}`}
           </span>
-        </div>
+        </Stack>
         {today && (
-          <div className="ml-auto flex flex-col items-end text-sm tabular-nums">
+          <Stack gap="none" align="end" className="ml-auto text-sm tabular-nums">
             <span className="font-medium">{t("max", { temperature: degrees(today.temperatureMax) })}</span>
             <span className="text-muted-foreground">{t("min", { temperature: degrees(today.temperatureMin) })}</span>
-          </div>
+          </Stack>
         )}
-      </div>
+      </Inline>
 
       <ul className="flex flex-col gap-1.5 text-sm">
         <li className="flex items-center gap-2">
@@ -173,10 +176,10 @@ export function WeatherCard({ weather, hours = 6, days = 5 }: WeatherCardProps) 
           </CardFooter>
         }
       >
-        <div className="flex items-start gap-3 text-sm text-muted-foreground">
+        <Inline gap="md" align="start" className="text-sm text-muted-foreground">
           <MapPinIcon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-          <p>{t("card.noLocation")}</p>
-        </div>
+          <Text>{t("card.noLocation")}</Text>
+        </Inline>
       </CardShell>
     );
   }
@@ -226,24 +229,24 @@ export function WeatherCardSkeleton() {
           {t("card.loading")}
         </span>
       </CardHeader>
-      <div aria-hidden className="flex items-center gap-4">
+      <Inline gap="4" align="center" aria-hidden>
         <Skeleton className="size-12 rounded-full" />
-        <div className="flex flex-col gap-2">
+        <Stack gap="sm">
           <Skeleton className="h-7 w-16" />
           <Skeleton className="h-4 w-32" />
-        </div>
-      </div>
-      <div aria-hidden className="flex flex-col gap-2">
+        </Stack>
+      </Inline>
+      <Stack gap="sm" aria-hidden>
         <Skeleton className="h-4 w-4/5" />
         <Skeleton className="h-4 w-3/5" />
         <Skeleton className="h-4 w-2/3" />
-      </div>
+      </Stack>
       <Skeleton aria-hidden className="h-16 w-full" />
-      <div aria-hidden className="flex flex-col gap-2">
+      <Stack gap="sm" aria-hidden>
         {Array.from({ length: 4 }, (_, index) => (
           <Skeleton key={index} className="h-5 w-full" />
         ))}
-      </div>
+      </Stack>
     </Card>
   );
 }

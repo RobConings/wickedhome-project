@@ -1,3 +1,4 @@
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { MapPinIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -56,14 +57,14 @@ export function ChatMessageBubble({ role, text, images = [], screen, streaming =
         )}
       >
         <span className="sr-only">{mine ? t("chat.you") : t("chat.assistant")}: </span>
-        {editing ? <form className="flex min-w-0 flex-col gap-2" onSubmit={(event) => { event.preventDefault(); if (draft.trim()) { onEdit?.(draft.trim()); setEditing(false); } }}><Textarea aria-label={t("chat.edit")} value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={4000} autoFocus /><div className="flex flex-wrap gap-2"><Button size="sm" type="submit">{t("chat.resend")}</Button><Button size="sm" type="button" variant="outline" onClick={() => setEditing(false)}>{t("confirm.cancel")}</Button></div></form> : mine ? text : text.length > 12000 && !streaming ? <details><summary className="cursor-pointer text-muted-foreground">{text.slice(0, 180)}…</summary><AssistantMarkdown text={text} onRecordNavigate={onRecordNavigate} /></details> : <AssistantMarkdown text={text} onRecordNavigate={onRecordNavigate} />}
+        {editing ? <form className="flex min-w-0 flex-col gap-2" onSubmit={(event) => { event.preventDefault(); if (draft.trim()) { onEdit?.(draft.trim()); setEditing(false); } }}><Textarea aria-label={t("chat.edit")} value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={4000} autoFocus /><Inline gap="sm" align="stretch" wrap><Button size="sm" type="submit">{t("chat.resend")}</Button><Button size="sm" type="button" variant="outline" onClick={() => setEditing(false)}>{t("confirm.cancel")}</Button></Inline></form> : mine ? text : text.length > 12000 && !streaming ? <details><summary className="cursor-pointer text-muted-foreground">{text.slice(0, 180)}…</summary><AssistantMarkdown text={text} onRecordNavigate={onRecordNavigate} /></details> : <AssistantMarkdown text={text} onRecordNavigate={onRecordNavigate} />}
         {streaming && <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse rounded-sm bg-current align-text-bottom opacity-60" aria-hidden />}
       </div>
       )}
-      {!streaming && !editing && text && <div className="flex gap-1 text-muted-foreground">
+      {!streaming && !editing && text && <Inline gap="xs" align="stretch" className="text-muted-foreground">
         <Button variant="ghost" size="sm" onClick={() => { void navigator.clipboard.writeText(text).then(() => setCopied(true)).catch(() => setCopied(false)); }}>{t(copied ? "chat.copied" : "chat.copy")}</Button>
         {mine && onEdit && <Button variant="ghost" size="sm" onClick={() => { setDraft(text); setEditing(true); }}>{t("chat.edit")}</Button>}
-      </div>}
+      </Inline>}
     </div>
   );
 }

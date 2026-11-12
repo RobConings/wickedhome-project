@@ -143,7 +143,7 @@ export function ShopViewScreen({
       {actions.confirmation}
         <PageHeader backTo="/shopping" title={t("shopView.title")} description={t("shopView.description")} actions={addAction} />
         <ShoppingNavigation />
-        <div className="mb-6 max-w-xl">{selection}</div>
+        <Stack gap="none" className="mb-6 max-w-xl">{selection}</Stack>
         {anything ? (
           <Card className="max-w-xl">
             <CardTitle>{t("shopView.chooseShop")}</CardTitle>

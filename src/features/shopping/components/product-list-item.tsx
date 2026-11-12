@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import { ShoppingCartIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RecordImage } from "@/components/shared/record-image";
@@ -49,7 +50,7 @@ export function ProductListItem({ product, shops, canManage, initialSelections, 
       aria-busy={actions.busy || undefined}
     >
       <RecordImage src={product.imageUrl} shape="avatar" fit="contain" fallback={<ProductCategoryIcon category={product.category} className="size-6 text-section" />} />
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
+      <Stack gap="xs" className="min-w-0 flex-1">
         <RecordLink to={`/inventory/products/${encodeURIComponent(product.id)}`} className="font-medium break-words hover:underline">{product.name}</RecordLink>
         {product.brand && <span className="text-sm break-words text-muted-foreground">{product.brand}</span>}
         <span><ProductEssentialBadge isEssential={product.isEssential} /></span>
@@ -70,7 +71,7 @@ export function ProductListItem({ product, shops, canManage, initialSelections, 
             ))}
           </span>
         )}
-      </div>
+      </Stack>
       <Button
         variant="ghost"
         size="icon-sm"

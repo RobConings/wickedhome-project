@@ -1,3 +1,5 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
 import { GaugeIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
@@ -32,27 +34,27 @@ export function MonthlyPeakCard({ peak, className }: MonthlyPeakCardProps) {
       </CardHeader>
 
       {peak.kw === null ? (
-        <p className="text-sm text-muted-foreground">{t("peak.none", { month: formatMonth(peak.month, locale) })}</p>
+        <Text size="sm" tone="muted">{t("peak.none", { month: formatMonth(peak.month, locale) })}</Text>
       ) : (
-        <div className="flex flex-col gap-1">
-          <p className="text-4xl font-semibold tracking-tight">{formatKw(peak.kw, locale)}</p>
+        <Stack gap="xs">
+          <Text weight="semibold" className="text-4xl tracking-tight">{formatKw(peak.kw, locale)}</Text>
           {when && (
-            <p className="text-sm text-muted-foreground">
+            <Text size="sm" tone="muted">
               {t("peak.at", {
                 date: formatDate(when.date, locale),
                 time: when.time,
               })}
-            </p>
+            </Text>
           )}
-          <p className="text-sm">
+          <Text size="sm">
             {peak.kw < CAPACITY_MINIMUM_KW ? t("peak.minimum") : t("peak.billed", { kw: formatKw(peak.billedKw, locale) })}
-          </p>
+          </Text>
           {peak.rollingAverageKw !== null && (
-            <p className="text-sm text-muted-foreground">
+            <Text size="sm" tone="muted">
               {t("peak.rollingAverage", { kw: formatKw(peak.rollingAverageKw, locale) })}
-            </p>
+            </Text>
           )}
-        </div>
+        </Stack>
       )}
 
       {hasHistory && (

@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import { PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -54,14 +56,14 @@ export function CookingIngredientsPanel({
   );
 
   return (
-    <div className="flex flex-col gap-3">
-      {ingredients.length === 0 && extras.length === 0 && <p className="text-sm text-muted-foreground">{t("cooking.noIngredients")}</p>}
+    <Stack gap="3">
+      {ingredients.length === 0 && extras.length === 0 && <Text size="sm" tone="muted">{t("cooking.noIngredients")}</Text>}
       {ingredients.length > 0 && <ul className="flex flex-col gap-1">{sortForStep(ingredients, stepText).map(row)}</ul>}
       {extras.length > 0 && (
-        <div className="flex flex-col gap-1">
+        <Stack gap="xs">
           <h3 className="px-2 text-sm font-medium text-muted-foreground">{t("cooking.extras")}</h3>
           <ul className="flex flex-col gap-1">{extras.map(row)}</ul>
-        </div>
+        </Stack>
       )}
       {!disabled && (
         <AddExtraDialog
@@ -78,6 +80,6 @@ export function CookingIngredientsPanel({
           }
         />
       )}
-    </div>
+    </Stack>
   );
 }

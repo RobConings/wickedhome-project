@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { ArrowRightIcon, ExternalLinkIcon, HandCoinsIcon, PauseIcon, PencilIcon, PlayIcon, SquareIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -76,7 +79,7 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
   };
 
   const actions = (
-    <div className="grid w-full gap-2 sm:flex sm:w-auto sm:flex-wrap">
+    <PageGrid gap="sm" className="w-full sm:flex sm:w-auto sm:flex-wrap">
       {upcoming[0] && <Button asChild><RecordLink to={`/expenses/${encodeURIComponent(upcoming[0].id)}`}>
         <ArrowRightIcon />{t("workspace.openNextPayment")}
       </RecordLink></Button>}
@@ -93,14 +96,14 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
           </Button>
         }
       />}
-    </div>
+    </PageGrid>
   );
 
   const management = canManage && (
     <Card className="gap-3">
       <CardTitle>{t("workspace.manageSchedule")}</CardTitle>
-      <p className="text-sm text-muted-foreground">{t("workspace.manageDescription")}</p>
-      <div className="flex flex-wrap gap-2">
+      <Text size="sm" tone="muted">{t("workspace.manageDescription")}</Text>
+      <Inline gap="sm" align="stretch" wrap>
       {recurring.status !== "ended" && (recurring.kind === "loan" || recurring.kind === "down_payment" || recurring.totalOpen) && recurring.totalOpen?.remainingCents !== 0 && (
         <LogExpenseDialog habitants={habitants} shops={shops} today={today} loans={[recurring]} defaultLoanId={recurring.id}
           projectId={recurring.project?.id} trigger={<Button><HandCoinsIcon />{t("repayment.record")}</Button>} />
@@ -155,7 +158,7 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
           fetcher.submit({ intent: "delete-recurring", id: recurring.id, redirectTo: "/expenses?view=recurring" }, { method: "post" })
         }
       />
-      </div>
+      </Inline>
     </Card>
   );
 
@@ -184,18 +187,18 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
         detailsLabel={t("detail.details")}
         overviewLabel={t("workspace.payments")}
         details={<PageGrid columns="main-sidebar">
-        <div className="flex min-w-0 flex-col gap-6">
+        <Stack gap="lg" className="min-w-0">
           <Card>
             <CardHeader className="items-center">
-              <div className="flex items-center gap-3">
+              <Inline gap="md" align="center">
                 <ExpenseCategoryIcon category={recurring.category} />
-                <div className="flex flex-col">
+                <Stack gap="none">
                   <span className="text-3xl font-semibold tracking-tight tabular-nums">
                     {formatCurrency(recurring.amountCents, locale)}
                   </span>
                   <span className="text-sm text-muted-foreground">{recurrenceSummary(recurring.rrule)}</span>
-                </div>
-              </div>
+                </Stack>
+              </Inline>
               <RecurringStatusBadge status={status} />
             </CardHeader>
             {recurring.totalOpen && (
@@ -277,19 +280,19 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
             </DescriptionList>
           </Card>
           {attachments}
-        </div>
+        </Stack>
 
-        <div className="flex min-w-0 flex-col gap-6">
+        <Stack gap="lg" className="min-w-0">
           {recurring.paymentMethod === "wire_transfer" && upcoming[0] && <PaymentQrCard expense={upcoming[0]} />}
           {management}
-        </div>
+        </Stack>
       </PageGrid>}
         overview={<PageGrid columns="2">
-          <div className="md:col-span-2"><Button asChild variant="outline"><RecordLink to={`/expenses/recurring/${encodeURIComponent(recurring.id)}/payments`}>{t("workspace.allPayments")}</RecordLink></Button></div>
+          <Stack gap="none" className="md:col-span-2"><Button asChild variant="outline"><RecordLink to={`/expenses/recurring/${encodeURIComponent(recurring.id)}/payments`}>{t("workspace.allPayments")}</RecordLink></Button></Stack>
           <Card>
             <CardTitle>{t("detail.upcoming")}</CardTitle>
             {upcoming.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t("detail.noUpcoming")}</p>
+              <Text size="sm" tone="muted">{t("detail.noUpcoming")}</Text>
             ) : (
               <HistoryList items={upcoming} habitants={habitants} />
             )}
@@ -297,7 +300,7 @@ export function RecurringExpenseDetailScreen({ detail, habitants, shops = [], ca
           <Card>
             <CardTitle>{t("detail.history")}</CardTitle>
             {history.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t("detail.noHistory")}</p>
+              <Text size="sm" tone="muted">{t("detail.noHistory")}</Text>
             ) : (
               <HistoryList items={history} habitants={habitants} />
             )}

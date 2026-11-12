@@ -1,3 +1,4 @@
+import { Inline } from "@/components/layout/inline";
 import { MapPinIcon, PlusIcon, SparklesIcon, TreesIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
@@ -71,7 +72,7 @@ export function PlacesScreen({ overview, canManage }: PlacesScreenProps) {
           description={t("empty.description")}
           action={
             canManage && (
-              <div className="flex flex-wrap justify-center gap-2">
+              <Inline gap="sm" align="stretch" justify="center" wrap>
                 <starter.Form method="post">
                   <input type="hidden" name="intent" value="create-starter" />
                   <Button type="submit" loading={starter.state !== "idle"}>
@@ -87,7 +88,7 @@ export function PlacesScreen({ overview, canManage }: PlacesScreenProps) {
                     </Button>
                   }
                 />
-              </div>
+              </Inline>
             )
           }
         />

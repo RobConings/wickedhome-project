@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import { projectPath, type Project } from "../types/projects";
@@ -16,26 +18,26 @@ export function ProjectListItem({ project }: { project: Project }) {
     .join(" · ");
 
   return (
-    <div className="relative flex items-center gap-3">
+    <Inline gap="md" align="center" className="relative">
       <ProjectAvatar project={project} size="md" />
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <div className="flex min-w-0 items-center gap-2">
+      <Stack gap="xs" className="min-w-0 flex-1">
+        <Inline gap="sm" align="center" className="min-w-0">
           <Link to={projectPath(project.id)} className="truncate font-medium outline-none after:absolute after:inset-0 focus-visible:underline">
             {project.name}
           </Link>
           {project.status !== "active" && <ProjectStatusBadge status={project.status} />}
-        </div>
+        </Inline>
         {details && <span className="truncate text-sm text-muted-foreground">{details}</span>}
         {project.budgetCents !== null && <ProjectBudgetBar budget={project.budget} showLegend={false} className="max-w-sm" />}
-      </div>
-      <div className="flex shrink-0 flex-col items-end gap-1 text-sm tabular-nums">
+      </Stack>
+      <Stack gap="xs" align="end" className="shrink-0 text-sm tabular-nums">
         <span className="font-medium">
           {project.budgetCents !== null
             ? t("budget.ofBudget", { used: text.money(project.budget.spentCents + project.budget.committedCents), budget: text.money(project.budgetCents) })
             : text.money(project.budget.spentCents + project.budget.committedCents)}
         </span>
         <ProjectBudgetBadge budget={project.budget} className="hidden sm:inline-flex" />
-      </div>
-    </div>
+      </Stack>
+    </Inline>
   );
 }

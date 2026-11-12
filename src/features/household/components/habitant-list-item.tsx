@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import { RecordLink } from "@/components/shared/record-link";
 import { CakeIcon, KeyRoundIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -21,7 +22,7 @@ export function HabitantListItem({ habitant, canManage }: HabitantListItemProps)
   return (
     <Inline gap="md" className="min-w-0">
       <HabitantAvatar habitant={habitant} />
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
+      <Stack gap="xs" className="min-w-0 flex-1">
         <Inline gap="sm" wrap className="min-w-0">
           <RecordLink className="break-words font-medium" to={`/habitants/${encodeURIComponent(habitant.id)}`}>{habitant.name}</RecordLink>
           <HabitantTypeBadge type={habitant.type} />
@@ -42,7 +43,7 @@ export function HabitantListItem({ habitant, canManage }: HabitantListItemProps)
             )}
           </Inline>
         )}
-      </div>
+      </Stack>
       {canManage && <HabitantActions habitant={habitant} iconOnly />}
     </Inline>
   );

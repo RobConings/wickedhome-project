@@ -59,9 +59,11 @@ export type GeneralListProps<T> = {
   /** One row of the list view: the content only, the list draws the dividers and padding. */
   renderRow: (item: T) => React.ReactNode;
   /** One tile of the tiles view, usually a `Card`; it is stretched to the row's height. */
-  renderTile: (item: T) => React.ReactNode;
+  renderTile?: (item: T) => React.ReactNode;
   /** Every list has the same search field; this says what it searches. */
-  search: GeneralListSearch<T>;
+  search?: GeneralListSearch<T>;
+  /** A related-record list inside a card: rows and states, without a second search/view toolbar or surface. */
+  variant?: "default" | "embedded";
   /** Accessible name of the list, e.g. "Shops". */
   label: string;
   /** Remembers the chosen view per list on this device (e.g. "shops"). */
@@ -115,6 +117,10 @@ const searchTexts = <T,>(search: GeneralListSearch<T>) => {
     });
 };
 
+function ListSurface({ embedded, children }: { embedded: boolean; children: React.ReactNode }) {
+  return embedded ? <>{children}</> : <Card className="gap-0 px-4 py-1 sm:px-5">{children}</Card>;
+}
+
 /**
  * The standard list of a screen: one search field, a list/tiles switch (remembered per list), optional
  * filters and groups, and the empty, no-results, loading, refreshing and error states. Screens give it
@@ -125,7 +131,8 @@ export function GeneralList<T>({
   getKey,
   renderRow,
   renderTile,
-  search,
+  search = {},
+  variant = "default",
   label,
   storageKey,
   defaultView = "list",
@@ -187,11 +194,12 @@ export function GeneralList<T>({
 
   // --- View ---------------------------------------------------------------------------------------
   const [storedView, setStoredView] = React.useState(() => (storageKey ? readStoredListView(storageKey) : null));
-  const view = resolveListView({
+  const selectedView = resolveListView({
     urlValue: viewParam ? searchParams.get(viewParam) : null,
     storedValue: storedView,
     defaultView,
   });
+  const view = variant === "embedded" ? "list" : selectedView;
 
   const changeView = (next: ListView) => {
     setStoredView(next);
@@ -216,12 +224,12 @@ export function GeneralList<T>({
       <PageGrid columns="tiles" role="list" aria-label={labelledBy ? undefined : label} aria-labelledby={labelledBy}>
         {list.map((item) => (
           <div key={getKey(item)} role="listitem" className="flex min-w-0 flex-col *:flex-1">
-            {renderTile(item)}
+            {(renderTile ?? renderRow)(item)}
           </div>
         ))}
       </PageGrid>
     ) : (
-      <Card className="gap-0 px-4 py-1 sm:px-5">
+      <ListSurface embedded={variant === "embedded"}>
         <Stack
           gap="none"
           role="list"
@@ -230,12 +238,12 @@ export function GeneralList<T>({
           className="divide-y"
         >
           {list.map((item) => (
-            <div key={getKey(item)} role="listitem" className="flex min-h-10 min-w-0 flex-col justify-center py-2.5">
+            <Stack key={getKey(item)} gap="none" role="listitem" className="min-h-10 min-w-0 justify-center py-2.5">
               {renderRow(item)}
-            </div>
+            </Stack>
           ))}
         </Stack>
-      </Card>
+      </ListSurface>
     );
 
   const renderContent = () => {
@@ -263,9 +271,9 @@ export function GeneralList<T>({
               ))}
             </PageGrid>
           ) : (
-            <Card className="gap-0 px-4 py-1 sm:px-5">
+            <ListSurface embedded={variant === "embedded"}>
               <SkeletonList rows={skeletonCount} />
-            </Card>
+            </ListSurface>
           )}
         </div>
       );
@@ -323,7 +331,7 @@ export function GeneralList<T>({
 
   return (
     <Stack gap="md" className={className}>
-      {!pristineEmpty && (
+      {!pristineEmpty && variant !== "embedded" && (
         <Stack gap="sm">
           {/* The actions move under the search field when they don't fit next to it (phones). */}
           <Inline gap="sm" wrap>

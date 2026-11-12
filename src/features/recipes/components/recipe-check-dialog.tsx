@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { CheckIcon, MinusIcon, PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -135,11 +138,11 @@ export function RecipeCheckDialog({ recipe, trigger, open: controlledOpen, onOpe
           <DialogDescription>{t("check.description")}</DialogDescription>
         </DialogHeader>
 
-        <div className="flex items-center justify-between gap-3 rounded-lg border p-3">
+        <Inline gap="md" align="center" justify="between" className="rounded-lg border p-3">
           <span className="text-sm font-medium" id={`servings-${recipe.id}`}>
             {t("check.servings")}
           </span>
-          <div className="flex items-center gap-2" role="group" aria-labelledby={`servings-${recipe.id}`}>
+          <Inline gap="sm" align="center"  role="group" aria-labelledby={`servings-${recipe.id}`}>
             <Button
               type="button"
               variant="outline"
@@ -163,12 +166,12 @@ export function RecipeCheckDialog({ recipe, trigger, open: controlledOpen, onOpe
             >
               <PlusIcon />
             </Button>
-          </div>
-        </div>
+          </Inline>
+        </Inline>
 
         {failed && !check && <InlineAlert tone="error">{t("check.failed")}</InlineAlert>}
         {!check && !failed && <SkeletonList rows={4} />}
-        {check && check.ingredients.length === 0 && <p className="text-sm text-muted-foreground">{t("check.noIngredients")}</p>}
+        {check && check.ingredients.length === 0 && <Text size="sm" tone="muted">{t("check.noIngredients")}</Text>}
         {check && check.ingredients.length > 0 && (
           <ul
             className={cn("flex flex-col divide-y rounded-lg border", check.servings !== servings && "opacity-60")}
@@ -195,7 +198,7 @@ export function RecipeCheckDialog({ recipe, trigger, open: controlledOpen, onOpe
                   >
                     {on && <CheckIcon aria-hidden="true" />}
                   </button>
-                  <div className="flex min-w-0 flex-1 flex-col gap-1">
+                  <Stack gap="xs" className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-center gap-2">
                       <IngredientStatusDot status={ingredient.status} />
                       <span className="font-medium break-words">{ingredient.name}</span>
@@ -207,18 +210,18 @@ export function RecipeCheckDialog({ recipe, trigger, open: controlledOpen, onOpe
                       <IngredientStockText check={ingredient} variant="need" />
                     </span>
                     {on && product ? (
-                      <div className="space-y-1 pt-1">
+                      <Stack gap="xs" className="pt-1">
                         <label htmlFor={quantityId} className="text-xs font-medium">{t("check.buyQuantity", { name: ingredient.name, unit: product.unit ?? "×" })}</label>
                         <Input id={quantityId} inputMode="decimal" autoComplete="off" className="h-10 max-w-40" disabled={busy || refreshing} value={quantities[ingredient.ingredientId] ?? (toBuy === null ? "" : String(toBuy))} onChange={(event) => setQuantities((previous) => ({ ...previous, [ingredient.ingredientId]: event.target.value }))} aria-invalid={toBuy === null || undefined} placeholder={t("check.quantityPlaceholder")} />
-                        {toBuy === null && <p className="text-xs text-muted-foreground">{t("check.quantityRequired")}</p>}
-                      </div>
+                        {toBuy === null && <Text size="xs" tone="muted">{t("check.quantityRequired")}</Text>}
+                      </Stack>
                     ) : on && (
                       <span className="text-sm font-medium tabular-nums">
                         {t("check.toBuy", { amount: text.amount(toBuy ?? ingredient.needed, ingredient.unit) })}
                       </span>
                     )}
                     {ingredient.note && <span className="text-xs break-words text-muted-foreground">{ingredient.note}</span>}
-                  </div>
+                  </Stack>
                   {product && <IngredientThumbnail product={product} className="hidden sm:block" />}
                   {product && <IngredientShopLink product={product} />}
                 </li>

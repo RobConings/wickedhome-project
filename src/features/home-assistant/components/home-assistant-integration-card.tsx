@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { ArrowRightIcon, HousePlugIcon, PlugZapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -72,15 +75,15 @@ export function HomeAssistantIntegrationCard({ status: initial, canManage, showP
 
   const header = (
     <CardHeader>
-      <div className="flex min-w-0 items-center gap-3">
+      <Inline gap="md" align="center" className="min-w-0">
         <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-section-soft text-section">
           <HousePlugIcon className="size-5" aria-hidden="true" />
         </span>
-        <div className="flex min-w-0 flex-col gap-0.5">
+        <Stack gap="0.5" className="min-w-0">
           <CardTitle>{t("card.title")}</CardTitle>
           <CardDescription>{t("card.description")}</CardDescription>
-        </div>
-      </div>
+        </Stack>
+      </Inline>
       {status && <HaStatusBadge state={status.state} />}
     </CardHeader>
   );
@@ -92,11 +95,11 @@ export function HomeAssistantIntegrationCard({ status: initial, canManage, showP
         {loadFailed ? (
           <InlineAlert tone="error">{t("card.loadFailed")}</InlineAlert>
         ) : (
-          <div className="flex flex-col gap-2" aria-label={t("card.loading")}>
+          <Stack gap="sm"  aria-label={t("card.loading")}>
             <Skeleton className="h-4 w-2/3" />
             <Skeleton className="h-4 w-1/2" />
             <Skeleton className="h-9 w-40" />
-          </div>
+          </Stack>
         )}
       </Card>
     );
@@ -108,16 +111,16 @@ export function HomeAssistantIntegrationCard({ status: initial, canManage, showP
       {header}
 
       {notConfigured ? (
-        <div className="flex flex-col gap-3">
+        <Stack gap="3">
           {status.errorCode === "other_household" ? (
             <InlineAlert>{t("errors.other_household")}</InlineAlert>
           ) : (
             <>
-              <p className="text-sm">{t("setup.intro")}</p>
+              <Text size="sm">{t("setup.intro")}</Text>
               <HaSetupSteps />
             </>
           )}
-        </div>
+        </Stack>
       ) : (
         <>
           {status.state === "error" && (
@@ -141,7 +144,7 @@ export function HomeAssistantIntegrationCard({ status: initial, canManage, showP
         </>
       )}
 
-      <div className="mt-auto flex flex-wrap items-center gap-2">
+      <Inline gap="sm" align="center" wrap className="mt-auto">
         {canManage && !notConfigured && (
           <Button variant="outline" onClick={() => void test()} loading={testing}>
             <PlugZapIcon />
@@ -156,7 +159,7 @@ export function HomeAssistantIntegrationCard({ status: initial, canManage, showP
             </Link>
           </Button>
         )}
-      </div>
+      </Inline>
     </Card>
   );
 }

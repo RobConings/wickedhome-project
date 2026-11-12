@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { useState } from "react";
 import { ExpandIcon, MapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -24,13 +26,13 @@ export function HomeRoomMap({ data, live = true, now }: { data: HomeMapData | nu
   const work = useHomeWorkMarkers(data);
   const explore = `/house${plan ? `?floor=${encodeURIComponent(plan.floor.id)}` : ""}`;
   return <Card className="gap-4">
-    <CardHeader><div className="flex min-w-0 items-center gap-3"><IconChip icon={MapIcon} tone="home" /><div><CardTitle>{t("rooms.title")}</CardTitle><CardDescription>{t("rooms.description")}</CardDescription></div></div>
+    <CardHeader><Inline gap="md" align="center" className="min-w-0"><IconChip icon={MapIcon} tone="home" /><div><CardTitle>{t("rooms.title")}</CardTitle><CardDescription>{t("rooms.description")}</CardDescription></div></Inline>
       <Button variant="outline" asChild><RecordLink to={explore}><ExpandIcon />{t("rooms.explore")}</RecordLink></Button>
     </CardHeader>
-    {!data?.places ? <p role="status">{t("loadError")}</p> : !plan ? <EmptyState icon={MapIcon} title={t(data.places.floors.length ? "rooms.planError" : "rooms.empty")} action={<Button asChild variant="outline"><RecordLink to="/places">{t("rooms.manage")}</RecordLink></Button>} /> : <>
+    {!data?.places ? <Text role="status">{t("loadError")}</Text> : !plan ? <EmptyState icon={MapIcon} title={t(data.places.floors.length ? "rooms.planError" : "rooms.empty")} action={<Button asChild variant="outline"><RecordLink to="/places">{t("rooms.manage")}</RecordLink></Button>} /> : <>
       <Select value={plan.floor.id} onValueChange={setFloorId}><SelectTrigger className="w-full sm:w-52" aria-label={t("rooms.floor")}><SelectValue /></SelectTrigger><SelectContent>{data.plans.map((row) => <SelectItem key={row.floor.id} value={row.floor.id}>{row.floor.name}</SelectItem>)}</SelectContent></Select>
       <FloorPlanView plan={plan} markers={[...markers, ...(work[plan.floor.id] ?? [])]} onPlaceClick={(id) => navigate(`${explore}&room=${encodeURIComponent(id)}`)} onMarkerClick={(id) => navigate(id.startsWith("room:") ? `${explore}&room=${encodeURIComponent(id.slice(5))}` : `${explore}&device=${encodeURIComponent(id)}`)} className="h-[26rem] min-h-80 sm:h-[32rem]" />
-      {data.plansUnavailable && <p role="status" className="text-sm text-muted-foreground">{t("rooms.planError")}</p>}
+      {data.plansUnavailable && <Text size="sm" tone="muted" role="status">{t("rooms.planError")}</Text>}
     </>}
   </Card>;
 }

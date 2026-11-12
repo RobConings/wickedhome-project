@@ -1,3 +1,6 @@
+import { GeneralList } from "@/components/shared/general-list";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import { useState } from "react";
 import { DownloadIcon, EyeIcon, FileIcon, FolderInputIcon, PencilIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -40,8 +43,8 @@ export function DocumentDetailScreen({ detail, folders, canManage, fileMenuItems
       <Button asChild variant="outline"><a href={documentContentUrl(file.id, { download: true })} download={file.name}><DownloadIcon />{t("actions.download")}</a></Button>
       <FileMenuItemsContext value={fileMenuItems ?? null}><DocumentItemMenu item={{ kind: "file", file }} canManage={canManage} onAction={onAction} /></FileMenuItemsContext>
     </>} />
-    {fetcher.data?.formError && <p role="alert" className="text-destructive">{fetcher.data.formError}</p>}
-    {file.deletedAt ? <Card><p>{t("detail.deleted")}</p><RecordLink className="underline" to="/documents/trash">{t("trash.title")}</RecordLink></Card> : !ready && <p role="status">{t("detail.pending")}</p>}
+    {fetcher.data?.formError && <Text tone="danger" role="alert">{fetcher.data.formError}</Text>}
+    {file.deletedAt ? <Card><Text>{t("detail.deleted")}</Text><RecordLink className="underline" to="/documents/trash">{t("trash.title")}</RecordLink></Card> : !ready && <Text role="status">{t("detail.pending")}</Text>}
     <PageGrid columns="main-sidebar">
       <Card><CardTitle>{t("detail.title")}</CardTitle><DocumentStorageBadge file={file} /><DescriptionList>
         <DescriptionItem label={t("detail.folder")}><RecordLink className="underline" to={folderHref(file.folderId)}>{detail.folder?.name ?? t("page.title")}</RecordLink></DescriptionItem>
@@ -50,9 +53,9 @@ export function DocumentDetailScreen({ detail, folders, canManage, fileMenuItems
         <DescriptionItem label={t("detail.uploaded")}>{file.uploadedAt ? shortDate(file.uploadedAt) : t("detail.notUploaded")}</DescriptionItem>
         <DescriptionItem label={t("detail.owner")}>{file.uploadedBy?.name ?? t("detail.unknown")}</DescriptionItem>
       </DescriptionList>
-        {canManage && ready && <div className="flex flex-wrap gap-2"><Button variant="outline" onClick={() => setDialog("rename")}><PencilIcon />{t("actions.rename")}</Button><Button variant="outline" onClick={() => setDialog("move")}><FolderInputIcon />{t("actions.move")}</Button></div>}
+        {canManage && ready && <Inline gap="sm" align="stretch" wrap><Button variant="outline" onClick={() => setDialog("rename")}><PencilIcon />{t("actions.rename")}</Button><Button variant="outline" onClick={() => setDialog("move")}><FolderInputIcon />{t("actions.move")}</Button></Inline>}
       </Card>
-      <Card className="self-start"><CardTitle>{t("detail.linked")}</CardTitle>{detail.links.length ? <ul className="divide-y">{detail.links.map((link) => <li key={`${link.entityType}:${link.entityId}`}><RecordLink to={link.href} className="flex min-h-11 items-center break-words py-3 font-medium underline">{link.name}</RecordLink></li>)}</ul> : <p className="text-sm text-muted-foreground">{t("detail.noLinks")}</p>}</Card>
+      <Card className="self-start"><CardTitle>{t("detail.linked")}</CardTitle>{detail.links.length ? <GeneralList variant="embedded" label={t("detail.linked")} items={detail.links} getKey={(link) => `${link.entityType}:${link.entityId}`} renderRow={(link) => <><RecordLink to={link.href} className="flex min-h-11 items-center break-words py-3 font-medium underline">{link.name}</RecordLink></>} emptyState={null} /> : <Text size="sm" tone="muted">{t("detail.noLinks")}</Text>}</Card>
     </PageGrid>
     <DocumentPreviewDialog file={dialog === "preview" ? file : null} onOpenChange={(open) => !open && setDialog(null)} />
     {canManage && <>

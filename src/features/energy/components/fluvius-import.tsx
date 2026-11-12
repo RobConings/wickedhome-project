@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { CircleCheckIcon, CircleStopIcon, FileSpreadsheetIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -125,7 +127,7 @@ export function FluviusImport({ initialState, upload = uploadFluviusFile, defaul
 
   if (state.step === "choose") {
     return (
-      <div className="flex flex-col gap-3">
+      <Stack gap="3">
         {state.error && <InlineAlert tone="error">{state.error}</InlineAlert>}
         <FileDropZone
           accept=".csv,text/csv"
@@ -135,7 +137,7 @@ export function FluviusImport({ initialState, upload = uploadFluviusFile, defaul
           buttonLabel={t("import.drop.button")}
           onFiles={(files) => void handleFiles(files)}
         />
-      </div>
+      </Stack>
     );
   }
 
@@ -147,14 +149,14 @@ export function FluviusImport({ initialState, upload = uploadFluviusFile, defaul
           <FileSpreadsheetIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
           <CardTitle className="min-w-0 truncate">{state.fileName}</CardTitle>
         </CardHeader>
-        <div className="flex flex-col gap-2">
+        <Stack gap="sm">
           <Progress value={percent} label={t("import.stages.parsingLabel")} />
-          <p className="text-sm text-muted-foreground" role="status">
+          <Text size="sm" tone="muted"  role="status">
             {state.step === "reading"
               ? t("import.stages.reading")
               : t("import.stages.parsing", { done: number(state.done), total: number(state.total) })}
-          </p>
-        </div>
+          </Text>
+        </Stack>
         <CardFooter className="justify-end">
           <Button variant="outline" onClick={stop}>
             {t("import.cancelFile")}
@@ -182,11 +184,11 @@ export function FluviusImport({ initialState, upload = uploadFluviusFile, defaul
           <CardTitle>{result.stopped ? t("import.stopped.title") : t("import.done.title")}</CardTitle>
           <CarrierBadge carrier={parsed.carrier} className="ml-auto" />
         </CardHeader>
-        <p className="text-sm text-muted-foreground" role="status">
+        <Text size="sm" tone="muted"  role="status">
           {result.stopped
             ? t("import.stopped.description", { batch: result.batchesDone, batches: result.batches })
             : t("import.done.description", { count: result.received })}
-        </p>
+        </Text>
         <DescriptionList>
           <DescriptionItem label={t("import.preview.range")}>{range}</DescriptionItem>
           <DescriptionItem label={t("import.result.rows")}>
@@ -289,12 +291,12 @@ export function FluviusImport({ initialState, upload = uploadFluviusFile, defaul
       {parsed.skipped.length > 0 && <InlineAlert>{t("import.preview.skipped", { count: parsed.skipped.length })}</InlineAlert>}
 
       {uploading && (
-        <div className="flex flex-col gap-2">
+        <Stack gap="sm">
           <Progress
             value={state.progress.batches ? (state.progress.batch / state.progress.batches) * 100 : 0}
             label={t("import.stages.savingLabel")}
           />
-          <p className="flex flex-wrap justify-between gap-x-3 text-sm text-muted-foreground" role="status">
+          <Text size="sm" tone="muted" className="flex flex-wrap justify-between gap-x-3" role="status">
             <span>
               {state.stopping
                 ? t("import.stages.stopping")
@@ -306,8 +308,8 @@ export function FluviusImport({ initialState, upload = uploadFluviusFile, defaul
             <span className="tabular-nums">
               {t("import.stages.rows", { done: number(state.progress.done), total: number(state.progress.total) })}
             </span>
-          </p>
-        </div>
+          </Text>
+        </Stack>
       )}
 
       <CardFooter className="flex-wrap justify-end">

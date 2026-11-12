@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { TicketIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardDescription, CardTitle } from "@/components/shared/card";
@@ -28,10 +30,10 @@ export function VoucherBalances({ balances, habitants, className }: VoucherBalan
 
   return (
     <Card className={className}>
-      <div className="flex items-center gap-2">
+      <Inline gap="sm" align="center">
         <TicketIcon className="size-4 text-muted-foreground" aria-hidden="true" />
         <CardTitle>{t("vouchers.title")}</CardTitle>
-      </div>
+      </Inline>
       <CardDescription>{t("vouchers.description")}</CardDescription>
       {soon.length > 0 && (
         <InlineAlert>
@@ -48,7 +50,7 @@ export function VoucherBalances({ balances, habitants, className }: VoucherBalan
         </InlineAlert>
       )}
       {rows.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("vouchers.none")}</p>
+        <Text size="sm" tone="muted">{t("vouchers.none")}</Text>
       ) : (
         <ul className="flex flex-col divide-y">
           {rows.map(({ balance, habitant }) => {

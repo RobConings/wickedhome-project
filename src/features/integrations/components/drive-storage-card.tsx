@@ -1,3 +1,7 @@
+import { FormField } from "@/components/shared/form-field";
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { ExternalLinkIcon, FolderOpenIcon, FolderPlusIcon, HardDriveUploadIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -187,12 +191,12 @@ function DriveStoragePanel({ initial, client = driveStorageClient, pollMs = 2000
 
       {showSetup &&
         (!viewer.googleConfigured ? (
-          <p className="text-sm text-muted-foreground">{t("driveStorage.notConfigured")}</p>
+          <Text size="sm" tone="muted">{t("driveStorage.notConfigured")}</Text>
         ) : !hasDrive ? (
-          <div className="flex flex-col gap-3">
-            <p className="text-sm text-muted-foreground">{t("driveStorage.needsDrive")}</p>
+          <Stack gap="3">
+            <Text size="sm" tone="muted">{t("driveStorage.needsDrive")}</Text>
             <ConnectButton label={viewer.connected ? t("driveStorage.turnOnDrive") : t("driveStorage.connectDrive")} onClick={() => connect(["drive"])} />
-          </div>
+          </Stack>
         ) : (
           <SetupForm
             status={status}
@@ -268,7 +272,7 @@ function SetupForm({
   };
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg border p-3">
+    <Stack gap="md" className="rounded-lg border p-3">
       <SegmentedControl
         label={t("driveStorage.modeLabel")}
         value={mode}
@@ -289,11 +293,9 @@ function SetupForm({
           }}
         >
           <fieldset disabled={saving} className="flex flex-col gap-3">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor={nameId}>{t("driveStorage.folderName")}</Label>
+            <FormField htmlFor={nameId} label={<>{t("driveStorage.folderName")}</>} description={<>{t("driveStorage.createHint")}</>}>
               <Input id={nameId} value={folderName} onChange={(event) => setFolderName(event.target.value)} maxLength={100} className="text-base sm:text-sm" required />
-              <p className="text-xs text-muted-foreground">{t("driveStorage.createHint")}</p>
-            </div>
+            </FormField>
             <YearSwitch id={yearsId} checked={yearSubfolders} onChange={setYearSubfolders} />
           </fieldset>
           <Button type="submit" className="w-fit" loading={saving} disabled={!folderName.trim()}>
@@ -301,8 +303,8 @@ function SetupForm({
           </Button>
         </form>
       ) : (
-        <div className="flex flex-col gap-3">
-          <p className="text-sm text-muted-foreground">{t("driveStorage.pickHint")}</p>
+        <Stack gap="3">
+          <Text size="sm" tone="muted">{t("driveStorage.pickHint")}</Text>
           {missing ? (
             <>
               <InlineAlert>{t("driveStorage.pickScope")}</InlineAlert>
@@ -329,22 +331,22 @@ function SetupForm({
               />
             </>
           )}
-        </div>
+        </Stack>
       )}
-    </div>
+    </Stack>
   );
 }
 
 function YearSwitch({ id, checked, onChange, disabled }: { id: string; checked: boolean; onChange: (value: boolean) => void; disabled?: boolean }) {
   const { t } = useTranslation("integrations");
   return (
-    <div className="flex items-start gap-3">
+    <Inline gap="md" align="start">
       <Switch id={id} checked={checked} onCheckedChange={onChange} disabled={disabled} className="mt-0.5" />
       <Label htmlFor={id} className="flex flex-col items-start gap-0.5 font-normal">
         <span className="text-sm font-medium">{t("driveStorage.yearSubfolders")}</span>
         <span className="text-xs text-muted-foreground">{t("driveStorage.yearSubfoldersHint", { year: new Date().getFullYear() })}</span>
       </Label>
-    </div>
+    </Inline>
   );
 }
 
@@ -410,7 +412,7 @@ function ActiveTarget({
   const done = batch ? Math.max(0, batch.total - waiting) : 0;
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       {target.state === "paused" && target.pausedReason === "disconnected" && (
         <InlineAlert tone="error">
           <span className="flex flex-col gap-2">
@@ -437,7 +439,7 @@ function ActiveTarget({
       )}
 
       {target.folder && (
-        <div className="flex flex-col gap-1 text-sm">
+        <Stack gap="xs" className="text-sm">
           <span>
             {owner?.mine ? t("driveStorage.whereMine") : t("driveStorage.whereOther", { name: ownerName })}{" "}
             <a href={target.folder.webUrl} target="_blank" rel="noreferrer noopener" className="inline-flex items-center gap-1 font-medium text-primary underline-offset-4 hover:underline">
@@ -446,18 +448,18 @@ function ActiveTarget({
             </a>
           </span>
           {owner?.email && <span className="text-xs text-muted-foreground">{owner.email}</span>}
-        </div>
+        </Stack>
       )}
 
-      <p className="text-sm text-muted-foreground">
+      <Text size="sm" tone="muted">
         {t("driveStorage.counts.inDrive", { count: counts.inDrive })} · {t("driveStorage.counts.local", { count: counts.local })}
-      </p>
+      </Text>
 
       {batch ? (
-        <div className="flex flex-col gap-1.5" aria-live="polite">
+        <Stack gap="1.5"  aria-live="polite">
           <Progress value={(done / batch.total) * 100} label={t("driveStorage.moving", { done, total: batch.total })} />
           <span className="text-xs text-muted-foreground">{t("driveStorage.moving", { done, total: batch.total })}</span>
-        </div>
+        </Stack>
       ) : (
         waiting > 0 && (
           <InlineAlert>
@@ -470,7 +472,7 @@ function ActiveTarget({
         )
       )}
 
-      <div className="flex flex-wrap gap-2">
+      <Inline gap="sm" align="stretch" wrap>
         {target.state === "active" && (counts.local > 0 || waiting > 0) && !batch && (
           <Button size="sm" variant="outline" onClick={moveExisting} loading={starting}>
             <HardDriveUploadIcon />
@@ -482,19 +484,19 @@ function ActiveTarget({
             {changing ? tCommon("actions.cancel") : owner?.mine ? t("driveStorage.changeFolder") : t("driveStorage.useMyDrive")}
           </Button>
         )}
-      </div>
-      {target.state === "active" && counts.local > 0 && !batch && <p className="text-xs text-muted-foreground">{t("driveStorage.moveHint")}</p>}
+      </Inline>
+      {target.state === "active" && counts.local > 0 && !batch && <Text size="xs" tone="muted">{t("driveStorage.moveHint")}</Text>}
 
-      <div className="flex flex-col gap-3 border-t pt-3">
+      <Stack gap="3" className="border-t pt-3">
         <YearSwitch id={yearsId} checked={target.yearSubfolders} onChange={(value) => update({ yearSubfolders: value })} disabled={saving !== null} />
-        <div className="flex items-start gap-3">
+        <Inline gap="md" align="start">
           <Switch id={deleteId} checked={target.deleteInDrive} onCheckedChange={(value) => update({ deleteInDrive: value })} disabled={saving !== null} className="mt-0.5" />
           <Label htmlFor={deleteId} className="flex flex-col items-start gap-0.5 font-normal">
             <span className="text-sm font-medium">{t("driveStorage.deleteInDrive")}</span>
             <span className="text-xs text-muted-foreground">{t("driveStorage.deleteInDriveHint")}</span>
           </Label>
-        </div>
-      </div>
-    </div>
+        </Inline>
+      </Stack>
+    </Stack>
   );
 }

@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import {
   ClockIcon,
@@ -126,13 +128,13 @@ export function ShopDetailScreen({
   );
 
   const detailRow = (icon: React.ReactNode, label: string, value: string | null) => (
-    <div className="flex items-start gap-3">
+    <Inline gap="md" align="start">
       <span className="mt-0.5 text-muted-foreground [&_svg]:size-4">{icon}</span>
-      <div className="flex min-w-0 flex-col">
+      <Stack gap="none" className="min-w-0">
         <span className="text-xs text-muted-foreground">{label}</span>
         <span className={value ? "whitespace-pre-line" : "text-muted-foreground"}>{value ?? t("detail.notSet")}</span>
-      </div>
-    </div>
+      </Stack>
+    </Inline>
   );
 
   return (
@@ -167,9 +169,9 @@ export function ShopDetailScreen({
 
           <Card>
             <CardTitle>{t("detail.notes")}</CardTitle>
-            <p className={shop.notes ? "whitespace-pre-line" : "text-sm text-muted-foreground"}>
+            <Text className={shop.notes ? "whitespace-pre-line" : "text-sm text-muted-foreground"}>
               {shop.notes ?? t("detail.noNotes")}
-            </p>
+            </Text>
           </Card>
         </Stack>
 
@@ -197,18 +199,18 @@ export function ShopDetailScreen({
                   {displayUrl(shop.websiteUrl)}
                   <ExternalLinkIcon className="size-4 shrink-0" aria-hidden="true" />
                 </a>
-                {shop.hasWebshop && <p className="text-sm text-muted-foreground">{t("fields.hasWebshopDescription")}</p>}
-                <div className="border-t pt-3">
+                {shop.hasWebshop && <Text size="sm" tone="muted">{t("fields.hasWebshopDescription")}</Text>}
+                <Stack gap="none" className="border-t pt-3">
                   <ShopIngredientSearchToggle shop={shop} canChange={canSetIngredientSearch} />
-                </div>
-                <div className="flex items-center gap-3 border-t pt-3" aria-busy={refreshingIcon || undefined}>
+                </Stack>
+                <Inline gap="md" align="center" className="border-t pt-3" aria-busy={refreshingIcon || undefined}>
                   <ShopLogo shop={shop} size="md" className={refreshingIcon ? "animate-pulse" : undefined} />
-                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <Stack gap="0.5" className="min-w-0 flex-1">
                     <span className="text-sm font-medium">{t("icon.label")}</span>
                     <span className="text-xs text-muted-foreground" aria-live="polite">
                       {refreshingIcon ? t("icon.searching") : shop.iconUrl ? t("icon.auto") : t("icon.missing")}
                     </span>
-                  </div>
+                  </Stack>
                   {canRefreshIcon && (
                     <Button
                       variant="outline"
@@ -220,10 +222,10 @@ export function ShopDetailScreen({
                       {refreshingIcon ? t("icon.refreshing") : t("icon.refresh")}
                     </Button>
                   )}
-                </div>
+                </Inline>
               </CardContent>
             ) : (
-              <p className="text-sm text-muted-foreground">{t("detail.noWebsite")}</p>
+              <Text size="sm" tone="muted">{t("detail.noWebsite")}</Text>
             )}
           </Card>
         </Stack>

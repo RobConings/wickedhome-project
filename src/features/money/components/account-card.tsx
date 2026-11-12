@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { ArrowLeftRightIcon, HistoryIcon, EllipsisVerticalIcon, LandmarkIcon, PiggyBankIcon, ScaleIcon } from "lucide-react";
 import { type To } from "react-router";
@@ -47,17 +49,17 @@ export function AccountCard({ account, month, accounts, habitants, today, canMan
 
   return (
     <Card className={cn("h-full min-w-0 gap-3", account.archived && "opacity-60")}>
-      <div className="flex items-start gap-3">
+      <Inline gap="md" align="start">
         <span className="grid size-10 shrink-0 place-items-center rounded-full text-white" style={{ backgroundColor: account.color }}>
           <Icon className="size-5" aria-hidden="true" />
         </span>
-        <div className="flex min-w-0 flex-1 flex-col">
+        <Stack gap="none" className="min-w-0 flex-1">
           <h3 className="font-semibold break-words">{account.name}</h3>
           <span className="truncate text-xs text-muted-foreground">
             {t(`kinds.${account.kind}`)}
             {account.iban ? ` · ${groupIban(account.iban)}` : ""}
           </span>
-        </div>
+        </Stack>
         {canManage && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -71,9 +73,9 @@ export function AccountCard({ account, month, accounts, habitants, today, canMan
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-      </div>
+      </Inline>
 
-      <div className="flex flex-col">
+      <Stack gap="none">
         <span className="text-xs text-muted-foreground">{t("accounts.balance")}</span>
         <span className={cn("text-2xl font-semibold tabular-nums", account.balanceCents < 0 && "text-destructive")}>{money(account.balanceCents)}</span>
         {account.lastCorrection && (
@@ -81,19 +83,19 @@ export function AccountCard({ account, month, accounts, habitants, today, canMan
             {t("accounts.lastCorrection", { amount: money(account.lastCorrection.balanceCents), date: dateText(account.lastCorrection.date) })}
           </span>
         )}
-      </div>
+      </Stack>
 
       {month && (month.inCents > 0 || month.outCents > 0 || month.plannedInCents > 0 || month.plannedOutCents > 0) && (
-        <div className="flex flex-wrap gap-2 text-xs">
+        <Inline gap="sm" align="stretch" wrap className="text-xs">
           <Badge variant="secondary">{t("accounts.monthIn", { amount: money(month.inCents) })}</Badge>
           <Badge variant="secondary">{t("accounts.monthOut", { amount: money(month.outCents) })}</Badge>
           {/* Dated after today: not in the balance yet. */}
           {month.plannedInCents > 0 && <Badge variant="outline">{t("accounts.plannedIn", { amount: money(month.plannedInCents) })}</Badge>}
           {month.plannedOutCents > 0 && <Badge variant="outline">{t("accounts.plannedOut", { amount: money(month.plannedOutCents) })}</Badge>}
-        </div>
+        </Inline>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
+      <Inline gap="sm" align="center" wrap>
         {owners.length > 0 && (
           <span className="flex items-center" aria-label={`${t("accounts.owners")}: ${owners.map((owner) => owner.name).join(", ")}`}>
             {owners.map((owner) => (
@@ -103,11 +105,11 @@ export function AccountCard({ account, month, accounts, habitants, today, canMan
         )}
         {account.isDefault && <Badge variant="outline">{t("accounts.default")}</Badge>}
         {account.archived && <Badge variant="outline">{t("accounts.archived")}</Badge>}
-      </div>
+      </Inline>
 
       {canManage && !account.archived && (
         // Side by side when the card is wide enough, else stacked full width; labels wrap instead of overflowing.
-        <div className="mt-auto flex flex-wrap gap-2">
+        <Inline gap="sm" align="stretch" wrap className="mt-auto">
           {showTransfer && <RecordTransferDialog
             accounts={accounts}
             habitants={habitants}
@@ -130,7 +132,7 @@ export function AccountCard({ account, month, accounts, habitants, today, canMan
               </Button>
             }
           />
-        </div>
+        </Inline>
       )}
 
       {activityTo && <Button asChild variant="outline"><Link to={activityTo} preventScrollReset><HistoryIcon />{t("tabs.history")}</Link></Button>}

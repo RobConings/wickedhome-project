@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import { BotIcon, MonitorSmartphoneIcon, PlugIcon, WorkflowIcon, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
@@ -50,14 +52,14 @@ function EntryMeta({ entry }: { entry: AuditEntry }) {
 export function AuditEntryRow({ entry }: { entry: AuditEntry }) {
   const { title, detail } = useEntryTitle()(entry);
   return (
-    <div className="flex min-w-0 flex-col gap-1">
-      <p className="leading-snug">
+    <Stack gap="xs" className="min-w-0">
+      <Text className="leading-snug">
         <span className="font-medium">{title}</span>
         {entry.targetLabel && <span className="text-muted-foreground"> · {entry.targetUrl ? <RecordLink to={entry.targetUrl} className="font-medium text-primary hover:underline">{entry.targetLabel}</RecordLink> : entry.targetLabel}</span>}
-      </p>
-      {detail && <p className="text-sm break-words text-muted-foreground">{detail}</p>}
+      </Text>
+      {detail && <Text size="sm" tone="muted" className="break-words">{detail}</Text>}
       <EntryMeta entry={entry} />
-    </div>
+    </Stack>
   );
 }
 
@@ -66,9 +68,9 @@ export function AuditEntryTile({ entry }: { entry: AuditEntry }) {
   const { title, detail } = useEntryTitle()(entry);
   return (
     <Card className="flex h-full flex-col gap-2">
-      <p className="leading-snug font-medium">{title}</p>
-      {entry.targetLabel && <p className="text-sm">{entry.targetUrl ? <RecordLink to={entry.targetUrl} className="font-medium text-primary hover:underline">{entry.targetLabel}</RecordLink> : entry.targetLabel}</p>}
-      {detail && <p className="text-sm break-words text-muted-foreground">{detail}</p>}
+      <Text weight="medium" className="leading-snug">{title}</Text>
+      {entry.targetLabel && <Text size="sm">{entry.targetUrl ? <RecordLink to={entry.targetUrl} className="font-medium text-primary hover:underline">{entry.targetLabel}</RecordLink> : entry.targetLabel}</Text>}
+      {detail && <Text size="sm" tone="muted" className="break-words">{detail}</Text>}
       <div className="mt-auto">
         <EntryMeta entry={entry} />
       </div>

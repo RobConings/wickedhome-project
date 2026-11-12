@@ -1,3 +1,7 @@
+import { PageGrid } from "@/components/layout/page-grid";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import { ArrowRightIcon, FlameIcon, ZapIcon, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
@@ -33,15 +37,15 @@ function CarrierLabel({ icon: Icon, label }: { icon: LucideIcon; label: string }
 
 function FigurePair({ figures }: { figures: [Figure, Figure] }) {
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <PageGrid gap="3" className="grid-cols-2">
       {figures.map((figure) => (
-        <div key={figure.label} className="flex min-w-0 flex-col gap-0.5">
+        <Stack gap="0.5" key={figure.label} className="min-w-0">
           <span className="text-xs text-muted-foreground">{figure.label}</span>
           <span className="text-xl font-semibold tracking-tight tabular-nums">{figure.value}</span>
           {figure.detail && <span className="text-xs text-muted-foreground tabular-nums">{figure.detail}</span>}
-        </div>
+        </Stack>
       ))}
-    </div>
+    </PageGrid>
   );
 }
 
@@ -67,11 +71,11 @@ export function EnergyCard({ today, summary }: EnergyCardProps) {
       {!figures ? (
         <InlineAlert tone="error">{t("loadError")}</InlineAlert>
       ) : !hasAnyData ? (
-        <p className="text-sm text-muted-foreground">{t("energy.noData")}</p>
+        <Text size="sm" tone="muted">{t("energy.noData")}</Text>
       ) : (
         <>
           {figures.hasData && (
-            <div className="flex flex-col gap-1.5">
+            <Stack gap="1.5">
               {gas && <CarrierLabel icon={ZapIcon} label={t("energy.electricity")} />}
               <FigurePair
                 figures={[
@@ -79,7 +83,7 @@ export function EnergyCard({ today, summary }: EnergyCardProps) {
                   { label: electricityLabel(t("energy.month")), value: kwh(figures.monthWh) },
                 ]}
               />
-            </div>
+            </Stack>
           )}
           {gas && (
             <div className={figures.hasData ? "flex flex-col gap-1.5 border-t pt-3" : "flex flex-col gap-1.5"}>
@@ -111,10 +115,10 @@ export function EnergyCard({ today, summary }: EnergyCardProps) {
               ]
                 .filter((row): row is { term: string; value: string } => row !== false)
                 .map((row) => (
-                  <div key={row.term} className="flex items-center justify-between gap-3 py-2">
+                  <Inline gap="md" align="center" justify="between" key={row.term} className="py-2">
                     <dt className="text-muted-foreground">{row.term}</dt>
                     <dd className="font-medium tabular-nums">{row.value}</dd>
-                  </div>
+                  </Inline>
                 ))}
             </dl>
           )}

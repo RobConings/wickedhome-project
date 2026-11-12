@@ -58,6 +58,8 @@ jobs:
         run: npm run typecheck
       - name: Lint
         run: npm run lint
+      - name: Check component composition across all features
+        run: npm run audit:components
       - name: Unit tests
         run: npm test
       - name: Shopping database and MCP integration
@@ -78,6 +80,8 @@ jobs:
         run: npm run build
       - name: Build the shared component catalogue
         run: npm run build-storybook
+      - name: Check every feature screen and shared compositions in browsers
+        run: npm run test:components-browser
       - name: Verify redesign components on phone and desktop
         run: node scripts/redesign-storybook-smoke.mjs
 

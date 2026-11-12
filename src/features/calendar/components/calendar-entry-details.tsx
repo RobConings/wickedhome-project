@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import type * as React from "react";
 import { ClockIcon, ListIcon, MapPinIcon, RepeatIcon, StickyNoteIcon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -31,13 +33,13 @@ type CalendarEntryDetailsProps = {
 
 function Row({ icon: Icon, label, children }: { icon: typeof ClockIcon; label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-3 text-sm">
+    <Inline gap="md" align="start" className="text-sm">
       <Icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
       <div className="min-w-0 flex-1">
         <span className="sr-only">{label}: </span>
         {children}
       </div>
-    </div>
+    </Inline>
   );
 }
 
@@ -58,7 +60,7 @@ export function CalendarEntryDetails({ entry, event, habitants, shops, renderSho
 
   return (
     <div className={cn("flex flex-col gap-4", className)}>
-      <div className="flex flex-wrap items-center gap-2">
+      <Inline gap="sm" align="center" wrap>
         <Badge variant="outline" className="gap-1 font-normal">
           <CalendarEntryIcon kind={kind} />
           {t(`kinds.${kind}`)}
@@ -74,7 +76,7 @@ export function CalendarEntryDetails({ entry, event, habitants, shops, renderSho
             {t("entry.readOnly")}
           </Badge>
         )}
-      </div>
+      </Inline>
 
       <Row icon={ClockIcon} label={t("detail.when")}>
         <span className="first-letter:uppercase">{when}</span>
@@ -111,25 +113,25 @@ export function CalendarEntryDetails({ entry, event, habitants, shops, renderSho
 
       {event?.description && (
         <Row icon={StickyNoteIcon} label={t("detail.notes")}>
-          <p className="whitespace-pre-line">{event.description}</p>
+          <Text className="whitespace-pre-line">{event.description}</Text>
         </Row>
       )}
 
-      {entry?.readOnly && <p className="text-sm text-muted-foreground">{t("detail.managedIn")}</p>}
+      {entry?.readOnly && <Text size="sm" tone="muted">{t("detail.managedIn")}</Text>}
 
       {shop && (
         <section className="flex flex-col gap-2 rounded-lg border bg-muted/30 p-3" aria-labelledby="store-visit-list">
-          <div className="flex items-center justify-between gap-2">
+          <Inline gap="sm" align="center" justify="between">
             <h3 id="store-visit-list" className="flex items-center gap-2 text-sm font-semibold">
               <ListIcon className="size-4 text-muted-foreground" aria-hidden="true" />
               {t("detail.shopList")}
             </h3>
             <ShopBadge shop={shop} linked />
-          </div>
+          </Inline>
           {renderShopList ? (
             renderShopList(shop.id)
           ) : (
-            <p className="text-sm text-muted-foreground">{t("detail.shopListPlaceholder", { shop: shop.name })}</p>
+            <Text size="sm" tone="muted">{t("detail.shopListPlaceholder", { shop: shop.name })}</Text>
           )}
         </section>
       )}

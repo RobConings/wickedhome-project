@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { RefreshCwIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -215,8 +218,8 @@ function LinkField({ id, name, value, onChange, invalid, describedBy, disabled, 
   };
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex gap-2">
+    <Stack gap="1.5">
+      <Inline gap="sm" align="stretch">
         <input
           id={id}
           name={name}
@@ -234,13 +237,13 @@ function LinkField({ id, name, value, onChange, invalid, describedBy, disabled, 
           <RefreshCwIcon />
           <span className="max-sm:sr-only">{t("edit.fetch")}</span>
         </Button>
-      </div>
+      </Inline>
       <input type="hidden" name="imageUrl" value={value.imageUrl} />
       {state.message && (
-        <p className="text-xs text-muted-foreground" aria-live="polite">
+        <Text size="xs" tone="muted"  aria-live="polite">
           {state.message}
-        </p>
+        </Text>
       )}
-    </div>
+    </Stack>
   );
 }

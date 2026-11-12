@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import { BellRingIcon, CheckCircle2Icon, SendIcon, ShareIcon, SmartphoneIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -25,57 +27,57 @@ export function PushEnablePanel({ support, enabled, enabling, testing, onEnable,
   const { t } = useTranslation("notifications");
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       {support === "ios-install" && (
         <InlineAlert>
           <ShareIcon />
-          <div className="flex flex-col gap-1">
-            <p className="font-medium">{t("push.iosTitle")}</p>
-            <p className="text-muted-foreground">{t("push.iosSteps")}</p>
-          </div>
+          <Stack gap="xs">
+            <Text weight="medium">{t("push.iosTitle")}</Text>
+            <Text tone="muted">{t("push.iosSteps")}</Text>
+          </Stack>
         </InlineAlert>
       )}
       {support === "denied" && (
         <InlineAlert tone="error">
           <BellRingIcon />
-          <p>{t("push.denied")}</p>
+          <Text>{t("push.denied")}</Text>
         </InlineAlert>
       )}
       {support === "insecure" && (
         <InlineAlert>
           <BellRingIcon />
-          <p>{t("push.insecure")}</p>
+          <Text>{t("push.insecure")}</Text>
         </InlineAlert>
       )}
       {support === "unsupported" && (
         <InlineAlert>
           <BellRingIcon />
-          <p>{t("push.unsupported")}</p>
+          <Text>{t("push.unsupported")}</Text>
         </InlineAlert>
       )}
       {support === "available" &&
         (enabled ? (
           <InlineAlert tone="success">
             <CheckCircle2Icon />
-            <p>{t("push.on")}</p>
+            <Text>{t("push.on")}</Text>
           </InlineAlert>
         ) : (
-          <div className="flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-center">
+          <Stack gap="sm" className="rounded-lg border p-3 sm:flex-row sm:items-center">
             <SmartphoneIcon className="hidden size-5 shrink-0 text-muted-foreground sm:block" aria-hidden="true" />
-            <p className="flex-1 text-sm">{dismissed ? t("push.permissionDismissed") : t("push.off")}</p>
+            <Text size="sm" className="flex-1">{dismissed ? t("push.permissionDismissed") : t("push.off")}</Text>
             <Button size="lg" onClick={onEnable} loading={enabling}>
               <BellRingIcon />
               {enabling ? t("push.enabling") : t("push.enable")}
             </Button>
-          </div>
+          </Stack>
         ))}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-muted-foreground">{t("push.androidHint")}</p>
+      <Stack gap="sm" className="sm:flex-row sm:items-center sm:justify-between">
+        <Text size="sm" tone="muted">{t("push.androidHint")}</Text>
         <Button variant="outline" size="lg" onClick={onTest} loading={testing}>
           <SendIcon />
           {t("push.test")}
         </Button>
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   );
 }

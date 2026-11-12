@@ -12,7 +12,7 @@ function Box({ label, className = "h-24" }: { label: string; className?: string 
 const meta = {
   title: "Layout/Stack",
   component: Stack,
-  argTypes: { gap: { control: "select", options: ["none", "xs", "sm", "md", "lg", "xl"] } },
+  argTypes: { gap: { control: "select", options: ["none", "xs", "sm", "md", "lg", "xl", "0.5", "1.5", "3", "5", "8"] } },
   args: { gap: "md" },
   render: (args) => (
     <Stack {...args} className="w-64">

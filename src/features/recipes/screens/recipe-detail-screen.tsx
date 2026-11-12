@@ -1,3 +1,5 @@
+import { DescriptionList, DescriptionItem } from "@/components/shared/description-list";
+import { Text } from "@/components/ui/text";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import { RelatedRecordCards } from "@/components/shared/related-record-cards";
 import { RecordImage } from "@/components/shared/record-image";
@@ -165,7 +167,7 @@ export function RecipeDetailScreen({
         return (
           <li key={ingredient.id} className="flex items-start gap-3 py-2.5">
             <IngredientThumbnail product={product} />
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <Stack gap="0.5" className="min-w-0 flex-1">
               <span className="flex flex-wrap items-center gap-x-2">
                 {check ? <IngredientStatusDot status={check.status} /> : <span className="size-2.5 animate-pulse rounded-full bg-muted" aria-hidden="true" />}
                 <span className="font-medium break-words">{product && product.name === ingredient.name ? <IngredientProductLink product={product} /> : ingredient.name}</span>
@@ -179,7 +181,7 @@ export function RecipeDetailScreen({
                   <IngredientStockText check={check} variant="stock" />
                 </span>
               )}
-            </div>
+            </Stack>
             {product && <IngredientShopLink product={product} />}
           </li>
         );
@@ -235,7 +237,7 @@ export function RecipeDetailScreen({
               description={recipe.servings ? t("detail.ingredientsFor", { count: recipe.servings }) : undefined}
             />
             {recipe.ingredients.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t("detail.noIngredients")}</p>
+              <Text size="sm" tone="muted">{t("detail.noIngredients")}</Text>
             ) : (
               <React.Suspense fallback={ingredientList(null)}>
                 <Await
@@ -264,7 +266,7 @@ export function RecipeDetailScreen({
               }
             />
             {recipe.steps.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t("detail.noSteps")}</p>
+              <Text size="sm" tone="muted">{t("detail.noSteps")}</Text>
             ) : (
               <ol className="flex flex-col gap-4">
                 {recipe.steps.map((step, index) => (
@@ -272,45 +274,37 @@ export function RecipeDetailScreen({
                     <span className="grid size-7 shrink-0 place-items-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
                       {index + 1}
                     </span>
-                    <div className="flex min-w-0 flex-col gap-1 pt-0.5">
-                      <p className="break-words whitespace-pre-line">{step.text}</p>
+                    <Stack gap="xs" className="min-w-0 pt-0.5">
+                      <Text className="break-words whitespace-pre-line">{step.text}</Text>
                       {step.timerMinutes && (
                         <span className="flex items-center gap-1 text-xs text-muted-foreground">
                           <TimerIcon className="size-3.5" aria-hidden="true" />
                           {t("detail.timer", { count: step.timerMinutes })}
                         </span>
                       )}
-                    </div>
+                    </Stack>
                   </li>
                 ))}
               </ol>
             )}
-            {mealPlan.length === 0 && recipe.steps.length > 0 && <div className="pt-2">{cookButton(true)}</div>}
+            {mealPlan.length === 0 && recipe.steps.length > 0 && <Stack gap="none" className="pt-2">{cookButton(true)}</Stack>}
           </PageSection>
         </Stack>
 
         <Stack gap="lg">
           <Card>
             <CardTitle>{t("detail.details")}</CardTitle>
-            <dl className="flex flex-col gap-3 text-sm">
-              <div className="flex flex-col">
-                <dt className="text-xs text-muted-foreground">{t("fields.category")}</dt>
-                <dd>
+            <DescriptionList columns="1" className="flex flex-col gap-3 text-sm">
+              <DescriptionItem  label={<>{t("fields.category")}</>}>
                   <Link className="text-primary underline-offset-4 hover:underline" to={`/recipes?tab=all&category=${encodeURIComponent(recipe.category?.id ?? "none")}`}>
                     {recipe.category?.name ?? t("categories.uncategorized")}
                   </Link>
-                </dd>
-              </div>
-              <div className="flex flex-col">
-                <dt className="text-xs text-muted-foreground">{t("fields.servings")}</dt>
-                <dd className={recipe.servings ? undefined : "text-muted-foreground"}>
+                </DescriptionItem>
+              <DescriptionItem  label={<>{t("fields.servings")}</>}>
                   {recipe.servings ? t("facts.servings", { count: recipe.servings }) : t("detail.noServings")}
-                </dd>
-              </div>
+                </DescriptionItem>
               {recipe.sourceUrl && (
-                <div className="flex flex-col">
-                  <dt className="text-xs text-muted-foreground">{t("fields.sourceUrl")}</dt>
-                  <dd>
+                <DescriptionItem  label={<>{t("fields.sourceUrl")}</>}>
                     <a
                       href={recipe.sourceUrl}
                       target="_blank"
@@ -320,16 +314,12 @@ export function RecipeDetailScreen({
                       {new URL(recipe.sourceUrl).hostname.replace(/^www\./, "")}
                       <ExternalLinkIcon className="size-3.5 shrink-0" aria-hidden="true" />
                     </a>
-                  </dd>
-                </div>
+                  </DescriptionItem>
               )}
               {recipe.notes && (
-                <div className="flex flex-col">
-                  <dt className="text-xs text-muted-foreground">{t("fields.notes")}</dt>
-                  <dd className="break-words whitespace-pre-line">{recipe.notes}</dd>
-                </div>
+                <DescriptionItem  label={<>{t("fields.notes")}</>}>{recipe.notes}</DescriptionItem>
               )}
-            </dl>
+            </DescriptionList>
           </Card>
           <Card>
             <CardTitle>{t("cover.title")}</CardTitle>

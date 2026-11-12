@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -16,7 +19,7 @@ export function LoanRepaymentField({ id, loans, value, onChange, onPayAll }: {
   const { t } = useTranslation("expenses");
   const selected = loans.find((loan) => loan.id === value);
   return (
-    <div className="flex flex-col gap-2">
+    <Stack gap="sm">
       <input type="hidden" name="earlyRepaymentForId" value={value ?? ""} />
       <Select value={value ?? "none"} onValueChange={(next) => onChange(next === "none" ? null : next)}>
         <SelectTrigger id={id} className="w-full"><SelectValue /></SelectTrigger>
@@ -27,13 +30,13 @@ export function LoanRepaymentField({ id, loans, value, onChange, onPayAll }: {
       </Select>
       {selected && (selected.totalOpen ? (
         <>
-          <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+          <Inline gap="sm" align="center" justify="between" wrap className="text-sm">
             <span>{t("repayment.remaining", { amount: formatCurrency(selected.totalOpen.remainingCents, currentLocale()) })}</span>
             <Button type="button" variant="outline" size="sm" onClick={() => onPayAll(selected.totalOpen!.remainingCents)}>{t("repayment.payAll")}</Button>
-          </div>
-          <p className="text-xs text-muted-foreground">{t("repayment.hint")} {t("repayment.paymentDateHint")}</p>
+          </Inline>
+          <Text size="xs" tone="muted">{t("repayment.hint")} {t("repayment.paymentDateHint")}</Text>
         </>
-      ) : <p className="text-xs text-warning">{t("repayment.needsTotal")}</p>)}
-    </div>
+      ) : <Text size="xs" tone="warning">{t("repayment.needsTotal")}</Text>)}
+    </Stack>
   );
 }

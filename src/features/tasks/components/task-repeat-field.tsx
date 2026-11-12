@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { RepeatIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -101,19 +104,19 @@ export function TaskRepeatField({ name, defaultValue, startDate, defaultOn = fal
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       {preset !== "custom" || !on ? <input type="hidden" name={name} value={rrule} /> : null}
-      <div className="flex items-center justify-between gap-3">
+      <Inline gap="md" align="center" justify="between">
         <label htmlFor={baseId} className="flex min-w-0 cursor-pointer items-center gap-2 text-sm font-medium">
           <RepeatIcon className="size-4 text-muted-foreground" aria-hidden="true" />
           {t("repeat.label")}
         </label>
         <Switch id={baseId} checked={on} onCheckedChange={toggle} />
-      </div>
+      </Inline>
 
       {on && (
-        <div className="flex flex-col gap-3 rounded-lg border bg-muted/30 p-3">
-          <div role="radiogroup" aria-label={t("repeat.label")} className="flex flex-wrap gap-1.5">
+        <Stack gap="3" className="rounded-lg border bg-muted/30 p-3">
+          <Inline gap="1.5" align="stretch" wrap role="radiogroup" aria-label={t("repeat.label")}>
             {REPEAT_PRESETS.map((value) => {
               const active = preset === value;
               return (
@@ -132,7 +135,7 @@ export function TaskRepeatField({ name, defaultValue, startDate, defaultOn = fal
                 </button>
               );
             })}
-          </div>
+          </Inline>
 
           {preset === "custom" ? (
             <RecurrenceFields
@@ -149,7 +152,7 @@ export function TaskRepeatField({ name, defaultValue, startDate, defaultOn = fal
           ) : (
             <>
               {weekly && (
-                <div role="group" aria-label={t("repeat.weekdays")} className="flex flex-wrap gap-1.5">
+                <Inline gap="1.5" align="stretch" wrap role="group" aria-label={t("repeat.weekdays")}>
                   {WEEKDAY_CODES.map((code, index) => {
                     const active = weekdays.includes(code);
                     return (
@@ -168,9 +171,9 @@ export function TaskRepeatField({ name, defaultValue, startDate, defaultOn = fal
                       </button>
                     );
                   })}
-                </div>
+                </Inline>
               )}
-              <div className="flex flex-wrap items-center gap-2 text-sm">
+              <Inline gap="sm" align="center" wrap className="text-sm">
                 <label htmlFor={`${baseId}-until`}>{t("repeat.until")}</label>
                 <Input
                   id={`${baseId}-until`}
@@ -180,16 +183,16 @@ export function TaskRepeatField({ name, defaultValue, startDate, defaultOn = fal
                   onChange={(event) => setUntil(event.target.value)}
                   className="w-auto"
                 />
-              </div>
-              <p className="text-xs text-muted-foreground">
+              </Inline>
+              <Text size="xs" tone="muted">
                 {text.recurrence(rrule)}
                 {firstTime !== startDate && ` · ${t("repeat.firstTime", { date: text.day(firstTime, { weekday: "short" }) })}`}
-              </p>
+              </Text>
             </>
           )}
-        </div>
+        </Stack>
       )}
-      {errors?.length ? <p className="text-xs font-medium text-destructive">{errors.join(" ")}</p> : null}
-    </div>
+      {errors?.length ? <Text size="xs" tone="danger" weight="medium">{errors.join(" ")}</Text> : null}
+    </Stack>
   );
 }

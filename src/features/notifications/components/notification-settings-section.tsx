@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { KeyRoundIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -73,10 +75,10 @@ export function NotificationSettingsSection({ client = notificationsClient, brow
       );
     }
     return (
-      <div className="flex flex-col gap-4" aria-busy="true" aria-label={t("section.loading")}>
+      <Stack gap="md"  aria-busy="true" aria-label={t("section.loading")}>
         <SkeletonBlock className="h-20" />
         <SkeletonList rows={4} />
-      </div>
+      </Stack>
     );
   }
 
@@ -160,7 +162,7 @@ export function NotificationSettingsSection({ client = notificationsClient, brow
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <Stack gap="lg">
       <section className="flex flex-col gap-2" aria-labelledby="notifications-this-device">
         <h3 id="notifications-this-device" className="font-medium">
           {t("push.title")}
@@ -204,9 +206,9 @@ export function NotificationSettingsSection({ client = notificationsClient, brow
       {loaded.keyStorage === "plain" && (
         <InlineAlert>
           <KeyRoundIcon />
-          <p className="text-muted-foreground">{t("keyStorage.plain")}</p>
+          <Text tone="muted">{t("keyStorage.plain")}</Text>
         </InlineAlert>
       )}
-    </div>
+    </Stack>
   );
 }

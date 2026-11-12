@@ -1,3 +1,5 @@
+import { PageGrid } from "@/components/layout/page-grid";
+import { Text } from "@/components/ui/text";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
@@ -50,20 +52,20 @@ export function EnergyPeriodNav({ period, date, today, carrier = "electricity", 
         ))}
       </ScrollRow>
 
-      <div className="grid w-full min-w-0 grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] items-center gap-1 sm:flex sm:w-auto">
+      <PageGrid gap="xs" className="w-full min-w-0 grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] items-center sm:flex sm:w-auto">
         <Button asChild variant="ghost" size="icon" aria-label={t("period.previous")}>
           <Link to={href(period, shiftPeriod(period, date, -1))}>
             <ChevronLeftIcon />
           </Link>
         </Button>
-        <p className="relative min-w-0 text-center sm:min-w-40 font-medium tabular-nums first-letter:uppercase" aria-live="polite">
+        <Text weight="medium" className="relative min-w-0 text-center sm:min-w-40 tabular-nums first-letter:uppercase" aria-live="polite">
           {formatPeriod(period, from, to, currentLocale())}
           {pending && (
             <span className="absolute top-1/2 -right-5 flex -translate-y-1/2 animate-appear text-muted-foreground">
               <Spinner />
             </span>
           )}
-        </p>
+        </Text>
         {isCurrent || isFuture ? (
           <Button variant="ghost" size="icon" aria-label={t("period.next")} disabled>
             <ChevronRightIcon />
@@ -80,7 +82,7 @@ export function EnergyPeriodNav({ period, date, today, carrier = "electricity", 
             <Link to={href(period, periodStart(period, today))}>{t("period.today")}</Link>
           </Button>
         )}
-      </div>
+      </PageGrid>
     </div>
   );
 }

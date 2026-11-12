@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { CheckIcon, EyeIcon, Link2Icon, MailIcon, PaperclipIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -171,9 +173,9 @@ export function MailBillSuggestions({ initial, client = googleClient, onChanged,
           return (
             <li key={suggestion.id}>
               <Card tone="attention" className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex min-w-0 items-start gap-3">
+                <Inline gap="md" align="start" className="min-w-0">
                   <ExpenseCategoryIcon category={suggestion.category as ExpenseCategory} />
-                  <div className="flex min-w-0 flex-col gap-0.5">
+                  <Stack gap="0.5" className="min-w-0">
                     <span className="flex flex-wrap items-baseline gap-x-2 text-sm font-medium">
                       {suggestion.payee}
                       <span className="tabular-nums">
@@ -208,15 +210,15 @@ export function MailBillSuggestions({ initial, client = googleClient, onChanged,
                         {best.reasons.includes("remembered") && <Badge className="shrink-0">{t("link.reasons.remembered")}</Badge>}
                       </button>
                     )}
-                  </div>
-                </div>
-                <div className="flex shrink-0 flex-wrap justify-end gap-2">
+                  </Stack>
+                </Inline>
+                <Inline gap="sm" align="stretch" justify="end" wrap className="shrink-0">
                   <Button variant="ghost" size="sm" onClick={() => setViewing(suggestion)}>
                     <EyeIcon />
                     {t("suggestions.view")}
                   </Button>
                   {actionsFor(suggestion)}
-                </div>
+                </Inline>
               </Card>
             </li>
           );

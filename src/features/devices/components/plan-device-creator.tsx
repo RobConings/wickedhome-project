@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import { PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,6 @@ export function PlanDeviceCreator({ placeId }: { placeId?: string }) {
     return { ...overview, places, appliances };
   });
   if (!data) return <Button variant="outline" disabled={!error} onClick={refresh}><PlusIcon />{t("add")}</Button>;
-  if (!data.profiles.length) return <p className="text-sm text-muted-foreground">{t("form.profilePlaceholder")}</p>;
+  if (!data.profiles.length) return <Text size="sm" tone="muted">{t("form.profilePlaceholder")}</Text>;
   return <DeviceFormDialog profiles={data.profiles} places={data.places} appliances={data.appliances} defaultPlaceId={placeId} trigger={<Button variant="outline"><PlusIcon />{t("add")}</Button>} />;
 }

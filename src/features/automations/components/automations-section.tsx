@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { WorkflowIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -208,7 +209,7 @@ function AutomationsPanel({ data, client }: PanelProps) {
 
   return (
     <Card>
-      {!canManage && <p className="text-sm text-muted-foreground">{t("section.readOnly")}</p>}
+      {!canManage && <Text size="sm" tone="muted">{t("section.readOnly")}</Text>}
       <ul className="flex flex-col divide-y">
         {jobs.map((job) => (
           <AutomationJobRow

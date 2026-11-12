@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { LinkIcon, MoreHorizontalIcon, PencilIcon, PlusIcon, RulerIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -107,29 +110,29 @@ export function UnitCatalogueSection({ canManage, initialData, onSave = saveCata
       <DropdownMenuItem variant="destructive" onSelect={() => { setError(null); setDeleting(unit); }}><Trash2Icon />{t("remove")}</DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>;
-  const details = (unit: UnitOverviewItem) => <div className="min-w-0 flex-1 space-y-1">
-    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1"><button type="button" onClick={() => explore(unit.name)} className="text-left font-semibold break-words underline-offset-4 hover:underline focus-visible:underline" aria-label={t("links.forUnit", { name: unit.name })}>{unit.name}</button><span className="text-xs text-muted-foreground">{t(`sources.${unit.source}`)}</span></div>
-    <p className="text-sm break-words tabular-nums">{unit.referenceUnit ? <>1 {unit.name} = {numbers.format(unit.factor)} {unit.referenceUnit}</> : t(unit.source === "used" ? "undefinedConversion" : unit.needsDefinition ? "undefinedContent" : "baseUnit")}</p>
-    <p className="text-xs text-muted-foreground">{t(`categories.${unit.dimension ?? "other"}`)}{unit.source === "custom" && <> · {t("roundingSummary", { amount: numbers.format(unit.rounding) })}</>}</p>
-    {unit.aliases.length > 0 && <p className="text-xs break-words text-muted-foreground">{t("aliasesSummary", { names: unit.aliases.join(", ") })}</p>}
-    {canManage && unit.source !== "used" ? <div className="flex items-center gap-2 pt-1"><Switch id={`${prefix}-terminal-${encodeURIComponent(unit.name)}`} checked={unit.isTerminal} disabled={busy} onCheckedChange={(checked) => void toggleTerminal(unit, checked)} aria-label={t("terminalFor", { name: unit.name })} title={t("terminalHelp")} /><label htmlFor={`${prefix}-terminal-${encodeURIComponent(unit.name)}`} className="cursor-pointer text-xs text-muted-foreground">{t("terminal")}</label></div> : unit.isTerminal && <p className="text-xs font-medium text-section-foreground">{t("terminal")}</p>}
-  </div>;
+  const details = (unit: UnitOverviewItem) => <Stack gap="xs" className="min-w-0 flex-1">
+    <Inline gap="none" align="baseline" wrap className="gap-x-2 gap-y-1"><button type="button" onClick={() => explore(unit.name)} className="text-left font-semibold break-words underline-offset-4 hover:underline focus-visible:underline" aria-label={t("links.forUnit", { name: unit.name })}>{unit.name}</button><span className="text-xs text-muted-foreground">{t(`sources.${unit.source}`)}</span></Inline>
+    <Text size="sm" className="break-words tabular-nums">{unit.referenceUnit ? <>1 {unit.name} = {numbers.format(unit.factor)} {unit.referenceUnit}</> : t(unit.source === "used" ? "undefinedConversion" : unit.needsDefinition ? "undefinedContent" : "baseUnit")}</Text>
+    <Text size="xs" tone="muted">{t(`categories.${unit.dimension ?? "other"}`)}{unit.source === "custom" && <> · {t("roundingSummary", { amount: numbers.format(unit.rounding) })}</>}</Text>
+    {unit.aliases.length > 0 && <Text size="xs" tone="muted" className="break-words">{t("aliasesSummary", { names: unit.aliases.join(", ") })}</Text>}
+    {canManage && unit.source !== "used" ? <Inline gap="sm" align="center" className="pt-1"><Switch id={`${prefix}-terminal-${encodeURIComponent(unit.name)}`} checked={unit.isTerminal} disabled={busy} onCheckedChange={(checked) => void toggleTerminal(unit, checked)} aria-label={t("terminalFor", { name: unit.name })} title={t("terminalHelp")} /><label htmlFor={`${prefix}-terminal-${encodeURIComponent(unit.name)}`} className="cursor-pointer text-xs text-muted-foreground">{t("terminal")}</label></Inline> : unit.isTerminal && <Text size="xs" weight="medium" className="text-section-foreground">{t("terminal")}</Text>}
+  </Stack>;
   const rowActions = (unit: UnitOverviewItem) => {
     const definition = catalogue?.units.find((item) => item.name === unit.name && !isStandardUnitSetting(item));
     if (definition) return actions(definition);
     return canManage && unit.needsDefinition && <Button variant="ghost" size="icon" disabled={busy || !catalogue || atUnitLimit} onClick={() => edit("new", unit.name)} aria-label={t("defineNamed", { name: unit.name })}><PencilIcon /></Button>;
   };
 
-  return <div className="space-y-4">
-    <p className="text-sm text-muted-foreground">{t("listHint")}</p>
-    <p className="text-xs text-muted-foreground">{t("terminalHelp")}</p>
-    {error && !editing && catalogue && <div className="space-y-2"><p role="alert" className="text-sm text-destructive">{error}</p>{conflict && <Button variant="outline" disabled={busy} onClick={() => void reload()}>{t("reload")}</Button>}</div>}
+  return <Stack gap="md">
+    <Text size="sm" tone="muted">{t("listHint")}</Text>
+    <Text size="xs" tone="muted">{t("terminalHelp")}</Text>
+    {error && !editing && catalogue && <Stack gap="sm"><Text size="sm" tone="danger" role="alert">{error}</Text>{conflict && <Button variant="outline" disabled={busy} onClick={() => void reload()}>{t("reload")}</Button>}</Stack>}
     <GeneralList
       label={t("title")}
       items={catalogue ? unitOverview(catalogue.units, catalogue.usedUnits).sort((a, b) => a.name.localeCompare(b.name, locale)) : []}
       getKey={(unit) => unit.name}
-      renderRow={(unit) => <div className="flex items-start gap-3"><IconChip icon={RulerIcon} size="sm" />{details(unit)}{rowActions(unit)}</div>}
-      renderTile={(unit) => <Card><div className="flex items-start gap-3"><IconChip icon={RulerIcon} size="sm" />{details(unit)}{rowActions(unit)}</div></Card>}
+      renderRow={(unit) => <Inline gap="md" align="start"><IconChip icon={RulerIcon} size="sm" />{details(unit)}{rowActions(unit)}</Inline>}
+      renderTile={(unit) => <Card><Inline gap="md" align="start"><IconChip icon={RulerIcon} size="sm" />{details(unit)}{rowActions(unit)}</Inline></Card>}
       search={{ param: "unitQ", label: t("search"), keys: (unit) => [unit.name, unit.referenceUnit, ...unit.aliases] }}
       storageKey="unit-catalogue" viewParam="unitView" defaultView="list"
       actions={<><Button ref={linksRef} variant="outline" disabled={!catalogue} onClick={() => explore("")}><LinkIcon />{t("links.title")}</Button>{addButton}</>}
@@ -160,5 +163,5 @@ export function UnitCatalogueSection({ canManage, initialData, onSave = saveCata
         if (await persist(catalogue.units.filter((item) => item.name !== deleting.name))) { returnFocus.current = addRef.current; toast.success(t("removedUnit", { name: deleting.name })); }
       }}
     />
-  </div>;
+  </Stack>;
 }

@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { ChevronRightIcon, HardDriveIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -161,23 +163,23 @@ export function MoveToFolderDialog({ item, folders, foldersFailed = false, onRet
             </DialogHeader>
             {!submitting && fetcher.data?.formError && <InlineAlert tone="error">{fetcher.data.formError}</InlineAlert>}
             {!loaded && foldersFailed ? (
-              <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm">
+              <Inline gap="sm" align="center" justify="between" wrap className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm">
                 {t("moveForm.loadFailed")}
                 {onRetry && (
                   <Button type="button" size="sm" variant="outline" onClick={onRetry}>
                     {tCommon("actions.retry")}
                   </Button>
                 )}
-              </div>
+              </Inline>
             ) : !loaded ? (
-              <div className="flex flex-col rounded-lg border p-2" role="status" aria-label={t("loading.folders")}>
+              <Stack gap="none" className="rounded-lg border p-2" role="status" aria-label={t("loading.folders")}>
                 {[45, 60, 35, 55, 40].map((width, index) => (
-                  <div key={index} className="flex items-center gap-2 py-1.5" style={{ paddingLeft: index === 0 ? 0 : "1.75rem" }}>
+                  <Inline gap="sm" align="center" key={index} className="py-1.5" style={{ paddingLeft: index === 0 ? 0 : "1.75rem" }}>
                     <Skeleton className="size-4 shrink-0 rounded" />
                     <Skeleton className="h-4" style={{ width: `${width}%` }} />
-                  </div>
+                  </Inline>
                 ))}
-              </div>
+              </Stack>
             ) : (
               <fieldset disabled={submitting} className="max-h-80 overflow-y-auto rounded-lg border p-1 text-sm">
                 <legend className="sr-only">{t("moveForm.destination")}</legend>

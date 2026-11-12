@@ -1,3 +1,4 @@
+import { PageGrid } from "@/components/layout/page-grid";
 import { AlertTriangleIcon, CalendarClockIcon, CalendarIcon, PiggyBankIcon, RepeatIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { StatTile } from "@/components/shared/stat-tile";
@@ -18,7 +19,7 @@ export function ExpenseTotals({ totals }: { totals: ExpenseTotalsData }) {
         : t("totals.unpaid", { amount: formatCurrency(period.unpaidCents, locale) });
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <PageGrid gap="md" className="sm:grid-cols-3">
       <StatTile
         label={t("totals.thisMonth")}
         value={formatCurrency(totals.thisMonth.totalCents, locale)}
@@ -40,7 +41,7 @@ export function ExpenseTotals({ totals }: { totals: ExpenseTotalsData }) {
         icon={AlertTriangleIcon}
         tone={totals.overdue.count > 0 ? "negative" : "positive"}
       />
-    </div>
+    </PageGrid>
   );
 }
 
@@ -49,7 +50,7 @@ export function RecurringTotals({ totals }: { totals: RecurringTotalsData }) {
   const { t } = useTranslation("expenses");
   const locale = currentLocale();
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <PageGrid gap="md" className="sm:grid-cols-3">
       <StatTile
         label={t("totals.perMonth")}
         value={formatCurrency(totals.monthlyCents, locale)}
@@ -70,6 +71,6 @@ export function RecurringTotals({ totals }: { totals: RecurringTotalsData }) {
         icon={PiggyBankIcon}
         tone={totals.candidatesCount > 0 ? "positive" : "default"}
       />
-    </div>
+    </PageGrid>
   );
 }

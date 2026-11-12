@@ -1,3 +1,5 @@
+import { PageGrid } from "@/components/layout/page-grid";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { FolderPlusIcon, HardDriveIcon, SearchXIcon, Trash2Icon, UploadIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -193,7 +195,7 @@ export function DocumentsScreen({ data, canManage, initialUploads, initialView, 
         actions={actions}
       />
 
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
+      <PageGrid gap="lg" className="items-start lg:grid-cols-[minmax(0,1fr)_16rem]">
         <Stack gap="md">
           <UploadProgressList
             items={uploads.items}
@@ -223,7 +225,7 @@ export function DocumentsScreen({ data, canManage, initialUploads, initialView, 
               storageKey={initialView ? undefined : "documents"}
               defaultView={initialView ?? defaultView}
               actions={<DocumentsToolbar sort={sort} onSortChange={setSort} />}
-              toolbar={search && <p className="text-sm text-muted-foreground">{t("search.results", { query })}</p>}
+              toolbar={search && <Text size="sm" tone="muted">{t("search.results", { query })}</Text>}
               groupBy={(entry) => (entry.kind === "folder" ? FOLDERS_GROUP : FILES_GROUP)}
               groupOrder={[FOLDERS_GROUP, FILES_GROUP]}
               renderGroupHeader={(key) => (key === FOLDERS_GROUP ? t("list.folders") : t("list.files"))}
@@ -259,7 +261,7 @@ export function DocumentsScreen({ data, canManage, initialUploads, initialView, 
           </FileMenuItemsContext>
         </Stack>
         <StorageUsageMeter usage={usage.value} failed={usage.failed} onRetry={() => void revalidator.revalidate()} />
-      </div>
+      </PageGrid>
 
       <FolderFormDialog
         key={folderDialog.key}

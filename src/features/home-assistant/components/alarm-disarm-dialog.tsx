@@ -1,10 +1,10 @@
+import { FormField } from "@/components/shared/form-field";
 import * as React from "react";
 import { ShieldOffIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { InlineAlert } from "@/components/shared/inline-alert";
 
 type AlarmDisarmDialogProps = {
@@ -67,8 +67,7 @@ export function AlarmDisarmDialog({ panelName, codeFormat, onConfirm, disabled, 
             <DialogDescription>{t("alarm.disarm.description", { panel: panelName })}</DialogDescription>
           </DialogHeader>
           {error && <InlineAlert tone="error">{error}</InlineAlert>}
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="alarm-disarm-code">{t("alarm.code")}</Label>
+          <FormField htmlFor="alarm-disarm-code" label={<>{t("alarm.code")}</>} description={<>{t("alarm.disarm.logged")}</>}>
             <Input
               id="alarm-disarm-code"
               name="alarm-code"
@@ -81,8 +80,7 @@ export function AlarmDisarmDialog({ panelName, codeFormat, onConfirm, disabled, 
               className="text-base"
               autoFocus
             />
-            <p className="text-xs text-muted-foreground">{t("alarm.disarm.logged")}</p>
-          </div>
+          </FormField>
           <DialogFooter className="gap-2">
             <Button type="button" variant="ghost" onClick={() => change(false)} disabled={busy}>
               {tCommon("actions.cancel")}

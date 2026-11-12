@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useRevalidator } from "react-router";
@@ -41,41 +44,41 @@ export function AssistantProviderSettings({ compact = false, initial }: { compac
       {status.provider === "chatgpt_subscription" && !status.models.some((m) => m.slug === status.model) && <option value={status.model ?? ""} disabled>{t("provider.reconnect")}</option>}
     </select>
   );
-  const notice = status?.needsPlanNotice && <div className="rounded-lg border bg-muted/30 p-3 text-sm" role="status"><p className="font-medium">{t("provider.usingPlan")}</p><p className="text-muted-foreground">{t("provider.planNotice")}</p><Button size="sm" variant="outline" className="mt-2" disabled={busy} onClick={() => void work(async () => { await providerClient.acknowledgePlan(); setStatus({ ...status, needsPlanNotice: false }); })}>{t("provider.gotIt")}</Button></div>;
-  if (compact) return <div className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">{picker ?? <Link to="/settings?section=assistant">{t("provider.title")}</Link>}{status?.provider === "chatgpt_subscription" && <p className="flex flex-wrap items-center gap-x-2"><span>{t("provider.usingPlan")}</span><a href={status.usageUrl} target="_blank" rel="noopener noreferrer" className="underline">{t("provider.manageUsage")}</a></p>}{notice}{error && <span role="alert">{error}</span>}</div>;
+  const notice = status?.needsPlanNotice && <div className="rounded-lg border bg-muted/30 p-3 text-sm" role="status"><Text weight="medium">{t("provider.usingPlan")}</Text><Text tone="muted">{t("provider.planNotice")}</Text><Button size="sm" variant="outline" className="mt-2" disabled={busy} onClick={() => void work(async () => { await providerClient.acknowledgePlan(); setStatus({ ...status, needsPlanNotice: false }); })}>{t("provider.gotIt")}</Button></div>;
+  if (compact) return <Stack gap="xs" className="min-w-0 text-xs text-muted-foreground">{picker ?? <Link to="/settings?section=assistant">{t("provider.title")}</Link>}{status?.provider === "chatgpt_subscription" && <Text className="flex flex-wrap items-center gap-x-2"><span>{t("provider.usingPlan")}</span><a href={status.usageUrl} target="_blank" rel="noopener noreferrer" className="underline">{t("provider.manageUsage")}</a></Text>}{notice}{error && <span role="alert">{error}</span>}</Stack>;
   return (
     <section className="flex min-w-0 flex-col gap-4" aria-label={t("provider.title")}>
-      <div><h2 className="font-semibold">{t("provider.title")}</h2><p className="text-sm text-muted-foreground">{t("provider.description")}</p></div>
+      <div><h2 className="font-semibold">{t("provider.title")}</h2><Text size="sm" tone="muted">{t("provider.description")}</Text></div>
       {notice}
       {error && <InlineAlert tone="error">{error}</InlineAlert>}
       {status && <>
         <label className="flex min-w-0 flex-col gap-2 text-sm">{t("provider.selected")}{picker}</label>
         {status.accounts.length > 1 && <label className="flex flex-col gap-2 text-sm">{t("provider.account")}<select aria-label={t("provider.account")} className="min-h-10 min-w-0 rounded-md border bg-background p-2" value={status.accountId ?? ""} disabled={busy} onChange={(event) => void work(async () => setStatus(await providerClient.status(event.target.value)))}>{status.accounts.map((account) => <option key={account.id} value={account.id}>{account.email ?? account.id} · {account.id.slice(-8)}</option>)}</select></label>}
-        <p className="text-sm" role="status">{t(status.connected ? "provider.connected" : "provider.disconnected")}{status.accountId && ` · ${status.accounts.find((a) => a.id === status.accountId)?.email ?? status.accountId}`}</p>
+        <Text size="sm"  role="status">{t(status.connected ? "provider.connected" : "provider.disconnected")}{status.accountId && ` · ${status.accounts.find((a) => a.id === status.accountId)?.email ?? status.accountId}`}</Text>
         {status.error && <InlineAlert tone="error">{t(`errors.${status.error}`, { defaultValue: t("provider.reconnect") })}</InlineAlert>}
         {!status.storageReady && <InlineAlert tone="info">{t("provider.storageSetup")}</InlineAlert>}
         {status.connected && !status.permission && <InlineAlert tone="info">{t("provider.permissionRequired")}</InlineAlert>}
-        <div className="flex flex-wrap gap-2">
+        <Inline gap="sm" align="stretch" wrap>
           <Button className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90" data-oai-siwc-button="" disabled={busy || !status.storageReady} onClick={() => void work(async () => { setPairing(await providerClient.pair(false, status.accountId ?? undefined)); setCopied(false); })}><img src="/brand/chatgpt-logo-white.svg" alt="" className="size-5 dark:invert" />{t("provider.continue")}</Button>
           <Button variant="outline" disabled={busy} onClick={() => void work(refresh)}>{t("provider.refresh")}</Button>
           {status.accountId && <Button variant="outline" disabled={busy} onClick={() => void work(async () => { setPairing(await providerClient.pair(true)); setCopied(false); })}>{t("provider.addAccount")}</Button>}
           {status.connected && <ConfirmDialog trigger={<Button variant="outline" disabled={busy}>{t("provider.disconnect")}</Button>} title={t("provider.disconnect")} description={t("provider.disconnectDescription")} confirmLabel={t("provider.disconnect")} cancelLabel={t("confirm.cancel")} destructive onConfirm={() => work(async () => { const result = await providerClient.disconnect(status.accountId ?? undefined); setStatus(await providerClient.status(status.accountId ?? undefined)); await revalidator.revalidate(); if (!result.remoteRevoked) setError(t("provider.revocationUnconfirmed")); })} />}
-        </div>
+        </Inline>
         <a href={status.usageUrl} target="_blank" rel="noopener noreferrer" className="text-sm underline">{t("provider.usage")}</a>
       </>}
-      {pairing && <div className="flex min-w-0 flex-col gap-3 rounded-xl border bg-muted/30 p-4">
+      {pairing && <Stack gap="3" className="min-w-0 rounded-xl border bg-muted/30 p-4">
         <h3 className="font-medium">{t("provider.pairTitle")}</h3>
-        <p className="text-sm text-muted-foreground">{t("provider.pairInstructions")}</p>
+        <Text size="sm" tone="muted">{t("provider.pairInstructions")}</Text>
         <pre className="overflow-x-auto rounded-md border bg-background p-3 text-xs"><code>{command}</code></pre>
-        <p className="text-xs text-muted-foreground">{t("provider.expires", { time: new Date(pairing.expiresAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) })}</p>
-        <div className="flex flex-wrap gap-2">
+        <Text size="xs" tone="muted">{t("provider.expires", { time: new Date(pairing.expiresAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) })}</Text>
+        <Inline gap="sm" align="stretch" wrap>
           <Button variant="outline" onClick={() => void work(async () => { await navigator.clipboard.writeText(command); setCopied(true); })}>{t(copied ? "chat.copied" : "chat.copy")}</Button>
           <Button onClick={() => void work(async () => { await refresh(); setPairing(null); })}>{t("provider.pairDone")}</Button>
           <Button variant="ghost" onClick={() => void work(async () => { await providerClient.cancelPair(); setPairing(null); })}>{t("confirm.cancel")}</Button>
-        </div>
+        </Inline>
         <a className="text-sm underline" href="https://developers.openai.com/siwc/token-sharing-open-source/self-hosted-vms" target="_blank" rel="noopener noreferrer">{t("provider.pairDocs")}</a>
-      </div>}
-      {!status && !error && <p role="status" className="text-sm text-muted-foreground">{t("page.loading")}</p>}
+      </Stack>}
+      {!status && !error && <Text size="sm" tone="muted" role="status">{t("page.loading")}</Text>}
     </section>
   );
 }

@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { RecordImage } from "@/components/shared/record-image";
 import { CalendarIcon, ListChecksIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -25,39 +28,39 @@ export function ProjectTile({ project }: { project: Project }) {
       ) : (
         <div className="h-1.5 w-full" style={{ backgroundColor: project.color }} aria-hidden="true" />
       )}
-      <div className="flex flex-col gap-3 px-4 pb-4">
-        <div className="flex items-start gap-3">
+      <Stack gap="3" className="px-4 pb-4">
+        <Inline gap="md" align="start">
           <ProjectAvatar project={project} size="md" />
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <Stack gap="xs" className="min-w-0 flex-1">
             <Link
               to={projectPath(project.id)}
               className="line-clamp-2 font-medium break-words outline-none after:absolute after:inset-0 focus-visible:underline"
             >
               {project.name}
             </Link>
-            <div className="flex flex-wrap items-center gap-1.5">
+            <Inline gap="1.5" align="center" wrap>
               {project.status !== "active" && <ProjectStatusBadge status={project.status} />}
               {project.tag && <span className="truncate text-xs text-muted-foreground">{project.tag}</span>}
-            </div>
-          </div>
-        </div>
+            </Inline>
+          </Stack>
+        </Inline>
 
         {project.budgetCents !== null ? (
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-baseline justify-between gap-2 text-sm">
+          <Stack gap="1.5">
+            <Inline gap="sm" align="baseline" justify="between" className="text-sm">
               <span className="text-muted-foreground">{t("budget.label")}</span>
               <span className="font-medium tabular-nums">{text.money(project.budgetCents)}</span>
-            </div>
+            </Inline>
             <ProjectBudgetBar budget={project.budget} />
             <ProjectBudgetBadge budget={project.budget} className="self-start" />
-          </div>
+          </Stack>
         ) : (
-          <p className="text-sm text-muted-foreground tabular-nums">
+          <Text size="sm" tone="muted" className="tabular-nums">
             {t("budget.noBudgetSpent", { amount: text.money(project.budget.spentCents + project.budget.committedCents) })}
-          </p>
+          </Text>
         )}
 
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+        <Inline gap="none" align="center" wrap className="gap-x-3 gap-y-1 text-xs text-muted-foreground">
           {period && (
             <span className="flex items-center gap-1">
               <CalendarIcon className="size-3.5" aria-hidden="true" />
@@ -70,8 +73,8 @@ export function ProjectTile({ project }: { project: Project }) {
               {t("tasks.progress", { done: project.tasks.done, total: project.tasks.total })}
             </span>
           )}
-        </div>
-      </div>
+        </Inline>
+      </Stack>
     </Card>
   );
 }

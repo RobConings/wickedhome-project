@@ -1,3 +1,7 @@
+import { PageGrid } from "@/components/layout/page-grid";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { DownloadIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -46,8 +50,8 @@ export function MailSuggestionPreviewDialog({ suggestion, onOpenChange, actions,
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid min-h-0 flex-1 gap-4 overflow-y-auto lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:overflow-hidden">
-              <div className="flex min-h-0 flex-col gap-4">
+            <PageGrid gap="md" className="min-h-0 flex-1 overflow-y-auto lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:overflow-hidden">
+              <Stack gap="md" className="min-h-0">
                 <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 rounded-lg border p-3 text-sm">
                   <Found label={t("preview.amount")} value={suggestion.amountCents !== null ? formatCurrency(suggestion.amountCents, locale) : null} />
                   <Found label={t("preview.dueDate")} value={suggestion.dueDate ? formatDate(suggestion.dueDate, locale) : null} />
@@ -60,10 +64,10 @@ export function MailSuggestionPreviewDialog({ suggestion, onOpenChange, actions,
                   </h3>
                   <MailText key={suggestion.id} id={suggestion.id} client={client} initial={initialMail} />
                 </section>
-              </div>
+              </Stack>
 
               <section aria-labelledby="mail-preview-pdf" className="flex min-h-0 flex-col gap-1.5">
-                <div className="flex items-center justify-between gap-2">
+                <Inline gap="sm" align="center" justify="between">
                   <h3 id="mail-preview-pdf" className="truncate text-sm font-medium">
                     {suggestion.attachmentName ?? t("preview.pdf")}
                   </h3>
@@ -71,14 +75,14 @@ export function MailSuggestionPreviewDialog({ suggestion, onOpenChange, actions,
                     <DownloadIcon />
                     {t("preview.downloadPdf")}
                   </Button>
-                </div>
+                </Inline>
                 <div className="h-[60dvh] min-h-64 overflow-y-auto overscroll-contain rounded-lg border bg-muted/40 lg:h-auto lg:flex-1">
                   <PdfPages key={pdfUrl} url={pdfUrl} title={suggestion.attachmentName ?? t("preview.pdf")} />
                 </div>
               </section>
-            </div>
+            </PageGrid>
 
-            {actions && <div className="flex flex-wrap justify-end gap-2">{actions}</div>}
+            {actions && <Inline gap="sm" align="stretch" justify="end" wrap>{actions}</Inline>}
           </>
         )}
       </DialogContent>
@@ -116,14 +120,14 @@ function MailText({ id, client, initial }: { id: string; client: Pick<GoogleClie
     };
   }, [client, id, initial]);
 
-  if (state.failed) return <p className="rounded-lg border p-3 text-sm text-muted-foreground">{t("preview.textFailed")}</p>;
+  if (state.failed) return <Text size="sm" tone="muted" className="rounded-lg border p-3">{t("preview.textFailed")}</Text>;
   if (!state.mail) {
     return (
-      <div className="flex flex-col gap-2 rounded-lg border p-3" aria-busy="true">
+      <Stack gap="sm" className="rounded-lg border p-3" aria-busy="true">
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-4 w-2/3" />
         <Skeleton className="h-4 w-1/2" />
-      </div>
+      </Stack>
     );
   }
   return (

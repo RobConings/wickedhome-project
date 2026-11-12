@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { ChartColumnIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -24,21 +27,21 @@ type Ahead = (typeof AHEAD_OPTIONS)[number];
 /** Income and expenses per month, past and future: the expenses step down as loans end. */
 export function MoneyTimelineCard({ data, className }: MoneyTimelineCardProps) {
   const { t } = useTranslation("money");
-  const failed = <p className="text-sm text-muted-foreground">{t("timeline.error")}</p>;
+  const failed = <Text size="sm" tone="muted">{t("timeline.error")}</Text>;
   return (
     <Card className={cn("gap-3", className)}>
-      <div className="flex items-center gap-2">
+      <Inline gap="sm" align="center">
         <ChartColumnIcon className="size-4 text-muted-foreground" aria-hidden="true" />
         <CardTitle>{t("timeline.title")}</CardTitle>
-      </div>
+      </Inline>
       <CardDescription>{t("timeline.description")}</CardDescription>
       {data instanceof Promise ? (
         <React.Suspense
           fallback={
-            <div className="flex flex-col gap-3" role="status" aria-label={t("timeline.loading")}>
+            <Stack gap="3"  role="status" aria-label={t("timeline.loading")}>
               <Skeleton className="h-8 w-56 rounded-lg" />
               <Skeleton className="h-60 rounded-lg" />
-            </div>
+            </Stack>
           }
         >
           <Await resolve={data} errorElement={failed}>
@@ -83,8 +86,8 @@ export function MoneyTimelineChart({ data }: { data: MoneyTimeline }) {
   }));
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+    <Stack gap="3">
+      <Inline gap="sm" align="center" justify="between" wrap>
         <SegmentedControl
           label={t("timeline.ahead")}
           size="sm"
@@ -92,9 +95,9 @@ export function MoneyTimelineChart({ data }: { data: MoneyTimeline }) {
           onChange={setAhead}
           options={AHEAD_OPTIONS.map((value) => ({ value, label: t("timeline.months", { count: Number(value) }) }))}
         />
-      </div>
+      </Inline>
       {empty ? (
-        <p className="text-sm text-muted-foreground">{t("timeline.empty")}</p>
+        <Text size="sm" tone="muted">{t("timeline.empty")}</Text>
       ) : (
         <>
           <TimelineSummary months={months} current={current} />
@@ -129,16 +132,16 @@ export function MoneyTimelineChart({ data }: { data: MoneyTimeline }) {
               const month = months.find((item) => item.month === datum.key);
               if (!month) return null;
               return (
-                <p className="mt-1.5 border-t pt-1 text-xs text-muted-foreground">
+                <Text size="xs" tone="muted" className="mt-1.5 border-t pt-1">
                   {month.period === "past" ? t("timeline.actual") : month.period === "current" ? t("timeline.currentHint") : t("timeline.projectedHint")}
                   {month.incomeEstimateCents > 0 ? ` ${t("timeline.estimateHint")}` : ""}
-                </p>
+                </Text>
               );
             }}
           />
         </>
       )}
-    </div>
+    </Stack>
   );
 }
 
@@ -154,7 +157,7 @@ function TimelineSummary({ months, current }: { months: TimelineMonth[]; current
   // A step down of more than 2 % against the first projected month.
   const lower = future.find((month) => month.expenseCents < reference.expenseCents * 0.98);
   return (
-    <p className="text-sm" aria-live="polite">
+    <Text size="sm"  aria-live="polite">
       {t("timeline.summaryNow", { income: money(current.incomeCents), expenses: money(current.expenseCents) })}
       {lower && (
         <>
@@ -162,6 +165,6 @@ function TimelineSummary({ months, current }: { months: TimelineMonth[]; current
           {t("timeline.summaryLower", { from: money(reference.expenseCents), to: money(lower.expenseCents), month: monthLabel(lower.month) })}
         </>
       )}
-    </p>
+    </Text>
   );
 }

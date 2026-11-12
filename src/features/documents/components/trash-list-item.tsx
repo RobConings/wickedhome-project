@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import { FileTypeIcon } from "@/components/shared/file-type-icon";
 import { cn } from "@/lib/utils";
 import { itemName } from "./document-item";
@@ -27,10 +28,10 @@ export function TrashListItem({ item, canManage, busy = null, onRestore, onDelet
       ) : (
         <FileTypeIcon mimeType={item.file.mimeType} name={item.file.name} size="sm" />
       )}
-      <div className="flex min-w-0 flex-1 flex-col">
+      <Stack gap="none" className="min-w-0 flex-1">
         <span className="truncate font-medium">{itemName(item)}</span>
         <span className="truncate text-xs text-muted-foreground">{detail(item)}</span>
-      </div>
+      </Stack>
       {canManage && (
         <TrashItemActions item={item} busy={busy} onRestore={onRestore} onDelete={onDelete} className="ml-11 sm:ml-0" />
       )}

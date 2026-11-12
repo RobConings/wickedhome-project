@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import { RecordLink } from "@/components/shared/record-link";
 import { CakeIcon, KeyRoundIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -24,10 +25,10 @@ export function HabitantCard({ habitant, canManage }: HabitantCardProps) {
     <Card className="p-4 sm:p-5">
       <CardHeader className="flex-col items-start justify-start gap-3 sm:flex-row sm:items-center sm:gap-4">
         <HabitantAvatar habitant={habitant} size="lg" />
-        <div className="flex w-full min-w-0 flex-col items-start gap-1.5">
+        <Stack gap="1.5" align="start" className="w-full min-w-0">
           <CardTitle className="w-full break-words text-lg"><RecordLink to={`/habitants/${encodeURIComponent(habitant.id)}`}>{habitant.name}</RecordLink></CardTitle>
           <HabitantTypeBadge type={habitant.type} />
-        </div>
+        </Stack>
       </CardHeader>
 
       <Inline gap="md" wrap className="min-h-5 text-sm text-muted-foreground">

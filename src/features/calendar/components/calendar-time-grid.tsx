@@ -1,3 +1,5 @@
+import { PageGrid } from "@/components/layout/page-grid";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { BellIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -81,7 +83,7 @@ export function CalendarTimeGrid({ days, today, entries, onSelectEntry, onAddAt,
   return (
     <div className={cn("flex flex-col overflow-hidden rounded-xl border bg-card", className)}>
       {/* Day headers */}
-      <div className="grid border-b bg-muted/40" style={template}>
+      <PageGrid gap="none" className="border-b bg-muted/40" style={template}>
         <div />
         {days.map((day) => (
           <div key={day} className={cn("flex items-center justify-center gap-0.5 border-l py-2", single ? "gap-2" : "flex-col")}>
@@ -98,19 +100,19 @@ export function CalendarTimeGrid({ days, today, entries, onSelectEntry, onAddAt,
             </span>
           </div>
         ))}
-      </div>
+      </PageGrid>
 
       {/* All-day row */}
       {hasAllDay && (
-        <div className="relative grid border-b" style={template}>
+        <PageGrid gap="none" className="relative border-b" style={template}>
           <div className="px-1 py-1.5 text-right text-[0.65rem] leading-6 text-muted-foreground">{t("entry.allDay")}</div>
           {days.map((day) => (
-            <div key={day} className="flex min-w-0 flex-col gap-1 border-l p-1">
+            <Stack gap="xs" key={day} className="min-w-0 border-l p-1">
               {lanes > 0 && <div aria-hidden="true" className="shrink-0" style={{ height: lanes * SPAN_LANE_HEIGHT - 4 }} />}
               {singleAllDay(day).map((entry) => (
                 <CalendarEntryBadge key={entry.key} entry={entry} onClick={() => onSelectEntry(entry)} />
               ))}
-            </div>
+            </Stack>
           ))}
           {segments.length > 0 && (
             <div className="pointer-events-none absolute inset-y-0 right-0 left-14">
@@ -128,12 +130,12 @@ export function CalendarTimeGrid({ days, today, entries, onSelectEntry, onAddAt,
               ))}
             </div>
           )}
-        </div>
+        </PageGrid>
       )}
 
       {/* Time grid */}
       <div ref={scroller} className="max-h-[70vh] overflow-y-auto">
-        <div className="relative grid" style={{ ...template, height: 24 * HOUR_HEIGHT }}>
+        <PageGrid gap="none" className="relative" style={{ ...template, height: 24 * HOUR_HEIGHT }}>
           <div className="relative">
             {HOURS.slice(1).map((hour) => (
               <span
@@ -188,7 +190,7 @@ export function CalendarTimeGrid({ days, today, entries, onSelectEntry, onAddAt,
               )}
             </div>
           ))}
-        </div>
+        </PageGrid>
       </div>
     </div>
   );

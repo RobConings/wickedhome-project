@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { ScaleIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -93,34 +96,34 @@ export function CoverageCard({ rows, accounts, accountMonths = NO_MONTHS, costs,
       <MoneyCardHeader icon={ScaleIcon} title={t("coverage.title")} description={t("coverage.description")} />
 
       {nothing ? (
-        <p className="text-sm text-muted-foreground">{t("coverage.noPlans")}</p>
+        <Text size="sm" tone="muted">{t("coverage.noPlans")}</Text>
       ) : (
         <>
           <dl className="flex flex-col gap-2 text-sm">
-            <div className="flex items-baseline justify-between gap-3">
+            <Inline gap="md" align="baseline" justify="between">
               <dt className="text-muted-foreground">{t("coverage.planned")}</dt>
               <dd className="font-semibold tabular-nums">{money(coverage.plannedCents)}</dd>
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <div className="flex items-baseline justify-between gap-3">
+            </Inline>
+            <Stack gap="0.5">
+              <Inline gap="md" align="baseline" justify="between">
                 <dt className="text-muted-foreground">{t("coverage.costs")}</dt>
                 <dd className="font-semibold tabular-nums">{money(coverage.costsCents)}</dd>
-              </div>
+              </Inline>
               <dd className="text-xs text-muted-foreground">{t("coverage.costsDetail", { paid: money(coverage.paidCents), toPay: money(coverage.toPayCents) })}</dd>
-            </div>
+            </Stack>
           </dl>
           {coverage.plannedCents === 0 ? (
-            <p className="text-sm text-muted-foreground">{t("coverage.noPlans")}</p>
+            <Text size="sm" tone="muted">{t("coverage.noPlans")}</Text>
           ) : (
-            <p className={cn("text-base font-semibold", result.className)} role="status">
+            <Text className={cn("text-base font-semibold", result.className)} role="status">
               {result.text}
-            </p>
+            </Text>
           )}
         </>
       )}
 
       {projection && (
-        <div className="flex flex-col gap-1 border-t pt-3 text-sm">
+        <Stack gap="xs" className="border-t pt-3 text-sm">
           <span className="text-muted-foreground">{t("coverage.projectionTitle")}</span>
           <span className={cn("text-xl font-semibold tabular-nums", projection.endCents < 0 && "text-danger")}>{money(projection.endCents)}</span>
           <span className="text-xs text-muted-foreground">
@@ -133,17 +136,17 @@ export function CoverageCard({ rows, accounts, accountMonths = NO_MONTHS, costs,
                 : t("coverage.belowZero", { date: dateText(projection.belowZeroOn), amount: money(projection.lowestCents) })}
             </InlineAlert>
           )}
-        </div>
+        </Stack>
       )}
 
       {coverage.suggestions && (
-        <div className="flex flex-col gap-3 border-t pt-3 text-sm">
+        <Stack gap="3" className="border-t pt-3 text-sm">
           <span className="font-medium">{t("coverage.suggestTitle", { amount: money(coverage.costsCents) })}</span>
           {[
             { key: "plan", label: t("coverage.byPlan"), items: coverage.suggestions.byPlan },
             ...(coverage.suggestions.byIncome ? [{ key: "income", label: t("coverage.byIncome"), items: coverage.suggestions.byIncome }] : []),
           ].map((option) => (
-            <div key={option.key} className="flex flex-col gap-2 rounded-lg border p-3">
+            <Stack gap="sm" key={option.key} className="rounded-lg border p-3">
               <span className="text-xs font-medium text-muted-foreground">{option.label}</span>
               <ul className="flex flex-col gap-0.5">
                 {option.items.map((item) => (
@@ -153,7 +156,7 @@ export function CoverageCard({ rows, accounts, accountMonths = NO_MONTHS, costs,
                 ))}
               </ul>
               {canUpdate && (
-                <div className="flex flex-col gap-1">
+                <Stack gap="xs">
                   <Button
                     size="sm"
                     variant="outline"
@@ -164,11 +167,11 @@ export function CoverageCard({ rows, accounts, accountMonths = NO_MONTHS, costs,
                     {t("actions.updatePlans")}
                   </Button>
                   <span className="text-xs text-muted-foreground">{t("coverage.updateHint", { date: dateText(monthStart) })}</span>
-                </div>
+                </Stack>
               )}
-            </div>
+            </Stack>
           ))}
-        </div>
+        </Stack>
       )}
     </Card>
   );

@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import { PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
@@ -26,10 +27,10 @@ export function PresetCard({ preset, canManage, variant = "card", className }: P
     </span>
   );
   const text = (
-    <div className="flex min-w-0 flex-1 flex-col gap-1">
+    <Stack gap="xs" className="min-w-0 flex-1">
       <span className="font-medium break-words">{preset.name}</span>
       <span className="text-xs text-muted-foreground">{preset.description}</span>
-    </div>
+    </Stack>
   );
   const addForm = canManage && (
     <fetcher.Form method="post" className={variant === "card" ? "mt-auto" : undefined}>

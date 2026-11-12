@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { ArrowLeftRightIcon, ChartNoAxesCombinedIcon, HistoryIcon, ScaleIcon, UsersIcon, FolderKanbanIcon, LandmarkIcon, PiggyBankIcon, PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -163,16 +165,16 @@ export function MoneyFlowScreen({ data, contributionHistory, habitants, canManag
           description={t("setup.description")}
           action={
             canManage && (
-              <div className="flex flex-wrap justify-center gap-2">
+              <Inline gap="sm" align="stretch" justify="center" wrap>
                 {addAccount("joint", "default")}
                 {addAccount("savings")}
-              </div>
+              </Inline>
             )
           }
         />
       )}
 
-      <div className="flex flex-col gap-6">
+      <Stack gap="lg">
         <SectionNavigation label={t("tabs.label")} items={[
           { id: "overview", label: t("tabs.overview"), icon: ChartNoAxesCombinedIcon },
           { id: "contributions", label: t("tabs.contributions"), icon: UsersIcon },
@@ -299,7 +301,7 @@ export function MoneyFlowScreen({ data, contributionHistory, habitants, canManag
             )}
           </section>}
         </PendingContent>
-      </div>
+      </Stack>
     </PageContainer>
   );
 }

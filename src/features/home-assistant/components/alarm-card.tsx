@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { ShieldIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -99,23 +102,23 @@ export function AlarmCard({ overview: initial, canControl, compact = false, live
 
   return (
     <Card className={cn("gap-3", accent, className)} aria-labelledby="alarm-card-title">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <Inline gap="sm" align="center" justify="between" wrap>
         <h2 id="alarm-card-title" className="flex min-w-0 items-center gap-2 font-semibold">
           <ShieldIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
           <span className="truncate">{panel?.name ?? t("alarm.title")}</span>
         </h2>
         {panel && <AlarmStateChip state={panel.state} />}
-      </div>
+      </Inline>
 
       {!connected ? (
         <InlineAlert tone="error">{t("alarm.errors.unavailable")}</InlineAlert>
       ) : (
         <>
           {panel.changedAt && (
-            <p className="text-sm text-muted-foreground">{t("alarm.since", { when: formatRelative(panel.changedAt, i18n.language, now) })}</p>
+            <Text size="sm" tone="muted">{t("alarm.since", { when: formatRelative(panel.changedAt, i18n.language, now) })}</Text>
           )}
           {canControl && !unavailable && (
-            <div className="flex flex-wrap gap-2">
+            <Inline gap="sm" align="stretch" wrap>
               {panel.supportsArmHome && panel.state !== "armed_home" && panel.state !== "triggered" && (
                 <AlarmArmDialog mode="home" panelName={panel.name} codeRequired={panel.codeArmRequired} codeFormat={panel.codeFormat} onConfirm={(code) => arm("home", code)} />
               )}
@@ -123,10 +126,10 @@ export function AlarmCard({ overview: initial, canControl, compact = false, live
                 <AlarmArmDialog mode="away" panelName={panel.name} codeRequired={panel.codeArmRequired} codeFormat={panel.codeFormat} onConfirm={(code) => arm("away", code)} />
               )}
               {panel.state !== "disarmed" && <AlarmDisarmDialog panelName={panel.name} codeFormat={panel.codeFormat} onConfirm={disarm} />}
-            </div>
+            </Inline>
           )}
           {!compact && overview.history.length > 0 && (
-            <div className="flex flex-col gap-1.5 border-t pt-3">
+            <Stack gap="1.5" className="border-t pt-3">
               <h3 className="text-xs font-medium text-muted-foreground">{t("alarm.history")}</h3>
               <ul className="flex flex-col gap-1 text-sm">
                 {overview.history.slice(0, HISTORY_ROWS).map((entry) => (
@@ -138,7 +141,7 @@ export function AlarmCard({ overview: initial, canControl, compact = false, live
                   </li>
                 ))}
               </ul>
-            </div>
+            </Stack>
           )}
         </>
       )}

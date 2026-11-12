@@ -1,3 +1,5 @@
+import { PageGrid } from "@/components/layout/page-grid";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { BellIcon, CheckCheckIcon, SettingsIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -133,7 +135,7 @@ export function NotificationsScreen({ userId, client = notificationsClient, live
         title={t("page.title")}
         description={t("page.description")}
         actions={
-          <div className="grid w-full min-w-0 grid-cols-1 gap-2 sm:flex sm:w-auto sm:justify-center xl:justify-end">
+          <PageGrid gap="sm" className="w-full min-w-0 sm:flex sm:w-auto sm:justify-center xl:justify-end">
             <Button variant="outline" asChild>
               <Link to="/settings#notifications">
                 <SettingsIcon />
@@ -144,10 +146,10 @@ export function NotificationsScreen({ userId, client = notificationsClient, live
               <CheckCheckIcon />
               {t("list.markAllRead")}
             </Button>
-          </div>
+          </PageGrid>
         }
       />
-      <div className="flex flex-col gap-3">
+      <Stack gap="3">
         <GeneralList<NotificationItem>
           label={t("list.label")}
           items={items}
@@ -184,7 +186,7 @@ export function NotificationsScreen({ userId, client = notificationsClient, live
             {t("list.more")}
           </Button>
         )}
-      </div>
+      </Stack>
     </PageContainer>
   );
 }

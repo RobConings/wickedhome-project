@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import { RecordImage } from "@/components/shared/record-image";
 import { ChefHatIcon, ListOrderedIcon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -38,11 +40,11 @@ export function RecipeTile({ recipe, isFavorite, onToggleFavorite }: RecipeCardP
   return (
     <Card className="relative h-full gap-0 overflow-hidden p-0 has-[a:hover]:bg-accent/30">
       <RecipeCardCover src={coverUrl} />
-      <div className="flex flex-1 flex-col gap-3 p-4">
+      <Stack gap="3" className="flex-1 p-4">
         <RecipeCardTitle name={recipe.name} to={recipePath(recipe.id)} stretched />
         {recipe.category && <span className="sr-only">{recipe.category.name}</span>}
         <div className="mt-auto"><RecipeFacts recipe={recipe} compact /></div>
-      </div>
+      </Stack>
       <div className="absolute top-2 right-2 rounded-full bg-card/90">
         <FavoriteToggle
           className="relative z-10"
@@ -62,7 +64,7 @@ export function RecipeListItem({ recipe, isFavorite, onToggleFavorite }: RecipeC
   const { t } = useTranslation("recipes");
   const coverUrl = recipeCoverUrl(recipe);
   return (
-    <div className="relative flex items-center gap-3">
+    <Inline gap="md" align="center" className="relative">
       {coverUrl ? (
         <RecordImage src={coverUrl} shape="avatar" fallback={<ChefHatIcon className="size-7 text-section" />} />
       ) : (
@@ -70,7 +72,7 @@ export function RecipeListItem({ recipe, isFavorite, onToggleFavorite }: RecipeC
           <ChefHatIcon className="size-5" />
         </span>
       )}
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
+      <Stack gap="xs" className="min-w-0 flex-1">
         <Link
           to={recipePath(recipe.id)}
           className="font-medium break-words outline-none after:absolute after:inset-0 hover:underline focus-visible:underline"
@@ -79,7 +81,7 @@ export function RecipeListItem({ recipe, isFavorite, onToggleFavorite }: RecipeC
         </Link>
         {recipe.category && <span className="text-xs text-muted-foreground">{recipe.category.name}</span>}
         <RecipeFacts recipe={recipe} />
-      </div>
+      </Stack>
       <FavoriteToggle
         className="relative z-10"
         active={isFavorite}
@@ -88,6 +90,6 @@ export function RecipeListItem({ recipe, isFavorite, onToggleFavorite }: RecipeC
         })}
         onToggle={() => onToggleFavorite(recipe.id)}
       />
-    </div>
+    </Inline>
   );
 }

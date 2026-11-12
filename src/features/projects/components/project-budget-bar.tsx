@@ -1,3 +1,4 @@
+import { Inline } from "@/components/layout/inline";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { budgetBarSegments, type ProjectBudget } from "../types/project-budget";
@@ -29,8 +30,8 @@ export function ProjectBudgetBar({ budget, showLegend = true, className }: Proje
 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <div
-        className="flex h-2.5 overflow-hidden rounded-full bg-muted"
+      <Inline gap="none" align="stretch"
+        className="h-2.5 overflow-hidden rounded-full bg-muted"
         role="img"
         aria-label={
           budget.budgetCents === null
@@ -50,9 +51,9 @@ export function ProjectBudgetBar({ budget, showLegend = true, className }: Proje
             backgroundImage: "repeating-linear-gradient(135deg, transparent 0 3px, rgb(255 255 255 / 0.45) 3px 6px)",
           }}
         />
-      </div>
+      </Inline>
       {showLegend && (
-        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-xs text-muted-foreground tabular-nums">
+        <Inline gap="none" align="baseline" justify="between" wrap className="gap-x-3 gap-y-0.5 text-xs text-muted-foreground tabular-nums">
           <span>
             {t("budget.spentShort", { amount: text.money(budget.spentCents) })}
             {budget.committedCents > 0 && <> · {t("budget.committedShort", { amount: text.money(budget.committedCents) })}</>}
@@ -64,7 +65,7 @@ export function ProjectBudgetBar({ budget, showLegend = true, className }: Proje
                 : t("budget.leftShort", { amount: text.money(budget.remainingCents) })}
             </span>
           )}
-        </div>
+        </Inline>
       )}
     </div>
   );

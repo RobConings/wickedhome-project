@@ -1,3 +1,7 @@
+import { Stack } from "@/components/layout/stack";
+import { GeneralList } from "@/components/shared/general-list";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { BookUserIcon, PencilIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
@@ -32,7 +36,7 @@ export function ContactDetailScreen({ contact, shops, canManage, initialSelectio
     </>} />
     <PageGrid columns="main-sidebar">
       <Card>
-        <div className="flex items-center gap-4"><ContactAvatar name={contact.name} size="lg" /><CardTitle>{t("detail.about")}</CardTitle></div>
+        <Inline gap="4" align="center"><ContactAvatar name={contact.name} size="lg" /><CardTitle>{t("detail.about")}</CardTitle></Inline>
         <ContactLinks contact={contact} all website />
         <DescriptionList>
           <DescriptionItem label={t("fields.company")}>{contact.company || t("detail.notRecorded")}</DescriptionItem>
@@ -44,11 +48,11 @@ export function ContactDetailScreen({ contact, shops, canManage, initialSelectio
       </Card>
       <Card className="self-start">
         <CardTitle>{t("projects.label")}</CardTitle>
-        <p className="text-sm text-muted-foreground">{t("detail.projectsHint")}</p>
-        {projects ?? (contact.projects.length ? <ul className="divide-y">{contact.projects.map((project) => <li key={project.id} className="flex flex-col gap-1 py-3">
+        <Text size="sm" tone="muted">{t("detail.projectsHint")}</Text>
+        {projects ?? (contact.projects.length ? <GeneralList variant="embedded" label={t("projects.label")} items={contact.projects} getKey={(project) => project.id} renderRow={(project) => <Stack gap="none" className="gap-1">
           <RecordLink to={`/projects/${encodeURIComponent(project.id)}`} className="flex min-h-11 items-center gap-2 font-medium underline"><span aria-hidden="true" className="size-3 shrink-0 rounded-full" style={{ backgroundColor: project.color }} />{project.name}</RecordLink>
-          {project.role && <p className="text-sm text-muted-foreground">{project.role}</p>}
-        </li>)}</ul> : <p className="text-sm text-muted-foreground">{t("detail.noProjects")}</p>)}
+          {project.role && <Text size="sm" tone="muted">{project.role}</Text>}
+        </Stack>} emptyState={null} /> : <Text size="sm" tone="muted">{t("detail.noProjects")}</Text>)}
       </Card>
     </PageGrid>
   </PageContainer>;

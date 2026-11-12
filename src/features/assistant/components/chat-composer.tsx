@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { ImagePlusIcon, LoaderCircleIcon, MapPinIcon, MapPinOffIcon, SendHorizontalIcon, SquareIcon, TriangleAlertIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -78,9 +80,9 @@ export function ChatComposer({ busy, disabled = false, onSend, onStop, voice, im
       }}
     >
       {hint && <div className="px-1 text-xs text-muted-foreground" aria-live="polite">{hint}</div>}
-      <div className="flex flex-col gap-1.5 rounded-2xl border bg-background p-1.5 shadow-xs focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50">
+      <Stack gap="1.5" className="rounded-2xl border bg-background p-1.5 shadow-xs focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50">
         {screen && (
-          <div className="flex min-w-0 px-1 pt-1">
+          <Inline gap="none" align="stretch" className="min-w-0 px-1 pt-1">
             <button
               type="button"
               onClick={screen.onToggle}
@@ -96,7 +98,7 @@ export function ChatComposer({ busy, disabled = false, onSend, onStop, voice, im
               <span className={cn("min-w-0 truncate", !screen.on && "line-through")}>{screen.label}</span>
               {screen.on && <XIcon className="size-3 shrink-0 opacity-60" aria-hidden />}
             </button>
-          </div>
+          </Inline>
         )}
         {images && images.items.length > 0 && (
           <ul className="flex flex-wrap gap-1.5 px-1 pt-1" aria-label={t("chat.images")}>
@@ -127,7 +129,7 @@ export function ChatComposer({ busy, disabled = false, onSend, onStop, voice, im
             ))}
           </ul>
         )}
-        <div className="flex items-end gap-1.5">
+        <Inline gap="1.5" align="end">
           {images && (
             <>
               <input
@@ -189,8 +191,8 @@ export function ChatComposer({ busy, disabled = false, onSend, onStop, voice, im
               <SendHorizontalIcon />
             </Button>
           )}
-        </div>
-      </div>
+        </Inline>
+      </Stack>
     </form>
   );
 }

@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import { ExternalLinkIcon, MapPinOffIcon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useTranslation } from "react-i18next";
@@ -50,16 +53,16 @@ export function DevicePalette({
   );
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       {saving && (
-        <p role="status" className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Text size="xs" tone="muted" role="status" className="flex items-center gap-2">
           <Spinner className="size-3.5" />
           {t("placement.saving")}
-        </p>
+        </Text>
       )}
-      {failed && <p className="text-sm text-destructive">{t("placement.loadFailed")}</p>}
+      {failed && <Text size="sm" tone="danger">{t("placement.loadFailed")}</Text>}
       {selected && (
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-card px-3 py-2 text-sm">
+        <Inline gap="sm" align="center" justify="between" wrap className="rounded-lg border bg-card px-3 py-2 text-sm">
           <span className="flex min-w-0 flex-col">
             <span className="font-medium">{selected.name}</span>
             {onRemove && <span className="text-xs text-muted-foreground">{t("placement.nudgeHint")}</span>}
@@ -78,10 +81,10 @@ export function DevicePalette({
               </Button>
             )}
           </span>
-        </div>
+        </Inline>
       )}
       {failed ? null : sorted.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("placement.allPlaced")}</p>
+        <Text size="sm" tone="muted">{t("placement.allPlaced")}</Text>
       ) : (
         <ul className="flex flex-wrap gap-2" aria-label={t("placement.unplacedLabel")}>
           {sorted.map((device) => {
@@ -107,6 +110,6 @@ export function DevicePalette({
           })}
         </ul>
       )}
-    </div>
+    </Stack>
   );
 }

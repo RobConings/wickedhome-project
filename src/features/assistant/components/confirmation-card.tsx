@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { PencilIcon, ShieldAlertIcon, ShieldQuestionIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -58,25 +61,25 @@ export function ConfirmationCard({ summary, preview = null, options = null, perm
       aria-labelledby={`${id}-title`}
       className={cn("flex flex-col gap-3 rounded-xl border bg-card p-3 shadow-xs sm:p-4", sensitive && "border-warning/50", className)}
     >
-      <div className="flex items-start gap-2.5">
+      <Inline gap="2.5" align="start">
         <Icon className={cn("mt-0.5 size-5 shrink-0", sensitive ? "text-warning" : "text-primary")} aria-hidden />
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <p id={`${id}-title`} className="text-xs font-medium text-muted-foreground">
+        <Stack gap="0.5" className="min-w-0">
+          <Text size="xs" tone="muted" weight="medium" id={`${id}-title`}>
             {sensitive ? t("confirm.sensitiveTitle") : t("confirm.title")}
-          </p>
-          <p className="text-sm font-medium text-pretty">{summary}</p>
-        </div>
-      </div>
+          </Text>
+          <Text size="sm" weight="medium" className="text-pretty">{summary}</Text>
+        </Stack>
+      </Inline>
       {preview && <AssistantPreview preview={preview} edit={edit} />}
       {allowRemember && (
-        <div className="flex items-center gap-2">
+        <Inline gap="sm" align="center">
           <Switch id={`${id}-remember`} checked={remember} onCheckedChange={setRemember} disabled={busy || disabled} />
           <Label htmlFor={`${id}-remember`} className="text-sm font-normal">
             {t("confirm.remember")}
           </Label>
-        </div>
+        </Inline>
       )}
-      <div className="flex flex-wrap justify-end gap-2">
+      <Inline gap="sm" align="stretch" justify="end" wrap>
         {editable.length > 0 && preview && (
           <Button variant="ghost" className="min-h-10 flex-1 sm:mr-auto sm:flex-none" aria-pressed={editing} disabled={busy || disabled} onClick={() => setEditing((value) => !value)}>
             <PencilIcon />
@@ -107,7 +110,7 @@ export function ConfirmationCard({ summary, preview = null, options = null, perm
             {t("confirm.confirm")}
           </Button>
         )}
-      </div>
+      </Inline>
     </div>
   );
 }

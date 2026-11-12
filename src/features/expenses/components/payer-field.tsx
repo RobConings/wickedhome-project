@@ -1,3 +1,5 @@
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { UserIcon, UsersIcon, WalletIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -105,7 +107,7 @@ export function PayerField({
         className="flex w-full [&>label]:flex-1 [&>label>span]:w-full"
       />
 
-      {personOnly && <p className="text-xs text-muted-foreground">{t("payer.vouchersPersonal")}</p>}
+      {personOnly && <Text size="xs" tone="muted">{t("payer.vouchersPersonal")}</Text>}
 
       {payerType === "person" && (
         <HabitantPicker
@@ -119,9 +121,9 @@ export function PayerField({
       )}
 
       {payerType === "split" && (
-        <div className="flex flex-col gap-2 rounded-lg border p-3">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs text-muted-foreground">{t("payer.pickHabitants")}</p>
+        <Stack gap="sm" className="rounded-lg border p-3">
+          <Inline gap="sm" align="center" justify="between">
+            <Text size="xs" tone="muted">{t("payer.pickHabitants")}</Text>
             <SegmentedControl
               size="sm"
               label={t("payer.split")}
@@ -132,7 +134,7 @@ export function PayerField({
                 { value: "custom", label: t("payer.custom") },
               ]}
             />
-          </div>
+          </Inline>
           <ul className="flex flex-col gap-2">
             {payers.map((habitant) => {
               const isSelected = selectedIds.includes(habitant.id);
@@ -165,17 +167,17 @@ export function PayerField({
             })}
           </ul>
           {mode === "custom" && selectedIds.length > 0 && (
-            <p className={cn("text-xs", remaining === 0 ? "text-success" : "text-warning")} aria-live="polite">
+            <Text className={cn("text-xs", remaining === 0 ? "text-success" : "text-warning")} aria-live="polite">
               {remaining === 0
                 ? t("payer.balanced")
                 : remaining > 0
                   ? t("payer.remaining", { amount: formatCurrency(remaining, locale) })
                   : t("payer.over", { amount: formatCurrency(-remaining, locale) })}
-            </p>
+            </Text>
           )}
-        </div>
+        </Stack>
       )}
-      {error && <p className="text-xs font-medium text-destructive">{error}</p>}
+      {error && <Text size="xs" tone="danger" weight="medium">{error}</Text>}
     </Stack>
   );
 }

@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import { RecordLink } from "@/components/shared/record-link";
 import * as React from "react";
 import { CalendarClockIcon, CircleCheckIcon, PencilLineIcon } from "lucide-react";
@@ -124,7 +125,7 @@ export function IncomeOccurrenceList({ occurrences, upcoming = [], habitants, ac
     <Card>
       <CardTitle>{t("month.planned")}</CardTitle>
       {rows.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("month.nothingPlanned")}</p>
+        <Text size="sm" tone="muted">{t("month.nothingPlanned")}</Text>
       ) : (
         <ul className="flex flex-col divide-y">
           {rows.map((row) => (

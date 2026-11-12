@@ -25,3 +25,8 @@ export const Default: Story = {
     </DescriptionList>
   ),
 };
+
+export const PropertyRows: Story = { render: () => <DescriptionList columns="1" className="max-w-xl gap-0 divide-y">
+  <DescriptionItem layout="row" label="Storage" className="py-3">Kitchen cupboard</DescriptionItem>
+  <DescriptionItem layout="row" label="Minimum stock" className="py-3">2 packs</DescriptionItem>
+</DescriptionList> };

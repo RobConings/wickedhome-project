@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { PackageCheckIcon, PlusIcon, SparklesIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -186,16 +189,16 @@ export function LinkInvoiceMaterialsDialog({
   });
 
   const aiPanel = invoiceReader && (
-    <div className="flex flex-col gap-2">
+    <Stack gap="sm">
       <Button type="button" variant="outline" fullOnMobile className="self-start" loading={busyReading} disabled={busyReading} onClick={() => void read()}>
         {!busyReading && <SparklesIcon />}
         {reading ? t("invoice.readAgain") : t("invoice.read")}
       </Button>
       {busyReading && (
-        <p className="flex items-center gap-2 text-sm text-muted-foreground" aria-live="polite">
+        <Text size="sm" tone="muted" className="flex items-center gap-2" aria-live="polite">
           <Spinner />
           {t("invoice.reading")}
-        </p>
+        </Text>
       )}
       {readState.status === "failed" && <InlineAlert tone="error">{t(`invoice.errors.${readState.code}`)}</InlineAlert>}
       {reading && !busyReading && (
@@ -216,7 +219,7 @@ export function LinkInvoiceMaterialsDialog({
           />
         </label>
       )}
-    </div>
+    </Stack>
   );
 
   const fields: GeneralFormField[] = [
@@ -225,10 +228,10 @@ export function LinkInvoiceMaterialsDialog({
       type: "custom",
       label: t("invoice.materialsLabel"),
       render: ({ name }) => (
-        <div className="flex flex-col gap-3">
+        <Stack gap="3">
           <input type="hidden" name={name} value={JSON.stringify(payload)} />
           {candidates.length === 0 ? (
-            <p className="rounded-lg border border-dashed px-3 py-4 text-sm text-muted-foreground">{t("invoice.noMaterials")}</p>
+            <Text size="sm" tone="muted" className="rounded-lg border border-dashed px-3 py-4">{t("invoice.noMaterials")}</Text>
           ) : (
             <ul className="divide-y rounded-lg border bg-card px-3">
               {candidates.map((material) => {
@@ -275,14 +278,14 @@ export function LinkInvoiceMaterialsDialog({
           )}
 
           {reading && reading.unmatchedLines.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-medium">{t("invoice.unmatchedTitle")}</p>
+            <Stack gap="sm">
+              <Inline gap="sm" align="center" justify="between" wrap>
+                <Text size="sm" weight="medium">{t("invoice.unmatchedTitle")}</Text>
                 <Button type="button" variant="ghost" size="sm" onClick={() => setAddLines(new Set(reading.unmatchedLines))}>
                   <PlusIcon />
                   {t("invoice.addAll")}
                 </Button>
-              </div>
+              </Inline>
               <ul className="divide-y rounded-lg border bg-card px-3">
                 {reading.unmatchedLines.map((index) => {
                   const line = reading.lines[index];
@@ -305,26 +308,26 @@ export function LinkInvoiceMaterialsDialog({
                   );
                 })}
               </ul>
-            </div>
+            </Stack>
           )}
 
           <dl className="flex flex-col gap-1 rounded-lg border bg-muted/30 px-3 py-2.5 text-sm tabular-nums">
-            <div className="flex justify-between gap-3">
+            <Inline gap="md" align="stretch" justify="between">
               <dt className="text-muted-foreground">{t("invoice.linkedTotal")}</dt>
               <dd className="font-medium">{text.money(linkedCents)}</dd>
-            </div>
-            <div className="flex justify-between gap-3">
+            </Inline>
+            <Inline gap="md" align="stretch" justify="between">
               <dt className="text-muted-foreground">{t("invoice.expenseTotal")}</dt>
               <dd>{text.money(expense.amountCents)}</dd>
-            </div>
-            <div className="flex justify-between gap-3">
+            </Inline>
+            <Inline gap="md" align="stretch" justify="between">
               <dt className="text-muted-foreground">{t("invoice.difference")}</dt>
               <dd className={cn("font-medium", differenceCents === 0 ? "text-success" : "text-warning")}>
                 {differenceCents === 0 ? t("invoice.matches") : text.money(differenceCents)}
               </dd>
-            </div>
+            </Inline>
           </dl>
-        </div>
+        </Stack>
       ),
     },
   ];

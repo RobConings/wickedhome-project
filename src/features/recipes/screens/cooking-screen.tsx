@@ -1,12 +1,12 @@
+import { CookingIngredientsTray } from "../components/cooking-ingredients-tray";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
-import { CheckIcon, ChefHatIcon, ChevronUpIcon, MonitorSmartphoneIcon, UsersIcon } from "lucide-react";
+import { CheckIcon, ChefHatIcon, MonitorSmartphoneIcon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageGrid } from "@/components/layout/page-grid";
 import { Stack } from "@/components/layout/stack";
@@ -163,25 +163,7 @@ export function CookingScreen({ state, products, canSaveToRecipe, pending = fals
         </Card>
       </PageGrid>
 
-      {/* Phones and tablets: a tray at the bottom opens the ingredients as a sheet. Room on the right for the Ask button. */}
-      <div className="h-20 lg:hidden" aria-hidden="true" />
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 pt-3 pr-[calc(max(1rem,env(safe-area-inset-right))+3.5rem)] pb-[max(0.75rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] backdrop-blur lg:hidden print:hidden">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button size="lg" variant="secondary" className="h-12 w-full justify-between">
-              <span className="truncate">{trayLabel}</span>
-              <ChevronUpIcon aria-hidden="true" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))]">
-            <SheetHeader>
-              <SheetTitle>{t("cooking.ingredients")}</SheetTitle>
-              <SheetDescription>{trayLabel}</SheetDescription>
-            </SheetHeader>
-            <div className="px-4">{panel}</div>
-          </SheetContent>
-        </Sheet>
-      </div>
+      <CookingIngredientsTray title={t("cooking.ingredients")} label={trayLabel}>{panel}</CookingIngredientsTray>
     </PageContainer>
   );
 }

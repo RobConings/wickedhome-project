@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { PageGrid } from "@/components/layout/page-grid";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -125,23 +128,23 @@ export function LinkAlternativeDialog({
         if (!preview?.needsConfirmation) return null;
         return (
           <section className="flex flex-col gap-3 rounded-lg border border-warning/40 bg-muted/40 p-3" aria-label={t("alternatives.groupMergeTitle")}>
-            <div className="space-y-1">
-              <p className="text-sm font-semibold">{t("alternatives.groupMergeTitle")}</p>
-              <p className="text-sm text-muted-foreground">{t("alternatives.groupMergeDescription")}</p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <Stack gap="xs">
+              <Text size="sm" weight="semibold">{t("alternatives.groupMergeTitle")}</Text>
+              <Text size="sm" tone="muted">{t("alternatives.groupMergeDescription")}</Text>
+            </Stack>
+            <PageGrid gap="3" className="sm:grid-cols-2">
               {[
                 { label: t("alternatives.currentGroup"), members: preview.currentMembers },
                 { label: t("alternatives.selectedGroup"), members: preview.selectedMembers },
               ].map((group) => (
                 <div key={group.label} className="min-w-0">
-                  <p className="text-xs font-semibold text-muted-foreground">{group.label}</p>
+                  <Text size="xs" tone="muted" weight="semibold">{group.label}</Text>
                   <ul className="mt-1 list-disc space-y-0.5 pl-4 text-sm">
                     {group.members.map((member) => <li key={member.id} className="break-words">{member.name}</li>)}
                   </ul>
                 </div>
               ))}
-            </div>
+            </PageGrid>
             <input type="hidden" name={name} value={value === true ? "true" : "false"} />
             <label htmlFor={id} className="flex cursor-pointer items-start gap-2 text-sm">
               <input
@@ -155,7 +158,7 @@ export function LinkAlternativeDialog({
               />
               <span>{t("alternatives.groupMergeConfirm")}</span>
             </label>
-            {errors?.length ? <p className="text-xs font-medium text-destructive">{errors.join(" ")}</p> : null}
+            {errors?.length ? <Text size="xs" tone="danger" weight="medium">{errors.join(" ")}</Text> : null}
           </section>
         );
       },

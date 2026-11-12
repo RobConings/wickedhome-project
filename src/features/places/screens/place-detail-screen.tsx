@@ -1,3 +1,6 @@
+import { DescriptionItem, DescriptionList } from "@/components/shared/description-list";
+import { Masonry } from "@/components/layout/masonry";
+import { Stack } from "@/components/layout/stack";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import type * as React from "react";
 import { BoxIcon, CpuIcon, FolderKanbanIcon, ListChecksIcon, MapIcon, PencilIcon, PlugIcon, ShoppingCartIcon, Trash2Icon, type LucideIcon } from "lucide-react";
@@ -94,15 +97,11 @@ export function PlaceDetailScreen({ detail, canManage, sections = {} }: PlaceDet
           <Card className="overflow-hidden p-0">
             {place.polygon ? (
               <>
-                <div className="overflow-hidden bg-background">
-                  <FloorPlanView plan={plan} selectedPlaceId={place.id} onPlaceClick={(id) => void navigate(`/places/${encodeURIComponent(id)}`)} className="h-[65dvh] min-h-96 rounded-none border-0" />
-                </div>
-                <dl className="grid grid-cols-2 gap-2 text-sm">
-                  <dt className="text-muted-foreground">{t("fields.floor")}</dt>
-                  <dd className="text-right font-medium">{plan.floor.name}</dd>
-                  <dt className="text-muted-foreground">{t("fields.area")}</dt>
-                  <dd className="text-right font-medium">{place.areaM2 !== null && formatArea(place.areaM2, currentLocale())}</dd>
-                </dl>
+                  <FloorPlanView plan={plan} selectedPlaceId={place.id} onPlaceClick={(id) => void navigate(`/places/${encodeURIComponent(id)}`)} className="h-[65dvh] min-h-96 overflow-hidden rounded-none border-0 bg-background" />
+                <DescriptionList columns="1" className="gap-2 text-sm">
+                  <DescriptionItem layout="row" label={t("fields.floor")} valueClassName="text-right">{plan.floor.name}</DescriptionItem>
+                  <DescriptionItem layout="row" label={t("fields.area")} valueClassName="text-right">{place.areaM2 !== null && formatArea(place.areaM2, currentLocale())}</DescriptionItem>
+                </DescriptionList>
               </>
             ) : (
               <CardDescription>{t("detail.notDrawn", { floor: plan.floor.name })}</CardDescription>
@@ -119,22 +118,22 @@ export function PlaceDetailScreen({ detail, canManage, sections = {} }: PlaceDet
       <RelatedRecordCards label={t("detail.contentsTitle")} items={LINKED_SECTIONS.filter(({ key }) => sections[key]).map(({ key, icon }) => ({ id: key, label: t(`detail.sections.${key}.title`), icon, accent: "home", to: `#place-${key}` }))} />
       <PageSection aria-labelledby="place-contents">
           <SectionHeader id="place-contents" title={t("detail.contentsTitle")} description={t("detail.contentsDescription")} />
-          <div className="columns-1 gap-4 md:columns-2">
+          <Masonry>
             {LINKED_SECTIONS.map(({ key, icon: Icon }) => (
-              <Card key={key} id={`place-${key}`} className="mb-4 break-inside-avoid scroll-mt-20 gap-2">
+              <Card key={key} id={`place-${key}`} className="scroll-mt-20 gap-2">
                 <CardHeader className="justify-start gap-3">
                   <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-section-soft text-section">
                     <Icon className="size-4" aria-hidden="true" />
                   </span>
-                  <div className="flex min-w-0 flex-col gap-0.5">
+                  <Stack gap="0.5" className="min-w-0">
                     <CardTitle>{t(`detail.sections.${key}.title`)}</CardTitle>
                     {!sections[key] && <CardDescription>{t(`detail.sections.${key}.empty`)}</CardDescription>}
-                  </div>
+                  </Stack>
                 </CardHeader>
                 {sections[key]}
               </Card>
             ))}
-          </div>
+          </Masonry>
       </PageSection>
     </PageContainer>
   );

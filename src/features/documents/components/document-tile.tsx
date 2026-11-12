@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { PageGrid } from "@/components/layout/page-grid";
 import * as React from "react";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import { Spinner } from "@/components/ui/spinner";
@@ -49,7 +52,7 @@ function FolderTile({ folder, canManage, onAction }: MenuProps & { folder: Docum
   const { menu, onContextMenu } = useContextMenu();
   return (
     <Card className={`${tileClass} p-3`} aria-busy={opening || undefined} onContextMenu={onContextMenu}>
-      <div className="flex items-start justify-between gap-2">
+      <Inline gap="sm" align="start" justify="between">
         <span className="grid size-10 shrink-0 place-items-center">
           {opening ? <Spinner className="size-6 text-primary" /> : <FolderGlyph color={folder.color} size="lg" />}
         </span>
@@ -60,13 +63,13 @@ function FolderTile({ folder, canManage, onAction }: MenuProps & { folder: Docum
           className="-mt-1 -mr-1"
           {...menu}
         />
-      </div>
-      <div className="flex min-w-0 flex-col">
+      </Inline>
+      <Stack gap="none" className="min-w-0">
         <Link to={folderHref(folder.id)} className={overlay} title={folder.name}>
           {folder.name}
         </Link>
         <span className="truncate text-xs text-muted-foreground">{summary(folder)}</span>
-      </div>
+      </Stack>
     </Card>
   );
 }
@@ -76,21 +79,21 @@ function FileTile({ file, canManage, onAction }: MenuProps & { file: DocumentFil
   const item = { kind: "file", file } as const;
   return (
     <Card className={`${tileClass} p-2`} onContextMenu={onContextMenu}>
-      <div className="relative grid aspect-[4/3] place-items-center rounded-lg bg-muted/50">
+      <PageGrid gap="none" className="relative aspect-[4/3] place-items-center rounded-lg bg-muted/50">
         <FileTypeIcon mimeType={file.mimeType} name={file.name} size="lg" />
         <DocumentStorageBadge file={file} className="absolute bottom-1.5 left-1.5" />
-      </div>
-      <div className="flex items-start gap-1 pl-1">
-        <div className="flex min-w-0 flex-1 flex-col">
+      </PageGrid>
+      <Inline gap="xs" align="start" className="pl-1">
+        <Stack gap="none" className="min-w-0 flex-1">
           <Link to={`/documents/files/${encodeURIComponent(file.id)}`} className={overlay} title={file.name}>
             {file.name}
           </Link>
           <span className="truncate text-xs text-muted-foreground">
             {fileSize(file.sizeBytes)} · {shortDate(fileModified(file))}
           </span>
-        </div>
+        </Stack>
         <DocumentItemMenu item={item} canManage={canManage} onAction={onAction} {...menu} />
-      </div>
+      </Inline>
     </Card>
   );
 }

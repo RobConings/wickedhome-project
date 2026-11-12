@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import type { AssistantSkillInfo } from "../types/assistant";
@@ -13,15 +15,15 @@ type AssistantSkillsListProps = {
 export function AssistantSkillsList({ skills }: AssistantSkillsListProps) {
   const { t } = useTranslation("assistant");
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       {skills.map((skill) => (
         <section key={skill.id} aria-labelledby={`skill-${skill.id}`} className="flex flex-col gap-1.5">
-          <div className="flex min-w-0 flex-col">
+          <Stack gap="none" className="min-w-0">
             <h4 id={`skill-${skill.id}`} className="text-sm font-medium">
               {skill.title}
             </h4>
-            <p className="text-xs text-pretty break-words text-muted-foreground">{skill.summary}</p>
-          </div>
+            <Text size="xs" tone="muted" className="text-pretty break-words">{skill.summary}</Text>
+          </Stack>
           <ul className="flex flex-col gap-1">
             {skill.tools.map((tool) => (
               <li key={tool.name} className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-sm">
@@ -40,6 +42,6 @@ export function AssistantSkillsList({ skills }: AssistantSkillsListProps) {
           </ul>
         </section>
       ))}
-    </div>
+    </Stack>
   );
 }

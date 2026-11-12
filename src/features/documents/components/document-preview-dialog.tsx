@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { CircleAlertIcon, DownloadIcon, ExternalLinkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -41,9 +44,9 @@ export function DocumentPreviewDialog({ file, onOpenChange, src, downloadSrc, te
         {file && (
           <>
             <DialogHeader className="pr-8">
-              <div className="flex min-w-0 items-center gap-3">
+              <Inline gap="md" align="center" className="min-w-0">
                 <FileTypeIcon mimeType={file.mimeType} name={file.name} />
-                <div className="flex min-w-0 flex-col gap-0.5 text-left">
+                <Stack gap="0.5" className="min-w-0 text-left">
                   <DialogTitle className="truncate">{file.name}</DialogTitle>
                   <DialogDescription className="truncate">
                     {[
@@ -54,8 +57,8 @@ export function DocumentPreviewDialog({ file, onOpenChange, src, downloadSrc, te
                       .filter(Boolean)
                       .join(" · ")}
                   </DialogDescription>
-                </div>
-              </div>
+                </Stack>
+              </Inline>
             </DialogHeader>
 
             <div className="min-h-0 flex-1 overflow-auto rounded-lg border bg-muted/40">
@@ -64,14 +67,14 @@ export function DocumentPreviewDialog({ file, onOpenChange, src, downloadSrc, te
               )}
               {kind === "text" && <TextPreview key={file.id} url={url} text={text} />}
               {kind === "none" && (
-                <div className="flex flex-col items-center gap-3 px-6 py-16 text-center">
+                <Stack gap="3" align="center" className="px-6 py-16 text-center">
                   <FileTypeIcon mimeType={file.mimeType} name={file.name} size="lg" />
-                  <p className="text-sm text-muted-foreground">{t("preview.unavailable")}</p>
-                </div>
+                  <Text size="sm" tone="muted">{t("preview.unavailable")}</Text>
+                </Stack>
               )}
             </div>
 
-            <div className="flex flex-wrap justify-end gap-2">
+            <Inline gap="sm" align="stretch" justify="end" wrap>
               {kind !== "none" && (
                 <Button variant="outline" asChild>
                   <a href={url} target="_blank" rel="noopener noreferrer">
@@ -86,7 +89,7 @@ export function DocumentPreviewDialog({ file, onOpenChange, src, downloadSrc, te
                   {t("actions.download")}
                 </a>
               </Button>
-            </div>
+            </Inline>
           </>
         )}
       </DialogContent>
@@ -124,10 +127,10 @@ function MediaPreview({ kind, url, name }: { kind: MediaKind; url: string; name:
 
   if (status === "failed") {
     return (
-      <div className="flex flex-col items-center gap-3 px-6 py-16 text-center" role="alert">
+      <Stack gap="3" align="center" className="px-6 py-16 text-center" role="alert">
         <CircleAlertIcon className="size-8 text-destructive" aria-hidden="true" />
-        <p className="text-sm text-muted-foreground">{t("preview.failed")}</p>
-      </div>
+        <Text size="sm" tone="muted">{t("preview.failed")}</Text>
+      </Stack>
     );
   }
 
@@ -180,20 +183,20 @@ function TextPreview({ url, text }: { url: string; text?: string }) {
     return () => controller.abort();
   }, [url, text]);
 
-  if (state.failed) return <p className="p-6 text-sm text-muted-foreground">{t("preview.failed")}</p>;
+  if (state.failed) return <Text size="sm" tone="muted" className="p-6">{t("preview.failed")}</Text>;
   if (state.text === undefined) {
     return (
-      <div className="flex flex-col gap-2 p-4">
+      <Stack gap="sm" className="p-4">
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-4 w-2/3" />
         <Skeleton className="h-4 w-1/2" />
-      </div>
+      </Stack>
     );
   }
   return (
     <div>
       <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed whitespace-pre">{state.text}</pre>
-      {state.truncated && <p className="border-t px-4 py-2 text-xs text-muted-foreground">{t("preview.truncated")}</p>}
+      {state.truncated && <Text size="xs" tone="muted" className="border-t px-4 py-2">{t("preview.truncated")}</Text>}
     </div>
   );
 }

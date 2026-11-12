@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import { useId, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -33,7 +34,7 @@ export function ShoppingNeedSections<T extends StockItem>({
   if (!grouped) return children(items);
   if (groups.length === 1 && groups[0]!.key === "other") return children(items);
   return (
-    <div className="space-y-2">
+    <Stack gap="sm">
       {groups.map((group) => (
         <section
           key={group.key}
@@ -58,6 +59,6 @@ export function ShoppingNeedSections<T extends StockItem>({
           {children(group.items)}
         </section>
       ))}
-    </div>
+    </Stack>
   );
 }

@@ -1,3 +1,6 @@
+import { PageGrid } from "@/components/layout/page-grid";
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { BanknoteIcon, CalendarClockIcon, ChartNoAxesCombinedIcon, PencilIcon, PlusIcon, RepeatIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -191,8 +194,8 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
         />
         <PendingContent pending={pending} label={tCommon("loading.updating")} contentClassName="flex flex-col gap-4">
           {view === "overview" && <IncomeMonthTotalsTiles totals={overview.totals} habitants={habitants} />}
-          <div className="grid min-w-0 grid-cols-1 items-start gap-4 lg:grid-cols-3">
-            <div className="min-w-0 lg:col-span-2">
+          <PageGrid gap="md" className="min-w-0 items-start lg:grid-cols-3">
+            <Stack gap="none" className="min-w-0 lg:col-span-2">
               <IncomeOccurrenceList
                 occurrences={overview.occurrences.filter((occurrence) => occurrence.status !== "received")}
                 upcoming={overview.upcoming}
@@ -202,9 +205,9 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
                 canManage={canManage}
                 renderIncomeActions={(income) => <IncomeActions income={income} overview={overview} habitants={habitants} />}
               />
-            </div>
+            </Stack>
             <VoucherBalances balances={overview.vouchers} habitants={habitants} />
-          </div>
+          </PageGrid>
         </PendingContent>
       </PageSection>}
 
@@ -235,17 +238,17 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
           items={incomes}
           getKey={(income) => income.id}
           renderRow={(income) => (
-            <div className="flex items-center gap-1">
-              <div className="min-w-0 flex-1">
+            <Inline gap="xs" align="center">
+              <Stack gap="none" className="min-w-0 flex-1">
                 <IncomeRow income={income} habitants={habitants} sources={overview.sources} accounts={overview.accounts} today={overview.today} />
-              </div>
+              </Stack>
               {canManage && <IncomeActions income={income} overview={overview} habitants={habitants} />}
-            </div>
+            </Inline>
           )}
           renderTile={(income) => (
             <Card className="h-full">
               <IncomeRow income={income} habitants={habitants} sources={overview.sources} accounts={overview.accounts} today={overview.today} tile />
-              {canManage && <div className="flex justify-end"><IncomeActions income={income} overview={overview} habitants={habitants} /></div>}
+              {canManage && <Inline gap="none" align="stretch" justify="end"><IncomeActions income={income} overview={overview} habitants={habitants} /></Inline>}
             </Card>
           )}
           search={{
@@ -263,7 +266,7 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
           renderGroupHeader={(month) => <span className="first-letter:uppercase">{monthLabel(month)}</span>}
           filtered={whoFilter !== ALL || kindFilter !== ALL}
           toolbar={
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <Stack gap="3" className="sm:flex-row">
               <Select value={whoFilter} onValueChange={(value) => setFilter("person", value)}>
                 <SelectTrigger className="w-full sm:w-44" aria-label={t("who.label")}>
                   <SelectValue />
@@ -290,7 +293,7 @@ export function IncomeScreen({ overview, habitants, canManage, currentHabitantId
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </Stack>
           }
           emptyState={
             <EmptyState icon={BanknoteIcon} title={t("empty.incomes.title")} description={t("empty.incomes.description")} action={oneOffDialog(false)} />

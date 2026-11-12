@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import { ExternalLinkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
@@ -44,7 +45,7 @@ export function ShopTile({ shop, isFavorite, onToggleFavorite }: ShopTileProps) 
           />
         </Inline>
       </Inline>
-      <div className="flex min-w-0 flex-col gap-1.5">
+      <Stack gap="1.5" className="min-w-0">
         <Link
           to={`/shops/${shop.id}`}
           className="line-clamp-2 font-medium break-words underline-offset-4 outline-none hover:underline focus-visible:underline"
@@ -52,7 +53,7 @@ export function ShopTile({ shop, isFavorite, onToggleFavorite }: ShopTileProps) 
           {shop.name}
         </Link>
         <ShopMarkers shop={shop} />
-      </div>
+      </Stack>
     </Card>
   );
 }

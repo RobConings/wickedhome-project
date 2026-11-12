@@ -1,3 +1,5 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { PlayIcon, RotateCwIcon, SquareIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -51,13 +53,13 @@ export function VoicePicker({ client = assistantClient, className }: VoicePicker
       <h3 id="assistant-voice-title" className="text-sm font-medium">
         {t("voices.title")}
       </h3>
-      <p className="mt-0.5 text-xs text-muted-foreground">{t("voices.description")}</p>
-      <div className="mt-3 flex flex-col gap-4">
+      <Text size="xs" tone="muted" className="mt-0.5">{t("voices.description")}</Text>
+      <Stack gap="md" className="mt-3">
         {status === null ? (
-          <div className="flex flex-col gap-4" aria-busy="true" aria-label={t("voices.loading")}>
+          <Stack gap="md"  aria-busy="true" aria-label={t("voices.loading")}>
             <SkeletonBlock className="h-16" />
             <SkeletonBlock className="h-16" />
-          </div>
+          </Stack>
         ) : status === "failed" ? (
           <InlineAlert tone="error">
             {t("voices.loadFailed")}{" "}
@@ -74,7 +76,7 @@ export function VoicePicker({ client = assistantClient, className }: VoicePicker
             ))}
           </>
         )}
-      </div>
+      </Stack>
     </section>
   );
 }
@@ -129,9 +131,9 @@ function LanguageVoice({ language, status, client }: { language: Language; statu
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <Stack gap="sm">
       <Label htmlFor={id}>{t(`voices.language.${language}`)}</Label>
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <Stack gap="sm" className="sm:flex-row sm:items-center">
         <Select value={choice} onValueChange={change}>
           <SelectTrigger id={id} className="w-full min-w-0 sm:flex-1">
             <SelectValue />
@@ -156,9 +158,9 @@ function LanguageVoice({ language, status, client }: { language: Language; statu
           {test === "playing" ? <SquareIcon /> : <PlayIcon />}
           {test === "loading" ? t("voices.testing") : test === "playing" ? t("voices.stop") : t("voices.test")}
         </Button>
-      </div>
-      {test === "failed" && <p className="text-xs font-medium text-destructive">{t("voices.testFailed")}</p>}
-      {voices.length === 0 && status.ok && <p className="text-xs text-muted-foreground">{t("voices.none")}</p>}
-    </div>
+      </Stack>
+      {test === "failed" && <Text size="xs" tone="danger" weight="medium">{t("voices.testFailed")}</Text>}
+      {voices.length === 0 && status.ok && <Text size="xs" tone="muted">{t("voices.none")}</Text>}
+    </Stack>
   );
 }

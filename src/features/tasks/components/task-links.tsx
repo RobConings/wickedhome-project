@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import { CheckIcon, HourglassIcon, Link2Icon, LockOpenIcon, PlusIcon, XIcon } from "lucide-react";
@@ -173,13 +174,13 @@ export function TaskLinksPanel({ taskId, links, canManage, action = "/tasks", on
   const empty = sections.every((section) => section.items.length === 0);
 
   return (
-    <div className="flex flex-col gap-3">
-      {openBlockers > 0 && <p className="text-sm font-medium text-warning">{t("waiting.summary", { count: openBlockers })}</p>}
-      {empty && <p className="text-sm text-muted-foreground">{t("links.empty")}</p>}
+    <Stack gap="3">
+      {openBlockers > 0 && <Text size="sm" tone="warning" weight="medium">{t("waiting.summary", { count: openBlockers })}</Text>}
+      {empty && <Text size="sm" tone="muted">{t("links.empty")}</Text>}
       {sections
         .filter((section) => section.items.length > 0)
         .map((section) => (
-          <div key={section.key} className="flex flex-col gap-1.5">
+          <Stack gap="1.5" key={section.key}>
             <h4 className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
               <section.icon className="size-3.5" aria-hidden="true" />
               {section.title}
@@ -189,7 +190,7 @@ export function TaskLinksPanel({ taskId, links, canManage, action = "/tasks", on
                 <LinkRow key={other.id} other={other} onRemove={onRemove(other)} busy={removing === other.id} />
               ))}
             </ul>
-          </div>
+          </Stack>
         ))}
       {canManage && (
         <>
@@ -201,6 +202,6 @@ export function TaskLinksPanel({ taskId, links, canManage, action = "/tasks", on
           {adding && <AddLinkDialog taskId={taskId} open onOpenChange={setAdding} action={action} onChanged={onChanged} />}
         </>
       )}
-    </div>
+    </Stack>
   );
 }

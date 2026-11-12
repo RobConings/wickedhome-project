@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import {
   BanIcon,
@@ -252,16 +255,16 @@ function AccountsPanel({ data, actor, client = accountsClient }: Omit<AccountsSe
 
   return (
     <Card className="gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
+      <Inline gap="md" align="center" justify="between" wrap>
+        <Text size="sm" tone="muted">
           {t("accounts.summary", { count: overview.accounts.length })}
           {overview.pendingInvites.length > 0 && ` · ${t("accounts.pendingSummary", { count: overview.pendingInvites.length })}`}
-        </p>
+        </Text>
         <Button size="lg" onClick={() => setInviteDialog({ open: true })} className="w-full sm:w-auto">
           <UserPlusIcon />
           {t("accounts.invite")}
         </Button>
-      </div>
+      </Inline>
 
       <ul className="flex flex-col divide-y" aria-label={t("accounts.listLabel")}>
         {overview.accounts.map((account) => (
@@ -414,8 +417,8 @@ function AccountItem({ account, isMe, now, busy, roles, can, lastOwner, ...on }:
       ) : (
         <span className="grid size-10 shrink-0 place-items-center rounded-full bg-muted text-sm font-semibold">{initials(name)}</span>
       )}
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+      <Stack gap="xs" className="min-w-0 flex-1">
+        <Inline gap="none" align="center" wrap className="gap-x-2 gap-y-1">
           <span className="truncate font-medium">{name}</span>
           {isMe && <Badge variant="outline">{t("accounts.you")}</Badge>}
           <Badge variant="secondary">{t(`roles.${account.role}`)}</Badge>
@@ -426,7 +429,7 @@ function AccountItem({ account, isMe, now, busy, roles, can, lastOwner, ...on }:
               {t("accounts.status.active")}
             </Badge>
           )}
-        </div>
+        </Inline>
         <span className="truncate text-sm text-muted-foreground">{account.email}</span>
         <span className="text-xs text-muted-foreground">
           {account.lastLoginAt
@@ -441,7 +444,7 @@ function AccountItem({ account, isMe, now, busy, roles, can, lastOwner, ...on }:
           </span>
         )}
         {lastOwner && isMe && <span className="text-xs text-muted-foreground">{t("accounts.lastOwnerHint")}</span>}
-      </div>
+      </Stack>
       {hasActions && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -521,21 +524,21 @@ function InviteItem({ invite, now, busy, canManage, link, onCopy, onRenew, onRev
   return (
     <li className="flex min-w-0 items-start gap-3 py-3" aria-busy={busy || undefined}>
       <HabitantAvatar habitant={invite.person} className="opacity-70" />
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+      <Stack gap="xs" className="min-w-0 flex-1">
+        <Inline gap="none" align="center" wrap className="gap-x-2 gap-y-1">
           <span className="truncate font-medium">{invite.person.name}</span>
           <Badge variant="secondary">{t(`roles.${invite.role}`)}</Badge>
           <Badge variant="outline" className="border-dashed">
             <UsersIcon />
             {t("accounts.status.invited")}
           </Badge>
-        </div>
+        </Inline>
         <span className="text-xs text-muted-foreground">
           {invite.createdByName ? t("accounts.invitedBy", { name: invite.createdByName }) : t("accounts.invitedPending")}
           {" · "}
           {t("accounts.inviteExpires", { when: relativeTime(invite.expiresAt, locale, now) })}
         </span>
-      </div>
+      </Stack>
       {canManage && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

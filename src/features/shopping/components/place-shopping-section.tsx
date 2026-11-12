@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { ShoppingCartIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -30,10 +32,10 @@ export function PlaceShoppingSection({ placeId, initialItems }: PlaceShoppingSec
   if (items === null) return failed ? <ShoppingItemsError onRetry={refresh} /> : <ShoppingItemsSkeleton />;
 
   return (
-    <div className="flex flex-col gap-2">
+    <Stack gap="sm">
       {actions.confirmation}
       {actions.items.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("place.empty")}</p>
+        <Text size="sm" tone="muted">{t("place.empty")}</Text>
       ) : (
         <ul className="divide-y rounded-xl border bg-card px-3">
           {actions.items.map((item) => (
@@ -47,7 +49,7 @@ export function PlaceShoppingSection({ placeId, initialItems }: PlaceShoppingSec
           {t("actions.backToShopping")}
         </Link>
       </Button>
-    </div>
+    </Stack>
   );
 }
 

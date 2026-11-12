@@ -1,3 +1,5 @@
+import { PageGrid } from "@/components/layout/page-grid";
+import { Inline } from "@/components/layout/inline";
 import { RecordLink } from "@/components/shared/record-link";
 import * as React from "react";
 import { PencilIcon, Trash2Icon } from "lucide-react";
@@ -100,15 +102,15 @@ export function IncomeSourceList({ sources, habitants, accounts, today, canManag
     .filter((group) => group.sources.length > 0);
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <PageGrid gap="md" className="md:grid-cols-2">
       {groups.map((group) => {
         const habitant = habitants.find((item) => item.id === group.key);
         return (
           <Card key={group.key} className="gap-2">
-            <div className="flex items-center gap-2">
+            <Inline gap="sm" align="center">
               {habitant && <HabitantAvatar habitant={habitant} size="sm" />}
               <h3 className="text-sm font-semibold">{whoName(group.key)}</h3>
-            </div>
+            </Inline>
             <ul className="flex flex-col divide-y">
               {group.sources.map((source) => (
                 <IncomeSourceRow key={source.id} source={source} habitants={habitants} accounts={accounts} today={today} canManage={canManage} />
@@ -117,6 +119,6 @@ export function IncomeSourceList({ sources, habitants, accounts, today, canManag
           </Card>
         );
       })}
-    </div>
+    </PageGrid>
   );
 }

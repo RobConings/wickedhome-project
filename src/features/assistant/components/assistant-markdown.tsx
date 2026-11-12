@@ -1,3 +1,4 @@
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -12,7 +13,7 @@ function CodeBlock({ children }: { children?: React.ReactNode }) {
   const code = React.useRef<HTMLPreElement>(null);
   const [copied, setCopied] = React.useState(false);
   return <div className="my-3 min-w-0 overflow-hidden rounded-xl border bg-muted/50">
-    <div className="flex justify-end border-b px-2"><Button size="sm" variant="ghost" onClick={() => { void navigator.clipboard.writeText(code.current?.textContent ?? "").then(() => setCopied(true)).catch(() => setCopied(false)); }}>{t(copied ? "chat.copied" : "chat.copyCode")}</Button></div>
+    <Inline gap="none" align="stretch" justify="end" className="border-b px-2"><Button size="sm" variant="ghost" onClick={() => { void navigator.clipboard.writeText(code.current?.textContent ?? "").then(() => setCopied(true)).catch(() => setCopied(false)); }}>{t(copied ? "chat.copied" : "chat.copyCode")}</Button></Inline>
     <pre ref={code} className="overflow-x-auto p-3 text-xs leading-relaxed">{children}</pre>
   </div>;
 }

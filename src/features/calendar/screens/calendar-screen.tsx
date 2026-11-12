@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -127,7 +128,7 @@ export function CalendarScreen({ data, canManage, renderShopList, now }: Calenda
         }
       />
 
-      <div className="flex flex-col gap-3">
+      <Stack gap="3">
         <CalendarToolbar
           view={target?.view ?? view}
           date={target?.date ?? date}
@@ -136,7 +137,7 @@ export function CalendarScreen({ data, canManage, renderShopList, now }: Calenda
           pending={target !== null}
         />
         <CalendarCategoryFilter selected={categories} onChange={setFilter} sources={sourceChips} selectedSources={sources} />
-      </div>
+      </Stack>
 
       <PendingContent pending={pending} label={tCommon("loading.default")}>
         {view === "day" && (
@@ -172,7 +173,7 @@ export function CalendarScreen({ data, canManage, renderShopList, now }: Calenda
         {view === "month" && (
           <>
             {/* Phones: compact month + the agenda for the month (tap a day to jump to it). */}
-            <div className="flex flex-col gap-5 md:hidden">
+            <Stack gap="5" className="md:hidden">
               <CalendarCompactMonth
                 date={date}
                 today={today}
@@ -188,7 +189,7 @@ export function CalendarScreen({ data, canManage, renderShopList, now }: Calenda
                 selectedDate={selectedDate}
                 onSelectEntry={setSelectedEntry}
               />
-            </div>
+            </Stack>
             <CalendarMonthGrid
               className="hidden md:block"
               date={date}

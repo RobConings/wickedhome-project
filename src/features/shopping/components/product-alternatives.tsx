@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import { RecordImage } from "@/components/shared/record-image";
 import * as React from "react";
 import { Layers2Icon, LinkIcon, PlusIcon, UnlinkIcon } from "lucide-react";
@@ -49,8 +51,8 @@ export function ProductAlternatives({ product, products, canManage, highlightId,
 
   if (product.stockProductId) {
     return (
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="flex items-center gap-2 text-sm">
+      <Stack gap="3" className="sm:flex-row sm:items-center sm:justify-between">
+        <Text size="sm" className="flex items-center gap-2">
           <Layers2Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
           <span className="min-w-0 break-words">
             <Trans
@@ -67,16 +69,16 @@ export function ProductAlternatives({ product, products, canManage, highlightId,
               }}
             />
           </span>
-        </p>
+        </Text>
         {canManage && <UnlinkButton alternative={product} action={action} withLabel />}
-      </div>
+      </Stack>
     );
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       {product.alternatives.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("alternatives.none")}</p>
+        <Text size="sm" tone="muted">{t("alternatives.none")}</Text>
       ) : (
         <ul className="-my-1 divide-y">
           {product.alternatives.map((alternative) => (
@@ -123,7 +125,7 @@ export function ProductAlternatives({ product, products, canManage, highlightId,
           }
         />
       ))}
-    </div>
+    </Stack>
   );
 }
 

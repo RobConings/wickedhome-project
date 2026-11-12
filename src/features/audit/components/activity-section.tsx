@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { useSearchParams } from "react-router";
 import { HistoryIcon } from "lucide-react";
@@ -93,7 +96,7 @@ export function ActivitySection({ client = auditClient }: ActivitySectionProps) 
   const setFilter = (name: keyof Filters) => (value: string) => setFilters({ ...filters, [name]: value });
 
   const toolbar = (
-    <div className="flex flex-wrap gap-2">
+    <Inline gap="sm" align="stretch" wrap>
       <Select value={filters.channel} onValueChange={setFilter("channel")}>
         <SelectTrigger className="w-full sm:w-40" aria-label={t("filters.channel")}>
           <SelectValue />
@@ -138,11 +141,11 @@ export function ActivitySection({ client = auditClient }: ActivitySectionProps) 
           {t("filters.clear")}
         </Button>
       )}
-    </div>
+    </Inline>
   );
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       <GeneralList<AuditEntry>
         label={t("list.label")}
         items={loaded?.entries ?? []}
@@ -166,7 +169,7 @@ export function ActivitySection({ client = auditClient }: ActivitySectionProps) 
           {t("list.more")}
         </Button>
       )}
-      <p className="text-sm text-muted-foreground">{t("section.retention", { days: AUDIT_RETENTION_DAYS })}</p>
-    </div>
+      <Text size="sm" tone="muted">{t("section.retention", { days: AUDIT_RETENTION_DAYS })}</Text>
+    </Stack>
   );
 }

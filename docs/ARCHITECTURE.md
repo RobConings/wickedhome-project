@@ -74,6 +74,19 @@ WickedHome/
 
 ## How a page is built
 
+Screens compose the design system: use `Stack`, `Inline`, `PageGrid`, `PageSection`, `Card`, `Text` and
+feature components instead of native `div`/`p` layouts. ESLint enforces this in every feature screen.
+Native HTML belongs in the component that owns its semantics and behavior. Use `DescriptionList` and
+`DescriptionItem` for properties; `layout="row"` supports compact label/value tables. `GeneralList`
+supports `variant="embedded"` for related records inside a card, sharing rows and states without a
+second search/view toolbar or card. Ordinary standalone lists keep the full GeneralList controls.
+
+Run `npm run audit:components` to check every component and feature folder for composition drift.
+Regenerate the inventory with `node scripts/audit-component-composition.mjs --write`; the
+[audit report](COMPONENT-COMPOSITION-AUDIT.md) records ownership exceptions and existing Storybook gaps.
+After building Storybook, `npm run test:components-browser` renders every screen in English/Dutch and
+light/dark on phone and desktop sizes, and exercises the shared embedded lists and mobile cooking tray.
+
 ```tsx
 // src/routes/habitants.tsx  — the whole route file
 export const loader = habitantsLoader;   // from @/features/household

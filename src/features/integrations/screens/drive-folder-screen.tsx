@@ -1,3 +1,4 @@
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import {
   DownloadIcon,
@@ -243,21 +244,21 @@ function DriveFolderContent({ linkId, listing, canManage, client = googleClient 
         pending={pending}
         emptyState={<EmptyState icon={FolderIcon} title={t("driveFolder.empty")} />}
         renderRow={(item) => (
-          <div className="relative flex min-h-11 items-center gap-3">
+          <Inline gap="md" align="center" className="relative min-h-11">
             {icon(item, "icon")}
             <button type="button" className="flex min-w-0 flex-1 flex-col text-left after:absolute after:inset-0" onClick={() => openItem(item)}>
               <span className="truncate text-sm font-medium">{item.name}</span>
               {details(item) && <span className="text-xs text-muted-foreground">{details(item)}</span>}
             </button>
             {!item.isFolder && menu(item)}
-          </div>
+          </Inline>
         )}
         renderTile={(item) => (
           <Card className="relative h-full gap-2 p-3">
-            <div className="flex items-start justify-between gap-2">
+            <Inline gap="sm" align="start" justify="between">
               {icon(item, "tile")}
               {!item.isFolder && menu(item)}
-            </div>
+            </Inline>
             <button type="button" className="min-w-0 text-left after:absolute after:inset-0" onClick={() => openItem(item)}>
               <span className="line-clamp-2 text-sm font-medium break-words">{item.name}</span>
             </button>

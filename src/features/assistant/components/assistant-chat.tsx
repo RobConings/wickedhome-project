@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { Volume2Icon, VolumeXIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -103,7 +105,7 @@ export function AssistantChat({
           className="mx-auto min-h-full w-full max-w-3xl"
         />
       </div>
-      <div className="flex flex-col gap-1 border-t bg-background pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+      <Stack gap="xs" className="border-t bg-background pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         <ChatComposer
           busy={chat.busy}
           onSend={(text) => {
@@ -142,7 +144,7 @@ export function AssistantChat({
           }
         />
         {speech.supported && (
-          <div className="flex justify-end">
+          <Inline gap="none" align="stretch" justify="end">
             <Button
               type="button"
               variant="ghost"
@@ -154,9 +156,9 @@ export function AssistantChat({
               {speech.enabled ? <Volume2Icon /> : <VolumeXIcon />}
               {speech.speaking ? t("voice.stopSpeaking") : t("voice.readAloud")}
             </Button>
-          </div>
+          </Inline>
         )}
-      </div>
+      </Stack>
     </div>
   );
 }

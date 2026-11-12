@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { LayersIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -59,13 +62,13 @@ export function ShopViewSelection({ shops, groups, selectedKeys, activeGroupId, 
   return (
     <div className={compact ? "min-w-0" : "flex flex-col gap-3 rounded-xl border bg-card p-4"}>
       {compact ? <Button variant="outline" size="sm" onClick={() => choose()}><LayersIcon />{t("shopGroups.choose")}</Button> : <>
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <Inline gap="sm" align="center" justify="between" wrap>
         <span className="text-sm font-medium">{t("shopGroups.title")}</span>
         <Button variant="outline" size="sm" onClick={() => choose()}><PlusIcon />{t("shopGroups.combine")}</Button>
-      </div>
-      <p className="text-sm text-muted-foreground">{t("shopGroups.description")}</p>
-      {groups.length > 0 && <div className="flex flex-wrap gap-2">
-        {groups.map((group) => <div key={group.id} className="flex min-w-0 max-w-full items-center gap-1 rounded-lg border p-1">
+      </Inline>
+      <Text size="sm" tone="muted">{t("shopGroups.description")}</Text>
+      {groups.length > 0 && <Inline gap="sm" align="stretch" wrap>
+        {groups.map((group) => <Inline gap="xs" align="center" key={group.id} className="min-w-0 max-w-full rounded-lg border p-1">
           <Button className="min-w-0" size="sm" variant={activeGroupId === group.id ? "secondary" : "ghost"} onClick={() => onSelectGroup(group.id)} aria-pressed={activeGroupId === group.id} title={group.name}>
             <LayersIcon /><span className="truncate">{group.name}</span>
           </Button>
@@ -84,24 +87,24 @@ export function ShopViewSelection({ shops, groups, selectedKeys, activeGroupId, 
               }}
             />
           </>}
-        </div>)}
-      </div>}
+        </Inline>)}
+      </Inline>}
       </>}
       <Dialog open={open} onOpenChange={(next) => !busy && setOpen(next)}>
         <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-lg">
-          {compact && groups.length > 0 && <div className="flex flex-wrap gap-2 pr-6">{groups.map((group) => <Button key={group.id} variant="outline" size="sm" onClick={() => { onSelectGroup(group.id); setOpen(false); }}>{group.name}</Button>)}</div>}
+          {compact && groups.length > 0 && <Inline gap="sm" align="stretch" wrap className="pr-6">{groups.map((group) => <Button key={group.id} variant="outline" size="sm" onClick={() => { onSelectGroup(group.id); setOpen(false); }}>{group.name}</Button>)}</Inline>}
           <DialogHeader><DialogTitle>{editing ? t("shopGroups.edit", { name: editing.name }) : t("shopGroups.combine")}</DialogTitle><DialogDescription>{t("shopGroups.description")}</DialogDescription></DialogHeader>
           <EntityMultiPicker items={options.filter((shop) => !editing || shop.id !== NO_SHOP).map((shop) => ({ id: shop.id, label: shop.name }))}
             value={draft} onChange={setDraft} disabled={busy} placeholder={t("shopGroups.search")} />
-          {canManage && <div className="flex flex-col gap-2 border-t pt-4">
+          {canManage && <Stack gap="sm" className="border-t pt-4">
             <label htmlFor={groupNameId} className="text-sm font-medium">{t("shopGroups.name")}</label>
             <Input id={groupNameId} value={name} onChange={(event) => setName(event.target.value)} maxLength={80} placeholder={t("shopGroups.namePlaceholder")} disabled={busy} />
-            <p className="text-xs text-muted-foreground">{t("shopGroups.saveHint")}</p>
-          </div>}
-          <div className="flex flex-wrap justify-end gap-2">
+            <Text size="xs" tone="muted">{t("shopGroups.saveHint")}</Text>
+          </Stack>}
+          <Inline gap="sm" align="stretch" justify="end" wrap>
             <Button variant="outline" disabled={busy || draft.length === 0} onClick={() => { onSelect(draft); setOpen(false); }}>{t("shopGroups.apply")}</Button>
             {canManage && <Button disabled={busy || !name.trim() || draft.length < 2 || draft.includes(NO_SHOP)} onClick={() => void save()}>{busy ? common("form.saving") : t(editing ? "shopGroups.save" : "shopGroups.saveNew")}</Button>}
-          </div>
+          </Inline>
         </DialogContent>
       </Dialog>
     </div>

@@ -1,3 +1,5 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { PencilIcon, RepeatIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -36,7 +38,7 @@ export function StapleList({ staples, lists, products, shops, canManage, initial
   const listName = (id: string) => lists.find((list) => list.id === id)?.name ?? "";
   const shopName = (id: string | null) => (id ? shops.find((shop) => shop.id === id)?.name : undefined);
 
-  if (staples.length === 0) return <p className="text-sm text-muted-foreground">{t("staples.empty")}</p>;
+  if (staples.length === 0) return <Text size="sm" tone="muted">{t("staples.empty")}</Text>;
 
   return (
     <ul className="divide-y">
@@ -47,7 +49,7 @@ export function StapleList({ staples, lists, products, shops, canManage, initial
             <span className="grid size-8 shrink-0 place-items-center rounded-full bg-section-soft text-section">
               <RepeatIcon className="size-4" aria-hidden="true" />
             </span>
-            <div className="flex min-w-0 flex-1 flex-col">
+            <Stack gap="none" className="min-w-0 flex-1">
               <span className="truncate font-medium">
                 {staple.name}
                 {amount && <span className="ml-2 text-sm font-normal text-muted-foreground tabular-nums">{amount}</span>}
@@ -62,7 +64,7 @@ export function StapleList({ staples, lists, products, shops, canManage, initial
                   .filter(Boolean)
                   .join(" · ")}
               </span>
-            </div>
+            </Stack>
             {canManage && (
               <>
                 <StapleFormDialog

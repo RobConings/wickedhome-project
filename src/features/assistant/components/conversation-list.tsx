@@ -1,3 +1,5 @@
+import { FormField } from "@/components/shared/form-field";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { MessageSquareIcon, MoreVerticalIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -6,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { currentLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -49,7 +50,7 @@ export function ConversationList({ conversations, activeId, onRename, onDelete, 
       </Button>
       <Input type="search" aria-label={t("conversations.search")} placeholder={t("conversations.search")} value={query} maxLength={80} onChange={(event) => setQuery(event.target.value)} />
       {filtered.length === 0 ? (
-        <p className="px-2 py-4 text-sm text-muted-foreground">{t(query.trim() ? "conversations.noMatches" : "conversations.empty")}</p>
+        <Text size="sm" tone="muted" className="px-2 py-4">{t(query.trim() ? "conversations.noMatches" : "conversations.empty")}</Text>
       ) : (
         <ul className="flex min-h-0 flex-col gap-0.5 overflow-y-auto">
           {filtered.map((conversation) => (
@@ -97,7 +98,7 @@ export function ConversationList({ conversations, activeId, onRename, onDelete, 
           ))}
         </ul>
       )}
-      <p className="px-2 text-xs text-muted-foreground">{t("conversations.retention", { days: CONVERSATION_RETENTION_DAYS })}</p>
+      <Text size="xs" tone="muted" className="px-2">{t("conversations.retention", { days: CONVERSATION_RETENTION_DAYS })}</Text>
       <RenameDialog conversation={renaming} onClose={() => setRenaming(null)} onRename={onRename} />
     </nav>
   );
@@ -135,10 +136,9 @@ function RenameDialog({
             <DialogTitle>{t("conversations.renameTitle")}</DialogTitle>
             <DialogDescription className="sr-only">{t("conversations.renameTitle")}</DialogDescription>
           </DialogHeader>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor={id}>{t("conversations.titleLabel")}</Label>
+          <FormField htmlFor={id} label={<>{t("conversations.titleLabel")}</>}>
             <Input id={id} name="title" defaultValue={conversation?.title ?? ""} maxLength={80} required disabled={busy} />
-          </div>
+          </FormField>
           <DialogFooter>
             <Button type="submit" loading={busy}>
               {t("conversations.save")}

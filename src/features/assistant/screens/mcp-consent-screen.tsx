@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { BookOpenIcon, GlobeIcon, PencilLineIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -104,13 +105,13 @@ export function McpConsentScreen({ data, client = mcpOAuthClient, navigate = (ur
               </Stack>
 
               {/* Where the tokens really go: the redirect URI's host, not the name the client gave itself. */}
-              <div className="flex items-start gap-3 rounded-lg border-2 border-primary/40 bg-primary/5 p-4">
+              <Inline gap="md" align="start" className="rounded-lg border-2 border-primary/40 bg-primary/5 p-4">
                 <GlobeIcon className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
-                <div className="flex min-w-0 flex-col gap-0.5">
+                <Stack gap="0.5" className="min-w-0">
                   <span className="text-sm text-muted-foreground">{t("consent.tokensGoTo")}</span>
                   <span className="text-lg font-semibold break-all">{consent.redirectHost}</span>
-                </div>
-              </div>
+                </Stack>
+              </Inline>
 
               {consent.refused === "child" ? (
                 <InlineAlert tone="error">{t("consent.childRefused")}</InlineAlert>
@@ -131,11 +132,11 @@ export function McpConsentScreen({ data, client = mcpOAuthClient, navigate = (ur
                       />
                     )}
                   </fieldset>
-                  <p className="text-xs text-muted-foreground text-pretty">{t("consent.dataNote", { client: consent.clientName })}</p>
+                  <Text size="xs" tone="muted" className="text-pretty">{t("consent.dataNote", { client: consent.clientName })}</Text>
                 </>
               )}
 
-              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <Stack gap="sm" className="flex-col-reverse sm:flex-row sm:justify-end">
                 <Button type="button" variant="outline" className="min-h-10 w-full sm:w-auto" loading={busy === "deny"} disabled={busy !== null || leaving} onClick={() => void decide("deny")}>
                   {consent.refused ? t("consent.back") : t("consent.deny")}
                 </Button>
@@ -144,11 +145,11 @@ export function McpConsentScreen({ data, client = mcpOAuthClient, navigate = (ur
                     {t("consent.allow")}
                   </Button>
                 )}
-              </div>
+              </Stack>
               {leaving && (
-                <p className="text-center text-sm text-muted-foreground" role="status">
+                <Text size="sm" tone="muted" className="text-center" role="status">
                   {t("consent.leaving", { host: consent.redirectHost })}
-                </p>
+                </Text>
               )}
             </>
           )}

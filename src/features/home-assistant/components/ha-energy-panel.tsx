@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { RefreshCwIcon, ZapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -49,15 +52,15 @@ export function HaEnergyPanel({ energy, appliances, canManage }: HaEnergyPanelPr
   const nameOf = (statisticId: string) => energy.devices.find((device) => device.statisticId === statisticId)?.name ?? statisticId;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-0.5 text-sm">
+    <Stack gap="md">
+      <Stack gap="sm" className="rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between">
+        <Stack gap="0.5" className="text-sm">
           <span className="font-medium">{energy.lastImportAt ? t("energy.lastImport", { when: formatDateTime(energy.lastImportAt, i18n.language) }) : t("energy.neverImported")}</span>
           {energy.lastResult && <span className="text-xs text-muted-foreground">{energy.lastResult}</span>}
-        </div>
+        </Stack>
         {canManage && (
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2">
+          <Inline gap="md" align="center" wrap>
+            <Inline gap="sm" align="center">
               <Switch
                 id="ha-energy-enabled"
                 checked={enabled}
@@ -69,7 +72,7 @@ export function HaEnergyPanel({ energy, appliances, canManage }: HaEnergyPanelPr
               <Label htmlFor="ha-energy-enabled" className="text-sm font-normal">
                 {t("energy.enabled")}
               </Label>
-            </div>
+            </Inline>
             <Button
               variant="outline"
               size="sm"
@@ -80,9 +83,9 @@ export function HaEnergyPanel({ energy, appliances, canManage }: HaEnergyPanelPr
               <RefreshCwIcon />
               {t("energy.importNow")}
             </Button>
-          </div>
+          </Inline>
         )}
-      </div>
+      </Stack>
 
       {energy.sources === null ? (
         <InlineAlert>{energy.status.state === "connected" ? t("energy.noPrefs") : t("energy.notConnected")}</InlineAlert>
@@ -118,7 +121,7 @@ export function HaEnergyPanel({ energy, appliances, canManage }: HaEnergyPanelPr
         <h3 id="ha-energy-devices" className="text-sm font-medium">
           {t("energy.devices")}
         </h3>
-        <p className="text-xs text-muted-foreground">{t("energy.devicesHint")}</p>
+        <Text size="xs" tone="muted">{t("energy.devicesHint")}</Text>
         {energy.devices.length === 0 ? (
           <EmptyState icon={ZapIcon} title={t("energy.noDevices.title")} description={t("energy.noDevices.description")} className="py-8" />
         ) : (
@@ -148,7 +151,7 @@ export function HaEnergyPanel({ energy, appliances, canManage }: HaEnergyPanelPr
               </ul>
             </fieldset>
             {canManage && (
-              <div className="flex justify-end">
+              <Inline gap="none" align="stretch" justify="end">
                 <Button
                   loading={links.state !== "idle"}
                   disabled={!dirty}
@@ -164,11 +167,11 @@ export function HaEnergyPanel({ energy, appliances, canManage }: HaEnergyPanelPr
                 >
                   {t("energy.saveLinks")}
                 </Button>
-              </div>
+              </Inline>
             )}
           </>
         )}
       </section>
-    </div>
+    </Stack>
   );
 }

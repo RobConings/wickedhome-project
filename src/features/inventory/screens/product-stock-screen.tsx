@@ -1,3 +1,8 @@
+import { DescriptionList, DescriptionItem } from "@/components/shared/description-list";
+import { PageGrid } from "@/components/layout/page-grid";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import {
   BarcodeIcon, BoxesIcon, ExternalLinkIcon, HistoryIcon, LinkIcon, PackageIcon,
@@ -145,7 +150,7 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
   ];
 
   const actionButtons = (
-    <div className="grid min-w-0 grid-cols-1 gap-2 xl:flex xl:flex-wrap xl:justify-end">
+    <PageGrid gap="sm" className="min-w-0 xl:flex xl:flex-wrap xl:justify-end">
       <SplitAction
         icon={ShoppingCartIcon}
         label={t("workspace.addToShopping")}
@@ -176,18 +181,18 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
           }
         />
       )}
-    </div>
+    </PageGrid>
   );
 
   return (
     <PageContainer>
       {confirmation}
-      <div data-slot="product-hero" className="rounded-xl border bg-card p-3 shadow-xs sm:p-5">
-        <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)]">
+      <Card data-slot="product-hero" className="rounded-xl border bg-card p-3 shadow-xs sm:p-5">
+        <PageGrid gap="5" className="min-w-0 lg:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)]">
           <RecordImage src={product.imageUrl} alt={product.name} shape="banner" fit="contain"
             className="h-56 sm:h-56 lg:h-72" fallback={<ProductCategoryIcon category={product.category} className="size-20 text-section" />} />
-          <div className="flex min-w-0 flex-col gap-4">
-            <div className="flex min-w-0 flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+          <Stack gap="md" className="min-w-0">
+            <Stack gap="3" className="min-w-0 xl:flex-row xl:items-start xl:justify-between">
               <PageHeader
                 backTo="/inventory"
                 title={product.name}
@@ -200,34 +205,34 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
                 }
                 className="min-w-0 xl:flex-1"
               />
-              <div data-slot="product-desktop-actions" className="hidden min-w-0 xl:block xl:max-w-[58%]">{actionButtons}</div>
-            </div>
-            <div data-slot="product-statistics" className="grid grid-cols-2 gap-2 xl:grid-cols-4">
+              <Stack gap="none" data-slot="product-desktop-actions" className="hidden min-w-0 xl:block xl:max-w-[58%]">{actionButtons}</Stack>
+            </Stack>
+            <PageGrid gap="sm" data-slot="product-statistics" className="grid-cols-2 xl:grid-cols-4">
               {stats.map(({ id, icon, tone, value, label }) => (
-                <div key={id} className="flex min-w-0 items-center gap-2 rounded-xl border bg-background p-2.5 sm:p-3">
+                <Inline gap="sm" align="center" key={id} className="min-w-0 rounded-xl border bg-background p-2.5 sm:p-3">
                   <IconChip icon={icon} tone={tone} size="sm" />
-                  <div className="min-w-0">
-                    <p className="break-words text-lg font-semibold leading-tight tabular-nums">{value}</p>
-                    <p className="break-words text-xs text-muted-foreground">{label}</p>
-                  </div>
-                </div>
+                  <Stack gap="none" className="min-w-0">
+                    <Text size="lg" weight="semibold" className="break-words leading-tight tabular-nums">{value}</Text>
+                    <Text size="xs" tone="muted" className="break-words">{label}</Text>
+                  </Stack>
+                </Inline>
               ))}
-            </div>
+            </PageGrid>
             {/* On phones the actions follow the product facts, just like the approved mobile wireframe. */}
-            <div data-slot="product-mobile-actions" className="min-w-0 xl:hidden">{actionButtons}</div>
-          </div>
-        </div>
-      </div>
+            <Stack gap="none" data-slot="product-mobile-actions" className="min-w-0 xl:hidden">{actionButtons}</Stack>
+          </Stack>
+        </PageGrid>
+      </Card>
 
       <RecordWorkspaceTabs
         label={t("workspace.navigation")}
         detailsLabel={t("workspace.details")}
         overviewLabel={t("workspace.overview")}
         details={
-          <div className="flex min-w-0 flex-col gap-4">
+          <Stack gap="md" className="min-w-0">
             <Card className="gap-3">
-              <div className="flex items-center gap-2"><IconChip icon={BarcodeIcon} tone="info" size="sm" /><CardTitle>{t("workspace.productInfo")}</CardTitle></div>
-              <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <Inline gap="sm" align="center"><IconChip icon={BarcodeIcon} tone="info" size="sm" /><CardTitle>{t("workspace.productInfo")}</CardTitle></Inline>
+              <DescriptionList columns="1" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {[
                   { icon: BarcodeIcon, label: t("workspace.barcode"), value: product.barcode },
                   ...(product.qrCode ? [{ icon: QrCodeIcon, label: t("workspace.qrCode"), value: product.qrCode }] : []),
@@ -237,29 +242,24 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
                   { icon: StoreIcon, label: t("workspace.preferredShop"), value: preferredShop },
                 ].map(({ icon, label, value }) => {
                   const Icon = icon;
-                  return <div key={label} className="min-w-0 rounded-lg bg-muted/40 p-3">
-                    <dt className="flex items-center gap-2 text-xs text-muted-foreground"><Icon className="size-4 shrink-0 text-section" aria-hidden="true" />{label}</dt>
-                    <dd className="mt-1 break-words font-medium">{value || t("workspace.notSet")}</dd>
-                  </div>;
+                  return <DescriptionItem key={label} className="min-w-0 rounded-lg bg-muted/40 p-3" label={<><Icon className="size-4 shrink-0 text-section" aria-hidden="true" />{label}</>}>{value || t("workspace.notSet")}</DescriptionItem>;
                 })}
-              </dl>
+              </DescriptionList>
             </Card>
             <Card className="gap-3">
-              <div className="flex items-center gap-2"><IconChip icon={TagIcon} tone="shopping" size="sm" /><CardTitle>{t("workspace.productDetails")}</CardTitle></div>
-              <dl className="divide-y">
-                {detailRows.map(({ label, value }) => <div key={label} className="grid min-w-0 grid-cols-2 gap-3 py-2.5 text-sm">
-                  <dt className="break-words text-muted-foreground">{label}</dt><dd className="break-words font-medium">{value}</dd>
-                </div>)}
-              </dl>
-              <div className="flex items-center gap-2 border-t pt-4"><IconChip icon={PencilIcon} tone="tasks" size="sm" /><CardTitle>{t("workspace.notes")}</CardTitle></div>
-              <p className="whitespace-pre-wrap rounded-lg bg-muted/40 p-3 text-sm">{product.notes || t("workspace.noNotes")}</p>
+              <Inline gap="sm" align="center"><IconChip icon={TagIcon} tone="shopping" size="sm" /><CardTitle>{t("workspace.productDetails")}</CardTitle></Inline>
+              <DescriptionList columns="1" className="gap-0 divide-y">
+                {detailRows.map(({ label, value }) => <DescriptionItem layout="row" key={label} className="min-w-0 grid-cols-2 py-2.5 text-sm" label={<>{label}</>}>{value}</DescriptionItem>)}
+              </DescriptionList>
+              <Inline gap="sm" align="center" className="border-t pt-4"><IconChip icon={PencilIcon} tone="tasks" size="sm" /><CardTitle>{t("workspace.notes")}</CardTitle></Inline>
+              <Text size="sm" className="whitespace-pre-wrap rounded-lg bg-muted/40 p-3">{product.notes || t("workspace.noNotes")}</Text>
             </Card>
             <Card className="gap-3" id="product-stock-management">
               <button type="button" aria-expanded={stockDetailsOpen} className="flex w-full items-center justify-between gap-3 text-left font-semibold" onClick={() => setStockDetailsOpen((value) => !value)}>
                 <span className="inline-flex items-center gap-2"><IconChip icon={BoxesIcon} tone="info" size="sm" />{t("workspace.advancedStock")}</span>
                 <span className="text-xs font-normal text-muted-foreground">{stockDetailsOpen ? t("workspace.collapse") : t("workspace.expand")}</span>
               </button>
-              {stockDetailsOpen && <div className="flex flex-col gap-3">
+              {stockDetailsOpen && <Stack gap="3">
                 {stockItems.length ? <ul className="divide-y">{stockItems.map((item) => <StockItemRow
                   key={item.id}
                   item={item}
@@ -268,23 +268,23 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
                   onAdjust={(target, delta) => void adjust(target, delta, delta < 0 ? "scan_use" : "scan_add")}
                   actions={canManage && <StockItemFormDialog stockItem={item} products={[product]} places={places}
                     trigger={<button type="button" className="min-h-11 rounded-lg px-2 text-sm underline">{tCommon("actions.edit")}</button>} />}
-                />)}</ul> : <p className="text-sm text-muted-foreground">{t("detail.notKept")}</p>}
+                />)}</ul> : <Text size="sm" tone="muted">{t("detail.notKept")}</Text>}
                 {canManage && availablePlaces.length > 0 && <StockItemFormDialog
                   products={[product]} places={availablePlaces} defaults={{ productId: product.id }}
                   initialSelections={initialSelections}
                   trigger={<button type="button" className="inline-flex min-h-11 items-center gap-2 self-start rounded-lg border px-3 text-sm"><PlusIcon className="size-4" />{t("actions.keepAt")}</button>}
                 />}
-              </div>}
+              </Stack>}
             </Card>
-          </div>
+          </Stack>
         }
         overview={
-          <div className="flex min-w-0 flex-col gap-4">
+          <Stack gap="md" className="min-w-0">
             {context}
             {attachments && <section id="product-documents" className="scroll-mt-20">{attachments}</section>}
-            <div className="grid gap-4 lg:grid-cols-2">
+            <PageGrid gap="md" className="lg:grid-cols-2">
               <Card>
-                <div className="flex items-center gap-2"><IconChip icon={StoreIcon} tone="shopping" size="sm" /><CardTitle>{t("workspace.linkedShops")} ({product.shopLinks.length})</CardTitle></div>
+                <Inline gap="sm" align="center"><IconChip icon={StoreIcon} tone="shopping" size="sm" /><CardTitle>{t("workspace.linkedShops")} ({product.shopLinks.length})</CardTitle></Inline>
                 {product.shopLinks.length ? <ul className="divide-y">
                   {product.shopLinks.map((link) => <li key={link.id} className="py-1">
                     <RecordLink to={`/shops/${encodeURIComponent(link.shopId)}`}
@@ -292,22 +292,22 @@ export function ProductStockScreen({ data, canManage, initialSelections, context
                       <span className="min-w-0 truncate font-medium">{link.shop.name}</span>
                       <span className="shrink-0 tabular-nums text-muted-foreground">{link.priceCents === null ? "" : formatCurrency(link.priceCents, locale)}</span>
                     </RecordLink>
-                    {link.articleNumber && <p className="break-words text-xs text-muted-foreground">{t("workspace.articleNumber", { number: link.articleNumber })}</p>}
+                    {link.articleNumber && <Text size="xs" tone="muted" className="break-words">{t("workspace.articleNumber", { number: link.articleNumber })}</Text>}
                     {link.url && /^https?:\/\//i.test(link.url) && <a href={link.url} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 text-sm font-medium underline-offset-4 hover:underline"><ExternalLinkIcon className="size-4 shrink-0" aria-hidden="true" />{t("workspace.openOffer", { shop: link.shop.name })}</a>}
                   </li>)}
-                </ul> : <p className="text-sm text-muted-foreground">{t("workspace.noLinkedShops")}</p>}
+                </ul> : <Text size="sm" tone="muted">{t("workspace.noLinkedShops")}</Text>}
               </Card>
               <Card>
-                <div className="flex items-center gap-2"><IconChip icon={LinkIcon} tone="info" size="sm" /><CardTitle>{tShopping("alternatives.title")}</CardTitle></div>
+                <Inline gap="sm" align="center"><IconChip icon={LinkIcon} tone="info" size="sm" /><CardTitle>{tShopping("alternatives.title")}</CardTitle></Inline>
                 <ProductAlternatives product={product} products={products} canManage={canManage} highlightId={highlightId}
                   productHref={productPath} initialSelections={initialSelections?.products} />
               </Card>
               <Card id="product-stock-history" className="scroll-mt-20">
-                <div className="flex items-center gap-2"><IconChip icon={HistoryIcon} tone="tasks" size="sm" /><CardTitle>{t("history.title")}</CardTitle></div>
+                <Inline gap="sm" align="center"><IconChip icon={HistoryIcon} tone="tasks" size="sm" /><CardTitle>{t("history.title")}</CardTitle></Inline>
                 <StockMovementList movements={stock.movements} showPlace={stockItems.length > 1} />
               </Card>
-            </div>
-          </div>
+            </PageGrid>
+          </Stack>
         }
       />
 

@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import type * as React from "react";
 import { CheckIcon, PauseCircleIcon, RepeatIcon, ZapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -140,19 +142,19 @@ export function ExpenseRow({
           shown.status === "overdue" && "border-destructive/40",
         )}
       >
-        <div className="flex items-start gap-3">
+        <Inline gap="md" align="start">
           {icon}
           <div className="min-w-0 flex-1 pt-1">{payeeLink}</div>
           {markPaid}
-        </div>
-        <div className="flex flex-col gap-0.5">
+        </Inline>
+        <Stack gap="0.5">
           {details}
           {onHoldBadge}
-        </div>
-        <div className="mt-auto flex flex-col gap-2">
+        </Stack>
+        <Stack gap="sm" className="mt-auto">
           <PayerBadge payer={expense} habitants={habitants} />
           {amount}
-        </div>
+        </Stack>
       </div>
     );
   }
@@ -167,11 +169,11 @@ export function ExpenseRow({
       )}
     >
       {icon}
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+      <Stack gap="0.5" className="min-w-0 flex-1">
         {payeeLink}
         {details}
         {onHoldBadge}
-      </div>
+      </Stack>
       <PayerBadge payer={expense} habitants={habitants} className="hidden sm:flex" />
       {amount}
       {markPaid}

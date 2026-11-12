@@ -1,3 +1,4 @@
+import { PageGrid } from "@/components/layout/page-grid";
 import {
   ArrowUpFromLineIcon,
   BatteryChargingIcon,
@@ -48,7 +49,7 @@ export function EnergyStatTiles({ summary, totalKwp }: EnergyStatTilesProps) {
 
   if (summary.carrier === "gas") {
     return (
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+      <PageGrid gap="3" className="sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
         {consumed}
         {totals.volumeLitres !== null && (
           <StatTile
@@ -62,7 +63,7 @@ export function EnergyStatTiles({ summary, totalKwp }: EnergyStatTilesProps) {
             icon={CylinderIcon}
           />
         )}
-      </div>
+      </PageGrid>
     );
   }
 
@@ -74,7 +75,7 @@ export function EnergyStatTiles({ summary, totalKwp }: EnergyStatTilesProps) {
     const electricity = status.hasElectricityData ? sum("electricityWh") : null;
     const gas = status.hasGasData ? sum("gasWh") : null;
     return (
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+      <PageGrid gap="3" className="sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
         {consumed}
         <StatTile
           label={t("carriers.electricity")}
@@ -89,12 +90,12 @@ export function EnergyStatTiles({ summary, totalKwp }: EnergyStatTilesProps) {
           icon={FlameIcon}
         />
         {showSolar && totals.solarWh !== null && <StatTile label={t("stats.solar")} value={kwh(totals.solarWh)} icon={SunIcon} />}
-      </div>
+      </PageGrid>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+    <PageGrid gap="3" className="sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
       {consumed}
       <StatTile
         label={t("stats.import")}
@@ -151,6 +152,6 @@ export function EnergyStatTiles({ summary, totalKwp }: EnergyStatTilesProps) {
           icon={RecycleIcon}
         />
       )}
-    </div>
+    </PageGrid>
   );
 }

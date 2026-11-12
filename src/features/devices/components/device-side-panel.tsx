@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import { ExternalLinkIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
@@ -28,24 +30,24 @@ export function DeviceSidePanel({ device, profile, state, canSetValues, now, onC
   const { t: tCommon } = useTranslation();
   return (
     <Card className={cn("gap-3", className)} aria-label={device.name}>
-      {!hideHeading && <div className="flex items-start gap-3">
+      {!hideHeading && <Inline gap="md" align="start">
         <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-section-soft text-section">
           <DeviceIcon icon={profile.icon} className="size-5" />
         </span>
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <Stack gap="xs" className="min-w-0 flex-1">
           <h2 className="truncate font-semibold">{device.name}</h2>
           <span className="text-xs text-muted-foreground">{profile.name}</span>
-        </div>
+        </Stack>
         {onClose && (
           <Button type="button" size="icon" variant="ghost" className="-mt-1 -mr-2" onClick={onClose} aria-label={tCommon("actions.close")}>
             <XIcon />
           </Button>
         )}
-      </div>}
-      <div className="flex flex-wrap items-center gap-2">
+      </Inline>}
+      <Inline gap="sm" align="center" wrap>
         {state && <DeviceStateChip state={state} />}
         {device.place && <PlaceBadge place={device.place} />}
-      </div>
+      </Inline>
       <DeviceValuesList device={device} profile={profile} canSetValues={canSetValues} now={now} />
       <Button asChild variant="outline" size="sm" className="self-start">
         <Link to={`/devices/${device.id}`}>

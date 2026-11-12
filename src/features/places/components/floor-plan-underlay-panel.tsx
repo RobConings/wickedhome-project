@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import {
   CheckIcon,
@@ -71,7 +74,7 @@ export function UnderlaySection({ state, dispatch, onImport, onRecrop }: PanelPr
           <LayersIcon className="size-3.5" aria-hidden="true" />
           {t("editor.underlay.title")}
         </h3>
-        <p className="text-xs text-muted-foreground">{t("editor.underlay.empty")}</p>
+        <Text size="xs" tone="muted">{t("editor.underlay.empty")}</Text>
         <Button type="button" size="sm" variant="secondary" onClick={onImport} className="self-start">
           <FileUpIcon />
           {t("editor.underlay.import")}
@@ -100,12 +103,12 @@ function UnderlayControls({
 
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-2.5 border-t pt-3">
-      <div className="flex items-center justify-between gap-2">
+      <Inline gap="sm" align="center" justify="between">
         <h3 id={headingId} className="flex min-w-0 items-center gap-1.5 text-xs font-semibold">
           <LayersIcon className="size-3.5 shrink-0" aria-hidden="true" />
           {t("editor.underlay.title")}
         </h3>
-        <div className="flex items-center gap-0.5">
+        <Inline gap="none" align="center" className="gap-0.5">
           <Button
             type="button"
             size="icon-sm"
@@ -128,12 +131,12 @@ function UnderlayControls({
           >
             {underlay.locked ? <LockIcon /> : <LockOpenIcon />}
           </Button>
-        </div>
-      </div>
+        </Inline>
+      </Inline>
 
-      <p className="truncate text-xs text-muted-foreground" title={underlay.sourceName}>
+      <Text size="xs" tone="muted" className="truncate" title={underlay.sourceName}>
         {underlay.unit === "pt" ? t("editor.underlay.sourcePage", { name: underlay.sourceName, page: underlay.page }) : underlay.sourceName}
-      </p>
+      </Text>
 
       <div
         className={cn(
@@ -171,12 +174,12 @@ function UnderlayControls({
         />
       </label>
 
-      <div className="flex flex-col gap-1 text-xs">
+      <Stack gap="xs" className="text-xs">
         <span className="flex justify-between">
           {t("editor.underlay.rotation")}
           <span className="text-muted-foreground tabular-nums">{number(underlay.rotation)}°</span>
         </span>
-        <div className="flex items-center gap-1">
+        <Inline gap="xs" align="center">
           <Button
             type="button"
             size="icon-sm"
@@ -207,15 +210,15 @@ function UnderlayControls({
           >
             <RotateCwIcon />
           </Button>
-        </div>
-      </div>
+        </Inline>
+      </Stack>
 
-      <p className="text-xs text-muted-foreground">
+      <Text size="xs" tone="muted">
         {underlay.locked ? t("editor.underlay.lockedHint") : t("editor.underlay.unlockedHint")}
         {underlay.labels.length > 0 && ` ${t("editor.underlay.labelsFound", { count: underlay.labels.length })}`}
-      </p>
+      </Text>
 
-      <div className="flex flex-wrap gap-1.5">
+      <Inline gap="1.5" align="stretch" wrap>
         <Button type="button" size="xs" variant="secondary" onClick={onRecrop}>
           <CropIcon />
           {t("editor.underlay.recrop")}
@@ -237,7 +240,7 @@ function UnderlayControls({
           <Trash2Icon />
           {t("editor.underlay.remove")}
         </Button>
-      </div>
+      </Inline>
     </section>
   );
 }
@@ -258,7 +261,7 @@ export function CalibrateToolContext({ state, dispatch, detail }: PanelProps & {
   const realCm = parseLengthCm(lengthText);
 
   if (!underlay) {
-    return <p className="text-xs text-muted-foreground">{t("editor.calibrate.noUnderlay")}</p>;
+    return <Text size="xs" tone="muted">{t("editor.calibrate.noUnderlay")}</Text>;
   }
 
   const applyLength = (event: React.FormEvent) => {
@@ -286,21 +289,21 @@ export function CalibrateToolContext({ state, dispatch, detail }: PanelProps & {
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       <div className={cn("flex flex-col gap-1", detail)}>
-        <p className="text-sm font-semibold">{t("editor.calibrate.title")}</p>
-        <p className="text-xs text-muted-foreground">{t("editor.calibrate.hint")}</p>
+        <Text size="sm" weight="semibold">{t("editor.calibrate.title")}</Text>
+        <Text size="xs" tone="muted">{t("editor.calibrate.hint")}</Text>
       </div>
 
       {measured !== null ? (
         <form onSubmit={applyLength} className="flex flex-col gap-1.5">
-          <p className="text-xs" aria-live="polite">
+          <Text size="xs"  aria-live="polite">
             {t("editor.calibrate.measures", { length: formatLength(measured, locale) })}
-          </p>
+          </Text>
           <Label htmlFor="plan-calibrate-length" className="text-xs">
             {t("editor.calibrate.realLength")}
           </Label>
-          <div className="flex gap-1.5">
+          <Inline gap="1.5" align="stretch">
             <Input
               id="plan-calibrate-length"
               className="h-8"
@@ -314,25 +317,25 @@ export function CalibrateToolContext({ state, dispatch, detail }: PanelProps & {
             <Button type="submit" size="sm" disabled={realCm === null}>
               {t("editor.calibrate.apply")}
             </Button>
-          </div>
-          <p className={cn("text-xs", lengthText.trim() !== "" && realCm === null ? "text-destructive" : "text-muted-foreground")}>
+          </Inline>
+          <Text className={cn("text-xs", lengthText.trim() !== "" && realCm === null ? "text-destructive" : "text-muted-foreground")}>
             {lengthText.trim() === ""
               ? t("editor.calibrate.formats")
               : realCm === null
                 ? t("editor.calibrate.unreadable")
                 : t("editor.calibrate.reads", { length: formatLength(realCm, locale) })}
-          </p>
+          </Text>
         </form>
       ) : (
-        <p className="rounded-md bg-muted px-2 py-1.5 text-xs">{a ? t("editor.calibrate.secondPoint") : t("editor.calibrate.firstPoint")}</p>
+        <Text size="xs" className="rounded-md bg-muted px-2 py-1.5">{a ? t("editor.calibrate.secondPoint") : t("editor.calibrate.firstPoint")}</Text>
       )}
 
       {underlay.unit === "pt" && (
-        <div className="flex flex-col gap-1.5 border-t pt-3">
+        <Stack gap="1.5" className="border-t pt-3">
           <Label htmlFor="plan-calibrate-ratio" className="text-xs">
             {t("editor.calibrate.drawingScale")}
           </Label>
-          <div className="flex gap-1.5">
+          <Inline gap="1.5" align="stretch">
             <Select value={ratio} onValueChange={setRatio}>
               <SelectTrigger id="plan-calibrate-ratio" size="sm" className="flex-1">
                 <SelectValue />
@@ -348,12 +351,12 @@ export function CalibrateToolContext({ state, dispatch, detail }: PanelProps & {
             <Button type="button" size="sm" variant="secondary" onClick={applyRatio}>
               {t("editor.calibrate.apply")}
             </Button>
-          </div>
-          <p className="text-xs text-muted-foreground">{t("editor.calibrate.drawingScaleHint")}</p>
-        </div>
+          </Inline>
+          <Text size="xs" tone="muted">{t("editor.calibrate.drawingScaleHint")}</Text>
+        </Stack>
       )}
 
-      <div className="flex items-center justify-between gap-2 border-t pt-3">
+      <Inline gap="sm" align="center" justify="between" className="border-t pt-3">
         <span className="text-xs text-muted-foreground">
           {underlay.calibrated ? scaleText(t, underlay) : t("editor.underlay.notCalibrated")}
         </span>
@@ -361,8 +364,8 @@ export function CalibrateToolContext({ state, dispatch, detail }: PanelProps & {
           <CheckIcon />
           {t("editor.calibrate.finish")}
         </Button>
-      </div>
-    </div>
+      </Inline>
+    </Stack>
   );
 }
 

@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
@@ -81,7 +84,7 @@ export function DeviceBindingsForm({ device, profile, renderEntityPicker }: Devi
           const id = `binding-${device.id}-${field.key}`;
           return (
             <li key={field.key} className="grid gap-2 sm:grid-cols-[10rem_1fr_1fr_10rem] sm:items-end">
-              <div className="flex flex-col gap-1.5">
+              <Stack gap="1.5">
                 <Label htmlFor={`${id}-source`}>{field.label}</Label>
                 <Select value={binding.source} onValueChange={(source) => update(index, { source: source as ValueSource })}>
                   <SelectTrigger id={`${id}-source`} className="w-full">
@@ -95,8 +98,8 @@ export function DeviceBindingsForm({ device, profile, renderEntityPicker }: Devi
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-              <div className="flex flex-col gap-1.5">
+              </Stack>
+              <Stack gap="1.5">
                 <Label htmlFor={`${id}-entity`} className="text-xs text-muted-foreground">
                   {t("bindings.entity")}
                 </Label>
@@ -109,8 +112,8 @@ export function DeviceBindingsForm({ device, profile, renderEntityPicker }: Devi
                   autoComplete="off"
                   spellCheck={false}
                 />
-              </div>
-              <div className="flex flex-col gap-1.5">
+              </Stack>
+              <Stack gap="1.5">
                 <Label htmlFor={`${id}-attribute`} className="text-xs text-muted-foreground">
                   {t("bindings.attribute")}
                 </Label>
@@ -123,8 +126,8 @@ export function DeviceBindingsForm({ device, profile, renderEntityPicker }: Devi
                   autoComplete="off"
                   spellCheck={false}
                 />
-              </div>
-              <div className="flex items-center justify-between gap-2 sm:flex-col sm:items-start sm:justify-end">
+              </Stack>
+              <Inline gap="sm" align="center" justify="between" className="sm:flex-col sm:items-start sm:justify-end">
                 <span className="text-xs text-muted-foreground sm:pb-1">{t(`fieldTypes.${field.type}`)}{field.unit ? ` · ${field.unit}` : ""}</span>
                 {renderEntityPicker?.({
                   fieldLabel: field.label,
@@ -133,18 +136,18 @@ export function DeviceBindingsForm({ device, profile, renderEntityPicker }: Devi
                   disabled: saving,
                   onPick: (entityId, attribute) => update(index, { source: "home_assistant", haEntityId: entityId, haAttribute: attribute }),
                 })}
-              </div>
+              </Inline>
             </li>
           );
         })}
       </ul>
       </fieldset>
-      <p className="text-xs text-muted-foreground">{t("bindings.hint")}</p>
-      <div className="flex justify-end">
+      <Text size="xs" tone="muted">{t("bindings.hint")}</Text>
+      <Inline gap="none" align="stretch" justify="end">
         <Button type="submit" loading={saving} disabled={!dirty}>
           {saving ? tCommon("form.saving") : t("bindings.save")}
         </Button>
-      </div>
+      </Inline>
     </form>
   );
 }

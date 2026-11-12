@@ -1,3 +1,5 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { EuroIcon, PackageIcon, ReceiptIcon, UnlinkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -95,7 +97,7 @@ function PriceButton({ item, onSave }: { item: ShoppingItem; onSave: (priceCents
             }
           }}
         />
-        <p className="text-xs text-muted-foreground">{t("project.priceHint")}</p>
+        <Text size="xs" tone="muted">{t("project.priceHint")}</Text>
         <Button type="button" size="sm" loading={saving} onClick={() => void save()}>
           {tCommon("actions.save")}
         </Button>
@@ -182,13 +184,13 @@ export function ProjectMaterialsPanel({
     .reduce((sum, item) => sum + Math.round((item.priceCents ?? 0) * item.quantity), 0);
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       {actions.confirmation}
       {visible.length > 0 && (
-        <p className="text-sm text-muted-foreground tabular-nums">
+        <Text size="sm" tone="muted" className="tabular-nums">
           {t("task.progress", { bought, total: visible.length })}
           {estimate > 0 && <> · {t("project.toBuy", { amount: formatCurrency(estimate, locale) })}</>}
-        </p>
+        </Text>
       )}
 
       {items === null ? (
@@ -198,10 +200,10 @@ export function ProjectMaterialsPanel({
           <ShoppingItemsSkeleton className="rounded-lg" />
         )
       ) : visible.length === 0 ? (
-        <p className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-4 text-sm text-muted-foreground">
+        <Text size="sm" tone="muted" className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-4">
           <PackageIcon className="size-4 shrink-0" aria-hidden="true" />
           {canManage ? t("project.emptyManage") : t("project.empty")}
-        </p>
+        </Text>
       ) : (
         <ul className="divide-y rounded-lg border bg-card px-3">
           {visible.map((item) => (
@@ -252,7 +254,7 @@ export function ProjectMaterialsPanel({
       {canManage && (
         <AddShoppingItemForm products={products} shops={shops} catalogLoading={catalogLoading} onAdd={add} previewLink={previewLink} />
       )}
-    </div>
+    </Stack>
   );
 }
 

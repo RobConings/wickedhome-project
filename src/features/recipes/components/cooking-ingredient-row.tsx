@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { CheckIcon, MinusIcon, MoreHorizontalIcon, PlusIcon, Undo2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -91,9 +93,9 @@ export function CookingIngredientRow({ item, entryId, mentioned, disabled, onUnd
 
   return (
     <div className={cn("flex flex-col gap-2 rounded-lg p-2", mentioned && "bg-primary/5 ring-1 ring-primary/30")}>
-      <div className="flex items-start gap-3">
+      <Inline gap="md" align="start">
         {product && <IngredientThumbnail product={product} />}
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <Stack gap="0.5" className="min-w-0 flex-1">
           <span className="flex flex-wrap items-baseline gap-x-2">
             <span className={cn("font-medium break-words", done && "text-muted-foreground")}>{item.name}</span>
             {item.optional && <span className="text-xs text-muted-foreground">{t("ingredients.optionalShort")}</span>}
@@ -117,10 +119,10 @@ export function CookingIngredientRow({ item, entryId, mentioned, disabled, onUnd
               </Link>
             </span>
           )}
-        </div>
+        </Stack>
         {product && <IngredientShopLink product={product} />}
-      </div>
-      <div className="flex items-center justify-end gap-2">
+      </Inline>
+      <Inline gap="sm" align="center" justify="end">
         {item.lastUsageId && !pending && !disabled && (
           <Button
             variant="ghost"
@@ -146,7 +148,7 @@ export function CookingIngredientRow({ item, entryId, mentioned, disabled, onUnd
           </PopoverTrigger>
           <PopoverContent align="end" className="flex w-64 flex-col gap-3">
             <span className="text-sm font-medium">{t("cooking.howMuch", { name: item.name })}</span>
-            <div className="flex items-center gap-2">
+            <Inline gap="sm" align="center">
               <Button variant="outline" size="icon-lg" onClick={() => setCustom(String(Math.max(0, round3((customValue || 0) - 1))))} aria-label={t("cooking.less")}>
                 <MinusIcon />
               </Button>
@@ -161,7 +163,7 @@ export function CookingIngredientRow({ item, entryId, mentioned, disabled, onUnd
               <Button variant="outline" size="icon-lg" onClick={() => setCustom(String(round3((customValue || 0) + 1)))} aria-label={t("cooking.moreAmount")}>
                 <PlusIcon />
               </Button>
-            </div>
+            </Inline>
             {unitLabel && <span className="text-xs text-muted-foreground">{t("cooking.inUnit", { unit: unitLabel })}</span>}
             {showRecipeUnit && ratio && customValue > 0 && (
               <span className="text-xs text-muted-foreground tabular-nums">= {text.amount(customValue * ratio, item.unit)}</span>
@@ -188,7 +190,7 @@ export function CookingIngredientRow({ item, entryId, mentioned, disabled, onUnd
           <CheckIcon />
           {t("cooking.used")}
         </Button>
-      </div>
+      </Inline>
     </div>
   );
 }

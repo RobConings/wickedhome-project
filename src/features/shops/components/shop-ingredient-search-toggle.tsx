@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
@@ -35,8 +37,8 @@ export function ShopIngredientSearchToggle({ shop, canChange }: ShopIngredientSe
   const hint = !eligible ? t("ingredientSearch.needsWebshop") : saving ? t("ingredientSearch.saving") : t("ingredientSearch.description");
 
   return (
-    <div className="flex items-start gap-3" aria-busy={saving || undefined}>
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+    <Inline gap="md" align="start"  aria-busy={saving || undefined}>
+      <Stack gap="0.5" className="min-w-0 flex-1">
         <Label htmlFor={id} className="text-sm font-medium">
           {t("ingredientSearch.label")}
         </Label>
@@ -44,13 +46,13 @@ export function ShopIngredientSearchToggle({ shop, canChange }: ShopIngredientSe
           {saving && <Spinner className="size-3" />}
           {hint}
         </span>
-      </div>
+      </Stack>
       <Switch
         id={id}
         checked={checked && eligible}
         disabled={!canChange || !eligible || saving}
         onCheckedChange={(next) => void fetcher.submit({ intent: "ingredient-search", id: shop.id, enabled: String(next) }, { method: "post" })}
       />
-    </div>
+    </Inline>
   );
 }

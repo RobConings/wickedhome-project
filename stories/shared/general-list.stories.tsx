@@ -140,3 +140,9 @@ export const FromUrl: Story = {
 
 /** The chosen view is remembered per list on this device (`storageKey`). */
 export const RememberedView: Story = { args: { storageKey: "storybook-things" } };
+
+/** Related records reuse list semantics and states without a second toolbar or card. */
+export const Embedded: Story = { args: { variant: "embedded", defaultView: "tiles" }, decorators: [(Story) => <Card><CardTitle>Related records</CardTitle><Story /></Card>] };
+export const EmbeddedEmpty: Story = { args: { variant: "embedded", items: [] } };
+export const EmbeddedLoading: Story = { args: { variant: "embedded", loading: true } };
+export const EmbeddedError: Story = { args: { variant: "embedded", error: true } };

@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import type * as React from "react";
 import { useTranslation } from "react-i18next";
 import { PageContainer } from "@/components/layout/page-container";
@@ -13,8 +15,8 @@ export function IntegrationsScreen({ children }: { children: React.ReactNode }) 
   return (
     <PageContainer>
       <PageHeader title={t("page.title")} description={t("page.description")} />
-      <div className="flex flex-col gap-4">{children}</div>
-      <p className="text-xs text-muted-foreground">{t("page.footer")}</p>
+      <Stack gap="md">{children}</Stack>
+      <Text size="xs" tone="muted">{t("page.footer")}</Text>
     </PageContainer>
   );
 }

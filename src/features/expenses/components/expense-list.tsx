@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { ReceiptIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -88,7 +89,7 @@ export function ExpenseList({
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <Stack gap="lg">
       <GeneralList<Expense>
         label={t("page.title")}
         items={visible}
@@ -134,6 +135,6 @@ export function ExpenseList({
           {t("actions.showMore", { count: hiddenMonths })}
         </Button>
       )}
-    </div>
+    </Stack>
   );
 }

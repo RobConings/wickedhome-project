@@ -1,3 +1,4 @@
+import { PageGrid } from "@/components/layout/page-grid";
 import * as React from "react";
 import { HardDriveIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -111,7 +112,7 @@ export function DocumentsTrashScreen({ trash, usage: usagePromise, canManage }: 
         }
       />
 
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
+      <PageGrid gap="lg" className="items-start lg:grid-cols-[minmax(0,1fr)_16rem]">
         <Stack gap="md">
           {fetcher.state === "idle" && fetcher.data?.formError && (
             <InlineAlert tone="error">{fetcher.data.formError}</InlineAlert>
@@ -135,7 +136,7 @@ export function DocumentsTrashScreen({ trash, usage: usagePromise, canManage }: 
           />
         </Stack>
         <StorageUsageMeter usage={usage.value} failed={usage.failed} onRetry={() => void revalidator.revalidate()} />
-      </div>
+      </PageGrid>
     </PageContainer>
   );
 }

@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import type { GeneralFormField } from "@/components/shared/general-form";
@@ -77,7 +79,7 @@ export function ApplianceFormDialog({ appliance, appliances, places, defaultPlac
           <fieldset className="flex min-w-0 flex-col gap-2" disabled={disabled} aria-describedby={`${id}-hint`}>
             <legend className="mb-2 text-sm font-medium">{t("appliances.fields.carriers")}</legend>
             <input type="hidden" name={name} value={carriers.join(",")} />
-            <div className="flex flex-wrap gap-2">
+            <Inline gap="sm" align="stretch" wrap>
               {ACTIVE_CARRIERS.map((carrier) => {
                 const Icon = CARRIER_ICONS[carrier];
                 const checked = carriers.includes(carrier);
@@ -106,11 +108,11 @@ export function ApplianceFormDialog({ appliance, appliances, places, defaultPlac
                   </label>
                 );
               })}
-            </div>
-            <p id={`${id}-hint`} className="text-xs text-muted-foreground">
+            </Inline>
+            <Text size="xs" tone="muted" id={`${id}-hint`}>
               {t("appliances.form.carriersHint")}
-            </p>
-            {errors && <p className="text-xs font-medium text-destructive">{errors.join(" ")}</p>}
+            </Text>
+            {errors && <Text size="xs" tone="danger" weight="medium">{errors.join(" ")}</Text>}
           </fieldset>
         );
       },

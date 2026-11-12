@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { GeneralList } from "@/components/shared/general-list";
+import { Text } from "@/components/ui/text";
 import { ChevronLeftIcon, ChevronRightIcon, TicketIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
@@ -26,20 +29,20 @@ export function VoucherDetailScreen({ detail }: { detail: VoucherDetail }) {
   return <PageContainer>
     <PageHeader icon={TicketIcon} title={t("voucherDetail.title", { name: person.name })} description={t("voucherDetail.asOf", { date: dateText(detail.today) })} backTo="/income" actions={<Button asChild variant="outline"><RecordLink to={`/habitants/${encodeURIComponent(person.id)}`}>{person.name}</RecordLink></Button>} />
     {balance.expiringSoon && <InlineAlert>{t("vouchers.soon", { name: person.name, amount: money(balance.expiringSoon.amountCents), date: dateText(balance.expiringSoon.date) })}</InlineAlert>}
-    <Card tone="featured"><CardTitle>{t("voucherDetail.available")}</CardTitle><p className="text-3xl font-semibold tabular-nums">{money(balance.availableCents)}</p><DescriptionList>
+    <Card tone="featured"><CardTitle>{t("voucherDetail.available")}</CardTitle><Text size="3xl" weight="semibold" className="tabular-nums">{money(balance.availableCents)}</Text><DescriptionList>
       <DescriptionItem label={t("voucherDetail.received")}>{money(balance.receivedCents)}</DescriptionItem><DescriptionItem label={t("voucherDetail.spent")}>{money(balance.spentCents)}</DescriptionItem>
       <DescriptionItem label={t("voucherDetail.expired")}>{money(balance.expiredCents)}</DescriptionItem><DescriptionItem label={t("voucherDetail.uncovered")}>{money(balance.uncoveredCents)}</DescriptionItem>
       <DescriptionItem wide label={t("voucherDetail.nextExpiry")}>{balance.nextExpiry ? `${money(balance.nextExpiry.amountCents)} · ${dateText(balance.nextExpiry.date)}` : t("voucherDetail.noExpiry")}</DescriptionItem>
     </DescriptionList></Card>
-    <p className="text-sm text-muted-foreground">{t("voucherDetail.meaning")}</p>
+    <Text size="sm" tone="muted">{t("voucherDetail.meaning")}</Text>
     <PageGrid columns="2" className="items-start">
-      <Card><CardTitle>{t("voucherDetail.receipts", { count: receipts.total })}</CardTitle>{receipts.items.length ? <ul className="divide-y">{receipts.items.map((income) => <li key={income.id} className="space-y-1 py-3">
+      <Card><CardTitle>{t("voucherDetail.receipts", { count: receipts.total })}</CardTitle>{receipts.items.length ? <GeneralList variant="embedded" label={t("voucherDetail.receipts", { count: receipts.total })} items={receipts.items} getKey={(income) => income.id} renderRow={(income) => <Stack gap="none" className="space-y-1">
         <RecordLink to={`/income/receipts/${encodeURIComponent(income.id)}`} className="flex min-h-11 flex-wrap items-center justify-between gap-2 font-medium hover:underline"><span>{dateText(income.date)}</span><span className="tabular-nums">{money(income.amountCents)}</span></RecordLink>
-        {income.description && <p className="text-sm break-words">{income.description}</p>}<p className="text-xs text-muted-foreground">{t("voucherDetail.creditExpiry", { date: dateText(income.expiresOn) })}</p>
-      </li>)}</ul> : <p className="text-sm text-muted-foreground">{t("voucherDetail.noReceipts")}</p>}{pager("receiptPage", receipts)}</Card>
-      <Card><CardTitle>{t("voucherDetail.spending", { count: spending.total })}</CardTitle>{spending.items.length ? <ul className="divide-y">{spending.items.map((payment) => <li key={`${payment.expenseId}:${payment.habitantId}`} className="py-3">
-        <RecordLink to={`/expenses/${encodeURIComponent(payment.expenseId)}`} className="flex min-h-11 flex-wrap items-center justify-between gap-2 font-medium hover:underline"><span className="min-w-0 break-words">{payment.payee}</span><span className="tabular-nums">{money(payment.amountCents)}</span></RecordLink><p className="text-xs text-muted-foreground">{dateText(payment.date)}</p>
-      </li>)}</ul> : <p className="text-sm text-muted-foreground">{t("voucherDetail.noSpending")}</p>}{pager("spendingPage", spending)}</Card>
+        {income.description && <Text size="sm" className="break-words">{income.description}</Text>}<Text size="xs" tone="muted">{t("voucherDetail.creditExpiry", { date: dateText(income.expiresOn) })}</Text>
+      </Stack>} emptyState={null} /> : <Text size="sm" tone="muted">{t("voucherDetail.noReceipts")}</Text>}{pager("receiptPage", receipts)}</Card>
+      <Card><CardTitle>{t("voucherDetail.spending", { count: spending.total })}</CardTitle>{spending.items.length ? <GeneralList variant="embedded" label={t("voucherDetail.spending", { count: spending.total })} items={spending.items} getKey={(payment) => `${payment.expenseId}:${payment.habitantId}`} renderRow={(payment) => <>
+        <RecordLink to={`/expenses/${encodeURIComponent(payment.expenseId)}`} className="flex min-h-11 flex-wrap items-center justify-between gap-2 font-medium hover:underline"><span className="min-w-0 break-words">{payment.payee}</span><span className="tabular-nums">{money(payment.amountCents)}</span></RecordLink><Text size="xs" tone="muted">{dateText(payment.date)}</Text>
+      </>} emptyState={null} /> : <Text size="sm" tone="muted">{t("voucherDetail.noSpending")}</Text>}{pager("spendingPage", spending)}</Card>
     </PageGrid>
   </PageContainer>;
 }

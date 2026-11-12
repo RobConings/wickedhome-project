@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import { useTranslation } from "react-i18next";
 import { FavoriteToggle } from "@/components/shared/favorite-toggle";
 import { RecordLink } from "@/components/shared/record-link";
@@ -27,22 +29,22 @@ export function ContactListItem({ contact, isFavorite, onToggleFavorite, onEdit 
   const { t } = useTranslation("contacts");
   const subtitle = contactSubtitle(contact);
   return (
-    <div className="flex items-start gap-3">
+    <Inline gap="md" align="start">
       <ContactAvatar name={contact.name} size="md" />
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <div className="flex min-w-0 flex-col">
+      <Stack gap="sm" className="min-w-0 flex-1">
+        <Stack gap="none" className="min-w-0">
           <ContactName contact={contact} onEdit={onEdit} className="font-medium break-words" />
           {subtitle && <span className="text-sm break-words text-muted-foreground">{subtitle}</span>}
-        </div>
+        </Stack>
         <ContactLinks contact={contact} />
         <ContactProjectChips projects={contact.projects} />
-      </div>
+      </Stack>
       {onEdit && <Button variant="ghost" size="icon" aria-label={t("actions.edit", { name: contact.name })} onClick={() => onEdit(contact)}><PencilIcon /></Button>}
       <FavoriteToggle
         active={isFavorite}
         label={t(isFavorite ? "favorite.remove" : "favorite.add", { name: contact.name })}
         onToggle={() => onToggleFavorite(contact.id)}
       />
-    </div>
+    </Inline>
   );
 }

@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import { GaugeIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
@@ -43,5 +44,5 @@ export function ApplianceSummary({ appliance, className }: ApplianceSummaryProps
     appliance.ratedPowerW != null && t("appliances.rated", { power: formatWatts(appliance.ratedPowerW, locale) }),
     appliance.standbyPowerW != null && t("appliances.standby", { power: formatWatts(appliance.standbyPowerW, locale) }),
   ].filter(Boolean);
-  return <p className={cn("text-sm text-muted-foreground", className)}>{details.join(" · ")}</p>;
+  return <Text className={cn("text-sm text-muted-foreground", className)}>{details.join(" · ")}</Text>;
 }

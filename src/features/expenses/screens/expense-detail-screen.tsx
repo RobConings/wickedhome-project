@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import { RelatedRecordCards } from "@/components/shared/related-record-cards";
 import { ExpenseAllocationPanel } from "../components/expense-allocation-panel";
@@ -175,19 +178,19 @@ export function ExpenseDetailScreen({
       {canManage && <RelatedShoppingSessions expenseId={expense.id} />}
 
       <PageGrid columns="main-sidebar">
-        <div className="flex min-w-0 flex-col gap-6">
+        <Stack gap="lg" className="min-w-0">
           <Card>
             <CardHeader className="items-center">
-              <div className="flex items-center gap-3">
+              <Inline gap="md" align="center">
                 {shop ? <ShopLogo shop={shop} size="md" /> : <ExpenseCategoryIcon category={expense.category} />}
-                <div className="flex flex-col">
+                <Stack gap="none">
                   <span className="text-3xl font-semibold tracking-tight tabular-nums">
                     {formatCurrency(expense.amountCents, locale)}
                   </span>
                   <span className="text-sm text-muted-foreground">{dueLabel(shown, today)}</span>
-                </div>
-              </div>
-              <div className="flex flex-col items-end gap-1">
+                </Stack>
+              </Inline>
+              <Stack gap="xs" align="end">
                 <ExpenseStatusBadge status={shown.status} />
                 {onHold && (
                   <Badge variant="outline" className="border-warning/40 bg-warning/10 font-normal text-warning">
@@ -195,7 +198,7 @@ export function ExpenseDetailScreen({
                     {t("row.onHold", { reason: onHold })}
                   </Badge>
                 )}
-              </div>
+              </Stack>
             </CardHeader>
             <DescriptionList>
               <DescriptionItem label={t("fields.dueDate")}>{formatDate(expense.dueDate, locale)}</DescriptionItem>
@@ -260,9 +263,9 @@ export function ExpenseDetailScreen({
           {linkedTask && <section id="expense-task" className="scroll-mt-20">{linkedTask}</section>}
           {canManage && <ExpenseAllocationPanel key={expense.id + expense.amountCents} expenseId={expense.id} />}
           {attachments && <section id="expense-documents" className="scroll-mt-20">{attachments}</section>}
-        </div>
+        </Stack>
 
-        <div className="flex min-w-0 flex-col gap-6">
+        <Stack gap="lg" className="min-w-0">
           {showQr && <PaymentQrCard expense={expense} />}
           {accountEffect}
 
@@ -275,15 +278,15 @@ export function ExpenseDetailScreen({
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-sm">
-                <p className="font-medium">{recurrenceSummary(recurring.rrule)}</p>
-                <p className="text-muted-foreground">
+                <Text weight="medium">{recurrenceSummary(recurring.rrule)}</Text>
+                <Text tone="muted">
                   {recurring.nextDueDate
                     ? t("detail.nextDue", { date: formatDate(recurring.nextDueDate, locale) })
                     : t("detail.ended")}
-                </p>
-                <p className="text-muted-foreground">
+                </Text>
+                <Text tone="muted">
                   {t("detail.amountEach", { amount: formatCurrency(recurring.amountCents, locale) })}
-                </p>
+                </Text>
               </CardContent>
               <Button asChild variant="outline" size="sm" className="self-start">
                 <Link to={`/expenses/recurring/${recurring.id}`}>{t("actions.openRecurring")}</Link>
@@ -294,12 +297,12 @@ export function ExpenseDetailScreen({
           <Card>
             <CardTitle>{t("detail.history")}</CardTitle>
             {history.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t("detail.noHistory")}</p>
+              <Text size="sm" tone="muted">{t("detail.noHistory")}</Text>
             ) : (
               <HistoryList items={history} habitants={habitants} />
             )}
           </Card>
-        </div>
+        </Stack>
       </PageGrid>
     </PageContainer>
   );

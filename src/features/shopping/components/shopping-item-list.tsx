@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import { ShoppingNeedSections } from "./shopping-need-sections";
 import * as React from "react";
 import { ChevronDownIcon } from "lucide-react";
@@ -95,7 +97,7 @@ export function ShoppingItemList({
       {open.length > 0 && !groupByCategory ? (
         renderOpen(open)
       ) : open.length > 0 ? (
-        <div className="space-y-3">
+        <Stack gap="3">
           {groupItemsByCategory(open, order).map((group) => (
             <section key={group.category}>
               <h3 className="mb-1 text-sm font-medium">
@@ -104,12 +106,12 @@ export function ShoppingItemList({
               {renderOpen(group.items)}
             </section>
           ))}
-        </div>
+        </Stack>
       ) : (
         emptyText && (
-          <p className="rounded-xl border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">
+          <Text size="sm" tone="muted" className="rounded-xl border border-dashed px-4 py-6 text-center">
             {emptyText}
-          </p>
+          </Text>
         )
       )}
       {skipped.length > 0 && (
@@ -123,7 +125,7 @@ export function ShoppingItemList({
         </details>
       )}
       {bought.length > 0 && (
-        <div className="flex flex-col gap-1">
+        <Stack gap="xs">
           <button
             type="button"
             aria-expanded={showBought}
@@ -144,7 +146,7 @@ export function ShoppingItemList({
               {bought.map(renderRow)}
             </ul>
           )}
-        </div>
+        </Stack>
       )}
     </div>
   );

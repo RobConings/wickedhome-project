@@ -1,3 +1,4 @@
+import { PageGrid } from "@/components/layout/page-grid";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
@@ -165,7 +166,7 @@ export function LogExpenseDialog({
                 />
               </FormField>
 
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <PageGrid gap="3" className="sm:grid-cols-2">
                 <FormField label={t("fields.category")} htmlFor="log-category" errors={errors?.category}>
                   <CategorySelect id="log-category" value={category} onChange={(next) => { setCategory(next); if (next !== "loans") setLoanId(null); }} first="everyday" />
                 </FormField>
@@ -180,7 +181,7 @@ export function LogExpenseDialog({
                     required
                   />
                 </FormField>
-              </div>
+              </PageGrid>
 
               {category === "loans" && (
                 <FormField label={t("repayment.label")} htmlFor="log-loan" errors={errors?.earlyRepaymentForId}>

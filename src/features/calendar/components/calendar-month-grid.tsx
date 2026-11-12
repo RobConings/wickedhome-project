@@ -1,3 +1,6 @@
+import { PageGrid } from "@/components/layout/page-grid";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -50,18 +53,18 @@ export function CalendarMonthGrid({
 
   return (
     <div className={cn("overflow-hidden rounded-xl border bg-card", className)}>
-      <div className="grid grid-cols-7 border-b bg-muted/40">
+      <PageGrid gap="none" className="grid-cols-7 border-b bg-muted/40">
         {weekdayLabels(locale, "short").map((label) => (
           <div key={label} className="px-2 py-2 text-xs font-medium text-muted-foreground uppercase">
             {label}
           </div>
         ))}
-      </div>
+      </PageGrid>
       {weeks.map((week) => {
         const { segments, lanes } = layoutSpans(entries, week);
         const shownLanes = Math.min(lanes, maxPerDay);
         return (
-          <div key={week[0]} className="relative grid grid-cols-7 [&>*:nth-child(7)]:border-r-0">
+          <PageGrid gap="none" key={week[0]} className="relative grid-cols-7 [&>*:nth-child(7)]:border-r-0">
             {week.map((day, column) => {
               const dayEntries = byDate.get(day) ?? [];
               const singles = dayEntries.filter((entry) => !isMultiDay(entry));
@@ -84,7 +87,7 @@ export function CalendarMonthGrid({
                   )}
                   onClick={onAddOnDay ? () => onAddOnDay(day) : undefined}
                 >
-                  <div className="flex items-center justify-between">
+                  <Inline gap="none" align="center" justify="between">
                     <span
                       className={cn(
                         "grid size-6 place-items-center rounded-full text-xs font-medium tabular-nums",
@@ -107,7 +110,7 @@ export function CalendarMonthGrid({
                         <PlusIcon className="size-3.5" />
                       </button>
                     )}
-                  </div>
+                  </Inline>
                   {/* Room for the bars, which are drawn over the whole week row. */}
                   {shownLanes > 0 && <div aria-hidden="true" className="shrink-0" style={{ height: shownLanes * SPAN_LANE_HEIGHT - 4 }} />}
                   {visible.map((entry) => (
@@ -133,9 +136,9 @@ export function CalendarMonthGrid({
                         </button>
                       </PopoverTrigger>
                       <PopoverContent className="flex w-64 flex-col gap-1 p-2" onClick={(event) => event.stopPropagation()}>
-                        <p className="px-1.5 pb-1 text-sm font-semibold first-letter:uppercase">
+                        <Text size="sm" weight="semibold" className="px-1.5 pb-1 first-letter:uppercase">
                           {formatDayHeading(day, locale)}
-                        </p>
+                        </Text>
                         {dayEntries.map((entry) => (
                           <CalendarEntryBadge
                             key={entry.key}
@@ -165,7 +168,7 @@ export function CalendarMonthGrid({
                   onClick={() => onSelectEntry(segment.entry)}
                 />
               ))}
-          </div>
+          </PageGrid>
         );
       })}
     </div>

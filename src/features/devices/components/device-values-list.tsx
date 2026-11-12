@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import { HousePlugIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +35,7 @@ export function DeviceValuesList({ device, profile, canSetValues, now, className
         const fromHa = binding.source === "home_assistant";
         return (
           <li key={field.key} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3">
-            <div className="flex min-w-0 flex-col">
+            <Stack gap="none" className="min-w-0">
               <span className="flex items-center gap-2 text-sm font-medium">
                 {field.label}
                 {profile.primaryField === field.key && <Badge variant="secondary">{t("values.primary")}</Badge>}
@@ -47,8 +49,8 @@ export function DeviceValuesList({ device, profile, canSetValues, now, className
                   </>
                 )}
               </span>
-            </div>
-            <div className="flex items-center gap-2">
+            </Stack>
+            <Inline gap="sm" align="center">
               {stale && <Badge variant="outline" className="border-dashed text-muted-foreground">{t("state.stale")}</Badge>}
               {canSetValues && !fromHa ? (
                 <DeviceValueControl deviceId={device.id} field={field} value={binding.value} label={`${device.name}: ${field.label}`} />
@@ -57,7 +59,7 @@ export function DeviceValuesList({ device, profile, canSetValues, now, className
                   {text ?? t("state.unknown")}
                 </span>
               )}
-            </div>
+            </Inline>
           </li>
         );
       })}

@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import type * as React from "react";
 import { ActivityIcon, ListChecksIcon, FolderIcon, MapIcon, MapPinIcon, SlidersHorizontalIcon, MapPinOffIcon, PencilIcon, Trash2Icon, ZapIcon } from "lucide-react";
@@ -90,7 +92,7 @@ export function DeviceDetailScreen({
         description={profile.name}
         actions={
           (canManage || headerActions) && (
-            <div className="grid w-full min-w-0 grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-center xl:justify-end">
+            <PageGrid gap="sm" className="w-full min-w-0 sm:flex sm:w-auto sm:flex-wrap sm:justify-center xl:justify-end">
               {headerActions}
               {canManage && (
                 <>
@@ -122,7 +124,7 @@ export function DeviceDetailScreen({
                   />
                 </>
               )}
-            </div>
+            </PageGrid>
           )
         }
       />
@@ -142,13 +144,13 @@ export function DeviceDetailScreen({
       <PageGrid columns="main-sidebar">
         <Card>
           <CardHeader>
-            <div className="flex flex-wrap items-center justify-between gap-2">
+            <Inline gap="sm" align="center" justify="between" wrap>
               <CardTitle id="device-values" className="scroll-mt-20" tabIndex={-1}>{t("detail.values")}</CardTitle>
               <span className="flex flex-wrap items-center gap-2">
                 {live && <LiveStatusBadge refreshing={refreshing} />}
                 {state && <DeviceStateChip state={state} />}
               </span>
-            </div>
+            </Inline>
             <CardDescription>{canManage ? t("detail.valuesHint") : t("detail.valuesReadOnly")}</CardDescription>
           </CardHeader>
           <DeviceValuesList device={device} profile={profile} canSetValues={canManage} now={now} />
@@ -177,7 +179,7 @@ export function DeviceDetailScreen({
               </DescriptionItem>
             )}
           </DescriptionList>
-          <div className="flex flex-wrap gap-2">
+          <Inline gap="sm" align="stretch" wrap>
             {planFloorId && (
               <Button asChild size="sm" variant="outline">
                 <Link to={`/places/floors/${planFloorId}/plan`}>
@@ -197,14 +199,16 @@ export function DeviceDetailScreen({
                 {t("placement.remove")}
               </Button>
             )}
-          </div>
+          </Inline>
         </Card>
 
         {canManage && (
           <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle id="device-sources" className="scroll-mt-20" tabIndex={-1}>{t("bindings.title")}</CardTitle>
-              <CardDescription>{t("bindings.description")}</CardDescription>
+              <Stack gap="xs" className="min-w-0">
+                <CardTitle id="device-sources" className="scroll-mt-20" tabIndex={-1}>{t("bindings.title")}</CardTitle>
+                <CardDescription>{t("bindings.description")}</CardDescription>
+              </Stack>
             </CardHeader>
             <DeviceBindingsForm key={`${device.profileId}-${profile.fields.length}`} device={device} profile={profile} renderEntityPicker={renderEntityPicker} />
           </Card>

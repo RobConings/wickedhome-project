@@ -84,6 +84,17 @@ export default tseslint.config(
   // 4 + 5. Features (components and screens): any component layer, other features only via their index.
   layer(["src/features/**"], [NO_API, NO_APP, NO_ROUTES, NO_FEATURE_INTERNALS, NO_LEAVING_FEATURE, NO_AI, NO_AI_RELATIVE]),
 
+  // Screens compose the design system. Native layout and body-copy elements belong in components.
+  {
+    files: ["src/features/*/screens/*.tsx"],
+    rules: {
+      "no-restricted-syntax": ["error", {
+        selector: "JSXOpeningElement[name.type='JSXIdentifier'][name.name=/^(div|p)$/], JSXSelfClosingElement[name.type='JSXIdentifier'][name.name=/^(div|p)$/]",
+        message: "Compose screens with layout, Text and shared/domain components. Put custom native markup in the component that owns its behavior.",
+      }],
+    },
+  },
+
   // Feature contracts are shared with src/api, so they must run in the browser AND in Node.
   layer(
     ["src/features/*/types/**"],

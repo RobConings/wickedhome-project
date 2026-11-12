@@ -1,3 +1,4 @@
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { CheckIcon, LinkIcon, MapPinIcon, SearchXIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -43,7 +44,7 @@ export function HaEntityBrowser({ entities, loading, error, onRetry, fieldType, 
   );
 
   const toolbar = (
-    <div className="flex flex-wrap items-center gap-3">
+    <Inline gap="md" align="center" wrap>
       <Select value={domain} onValueChange={setDomain}>
         <SelectTrigger className="w-full sm:w-52" aria-label={t("entities.domain")}>
           <SelectValue />
@@ -58,14 +59,14 @@ export function HaEntityBrowser({ entities, loading, error, onRetry, fieldType, 
         </SelectContent>
       </Select>
       {fieldType && (
-        <div className="flex items-center gap-2">
+        <Inline gap="sm" align="center">
           <Switch id="ha-fitting-only" checked={fittingOnly} onCheckedChange={setFittingOnly} />
           <Label htmlFor="ha-fitting-only" className="text-sm font-normal">
             {t("entities.fittingOnly")}
           </Label>
-        </div>
+        </Inline>
       )}
-    </div>
+    </Inline>
   );
 
   const content = (entity: HaEntity, tile: boolean) => {

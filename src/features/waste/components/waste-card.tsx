@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import { ArrowRightIcon, BellRingIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
@@ -51,7 +54,7 @@ export function WasteCard({ summary, today }: WasteCardProps) {
     return (
       <Card>
         <Header />
-        <p className="text-sm text-muted-foreground">{t("card.notSetUp")}</p>
+        <Text size="sm" tone="muted">{t("card.notSetUp")}</Text>
         <CardFooter>
           <Button asChild variant="link" size="sm" className="px-0">
             <Link to="/settings#waste">
@@ -73,7 +76,7 @@ export function WasteCard({ summary, today }: WasteCardProps) {
       <Header />
       {summary.setup.lastSyncStatus === "error" && !next && <InlineAlert tone="error">{t("card.syncError")}</InlineAlert>}
       {!next ? (
-        <p className="text-sm text-muted-foreground">{t("card.none")}</p>
+        <Text size="sm" tone="muted">{t("card.none")}</Text>
       ) : (
         <div
           className={cn(
@@ -83,21 +86,21 @@ export function WasteCard({ summary, today }: WasteCardProps) {
           )}
           role={timing === "tomorrow" ? "status" : undefined}
         >
-          <div className="flex items-start gap-2">
+          <Inline gap="sm" align="start">
             {timing === "tomorrow" && <BellRingIcon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />}
-            <p className="text-sm font-semibold">
+            <Text size="sm" weight="semibold">
               {timing === "tomorrow"
                 ? t("card.tomorrow", { labels })
                 : timing === "today"
                   ? t("card.today", { labels })
                   : t("card.next", { date: label(next.date), labels })}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
+            </Text>
+          </Inline>
+          <Inline gap="1.5" align="stretch" wrap>
             {next.collections.map((collection) => (
               <WasteCollectionChip key={`${collection.fraction}-${collection.label}`} collection={collection} className="bg-background" />
             ))}
-          </div>
+          </Inline>
         </div>
       )}
       {later.length > 0 && <WasteDayList days={later} today={today} className="-my-2" />}
@@ -123,10 +126,10 @@ export function WasteCardSkeleton() {
         {t("card.loading")}
       </span>
       <Skeleton aria-hidden className="h-20 w-full rounded-lg" />
-      <div aria-hidden className="flex flex-col gap-2">
+      <Stack gap="sm" aria-hidden>
         <Skeleton className="h-5 w-3/4" />
         <Skeleton className="h-5 w-2/3" />
-      </div>
+      </Stack>
     </Card>
   );
 }

@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { CheckIcon, CloudSunIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -50,13 +52,13 @@ export function WeatherSettingsSection({ settings, canManage }: WeatherSettingsS
     <Card>
       <CardHeader className="items-center justify-start gap-3">
         <IconChip icon={CloudSunIcon} tone="info" size="sm" />
-        <div className="flex flex-col gap-0.5">
+        <Stack gap="0.5">
           <CardTitle>{t("settings.title")}</CardTitle>
-          <p className="text-sm text-muted-foreground">{t("settings.description")}</p>
-        </div>
+          <Text size="sm" tone="muted">{t("settings.description")}</Text>
+        </Stack>
       </CardHeader>
 
-      <div role="radiogroup" aria-label={t("settings.title")} className="flex flex-col gap-2">
+      <Stack gap="sm" role="radiogroup" aria-label={t("settings.title")}>
         {settings.providers.map((provider) => {
           const active = selected === provider.id;
           const disabled = !canManage || !provider.available || busy;
@@ -95,7 +97,7 @@ export function WeatherSettingsSection({ settings, canManage }: WeatherSettingsS
             </button>
           );
         })}
-      </div>
+      </Stack>
 
       {last ? (
         last.fallbackFrom ? (
@@ -107,18 +109,18 @@ export function WeatherSettingsSection({ settings, canManage }: WeatherSettingsS
             })}
           </InlineAlert>
         ) : (
-          <p className="text-sm text-muted-foreground">
+          <Text size="sm" tone="muted">
             {t("settings.last", {
               provider: WEATHER_PROVIDER_NAMES[last.provider],
               time: formatDateTime(last.fetchedAt, currentLocale()),
             })}
-          </p>
+          </Text>
         )
       ) : (
-        <p className="text-sm text-muted-foreground">{t("settings.noneYet")}</p>
+        <Text size="sm" tone="muted">{t("settings.noneYet")}</Text>
       )}
-      <p className="text-xs text-muted-foreground">{t("settings.fallbackHint")}</p>
-      {!canManage && <p className="text-sm text-muted-foreground">{t("settings.readOnly")}</p>}
+      <Text size="xs" tone="muted">{t("settings.fallbackHint")}</Text>
+      {!canManage && <Text size="sm" tone="muted">{t("settings.readOnly")}</Text>}
     </Card>
   );
 }

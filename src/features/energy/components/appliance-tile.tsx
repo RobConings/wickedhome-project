@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { RecordLink } from "@/components/shared/record-link";
 import type * as React from "react";
 import { Card } from "@/components/shared/card";
@@ -28,14 +31,14 @@ export function ApplianceTile({ appliance, appliances, places, canManage, docume
       <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-section-soft text-section">
         <ApplianceCategoryIcon category={appliance.category} className="size-5" />
       </span>
-      <div className="flex min-w-0 flex-col gap-1.5">
+      <Stack gap="1.5" className="min-w-0">
         <RecordLink to={`/energy/appliances/${encodeURIComponent(appliance.id)}`} className="line-clamp-2 font-medium break-words hover:underline">{appliance.name}</RecordLink>
-        <div className="flex flex-wrap gap-1.5">
+        <Inline gap="1.5" align="stretch" wrap>
           <ApplianceMarkers appliance={appliance} />
-        </div>
+        </Inline>
         <ApplianceSummary appliance={appliance} className="text-xs" />
-        {appliance.notes && <p className="line-clamp-2 text-xs text-muted-foreground">{appliance.notes}</p>}
-      </div>
+        {appliance.notes && <Text size="xs" tone="muted" className="line-clamp-2">{appliance.notes}</Text>}
+      </Stack>
       <ApplianceActions
         appliances={appliances}
         appliance={appliance}

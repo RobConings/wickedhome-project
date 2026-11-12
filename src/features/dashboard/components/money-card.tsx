@@ -1,3 +1,7 @@
+import { PageGrid } from "@/components/layout/page-grid";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import { ArrowRightIcon, LandmarkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
@@ -31,20 +35,20 @@ export function MoneyCard({ summary }: MoneyCardProps) {
         <InlineAlert tone="error">{t("loadError")}</InlineAlert>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex min-w-0 flex-col gap-0.5">
+          <PageGrid gap="3" className="grid-cols-2">
+            <Stack gap="0.5" className="min-w-0">
               <span className="text-xs text-muted-foreground">{t("money.in")}</span>
               <span className="text-xl font-semibold tracking-tight tabular-nums">{money(summary.incomeCents)}</span>
               <span className="text-xs text-muted-foreground tabular-nums">{t("money.received", { amount: money(summary.incomeReceivedCents) })}</span>
-            </div>
-            <div className="flex min-w-0 flex-col gap-0.5">
+            </Stack>
+            <Stack gap="0.5" className="min-w-0">
               <span className="text-xs text-muted-foreground">{t("money.out")}</span>
               <span className="text-xl font-semibold tracking-tight tabular-nums">{money(summary.outCents)}</span>
               <span className="text-xs text-muted-foreground tabular-nums">{t("money.paid", { amount: money(summary.outPaidCents) })}</span>
-            </div>
-          </div>
+            </Stack>
+          </PageGrid>
           {summary.jointBalanceCents === null && summary.savingsBalanceCents === null ? (
-            <p className="text-sm text-muted-foreground">{t("money.noAccounts")}</p>
+            <Text size="sm" tone="muted">{t("money.noAccounts")}</Text>
           ) : (
             <dl className="flex flex-col divide-y border-t text-sm">
               {[
@@ -53,10 +57,10 @@ export function MoneyCard({ summary }: MoneyCardProps) {
               ]
                 .filter((row): row is { term: string; value: number } => row.value !== null)
                 .map((row) => (
-                  <div key={row.term} className="flex items-center justify-between gap-3 py-2">
+                  <Inline gap="md" align="center" justify="between" key={row.term} className="py-2">
                     <dt className="text-muted-foreground">{row.term}</dt>
                     <dd className={cn("font-medium tabular-nums", row.value < 0 && "text-destructive")}>{money(row.value)}</dd>
-                  </div>
+                  </Inline>
                 ))}
             </dl>
           )}

@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { RelatedRecordCards, type RelatedRecordLink } from "@/components/shared/related-record-cards";
 import * as React from "react";
 import {
@@ -164,10 +167,10 @@ export function TaskDetailScreen({
         ...(attachments ? [{ id: "documents", label: tCommon("nav.documents"), icon: FolderIcon, accent: "documents", to: "#task-documents" } satisfies RelatedRecordLink] : []),
       ] satisfies RelatedRecordLink[])} />
       <PageGrid columns="main-sidebar">
-        <div className="flex min-w-0 flex-col gap-6">
+        <Stack gap="lg" className="min-w-0">
           <Card>
             <CardHeader className="flex-wrap items-center">
-              <div className="flex flex-col">
+              <Stack gap="none">
                 <span
                   className={cn(
                     "text-2xl font-semibold tracking-tight",
@@ -190,22 +193,22 @@ export function TaskDetailScreen({
                   </span>
                 )}
                 {(task.origin || (open && (task.hold || task.waitingFor.length > 0))) && (
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <Inline gap="sm" align="center" wrap className="mt-2">
                     <TaskOriginBadge task={task} full />
                     {open && <TaskHoldBadge task={task} full />}
                     {open && <TaskWaitingBadge task={task} />}
-                  </div>
+                  </Inline>
                 )}
-              </div>
+              </Stack>
               {/* Readiness changes when materials are bought or added. */}
-              <div className="flex items-center gap-2" aria-busy={reloading || undefined}>
+              <Inline gap="sm" align="center"  aria-busy={reloading || undefined}>
                 {reloading && (
                   <span className="flex animate-appear text-muted-foreground">
                     <Spinner />
                   </span>
                 )}
                 <TaskReadinessBadge task={task} />
-              </div>
+              </Inline>
             </CardHeader>
             <DescriptionList>
               <DescriptionItem label={t("fields.type")}>
@@ -226,7 +229,7 @@ export function TaskDetailScreen({
               )}
               <DescriptionItem label={t("fields.assignees")}>
                 {task.assigneeIds.length > 0 ? (
-                  <div className="flex flex-col gap-1">
+                  <Stack gap="xs">
                     <TaskAssignees task={task} habitants={habitants} withNames linked />
                     {task.rotateAssignees && (
                       <span className="text-xs font-normal text-muted-foreground">
@@ -235,7 +238,7 @@ export function TaskDetailScreen({
                         })}
                       </span>
                     )}
-                  </div>
+                  </Stack>
                 ) : (
                   <span className="font-normal text-muted-foreground">{t("detail.unassigned")}</span>
                 )}
@@ -277,9 +280,9 @@ export function TaskDetailScreen({
             </CardHeader>
             <TaskComments taskId={task.id} comments={comments} habitants={habitants} />
           </Card>
-        </div>
+        </Stack>
 
-        <div className="flex min-w-0 flex-col gap-6">
+        <Stack gap="lg" className="min-w-0">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -299,10 +302,10 @@ export function TaskDetailScreen({
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-sm">
-                <p className="font-medium">{recurrence}</p>
+                <Text weight="medium">{recurrence}</Text>
                 {upcoming.length > 0 ? (
-                  <div className="flex flex-col gap-1">
-                    <p className="text-muted-foreground">{t("detail.thenOn")}</p>
+                  <Stack gap="xs">
+                    <Text tone="muted">{t("detail.thenOn")}</Text>
                     <ul className="flex flex-col gap-0.5">
                       {upcoming.map((date) => (
                         <li key={date} className="tabular-nums">
@@ -311,9 +314,9 @@ export function TaskDetailScreen({
                         </li>
                       ))}
                     </ul>
-                  </div>
+                  </Stack>
                 ) : (
-                  open && <p className="text-muted-foreground">{t("detail.lastOccurrence")}</p>
+                  open && <Text tone="muted">{t("detail.lastOccurrence")}</Text>
                 )}
               </CardContent>
             </Card>
@@ -323,7 +326,7 @@ export function TaskDetailScreen({
             <CardTitle>{t("history.title")}</CardTitle>
             <TaskHistory history={history} habitants={habitants} />
           </Card>
-        </div>
+        </Stack>
       </PageGrid>
 
       {holding && <TaskHoldDialog task={task} open onOpenChange={setHolding} returnFocusRef={managementTrigger} onHold={(reason) => submit("hold", { reason })} />}

@@ -1,5 +1,6 @@
 import type * as React from "react";
 import { cn } from "@/lib/utils";
+import { Stack } from "@/components/layout/stack";
 
 /**
  * How a card stands out (docs/BRANDING.md): `attention` = a peach edge, "this needs you" (suggestions,
@@ -32,6 +33,14 @@ export function Card({ className, tone = "default", ...props }: React.ComponentP
 /** Title row of a card; its parts may shrink (`min-w-0`), so a long title wraps instead of pushing out. */
 export function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return <div className={cn("flex items-start justify-between gap-3 *:min-w-0", className)} {...props} />;
+}
+
+/** Keep the title and supporting copy in one column, leaving the header's other column for actions. */
+export function CardHeading({ title, description, className }: { title: React.ReactNode; description?: React.ReactNode; className?: string }) {
+  return <Stack gap="xs" className={cn("min-w-0 flex-1", className)}>
+    <CardTitle>{title}</CardTitle>
+    {description && <CardDescription>{description}</CardDescription>}
+  </Stack>;
 }
 
 export function CardTitle({ className, ...props }: React.ComponentProps<"h3">) {

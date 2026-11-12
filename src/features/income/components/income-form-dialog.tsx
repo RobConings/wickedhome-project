@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -23,7 +24,7 @@ function ReceiptAmountField({ id, name, value, setValue, errors, disabled, plann
   const [adjusting, setAdjusting] = React.useState(false);
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       <Select
         value={adjusting ? "adjust" : "keep"}
         onValueChange={(choice) => {
@@ -56,7 +57,7 @@ function ReceiptAmountField({ id, name, value, setValue, errors, disabled, plann
       ) : (
         <input type="hidden" name={name} value={plannedCents} />
       )}
-    </div>
+    </Stack>
   );
 }
 

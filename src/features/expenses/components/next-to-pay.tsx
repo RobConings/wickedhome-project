@@ -1,3 +1,4 @@
+import { Inline } from "@/components/layout/inline";
 import { WalletIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
@@ -58,11 +59,11 @@ export function NextToPay({ unpaid, habitants, today }: NextToPayProps) {
                 <span className="font-semibold tabular-nums">{formatCurrency(row.amount, locale)}</span>
               </Link>
             ) : (
-              <div className="flex min-h-11 items-center gap-3 py-2 text-sm">
+              <Inline gap="md" align="center" className="min-h-11 py-2 text-sm">
                 <span className="grid size-7 shrink-0 place-items-center">{row.leading}</span>
                 <span className="flex-1 font-medium">{row.label}</span>
                 <span className="text-xs text-muted-foreground">{t("next.nothing")}</span>
-              </div>
+              </Inline>
             )}
           </li>
         ))}

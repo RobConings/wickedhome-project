@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { Link } from "react-router";
 import { MailSearchIcon, SendIcon } from "lucide-react";
@@ -45,8 +48,8 @@ export function GoogleMailPanel({ settings, client, onStatus, canSend = false, o
   };
 
   return (
-    <div className="flex flex-col gap-3 pl-0 sm:pl-6">
-      <p className="text-sm">
+    <Stack gap="3" className="pl-0 sm:pl-6">
+      <Text size="sm">
         {settings.pendingCount > 0 ? (
           <Link to="/expenses" className="font-medium text-primary underline-offset-4 hover:underline">
             {t("google.mail.pending", { count: settings.pendingCount })}
@@ -54,9 +57,9 @@ export function GoogleMailPanel({ settings, client, onStatus, canSend = false, o
         ) : (
           <span className="text-muted-foreground">{t("google.mail.nonePending")}</span>
         )}
-      </p>
+      </Text>
       {settings.lastError && <InlineAlert tone="error">{t("google.mail.failed", { error: settings.lastError })}</InlineAlert>}
-      <div className="flex flex-wrap items-center gap-2">
+      <Inline gap="sm" align="center" wrap>
         <Button size="sm" variant="outline" onClick={scan} loading={scanning}>
           <MailSearchIcon />
           {t("google.mail.scanNow")}
@@ -69,26 +72,26 @@ export function GoogleMailPanel({ settings, client, onStatus, canSend = false, o
               })
             : t("google.mail.neverScanned")}
         </span>
-      </div>
-      <p className="text-xs text-muted-foreground">{t("google.mail.privacy")}</p>
+      </Inline>
+      <Text size="xs" tone="muted">{t("google.mail.privacy")}</Text>
       {onConnect && (
-        <div className="flex flex-col gap-2 rounded-lg border p-3">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex min-w-0 items-start gap-2.5">
+        <Stack gap="sm" className="rounded-lg border p-3">
+          <Inline gap="md" align="start" justify="between">
+            <Inline gap="2.5" align="start" className="min-w-0">
               <SendIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-              <div className="flex min-w-0 flex-col gap-0.5">
+              <Stack gap="0.5" className="min-w-0">
                 <span className="text-sm font-medium">{t("google.mail.send.title")}</span>
                 <span className="text-xs text-muted-foreground">{canSend ? t("google.mail.send.on") : t("google.mail.send.description")}</span>
-              </div>
-            </div>
+              </Stack>
+            </Inline>
             {!canSend && (
               <Button size="sm" variant="outline" className="shrink-0" onClick={() => onConnect(["gmail_send"])} loading={connecting} disabled={connectDisabled}>
                 {t("google.mail.send.turnOn")}
               </Button>
             )}
-          </div>
-        </div>
+          </Inline>
+        </Stack>
       )}
-    </div>
+    </Stack>
   );
 }

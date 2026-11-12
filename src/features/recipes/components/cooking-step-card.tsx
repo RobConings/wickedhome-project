@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
+import { PageGrid } from "@/components/layout/page-grid";
 import * as React from "react";
 import { ChevronLeftIcon, ChevronRightIcon, ListOrderedIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -31,10 +34,10 @@ export function CookingStepCard({ steps, current, onChange, finish }: CookingSte
   if (!step) {
     return (
       <Card className="gap-4 p-5">
-        <p className="flex items-center gap-2 text-muted-foreground">
+        <Text tone="muted" className="flex items-center gap-2">
           <ListOrderedIcon className="size-5 shrink-0" aria-hidden="true" />
           {t("cooking.noSteps")}
-        </p>
+        </Text>
         {finish}
       </Card>
     );
@@ -58,13 +61,13 @@ export function CookingStepCard({ steps, current, onChange, finish }: CookingSte
       onPointerCancel={() => (start.current = null)}
       aria-roledescription={t("cooking.stepsRole")}
     >
-      <div className="flex flex-col gap-2">
+      <Stack gap="sm">
         <span className="text-sm font-medium text-muted-foreground" aria-live="polite">
           {t("cooking.stepOf", { step: current + 1, total: steps.length })}
         </span>
         <Progress value={((current + 1) / steps.length) * 100} aria-hidden="true" />
-      </div>
-      <p className="min-h-32 text-xl leading-relaxed break-words whitespace-pre-line sm:text-2xl">{step.text}</p>
+      </Stack>
+      <Text size="xl" className="min-h-32 leading-relaxed break-words whitespace-pre-line sm:text-2xl">{step.text}</Text>
       {step.timerMinutes && (
         <StepTimer
           key={step.id}
@@ -75,7 +78,7 @@ export function CookingStepCard({ steps, current, onChange, finish }: CookingSte
           })}
         />
       )}
-      <div className="grid grid-cols-2 gap-3">
+      <PageGrid gap="3" className="grid-cols-2">
         <Button variant="outline" size="lg" className="h-12" onClick={() => go(current - 1)} disabled={current === 0}>
           <ChevronLeftIcon />
           {t("cooking.previous")}
@@ -88,7 +91,7 @@ export function CookingStepCard({ steps, current, onChange, finish }: CookingSte
             <ChevronRightIcon />
           </Button>
         )}
-      </div>
+      </PageGrid>
     </Card>
   );
 }

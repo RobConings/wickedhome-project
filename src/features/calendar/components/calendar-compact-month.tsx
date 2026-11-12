@@ -1,3 +1,4 @@
+import { PageGrid } from "@/components/layout/page-grid";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { currentLocale } from "@/lib/i18n";
@@ -26,7 +27,7 @@ export function CalendarCompactMonth({ date, today, entries, selectedDate, onSel
 
   return (
     <div className={cn("rounded-xl border bg-card p-2", className)}>
-      <div className="grid grid-cols-7 text-center">
+      <PageGrid gap="none" className="grid-cols-7 text-center">
         {weekdayLabels(locale, "narrow").map((label, index) => (
           <span key={index} className="py-1 text-xs font-medium text-muted-foreground">
             {label}
@@ -62,7 +63,7 @@ export function CalendarCompactMonth({ date, today, entries, selectedDate, onSel
             </button>
           );
         })}
-      </div>
+      </PageGrid>
     </div>
   );
 }

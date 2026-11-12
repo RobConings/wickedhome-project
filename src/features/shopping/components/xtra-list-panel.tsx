@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { CheckIcon, RefreshCwIcon } from "lucide-react";
 import { Link } from "react-router";
@@ -25,22 +28,22 @@ export function XtraListPanel({ initial, intervalMs }: { initial?: XtraListIniti
   }
   return <Card role="region" aria-label={t("xtraList.title")} className="gap-3">
     <CardHeader>
-      <div className="flex min-w-0 flex-col gap-1"><CardTitle>{t("xtraList.title")}{snapshot && ` · ${active.length}`}</CardTitle><CardDescription>{t("xtraList.description")}</CardDescription></div>
+      <Stack gap="xs" className="min-w-0"><CardTitle>{t("xtraList.title")}{snapshot && ` · ${active.length}`}</CardTitle><CardDescription>{t("xtraList.description")}</CardDescription></Stack>
       <Button type="button" variant="outline" size="icon-sm" disabled={loading} aria-label={t("xtraList.refresh")} onClick={() => void refresh(true)}><RefreshCwIcon aria-hidden="true" className={loading ? "animate-spin" : ""} /></Button>
     </CardHeader>
-    {status && !status.canUse && <p className="text-sm text-muted-foreground">{t("xtraList.noAccess")}</p>}
+    {status && !status.canUse && <Text size="sm" tone="muted">{t("xtraList.noAccess")}</Text>}
     {error && <InlineAlert tone="warning">{t(error === "reconnect" ? "xtraList.reconnect" : "xtraList.unavailable")}{snapshot && ` ${t("xtraList.stale")}`}</InlineAlert>}
-    {loading && !snapshot && <div aria-label={t("xtraList.loading")} role="status" className="space-y-2"><Skeleton className="h-5 w-3/4" /><Skeleton className="h-5 w-2/3" /></div>}
+    {loading && !snapshot && <Stack gap="sm" aria-label={t("xtraList.loading")} role="status"><Skeleton className="h-5 w-3/4" /><Skeleton className="h-5 w-2/3" /></Stack>}
     {snapshot && <>
-      <p className="text-xs text-muted-foreground">{t("xtraList.checked", { date: new Date(snapshot.observedAt).toLocaleString(i18n.language, { timeZone: "Europe/Brussels" }) })}</p>
+      <Text size="xs" tone="muted">{t("xtraList.checked", { date: new Date(snapshot.observedAt).toLocaleString(i18n.language, { timeZone: "Europe/Brussels" }) })}</Text>
       {snapshot.truncated && <InlineAlert tone="warning">{t("xtraList.truncated")}</InlineAlert>}
-      {active.length ? <ul className="max-h-80 overflow-y-auto">{rows(active.slice(0, visible))}</ul> : !snapshot.truncated && <p className="text-sm text-muted-foreground">{t("xtraList.empty")}</p>}
+      {active.length ? <ul className="max-h-80 overflow-y-auto">{rows(active.slice(0, visible))}</ul> : !snapshot.truncated && <Text size="sm" tone="muted">{t("xtraList.empty")}</Text>}
       {active.length > visible && <Button type="button" variant="ghost" className="self-start" onClick={() => setVisible((count) => count + 50)}>{t("xtraList.more", { count: active.length - visible })}</Button>}
-      {completed.length > 0 && <details className="rounded-lg border px-3 py-2"><summary className="cursor-pointer text-sm text-muted-foreground">{t("xtraList.completed", { count: completed.length })}</summary><ul className="mt-2 max-h-60 overflow-y-auto">{rows(completed.slice(0, 100))}</ul>{completed.length > 100 && <p className="text-xs text-muted-foreground">{t("xtraList.completedLimit")}</p>}</details>}
+      {completed.length > 0 && <details className="rounded-lg border px-3 py-2"><summary className="cursor-pointer text-sm text-muted-foreground">{t("xtraList.completed", { count: completed.length })}</summary><ul className="mt-2 max-h-60 overflow-y-auto">{rows(completed.slice(0, 100))}</ul>{completed.length > 100 && <Text size="xs" tone="muted">{t("xtraList.completedLimit")}</Text>}</details>}
     </>}
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+    <Inline gap="none" align="center" wrap className="gap-x-4 gap-y-1 text-sm">
       <a className="inline-flex min-h-10 items-center underline" href="https://www.colruyt.be/nl" target="_blank" rel="noopener noreferrer">{t("xtra.open")}</a>
       <Link to="/settings?section=xtra" className="inline-flex min-h-10 items-center underline">{t("xtraList.settings")}</Link>
-    </div>
+    </Inline>
   </Card>;
 }

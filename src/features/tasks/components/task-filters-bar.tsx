@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import { CalendarClockIcon, HouseIcon, MapPinIcon, ShapesIcon, TreesIcon, UsersIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
@@ -31,10 +33,10 @@ const ALL_TYPES = "all";
  */
 export function TaskFiltersBar(props: TaskFiltersBarProps) {
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       <TaskViewTabs {...props} />
       <TaskFilterControls {...props} />
-    </div>
+    </Stack>
   );
 }
 
@@ -65,7 +67,7 @@ export function TaskFilterControls({ filters, onChange, habitants, placeName }: 
   const { t } = useTranslation("tasks");
   const update = (patch: Partial<TaskFilters>) => onChange({ ...filters, ...patch });
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <Inline gap="sm" align="center" wrap>
       <Select value={filters.assignee ?? EVERYONE} onValueChange={(value) => update({ assignee: value === EVERYONE ? null : value })}>
         <SelectTrigger size="sm" className="min-w-0 flex-[1_1_9rem] sm:w-44 sm:flex-none" aria-label={t("filters.assignee")}>
           <SelectValue />
@@ -132,6 +134,6 @@ export function TaskFilterControls({ filters, onChange, habitants, placeName }: 
           <XIcon />
         </Button>
       )}
-    </div>
+    </Inline>
   );
 }

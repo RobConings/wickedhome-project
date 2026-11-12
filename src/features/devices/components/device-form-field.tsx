@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { FormField } from "@/components/shared/form-field";
@@ -17,8 +19,8 @@ export function DeviceFormField({ defaultValue = null, initialData, initialSelec
   const id = React.useId();
   const { data, error, loading, refresh } = useAsyncResource("device-task-picker", fetchDevicesOverview, { initial: initialData });
   return (
-    <div className="flex flex-col gap-2">
-      {error && <InlineAlert tone="error"><p>{t("maintenance.loadError")}</p><Button type="button" variant="outline" size="sm" onClick={refresh}>{tCommon("actions.retry")}</Button></InlineAlert>}
+    <Stack gap="sm">
+      {error && <InlineAlert tone="error"><Text>{t("maintenance.loadError")}</Text><Button type="button" variant="outline" size="sm" onClick={refresh}>{tCommon("actions.retry")}</Button></InlineAlert>}
       <FormField htmlFor={id} label={t("maintenance.device")} optionalLabel={tCommon("form.optional")} errors={errors}>
         {data ? (
           <DevicePicker id={id} name="deviceId" defaultValue={defaultValue} devices={data.devices} profiles={data.profiles} initialSelections={initialSelections} clearable />
@@ -28,6 +30,6 @@ export function DeviceFormField({ defaultValue = null, initialData, initialSelec
       </FormField>
       {/* An unavailable picker must not clear the existing relationship when the other task fields save. */}
       {!data && <input type="hidden" name="deviceId" value={defaultValue ?? ""} />}
-    </div>
+    </Stack>
   );
 }

@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { BellIcon, WrenchIcon, CheckIcon, ListChecksIcon, RepeatIcon, TimerIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -122,7 +124,7 @@ export function TaskRow({
   );
 
   const titleLine = (
-    <div className="flex min-w-0 items-center gap-2">
+    <Inline gap="sm" align="center" className="min-w-0">
       <Link
         to={taskPath(task.id)}
         className={cn(
@@ -134,13 +136,13 @@ export function TaskRow({
         {task.title}
       </Link>
       {open && <TaskPriorityBadge priority={task.priority} iconOnly />}
-    </div>
+    </Inline>
   );
 
   const reminder = text.reminderLabel(task);
 
   const meta = (
-    <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+    <Inline gap="none" align="center" wrap className="min-w-0 gap-x-3 gap-y-1 text-sm text-muted-foreground">
       <TaskTypeBadge type={task.type} iconOnly />
       <span
         className={cn(
@@ -184,7 +186,7 @@ export function TaskRow({
         </span>
       )}
       <TaskCommentCount task={task} />
-    </div>
+    </Inline>
   );
 
   const quickActions = viewer.canManage && !doneToday && (
@@ -224,11 +226,11 @@ export function TaskRow({
           open && task.hold && "border-warning/50",
         )}
       >
-        <div className="flex items-start gap-3">
+        <Inline gap="md" align="start">
           {checkButton}
           <div className="min-w-0 flex-1 pt-1">{titleLine}</div>
           {quickActions}
-        </div>
+        </Inline>
         {meta}
         <TaskAssignees task={task} habitants={habitants} className="mt-auto" />
         {dialogs}
@@ -248,10 +250,10 @@ export function TaskRow({
       )}
     >
       {checkButton}
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
+      <Stack gap="xs" className="min-w-0 flex-1">
         {titleLine}
         {meta}
-      </div>
+      </Stack>
       <TaskAssignees task={task} habitants={habitants} className="hidden sm:flex" />
       {quickActions}
       {dialogs}

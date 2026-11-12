@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { PageGrid } from "@/components/layout/page-grid";
 import * as React from "react";
 import { CheckIcon, CookingPotIcon, ListOrderedIcon, PlayIcon, ShoppingCartIcon, Trash2Icon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -53,9 +56,9 @@ export function MealPlanCard({ entry, canManage, action }: MealPlanCardProps) {
   return (
     <Card className={cn("h-full gap-0 overflow-hidden p-0", cooked && "opacity-75")} tone={status === "cooking" ? "featured" : "default"}>
       <RecipeCardCover src={coverUrl} />
-      <div className="flex flex-1 flex-col gap-3 p-4">
+      <Stack gap="3" className="flex-1 p-4">
         <RecipeCardTitle name={entry.recipeName} to={recipePath(entry.recipeId)} />
-        <div className="flex min-h-5 flex-wrap items-center gap-x-4 gap-y-2">
+        <Inline gap="none" align="center" wrap className="min-h-5 gap-x-4 gap-y-2">
           <RecipeCardStat icon={UsersIcon} label={t("facts.servings", { count: entry.servings })}>{entry.servings}</RecipeCardStat>
           {!cooked && <RecipeCardStat icon={ShoppingCartIcon} label={t("toCook.openItems", { count: entry.openItemCount })}>{entry.openItemCount}</RecipeCardStat>}
           {status === "cooking" ? <RecipeCardStat icon={CookingPotIcon} label={entry.stepCount > 0 ? t("toCook.cookingStep", { step: entry.currentStep + 1, total: entry.stepCount }) : t("toCook.cooking")}>
@@ -64,16 +67,16 @@ export function MealPlanCard({ entry, canManage, action }: MealPlanCardProps) {
           {cooked && <RecipeCardStat icon={CheckIcon} label={entry.cookedAt ? t("toCook.madeOn", { date: formatDate(entry.cookedAt, locale) }) : t("toCook.made")}>
             {entry.cookedAt ? <time dateTime={entry.cookedAt}>{formatDate(entry.cookedAt, locale)}</time> : "✓"}
           </RecipeCardStat>}
-        </div>
+        </Inline>
         {entry.addedByName && !cooked && <span className="sr-only">{t("toCook.addedBy", { name: entry.addedByName })}</span>}
-        {(!cooked || canManage) && <div className="mt-auto flex flex-col gap-2 pt-2" data-slot="recipe-card-actions">
+        {(!cooked || canManage) && <Stack gap="sm" className="mt-auto pt-2" data-slot="recipe-card-actions">
           {!cooked && (
             <Button fullOnMobile className="w-full" onClick={() => void submit("start")} loading={pendingIntent === "start"} disabled={fetcher.state !== "idle"}>
               <PlayIcon />
               {status === "cooking" ? t("toCook.continue") : t("toCook.start")}
             </Button>
           )}
-          <div className="grid grid-cols-2 gap-2">
+          <PageGrid gap="sm" className="grid-cols-2">
             {!cooked && (
               <Button variant="outline" fullOnMobile className={cn("w-full min-w-0 gap-1 px-2 text-xs", !canManage && "col-span-2")} onClick={() => void submit("done")} disabled={fetcher.state !== "idle"}>
                 <CheckIcon />
@@ -110,9 +113,9 @@ export function MealPlanCard({ entry, canManage, action }: MealPlanCardProps) {
                 }
               />
             )}
-          </div>
-        </div>}
-      </div>
+          </PageGrid>
+        </Stack>}
+      </Stack>
     </Card>
   );
 }

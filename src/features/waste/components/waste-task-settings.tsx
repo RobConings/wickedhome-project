@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { ListChecksIcon, MoonIcon, SunriseIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -48,8 +51,8 @@ export function WasteTaskSettings({ settings, habitants, canManage }: WasteTaskS
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border bg-muted/30 p-3" aria-busy={saving || undefined}>
-      <div className="flex items-start justify-between gap-3">
+    <Stack gap="3" className="rounded-lg border bg-muted/30 p-3" aria-busy={saving || undefined}>
+      <Inline gap="md" align="start" justify="between">
         <label htmlFor="waste-task-enabled" className="flex min-w-0 cursor-pointer items-start gap-2">
           <ListChecksIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
           <span className="flex flex-col gap-0.5">
@@ -63,11 +66,11 @@ export function WasteTaskSettings({ settings, habitants, canManage }: WasteTaskS
           disabled={!canManage}
           onCheckedChange={(enabled) => save({ ...value, enabled })}
         />
-      </div>
+      </Inline>
 
       {value.enabled && (
         <>
-          <div className="flex flex-col gap-1.5">
+          <Stack gap="1.5">
             <span className="text-sm font-medium">{t("tasks.timing")}</span>
             <SegmentedControl<WasteTaskTiming>
               label={t("tasks.timing")}
@@ -80,10 +83,10 @@ export function WasteTaskSettings({ settings, habitants, canManage }: WasteTaskS
               onChange={(timing) => canManage && save({ ...value, timing })}
               className="self-start"
             />
-          </div>
+          </Stack>
 
           {habitants.length > 0 && (
-            <div className="flex flex-col gap-1.5">
+            <Stack gap="1.5">
               <span className="text-sm font-medium">{t("tasks.who")}</span>
               {canManage ? (
                 <AssigneePicker
@@ -94,13 +97,13 @@ export function WasteTaskSettings({ settings, habitants, canManage }: WasteTaskS
                   onChange={(assigneeIds) => save({ ...value, assigneeIds })}
                 />
               ) : (
-                <p className="text-sm text-muted-foreground">
+                <Text size="sm" tone="muted">
                   {value.assigneeIds.length > 0
                     ? value.assigneeIds.flatMap((id) => habitants.find((habitant) => habitant.id === id)?.name ?? []).join(", ")
                     : t("tasks.nobody")}
-                </p>
+                </Text>
               )}
-              <p className="text-xs text-muted-foreground">{t("tasks.whoHint")}</p>
+              <Text size="xs" tone="muted">{t("tasks.whoHint")}</Text>
               {value.assigneeIds.length > 1 && (
                 <label className="flex cursor-pointer items-start gap-2.5 text-sm">
                   <input
@@ -116,7 +119,7 @@ export function WasteTaskSettings({ settings, habitants, canManage }: WasteTaskS
                   </span>
                 </label>
               )}
-            </div>
+            </Stack>
           )}
 
           <Link to="/tasks" className="self-start text-sm font-medium text-primary hover:underline">
@@ -124,6 +127,6 @@ export function WasteTaskSettings({ settings, habitants, canManage }: WasteTaskS
           </Link>
         </>
       )}
-    </div>
+    </Stack>
   );
 }

@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import { ChevronRightIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
@@ -61,7 +62,7 @@ export function ProfileCard({ profile, variant = "card", className }: ProfileCar
   return (
     <Card className={cn("relative gap-3 p-4 transition-colors hover:bg-accent/50", className)}>
       {icon}
-      <div className="flex min-w-0 flex-col gap-1">
+      <Stack gap="xs" className="min-w-0">
         <Link
           to={href}
           className="line-clamp-2 font-medium break-words outline-none after:absolute after:inset-0 after:rounded-xl focus-visible:after:ring-[3px] focus-visible:after:ring-ring/50"
@@ -69,7 +70,7 @@ export function ProfileCard({ profile, variant = "card", className }: ProfileCar
           {profile.name}
         </Link>
         <span className="line-clamp-3 text-xs text-muted-foreground">{details}</span>
-      </div>
+      </Stack>
       <div className="mt-auto">{legend}</div>
     </Card>
   );

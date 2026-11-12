@@ -1,3 +1,4 @@
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { LayersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -1317,9 +1318,9 @@ export function FloorPlanCanvas({
         </div>
       )}
       {placing && (
-        <div
+        <Inline gap="xs" align="center" justify="center" wrap
           role="status"
-          className="absolute top-4 left-1/2 z-20 flex w-max max-w-[calc(100%-2rem)] -translate-x-1/2 flex-wrap items-center justify-center gap-1 rounded-2xl border bg-popover/95 py-1 pr-1 pl-3 text-sm shadow-md backdrop-blur"
+          className="absolute top-4 left-1/2 z-20 w-max max-w-[calc(100%-2rem)] -translate-x-1/2 rounded-2xl border bg-popover/95 py-1 pr-1 pl-3 text-sm shadow-md backdrop-blur"
         >
           <span className="min-w-0">{t("editor.markers.placing", { label: placing.label })}</span>
           <Button type="button" size="sm" variant="ghost" onClick={placeInMiddle}>
@@ -1328,7 +1329,7 @@ export function FloorPlanCanvas({
           <Button type="button" size="sm" variant="outline" onClick={() => onPlacingCancel?.()}>
             {t("editor.markers.cancelPlacing")}
           </Button>
-        </div>
+        </Inline>
       )}
       {children}
     </div>

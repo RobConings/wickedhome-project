@@ -1,3 +1,7 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { PageGrid } from "@/components/layout/page-grid";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { ExternalLinkIcon, MapPinIcon, MapPinOffIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -70,12 +74,12 @@ export function HouseholdSettingsForm({ settings, canManage }: HouseholdSettings
             <Input id="household-name" name="name" defaultValue={settings.name} required maxLength={80} autoComplete="off" />
           </FormField>
 
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-0.5">
+          <Stack gap="3">
+            <Stack gap="0.5">
               <h3 className="font-semibold">{t("settings.address.title")}</h3>
-              <p className="text-sm text-muted-foreground">{t("settings.address.description")}</p>
-            </div>
-            <div className="grid grid-cols-6 gap-3">
+              <Text size="sm" tone="muted">{t("settings.address.description")}</Text>
+            </Stack>
+            <PageGrid gap="3" className="grid-cols-6">
               <FormField label={t("settings.fields.street")} htmlFor="address-street" errors={errors("street")} className="col-span-6 sm:col-span-4">
                 <Input id="address-street" name="street" defaultValue={address?.street ?? ""} autoComplete="address-line1" maxLength={120} />
               </FormField>
@@ -120,14 +124,14 @@ export function HouseholdSettingsForm({ settings, canManage }: HouseholdSettings
                   autoComplete="address-level2"
                 />
               </FormField>
-            </div>
-            <p className="text-xs text-muted-foreground">{t("settings.address.country")}</p>
-          </div>
+            </PageGrid>
+            <Text size="xs" tone="muted">{t("settings.address.country")}</Text>
+          </Stack>
 
-          <div className="flex flex-col gap-3 rounded-lg border bg-muted/40 p-4">
-            <div className="flex items-start gap-3">
+          <Stack gap="3" className="rounded-lg border bg-muted/40 p-4">
+            <Inline gap="md" align="start">
               <IconChip icon={location ? MapPinIcon : MapPinOffIcon} tone={location ? "success" : "neutral"} size="sm" />
-              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <Stack gap="0.5" className="min-w-0 flex-1">
                 <span className="text-sm font-medium">{t("settings.location.title")}</span>
                 {location ? (
                   <span className="text-sm text-muted-foreground tabular-nums">
@@ -138,7 +142,7 @@ export function HouseholdSettingsForm({ settings, canManage }: HouseholdSettings
                     {address ? t("settings.location.missing") : t("settings.location.none")}
                   </span>
                 )}
-              </div>
+              </Stack>
               {location && (
                 <Button asChild variant="outline" size="sm">
                   <a href={mapUrl(location)} target="_blank" rel="noreferrer noopener">
@@ -147,7 +151,7 @@ export function HouseholdSettingsForm({ settings, canManage }: HouseholdSettings
                   </a>
                 </Button>
               )}
-            </div>
+            </Inline>
 
             <SegmentedControl
               name="locationMode"
@@ -161,7 +165,7 @@ export function HouseholdSettingsForm({ settings, canManage }: HouseholdSettings
               ]}
             />
             {mode === "manual" ? (
-              <div className="grid grid-cols-2 gap-3">
+              <PageGrid gap="3" className="grid-cols-2">
                 <FormField label={t("settings.fields.latitude")} htmlFor="location-latitude" errors={errors("latitude")}>
                   <Input
                     id="location-latitude"
@@ -180,12 +184,12 @@ export function HouseholdSettingsForm({ settings, canManage }: HouseholdSettings
                     defaultValue={coordinate(location?.longitude)}
                   />
                 </FormField>
-              </div>
+              </PageGrid>
             ) : (
-              <p className="text-xs text-muted-foreground">{t("settings.location.autoHint")}</p>
+              <Text size="xs" tone="muted">{t("settings.location.autoHint")}</Text>
             )}
-            <p className="text-xs text-muted-foreground">{t("settings.location.usedFor")}</p>
-          </div>
+            <Text size="xs" tone="muted">{t("settings.location.usedFor")}</Text>
+          </Stack>
         </fieldset>
 
         {canManage ? (
@@ -195,7 +199,7 @@ export function HouseholdSettingsForm({ settings, canManage }: HouseholdSettings
             </Button>
           </CardFooter>
         ) : (
-          <p className="text-sm text-muted-foreground">{t("settings.readOnly")}</p>
+          <Text size="sm" tone="muted">{t("settings.readOnly")}</Text>
         )}
       </fetcher.Form>
     </Card>

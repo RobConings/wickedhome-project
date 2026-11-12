@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -25,7 +28,7 @@ export function NotificationKindList({ kinds, preferences, onChange, disabled = 
   const timeLabel = (time: string) => (time === AT_TASK_TIME ? t("kinds.atTaskTime") : t("kinds.at", { time }));
 
   return (
-    <div className="flex flex-col gap-4">
+    <Stack gap="md">
       {NOTIFICATION_GROUPS.map((group) => {
         const inGroup = kinds.filter((kind) => kind.group === group);
         if (inGroup.length === 0) return null;
@@ -46,14 +49,14 @@ export function NotificationKindList({ kinds, preferences, onChange, disabled = 
                         {tAny(kind.titleKey)}
                         {kind.urgent && <Badge variant="outline">{t("kinds.urgent")}</Badge>}
                       </label>
-                      <p className="text-sm text-muted-foreground">{tAny(kind.descriptionKey)}</p>
+                      <Text size="sm" tone="muted">{tAny(kind.descriptionKey)}</Text>
                       {kind.scoped && setting.enabled && (
-                        <p className="text-sm text-muted-foreground">
+                        <Text size="sm" tone="muted">
                           {setting.scope.length > 0 ? t("kinds.scopedCount", { count: setting.scope.length }) : t("kinds.scopedNone")}
-                        </p>
+                        </Text>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 self-end sm:self-auto">
+                    <Inline gap="md" align="center" className="self-end sm:self-auto">
                       {kind.times && setting.enabled && (
                         <Select
                           value={setting.time ?? kind.defaultTime ?? kind.times[0]}
@@ -78,7 +81,7 @@ export function NotificationKindList({ kinds, preferences, onChange, disabled = 
                         onCheckedChange={(enabled) => onChange(kind.id, { ...stored, enabled })}
                         disabled={disabled}
                       />
-                    </div>
+                    </Inline>
                   </li>
                 );
               })}
@@ -86,6 +89,6 @@ export function NotificationKindList({ kinds, preferences, onChange, disabled = 
           </section>
         );
       })}
-    </div>
+    </Stack>
   );
 }

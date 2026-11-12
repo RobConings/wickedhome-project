@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import { CookingPotIcon, HistoryIcon, PackageMinusIcon, PackagePlusIcon, PencilIcon, ShoppingCartIcon, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RecordLink } from "@/components/shared/record-link";
@@ -22,10 +25,10 @@ export function StockMovementList({ movements, showPlace = true }: { movements: 
 
   if (movements.length === 0) {
     return (
-      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+      <Text size="sm" tone="muted" className="flex items-center gap-2">
         <HistoryIcon className="size-4" aria-hidden="true" />
         {t("history.empty")}
-      </p>
+      </Text>
     );
   }
 
@@ -39,7 +42,7 @@ export function StockMovementList({ movements, showPlace = true }: { movements: 
             <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground">
               <Icon className="size-4" aria-hidden="true" />
             </span>
-            <div className="flex min-w-0 flex-1 flex-col">
+            <Stack gap="none" className="min-w-0 flex-1">
               <span className="text-sm font-medium">{t(`reasons.${movement.reason}`)}</span>
               <span className="text-xs text-muted-foreground">
                 {[
@@ -51,12 +54,12 @@ export function StockMovementList({ movements, showPlace = true }: { movements: 
                   .filter(Boolean)
                   .join(" · ")}
               </span>
-              {(movement.purchase || movement.needId || movement.cookingEntryId) && <div className="flex flex-wrap gap-x-3 text-xs">
+              {(movement.purchase || movement.needId || movement.cookingEntryId) && <Inline gap="none" align="stretch" wrap className="gap-x-3 text-xs">
                 {movement.purchase && <RecordLink to={`/purchases/${movement.purchase.kind === "acquisition" ? "acquisitions/" : ""}${encodeURIComponent(movement.purchase.id)}`} className="inline-flex min-h-10 items-center text-primary hover:underline">{t("history.openPurchase")}</RecordLink>}
                 {movement.needId && <RecordLink to={`/shopping/items/${encodeURIComponent(movement.needId)}`} className="inline-flex min-h-10 items-center text-primary hover:underline">{t("history.openNeed")}</RecordLink>}
                 {movement.cookingEntryId && <RecordLink to={`/recipes/cook/${encodeURIComponent(movement.cookingEntryId)}`} className="inline-flex min-h-10 items-center text-primary hover:underline">{t("history.openCooking")}</RecordLink>}
-              </div>}
-            </div>
+              </Inline>}
+            </Stack>
             <span className="flex flex-col items-end">
               <span className={cn("font-semibold tabular-nums", positive ? "text-success" : "text-foreground")}>
                 {/* A merge of alternatives that only moved stock to its main product changes nothing: ±0. */}

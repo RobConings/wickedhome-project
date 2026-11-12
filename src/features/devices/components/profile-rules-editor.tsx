@@ -1,3 +1,8 @@
+import { FormField } from "@/components/shared/form-field";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
+import { PageGrid } from "@/components/layout/page-grid";
 import { ArrowDownIcon, ArrowUpIcon, CheckIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
@@ -27,8 +32,8 @@ export function ProfileRulesEditor({ draft, onChange, matchedRuleId, disabled }:
   const set = (index: number, change: Partial<IndicatorRule>) => onChange(updateRule(draft, index, change));
 
   return (
-    <div className="flex flex-col gap-3">
-      {draft.rules.length === 0 && <p className="text-sm text-muted-foreground">{t("editor.rules.empty")}</p>}
+    <Stack gap="3">
+      {draft.rules.length === 0 && <Text size="sm" tone="muted">{t("editor.rules.empty")}</Text>}
       <ol className="flex flex-col gap-3">
         {draft.rules.map((rule, index) => {
           const field = draft.fields.find((candidate) => candidate.key === rule.field);
@@ -36,8 +41,8 @@ export function ProfileRulesEditor({ draft, onChange, matchedRuleId, disabled }:
           const matched = matchedRuleId === rule.id;
           return (
             <li key={rule.id} className={cn("flex flex-col gap-3 rounded-lg border bg-background/50 p-3", matched && "border-primary ring-1 ring-primary")}>
-              <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-2 text-sm font-medium">
+              <Inline gap="sm" align="center" justify="between" wrap>
+                <Inline gap="sm" wrap className="min-w-0 text-sm font-medium">
                   <span className="grid size-6 place-items-center rounded-full bg-muted text-xs tabular-nums">{index + 1}</span>
                   <PlanMarkerDot tone={rule.tone} color={rule.color} pulse={rule.pulse} />
                   {rule.label || t("editor.rules.untitled")}
@@ -47,8 +52,8 @@ export function ProfileRulesEditor({ draft, onChange, matchedRuleId, disabled }:
                       {t("editor.rules.matches")}
                     </Badge>
                   )}
-                </span>
-                <span className="flex gap-1">
+                </Inline>
+                <Inline gap="xs">
                   <Button type="button" size="icon" variant="ghost" disabled={disabled || index === 0} aria-label={t("editor.moveUp")} onClick={() => onChange({ ...draft, rules: moveItem(draft.rules, index, -1) })}>
                     <ArrowUpIcon />
                   </Button>
@@ -58,12 +63,12 @@ export function ProfileRulesEditor({ draft, onChange, matchedRuleId, disabled }:
                   <Button type="button" size="icon" variant="ghost" disabled={disabled} aria-label={t("editor.rules.remove")} onClick={() => onChange({ ...draft, rules: draft.rules.filter((_, i) => i !== index) })}>
                     <Trash2Icon />
                   </Button>
-                </span>
-              </div>
+                </Inline>
+              </Inline>
 
               {/* Condition: "If <field> <operator> <value>". */}
-              <div className="grid gap-3 sm:grid-cols-[1fr_10rem_1fr]">
-                <div className="flex flex-col gap-1.5">
+              <PageGrid gap="3" className="sm:grid-cols-[1fr_10rem_1fr]">
+                <Stack gap="1.5">
                   <Label htmlFor={`${id}-field`}>{t("editor.rules.when")}</Label>
                   <Select value={rule.field} onValueChange={(next) => set(index, { field: next })} disabled={disabled}>
                     <SelectTrigger id={`${id}-field`} className="w-full">
@@ -77,8 +82,8 @@ export function ProfileRulesEditor({ draft, onChange, matchedRuleId, disabled }:
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="flex flex-col gap-1.5">
+                </Stack>
+                <Stack gap="1.5">
                   <Label htmlFor={`${id}-operator`}>{t("editor.rules.operator")}</Label>
                   <Select value={rule.operator} onValueChange={(next) => set(index, { operator: next as RuleOperator })} disabled={disabled || !field}>
                     <SelectTrigger id={`${id}-operator`} className="w-full">
@@ -92,26 +97,25 @@ export function ProfileRulesEditor({ draft, onChange, matchedRuleId, disabled }:
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
+                </Stack>
                 {field && <RuleValueEditor id={id} rule={rule} field={field} disabled={disabled} onChange={(change) => set(index, change)} />}
-              </div>
+              </PageGrid>
 
               {/* Result: colour, label, icon, pulse. */}
-              <div className="grid gap-3 sm:grid-cols-[10rem_1fr_10rem]">
-                <div className="flex flex-col gap-1.5">
+              <PageGrid gap="3" className="sm:grid-cols-[10rem_1fr_10rem]">
+                <Stack gap="1.5">
                   <Label htmlFor={`${id}-tone`}>{t("editor.rules.tone")}</Label>
                   <ToneSelect id={`${id}-tone`} value={rule.tone} disabled={disabled} onChange={(tone) => set(index, { tone })} />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor={`${id}-label`}>{t("editor.rules.label")}</Label>
+                </Stack>
+                <FormField htmlFor={`${id}-label`} label={<>{t("editor.rules.label")}</>}>
                   <Input id={`${id}-label`} value={rule.label} maxLength={60} disabled={disabled} onChange={(event) => set(index, { label: event.target.value })} />
-                </div>
-                <div className="flex flex-col gap-1.5">
+                </FormField>
+                <Stack gap="1.5">
                   <Label htmlFor={`${id}-icon`}>{t("editor.rules.icon")}</Label>
                   <DeviceIconSelect id={`${id}-icon`} value={rule.icon ?? null} allowNone disabled={disabled} onChange={(icon) => set(index, { icon })} />
-                </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-4 text-sm">
+                </Stack>
+              </PageGrid>
+              <Inline gap="4" align="center" wrap className="text-sm">
                 <label className="flex items-center gap-2">
                   <input type="checkbox" className="size-4 accent-primary" checked={rule.pulse} disabled={disabled} onChange={(event) => set(index, { pulse: event.target.checked })} />
                   {t("editor.rules.pulse")}
@@ -136,7 +140,7 @@ export function ProfileRulesEditor({ draft, onChange, matchedRuleId, disabled }:
                     onChange={(event) => set(index, { color: event.target.value })}
                   />
                 )}
-              </div>
+              </Inline>
             </li>
           );
         })}
@@ -145,7 +149,7 @@ export function ProfileRulesEditor({ draft, onChange, matchedRuleId, disabled }:
         <PlusIcon />
         {t("editor.rules.add")}
       </Button>
-    </div>
+    </Stack>
   );
 }
 
@@ -171,14 +175,14 @@ function RuleValueEditor({ id, rule, field, disabled, onChange }: RuleValueEdito
 
   if (rule.operator === "between") {
     return (
-      <div className="flex flex-col gap-1.5">
+      <Stack gap="1.5">
         {label}
-        <div className="flex items-center gap-2">
+        <Inline gap="sm" align="center">
           <DraftNumberInput id={`${id}-value`} value={typeof rule.value === "number" ? rule.value : null} disabled={disabled} onChange={(value) => onChange({ value })} />
           <span className="text-sm text-muted-foreground">{t("editor.rules.and")}</span>
           <DraftNumberInput aria-label={t("editor.rules.upperBound")} value={rule.valueTo ?? null} disabled={disabled} onChange={(valueTo) => onChange({ valueTo })} />
-        </div>
-      </div>
+        </Inline>
+      </Stack>
     );
   }
 
@@ -188,7 +192,7 @@ function RuleValueEditor({ id, rule, field, disabled, onChange }: RuleValueEdito
       return (
         <fieldset className="flex flex-col gap-1.5">
           <legend className="mb-1.5 text-sm font-medium">{t("editor.rules.values")}</legend>
-          <div className="flex flex-wrap gap-x-3 gap-y-1">
+          <Inline gap="none" align="stretch" wrap className="gap-x-3 gap-y-1">
             {(field.choices ?? []).map((choice) => (
               <label key={choice.value} className="flex items-center gap-1.5 text-sm">
                 <input
@@ -206,35 +210,34 @@ function RuleValueEditor({ id, rule, field, disabled, onChange }: RuleValueEdito
                 {choice.label}
               </label>
             ))}
-          </div>
+          </Inline>
         </fieldset>
       );
     }
     return (
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor={`${id}-value`}>{t("editor.rules.valuesComma")}</Label>
+      <FormField htmlFor={`${id}-value`} label={<>{t("editor.rules.valuesComma")}</>}>
         <Input
           id={`${id}-value`}
           value={(rule.values ?? []).join(", ")}
           disabled={disabled}
           onChange={(event) => onChange({ values: event.target.value.split(",").map((part) => part.trim()).filter(Boolean) })}
         />
-      </div>
+      </FormField>
     );
   }
 
   if (field.type === "number") {
     return (
-      <div className="flex flex-col gap-1.5">
+      <Stack gap="1.5">
         {label}
         <DraftNumberInput id={`${id}-value`} value={typeof rule.value === "number" ? rule.value : null} disabled={disabled} onChange={(value) => onChange({ value })} />
-      </div>
+      </Stack>
     );
   }
 
   if (field.type === "choice") {
     return (
-      <div className="flex flex-col gap-1.5">
+      <Stack gap="1.5">
         {label}
         <Select value={typeof rule.value === "string" ? rule.value : ""} onValueChange={(value) => onChange({ value })} disabled={disabled}>
           <SelectTrigger id={`${id}-value`} className="w-full">
@@ -248,14 +251,14 @@ function RuleValueEditor({ id, rule, field, disabled, onChange }: RuleValueEdito
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </Stack>
     );
   }
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <Stack gap="1.5">
       {label}
       <Input id={`${id}-value`} value={typeof rule.value === "string" ? rule.value : ""} maxLength={200} disabled={disabled} onChange={(event) => onChange({ value: event.target.value })} />
-    </div>
+    </Stack>
   );
 }

@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import { Card } from "@/components/shared/card";
 import { FileTypeIcon } from "@/components/shared/file-type-icon";
 import { cn } from "@/lib/utils";
@@ -18,12 +19,12 @@ export function TrashTile({ item, canManage, busy = null, onRestore, onDelete }:
       ) : (
         <FileTypeIcon mimeType={item.file.mimeType} name={item.file.name} size="lg" />
       )}
-      <div className="flex min-w-0 flex-col gap-0.5">
+      <Stack gap="0.5" className="min-w-0">
         <span className="line-clamp-2 font-medium break-words" title={name}>
           {name}
         </span>
         <span className="text-xs text-muted-foreground">{detail(item)}</span>
-      </div>
+      </Stack>
       {canManage && (
         <TrashItemActions item={item} busy={busy} onRestore={onRestore} onDelete={onDelete} compact className="mt-auto" />
       )}

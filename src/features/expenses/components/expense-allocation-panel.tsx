@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import { useEffect, useState } from "react";
 import { FolderKanbanIcon, PlusIcon, XIcon } from "lucide-react";
@@ -49,27 +52,27 @@ export function ExpenseAllocationPanel({ expenseId, initial, initialProjects }: 
           { name: "projects", type: "custom", label: t("allocation.projects"), render: ({ name, value, setValue, values, disabled }) => {
             const rows = (Array.isArray(value) ? value : []) as { projectId: string; amountCents: number }[];
             const remainder = draft.totalCents - Number(values.householdCents ?? 0) - rows.reduce((sum, row) => sum + row.amountCents, 0);
-            return <div className="flex flex-col gap-3">
+            return <Stack gap="3">
               <input type="hidden" name={name} value={JSON.stringify(rows)} />
-              {rows.map((row, index) => <div key={`${index}:${row.projectId}`} className="flex flex-wrap gap-2 rounded-xl border p-3">
+              {rows.map((row, index) => <Inline gap="sm" align="stretch" wrap key={`${index}:${row.projectId}`} className="rounded-xl border p-3">
                 <EntityPicker items={projects.filter((project) => !rows.some((other, i) => i !== index && other.projectId === project.id)).map((project) => ({ id: project.id, label: project.name }))}
                   value={row.projectId || null} disabled={disabled} onChange={(id) => setValue(rows.map((other, i) => i === index ? { ...other, projectId: id ?? "" } : other))} className="min-w-0 flex-1" />
                 <MoneyInput aria-label={t("allocation.projectAmount")} defaultValueCents={row.amountCents} disabled={disabled} className="w-32" onValueChange={(amount) => setValue(rows.map((other, i) => i === index ? { ...other, amountCents: amount ?? 0 } : other))} />
                 <Button type="button" size="icon" variant="ghost" disabled={disabled} aria-label={t("allocation.remove")} onClick={() => setValue(rows.filter((_, i) => i !== index))}><XIcon /></Button>
-              </div>)}
+              </Inline>)}
               <Button type="button" variant="outline" disabled={disabled || rows.length >= projects.length} onClick={() => setValue([...rows, { projectId: projects.find((project) => !rows.some((row) => row.projectId === project.id))?.id ?? "", amountCents: 0 }])}><PlusIcon />{t("allocation.add")}</Button>
-              <p role="status" className={remainder < 0 ? "text-sm font-medium text-danger" : "text-sm text-muted-foreground"}>{t(remainder < 0 ? "allocation.over" : "allocation.remaining", { amount: money(Math.abs(remainder)) })}</p>
-            </div>;
+              <Text role="status" className={remainder < 0 ? "text-sm font-medium text-danger" : "text-sm text-muted-foreground"}>{t(remainder < 0 ? "allocation.over" : "allocation.remaining", { amount: money(Math.abs(remainder)) })}</Text>
+            </Stack>;
           } },
         ]}
         onSuccess={() => { setRefresh((value) => value + 1); void revalidator.revalidate(); }}
       />
     </CardHeader>
     <dl className="flex flex-col gap-2 text-sm">
-      <div className="flex justify-between gap-3"><dt>{t("allocation.total")}</dt><dd className="font-semibold tabular-nums">{money(data.totalCents)}</dd></div>
-      {data.projects.map((project, index) => <div key={project.projectId ?? index} className="flex justify-between gap-3"><dt>{project.projectId ? <Link to={`/projects/${encodeURIComponent(project.projectId)}`} className="hover:underline">{project.name}</Link> : t("allocation.deletedProject", { name: project.name })}</dt><dd className="tabular-nums">{money(project.amountCents)}</dd></div>)}
-      <div className="flex justify-between gap-3"><dt>{t("allocation.household")}</dt><dd className="tabular-nums">{money(data.householdCents)}</dd></div>
-      {data.unallocatedCents !== 0 && <div className="flex justify-between gap-3 text-warning"><dt>{t("allocation.unallocated")}</dt><dd className="tabular-nums">{money(data.unallocatedCents)}</dd></div>}
+      <Inline gap="md" align="stretch" justify="between"><dt>{t("allocation.total")}</dt><dd className="font-semibold tabular-nums">{money(data.totalCents)}</dd></Inline>
+      {data.projects.map((project, index) => <Inline gap="md" align="stretch" justify="between" key={project.projectId ?? index}><dt>{project.projectId ? <Link to={`/projects/${encodeURIComponent(project.projectId)}`} className="hover:underline">{project.name}</Link> : t("allocation.deletedProject", { name: project.name })}</dt><dd className="tabular-nums">{money(project.amountCents)}</dd></Inline>)}
+      <Inline gap="md" align="stretch" justify="between"><dt>{t("allocation.household")}</dt><dd className="tabular-nums">{money(data.householdCents)}</dd></Inline>
+      {data.unallocatedCents !== 0 && <Inline gap="md" align="stretch" justify="between" className="text-warning"><dt>{t("allocation.unallocated")}</dt><dd className="tabular-nums">{money(data.unallocatedCents)}</dd></Inline>}
     </dl>
   </Card>;
 }

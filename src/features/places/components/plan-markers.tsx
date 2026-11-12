@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import type * as React from "react";
 import { MapPinPlusIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -224,7 +225,7 @@ export function PlanLegend({ title, items, layout = "list", className }: PlanLeg
   }
   return (
     <div className={cn("flex flex-col gap-1.5 text-xs", className)}>
-      {title && <p className="font-medium text-foreground">{title}</p>}
+      {title && <Text weight="medium" className="text-foreground">{title}</Text>}
       <ul className="flex flex-col gap-1">
         {items.map((item) => (
           <li key={`${item.tone}-${item.color ?? ""}-${item.label}`} className="flex items-center gap-2 text-muted-foreground">

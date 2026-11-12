@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { CopyIcon, DownloadIcon, QrCodeIcon, Share2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -104,7 +106,7 @@ function PaymentQrActions({ payload, fileName, caption, copyText }: { payload: s
       .catch(() => undefined);
 
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-center">
+    <Stack gap="sm" className="sm:flex-row sm:flex-wrap sm:justify-center">
       {shareable ? (
         <Button type="button" fullOnMobile disabled={!file} onClick={share}>
           <Share2Icon />
@@ -120,7 +122,7 @@ function PaymentQrActions({ payload, fileName, caption, copyText }: { payload: s
         <CopyIcon />
         {t("qr.copyAll")}
       </Button>
-    </div>
+    </Stack>
   );
 }
 
@@ -146,8 +148,8 @@ export function PaymentQrCard({ expense }: PaymentQrCardProps) {
         {t("qr.title")}
       </CardTitle>
       {payload ? (
-        <div className="flex flex-col gap-4">
-          <p className="text-sm text-muted-foreground">{t("qr.description")}</p>
+        <Stack gap="md">
+          <Text size="sm" tone="muted">{t("qr.description")}</Text>
           <React.Suspense fallback={<Skeleton role="status" className="mx-auto aspect-square w-full max-w-56" aria-label={t("qr.loading")} />}>
             <QrCode value={payload} label={t("qr.label", { payee: name })} className="mx-auto w-full max-w-56" />
           </React.Suspense>
@@ -182,9 +184,9 @@ export function PaymentQrCard({ expense }: PaymentQrCardProps) {
               </>
             )}
           </dl>
-        </div>
+        </Stack>
       ) : (
-        <p className="text-sm text-muted-foreground">{t("qr.missing")}</p>
+        <Text size="sm" tone="muted">{t("qr.missing")}</Text>
       )}
     </Card>
   );

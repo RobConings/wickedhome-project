@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import type * as React from "react";
 import { CalendarIcon, HouseIcon, ShoppingBagIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -319,7 +320,7 @@ export function CalendarEventFormDialog({
             habitants={habitants}
             defaultValue={event?.participantIds ?? defaults.participantIds}
           />
-          {errors && <p className="text-xs font-medium text-destructive">{errors.join(" ")}</p>}
+          {errors && <Text size="xs" tone="danger" weight="medium">{errors.join(" ")}</Text>}
         </Stack>
       ),
     },

@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { HandCoinsIcon, UserIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -42,8 +45,8 @@ export function ContributionHistory({ data, accounts, plans, habitants }: Contri
   const amount = (month: string, person?: string | null) => (monthRows.get(month) ?? []).filter((row) => person === undefined || row.habitantId === person).reduce((sum, row) => sum + row.amountCents, 0);
 
   return (
-    <div className="flex min-w-0 flex-col gap-6">
-      <div className="flex flex-wrap gap-3">
+    <Stack gap="lg" className="min-w-0">
+      <Inline gap="md" align="stretch" wrap>
         <Select value={accountId} onValueChange={setAccountId}>
           <SelectTrigger className="w-full sm:w-64" aria-label={t("history.account")}><SelectValue /></SelectTrigger>
           <SelectContent>
@@ -51,43 +54,43 @@ export function ContributionHistory({ data, accounts, plans, habitants }: Contri
             {accounts.map((account) => <SelectItem key={account.id} value={account.id}>{account.name}</SelectItem>)}
           </SelectContent>
         </Select>
-      </div>
+      </Inline>
       <PageGrid columns="stats">
         <StatTile icon={HandCoinsIcon} tone="featured" label={t("history.total")} value={money(total())} hint={t("history.allTime")} />
         {people.map((id) => <StatTile key={id ?? "unknown"} icon={UserIcon} label={name(id)} value={money(total(id))} hint={t("history.allTime")} />)}
       </PageGrid>
       <Card>
-        <div className="flex flex-wrap items-start justify-between gap-3">
+        <Inline gap="md" align="start" justify="between" wrap>
           <MoneyCardHeader icon={HandCoinsIcon} title={t("history.title")} description={t("history.description")} />
           <Select value={year} onValueChange={setYear}>
             <SelectTrigger className="w-28" aria-label={t("history.year")}><SelectValue /></SelectTrigger>
             <SelectContent>{years.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
           </Select>
-        </div>
+        </Inline>
         {rows.length === 0 ? (
           <EmptyState icon={HandCoinsIcon} title={t("history.empty")} description={t("history.emptyDescription")} />
         ) : (
           <div className="divide-y">
             {months.map((month) => (
               <section key={month} aria-label={monthLabel(month)} className="flex flex-col gap-3 py-4 first:pt-0 last:pb-0">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <Inline gap="sm" align="baseline" justify="between" wrap>
                   <h3 className="text-sm font-semibold">{monthLabel(month)}</h3>
                   <span className="text-sm font-semibold tabular-nums">{t("history.monthTotal", { amount: money(amount(month)) })}</span>
-                </div>
+                </Inline>
                 <dl className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2 xl:grid-cols-3">
                   {people.map((id) => (
-                    <div key={id ?? "unknown"} className="flex min-w-0 items-baseline justify-between gap-3 text-sm">
+                    <Inline gap="md" align="baseline" justify="between" key={id ?? "unknown"} className="min-w-0 text-sm">
                       <dt className="break-words text-muted-foreground">{name(id)}</dt>
                       <dd className="shrink-0 tabular-nums">{money(amount(month, id))}</dd>
-                    </div>
+                    </Inline>
                   ))}
                 </dl>
               </section>
             ))}
           </div>
         )}
-        <p className="text-xs text-muted-foreground">{t("history.note")}</p>
+        <Text size="xs" tone="muted">{t("history.note")}</Text>
       </Card>
-    </div>
+    </Stack>
   );
 }

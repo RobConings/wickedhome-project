@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import { LandmarkIcon, ZapIcon } from "lucide-react";
@@ -108,7 +109,7 @@ export function DashboardScreen({ data, userName, homeStatus, roomMap, now = new
             {(agenda) => <Await resolve={data.tasks}>{(tasks) => <TodayCard today={data.today} agenda={agenda} tasks={tasks} />}</Await>}
           </Await>
         </React.Suspense>
-        <div className="flex flex-col gap-6">
+        <Stack gap="lg">
           <React.Suspense fallback={<DashboardCardSkeleton title={t("upcoming.title")} rows={4} />}>
             <Await resolve={data.expenses}>
               {(expenses) => (
@@ -124,8 +125,8 @@ export function DashboardScreen({ data, userName, homeStatus, roomMap, now = new
           <React.Suspense fallback={<DashboardCardSkeleton title={t("money.title")} icon={LandmarkIcon} tone="success" rows={3} />}>
             <Await resolve={data.money}>{(money) => <MoneyCard summary={money} />}</Await>
           </React.Suspense>
-        </div>
-        <div className="flex flex-col gap-6 md:col-span-2 md:grid md:grid-cols-2 xl:col-span-1 xl:flex">
+        </Stack>
+        <Stack gap="lg" className="md:col-span-2 md:grid md:grid-cols-2 xl:col-span-1 xl:flex">
           <React.Suspense fallback={<WeatherCardSkeleton />}>
             <Await resolve={data.weather}>{(weather) => <WeatherCard weather={weather} />}</Await>
           </React.Suspense>
@@ -133,7 +134,7 @@ export function DashboardScreen({ data, userName, homeStatus, roomMap, now = new
             <Await resolve={data.energy}>{(energy) => <EnergyCard today={data.today} summary={energy} />}</Await>
           </React.Suspense>
           <ComingSoonCard />
-        </div>
+        </Stack>
       </PageGrid>
     </PageContainer>
   );

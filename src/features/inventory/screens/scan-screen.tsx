@@ -1,3 +1,5 @@
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { CircleHelpIcon, Layers2Icon, PackageMinusIcon, PackagePlusIcon, PackageSearchIcon, PlusIcon, ScanLineIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -213,13 +215,13 @@ export function ScanScreen({
               className="min-h-40 tabular-nums"
             />
           ) : !result ? (
-            <div className="flex flex-col items-center gap-3 py-8 text-center text-muted-foreground">
+            <Stack gap="3" align="center" className="py-8 text-center text-muted-foreground">
               <ScanLineIcon className="size-8" aria-hidden="true" />
-              <p className="max-w-xs text-sm">{t(`scan.hints.${mode}`)}</p>
-            </div>
+              <Text size="sm" className="max-w-xs">{t(`scan.hints.${mode}`)}</Text>
+            </Stack>
           ) : !result.productId && suggestion ? (
             <Stack gap="md">
-              <p className="text-sm font-medium text-muted-foreground">{t("scan.newProduct")}</p>
+              <Text size="sm" tone="muted" weight="medium">{t("scan.newProduct")}</Text>
               <ProductSuggestionCard suggestion={suggestion} size="lg" />
               <CardDescription className="tabular-nums">{result.code}</CardDescription>
               {canManage ? (
@@ -236,18 +238,18 @@ export function ScanScreen({
             </Stack>
           ) : !result.productId ? (
             <Stack gap="md">
-              <div className="flex items-center gap-3">
+              <Inline gap="md" align="center">
                 <span className="grid size-11 place-items-center rounded-full bg-muted text-muted-foreground">
                   <CircleHelpIcon className="size-6" aria-hidden="true" />
                 </span>
-                <div className="flex flex-col">
+                <Stack gap="none">
                   <CardTitle>{autofill ? t("scan.notFoundTitle") : t("scan.unknownTitle")}</CardTitle>
                   <CardDescription className="tabular-nums">{result.code}</CardDescription>
-                </div>
-              </div>
+                </Stack>
+              </Inline>
               {canManage ? (
                 <>
-                  <p className="text-sm text-muted-foreground">{autofill ? t("scan.notFoundDescription") : t("scan.unknownDescription")}</p>
+                  <Text size="sm" tone="muted">{autofill ? t("scan.notFoundDescription") : t("scan.unknownDescription")}</Text>
                   <Button size="lg" className="h-12 w-full text-base sm:w-auto sm:self-start" onClick={() => setCreating(true)}>
                     <PlusIcon />
                     {t("scan.createProduct")}
@@ -260,7 +262,7 @@ export function ScanScreen({
             </Stack>
           ) : (
             <Stack gap="md">
-              <div className="flex items-center gap-3">
+              <Inline gap="md" align="center">
                 {shown?.imageUrl ? (
                   <img src={shown.imageUrl} alt="" referrerPolicy="no-referrer" className="size-14 shrink-0 rounded-lg border bg-white object-contain p-0.5" />
                 ) : (
@@ -268,7 +270,7 @@ export function ScanScreen({
                     {shown ? <ProductCategoryIcon category={shown.category} className="size-6" /> : <PackageSearchIcon className="size-6" aria-hidden="true" />}
                   </span>
                 )}
-                <div className="flex min-w-0 flex-col">
+                <Stack gap="none" className="min-w-0">
                   <CardTitle className="break-words">{shown?.name ?? result.stockItems[0]?.productName ?? result.code}</CardTitle>
                   {sharesStock && product && (
                     <CardDescription className="flex items-center gap-1.5 break-words">
@@ -277,17 +279,17 @@ export function ScanScreen({
                     </CardDescription>
                   )}
                   <CardDescription className="tabular-nums">{result.code}</CardDescription>
-                </div>
-              </div>
+                </Stack>
+              </Inline>
 
               {justAdded && justAdded === product?.id && result.stockItems.length === 0 && (
-                <p className="text-sm text-muted-foreground">{t("scan.whatNext")}</p>
+                <Text size="sm" tone="muted">{t("scan.whatNext")}</Text>
               )}
 
-              {needsChoice && <p className="text-sm font-medium">{t(mode === "use" ? "scan.chooseUse" : "scan.chooseAdd")}</p>}
+              {needsChoice && <Text size="sm" weight="medium">{t(mode === "use" ? "scan.chooseUse" : "scan.chooseAdd")}</Text>}
 
               {result.stockItems.length === 0 ? (
-                <p className="text-sm text-muted-foreground">{t("scan.notKept")}</p>
+                <Text size="sm" tone="muted">{t("scan.notKept")}</Text>
               ) : (
                 <ul className="divide-y rounded-lg border px-3">
                   {result.stockItems.map((item) => (
@@ -309,7 +311,7 @@ export function ScanScreen({
                 </ul>
               )}
 
-              <div className="flex flex-wrap gap-2">
+              <Inline gap="sm" align="stretch" wrap>
                 {canManage && product && result.stockItems.length === 0 && (
                   <Button className="h-11" onClick={() => setKeepFor(product.id)}>
                     <PlusIcon />
@@ -336,7 +338,7 @@ export function ScanScreen({
                     {t("scan.next")}
                   </Button>
                 )}
-              </div>
+              </Inline>
               {canManage && product && (
                 <StockItemFormDialog
                   products={[product]}

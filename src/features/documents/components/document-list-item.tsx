@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
@@ -43,8 +45,8 @@ export function DocumentListItem({ item, canManage, onAction, showPath = false }
   const pathLabel = path && (path.length ? path.map((crumb) => crumb.name).join(" / ") : t("page.title"));
 
   return (
-    <div
-      className="relative -mx-2 -my-1 flex min-w-0 items-center gap-3 rounded-lg px-2 py-1 transition-colors hover:bg-accent/40"
+    <Inline gap="md" align="center"
+      className="relative -mx-2 -my-1 min-w-0 rounded-lg px-2 py-1 transition-colors hover:bg-accent/40"
       aria-busy={opening || undefined}
       onContextMenu={(event) => {
         event.preventDefault();
@@ -58,7 +60,7 @@ export function DocumentListItem({ item, canManage, onAction, showPath = false }
       ) : (
         <FileTypeIcon mimeType={item.file.mimeType} name={item.file.name} size="sm" />
       )}
-      <div className="flex min-w-0 flex-1 flex-col">
+      <Stack gap="none" className="min-w-0 flex-1">
         {isFolder ? (
           <Link to={folderHref(item.folder.id)} className={overlay}>
             {name}
@@ -72,8 +74,8 @@ export function DocumentListItem({ item, canManage, onAction, showPath = false }
           {!isFolder && <DocumentStorageBadge file={item.file} />}
           <span className="truncate">{pathLabel ? `${t("list.in", { path: pathLabel })} · ${detail}` : detail}</span>
         </span>
-      </div>
+      </Stack>
       <DocumentItemMenu item={item} canManage={canManage} onAction={onAction} open={menuOpen} onOpenChange={setMenuOpen} />
-    </div>
+    </Inline>
   );
 }

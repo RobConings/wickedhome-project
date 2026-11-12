@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { LinkIcon, PlusIcon, UserMinusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -86,20 +89,20 @@ export function ProjectContactsPanel({ projectId, canManage, initialData, initia
   };
 
   const header = (
-    <div className="flex flex-col gap-1">
+    <Stack gap="xs">
       <CardTitle>{t("project.title")}</CardTitle>
       <CardDescription>{t("project.description")}</CardDescription>
-    </div>
+    </Stack>
   );
 
   if (state.status === "loading") {
     return (
       <Card>
         {header}
-        <div className="flex flex-col gap-2" role="status" aria-label={t("project.loading")}>
+        <Stack gap="sm"  role="status" aria-label={t("project.loading")}>
           <Skeleton className="h-14 rounded-xl" />
           <Skeleton className="h-14 rounded-xl" />
-        </div>
+        </Stack>
       </Card>
     );
   }
@@ -107,12 +110,12 @@ export function ProjectContactsPanel({ projectId, canManage, initialData, initia
     return (
       <Card>
         {header}
-        <div className="flex flex-col items-start gap-2 text-sm text-muted-foreground">
+        <Stack gap="sm" align="start" className="text-sm text-muted-foreground">
           {t("project.error")}
           <Button variant="outline" size="sm" fullOnMobile onClick={() => setReloads((value) => value + 1)}>
             {tCommon("actions.retry")}
           </Button>
-        </div>
+        </Stack>
       </Card>
     );
   }
@@ -170,21 +173,21 @@ export function ProjectContactsPanel({ projectId, canManage, initialData, initia
       {header}
       <PendingContent pending={refreshing} label={tCommon("loading.updating")}>
         {linked.length === 0 ? (
-          <p className="rounded-lg border border-dashed px-3 py-4 text-sm text-muted-foreground">{t("project.empty")}</p>
+          <Text size="sm" tone="muted" className="rounded-lg border border-dashed px-3 py-4">{t("project.empty")}</Text>
         ) : (
           <ul className="flex flex-col divide-y">
             {linked.map(({ contact, link }) => (
               <li key={contact.id} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
                 <ContactAvatar name={contact.name} size="md" />
-                <div className="flex min-w-0 flex-1 flex-col gap-2">
-                  <div className="flex min-w-0 flex-col">
+                <Stack gap="sm" className="min-w-0 flex-1">
+                  <Stack gap="none" className="min-w-0">
                     <ContactName contact={contact} className="font-medium break-words" />
                     {(link.role || contact.company) && (
                       <span className="text-sm break-words text-muted-foreground">{[link.role, contact.company].filter(Boolean).join(" · ")}</span>
                     )}
-                  </div>
+                  </Stack>
                   <ContactLinks contact={contact} />
-                </div>
+                </Stack>
                 {canManage && (
                   <ConfirmDialog
                     trigger={
@@ -213,7 +216,7 @@ export function ProjectContactsPanel({ projectId, canManage, initialData, initia
       </PendingContent>
 
       {canManage && (
-        <div className="flex flex-wrap gap-2">
+        <Inline gap="sm" align="stretch" wrap>
           <GeneralFormDialog<ContactActionResult>
             trigger={
               <Button variant="outline" size="sm" fullOnMobile>
@@ -255,7 +258,7 @@ export function ProjectContactsPanel({ projectId, canManage, initialData, initia
               </Button>
             }
           />
-        </div>
+        </Inline>
       )}
     </Card>
   );

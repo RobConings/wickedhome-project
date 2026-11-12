@@ -1,3 +1,6 @@
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { RecordLink } from "@/components/shared/record-link";
 import { HandCoinsIcon, HandshakeIcon, PencilIcon, PlusIcon, Trash2Icon, Undo2Icon } from "lucide-react";
@@ -105,7 +108,7 @@ export function ContributionsCard({ rows, plans, accounts, habitants, month, tod
       />
 
       {rows.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("contributions.none")}</p>
+        <Text size="sm" tone="muted">{t("contributions.none")}</Text>
       ) : (
         settlements.map((settlement) => (
           <section key={settlement.accountId} className="flex flex-col gap-3" aria-label={accountName(accounts, settlement.accountId)}>
@@ -257,7 +260,7 @@ function PersonRow({ person, habitant, name, personName, today, canManage, busy,
 
   return (
     <li className="flex flex-col gap-3 py-3">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+      <Inline gap="none" align="center" wrap className="gap-x-3 gap-y-2">
         <span className="flex min-w-[min(100%,12rem)] flex-1 items-center gap-2">
           {habitant && <HabitantAvatar habitant={habitant} size="sm" />}
           <span className="font-medium break-words">{name}</span>
@@ -265,21 +268,21 @@ function PersonRow({ person, habitant, name, personName, today, canManage, busy,
         <Badge variant={status.variant} className="h-auto max-w-full py-0.5 whitespace-normal">
           {status.label}
         </Badge>
-      </div>
+      </Inline>
 
       <dl className="grid gap-x-4 gap-y-1 text-sm sm:grid-cols-3">
-        <div className="flex items-baseline justify-between gap-2 sm:flex-col sm:justify-start sm:gap-0">
+        <Inline gap="sm" align="baseline" justify="between" className="sm:flex-col sm:justify-start sm:gap-0">
           <dt className="text-xs text-muted-foreground">{t("contributions.plannedLabel")}</dt>
           <dd className="tabular-nums">
             {person.plannedCents > 0 ? money(person.plannedCents) : t("contributions.noPlan")}
             {person.plannedDate && <span className="text-xs text-muted-foreground"> {t("contributions.plannedOn", { date: dateText(person.plannedDate) })}</span>}
           </dd>
-        </div>
-        <div className="flex items-baseline justify-between gap-2 sm:flex-col sm:justify-start sm:gap-0">
+        </Inline>
+        <Inline gap="sm" align="baseline" justify="between" className="sm:flex-col sm:justify-start sm:gap-0">
           <dt className="text-xs text-muted-foreground">{t("contributions.transferredLabel")}</dt>
           <dd className="font-semibold tabular-nums">{money(person.transferredCents)}</dd>
-        </div>
-        <div className="flex items-baseline justify-between gap-2 sm:flex-col sm:justify-start sm:gap-0">
+        </Inline>
+        <Inline gap="sm" align="baseline" justify="between" className="sm:flex-col sm:justify-start sm:gap-0">
           <dt className="text-xs text-muted-foreground">{t("contributions.differenceLabel")}</dt>
           <dd
             className={cn(
@@ -291,11 +294,11 @@ function PersonRow({ person, habitant, name, personName, today, canManage, busy,
           >
             {person.differenceCents === 0 ? money(0) : signedMoney(person.differenceCents)}
           </dd>
-        </div>
+        </Inline>
       </dl>
 
       {canManage && (person.status !== "done" || person.keptExtraCents > 0) && (
-        <div className="flex flex-wrap gap-2">
+        <Inline gap="sm" align="stretch" wrap>
           {person.status === "short" && (
             <Button size="sm" className={ACTION_BUTTON} onClick={onRecord}>
               {t("actions.record")}
@@ -317,11 +320,11 @@ function PersonRow({ person, habitant, name, personName, today, canManage, busy,
               {t("actions.unkeepExtra")}
             </Button>
           )}
-        </div>
+        </Inline>
       )}
 
       {person.entries.length === 0 ? (
-        <p className="text-xs text-muted-foreground">{t("contributions.noTransfers")}</p>
+        <Text size="xs" tone="muted">{t("contributions.noTransfers")}</Text>
       ) : (
         <details className="group text-sm">
           <summary className="min-h-10 cursor-pointer py-2 text-xs font-medium text-muted-foreground hover:text-foreground">
@@ -396,10 +399,10 @@ function SettlementSummary({ settlement, accountLabel, personName, canManage, on
     const only = netting.direct.length === 1 && first ? first : null;
     const [rest] = netting.steps;
     if (only && netting.steps.length === 0) {
-      nettingNode = <p>{t("settlement.nettingExact", { from: personName(only.fromHabitantId), to: personName(only.toHabitantId), amount: money(only.amountCents) })}</p>;
+      nettingNode = <Text>{t("settlement.nettingExact", { from: personName(only.fromHabitantId), to: personName(only.toHabitantId), amount: money(only.amountCents) })}</Text>;
     } else if (only && netting.steps.length === 1 && rest?.kind === "transfer" && rest.habitantId === only.fromHabitantId) {
       nettingNode = (
-        <p>
+        <Text>
           {t("settlement.nettingSimple", {
             from: personName(only.fromHabitantId),
             to: personName(only.toHabitantId),
@@ -407,12 +410,12 @@ function SettlementSummary({ settlement, accountLabel, personName, canManage, on
             rest: money(rest.amountCents),
             account: accountLabel,
           })}
-        </p>
+        </Text>
       );
     } else {
       nettingNode = (
-        <div className="flex flex-col gap-1">
-          <p>{t("settlement.nettingIntro")}</p>
+        <Stack gap="xs">
+          <Text>{t("settlement.nettingIntro")}</Text>
           <ul className="list-disc pl-5">
             {netting.direct.map((payment) => (
               <li key={`${payment.fromHabitantId}-${payment.toHabitantId}`}>
@@ -423,13 +426,13 @@ function SettlementSummary({ settlement, accountLabel, personName, canManage, on
               <li key={`${step.kind}-${step.habitantId}`}>{stepText(step, true)}</li>
             ))}
           </ul>
-        </div>
+        </Stack>
       );
     }
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border bg-muted/40 p-3 text-sm">
+    <Stack gap="3" className="rounded-lg border bg-muted/40 p-3 text-sm">
       <h4 className="font-semibold">{t("settlement.title")}</h4>
       <ul className="flex flex-col gap-1">
         {settlement.steps.map((step) => (
@@ -439,7 +442,7 @@ function SettlementSummary({ settlement, accountLabel, personName, canManage, on
         ))}
       </ul>
       {nettingNode && (
-        <div className="flex flex-col gap-2 text-muted-foreground">
+        <Stack gap="sm" className="text-muted-foreground">
           {nettingNode}
           {canManage &&
             netting?.direct.map((payment) => (
@@ -458,9 +461,9 @@ function SettlementSummary({ settlement, accountLabel, personName, canManage, on
                 onConfirm={() => onDirect(payment)}
               />
             ))}
-        </div>
+        </Stack>
       )}
-      {endPeople && <p className="font-medium break-words">{t("settlement.endResult", { people: endPeople, total, account: accountLabel })}</p>}
-    </div>
+      {endPeople && <Text weight="medium" className="break-words">{t("settlement.endResult", { people: endPeople, total, account: accountLabel })}</Text>}
+    </Stack>
   );
 }

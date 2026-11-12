@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -128,14 +130,14 @@ export function MailRulesDialog({ client, trigger }: { client: GoogleClient; tri
               <FormField label={t("google.rules.category")} htmlFor="mail-rule-category" errors={errors.category}>
                 <CategorySelect id="mail-rule-category" value={draft.category} onChange={(category) => setDraft({ ...draft, category })} />
               </FormField>
-              <div className="flex justify-end gap-2">
+              <Inline gap="sm" align="stretch" justify="end">
                 <Button type="button" variant="ghost" onClick={() => setDraft(null)}>
                   {tCommon("actions.cancel")}
                 </Button>
                 <Button type="submit" loading={saving}>
                   {tCommon("actions.save")}
                 </Button>
-              </div>
+              </Inline>
             </fieldset>
           </form>
         ) : rules === null ? (
@@ -143,7 +145,7 @@ export function MailRulesDialog({ client, trigger }: { client: GoogleClient; tri
         ) : rules === "error" ? (
           <ErrorState title={tCommon("errors.generic")} action={<Button variant="outline" onClick={load}>{tCommon("actions.retry")}</Button>} className="py-6" />
         ) : (
-          <div className="flex flex-col gap-3">
+          <Stack gap="3">
             <ul className="flex flex-col divide-y rounded-lg border">
               {rules.map((rule) => (
                 <li key={rule.id} className="flex items-center gap-3 p-2.5">
@@ -184,7 +186,7 @@ export function MailRulesDialog({ client, trigger }: { client: GoogleClient; tri
               <PlusIcon />
               {t("google.rules.add")}
             </Button>
-          </div>
+          </Stack>
         )}
       </DialogContent>
     </Dialog>

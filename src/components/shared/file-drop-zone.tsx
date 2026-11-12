@@ -70,6 +70,7 @@ export function FileDropZone({
       <input
         ref={inputRef}
         type="file"
+        aria-label={buttonLabel}
         accept={accept}
         multiple={multiple}
         disabled={disabled}

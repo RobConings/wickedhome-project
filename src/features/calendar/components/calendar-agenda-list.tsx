@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { BellIcon, CalendarDaysIcon, ChevronRightIcon, MapPinIcon, RepeatIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -176,7 +177,7 @@ export function CalendarAgendaList({
               )}
             </h3>
             {dayEntries.length === 0 ? (
-              <p className="rounded-xl border border-dashed px-3 py-2 text-xs text-muted-foreground">{t("agenda.nothing")}</p>
+              <Text size="xs" tone="muted" className="rounded-xl border border-dashed px-3 py-2">{t("agenda.nothing")}</Text>
             ) : (
               <ul className="flex flex-col divide-y overflow-hidden rounded-xl border bg-card">{dayRows(day, dayEntries)}</ul>
             )}

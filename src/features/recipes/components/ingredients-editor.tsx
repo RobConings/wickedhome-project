@@ -1,3 +1,8 @@
+import { FormField } from "@/components/shared/form-field";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { PageGrid } from "@/components/layout/page-grid";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { ArrowDownIcon, ArrowUpIcon, PackagePlusIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -73,9 +78,9 @@ export function IngredientsEditor({ id, name, value, onChange, products, shops, 
   };
 
   return (
-    <div id={id} className="flex flex-col gap-3">
+    <Stack gap="3" id={id}>
       <input type="hidden" name={name} value={JSON.stringify(draftsToInput(rows, products))} />
-      {rows.length === 0 && <p className="text-sm text-muted-foreground">{t("ingredients.none")}</p>}
+      {rows.length === 0 && <Text size="sm" tone="muted">{t("ingredients.none")}</Text>}
       <ol className="flex flex-col gap-3">
         {rows.map((row, index) => {
           const error = (field: string) => errorsFor?.(`${name}.${index}.${field}`);
@@ -83,7 +88,7 @@ export function IngredientsEditor({ id, name, value, onChange, products, shops, 
           const rowId = `${id ?? name}-${row.key}`;
           return (
             <li key={row.key} className={cn("flex flex-col gap-3 rounded-lg border bg-card p-3", nameErrors && "border-destructive")}>
-              <div className="flex flex-col gap-1.5">
+              <Stack gap="1.5">
                 <Label htmlFor={`${rowId}-product`}>{t("ingredients.product", { number: index + 1 })}</Label>
                 <ProductPicker
                   id={`${rowId}-product`}
@@ -95,8 +100,8 @@ export function IngredientsEditor({ id, name, value, onChange, products, shops, 
                   clearable
                   initialSelections={initialSelections}
                 />
-              </div>
-              <div className="flex flex-col gap-1.5">
+              </Stack>
+              <Stack gap="1.5">
                 <Label htmlFor={`${rowId}-name`}>{t("ingredients.name")}</Label>
                 <Input
                   id={`${rowId}-name`}
@@ -108,12 +113,11 @@ export function IngredientsEditor({ id, name, value, onChange, products, shops, 
                   aria-invalid={nameErrors ? true : undefined}
                   className="text-base sm:text-sm"
                 />
-                {nameErrors && <p className="text-sm text-destructive">{t("ingredients.nameRequired")}</p>}
-              </div>
+                {nameErrors && <Text size="sm" tone="danger">{t("ingredients.nameRequired")}</Text>}
+              </Stack>
               {/* Amount and unit belong together: one row, also on a phone. */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex min-w-0 flex-col gap-1.5">
-                  <Label htmlFor={`${rowId}-quantity`}>{t("ingredients.quantity")}</Label>
+              <PageGrid gap="3" className="grid-cols-2">
+                <FormField htmlFor={`${rowId}-quantity`} label={<>{t("ingredients.quantity")}</>} className="min-w-0">
                   <Input
                     id={`${rowId}-quantity`}
                     value={row.quantity}
@@ -124,8 +128,8 @@ export function IngredientsEditor({ id, name, value, onChange, products, shops, 
                     aria-invalid={error("quantity") ? true : undefined}
                     className="text-base sm:text-sm"
                   />
-                </div>
-                <div className="flex min-w-0 flex-col gap-1.5">
+                </FormField>
+                <Stack gap="1.5" className="min-w-0">
                   <Label htmlFor={`${rowId}-unit`}>{t("ingredients.unit")}</Label>
                   <UnitInput
                     id={`${rowId}-unit`}
@@ -136,10 +140,9 @@ export function IngredientsEditor({ id, name, value, onChange, products, shops, 
                     disabled={disabled}
                     className="text-base sm:text-sm"
                   />
-                </div>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor={`${rowId}-note`}>{t("ingredients.note")}</Label>
+                </Stack>
+              </PageGrid>
+              <FormField htmlFor={`${rowId}-note`} label={<>{t("ingredients.note")}</>}>
                 <Input
                   id={`${rowId}-note`}
                   value={row.note}
@@ -149,13 +152,13 @@ export function IngredientsEditor({ id, name, value, onChange, products, shops, 
                   disabled={disabled}
                   className="text-base sm:text-sm"
                 />
-              </div>
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              </FormField>
+              <Inline gap="sm" align="center" justify="between" wrap>
                 <label className="flex min-h-10 items-center gap-2 text-sm">
                   <Switch checked={row.optional} onCheckedChange={(optional) => update(row.key, { optional })} disabled={disabled} />
                   {t("ingredients.optional")}
                 </label>
-                <div className="flex items-center gap-1">
+                <Inline gap="xs" align="center">
                   <Button
                     type="button"
                     variant="ghost"
@@ -202,13 +205,13 @@ export function IngredientsEditor({ id, name, value, onChange, products, shops, 
                   >
                     <Trash2Icon />
                   </Button>
-                </div>
-              </div>
+                </Inline>
+              </Inline>
             </li>
           );
         })}
       </ol>
-      <div className="flex flex-col gap-2 sm:flex-row">
+      <Stack gap="sm" className="sm:flex-row">
         <Button
           type="button"
           variant="outline"
@@ -235,7 +238,7 @@ export function IngredientsEditor({ id, name, value, onChange, products, shops, 
             {t("ingredients.newProduct")}
           </Button>
         )}
-      </div>
+      </Stack>
       {/* Its form lives in a portal, but React still bubbles its submit to the recipe form: stop it here. */}
       {shops && (
         <div className="contents" onSubmit={(event) => event.stopPropagation()}>
@@ -250,6 +253,6 @@ export function IngredientsEditor({ id, name, value, onChange, products, shops, 
           />
         </div>
       )}
-    </div>
+    </Stack>
   );
 }

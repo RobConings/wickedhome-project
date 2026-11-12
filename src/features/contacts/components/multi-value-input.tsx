@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { PlusIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -45,14 +48,14 @@ export function MultiValueInput({
   const canAdd = rows.length < max && rows.every((row) => row.trim() !== "");
 
   return (
-    <div className="flex flex-col gap-2">
+    <Stack gap="sm">
       <input type="hidden" name={name} value={rows.map((row) => row.trim()).filter(Boolean).join("\n")} />
       {rows.map((row, index) => {
         const errors = errorsFor?.(index);
         const errorId = `${id}-${index}-error`;
         return (
-          <div key={index} className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
+          <Stack gap="xs" key={index}>
+            <Inline gap="sm" align="center">
               <Input
                 id={index === 0 ? id : `${id}-${index}`}
                 type={inputType}
@@ -80,13 +83,13 @@ export function MultiValueInput({
                   <XIcon />
                 </Button>
               )}
-            </div>
+            </Inline>
             {errors && (
-              <p id={errorId} className="text-sm text-destructive">
+              <Text size="sm" tone="danger" id={errorId}>
                 {errors.join(" ")}
-              </p>
+              </Text>
             )}
-          </div>
+          </Stack>
         );
       })}
       {canAdd && (
@@ -95,6 +98,6 @@ export function MultiValueInput({
           {t("multi.add")}
         </Button>
       )}
-    </div>
+    </Stack>
   );
 }

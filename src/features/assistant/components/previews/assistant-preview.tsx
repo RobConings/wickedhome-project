@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { MinusIcon, PencilIcon, PlusIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -58,7 +59,7 @@ export function AssistantPreview({ preview, edit, className }: { preview: Assist
   if (!renderer) return null;
   return (
     <div className={cn("flex flex-col gap-2 rounded-lg border bg-muted/40 p-2.5", className)}>
-      {preview.title && <p className="text-xs font-medium text-muted-foreground">{preview.title}</p>}
+      {preview.title && <Text size="xs" tone="muted" weight="medium">{preview.title}</Text>}
       <React.Suspense fallback={<div className="h-16 animate-pulse rounded-md bg-muted" />}>
         {React.createElement(renderer, { preview, edit })}
       </React.Suspense>

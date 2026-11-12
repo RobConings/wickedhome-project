@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import { LinkIcon, PackageCheckIcon, PlusIcon, ReceiptIcon, RepeatIcon, UnlinkIcon } from "lucide-react";
@@ -72,12 +75,12 @@ export function ProjectExpensesSection({
     void fetcher.submit({ intent: "unlink", id: projectId, kind, itemId }, { method: "post" });
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       {expenses.length === 0 && recurring.length === 0 ? (
-        <p className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-4 text-sm text-muted-foreground">
+        <Text size="sm" tone="muted" className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-4">
           <ReceiptIcon className="size-4 shrink-0" aria-hidden="true" />
           {t("expenses.empty")}
-        </p>
+        </Text>
       ) : (
         <ul className="divide-y rounded-lg border bg-card">
           {recurring.map((item) => (
@@ -98,7 +101,7 @@ export function ProjectExpensesSection({
             const overdue = !expense.paidOn && expense.dueDate < today;
             return (
               <li key={expense.id} className={cn("flex items-center gap-3 px-3 py-2.5", unlinking === expense.id && "opacity-50")}>
-                <div className="flex min-w-0 flex-1 flex-col">
+                <Stack gap="none" className="min-w-0 flex-1">
                   <Link to={`/expenses/${encodeURIComponent(expense.id)}`} className="truncate font-medium hover:underline">
                     {expense.payee}
                   </Link>
@@ -107,7 +110,7 @@ export function ProjectExpensesSection({
                     {expense.totalAmountCents !== undefined && expense.totalAmountCents !== expense.amountCents && <> · {t("expenses.shareOf", { amount: text.money(expense.totalAmountCents) })}</>}
                     {onInvoice(expense.id) > 0 && <> · {t("invoice.count", { count: onInvoice(expense.id) })}</>}
                   </span>
-                </div>
+                </Stack>
                 {!expense.paidOn && (
                   <Badge variant="outline" className={cn(overdue && "border-destructive/50 text-destructive")}>
                     {t("expenses.unpaid")}
@@ -137,7 +140,7 @@ export function ProjectExpensesSection({
       )}
 
       {canManage && (
-        <div className="flex flex-wrap gap-2">
+        <Inline gap="sm" align="stretch" wrap>
           {renderLogExpense?.({
             onSaved: offer,
             trigger: (
@@ -168,7 +171,7 @@ export function ProjectExpensesSection({
               </Button>
             }
           />
-        </div>
+        </Inline>
       )}
 
       {canManage && linking && (
@@ -182,6 +185,6 @@ export function ProjectExpensesSection({
           onOpenChange={(next) => !next && setLinkingId(null)}
         />
       )}
-    </div>
+    </Stack>
   );
 }

@@ -1,3 +1,7 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { PageGrid } from "@/components/layout/page-grid";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { CheckIcon, CompassIcon, NavigationIcon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -39,7 +43,7 @@ export function OrientationSection({ state, dispatch }: PanelProps) {
 
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-2.5 border-t pt-3">
-      <div className="flex items-center justify-between gap-2">
+      <Inline gap="sm" align="center" justify="between">
         <h3 id={headingId} className="flex min-w-0 items-center gap-1.5 text-xs font-semibold">
           <CompassIcon className="size-3.5 shrink-0" aria-hidden="true" />
           {t("orientation.title")}
@@ -50,13 +54,13 @@ export function OrientationSection({ state, dispatch }: PanelProps) {
             {t("orientation.clear")}
           </Button>
         )}
-      </div>
+      </Inline>
 
-      <div className="flex flex-col gap-1">
+      <Stack gap="xs">
         <label htmlFor={inputId} className="text-xs">
           {t("orientation.degrees")}
         </label>
-        <div className="flex items-center gap-1.5">
+        <Inline gap="1.5" align="center">
           <Input
             id={inputId}
             className="h-8 w-20"
@@ -75,14 +79,14 @@ export function OrientationSection({ state, dispatch }: PanelProps) {
           <span className="min-w-0 flex-1 text-xs text-muted-foreground" aria-live="polite">
             {facing ? t("orientation.topFacesValue", { direction: t(`orientation.names.${facing}`) }) : t("orientation.notSet")}
           </span>
-        </div>
-      </div>
+        </Inline>
+      </Stack>
 
-      <div className="flex flex-col gap-1">
+      <Stack gap="xs">
         <span id={`${headingId}-presets`} className="text-xs">
           {t("orientation.topFaces")}
         </span>
-        <div role="group" aria-labelledby={`${headingId}-presets`} className="grid grid-cols-4 gap-1">
+        <PageGrid gap="xs" role="group" aria-labelledby={`${headingId}-presets`} className="grid-cols-4">
           {COMPASS_POINTS.map((point, index) => {
             const value = northFromTopFacing(index * 45);
             const pressed = north !== null && Math.abs(north - value) < 0.05;
@@ -100,14 +104,14 @@ export function OrientationSection({ state, dispatch }: PanelProps) {
               </Button>
             );
           })}
-        </div>
-      </div>
+        </PageGrid>
+      </Stack>
 
       <Button type="button" size="xs" variant="secondary" className="self-start" onClick={() => dispatch({ type: "setTool", tool: "north" })}>
         <NavigationIcon />
         {t("orientation.pointNorth")}
       </Button>
-      <p className="text-xs text-muted-foreground">{t("orientation.hint")}</p>
+      <Text size="xs" tone="muted">{t("orientation.hint")}</Text>
     </section>
   );
 }
@@ -126,26 +130,26 @@ export function NorthToolContext({ state, dispatch, detail }: PanelProps & { det
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       <div className={cn("flex flex-col gap-1", detail)}>
-        <p className="text-sm font-semibold">{t("orientation.tool.title")}</p>
-        <p className="text-xs text-muted-foreground">
+        <Text size="sm" weight="semibold">{t("orientation.tool.title")}</Text>
+        <Text size="xs" tone="muted">
           {state.doc.underlay ? t("orientation.tool.hint") : t("orientation.tool.hintNoPlan")}
-        </p>
+        </Text>
       </div>
       {result !== null ? (
-        <p className="rounded-md bg-muted px-2 py-1.5 text-xs" aria-live="polite">
+        <Text size="xs" className="rounded-md bg-muted px-2 py-1.5" aria-live="polite">
           {t("orientation.tool.result", {
             degrees: Math.round(result),
             direction: t(`orientation.names.${compassPoint(topFacing(result))}`),
           })}
-        </p>
+        </Text>
       ) : (
-        <p className="rounded-md bg-muted px-2 py-1.5 text-xs" aria-live="polite">
+        <Text size="xs" className="rounded-md bg-muted px-2 py-1.5" aria-live="polite">
           {a ? t("orientation.tool.tip") : t("orientation.tool.tail")}
-        </p>
+        </Text>
       )}
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <Inline gap="sm" align="center" justify="between" wrap>
         <Button type="button" size="sm" variant="secondary" onClick={() => dispatch({ type: "setTool", tool: "select" })}>
           {t("orientation.tool.cancel")}
         </Button>
@@ -153,7 +157,7 @@ export function NorthToolContext({ state, dispatch, detail }: PanelProps & { det
           <CheckIcon />
           {t("orientation.tool.apply")}
         </Button>
-      </div>
-    </div>
+      </Inline>
+    </Stack>
   );
 }

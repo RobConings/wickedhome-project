@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { HardDriveIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -24,17 +26,17 @@ export function StorageUsageMeter({ usage, failed = false, onRetry, className }:
   const { t: tCommon } = useTranslation();
 
   const title = (
-    <div className="flex items-center gap-2 font-medium">
+    <Inline gap="sm" align="center" className="font-medium">
       <HardDriveIcon className="size-4 text-muted-foreground" aria-hidden="true" />
       {t("usage.title")}
-    </div>
+    </Inline>
   );
 
   if (!usage) {
     return failed ? (
       <div className={cn(cardClass, className)}>
         {title}
-        <p className="text-xs text-muted-foreground">{t("usage.failed")}</p>
+        <Text size="xs" tone="muted">{t("usage.failed")}</Text>
         {onRetry && (
           <Button variant="outline" size="sm" className="self-start" onClick={onRetry}>
             {tCommon("actions.retry")}
@@ -60,14 +62,14 @@ export function StorageUsageMeter({ usage, failed = false, onRetry, className }:
   return (
     <div className={cn(cardClass, className)}>
       {title}
-      <p>
+      <Text>
         <span className="font-semibold tabular-nums">{fileSize(usage.usedBytes)}</span>{" "}
         <span className="text-muted-foreground">{t("usage.files", { count: usage.fileCount })}</span>
-      </p>
+      </Text>
       {total !== null && free !== null && (
         <>
-          <div
-            className="flex h-2 overflow-hidden rounded-full bg-muted"
+          <Inline gap="none" align="stretch"
+            className="h-2 overflow-hidden rounded-full bg-muted"
             role="meter"
             aria-label={t("usage.disk")}
             aria-valuemin={0}
@@ -76,14 +78,14 @@ export function StorageUsageMeter({ usage, failed = false, onRetry, className }:
           >
             <div className="h-full bg-primary" style={{ width: `${Math.max(documentsShare * 100, usage.usedBytes ? 1 : 0)}%` }} />
             <div className="h-full bg-muted-foreground/40" style={{ width: `${otherShare * 100}%` }} />
-          </div>
-          <p className={cn("text-xs", lowSpace ? "font-medium text-destructive" : "text-muted-foreground")}>
+          </Inline>
+          <Text className={cn("text-xs", lowSpace ? "font-medium text-destructive" : "text-muted-foreground")}>
             {t("usage.free", { free: fileSize(free), total: fileSize(total) })}
-          </p>
+          </Text>
         </>
       )}
       {usage.trashBytes > 0 && (
-        <p className="text-xs text-muted-foreground">{t("usage.trash", { size: fileSize(usage.trashBytes) })}</p>
+        <Text size="xs" tone="muted">{t("usage.trash", { size: fileSize(usage.trashBytes) })}</Text>
       )}
     </div>
   );

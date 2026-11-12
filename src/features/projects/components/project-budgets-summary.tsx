@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { ArrowRightIcon, FolderKanbanIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -53,15 +56,15 @@ export function ProjectBudgetsSummary({ month, data }: ProjectBudgetsSummaryProp
 
   if (state.status === "loading") {
     return (
-      <div className="flex flex-col gap-3" role="status" aria-label={t("summary.loading")}>
+      <Stack gap="3"  role="status" aria-label={t("summary.loading")}>
         <Skeleton className="h-12 rounded-lg" />
         <Skeleton className="h-12 rounded-lg" />
-      </div>
+      </Stack>
     );
   }
   if (state.status === "error") {
     return (
-      <div className="flex flex-col items-start gap-2 text-sm text-muted-foreground">
+      <Stack gap="sm" align="start" className="text-sm text-muted-foreground">
         {t("summary.error")}
         <Button
           variant="outline"
@@ -73,14 +76,14 @@ export function ProjectBudgetsSummary({ month, data }: ProjectBudgetsSummaryProp
         >
           {tCommon("actions.retry")}
         </Button>
-      </div>
+      </Stack>
     );
   }
 
   const { projects, totals } = state.data;
   if (projects.length === 0) {
     return (
-      <div className="flex flex-col items-start gap-2 text-sm text-muted-foreground">
+      <Stack gap="sm" align="start" className="text-sm text-muted-foreground">
         <span className="flex items-center gap-2">
           <FolderKanbanIcon className="size-4" aria-hidden="true" />
           {t("summary.empty")}
@@ -91,38 +94,38 @@ export function ProjectBudgetsSummary({ month, data }: ProjectBudgetsSummaryProp
             <ArrowRightIcon />
           </Link>
         </Button>
-      </div>
+      </Stack>
     );
   }
 
   return (
     <PendingContent pending={refreshing} label={tCommon("loading.updating")}>
-      <div className="flex flex-col gap-4">
-        <p className="text-sm text-muted-foreground tabular-nums">
+      <Stack gap="md">
+        <Text size="sm" tone="muted" className="tabular-nums">
           {t("summary.totals", { paid: text.money(totals.spentInMonthCents), due: text.money(totals.dueInMonthCents) })}
           {totals.overBudget > 0 && <> · <span className="font-medium text-destructive">{t("summary.overBudget", { count: totals.overBudget })}</span></>}
           {totals.atRisk > 0 && <> · <span className="font-medium text-warning">{t("summary.atRisk", { count: totals.atRisk })}</span></>}
-        </p>
+        </Text>
         <ul className="flex flex-col gap-3">
           {projects.map(({ project, budget, spentInMonthCents, dueInMonthCents }) => (
             <li key={project.id} className="relative flex items-start gap-3">
               <ProjectAvatar project={project} size="sm" />
-              <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+              <Stack gap="1.5" className="min-w-0 flex-1">
+                <Inline gap="none" align="center" justify="between" wrap className="gap-x-2 gap-y-1">
                   <Link to={projectPath(project.id)} className="truncate font-medium outline-none after:absolute after:inset-0 focus-visible:underline">
                     {project.name}
                   </Link>
                   <ProjectBudgetBadge budget={budget} />
-                </div>
+                </Inline>
                 {budget.budgetCents !== null && <ProjectBudgetBar budget={budget} />}
                 <span className="text-xs text-muted-foreground tabular-nums">
                   {t("summary.month", { paid: text.money(spentInMonthCents), due: text.money(dueInMonthCents) })}
                 </span>
-              </div>
+              </Stack>
             </li>
           ))}
         </ul>
-      </div>
+      </Stack>
     </PendingContent>
   );
 }

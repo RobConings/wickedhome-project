@@ -1,3 +1,4 @@
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { ReceiptIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -35,7 +36,7 @@ export function ProjectPurchasesNote({ projectId, projectName, materials, render
   const itemIds = unlogged.map((material) => material.id).join(",");
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2.5 text-sm">
+    <Inline gap="md" align="center" justify="between" wrap className="rounded-lg border bg-muted/30 px-3 py-2.5 text-sm">
       <span className="text-muted-foreground">
         {t("purchases.unlogged", { count: unlogged.length, amount: text.money(totalCents) })}
       </span>
@@ -50,6 +51,6 @@ export function ProjectPurchasesNote({ projectId, projectName, materials, render
           </Button>
         ),
       })}
-    </div>
+    </Inline>
   );
 }

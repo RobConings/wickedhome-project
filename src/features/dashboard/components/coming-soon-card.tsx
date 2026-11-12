@@ -1,3 +1,4 @@
+import { Stack } from "@/components/layout/stack";
 import { BotIcon, HouseWifiIcon, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardHeader, CardTitle } from "@/components/shared/card";
@@ -21,10 +22,10 @@ export function ComingSoonCard() {
         {COMING.map(({ key, icon }) => (
           <li key={key} className="flex items-start gap-3">
             <IconChip icon={icon} tone="neutral" size="sm" />
-            <div className="flex min-w-0 flex-col gap-0.5">
+            <Stack gap="0.5" className="min-w-0">
               <span className="text-sm font-medium">{t(`comingSoon.${key}.title`)}</span>
               <span className="text-xs text-muted-foreground">{t(`comingSoon.${key}.description`)}</span>
-            </div>
+            </Stack>
           </li>
         ))}
       </ul>

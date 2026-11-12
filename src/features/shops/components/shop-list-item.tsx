@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import { ExternalLinkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
@@ -18,9 +20,9 @@ type ShopListItemProps = {
 export function ShopListItem({ shop, isFavorite, onToggleFavorite }: ShopListItemProps) {
   const { t } = useTranslation("shops");
   return (
-    <div className="flex items-center gap-3">
+    <Inline gap="md" align="center">
       <ShopLogo shop={shop} size="md" />
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
+      <Stack gap="xs" className="min-w-0 flex-1">
         <Link
           to={`/shops/${shop.id}`}
           className="truncate font-medium underline-offset-4 outline-none hover:underline focus-visible:underline"
@@ -28,7 +30,7 @@ export function ShopListItem({ shop, isFavorite, onToggleFavorite }: ShopListIte
           {shop.name}
         </Link>
         <ShopMarkers shop={shop} />
-      </div>
+      </Stack>
       {shop.websiteUrl && (
         <Button asChild variant="ghost" size="icon" className="text-muted-foreground">
           <a href={shop.websiteUrl} target="_blank" rel="noopener noreferrer" aria-label={t("actions.visitWebsite")} title={t("actions.visitWebsite")}>
@@ -41,6 +43,6 @@ export function ShopListItem({ shop, isFavorite, onToggleFavorite }: ShopListIte
         label={t(isFavorite ? "favorite.remove" : "favorite.add", { name: shop.name })}
         onToggle={() => onToggleFavorite(shop.id)}
       />
-    </div>
+    </Inline>
   );
 }

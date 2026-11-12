@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import { AlarmClockIcon, PartyPopperIcon, SparklesIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Progress } from "@/components/ui/progress";
@@ -34,17 +37,17 @@ export function TaskTodayProgress({ progress, overdue, openTotal, className }: T
         <span className="grid size-12 shrink-0 place-items-center rounded-full bg-success text-card">
           {everything ? <PartyPopperIcon className="size-6" aria-hidden="true" /> : <SparklesIcon className="size-6" aria-hidden="true" />}
         </span>
-        <div className="flex min-w-0 flex-col gap-0.5">
+        <Stack gap="0.5" className="min-w-0">
           <h2 className="text-lg font-semibold tracking-tight">{everything ? t("allDone.title") : t("allDone.todayTitle")}</h2>
-          <p className="text-sm text-muted-foreground">
+          <Text size="sm" tone="muted">
             {[
               progress.done > 0 ? t("allDone.doneToday", { count: progress.done }) : null,
               everything ? t("allDone.nothingLeft") : t("allDone.later", { count: later }),
             ]
               .filter(Boolean)
               .join(" ")}
-          </p>
-        </div>
+          </Text>
+        </Stack>
       </section>
     );
   }
@@ -52,7 +55,7 @@ export function TaskTodayProgress({ progress, overdue, openTotal, className }: T
   const percent = progress.total > 0 ? (progress.done / progress.total) * 100 : 0;
   return (
     <section aria-live="polite" className={cn("flex flex-col gap-2 rounded-2xl border bg-card px-4 py-3 shadow-xs", className)}>
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+      <Inline gap="none" align="baseline" justify="between" wrap className="gap-x-3 gap-y-1">
         <h2 className="text-base font-semibold">{t("progress.today", { done: progress.done, total: progress.total })}</h2>
         {overdue > 0 && (
           <span className="inline-flex items-center gap-1 text-sm font-medium text-danger">
@@ -60,9 +63,9 @@ export function TaskTodayProgress({ progress, overdue, openTotal, className }: T
             {t("progress.overdue", { count: overdue })}
           </span>
         )}
-      </div>
+      </Inline>
       <Progress value={percent} label={t("progress.today", { done: progress.done, total: progress.total })} />
-      {later > 0 && <p className="text-xs text-muted-foreground">{t("allDone.later", { count: later })}</p>}
+      {later > 0 && <Text size="xs" tone="muted">{t("allDone.later", { count: later })}</Text>}
     </section>
   );
 }

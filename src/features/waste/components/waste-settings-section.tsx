@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { PencilIcon, RefreshCwIcon, Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -60,10 +62,10 @@ export function WasteSettingsSection({ settings, defaults, canManage, today, hab
       <Card>
         <CardHeader className="items-center justify-start gap-3">
           <IconChip icon={Trash2Icon} tone="success" size="sm" />
-          <div className="flex flex-col gap-0.5">
+          <Stack gap="0.5">
             <CardTitle>{setup ? t("setup.changeTitle") : t("setup.title")}</CardTitle>
-            <p className="text-sm text-muted-foreground">{t("setup.description")}</p>
-          </div>
+            <Text size="sm" tone="muted">{t("setup.description")}</Text>
+          </Stack>
         </CardHeader>
         {canManage ? (
           <WasteSetupForm
@@ -75,7 +77,7 @@ export function WasteSettingsSection({ settings, defaults, canManage, today, hab
             onSaved={() => setEditing(false)}
           />
         ) : (
-          <p className="text-sm text-muted-foreground">{t("setup.readOnly")}</p>
+          <Text size="sm" tone="muted">{t("setup.readOnly")}</Text>
         )}
       </Card>
     );
@@ -85,10 +87,10 @@ export function WasteSettingsSection({ settings, defaults, canManage, today, hab
     <Card>
       <CardHeader className="items-center justify-start gap-3">
         <IconChip icon={Trash2Icon} tone="success" size="sm" />
-        <div className="flex min-w-0 flex-col gap-0.5">
+        <Stack gap="0.5" className="min-w-0">
           <CardTitle>{setup.providerName}</CardTitle>
-          <p className="text-sm text-muted-foreground">{setup.addressLabel}</p>
-        </div>
+          <Text size="sm" tone="muted">{setup.addressLabel}</Text>
+        </Stack>
       </CardHeader>
 
       {setup.lastSyncStatus === "error" ? (
@@ -97,22 +99,22 @@ export function WasteSettingsSection({ settings, defaults, canManage, today, hab
           {setup.lastSuccessAt ? t("sync.keptSince", { date: dateTime(setup.lastSuccessAt) }) : t("sync.nothingYet")}
         </InlineAlert>
       ) : (
-        <p className="text-sm text-muted-foreground">
+        <Text size="sm" tone="muted">
           {setup.lastSyncAt ? t("sync.lastSync", { date: dateTime(setup.lastSyncAt) }) : t("sync.never")} · {t("sync.daily")}
-        </p>
+        </Text>
       )}
 
       <PendingContent pending={syncing} label={t("sync.running")}>
         {settings.upcoming.length > 0 ? (
-          <div className="flex flex-col gap-1">
+          <Stack gap="xs">
             <h3 className="text-sm font-medium">{t("upcoming.title")}</h3>
             <WasteDayList days={settings.upcoming} today={today} />
-          </div>
+          </Stack>
         ) : (
-          <p className="text-sm text-muted-foreground">{t("upcoming.empty")}</p>
+          <Text size="sm" tone="muted">{t("upcoming.empty")}</Text>
         )}
       </PendingContent>
-      <p className="text-xs text-muted-foreground">{t("upcoming.calendar")}</p>
+      <Text size="xs" tone="muted">{t("upcoming.calendar")}</Text>
 
       <WasteTaskSettings settings={setup.tasks} habitants={habitants} canManage={canManage} />
 

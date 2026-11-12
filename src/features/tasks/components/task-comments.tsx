@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { PencilIcon, SendIcon, Trash2Icon, UserRoundIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -64,35 +67,35 @@ function CommentItem({
           <UserRoundIcon className="size-4" aria-hidden="true" />
         </span>
       )}
-      <div className="flex min-w-0 flex-1 flex-col gap-1 text-sm">
-        <p className="flex flex-wrap items-baseline gap-x-2">
+      <Stack gap="xs" className="min-w-0 flex-1 text-sm">
+        <Text className="flex flex-wrap items-baseline gap-x-2">
           <span className="font-medium">{comment.authorName ?? t("comments.formerMember")}</span>
           <span className="text-xs text-muted-foreground">
             {when}
             {comment.editedAt && ` · ${t("comments.edited")}`}
           </span>
-        </p>
+        </Text>
         {editing ? (
           <fetcher.Form method="post" action={action} className="flex flex-col gap-2">
             <input type="hidden" name="intent" value="comment-edit" />
             <input type="hidden" name="id" value={taskId} />
             <input type="hidden" name="commentId" value={comment.id} />
             <Textarea name="body" defaultValue={comment.body} rows={2} maxLength={2000} required aria-label={t("comments.edit")} autoFocus />
-            <div className="flex justify-end gap-2">
+            <Inline gap="sm" align="stretch" justify="end">
               <Button type="button" variant="ghost" size="sm" onClick={stopEditing} disabled={busy}>
                 {tCommon("actions.cancel")}
               </Button>
               <Button type="submit" size="sm" loading={busy}>
                 {tCommon("actions.save")}
               </Button>
-            </div>
+            </Inline>
           </fetcher.Form>
         ) : (
-          <p className="whitespace-pre-line break-words">{comment.body}</p>
+          <Text className="whitespace-pre-line break-words">{comment.body}</Text>
         )}
-      </div>
+      </Stack>
       {comment.mine && !editing && (
-        <div className="flex shrink-0 items-start">
+        <Inline gap="none" align="start" className="shrink-0">
           <Button variant="ghost" size="icon-sm" aria-label={t("comments.edit")} onClick={() => setEditing(true)} disabled={busy}>
             <PencilIcon />
           </Button>
@@ -110,7 +113,7 @@ function CommentItem({
               fetcher.submit({ intent: "comment-delete", id: taskId, commentId: comment.id }, { method: "post", ...(action && { action }) })
             }
           />
-        </div>
+        </Inline>
       )}
     </li>
   );
@@ -130,9 +133,9 @@ export function TaskComments({ taskId, comments, habitants, action = "/tasks", o
   const pendingBody = busy && fetcher.formData?.get("intent") === "comment-add" ? String(fetcher.formData.get("body") ?? "") : null;
 
   return (
-    <div className="flex flex-col gap-4">
+    <Stack gap="md">
       {comments.length === 0 && !pendingBody ? (
-        <p className="text-sm text-muted-foreground">{t("comments.empty")}</p>
+        <Text size="sm" tone="muted">{t("comments.empty")}</Text>
       ) : (
         <ol className="flex flex-col gap-4">
           {comments.map((comment) => (
@@ -141,7 +144,7 @@ export function TaskComments({ taskId, comments, habitants, action = "/tasks", o
           {pendingBody && (
             <li className="flex gap-3 opacity-60" aria-busy="true">
               <span className="size-7 shrink-0 rounded-full bg-muted" />
-              <p className="text-sm whitespace-pre-line">{pendingBody}</p>
+              <Text size="sm" className="whitespace-pre-line">{pendingBody}</Text>
             </li>
           )}
         </ol>
@@ -163,6 +166,6 @@ export function TaskComments({ taskId, comments, habitants, action = "/tasks", o
           <SendIcon />
         </Button>
       </fetcher.Form>
-    </div>
+    </Stack>
   );
 }

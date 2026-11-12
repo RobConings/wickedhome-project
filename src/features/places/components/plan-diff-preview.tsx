@@ -1,3 +1,5 @@
+import { Text } from "@/components/ui/text";
+import { Stack } from "@/components/layout/stack";
 import { useTranslation } from "react-i18next";
 import type { AssistantPreviewRendererProps } from "@/features/assistant";
 import { cn } from "@/lib/utils";
@@ -14,11 +16,11 @@ import { PlanCompass } from "./plan-compass";
 export default function PlanDiffPreview({ preview }: AssistantPreviewRendererProps) {
   const { t } = useTranslation("places");
   const parsed = planDiffDataSchema.safeParse(preview.data);
-  if (!parsed.success) return <p className="text-sm text-muted-foreground">{t("planDiff.invalid")}</p>;
+  if (!parsed.success) return <Text size="sm" tone="muted">{t("planDiff.invalid")}</Text>;
   const data = parsed.data;
   const states = new Set<PlanDiffState>([...data.rooms, ...data.walls, ...data.openings, ...(data.markers ?? [])].map((item) => item.state));
   return (
-    <div className="flex min-w-0 flex-col gap-2">
+    <Stack gap="sm" className="min-w-0">
       <div className="relative">
         <PlanDiffDrawing data={data} label={t("planDiff.label", { floor: data.floor })} />
         {data.north !== null && <PlanCompass north={data.north} size="sm" className="absolute top-0 right-0" />}
@@ -33,7 +35,7 @@ export default function PlanDiffPreview({ preview }: AssistantPreviewRendererPro
             </li>
           ))}
       </ul>
-    </div>
+    </Stack>
   );
 }
 

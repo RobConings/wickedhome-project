@@ -1,3 +1,4 @@
+import { PageGrid } from "@/components/layout/page-grid";
 import { AlarmClockIcon, CircleUserRoundIcon, ListTodoIcon, PackageIcon, PlayIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { StatTile } from "@/components/shared/stat-tile";
@@ -21,7 +22,7 @@ export function TaskStats({ tasks, today, currentHabitantId }: TaskStatsProps) {
   const mine = currentHabitantId ? open.filter((task) => onDutyIds(task).includes(currentHabitantId)).length : null;
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <PageGrid gap="3" className="sm:grid-cols-2 lg:grid-cols-4">
       {mine !== null ? (
         <StatTile label={t("stats.mine")} value={mine} hint={t("stats.openTotal", { count: open.length })} icon={CircleUserRoundIcon} tone="featured" />
       ) : (
@@ -36,6 +37,6 @@ export function TaskStats({ tasks, today, currentHabitantId }: TaskStatsProps) {
       />
       <StatTile label={t("stats.ready")} value={ready} icon={PlayIcon} tone={ready > 0 ? "positive" : "default"} />
       <StatTile label={t("stats.waiting")} value={waiting} icon={PackageIcon} tone={waiting > 0 ? "warning" : "default"} />
-    </div>
+    </PageGrid>
   );
 }

@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import { useTranslation } from "react-i18next";
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency } from "@/lib/format";
@@ -31,13 +32,13 @@ export function TotalOpenProgressBar({ progress, variant = "compact", className 
   return (
     <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
       <Progress value={percent} label={t("totalOpen.progressLabel", { percent })} className={variant === "compact" ? "h-1.5" : undefined} />
-      <p className={cn("text-muted-foreground tabular-nums", variant === "compact" ? "text-xs" : "text-sm")}>{parts.join(" · ")}</p>
+      <Text className={cn("text-muted-foreground tabular-nums", variant === "compact" ? "text-xs" : "text-sm")}>{parts.join(" · ")}</Text>
       {variant === "full" && !paidOff && progress.lastAmountCents !== null && progress.paymentsLeft > 0 && (
-        <p className="text-xs text-muted-foreground">
+        <Text size="xs" tone="muted">
           {t("totalOpen.since", { date: date(progress.asOf), paid: formatCurrency(progress.paidCents, locale) })}
           {" · "}
           {t("totalOpen.lastAmount", { amount: formatCurrency(progress.lastAmountCents, locale) })}
-        </p>
+        </Text>
       )}
     </div>
   );

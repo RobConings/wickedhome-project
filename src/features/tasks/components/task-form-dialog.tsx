@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import type { GeneralFormField, GeneralFormValues } from "@/components/shared/general-form";
@@ -270,7 +273,7 @@ export function TaskFormDialog({
       bare: true,
       hidden: linked,
       render: ({ name, value, setValue }) => (
-        <div className="flex flex-col gap-2">
+        <Stack gap="sm">
           <span className="text-sm font-medium">{t("fields.priority")}</span>
           <SegmentedControl<TaskPriority>
             name={name}
@@ -281,7 +284,7 @@ export function TaskFormDialog({
             onChange={setValue}
             className="self-start"
           />
-        </div>
+        </Stack>
       ),
     },
     {
@@ -351,13 +354,13 @@ export function TaskFormDialog({
       }}
       intro={
         linked && task ? (
-          <div className="flex flex-col gap-2 rounded-lg border bg-muted/30 p-3 text-sm">
-            <div className="flex flex-wrap items-center gap-2">
+          <Stack gap="sm" className="rounded-lg border bg-muted/30 p-3 text-sm">
+            <Inline gap="sm" align="center" wrap>
               <TaskOriginBadge task={task} full />
               <span className="font-medium">{task.title}</span>
-            </div>
-            <p className="text-muted-foreground">{t("linked.formHint")}</p>
-          </div>
+            </Inline>
+            <Text tone="muted">{t("linked.formHint")}</Text>
+          </Stack>
         ) : undefined
       }
       defaultValues={{

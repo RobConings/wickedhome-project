@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import { RecordLink } from "@/components/shared/record-link";
 import * as React from "react";
 import { PencilIcon, SunIcon, Trash2Icon } from "lucide-react";
@@ -44,13 +46,13 @@ export function SolarInstallationCard({ installation, canManage, linkName = true
         <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-highlight text-highlight-foreground">
           <SunIcon className="size-5" aria-hidden="true" />
         </span>
-        <div className="flex min-w-0 flex-col">
+        <Stack gap="none" className="min-w-0">
           <CardTitle className="break-words">{linkName ? <RecordLink to={`/energy/solar/${encodeURIComponent(installation.id)}`}>{installation.name}</RecordLink> : installation.name}</CardTitle>
-          <p className="text-sm text-muted-foreground">
+          <Text size="sm" tone="muted">
             {t("solar.panels", { count: installation.panelCount, wp: installation.panelWp })}
-          </p>
-        </div>
-        <p className="ml-auto text-xl font-semibold">{formatKwp(installation.kwp, locale)}</p>
+          </Text>
+        </Stack>
+        <Text size="xl" weight="semibold" className="ml-auto">{formatKwp(installation.kwp, locale)}</Text>
       </CardHeader>
 
       <DescriptionList>

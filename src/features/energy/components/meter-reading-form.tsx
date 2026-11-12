@@ -1,3 +1,6 @@
+import { CardHeading } from "@/components/shared/card";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -5,7 +8,7 @@ import { useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
+import { Card, CardHeader } from "@/components/shared/card";
 import { GeneralForm, type GeneralFormField, type GeneralFormValues } from "@/components/shared/general-form";
 import { currentLocale } from "@/lib/i18n";
 import { formatDate } from "@/types/date-format";
@@ -117,8 +120,7 @@ export function MeterReadingForm({ readings, appliances, now, canManage, default
   return (
     <Card>
       <CardHeader className="flex-col gap-1">
-        <CardTitle>{t("readings.title")}</CardTitle>
-        <CardDescription>{t("readings.description")}</CardDescription>
+        <CardHeading title={<>{t("readings.title")}</>} description={<>{t("readings.description")}</>} />
       </CardHeader>
 
       {canManage && (
@@ -137,17 +139,17 @@ export function MeterReadingForm({ readings, appliances, now, canManage, default
         />
       )}
 
-      <div className="flex flex-col gap-2 border-t pt-4">
+      <Stack gap="sm" className="border-t pt-4">
         <h3 className="text-sm font-medium">{historyLabel ?? t("readings.recent")}</h3>
         {readings.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t("readings.empty")}</p>
+          <Text size="sm" tone="muted">{t("readings.empty")}</Text>
         ) : (
           <ul className="flex flex-col divide-y text-sm">
             {readings.map((reading) => {
               const when = zonedDateTime(reading.readAt);
               return (
                 <li key={reading.id} className="flex items-center gap-3 py-2">
-                  <div className="flex min-w-0 flex-1 flex-col">
+                  <Stack gap="none" className="min-w-0 flex-1">
                     <span className="truncate">
                       {reading.applianceName ?? (reading.carrier === "gas" ? t("readingMeters.gas") : t(`kinds.${reading.kind}`))}
                       {reading.carrier === "electricity" &&
@@ -157,7 +159,7 @@ export function MeterReadingForm({ readings, appliances, now, canManage, default
                     <span className="text-xs text-muted-foreground">
                       {formatDate(when.date, locale)} · {when.time}
                     </span>
-                  </div>
+                  </Stack>
                   <span className="flex flex-col items-end">
                     <span className="font-medium tabular-nums">
                       {reading.valueLitres !== null ? formatM3(reading.valueLitres, locale) : formatKwh(reading.valueWh, locale)}
@@ -184,7 +186,7 @@ export function MeterReadingForm({ readings, appliances, now, canManage, default
             })}
           </ul>
         )}
-      </div>
+      </Stack>
     </Card>
   );
 }

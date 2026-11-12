@@ -1,3 +1,7 @@
+import { FormField } from "@/components/shared/form-field";
+import { Stack } from "@/components/layout/stack";
+import { PageGrid } from "@/components/layout/page-grid";
+import { Inline } from "@/components/layout/inline";
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -19,19 +23,17 @@ export function ProfileFieldsEditor({ draft, onChange, disabled }: ProfileFields
   const set = (index: number, change: Partial<DeviceField>) => onChange(updateField(draft, index, change));
 
   return (
-    <div className="flex flex-col gap-3">
+    <Stack gap="3">
       <ol className="flex flex-col gap-3">
         {draft.fields.map((field, index) => {
           const id = `field-${index}`;
           return (
             <li key={index} className="flex flex-col gap-3 rounded-lg border bg-background/50 p-3">
-              <div className="grid gap-3 sm:grid-cols-[1fr_9rem_9rem_6rem]">
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor={`${id}-label`}>{t("editor.fields.label")}</Label>
+              <PageGrid gap="3" className="sm:grid-cols-[1fr_9rem_9rem_6rem]">
+                <FormField htmlFor={`${id}-label`} label={<>{t("editor.fields.label")}</>}>
                   <Input id={`${id}-label`} value={field.label} maxLength={60} disabled={disabled} onChange={(event) => set(index, { label: event.target.value })} />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor={`${id}-key`}>{t("editor.fields.key")}</Label>
+                </FormField>
+                <FormField htmlFor={`${id}-key`} label={<>{t("editor.fields.key")}</>}>
                   <Input
                     id={`${id}-key`}
                     value={field.key}
@@ -41,8 +43,8 @@ export function ProfileFieldsEditor({ draft, onChange, disabled }: ProfileFields
                     spellCheck={false}
                     onChange={(event) => set(index, { key: event.target.value.replace(/[^a-zA-Z0-9_]/g, "") })}
                   />
-                </div>
-                <div className="flex flex-col gap-1.5">
+                </FormField>
+                <Stack gap="1.5">
                   <Label htmlFor={`${id}-type`}>{t("editor.fields.type")}</Label>
                   <Select value={field.type} onValueChange={(type) => set(index, { type: type as FieldType })} disabled={disabled}>
                     <SelectTrigger id={`${id}-type`} className="w-full">
@@ -56,35 +58,32 @@ export function ProfileFieldsEditor({ draft, onChange, disabled }: ProfileFields
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
+                </Stack>
                 {field.type === "number" ? (
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor={`${id}-unit`}>{t("editor.fields.unit")}</Label>
+                  <FormField htmlFor={`${id}-unit`} label={<>{t("editor.fields.unit")}</>}>
                     <Input id={`${id}-unit`} value={field.unit ?? ""} maxLength={12} placeholder="°C" disabled={disabled} onChange={(event) => set(index, { unit: event.target.value || null })} />
-                  </div>
+                  </FormField>
                 ) : (
                   <span />
                 )}
-              </div>
+              </PageGrid>
 
               {field.type === "boolean" && (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor={`${id}-true`}>{t("editor.fields.trueLabel")}</Label>
+                <PageGrid gap="3" className="sm:grid-cols-2">
+                  <FormField htmlFor={`${id}-true`} label={<>{t("editor.fields.trueLabel")}</>}>
                     <Input id={`${id}-true`} value={field.trueLabel ?? ""} placeholder={t("value.yes")} maxLength={60} disabled={disabled} onChange={(event) => set(index, { trueLabel: event.target.value || null })} />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor={`${id}-false`}>{t("editor.fields.falseLabel")}</Label>
+                  </FormField>
+                  <FormField htmlFor={`${id}-false`} label={<>{t("editor.fields.falseLabel")}</>}>
                     <Input id={`${id}-false`} value={field.falseLabel ?? ""} placeholder={t("value.no")} maxLength={60} disabled={disabled} onChange={(event) => set(index, { falseLabel: event.target.value || null })} />
-                  </div>
-                </div>
+                  </FormField>
+                </PageGrid>
               )}
 
               {field.type === "choice" && (
                 <fieldset className="flex flex-col gap-2">
                   <legend className="mb-1 text-sm font-medium">{t("editor.fields.choices")}</legend>
                   {(field.choices ?? []).map((choice, choiceIndex) => (
-                    <div key={choiceIndex} className="flex items-center gap-2">
+                    <Inline gap="sm" align="center" key={choiceIndex}>
                       <Input
                         aria-label={t("editor.fields.choiceValue")}
                         value={choice.value}
@@ -116,7 +115,7 @@ export function ProfileFieldsEditor({ draft, onChange, disabled }: ProfileFields
                       >
                         <XIcon />
                       </Button>
-                    </div>
+                    </Inline>
                   ))}
                   <Button
                     type="button"
@@ -135,7 +134,7 @@ export function ProfileFieldsEditor({ draft, onChange, disabled }: ProfileFields
                 </fieldset>
               )}
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <Inline gap="sm" align="center" justify="between" wrap>
                 <label className="flex items-center gap-2 text-sm">
                   <input
                     type="radio"
@@ -147,7 +146,7 @@ export function ProfileFieldsEditor({ draft, onChange, disabled }: ProfileFields
                   />
                   {t("editor.fields.primary")}
                 </label>
-                <div className="flex gap-1">
+                <Inline gap="xs" align="stretch">
                   <Button type="button" size="icon" variant="ghost" disabled={disabled || index === 0} aria-label={t("editor.moveUp")} onClick={() => onChange({ ...draft, fields: moveItem(draft.fields, index, -1) })}>
                     <ArrowUpIcon />
                   </Button>
@@ -157,8 +156,8 @@ export function ProfileFieldsEditor({ draft, onChange, disabled }: ProfileFields
                   <Button type="button" size="icon" variant="ghost" disabled={disabled || draft.fields.length <= 1} aria-label={t("editor.fields.remove")} onClick={() => onChange(removeField(draft, index))}>
                     <Trash2Icon />
                   </Button>
-                </div>
-              </div>
+                </Inline>
+              </Inline>
             </li>
           );
         })}
@@ -167,6 +166,6 @@ export function ProfileFieldsEditor({ draft, onChange, disabled }: ProfileFields
         <PlusIcon />
         {t("editor.fields.add")}
       </Button>
-    </div>
+    </Stack>
   );
 }

@@ -1,3 +1,5 @@
+import { PageGrid } from "@/components/layout/page-grid";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
@@ -103,7 +105,7 @@ export function PaymentDetailsFields({
               autoComplete="off"
             />
           </FormField>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[2fr_1fr]">
+          <PageGrid gap="md" className="sm:grid-cols-[2fr_1fr]">
             <FormField
               label={t("fields.iban")}
               htmlFor={`${idPrefix}-iban`}
@@ -136,7 +138,7 @@ export function PaymentDetailsFields({
                 className="font-mono uppercase"
               />
             </FormField>
-          </div>
+          </PageGrid>
           <FormField
             label={t("fields.communication")}
             htmlFor={`${idPrefix}-communication`}
@@ -148,7 +150,7 @@ export function PaymentDetailsFields({
                 : undefined
             }
           >
-            <div className="flex flex-col gap-2">
+            <Stack gap="sm">
               <SegmentedControl
                 size="sm"
                 label={t("fields.communication")}
@@ -181,7 +183,7 @@ export function PaymentDetailsFields({
                   autoComplete="off"
                 />
               )}
-            </div>
+            </Stack>
           </FormField>
         </>
       )}

@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -38,16 +40,16 @@ export function ProductSuggestionCard({ suggestion, size = "lg", className }: Pr
           <ProductCategoryIcon category={suggestion.category ?? "other"} className={large ? "size-10" : "size-6"} />
         </span>
       )}
-      <div className="flex min-w-0 flex-col gap-1">
-        <p className={cn("font-semibold leading-tight break-words", large ? "text-lg" : "text-base")}>{suggestion.name}</p>
-        {details && <p className={cn("text-muted-foreground break-words", large ? "text-base" : "text-sm")}>{details}</p>}
+      <Stack gap="xs" className="min-w-0">
+        <Text className={cn("font-semibold leading-tight break-words", large ? "text-lg" : "text-base")}>{suggestion.name}</Text>
+        {details && <Text className={cn("text-muted-foreground break-words", large ? "text-base" : "text-sm")}>{details}</Text>}
         {suggestion.category && (
-          <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Text size="sm" tone="muted" className="flex items-center gap-1.5">
             <ProductCategoryIcon category={suggestion.category} className="size-4" />
             {t(`categories.${suggestion.category}`)}
-          </p>
+          </Text>
         )}
-      </div>
+      </Stack>
     </div>
   );
 }

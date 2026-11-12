@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { useFetcher, useFetchers } from "react-router";
@@ -33,14 +35,14 @@ export function TaskChecklist({ task, canToggle }: TaskChecklistProps) {
   const disabled = !canToggle || task.status !== "open";
 
   return (
-    <div className="flex flex-col gap-3">
-      <p className="text-sm text-muted-foreground">{t("checklist.progress", { done: doneCount, total: task.checklist.length })}</p>
+    <Stack gap="3">
+      <Text size="sm" tone="muted">{t("checklist.progress", { done: doneCount, total: task.checklist.length })}</Text>
       <ul className="flex flex-col gap-1">
         {task.checklist.map((item) => (
           <ChecklistRow key={item.id} taskId={task.id} item={item} disabled={disabled} />
         ))}
       </ul>
-    </div>
+    </Stack>
   );
 }
 

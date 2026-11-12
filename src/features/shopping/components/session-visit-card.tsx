@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { ArrowUpRightIcon, ShoppingCartIcon } from "lucide-react";
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
@@ -20,8 +22,8 @@ export function SessionVisitCard({ visit, shops }: { visit: SessionSummary; shop
       className="group block min-w-0 rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-section/50"
     >
       <Card tone={active ? "featured" : "default"} className="h-full gap-3 p-4 transition-[border-color,box-shadow,transform] group-hover:border-section group-hover:shadow-md group-active:translate-y-px sm:p-5">
-        <div className="flex min-w-0 items-start gap-3">
-          <div className="flex min-w-0 shrink-0 items-center -space-x-2">
+        <Inline gap="md" align="start" className="min-w-0">
+          <Inline gap="none" align="center" className="min-w-0 shrink-0 -space-x-2">
             {visitShops.length ? visitShops.slice(0, 3).map((shop) => (
               <ShopLogo key={shop.id} shop={shop} size="md" className="ring-2 ring-card" />
             )) : (
@@ -34,22 +36,22 @@ export function SessionVisitCard({ visit, shops }: { visit: SessionSummary; shop
                 +{visitShops.length - 3}
               </span>
             )}
-          </div>
+          </Inline>
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
+            <Inline gap="sm" align="center" wrap>
               <h3 className="min-w-0 break-words font-semibold leading-snug group-hover:text-section">{sessionDisplayName(visit.name, visit.startedAt)}</h3>
               <Badge variant={active ? "success" : "neutral"}>{t(`sessions.${visit.status}`)}</Badge>
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">
+            </Inline>
+            <Text size="xs" tone="muted" className="mt-1">
               {formatDate(visit.startedAt, currentLocale())}
               {visitShops.length > 0 && <> · {visitShops.map((shop) => shop.name).join(" · ")}</>}
-            </p>
+            </Text>
           </div>
           <ArrowUpRightIcon className="size-5 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-section" aria-hidden="true" />
-        </div>
-        <div className="flex items-center justify-end text-sm font-medium text-section">
+        </Inline>
+        <Inline gap="none" align="center" justify="end" className="text-sm font-medium text-section">
           {t(active ? "sessions.continue" : "sessions.viewSession")}
-        </div>
+        </Inline>
       </Card>
     </Link>
   );

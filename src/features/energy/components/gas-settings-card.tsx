@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import { FlameIcon, PencilIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,7 @@ export function GasSettingsCard({ settings, canManage }: GasSettingsCardProps) {
           {formatCalorific(settings.gasCalorificKwhPerM3, currentLocale())}
         </DescriptionItem>
       </DescriptionList>
-      <p className="text-sm text-muted-foreground">{t("gas.calorificExplained")}</p>
+      <Text size="sm" tone="muted">{t("gas.calorificExplained")}</Text>
       {canManage && (
         <CardFooter className="justify-end border-t pt-3">
           <GasSettingsFormDialog

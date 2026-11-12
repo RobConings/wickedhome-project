@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import type * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -44,7 +45,7 @@ export function SolarInstallationFormDialog({ installation, trigger }: SolarInst
       bare: true,
       when: (values) => kwpOf(values) > 0,
       render: ({ values }) => (
-        <p className="-mt-2 text-sm text-muted-foreground">{t("solar.total", { kwp: formatKwp(kwpOf(values), currentLocale()) })}</p>
+        <Text size="sm" tone="muted" className="-mt-2">{t("solar.total", { kwp: formatKwp(kwpOf(values), currentLocale()) })}</Text>
       ),
     },
     {

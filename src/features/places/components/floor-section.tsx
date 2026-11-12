@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import * as React from "react";
 import { MapIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
@@ -38,20 +41,20 @@ export function FloorSection({ floor, places, canManage }: FloorSectionProps) {
   return (
     <Card className={deleting ? "opacity-50" : undefined} aria-busy={deleting || undefined} aria-labelledby={`floor-${floor.id}`}>
       <CardHeader className="flex-wrap items-center">
-        <div className="flex min-w-0 flex-col gap-1.5">
+        <Stack gap="1.5" className="min-w-0">
           <CardTitle id={`floor-${floor.id}`} className="truncate text-lg">
             {floor.name}
           </CardTitle>
-          <div className="flex flex-wrap gap-1.5">
+          <Inline gap="1.5" align="stretch" wrap>
             <Badge variant="secondary" className="font-normal">
               {floor.kind === "outdoor" ? t("floorKinds.outdoor") : t("floor.level", { level: floor.level })}
             </Badge>
             <Badge variant="outline" className="font-normal text-muted-foreground">
               {t("floor.drawnCount", { drawn, count: places.length })}
             </Badge>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-1">
+          </Inline>
+        </Stack>
+        <Inline gap="xs" align="center" wrap>
           <Button asChild variant="outline" size="sm">
             <Link to={`/places/floors/${floor.id}/plan`}>
               <MapIcon />
@@ -103,11 +106,11 @@ export function FloorSection({ floor, places, canManage }: FloorSectionProps) {
               )}
             </>
           )}
-        </div>
+        </Inline>
       </CardHeader>
 
       {places.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t(`list.empty.${floor.kind}`)}</p>
+        <Text size="sm" tone="muted">{t(`list.empty.${floor.kind}`)}</Text>
       ) : (
         <ul className="-mx-2.5 grid grid-cols-1 gap-x-4 sm:grid-cols-2">
           {places.map((place) => (

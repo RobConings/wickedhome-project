@@ -1,3 +1,8 @@
+import { FormField } from "@/components/shared/form-field";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
+import { PageGrid } from "@/components/layout/page-grid";
 import * as React from "react";
 import { MoonIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -32,22 +37,21 @@ export function QuietHoursFields({ value, onChange, disabled = false }: QuietHou
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border p-3">
-      <div className="flex items-start gap-3">
+    <Stack gap="3" className="rounded-lg border p-3">
+      <Inline gap="md" align="start">
         <MoonIcon className="mt-0.5 size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
         <div className="min-w-0 flex-1">
           <Label htmlFor={`${id}-on`} className="font-medium">
             {t("quiet.enabled")}
           </Label>
-          <p className="text-sm text-muted-foreground">{t("quiet.description")}</p>
+          <Text size="sm" tone="muted">{t("quiet.description")}</Text>
         </div>
         <Switch id={`${id}-on`} checked={value.enabled} onCheckedChange={(enabled) => onChange({ ...value, enabled })} disabled={disabled} />
-      </div>
+      </Inline>
       {value.enabled && (
-        <div className="grid grid-cols-2 gap-3 sm:max-w-sm">
+        <PageGrid gap="3" className="grid-cols-2 sm:max-w-sm">
           {(["start", "end"] as const).map((field) => (
-            <div key={field} className="flex flex-col gap-1.5">
-              <Label htmlFor={`${id}-${field}`}>{t(field === "start" ? "quiet.from" : "quiet.to")}</Label>
+            <FormField htmlFor={`${id}-${field}`} label={<>{t(field === "start" ? "quiet.from" : "quiet.to")}</>} key={field}>
               <Input
                 id={`${id}-${field}`}
                 type="time"
@@ -58,10 +62,10 @@ export function QuietHoursFields({ value, onChange, disabled = false }: QuietHou
                 onChange={(event) => setDraft((current) => ({ ...current, [field]: event.target.value }))}
                 onBlur={() => commit(field)}
               />
-            </div>
+            </FormField>
           ))}
-        </div>
+        </PageGrid>
       )}
-    </div>
+    </Stack>
   );
 }

@@ -1,16 +1,19 @@
+import { SessionItemForm } from "../components/session-item-form";
+import { PageGrid } from "@/components/layout/page-grid";
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import { useShoppingSort } from "../data/use-shopping-sort";
 import { ShoppingSortField } from "../components/shopping-sort-field";
 import { ShoppingNavigation } from "../components/shopping-navigation";
 import { formatCurrency } from "@/lib/format";
-import { CheckIcon, PackageIcon, PlusIcon, ShoppingBagIcon, ShoppingCartIcon, SlidersHorizontalIcon, Trash2Icon } from "lucide-react";
-import { RecordImage } from "@/components/shared/record-image";
+import { PlusIcon, ShoppingBagIcon, ShoppingCartIcon, SlidersHorizontalIcon, Trash2Icon } from "lucide-react";
 import { RecordProgress } from "@/components/shared/record-progress";
 import { RecordLink } from "@/components/shared/record-link";
 import { SessionExtraDialog } from "../components/session-extra-dialog";
 import { ProductFormDialog } from "../components/product-form-dialog";
 import { SessionStartCard } from "../components/session-start-card";
 import { SessionVisitCard } from "../components/session-visit-card";
-import { SessionItemAdjustDialog } from "../components/session-item-adjust-dialog";
 import { ShoppingNeedSections } from "../components/shopping-need-sections";
 import { ShoppingStockFilterField } from "../components/shopping-stock-filter";
 import { visitRequirements } from "../types/shopping-product-rows";
@@ -181,7 +184,7 @@ export function SessionsScreen({
         actions={!session ? (
           canManage && <Button onClick={() => setStartOpen(true)}><PlusIcon />{t("sessions.startShopping")}</Button>
         ) : active && (
-          <div className="grid w-full min-w-0 grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:justify-center xl:justify-end">
+          <PageGrid gap="sm" className="w-full min-w-0 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:justify-center xl:justify-end">
             {!session.participants.some((participant) => participant.userId === user?.id) && (
               <Button disabled={busy} variant="outline" onClick={() => void perform(() => joinSession(session.id))}>{t("sessions.join")}</Button>
             )}
@@ -205,7 +208,7 @@ export function SessionsScreen({
                 await navigate("/shopping/sessions");
               })}
             />}
-          </div>
+          </PageGrid>
         )}
       />
       {!session && <ShoppingNavigation />}
@@ -217,30 +220,30 @@ export function SessionsScreen({
           skipped: session.items.filter((item) => item.status === "skipped").length,
         })} />}
       {!session ? (
-        <div className="flex min-w-0 flex-col gap-4">
+        <Stack gap="md" className="min-w-0">
           {activeSessions.length > 0 && (
             <section className="space-y-2" aria-labelledby="active-sessions">
-              <div className="flex items-baseline justify-between gap-3">
+              <Inline gap="md" align="baseline" justify="between">
                 <h2 id="active-sessions" className="text-lg font-semibold">{t("sessions.activeSessions")}</h2>
                 <Badge variant="section">{activeSessions.length}</Badge>
-              </div>
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              </Inline>
+              <PageGrid gap="3" className="md:grid-cols-2 xl:grid-cols-3">
                 {activeSessions.map((visit) => <SessionVisitCard key={visit.id} visit={visit} shops={shopping.shops} />)}
-              </div>
+              </PageGrid>
             </section>
           )}
           {pastSessions.length > 0 && (
             <section className="space-y-2" aria-labelledby="past-sessions">
               <h2 id="past-sessions" className="text-lg font-semibold">{t("sessions.pastSessions")}</h2>
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              <PageGrid gap="3" className="md:grid-cols-2 xl:grid-cols-3">
                 {pastSessions.map((visit) => <SessionVisitCard key={visit.id} visit={visit} shops={shopping.shops} />)}
-              </div>
+              </PageGrid>
             </section>
           )}
           {sessions.length === 0 && (
             <Card tone="section" className="p-5">
-              <p className="font-medium">{t("sessions.noHistory")}</p>
-              <p className="text-sm text-muted-foreground">{t("sessions.simpleDescription")}</p>
+              <Text weight="medium">{t("sessions.noHistory")}</Text>
+              <Text size="sm" tone="muted">{t("sessions.simpleDescription")}</Text>
             </Card>
           )}
           {canManage && (
@@ -291,7 +294,7 @@ export function SessionsScreen({
                 />
                 <CategoryOrder order={order} onChange={change} />
                 <ShoppingStockFilterField value={stockFilter} onChange={setStockFilter} />
-                <div className="space-y-4">
+                <Stack gap="md">
                   {groupChecklistItems(open, sort, order, locale).map((group) => (
                     <fieldset key={group.key}>
                       <legend className="font-medium">
@@ -334,7 +337,7 @@ export function SessionsScreen({
                       </ShoppingNeedSections>
                     </fieldset>
                   ))}
-                </div>
+                </Stack>
                 <Button disabled={busy} type="submit">
                   {t("sessions.start", {
                     count: selected.filter((id) =>
@@ -347,14 +350,14 @@ export function SessionsScreen({
             </details>
           )}
 
-        </div>
+        </Stack>
       ) : (
         <RecordWorkspaceTabs
           details={
-            <div className="flex min-w-0 flex-col gap-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold">{t("sessions.checklist")} · {session.items.filter((item) => item.status === "open").length}</p>
-                <div className="flex flex-wrap items-center gap-2">
+            <Stack gap="3" className="min-w-0">
+              <Inline gap="sm" align="center" justify="between" wrap>
+                <Text size="sm" weight="semibold">{t("sessions.checklist")} · {session.items.filter((item) => item.status === "open").length}</Text>
+                <Inline gap="sm" align="center" wrap>
                   {(active || (canManage && session.purchases.some((purchase) => purchase.receipts.length > 0))) && (
                     <SessionExtraDialog products={shopping.products} disabled={busy} />
                   )}
@@ -375,11 +378,11 @@ export function SessionsScreen({
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent align="end" className="max-h-[75dvh] w-80 max-w-[calc(100vw-2rem)] space-y-3 overflow-y-auto">
-                      <div className="space-y-1">
+                      <Stack gap="xs">
                         <label className="text-sm font-medium">{t("shopView.sort.label")}</label>
                         <ShoppingSortField value={sort} onChange={changeSort} />
-                      </div>
-                      <div className="space-y-1">
+                      </Stack>
+                      <Stack gap="xs">
                         <label className="text-sm font-medium">{t("stockFilter.label")}</label>
                         <Select value={stockFilter} onValueChange={(value) => setStockFilter(value as ShoppingStockFilter)}>
                           <SelectTrigger className="w-full" aria-label={t("stockFilter.label")}><SelectValue /></SelectTrigger>
@@ -387,17 +390,17 @@ export function SessionsScreen({
                             {SHOPPING_STOCK_FILTERS.map((option) => <SelectItem key={option} value={option}>{t("stockFilter." + option)}</SelectItem>)}
                           </SelectContent>
                         </Select>
-                      </div>
+                      </Stack>
                       <CategoryOrder order={order} onChange={change} />
                     </PopoverContent>
                   </Popover>
-                </div>
-              </div>
-              {active && <p className="px-1 text-xs text-muted-foreground">{t("sessions.optionalSuggestions")}</p>}
+                </Inline>
+              </Inline>
+              {active && <Text size="xs" tone="muted" className="px-1">{t("sessions.optionalSuggestions")}</Text>}
               {!active && (
                 <Card tone="section" className="gap-1 p-3">
                   <CardTitle>{t("sessions.finishedTitle")}</CardTitle>
-                  <p className="text-sm text-muted-foreground">{t("sessions.finishedHint")}</p>
+                  <Text size="sm" tone="muted">{t("sessions.finishedHint")}</Text>
                 </Card>
               )}
               {groupChecklistItems(session.items.filter((item) => item.status === "open" && matchesStockFilter(item, stockFilter)), sort, order, locale).map((group) => (
@@ -405,60 +408,60 @@ export function SessionsScreen({
                   {sort === "category" && (
                     <h3 className="px-1 text-sm font-semibold">{t("categories." + group.key)}</h3>
                   )}
-                  <div className="overflow-hidden rounded-xl border bg-card">
+                  <Card className="gap-0 overflow-hidden p-0">
                     <ShoppingNeedSections grouped={sort === "category"} items={group.items}>
                       {(items) => items.map(renderItem)}
                     </ShoppingNeedSections>
-                  </div>
+                  </Card>
                 </section>
               ))}
               {session.items.every((item) => item.status !== "open") && (
-                <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">{t("sessions.noOpenItems")}</p>
+                <Text size="sm" tone="muted" className="rounded-xl border border-dashed p-4">{t("sessions.noOpenItems")}</Text>
               )}
               {session.items.some((item) => item.status === "open") &&
                 !session.items.some((item) => item.status === "open" && matchesStockFilter(item, stockFilter)) && (
-                  <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">{t("shopView.filters.noResults")}</p>
+                  <Text size="sm" tone="muted" className="rounded-xl border border-dashed p-4">{t("shopView.filters.noResults")}</Text>
                 )}
               {(["bought", "skipped"] as const).map((status) => {
                 const items = session.items.filter((item) => item.status === status);
                 return items.length > 0 && (
                   <details key={status} data-item-status={status} className="rounded-xl border bg-card p-3">
                     <summary className="min-h-10 cursor-pointer py-2 font-medium">{t("sessions.item_" + status)} ({items.length})</summary>
-                    <div className="divide-y border-t">
+                    <Stack gap="none" className="divide-y border-t">
                       {items.slice().sort((a, b) => a.name.localeCompare(b.name, locale)).map(renderItem)}
-                    </div>
+                    </Stack>
                   </details>
                 );
               })}
-            </div>
+            </Stack>
           }
           overview={
-            <div className="flex min-w-0 flex-col gap-3">
+            <Stack gap="3" className="min-w-0">
               {!session.purchases.length && (
                 <Card className="p-4">
-                  <p className="font-medium">{t("sessions.noPurchases")}</p>
-                  <p className="text-sm text-muted-foreground">{t("sessions.stockHint")}</p>
+                  <Text weight="medium">{t("sessions.noPurchases")}</Text>
+                  <Text size="sm" tone="muted">{t("sessions.stockHint")}</Text>
                 </Card>
               )}
           {session.purchases.map((purchase) => (
             <Card key={purchase.id} className="space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-2"><CardTitle>{t("sessions.purchase")}</CardTitle><Button asChild variant="outline"><RecordLink to={`/purchases/${purchase.id}`}><ShoppingBagIcon />{t("sessions.openPurchase")}</RecordLink></Button></div>
-              <p className="text-sm text-muted-foreground">
+              <Inline gap="sm" align="center" justify="between" wrap><CardTitle>{t("sessions.purchase")}</CardTitle><Button asChild variant="outline"><RecordLink to={`/purchases/${purchase.id}`}><ShoppingBagIcon />{t("sessions.openPurchase")}</RecordLink></Button></Inline>
+              <Text size="sm" tone="muted">
                 {t("sessions.stockHint")}
-              </p>
+              </Text>
               {purchase.lines.map((line) => (
-                <p className="text-sm" key={line.id}>
+                <Text size="sm"  key={line.id}>
                   {line.name} · {line.purchasedQuantity ?? line.quantity} {line.purchasedQuantity != null ? line.purchasedUnit : line.unit} ·{" "}
                   {t(
                     line.stockAdded
                       ? "sessions.stockCredited"
                       : "sessions.untracked",
                   )}
-                </p>
+                </Text>
               ))}
               {purchase.receipts.map((receipt) => (
-                <div
-                  className="space-y-3 rounded-lg border p-3"
+                <Stack gap="3"
+                  className="rounded-lg border p-3"
                   key={receipt.id}
                 >
                   <a
@@ -473,7 +476,7 @@ export function SessionsScreen({
                   >
                     {receipt.filename}
                   </a>
-                  <p className="text-sm">
+                  <Text size="sm">
                     {
                       shopping.shops.find((shop) => shop.id === receipt.shopId)
                         ?.name
@@ -482,7 +485,7 @@ export function SessionsScreen({
                     {receipt.totalCents !== null
                       ? ` · ${formatCurrency(receipt.totalCents, locale)}`
                       : ""}
-                  </p>
+                  </Text>
                   {canManage && (
                     <details className="space-y-3">
                       <summary className="min-h-11 cursor-pointer py-3 text-sm">
@@ -616,7 +619,7 @@ export function SessionsScreen({
                       </form>
                     </details>
                   )}
-                </div>
+                </Stack>
               ))}
               {canManage && (
                 <details className="space-y-3">
@@ -707,7 +710,7 @@ export function SessionsScreen({
               )}
             </Card>
           ))}
-            </div>
+            </Stack>
           }
           detailsLabel={t("sessions.checklist")}
           overviewLabel={t("sessions.purchasesTab")}
@@ -715,146 +718,5 @@ export function SessionsScreen({
         />
       )}
     </PageContainer>
-  );
-}
-
-function SessionItemForm({
-  item,
-  session,
-  shopping,
-  disabled,
-  onChange,
-}: {
-  item: SessionItem;
-  session: SessionView;
-  shopping: ShoppingPageData;
-  disabled: boolean;
-  onChange: (
-    input: Omit<
-      Parameters<typeof updateSessionItem>[2],
-      "revision" | "operationId"
-    >,
-  ) => Promise<void>;
-}) {
-  const { t } = useTranslation("shopping");
-  const [adjusting, setAdjusting] = React.useState<SessionItem | null>(null);
-  const product = shopping.products.find(
-    (product) => product.id === item.productId,
-  );
-  const stocks = session.stockOptions.filter(
-    (stock) => stock.productId === (product?.stockProductId ?? item.productId),
-  );
-  // A linked packaging variant may not have its own photo; retain its canonical product image.
-  const imageUrl = product?.imageUrl ?? shopping.products.find((candidate) =>
-    (candidate.stockProductId ?? candidate.id) === (product?.stockProductId ?? item.productId) && candidate.imageUrl,
-  )?.imageUrl;
-  const values = (form: HTMLFormElement) => ({
-    quantity: item.quantity,
-    stockItemId: field(form, "stockItemId") || undefined,
-  });
-  return (
-    <>
-    <form
-      className="min-w-0 border-b border-border/70 px-3 py-2.5 last:border-b-0"
-      onSubmit={(event) => {
-        event.preventDefault();
-        const form = event.currentTarget;
-        void onChange({
-          ...values(form),
-          status: "bought",
-          purchasedQuantity: Number(field(form, "purchasedQuantity")),
-        });
-      }}
-    >
-      <div className="flex min-w-0 flex-wrap items-center gap-2.5">
-        <RecordImage src={imageUrl} alt="" shape="avatar" fit="contain"
-          fallback={<PackageIcon className="size-5 text-section" aria-hidden="true" />}
-          className="size-11 shrink-0 rounded-lg" />
-        <div className="min-w-32 flex-1">
-          <p className="break-words text-sm font-semibold leading-snug">{item.name}</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            {item.purchasedQuantity}/{item.quantity} {item.unit} · {t(
-              "sessions.item_" + item.status,
-            )}
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-1.5 sm:ml-auto">
-          {item.status !== "bought" && (
-            <Button disabled={disabled} size="sm" className="min-h-10 sm:min-h-9" type="submit">
-              <CheckIcon />{t("sessions.buy")}
-            </Button>
-          )}
-          {item.status !== "bought" && (
-            <Button disabled={disabled} size="sm" variant="outline" className="min-h-10 sm:min-h-9"
-              type="button" onClick={() => void onChange({ status: item.status === "skipped" ? "open" : "skipped" })}>
-              {t(item.status === "skipped" ? "planning.restore" : "planning.skip")}
-            </Button>
-          )}
-          {item.status === "bought" && <Badge variant="success"><CheckIcon />{t("sessions.item_bought")}</Badge>}
-          <Button disabled={disabled} size="sm" variant="ghost" className="min-h-10 sm:min-h-9"
-            type="button" onClick={() => setAdjusting(item)}>{t("sessions.adjust")}</Button>
-        </div>
-      </div>
-      <details className="mt-2 rounded-lg bg-muted/30 px-2">
-        <summary className="min-h-9 cursor-pointer py-2 text-xs text-muted-foreground">
-          {t("sessions.purchaseDetails")}
-        </summary>
-        <fieldset disabled={disabled} className="grid gap-3 sm:grid-cols-3">
-          <label className="text-sm">
-            {t("sessions.boughtQuantity")}
-            <Input
-              key={`quantity:${item.revision}`}
-              name="purchasedQuantity"
-              type="number"
-              min="0.001"
-              step="0.001"
-              defaultValue={Math.max(item.quantity, item.purchasedQuantity)}
-            />
-          </label>
-          {stocks.length > 0 && (
-            <label className="text-sm">
-              {t("sessions.stockLocation")}
-              <select
-                key={`stock:${item.revision}`}
-                name="stockItemId"
-                className={selectClass}
-                defaultValue={
-                  item.stockItemId ?? (stocks.length === 1 ? stocks[0]!.id : "")
-                }
-              >
-                <option value="">{t("sessions.chooseLocation")}</option>
-                {stocks.map((stock) => (
-                  <option key={stock.id} value={stock.id}>
-                    {stock.placeName} · {stock.unit}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
-        </fieldset>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            disabled={disabled}
-            variant="outline"
-            type="button"
-            onClick={(event) =>
-              void onChange({ stockItemId: values(event.currentTarget.form!).stockItemId })
-            }
-          >
-            {t("sessions.saveLocation")}
-          </Button>
-          <Button
-            disabled={disabled}
-            variant="ghost"
-            type="button"
-            onClick={() => void onChange({ remove: true })}
-          >
-            {t("sessions.remove")}
-          </Button>{" "}
-        </div>
-      </details>
-    </form>
-      {adjusting && <SessionItemAdjustDialog item={adjusting} products={shopping.products} open onOpenChange={(open) => { if (!open) setAdjusting(null); }} />}
-    </>
   );
 }

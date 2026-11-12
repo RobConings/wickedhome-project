@@ -1,3 +1,5 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { CpuIcon, HouseIcon, PlusIcon, SlidersHorizontalIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -78,7 +80,7 @@ export function DevicesScreen({ devices: loaded, profiles, places, appliances, c
   );
 
   const filters = (
-    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap" role="group" aria-label={t("filters.label")}>
+    <Stack gap="sm" className="sm:flex-row sm:flex-wrap" role="group" aria-label={t("filters.label")}>
       <Select value={category} onValueChange={(value) => setFilter("category", value)}>
         <SelectTrigger className="w-full sm:w-48" aria-label={t("filters.category")}>
           <SelectValue />
@@ -106,7 +108,7 @@ export function DevicesScreen({ devices: loaded, profiles, places, appliances, c
           ))}
         </SelectContent>
       </Select>
-    </div>
+    </Stack>
   );
 
   return (
@@ -115,7 +117,7 @@ export function DevicesScreen({ devices: loaded, profiles, places, appliances, c
         title={t("page.title")}
         description={t("page.description")}
         actions={
-          <div className="flex flex-wrap items-center gap-2">
+          <Inline gap="sm" align="center" wrap>
             {live && <LiveStatusBadge />}
             <Button asChild variant="outline">
               <Link to="/house">
@@ -130,7 +132,7 @@ export function DevicesScreen({ devices: loaded, profiles, places, appliances, c
               </Link>
             </Button>
             {addButton}
-          </div>
+          </Inline>
         }
       />
 

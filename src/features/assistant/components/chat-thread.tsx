@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { BotIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -55,18 +58,18 @@ export function ChatThread({ items, busy, onDecide, onRetry, suggestions, onSugg
     return (
       <div className={cn("flex flex-1 flex-col items-center justify-center gap-4 px-2 py-8 text-center", className)}>
         <BotIcon className="size-10 text-muted-foreground" aria-hidden />
-        <div className="flex flex-col gap-1">
+        <Stack gap="xs">
           <h2 className="text-lg font-semibold">{t("chat.emptyTitle")}</h2>
-          <p className="max-w-sm text-sm text-muted-foreground text-pretty">{t("chat.emptyDescription")}</p>
-        </div>
+          <Text size="sm" tone="muted" className="max-w-sm text-pretty">{t("chat.emptyDescription")}</Text>
+        </Stack>
         {onSuggestion && (
-          <div className="flex max-w-md flex-wrap justify-center gap-2">
+          <Inline gap="sm" align="stretch" justify="center" wrap className="max-w-md">
             {list.map((text) => (
               <Button key={text} type="button" variant="outline" size="sm" className="h-auto min-h-10 whitespace-normal" onClick={() => onSuggestion(text)}>
                 {text}
               </Button>
             ))}
-          </div>
+          </Inline>
         )}
       </div>
     );
@@ -135,14 +138,14 @@ export function ChatThread({ items, busy, onDecide, onRetry, suggestions, onSugg
         }
       })}
       {thinking && (
-        <div className="flex items-center gap-2 px-1 text-sm text-muted-foreground">
+        <Inline gap="sm" align="center" className="px-1 text-sm text-muted-foreground">
           <span className="flex gap-1" aria-hidden>
             <span className="size-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.3s]" />
             <span className="size-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.15s]" />
             <span className="size-1.5 animate-bounce rounded-full bg-current" />
           </span>
           {last?.kind === "status" ? t(`chat.status.${last.code}`) : t("chat.thinking")}
-        </div>
+        </Inline>
       )}
       <div ref={end} />
     </div>

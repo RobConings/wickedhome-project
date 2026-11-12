@@ -1,3 +1,5 @@
+import { PageGrid } from "@/components/layout/page-grid";
+import { Text } from "@/components/ui/text";
 import { ArrowDownIcon, ArrowRightIcon, BatteryChargingIcon, FlameIcon, HouseIcon, SunIcon, UtilityPoleIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
@@ -31,15 +33,15 @@ export function EnergyNetwork({ summary }: { summary: EnergySummary }) {
   ] : [];
   return <Card>
     <CardHeader><div><CardTitle>{t("network.title")}</CardTitle><CardDescription>{t("network.description")}</CardDescription></div></CardHeader>
-    <div className="grid min-w-0 gap-3 rounded-2xl bg-section-soft/40 p-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] md:items-center">
+    <PageGrid gap="3" className="min-w-0 rounded-2xl bg-section-soft/40 p-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] md:items-center">
       <ul className="flex min-w-0 flex-col gap-2">{sourceNodes.map((node) => <li key={node.id} className="flex min-w-0 items-center gap-3 rounded-xl border bg-card p-3">
-        <IconChip icon={node.icon} tone="energy" size="sm" /><div className="min-w-0"><p className="break-words text-sm text-muted-foreground">{node.label}</p><p className="break-words font-semibold tabular-nums">{value(node.wh)}</p></div>
+        <IconChip icon={node.icon} tone="energy" size="sm" /><div className="min-w-0"><Text size="sm" tone="muted" className="break-words">{node.label}</Text><Text weight="semibold" className="break-words tabular-nums">{value(node.wh)}</Text></div>
       </li>)}</ul>
       <ArrowDownIcon className="mx-auto size-5 text-section md:hidden" aria-hidden="true" /><ArrowRightIcon className="hidden size-5 text-section md:block" aria-hidden="true" />
-      <div className="min-w-0 rounded-xl border border-section-border bg-card p-4 text-center"><HouseIcon className="mx-auto mb-2 size-8 text-section" aria-hidden="true" /><p className="break-words font-semibold">{t("network.home")}</p><p className="break-words text-xl font-semibold tabular-nums">{value(totals.consumptionWh)}</p><p className="mt-1 text-xs text-muted-foreground">{t("network.recorded")}</p></div>
-      {destinations.length > 0 && <><ArrowDownIcon className="mx-auto size-5 text-section md:hidden" aria-hidden="true" /><ArrowRightIcon className="hidden size-5 text-section md:block" aria-hidden="true" /><ul className="flex min-w-0 flex-col gap-2">{destinations.map((node) => <li key={node.id} className="min-w-0 rounded-xl border bg-card p-3"><p className="break-words text-sm text-muted-foreground">{node.label}</p><p className="break-words font-semibold tabular-nums">{value(node.wh)}</p></li>)}</ul></>}
-    </div>
-    {status.channels && <details className="rounded-xl border p-3"><summary className="min-h-11 cursor-pointer py-2 font-medium">{t("network.sources")}</summary><p className="mb-3 text-sm text-muted-foreground">{t("network.coverageHint")}</p><ul className="divide-y">{status.channels.filter((channel) => carrier === "total" || channel.carrier === carrier).map((channel) => <li key={`${channel.carrier}:${channel.kind}`} className="py-2 text-sm"><p className="font-medium">{t(`carriers.${channel.carrier}`)} · {t(`kinds.${channel.kind}`)}</p><p className="break-words text-muted-foreground">{channel.sources.map((source) => t(`sources.${source}`)).join(" · ")} · {t("network.coverage", { count: channel.buckets, total: summary.series.length })}</p></li>)}</ul></details>}
+      <div className="min-w-0 rounded-xl border border-section-border bg-card p-4 text-center"><HouseIcon className="mx-auto mb-2 size-8 text-section" aria-hidden="true" /><Text weight="semibold" className="break-words">{t("network.home")}</Text><Text size="xl" weight="semibold" className="break-words tabular-nums">{value(totals.consumptionWh)}</Text><Text size="xs" tone="muted" className="mt-1">{t("network.recorded")}</Text></div>
+      {destinations.length > 0 && <><ArrowDownIcon className="mx-auto size-5 text-section md:hidden" aria-hidden="true" /><ArrowRightIcon className="hidden size-5 text-section md:block" aria-hidden="true" /><ul className="flex min-w-0 flex-col gap-2">{destinations.map((node) => <li key={node.id} className="min-w-0 rounded-xl border bg-card p-3"><Text size="sm" tone="muted" className="break-words">{node.label}</Text><Text weight="semibold" className="break-words tabular-nums">{value(node.wh)}</Text></li>)}</ul></>}
+    </PageGrid>
+    {status.channels && <details className="rounded-xl border p-3"><summary className="min-h-11 cursor-pointer py-2 font-medium">{t("network.sources")}</summary><Text size="sm" tone="muted" className="mb-3">{t("network.coverageHint")}</Text><ul className="divide-y">{status.channels.filter((channel) => carrier === "total" || channel.carrier === carrier).map((channel) => <li key={`${channel.carrier}:${channel.kind}`} className="py-2 text-sm"><Text weight="medium">{t(`carriers.${channel.carrier}`)} · {t(`kinds.${channel.kind}`)}</Text><Text tone="muted" className="break-words">{channel.sources.map((source) => t(`sources.${source}`)).join(" · ")} · {t("network.coverage", { count: channel.buckets, total: summary.series.length })}</Text></li>)}</ul></details>}
     <RecordLink to="/energy/appliances" className="inline-flex min-h-11 items-center text-sm font-medium underline-offset-4 hover:underline">{t("network.manageBranches")}</RecordLink>
   </Card>;
 }

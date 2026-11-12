@@ -1,3 +1,7 @@
+import { FormGrid } from "@/components/layout/form-grid";
+import { Text } from "@/components/ui/text";
+import { PageGrid } from "@/components/layout/page-grid";
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { ImageOffIcon, SparklesIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -139,10 +143,10 @@ export function ProductFormDialog({
         {/* Outside the form: linking and unlinking save on their own. */}
         {product && products && (
           <section className="flex flex-col gap-3 border-t pt-4">
-            <div className="flex flex-col gap-1">
+            <Stack gap="xs">
               <h3 className="font-semibold">{t("alternatives.title")}</h3>
-              <p className="text-sm text-muted-foreground">{t("alternatives.description")}</p>
-            </div>
+              <Text size="sm" tone="muted">{t("alternatives.description")}</Text>
+            </Stack>
             <ProductAlternatives product={product} products={products} canManage onLink={showLinkDialog} />
           </section>
         )}
@@ -223,7 +227,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
 
   const codes = (
     <Stack gap="sm">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <FormGrid  >
         <FormField
           label={t("fields.barcode")}
           htmlFor="product-barcode"
@@ -250,31 +254,31 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
         >
           <Input id="product-qr" name="qrCode" defaultValue={product?.qrCode ?? defaults?.qrCode ?? ""} autoComplete="off" />
         </FormField>
-      </div>
+      </FormGrid>
 
       <div aria-live="polite">
         {autofill.status === "loading" ? (
-          <p className="flex min-h-10 items-center gap-2 text-sm text-muted-foreground">
+          <Text size="sm" tone="muted" className="flex min-h-10 items-center gap-2">
             <Spinner />
             {t("autofill.lookingUp")}
-          </p>
+          </Text>
         ) : found && autofill.status === "found" ? (
-          <div className="flex flex-col gap-3 rounded-lg border bg-muted/40 p-3 sm:flex-row sm:items-center sm:justify-between">
+          <Stack gap="3" className="rounded-lg border bg-muted/40 p-3 sm:flex-row sm:items-center sm:justify-between">
             <ProductSuggestionCard suggestion={found} size="md" />
             <Button type="button" className="h-11 sm:h-10" onClick={() => applySuggestion(found, autofill.code)}>
               <SparklesIcon />
               {t("autofill.apply")}
             </Button>
-          </div>
+          </Stack>
         ) : autofill.status === "not_found" ? (
-          <p className="text-sm text-muted-foreground">{t("autofill.notFound")}</p>
+          <Text size="sm" tone="muted">{t("autofill.notFound")}</Text>
         ) : autofill.status === "unavailable" ? (
-          <p className="text-sm text-muted-foreground">{t("autofill.unavailable")}</p>
+          <Text size="sm" tone="muted">{t("autofill.unavailable")}</Text>
         ) : filled && !product ? (
-          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Text size="sm" tone="muted" className="flex items-center gap-2">
             <SparklesIcon className="size-4 shrink-0" aria-hidden="true" />
             {t("autofill.filled")}
-          </p>
+          </Text>
         ) : null}
       </div>
     </Stack>
@@ -287,7 +291,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
       <fieldset disabled={busy} className="contents">
         <Stack gap="lg">
           <DialogHeader>
-            <div className="flex items-center gap-3">
+            <Inline gap="md" align="center">
               {photo ? (
                 <img
                   src={photo}
@@ -305,7 +309,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
                 <DialogTitle>{product ? t("products.editTitle") : t("products.createTitle")}</DialogTitle>
                 <DialogDescription>{t("products.formDescription")}</DialogDescription>
               </Stack>
-            </div>
+            </Inline>
           </DialogHeader>
           {result?.formError && <InlineAlert tone="error">{result.formError}</InlineAlert>}
 
@@ -322,7 +326,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
             setPackageAmount(amount && amount <= 1_000_000 ? String(amount) : ""); setPackageUnit(amount && amount <= 1_000_000 ? size![3]!.toLowerCase() : "");
           }} />
           <input type="hidden" name="colruytProductId" value={colruytProductId} />
-          {colruytProductId && <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground"><span>{t("xtra.linkedArticle", { id: colruytProductId })}</span><Button type="button" variant="ghost" size="sm" onClick={() => setColruytProductId("")}>{t("xtra.unlink")}</Button></div>}
+          {colruytProductId && <Inline gap="sm" align="center" wrap className="text-xs text-muted-foreground"><span>{t("xtra.linkedArticle", { id: colruytProductId })}</span><Button type="button" variant="ghost" size="sm" onClick={() => setColruytProductId("")}>{t("xtra.unlink")}</Button></Inline>}
 
           <FormField label={t("fields.name")} htmlFor="product-name" errors={errors?.name}>
             <Input id="product-name" name="name" value={name} onChange={(event) => setName(event.target.value)} autoComplete="off" required />
@@ -331,7 +335,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
             <Input id="product-brand" name="brand" value={brand} onChange={(event) => setBrand(event.target.value)} autoComplete="off" maxLength={80} />
           </FormField>
 
-          <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_7rem]">
+          <PageGrid gap="md" className="sm:grid-cols-[minmax(0,1fr)_7rem]">
             <FormField label={t("fields.category")} htmlFor="product-category" errors={errors?.category}>
               <Select name="category" value={category} onValueChange={(value) => setCategory(value as ProductCategory)}>
                 <SelectTrigger id="product-category" className="w-full">
@@ -356,7 +360,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
                 autoComplete="off"
               />
             </FormField>
-          </div>
+          </PageGrid>
 
           <input type="hidden" name="isEssential" value={String(isEssential)} />
           <FormField label={t("fields.isEssential")} htmlFor="product-essential" description={t("fields.isEssentialDescription")}>
@@ -377,7 +381,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
             description={t("fields.packageSizeDescription")}
             errors={errors?.packageAmount?.map((message) => (message === "packageBoth" ? t("errors.packageBoth") : message))}
           >
-            <div className="grid grid-cols-[minmax(0,1fr)_7rem] gap-2">
+            <PageGrid gap="sm" className="grid-cols-[minmax(0,1fr)_7rem]">
               <Input
                 id="product-package-amount"
                 name="packageAmount"
@@ -401,7 +405,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </PageGrid>
           </FormField>
 
           <FormField label={t("fields.defaultShop")} htmlFor="product-shop" optionalLabel={optional} errors={errors?.defaultShopId}>
@@ -437,7 +441,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
 
           {isStoredPhoto(imageUrl) ? (
             <FormField label={t("fields.photo")} htmlFor="product-photo-remove" errors={errors?.imageUrl}>
-              <div className="flex items-center gap-3">
+              <Inline gap="md" align="center">
                 <input type="hidden" name="imageUrl" value={imageUrl} />
                 {photo ? (
                   <img src={photo} alt="" onError={() => setPhotoFailed(true)} className="size-16 rounded-lg border bg-white object-contain p-0.5" />
@@ -449,7 +453,7 @@ function ProductForm({ fetcher, product, shops, defaults, suggestion, lookup, pr
                 <Button id="product-photo-remove" type="button" variant="outline" onClick={() => setImageUrl("")}>
                   {t("fields.removePhoto")}
                 </Button>
-              </div>
+              </Inline>
             </FormField>
           ) : (
             <FormField label={t("fields.imageUrl")} htmlFor="product-image" optionalLabel={optional} errors={errors?.imageUrl}>

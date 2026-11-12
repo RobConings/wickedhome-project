@@ -1,3 +1,6 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { RecordLink } from "@/components/shared/record-link";
 import { ChevronDownIcon, ClockIcon, PlayIcon } from "lucide-react";
@@ -39,13 +42,13 @@ export function AutomationJobRow({ job, canManage, now, starting = false, onEnab
 
   return (
     <li className="flex flex-col gap-3 py-4 first:pt-0 last:pb-0">
-      <div className="flex items-start gap-3">
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
+      <Inline gap="md" align="start">
+        <Stack gap="xs" className="min-w-0 flex-1">
           <h3 className="leading-tight font-semibold">{title}</h3>
-          <p className="text-sm text-muted-foreground">{t(job.descriptionKey)}</p>
+          <Text size="sm" tone="muted">{t(job.descriptionKey)}</Text>
           {job.sourcePath && <RecordLink to={job.sourcePath} className="inline-flex min-h-10 self-start items-center text-sm font-medium text-primary hover:underline">{t("job.openSource")}</RecordLink>}
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
+        </Stack>
+        <Inline gap="sm" align="center" className="shrink-0">
           <label htmlFor={switchId} className={cn("text-sm", job.enabled ? "text-foreground" : "text-muted-foreground")}>
             {job.enabled ? t("job.on") : t("job.paused")}
           </label>
@@ -56,8 +59,8 @@ export function AutomationJobRow({ job, canManage, now, starting = false, onEnab
             onCheckedChange={onEnabledChange}
             aria-label={t("job.toggle", { title })}
           />
-        </div>
-      </div>
+        </Inline>
+      </Inline>
 
       <dl className="grid gap-x-4 gap-y-1.5 text-sm sm:grid-cols-[auto_1fr]">
         <dt className="text-muted-foreground">{t("job.schedule")}</dt>
@@ -111,7 +114,7 @@ export function AutomationJobRow({ job, canManage, now, starting = false, onEnab
         )}
       </dl>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <Inline gap="sm" align="center" wrap>
         {canManage && (
           <Button variant="outline" size="sm" className="min-h-10 sm:min-h-8" loading={busy} disabled={busy} onClick={onRun}>
             <PlayIcon />
@@ -129,7 +132,7 @@ export function AutomationJobRow({ job, canManage, now, starting = false, onEnab
           <ChevronDownIcon className={cn("transition-transform", expanded && "rotate-180")} />
           {expanded ? t("history.hide") : t("history.show")}
         </Button>
-      </div>
+      </Inline>
 
       {expanded && (
         <div id={historyId}>

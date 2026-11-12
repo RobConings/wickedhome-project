@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/shared/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardHeading, CardTitle } from "@/components/shared/card";
 
 const meta = {
   title: "Shared/Card",
   component: Card,
-  decorators: [(Story) => <div className="w-80"><Story /></div>],
+  parameters: { layout: "padded" },
+  decorators: [(Story) => <div className="w-full max-w-sm"><Story /></div>],
 } satisfies Meta<typeof Card>;
 
 export default meta;
@@ -15,10 +16,7 @@ export const Default: Story = {
   render: () => (
     <Card>
       <CardHeader>
-        <div className="flex flex-col gap-1">
-          <CardTitle>Card title</CardTitle>
-          <CardDescription>Supporting text for the card.</CardDescription>
-        </div>
+        <CardHeading title="Card title" description="Supporting text for the card." />
       </CardHeader>
       <CardContent>
         <p className="text-sm">Any content goes here.</p>
@@ -32,6 +30,8 @@ export const Default: Story = {
     </Card>
   ),
 };
+
+export const HeadingWithAction: Story = { render: () => <Card><CardHeader><CardHeading title="A longer card title" description="The description stays below its title on narrow screens." /><Button size="icon" aria-label="Add">+</Button></CardHeader></Card> };
 
 /** `attention` (peach edge: "needs you"), `section`, `featured` and status edges. */
 export const Tones: Story = {

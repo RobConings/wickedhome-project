@@ -1,7 +1,9 @@
+import { CardHeading } from "@/components/shared/card";
+import { Text } from "@/components/ui/text";
 import { useTranslation } from "react-i18next";
 import { RecordLink } from "@/components/shared/record-link";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
+import { Card, CardHeader } from "@/components/shared/card";
 import { intlLocale } from "@/lib/format";
 import { currentLocale } from "@/lib/i18n";
 import { formatDate } from "@/types/date-format";
@@ -25,11 +27,10 @@ export function EnergyMeterList({ meters, appliances }: EnergyMeterListProps) {
   return (
     <Card>
       <CardHeader className="flex-col gap-1">
-        <CardTitle>{t("meters.title")}</CardTitle>
-        <CardDescription>{t("meters.description")}</CardDescription>
+        <CardHeading title={<>{t("meters.title")}</>} description={<>{t("meters.description")}</>} />
       </CardHeader>
       {meters.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("meters.empty")}</p>
+        <Text size="sm" tone="muted">{t("meters.empty")}</Text>
       ) : (
         <ul className="flex flex-col divide-y text-sm">
           {meters.map((meter) => (

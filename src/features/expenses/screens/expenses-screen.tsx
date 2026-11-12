@@ -1,3 +1,6 @@
+import { PageGrid } from "@/components/layout/page-grid";
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import {
   CircleCheckIcon,
@@ -179,7 +182,7 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
       <PageHeader
         title={t("page.title")}
         description={t("page.description")}
-        actions={canManage && <div className="grid w-full min-w-0 grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-center xl:justify-end">
+        actions={canManage && <PageGrid gap="sm" className="w-full min-w-0 sm:flex sm:w-auto sm:flex-wrap sm:justify-center xl:justify-end">
           <SplitAction
             icon={ShoppingBasketIcon}
             label={t("actions.log")}
@@ -206,11 +209,11 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
               </DropdownMenuItem>
             </>}
           />
-        </div>}
+        </PageGrid>}
       />
 
       <Tabs value={view} onValueChange={(value) => setParam(EXPENSES_VIEW_PARAM, value === "upcoming" ? null : value)} className="min-w-0 gap-4">
-        <div className="flex min-w-0 items-center gap-2">
+        <Inline gap="sm" align="center" className="min-w-0">
           <TabsList aria-label={t("views.label")} className={cn(workspaceTabListClassName, "grid flex-1 grid-cols-3")}>
             {([
               { value: "upcoming", icon: ListTodoIcon },
@@ -226,11 +229,11 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
           {overdueCount > 0 && view !== "upcoming" && (
             <Badge variant="destructive" className="shrink-0 tabular-nums">{overdueCount}</Badge>
           )}
-        </div>
+        </Inline>
 
         <PendingContent pending={pending} label={tCommon("loading.updating")}>
         <TabsContent value="upcoming" className="min-w-0">
-          <div className="flex flex-col gap-6">
+          <Stack gap="lg">
             {suggestions}
             <ExpenseTotals totals={overview.totals} />
             {payerFilter === "all" && unpaid.length > 0 && (
@@ -253,11 +256,11 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
               }
               noMatchesState={filteredEmpty(CircleCheckIcon)}
             />
-          </div>
+          </Stack>
         </TabsContent>
 
         <TabsContent value="recurring" className="min-w-0">
-          <div className="flex flex-col gap-6">
+          <Stack gap="lg">
             <RecurringTotals totals={overview.recurringTotals} />
             <GeneralList<RecurringExpense>
               label={t("views.recurring")}
@@ -279,7 +282,7 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
               // With any recurring expense at all, an empty list means the kind/status filters hide them.
               filtered={overview.recurring.length > 0}
               toolbar={
-                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <Stack gap="3" className="sm:flex-row sm:flex-wrap">
                   <Select value={kind ?? ALL} onValueChange={(value) => setParam(EXPENSES_KIND_PARAM, value === ALL ? null : value)}>
                     <SelectTrigger className="w-full sm:w-48" aria-label={t("filters.kind")}>
                       <SelectValue />
@@ -308,14 +311,14 @@ export function ExpensesScreen({ overview, habitants, shops = [], canManage, cur
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
+                </Stack>
               }
               emptyState={
                 <EmptyState icon={RepeatIcon} title={t("empty.recurring.title")} description={t("empty.recurring.description")} action={addButton()} />
               }
               noResultsState={recurringQuery.trim() ? undefined : filteredEmpty(RepeatIcon)}
             />
-          </div>
+          </Stack>
         </TabsContent>
 
         <TabsContent value="history" className="min-w-0">

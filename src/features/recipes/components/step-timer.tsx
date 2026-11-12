@@ -1,3 +1,4 @@
+import { Inline } from "@/components/layout/inline";
 import * as React from "react";
 import { PauseIcon, PlayIcon, RotateCcwIcon, TimerIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -74,7 +75,7 @@ export function StepTimer({ minutes, label, initialSeconds, className }: StepTim
       <span className={cn("text-2xl font-semibold tabular-nums", left === 0 && "text-primary")} role="timer" aria-live={running ? "off" : "polite"}>
         {clock(left)}
       </span>
-      <div className="ml-auto flex items-center gap-2">
+      <Inline gap="sm" align="center" className="ml-auto">
         <Button variant={running ? "outline" : "default"} size="lg" onClick={running ? pause : start}>
           {running ? <PauseIcon /> : <PlayIcon />}
           {running ? t("timer.pause") : left < total && left > 0 ? t("timer.resume") : t("timer.start", { count: minutes })}
@@ -84,7 +85,7 @@ export function StepTimer({ minutes, label, initialSeconds, className }: StepTim
             <RotateCcwIcon />
           </Button>
         )}
-      </div>
+      </Inline>
     </div>
   );
 }

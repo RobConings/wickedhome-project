@@ -1,3 +1,5 @@
+import { Inline } from "@/components/layout/inline";
+import { Stack } from "@/components/layout/stack";
 import * as React from "react";
 import { toast } from "sonner";
 import { BellIcon, FlaskConicalIcon, PauseIcon, PlayIcon, ScissorsIcon } from "lucide-react";
@@ -146,17 +148,17 @@ export function RecurringExpenseRow({ recurring, today, habitants, canManage, va
           status === "ended" && "opacity-70",
         )}
       >
-        <div className="flex items-start gap-3">
+        <Inline gap="md" align="start">
           <ExpenseCategoryIcon category={recurring.category} />
           <div className="min-w-0 flex-1 pt-1">{payeeLink}</div>
           {pauseButton}
-        </div>
-        <div className="flex flex-wrap items-center gap-1">{flags}</div>
-        <div className="flex flex-col gap-1">{details}</div>
-        <div className="mt-auto flex flex-col gap-2">
+        </Inline>
+        <Inline gap="xs" align="center" wrap>{flags}</Inline>
+        <Stack gap="xs">{details}</Stack>
+        <Stack gap="sm" className="mt-auto">
           <PayerBadge payer={recurring} habitants={habitants} />
           {amounts}
-        </div>
+        </Stack>
       </div>
     );
   }
@@ -171,13 +173,13 @@ export function RecurringExpenseRow({ recurring, today, habitants, canManage, va
       )}
     >
       <ExpenseCategoryIcon category={recurring.category} />
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+      <Stack gap="xs" className="min-w-0 flex-1">
+        <Inline gap="none" align="center" wrap className="min-w-0 gap-x-2 gap-y-1">
           {payeeLink}
           {flags}
-        </div>
+        </Inline>
         {details}
-      </div>
+      </Stack>
       <PayerBadge payer={recurring} habitants={habitants} className="hidden sm:flex" />
       {amounts}
       {pauseButton}

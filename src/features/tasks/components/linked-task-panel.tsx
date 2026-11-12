@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Inline } from "@/components/layout/inline";
+import { Text } from "@/components/ui/text";
 import * as React from "react";
 import { ArrowRightIcon, CheckIcon, PauseCircleIcon, PlayCircleIcon, RotateCcwIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -54,8 +57,8 @@ function PanelBody({ detail, habitants, reload }: { detail: TaskDetail; habitant
   const due = dueState(task, today);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-start gap-3">
+    <Stack gap="md">
+      <Inline gap="md" align="start" wrap>
         <span
           className={cn(
             "grid size-9 shrink-0 place-items-center rounded-full border-2",
@@ -65,22 +68,22 @@ function PanelBody({ detail, habitants, reload }: { detail: TaskDetail; habitant
         >
           {!open && <CheckIcon className="size-4" />}
         </span>
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <Stack gap="xs" className="min-w-0 flex-1">
           <Link to={taskPath(task.id)} className={cn("font-medium hover:underline", !open && "text-muted-foreground line-through")}>
             {task.title}
           </Link>
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+          <Inline gap="sm" align="center" wrap className="text-sm text-muted-foreground">
             <span className={cn(open && due === "overdue" && "font-medium text-destructive", open && due === "today" && "font-medium text-warning")}>
               {open ? text.dueLabel(task, today) : t(`status.${task.status}`)}
             </span>
             {open && <TaskHoldBadge task={task} full />}
             {open && <TaskWaitingBadge task={task} />}
-          </div>
-        </div>
+          </Inline>
+        </Stack>
         <TaskAssignees task={task} habitants={habitants} withNames />
-      </div>
+      </Inline>
 
-      <div className="flex flex-wrap gap-2">
+      <Inline gap="sm" align="stretch" wrap>
         {open && canCompleteTask(task, viewer) && (
           <Button size="sm" disabled={busy} loading={pendingIntent === "complete"} onClick={() => submit("complete")}>
             <CheckIcon />
@@ -112,20 +115,20 @@ function PanelBody({ detail, habitants, reload }: { detail: TaskDetail; habitant
             <ArrowRightIcon />
           </Link>
         </Button>
-      </div>
+      </Inline>
 
       <TaskLinksPanel taskId={task.id} links={links} canManage={viewer.canManage} onChanged={reload} />
 
-      <div className="flex flex-col gap-2">
+      <Stack gap="sm">
         <h4 className="text-sm font-medium">{t("comments.title")}</h4>
         <TaskComments taskId={task.id} comments={comments} habitants={habitants} onChanged={reload} />
-      </div>
+      </Stack>
 
       {confirmBlocked && (
         <TaskBlockedDialog task={task} open onOpenChange={setConfirmBlocked} onConfirm={() => submit("complete", { force: "true" })} />
       )}
       {holding && <TaskHoldDialog task={task} open onOpenChange={setHolding} onHold={(reason) => submit("hold", { reason })} />}
-    </div>
+    </Stack>
   );
 }
 
@@ -169,16 +172,16 @@ export function LinkedTaskPanel({ originType, originId, initialData, emptyText, 
   const content = (
     <div className={cn("flex flex-col gap-3", !title && className)}>
       {state.status === "loading" && (
-        <div className="flex flex-col gap-3" role="status" aria-label={t("linked.loading")}>
-          <div className="flex items-center gap-3">
+        <Stack gap="3"  role="status" aria-label={t("linked.loading")}>
+          <Inline gap="md" align="center">
             <Skeleton className="size-9 rounded-full" />
-            <div className="flex flex-1 flex-col gap-1.5">
+            <Stack gap="1.5" className="flex-1">
               <Skeleton className="h-4 w-2/3" />
               <Skeleton className="h-3 w-1/3" />
-            </div>
-          </div>
+            </Stack>
+          </Inline>
           <Skeleton className="h-8 w-40" />
-        </div>
+        </Stack>
       )}
       {state.status === "error" && (
         <InlineAlert tone="error">
@@ -194,7 +197,7 @@ export function LinkedTaskPanel({ originType, originId, initialData, emptyText, 
             <PanelBody detail={state.detail} habitants={state.habitants} reload={reload} />
           </PendingContent>
         ) : (
-          <p className="text-sm text-muted-foreground">{emptyText ?? t("linked.none")}</p>
+          <Text size="sm" tone="muted">{emptyText ?? t("linked.none")}</Text>
         ))}
     </div>
   );

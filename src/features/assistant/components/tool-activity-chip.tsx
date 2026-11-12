@@ -1,3 +1,4 @@
+import { Text } from "@/components/ui/text";
 import { BanIcon, CheckIcon, CircleAlertIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Spinner } from "@/components/ui/spinner";
@@ -46,7 +47,7 @@ export function ToolActivityChip({ label, status, error, className }: ToolActivi
         <span className="truncate">{text}</span>
       </span>
       </summary>
-      <p className="mt-1 pl-2 text-muted-foreground">{t(`tool.state.${status}`)}</p>
+      <Text tone="muted" className="mt-1 pl-2">{t(`tool.state.${status}`)}</Text>
       {status === "failed" && error && <span className="pl-2 text-xs text-muted-foreground">{t("tool.error", { error })}</span>}
     </details>
   );

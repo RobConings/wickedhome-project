@@ -1,3 +1,6 @@
+import { Stack } from "@/components/layout/stack";
+import { Text } from "@/components/ui/text";
+import { PageGrid } from "@/components/layout/page-grid";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -48,18 +51,18 @@ export function UnitFormDialog({ unit, initialName, units, busy, error, onSave, 
           <FormField label={t("name")} htmlFor={`${prefix}-name`} errors={errors.name}>
             <Input id={`${prefix}-name`} autoFocus value={draft.name} onChange={(event) => change("name", event.target.value)} autoComplete="off" maxLength={20} placeholder={t("namePlaceholder")} />
           </FormField>
-          <div className="space-y-3 rounded-xl border bg-muted/30 p-3">
-            <p className="text-sm font-medium">{t("oneUnit", { name: draft.name || t("thisUnit") })}</p>
-            <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+          <Stack gap="3" className="rounded-xl border bg-muted/30 p-3">
+            <Text size="sm" weight="medium">{t("oneUnit", { name: draft.name || t("thisUnit") })}</Text>
+            <PageGrid gap="3" className="min-w-0 sm:grid-cols-2">
               <FormField label={t("factorShort")} htmlFor={amountId} errors={errors.factor}>
                 <Input id={amountId} value={draft.factor} onChange={(event) => change("factor", event.target.value)} inputMode="decimal" autoComplete="off" placeholder="75" />
               </FormField>
               <FormField label={t("reference")} htmlFor={referenceId} errors={errors.referenceUnit}>
                 <Input id={referenceId} value={draft.referenceUnit} onChange={(event) => change("referenceUnit", event.target.value)} list={references} autoComplete="off" maxLength={20} placeholder="cl" />
               </FormField>
-            </div>
+            </PageGrid>
             <datalist id={references}>{unitOverview(units).filter((item) => item.name !== unit?.name).flatMap((item) => [item.name, ...item.aliases]).map((name) => <option key={name} value={name} />)}</datalist>
-          </div>
+          </Stack>
           <FormField label={t("aliases")} htmlFor={`${prefix}-aliases`} errors={errors.aliases} optionalLabel={common("form.optional")} description={t("aliasesHelp")}>
             <Input id={`${prefix}-aliases`} value={draft.aliases} onChange={(event) => change("aliases", event.target.value)} autoComplete="off" maxLength={500} />
           </FormField>
@@ -68,7 +71,7 @@ export function UnitFormDialog({ unit, initialName, units, busy, error, onSave, 
           </FormField>
           <label className="flex cursor-pointer items-start gap-3 rounded-xl border p-3"><input type="checkbox" checked={draft.isTerminal} onChange={(event) => change("isTerminal", event.target.checked)} className="mt-1 size-4 shrink-0 accent-primary" /><span className="space-y-1"><span className="block text-sm font-medium">{t("terminal")}</span><span className="block text-xs text-muted-foreground">{t("terminalHelp")}</span></span></label>
         </fieldset>
-        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+        {error && <Text size="sm" tone="danger" role="alert">{error}</Text>}
         {onReload && <Button type="button" variant="outline" disabled={busy} onClick={() => void onReload()}>{t("reload")}</Button>}
         <DialogFooter><Button type="button" variant="outline" disabled={busy} onClick={onClose}>{common("actions.cancel")}</Button><Button type="submit" loading={busy}>{common("actions.save")}</Button></DialogFooter>
       </form>
