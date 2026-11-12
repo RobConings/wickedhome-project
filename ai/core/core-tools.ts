@@ -134,3 +134,14 @@ registerAssistantTool({
     };
   },
 });
+
+// Interactive questions only collect a new user message; all writes still pass the ordinary confirmation.
+registerAssistantTool({
+  name: "app.ask",
+  description: "Ask the person to choose among alternatives or select a date/time using an interactive card. This collects an answer only; it cannot authorize or execute changes.",
+  input: z.object({ title: z.string().min(1).max(200), kind: z.enum(["choices", "date", "datetime"]), choices: z.array(z.object({ label: z.string().min(1).max(100), message: z.string().min(1).max(1000) })).min(1).max(8).optional() }),
+  permission: "read", confirm: "never", core: true,
+  activity: { en: "Prepared a question", nl: "Een keuze voorbereid" },
+  present: (_ctx, input) => ({ version: 1, components: input.kind === "choices" ? [{ type: "choices", title: input.title, choices: input.choices ?? [{ label: "Continue", message: input.title }] }] : [{ type: "date_time", title: input.title, prompt: input.title, includeTime: input.kind === "datetime" }] }),
+  run: () => ({ waitingForPerson: true, note: "The interactive question is shown. Wait for the person's reply; no action has been authorized." }),
+});

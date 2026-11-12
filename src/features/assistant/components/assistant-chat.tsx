@@ -85,12 +85,13 @@ export function AssistantChat({
 
   return (
     <div className={cn("flex min-h-0 flex-1 flex-col", className)}>
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-1 py-3">
+      <div data-chat-scroll className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-1 py-3">
         <ChatThread
           onRecordNavigate={onRecordNavigate}
           items={chat.items}
           busy={chat.busy}
           onDecide={chat.decide}
+          onEdit={(item, text) => chat.send(text, { images: item.images, screen: item.screen })}
           onRetry={() => {
             speech.unlock();
             chat.retry();
@@ -99,7 +100,7 @@ export function AssistantChat({
             speech.unlock();
             chat.send(text);
           }}
-          className="min-h-full"
+          className="mx-auto min-h-full w-full max-w-3xl"
         />
       </div>
       <div className="flex flex-col gap-1 border-t bg-background pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">

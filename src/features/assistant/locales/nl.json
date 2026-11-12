@@ -20,7 +20,9 @@
     "menu": "Opties voor het gesprek",
     "retention": "Gesprekken blijven {{days}} dagen na het laatste bericht bewaard.",
     "loadFailed": "De gesprekken konden niet geladen worden.",
-    "open": "Gesprekken"
+    "open": "Gesprekken",
+    "search": "Gesprekken zoeken",
+    "noMatches": "Geen gesprekken gevonden."
   },
   "chat": {
     "placeholder": "Vraag iets…",
@@ -53,13 +55,27 @@
     "imageFailed": "Uploaden mislukt; verwijder ze en probeer opnieuw",
     "screenOn": "Over {{label}}; tik om het weg te laten",
     "screenOff": "Niet over {{label}}; tik om erover te vragen",
-    "screenAbout": "Gevraagd over"
+    "screenAbout": "Gevraagd over",
+    "copy": "Kopiëren",
+    "copied": "Gekopieerd",
+    "copyCode": "Code kopiëren",
+    "edit": "Bewerken",
+    "resend": "Bewerkt bericht versturen",
+    "collapse": "Verkleinen",
+    "close": "Terug"
   },
   "tool": {
     "running": "Bezig: {{label}}",
     "failed": "Lukte niet: {{label}}",
     "cancelled": "Geannuleerd: {{label}}",
-    "error": "Waarom: {{error}}"
+    "error": "Waarom: {{error}}",
+    "state": {
+      "running": "Bezig",
+      "pending": "Wacht op bevestiging",
+      "done": "Voltooid",
+      "failed": "Mislukt",
+      "cancelled": "Geannuleerd"
+    }
   },
   "confirm": {
     "title": "Bevestigen",
@@ -87,7 +103,24 @@
     "network": "De verbinding met de app viel weg. Controleer het netwerk en probeer opnieuw.",
     "interrupted": "Het antwoord werd onderbroken (de verbinding of de server viel weg). Probeer opnieuw.",
     "empty_answer": "Het model gaf geen antwoord. Probeer opnieuw, misschien in andere woorden.",
-    "generic": "Er ging iets mis. Probeer opnieuw."
+    "generic": "Er ging iets mis. Probeer opnieuw.",
+    "subscription_sharing_usage_limit_exceeded": "Je ChatGPT-gebruikslimiet is bereikt. Beheer je limieten in ChatGPT.",
+    "subscription_sharing_usage_unavailable": "ChatGPT-gebruik kan tijdelijk niet gecontroleerd worden. Probeer later opnieuw.",
+    "subscription_sharing_user_not_eligible": "Je ChatGPT-account of werkruimte staat dit gebruik niet toe.",
+    "subscription_sharing_unsupported_capability": "Dit model ondersteunt een onderdeel van dit verzoek niet. Kies een ander beschikbaar model of pas je verzoek aan.",
+    "subscription_sharing_user_unavailable": "Je ChatGPT-account is tijdelijk niet beschikbaar. Probeer later opnieuw.",
+    "subscription_sharing_invalid_user": "Verbind je ChatGPT-account opnieuw via de AI-instellingen.",
+    "chatgpt_http_401": "ChatGPT-toegang geweigerd. Verbind je account opnieuw.",
+    "chatgpt_http_403": "ChatGPT-toegang is beperkt door je account- of regiobeleid.",
+    "chatgpt_http_503": "ChatGPT is tijdelijk niet beschikbaar. Probeer later opnieuw.",
+    "reconnect_required": "Verbind ChatGPT opnieuw.",
+    "plan_permission_required": "Geef toestemming om je ChatGPT-abonnement te gebruiken.",
+    "incomplete": "Het antwoord is onvolledig. Probeer opnieuw.",
+    "invalid_client": "De ChatGPT-clientregistratie is geweigerd. Controleer de integratie-instellingen.",
+    "subscription_sharing_route_not_supported": "ChatGPT weigert deze inferentieroute. Controleer de integratieconfiguratie.",
+    "chatpass_v2_scope_not_authorized": "De ChatGPT-toestemming staat deze actie niet toe. Controleer je account en toegang.",
+    "chatpass_v2_invalid_authorization_context": "De ChatGPT-autorisatiecontext is ongeldig. Controleer de accountregistratie.",
+    "chatgpt_unavailable": "ChatGPT is tijdelijk niet bereikbaar. Controleer de verbinding en probeer later opnieuw."
   },
   "voice": {
     "start": "Ingedrukt houden om te praten",
@@ -327,5 +360,36 @@
     "failed": "Dat lukte niet. Herlaad de pagina en probeer opnieuw.",
     "expiredTitle": "Deze aanvraag is verlopen",
     "expiredDescription": "Start de koppeling opnieuw vanuit de app waar je vandaan kwam."
+  },
+  "provider": {
+    "title": "AI-assistent",
+    "description": "Kies een lokaal model of gebruik je ChatGPT-abonnement. Je gesprekken worden in WickedHome bewaard.",
+    "selected": "Provider en model",
+    "local": "Lokaal model",
+    "chatgpt": "ChatGPT-abonnement",
+    "connected": "Verbonden",
+    "disconnected": "Niet verbonden",
+    "reconnect": "Verbind ChatGPT opnieuw en kies een beschikbaar model.",
+    "continue": "Continue with ChatGPT",
+    "refresh": "Modellen vernieuwen",
+    "addAccount": "Ander account koppelen",
+    "disconnect": "Verbinding verbreken",
+    "disconnectDescription": "ChatGPT-verzoeken stoppen. Je gesprekken blijven bewaard. Een lokaal model kies je zelf.",
+    "usage": "Gebruik en toegang beheren in ChatGPT",
+    "storageSetup": "Stel INTEGRATIONS_KEY in op de server om accountgegevens versleuteld op te slaan. Zie ai/docs/CHATGPT-SUBSCRIPTION.md.",
+    "permissionRequired": "Geef toestemming om je ChatGPT-abonnement te gebruiken. Voer bij opnieuw koppelen het commando uit met --consent.",
+    "pairTitle": "Eenmalig koppelen vanaf je computer",
+    "pairInstructions": "Open de WickedHome-projectmap op een computer met Node.js en een browser. Voer onderstaand commando uit en geef toestemming in ChatGPT. De computer stuurt de gegevens beveiligd naar je thuisserver. Daarna werkt chat ook op je telefoon.",
+    "expires": "Koppelcode geldig tot {{time}}. Behandel dit commando als een geheim.",
+    "pairDone": "Gekoppeld, modellen ophalen",
+    "pairDocs": "Officiële instructies voor zelfhosting",
+    "loadFailed": "AI-instellingen konden niet geladen worden.",
+    "operationFailed": "Dit lukte niet. Controleer de verbinding, vernieuw de modellen of start het koppelen opnieuw.",
+    "revocationUnconfirmed": "Lokaal afgemeld, maar intrekking bij OpenAI is niet bevestigd. Verbreek ook de verbinding via de ChatGPT-instellingen.",
+    "account": "ChatGPT-account",
+    "usingPlan": "ChatGPT-abonnement actief",
+    "manageUsage": "Gebruik beheren",
+    "planNotice": "AI-verzoeken met deze provider gebruiken je ChatGPT-abonnement. Je beheert toegang en gebruikslimieten in de ChatGPT-instellingen.",
+    "gotIt": "Begrepen"
   }
 }

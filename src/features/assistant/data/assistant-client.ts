@@ -23,7 +23,7 @@ import type {
 export type AssistantClient = {
   status: () => Promise<AssistantStatus>;
   test: () => Promise<AssistantProbe>;
-  listConversations: () => Promise<AssistantConversationSummary[]>;
+  listConversations: (query?: string) => Promise<AssistantConversationSummary[]>;
   getConversation: (id: string) => Promise<AssistantConversationDetail>;
   renameConversation: (id: string, title: string) => Promise<AssistantConversationSummary>;
   deleteConversation: (id: string) => Promise<void>;
@@ -106,7 +106,7 @@ async function postStream(path: string, body: unknown, onEvent: (event: Assistan
 export const assistantClient: AssistantClient = {
   status: () => api.get<AssistantStatus>("/assistant/status"),
   test: () => api.post<AssistantProbe>("/assistant/status/test"),
-  listConversations: () => api.get<AssistantConversationSummary[]>("/assistant/conversations"),
+  listConversations: (query) => api.get<AssistantConversationSummary[]>(`/assistant/conversations${query ? `?q=${encodeURIComponent(query)}` : ""}`),
   getConversation: (id) => api.get<AssistantConversationDetail>(`/assistant/conversations/${encodeURIComponent(id)}`),
   renameConversation: (id, title) => api.patch<AssistantConversationSummary>(`/assistant/conversations/${encodeURIComponent(id)}`, { title }),
   deleteConversation: (id) => api.delete(`/assistant/conversations/${encodeURIComponent(id)}`),

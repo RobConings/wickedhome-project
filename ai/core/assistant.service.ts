@@ -1,3 +1,5 @@
+import { ChatGptAuthError } from "./providers/chatgpt-oauth";
+import { structuredResponseSchema } from "@/features/assistant/types/response-components";
 import { createHash, randomBytes } from "node:crypto";
 import type { Role, SessionUser } from "@/features/auth/types/auth";
 import {
@@ -26,7 +28,8 @@ import {
   type AssistantToolStatus as ToolStatusRow,
   type Prisma,
 } from "@/api/lib/db";
-import { badRequest, conflict, notFound } from "@/api/lib/http";
+import { badRequest, conflict, notFound, HttpError } from "@/api/lib/http";
+import { findRun, isRunning } from "./assistant-runs";
 import { readAssistantSettings, type AssistantSettings } from "./assistant-config";
 import {
   InvalidConfirmationError,
@@ -44,6 +47,8 @@ import { buildSystemPrompt, questionNoteFor } from "./assistant-prompt";
 import { householdSnapshot } from "./context";
 import "./core-tools";
 import { createOpenAiChatModel, probeModel, type ChatModel, type ModelProbe, type ToolCall } from "./llm-client";
+import { providerStatus, accessToken, availableModels } from "./providers/provider-store";
+import { createResponsesModel } from "./providers/responses-client";
 import { queuedModel, setModelConcurrency } from "./model-queue";
 import { entityMentionMatcher } from "./resolve";
 import { followUpFor, planTurn } from "./routing";
@@ -78,6 +83,7 @@ function toMessage(row: MessageRow & { images?: { id: string }[] }, locale: Loca
   const tool = row.toolName ? getAssistantTool(row.toolName) : undefined;
   const result = row.toolResult as ToolResult | null;
   const screen = row.role === "USER" ? readStoredScreen(row.screen) : null;
+  const response = structuredResponseSchema.safeParse(result?.ok ? result.response : null);
   return {
     id: row.id,
     role: toRole(row.role),
@@ -88,6 +94,7 @@ function toMessage(row: MessageRow & { images?: { id: string }[] }, locale: Loca
     tool:
       row.role === "TOOL"
         ? {
+            ...(response.success && { response: response.data }),
             name: row.toolName ?? "",
             status: toStatus(row.toolStatus) ?? "failed",
             summary: row.toolStatus === "PENDING" ? row.toolSummary : tool ? activityOf(tool, locale) : row.toolSummary,
@@ -114,9 +121,9 @@ const json = (value: unknown) => (value === undefined || value === null ? undefi
 
 const LIST_LIMIT = 100;
 
-export async function listConversations(user: SessionUser): Promise<AssistantConversationSummary[]> {
+export async function listConversations(user: SessionUser, search = ""): Promise<AssistantConversationSummary[]> {
   const rows = await db.assistantConversation.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, ...(search.trim() && { OR: [{ title: { contains: search.trim(), mode: "insensitive" as const } }, { messages: { some: { role: { in: ["USER" as const, "ASSISTANT" as const] }, content: { contains: search.trim(), mode: "insensitive" as const } } } }] }) },
     orderBy: { lastMessageAt: "desc" },
     take: LIST_LIMIT,
   });
@@ -160,6 +167,7 @@ export async function renameConversation(user: SessionUser, id: string, title: s
 
 export async function deleteConversation(user: SessionUser, id: string): Promise<void> {
   await findOwnConversation(user, id);
+  if (isRunning(findRun(id, user.id))) throw conflict("Stop the answer before deleting this conversation");
   await db.assistantConversation.delete({ where: { id } });
 }
 
@@ -186,8 +194,20 @@ export type ChatOptions = {
 /** Thrown when the assistant can't run: not configured. The route answers 409 before streaming. */
 export class AssistantNotConfiguredError extends Error {}
 
-function modelFor(options: ChatOptions): ChatModel {
+async function modelFor(options: ChatOptions, user: SessionUser): Promise<ChatModel> {
   if (options.model) return options.model;
+  if (!options.settings) {
+    const provider = await providerStatus(user.id);
+    if (provider.provider === "chatgpt_subscription") {
+      if (!provider.connected || !provider.permission || !provider.model) throw conflict("Reconnect ChatGPT and select an available model in AI settings");
+      let catalog;
+      try { catalog = await availableModels(user.id); }
+      catch (error) { throw new HttpError(error instanceof ChatGptAuthError ? error.status : 503, error instanceof ChatGptAuthError ? error.code : "chatgpt_unavailable", "Check your ChatGPT account connection and usage in AI settings"); }
+      if (!catalog.some((m) => m.slug === provider.model)) throw conflict("The selected ChatGPT model is no longer available. Select another model in AI settings.");
+      options.settings = { ...readAssistantSettings(), model: provider.model, thinking: true, problem: null };
+      return createResponsesModel(provider.model, () => accessToken(user.id, provider.accountId!));
+    }
+  }
   const settings = options.settings ?? readAssistantSettings();
   if (settings.problem) throw new AssistantNotConfiguredError(settings.problem);
   setModelConcurrency(settings.parallel ?? 1);
@@ -292,10 +312,12 @@ async function depsFor(
         },
       });
       await db.assistantConversation.update({ where: { id: conversationId }, data: { lastMessageAt: new Date() } });
+      if (message.toolResult?.ok && message.toolResult.response) options.emit({ type: "structured_response", messageId: row.id, response: message.toolResult.response });
       options.onSaved?.(row.id);
       return toLoopMessage(row);
     },
     update: async (id, patch) => {
+      if (patch.toolResult?.ok && patch.toolResult.response) options.emit({ type: "structured_response", messageId: id, response: patch.toolResult.response });
       await db.assistantMessage.update({
         where: { id },
         data: {
@@ -327,7 +349,7 @@ export async function sendMessage(
   input: AssistantMessageInput,
   options: ChatOptions,
 ): Promise<void> {
-  const model = modelFor(options);
+  const model = await modelFor(options, user);
   const images = await uploadedImages(user, input.imageIds ?? [], options.settings ?? readAssistantSettings());
   const title = titleFromQuestion(input.content) || (user.locale === "nl" ? "Afbeelding" : "Image");
   const conversation = conversationId
@@ -369,7 +391,7 @@ export async function answerConfirmation(
   const pending = history.find((message) => message.id === messageId);
   if (!pending || pending.role !== "tool" || pending.toolStatus !== "pending") throw notFound("No such confirmation");
   // Cancelling works without a model; continuing the answer needs one.
-  const model = modelFor(options);
+  const model = await modelFor(options, user);
   // The turn goes on with the screen of its question, looked up again (it may have changed since).
   const asked = history.findLast((message) => message.role === "user")?.screen;
   const screen = asked ? await resolveScreen(toolContext(user, options.signal), asked) : null;

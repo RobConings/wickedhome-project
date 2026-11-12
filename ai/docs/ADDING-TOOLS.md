@@ -320,3 +320,15 @@ A tool whose target may be "this" can default it: `input.vehicle?.id ?? screenTa
 - [ ] Results compact (`capList`, `money`, `day`, `done`)
 - [ ] New pages' screen kinds registered (`registerScreenContext`)
 - [ ] Scenarios in `ai/eval/scenarios.ts`; tests and lint pass
+
+
+## Structured read results
+
+A registered tool may define `present(ctx, input, data)` to return a version-1 `StructuredResponse` from
+`src/features/assistant/types/response-components.ts`. Return `null` when no card is appropriate. The
+runner validates the result; presentation failure leaves the domain result and audit outcome intact.
+Validated cards are persisted beside `toolResult.data`, streamed as `structured_response`, and rendered
+by the trusted registry. Do not return HTML, JavaScript or arbitrary component names. Selection/card
+buttons submit a new user message; they never directly execute a write or replace confirmations.
+Keep the original compact tool data useful to MCP and text-only models; presentation metadata is removed
+from the text fed back into the model. See Shopping, Recipes and Expenses for feature-owned examples.

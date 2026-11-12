@@ -1,3 +1,4 @@
+import { structuredResponseSchema, type StructuredResponse } from "../types/response-components";
 import {
   assistantImageUrl,
   type AssistantConfirmOptions,
@@ -17,6 +18,7 @@ import type { ScreenContext } from "@/types/screen-context";
  * stream events. Pure, so it can be tested and used in stories.
  */
 export type ChatItem =
+  | { kind: "structured"; key: string; response: StructuredResponse }
   /**
    * `images`: attached images, `url` to show (an object URL right after sending), `id` to send again.
    * `screen`: the page it was asked about (the chip on the question; sent again with Try again).
@@ -76,7 +78,7 @@ export function itemsFromMessages(messages: AssistantMessage[]): ChatItem[] {
         },
       ];
     }
-    return [{ kind: "tool", key: message.id, toolCallId: null, messageId: message.id, name: tool.name, status: tool.status, label: tool.summary ?? tool.name, error: tool.error }];
+    return [{ kind: "tool", key: message.id, toolCallId: null, messageId: message.id, name: tool.name, status: tool.status, label: tool.summary ?? tool.name, error: tool.error }, ...(tool.response ? [{ kind: "structured" as const, key: `response-${message.id}`, response: tool.response }] : [])];
   });
 }
 
@@ -92,6 +94,12 @@ const withoutStatus = (items: ChatItem[]) => (items.some((item) => item.kind ===
 export function applyEvent(current: ChatItem[], event: AssistantStreamEvent): ChatItem[] {
   const items = withoutStatus(current);
   switch (event.type) {
+    case "structured_response": {
+      const parsed = structuredResponseSchema.safeParse(event.response);
+      if (!parsed.success) return items;
+      const next: ChatItem = { kind: "structured", key: `response-${event.messageId}`, response: parsed.data };
+      return items.some((item) => item.key === next.key) ? items.map((item) => item.key === next.key ? next : item) : [...items, next];
+    }
     case "status":
       return event.code ? [...items, { kind: "status", key: "status", code: event.code }] : items;
     case "text": {
@@ -119,7 +127,7 @@ export function applyEvent(current: ChatItem[], event: AssistantStreamEvent): Ch
         name: event.name,
         status: event.status,
         label: event.label,
-        error: null,
+        error: event.error ?? null,
       };
       const index = items.findIndex(matches);
       if (index < 0) return [...items, next];

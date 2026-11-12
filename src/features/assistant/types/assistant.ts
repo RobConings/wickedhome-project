@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { StructuredResponse } from "./response-components";
 import { idSchema } from "@/types/common";
 import { screenRefSchema, type ScreenContext } from "@/types/screen-context";
 
@@ -14,7 +15,7 @@ export type AssistantToolStatus = (typeof ASSISTANT_TOOL_STATUSES)[number];
 export type AssistantToolPermission = "read" | "write" | "sensitive";
 
 /** What a tool returns to the model. */
-export type ToolResult = { ok: true; data: unknown } | { ok: false; error: string };
+export type ToolResult = { ok: true; data: unknown; response?: StructuredResponse } | { ok: false; error: string };
 
 /**
  * A proposed change shown on a confirmation card before Confirm. `kind` picks the renderer: built in are
@@ -57,6 +58,7 @@ export type AssistantStatusCode = "queued" | "restarting";
  * `text/event-stream`, one `data: <json>` line per event).
  */
 export type AssistantStreamEvent =
+  | { type: "structured_response"; messageId: string; response: StructuredResponse }
   /**
    * The question was stored (first event of a new message). `question`: what was asked, for a chat that
    * attaches to a running answer later (the stored question is left out of the detail until it ends).
@@ -74,7 +76,7 @@ export type AssistantStreamEvent =
   /** An assistant message was stored (text and/or tool calls). */
   | { type: "message"; messageId: string; role: "assistant" }
   /** A tool started, finished, failed or was cancelled. `label` is the activity text in the person's language. */
-  | { type: "tool"; messageId: string | null; toolCallId: string; name: string; status: AssistantToolStatus | "running"; label: string }
+  | { type: "tool"; messageId: string | null; toolCallId: string; name: string; status: AssistantToolStatus | "running"; label: string; error?: string }
   /** A write waits for the person: show a confirmation card. */
   | {
       type: "confirm";
@@ -119,6 +121,7 @@ export type AssistantMessage = {
   screen?: ScreenContext;
   /** Tool messages only. */
   tool: {
+    response?: StructuredResponse;
     name: string;
     status: AssistantToolStatus;
     /** The activity text, or what will happen while pending. */
@@ -144,6 +147,7 @@ export type AssistantProblem = "missing_url" | "missing_model" | "invalid_url";
 
 /** `GET /api/assistant/status`. Never includes the API key. */
 export type AssistantStatus = {
+  provider?: "local" | "chatgpt_subscription";
   configured: boolean;
   problem: AssistantProblem | null;
   /** Host and port of the model server, e.g. `192.168.1.20:1234`. */

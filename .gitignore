@@ -19,3 +19,7 @@ src/api/generated/
 
 # Logs
 *.log
+
+# Server-only assistant credentials and browser profiles
+data/assistant-private/
+data/collect-and-go/

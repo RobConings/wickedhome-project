@@ -105,3 +105,8 @@ export function startRun(key: string, userId: string, work: (run: AssistantRun) 
     })();
   });
 }
+
+/** A deliberate provider disconnect also stops this person's active inference requests. */
+export function stopUserRuns(userId: string) {
+  for (const run of runs.values()) if (run.userId === userId && !run.finished) run.controller.abort();
+}

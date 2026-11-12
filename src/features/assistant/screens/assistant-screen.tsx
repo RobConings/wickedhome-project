@@ -1,5 +1,5 @@
 import * as React from "react";
-import { MessagesSquareIcon, PlusIcon, SettingsIcon } from "lucide-react";
+import { ArrowLeftIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, MessagesSquareIcon, PlusIcon, SettingsIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useRevalidator } from "react-router";
 import { toast } from "sonner";
@@ -9,6 +9,8 @@ import { InlineAlert } from "@/components/shared/inline-alert";
 import { SkeletonList } from "@/components/shared/loading-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageContainer } from "@/components/layout/page-container";
+import { AssistantProviderSettings } from "../components/assistant-provider-settings";
+import { useChatViewport } from "../hooks/use-chat-viewport";
 import { AssistantChat } from "../components/assistant-chat";
 import { AssistantIntegrationCard } from "../components/assistant-integration-card";
 import { ConversationList } from "../components/conversation-list";
@@ -29,6 +31,8 @@ export function AssistantScreen({ data, client = assistantClient }: AssistantScr
   const { t } = useTranslation("assistant");
   const navigate = useNavigate();
   const revalidator = useRevalidator();
+  const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const viewportRef = useChatViewport(data.status.configured);
   const [listOpen, setListOpen] = React.useState(false);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const created = React.useRef<string | null>(null);
@@ -51,6 +55,7 @@ export function AssistantScreen({ data, client = assistantClient }: AssistantScr
     return (
       <PageContainer className="flex flex-col gap-6">
         <PageHeader title={t("page.title")} description={t("page.description")} />
+        <AssistantProviderSettings />
         <AssistantIntegrationCard data={data.status} client={client} showOpenLink={false} showTokens={false} />
       </PageContainer>
     );
@@ -73,21 +78,23 @@ export function AssistantScreen({ data, client = assistantClient }: AssistantScr
 
   const list = (onNavigate?: () => void) => (
     <React.Suspense fallback={<SkeletonList rows={6} />}>
-      <DeferredList promise={data.conversations} activeId={activeId} onRename={rename} onDelete={remove} onNavigate={onNavigate} />
+      <DeferredList search={client.listConversations} promise={data.conversations} activeId={activeId} onRename={rename} onDelete={remove} onNavigate={onNavigate} />
     </React.Suspense>
   );
 
   return (
     // Exactly the screen below the top bar: the negative margin takes back <main>'s safe-area padding (the
     // question field pads the safe area itself), which otherwise made the page taller than the screen.
-    <div className="-mb-[env(safe-area-inset-bottom)] flex h-[calc(100dvh-3.5rem-env(safe-area-inset-top))] overflow-hidden lg:grid lg:h-dvh lg:grid-cols-[17rem_minmax(0,1fr)]">
-      <aside className="hidden min-h-0 flex-col gap-3 border-r p-3 lg:flex">
+    <div ref={viewportRef} className={`-mb-[env(safe-area-inset-bottom)] flex h-[calc(var(--chat-viewport-height,100dvh)-3.5rem-env(safe-area-inset-top))] overflow-hidden lg:grid lg:h-[var(--chat-viewport-height,100dvh)] ${sidebarOpen ? "lg:grid-cols-[17rem_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,1fr)]"}`}>
+      <aside className={`hidden min-h-0 flex-col gap-3 border-r p-3 ${sidebarOpen ? "lg:flex" : ""}`}>
         <h2 className="px-1 text-sm font-semibold">{t("conversations.title")}</h2>
         {list()}
       </aside>
 
       <section className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-3 pt-2 sm:px-4 lg:pt-4">
         <header className="flex items-center gap-1 pb-2">
+          <Button variant="ghost" size="icon" aria-label={t("chat.close")} onClick={() => { if ((window.history.state?.idx ?? 0) > 0) void navigate(-1); else void navigate("/"); }}><ArrowLeftIcon /></Button>
+          <Button variant="ghost" size="icon" className="hidden lg:inline-flex" aria-label={t("conversations.open")} aria-expanded={sidebarOpen} onClick={() => setSidebarOpen((value) => !value)}>{sidebarOpen ? <PanelLeftCloseIcon /> : <PanelLeftOpenIcon />}</Button>
           <Button variant="ghost" size="icon" className="lg:hidden" aria-label={t("conversations.open")} onClick={() => setListOpen(true)}>
             <MessagesSquareIcon />
           </Button>
@@ -103,6 +110,7 @@ export function AssistantScreen({ data, client = assistantClient }: AssistantScr
             <SettingsIcon />
           </Button>
         </header>
+        <div className="min-w-0 pb-2"><AssistantProviderSettings compact /></div>
         {/* A new key per conversation: the chat starts from that conversation's stored messages. */}
         <AssistantChat
           key={activeId ?? "new"}
@@ -144,6 +152,7 @@ export function AssistantScreen({ data, client = assistantClient }: AssistantScr
             <SheetTitle>{t("card.title")}</SheetTitle>
             <SheetDescription className="sr-only">{t("card.description")}</SheetDescription>
           </SheetHeader>
+          <AssistantProviderSettings />
           <AssistantIntegrationCard data={data.status} client={client} showOpenLink={false} />
         </SheetContent>
       </Sheet>
@@ -155,6 +164,7 @@ function DeferredList({
   promise,
   ...props
 }: {
+  search?: (query: string) => Promise<AssistantConversationSummary[]>;
   promise: Promise<AssistantConversationSummary[] | null>;
   activeId: string | null;
   onRename: (id: string, title: string) => Promise<unknown>;

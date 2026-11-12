@@ -1,3 +1,4 @@
+import { dataObject, dataRows, stringValue } from "@ai/core/presentation";
 import { getProductContext } from "@/api/catalogue/catalogue.service";
 import { linkedUnits, unitOverview } from "@/types/unit-overview";
 import { z } from "zod";
@@ -211,6 +212,7 @@ registerAssistantTool({
   permission: "read",
   confirm: "never",
   activity: { en: "Checked the stock", nl: "Voorraad bekeken" },
+  present: (ctx, _input, data) => ({ version: 1, components: [{ type: "inventory", title: say(ctx.locale, "Inventory", "Voorraad"), items: dataRows(dataObject(data).items ?? dataObject(data).stock).map((item, index) => ({ id: stringValue(index), label: stringValue(item.product ?? item.name), detail: [item.qty, item.place, item.expires].filter(Boolean).join(" · "), href: "/inventory" })) }] }),
   run: async (ctx, input) => {
     if (input.product) {
       const [stock, product] = await Promise.all([getProductStock(ctx.householdId, input.product.id), getProduct(ctx.householdId, input.product.id)]);

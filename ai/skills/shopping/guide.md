@@ -15,3 +15,16 @@ Use shopping_sessions and shopping_session to obtain IDs and latest session/item
 **Kassabonnen are optional.** You may buy, finish and pay without any receipt. If supplied, shopping_session_upload_receipt accepts the actual base64 contents of a PDF or image (max 4 MB) and stores it in household documents; otherwise attach a document already uploaded with shopping_session_attach_receipt. Use the date printed on the receipt. Match individual printed lines with stable receipt references using shopping_session_match_receipt. Link earlier acquisitions (including purchases through the ordinary shopping list before sessions existed) rather than adding the goods again. A receipt's actual retailer may supersede the originally planned shop; an item sold at another shop is not an error. Do not assume that a quantity discrepancy, old stock count, or unmatched item should add more stock without confirming it.
 
 **Payments:** Get valid expenses, payment accounts and payers from shopping_payment_options. Record each actual split with shopping_session_record_payment and a distinct stable reference, correct payer, method, and date. Linking an existing paid expense must not create another one. Receipts alone do not create expenses. Do not infer a paid amount from stock quantities. Preserve unrelated recurring expenses and household cost allocations.
+
+
+## Collect&Go
+
+When the browser integration is enabled, use `shopping_collectandgo_search` for live product matches or
+promotion-page results. Use Dutch product search words for the Dutch storefront. Read the observed date, price context, package name and conditions. A lexical
+match is not a dietary or quantity equivalence guarantee. Never invent savings from mix-and-match,
+service costs or loyalty offers. Show the products and ask the person to choose an offer. Use
+`shopping_collectandgo_basket` only for that observed offer and an explicit final quantity; it always
+asks for confirmation and never places an order. If an offer expired or the price changed, search again.
+On CAPTCHA/login errors, direct the person to Settings → Collect&Go and the desktop login helper.
+On an unverified write, say the basket may have changed and ask them to inspect it before retrying.
+Preparing a basket does not mark WickedHome needs bought or create a purchase, expense or stock entry.

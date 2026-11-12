@@ -28,3 +28,5 @@ export type {
   AssistantPreviewListItem,
   AssistantSkillInfo,
 } from "./types/assistant";
+
+export { AssistantProviderSettings } from "./components/assistant-provider-settings";

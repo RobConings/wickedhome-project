@@ -395,3 +395,13 @@
     to { opacity: 1; }
   }
 }
+
+/* Assistant code uses the same semantic palette in both themes. */
+.assistant-markdown .hljs-keyword,
+.assistant-markdown .hljs-selector-tag,
+.assistant-markdown .hljs-literal { color: var(--primary); font-weight: 600; }
+.assistant-markdown .hljs-string,
+.assistant-markdown .hljs-title { color: var(--chart-2); }
+.assistant-markdown .hljs-number,
+.assistant-markdown .hljs-attr { color: var(--chart-3); }
+.assistant-markdown .hljs-comment { color: var(--muted-foreground); font-style: italic; }

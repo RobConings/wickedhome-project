@@ -1,3 +1,4 @@
+import { structuredResponseSchema } from "@/features/assistant/types/response-components";
 import { z } from "zod";
 import type { AssistantStreamEvent, AssistantToolStatus, ToolResult } from "@/features/assistant/types/assistant";
 import type { ScreenRef } from "@/types/screen-context";
@@ -194,7 +195,7 @@ export function toChatMessages(systemPrompt: string, history: LoopMessage[], opt
 
 /** A tool result as compact text for the model (nulls dropped), cut to `limit` characters. */
 export function resultForModel(result: ToolResult | null, limit = RESULT_LIMIT): string {
-  const text = JSON.stringify(prune(result ?? { ok: false, error: "No result" }));
+  const text = JSON.stringify(prune(result?.ok ? { ok: true, data: result.data } : result ?? { ok: false, error: "No result" }));
   return text.length > limit ? `${text.slice(0, limit)}… (cut off)` : text;
 }
 
@@ -255,7 +256,9 @@ export async function runTool(tool: RegisteredAssistantTool, ctx: AssistantToolC
     }
     // The one place every assistant and MCP write passes: record it in the household audit log.
     await auditToolCall(tool, ctx, input.data);
-    return { ok: true, data: data ?? null };
+    let response;
+    try { response = structuredResponseSchema.safeParse(tool.present?.(ctx, input.data, data)); } catch { /* Presentation never changes an action's outcome. */ }
+    return { ok: true, data: data ?? null, ...(response?.success && { response: response.data }) };
   } catch (error) {
     return { ok: false, error: errorMessage(error, tool.name) };
   }
@@ -328,7 +331,7 @@ async function handleCall(call: ToolCall, deps: LoopDeps, step: number, history:
   const base = { role: "tool" as const, content: "", toolCallId: call.id, toolName: tool?.name ?? call.function.name };
   const failWith = async (error: string, toolArgs?: unknown) => {
     const saved = await deps.save({ ...base, toolArgs, toolResult: { ok: false, error }, toolStatus: "failed", toolSummary: null });
-    deps.emit({ type: "tool", messageId: saved.id, toolCallId: call.id, name: base.toolName, status: "failed", label: tool ? activityOf(tool, deps.ctx.locale) : base.toolName });
+    deps.emit({ type: "tool", messageId: saved.id, toolCallId: call.id, name: base.toolName, status: "failed", error, label: tool ? activityOf(tool, deps.ctx.locale) : base.toolName });
     return saved;
   };
   if (!tool) return failWith(`Unknown tool "${call.function.name}". Use skills_load to get the tools of an area.`);
@@ -366,7 +369,7 @@ async function handleCall(call: ToolCall, deps: LoopDeps, step: number, history:
   deps.emit({ type: "tool", messageId: null, toolCallId: call.id, name: tool.name, status: "running", label });
   const result = await runTool(tool, deps.ctx, args.value);
   const saved = await deps.save({ ...base, toolArgs: args.value, toolResult: result, toolStatus: statusOf(result), toolSummary: label });
-  deps.emit({ type: "tool", messageId: saved.id, toolCallId: call.id, name: tool.name, status: statusOf(result), label });
+  deps.emit({ type: "tool", messageId: saved.id, toolCallId: call.id, name: tool.name, status: statusOf(result), label, ...(!result.ok && { error: result.error }) });
   return saved;
 }
 
@@ -525,11 +528,15 @@ export async function runAssistantLoop(history: LoopMessage[], deps: LoopDeps): 
     }
     return await fallbackAnswer(history, deps, step);
   } catch (error) {
-    const code = error instanceof ModelError ? error.code : "internal";
+    const code = error instanceof ModelError ? ("providerCode" in error ? String(error.providerCode) : error.code) : "internal";
     const message = error instanceof Error ? error.message : "Something went wrong";
     if (!(error instanceof ModelError)) console.error("Assistant loop failed", error);
     // One line per failed turn, so "no answer" can be traced; never the question or tool results.
     console.warn("[assistant] turn failed", { conversationId: deps.log?.conversationId ?? null, step: step + 1, model: deps.log?.model ?? null, error: `${code}: ${message.slice(0, 200)}` });
+    if ("requestId" in (error instanceof Error ? error : {})) {
+      const diagnostic = error as { requestId: string | null; status: number | null; param: string | null; bodyShape: string };
+      console.warn("[assistant] ChatGPT diagnostic", { code, status: diagnostic.status, requestId: diagnostic.requestId, param: diagnostic.param, bodyShape: diagnostic.bodyShape });
+    }
     deps.emit({ type: "error", code, message });
     // Stored too (not for Stop): coming back later, the conversation says why there was no answer.
     if (code !== "aborted") await saveFailureNote(history, deps, code);
@@ -680,13 +687,13 @@ export async function resolveConfirmation(
     deps.emit({ type: "tool", messageId, toolCallId: message.toolCallId ?? "", name: tool.name, status: "running", label: activityOf(tool, deps.ctx.locale) });
     result = await runTool(tool, deps.ctx, args);
     // The model wrote other arguments than what ran: tell it what the person changed.
-    if (result.ok && changed.length) result = { ok: true, data: { result: result.data, changedByPerson: changed } };
+    if (result.ok && changed.length) result = { ...result, data: { result: result.data, changedByPerson: changed } };
     status = statusOf(result);
   }
   const label = tool ? activityOf(tool, deps.ctx.locale) : (message.toolName ?? "");
   await deps.update(messageId, { toolResult: result, toolStatus: status });
   Object.assign(message, { toolResult: result, toolStatus: status });
-  deps.emit({ type: "tool", messageId, toolCallId: message.toolCallId ?? "", name: message.toolName ?? "", status, label });
+  deps.emit({ type: "tool", messageId, toolCallId: message.toolCallId ?? "", name: message.toolName ?? "", status, label, ...(!result.ok && { error: result.error }) });
 
   return (await nextPending(history, deps)) ?? runAssistantLoop(history, deps);
 }

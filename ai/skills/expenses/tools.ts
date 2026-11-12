@@ -1,3 +1,4 @@
+import { dataObject, dataRows, stringValue } from "@ai/core/presentation";
 import { z } from "zod";
 import { amountFor, computeRecurringTotals, matchesPayer, type PayerFilter } from "@/features/expenses/types/expense-calculations";
 import {
@@ -231,6 +232,11 @@ registerAssistantTool({
   permission: "read",
   confirm: "never",
   activity: { en: "Looked at the expenses", nl: "Uitgaven bekeken" },
+  present: (ctx, _input, data) => {
+    const result = dataObject(data);
+    const title = say(ctx.locale, "Expenses", "Uitgaven");
+    return { version: 1, components: [...(Array.isArray(result.categoryTotals) ? [{ type: "chart" as const, title, points: dataRows(result.categoryTotals).map((item) => ({ label: stringValue(item.category), value: Number(item.cents), display: stringValue(item.amount) })) }] : []), { type: "summary", title, values: [{ label: stringValue(result.month) || say(ctx.locale, "Monthly", "Maandelijks"), value: stringValue(result.total ?? result.perMonth) }] }, { type: "table", title: say(ctx.locale, "Breakdown", "Overzicht"), columns: [say(ctx.locale, "Payee", "Begunstigde"), say(ctx.locale, "Amount", "Bedrag"), say(ctx.locale, "Category", "Categorie")], rows: dataRows(result.items).map((item) => [stringValue(item.payee ?? item.name), stringValue(item.amount), stringValue(item.category)]) }] };
+  },
   run: async (ctx, input) => {
     const names = await entityNames(ctx, "habitant");
     const filter = payerFilterOf(input);
@@ -258,6 +264,7 @@ registerAssistantTool({
     for (const expense of paid) byCategory.set(expense.category, (byCategory.get(expense.category) ?? 0) + own(expense));
     return {
       month,
+      categoryTotals: [...byCategory].map(([category, cents]) => ({ category, cents, amount: money(cents) })),
       total: money(paid.reduce((sum, expense) => sum + own(expense), 0)),
       count: paid.length,
       byCategory: [...byCategory].sort((a, b) => b[1] - a[1]).map(([category, cents]) => `${category} ${money(cents)}`).join(", "),

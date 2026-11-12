@@ -15,6 +15,7 @@ import { CONVERSATION_RETENTION_DAYS, type AssistantConversationSummary } from "
 
 type ConversationListProps = {
   conversations: AssistantConversationSummary[];
+  search?: (query: string) => Promise<AssistantConversationSummary[]>;
   activeId: string | null;
   onRename: (id: string, title: string) => Promise<unknown>;
   onDelete: (id: string) => Promise<unknown>;
@@ -24,9 +25,18 @@ type ConversationListProps = {
 };
 
 /** The person's conversations, newest first, with "New chat", rename and delete. */
-export function ConversationList({ conversations, activeId, onRename, onDelete, onNavigate, className }: ConversationListProps) {
+export function ConversationList({ conversations, activeId, onRename, onDelete, onNavigate, className, search }: ConversationListProps) {
   const { t } = useTranslation("assistant");
   const locale = currentLocale();
+  const [query, setQuery] = React.useState("");
+  const [results, setResults] = React.useState<{ query: string; items: AssistantConversationSummary[] } | null>(null);
+  React.useEffect(() => {
+    if (!search || !query.trim()) return;
+    let active = true;
+    const timer = setTimeout(() => { void search(query).then((items) => { if (active) setResults({ query, items }); }).catch(() => undefined); }, 250);
+    return () => { active = false; clearTimeout(timer); };
+  }, [query, search]);
+  const filtered = search && results?.query === query && query.trim() ? results.items : conversations.filter((conversation) => (conversation.title ?? "").toLocaleLowerCase(locale).includes(query.trim().toLocaleLowerCase(locale)));
   const [renaming, setRenaming] = React.useState<AssistantConversationSummary | null>(null);
 
   return (
@@ -37,11 +47,12 @@ export function ConversationList({ conversations, activeId, onRename, onDelete, 
           {t("conversations.new")}
         </NavLink>
       </Button>
-      {conversations.length === 0 ? (
-        <p className="px-2 py-4 text-sm text-muted-foreground">{t("conversations.empty")}</p>
+      <Input type="search" aria-label={t("conversations.search")} placeholder={t("conversations.search")} value={query} maxLength={80} onChange={(event) => setQuery(event.target.value)} />
+      {filtered.length === 0 ? (
+        <p className="px-2 py-4 text-sm text-muted-foreground">{t(query.trim() ? "conversations.noMatches" : "conversations.empty")}</p>
       ) : (
         <ul className="flex min-h-0 flex-col gap-0.5 overflow-y-auto">
-          {conversations.map((conversation) => (
+          {filtered.map((conversation) => (
             <li key={conversation.id} className={cn("group flex items-center gap-1 rounded-md", conversation.id === activeId && "bg-accent")}>
               <NavLink
                 to={`/assistant/${conversation.id}`}

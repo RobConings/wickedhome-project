@@ -149,7 +149,10 @@ export type ModelErrorCode =
   | "no_tools"
   /** Any other non-2xx answer, e.g. no such model loaded. */
   | "http"
-  | "bad_response";
+  | "bad_response"
+  | "provider"
+  | "incomplete"
+  | "interrupted";
 
 export class ModelError extends Error {
   constructor(
@@ -247,7 +250,7 @@ const seconds = (ms: number) => `${Math.round(ms / 1000)} s`;
  * One abort signal for the person's stop, the total time, and the first-byte / idle timers. `timedOut()` says
  * which limit fired and after how long, for the log ("no output within 300 s, after 300 s").
  */
-function timers(outer: AbortSignal, timeouts: ModelTimeouts) {
+export function timers(outer: AbortSignal, timeouts: ModelTimeouts) {
   const controller = new AbortController();
   const started = Date.now();
   let reason: string | null = null;

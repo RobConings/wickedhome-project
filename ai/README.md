@@ -5,8 +5,8 @@ the skills (what it knows and can do, one folder per area of the app), the eval 
 the only part elsewhere: [`src/features/assistant`](../src/features/assistant) (browser code follows the
 app's layer rules).
 
-The assistant runs on a **local model** (LM Studio on a PC in the house, OpenAI-compatible API; the target is
-a Qwen-class model with ~16k context on a 20–24 GB GPU). The conversation never leaves the house; only the web
+The assistant supports a personal [ChatGPT subscription provider](docs/CHATGPT-SUBSCRIPTION.md) and a **local model** (LM Studio on a PC in the house, OpenAI-compatible API; the target is
+a Qwen-class model with ~16k context on a 20–24 GB GPU). With the local provider, the conversation stays in the house; only the web
 skill sends search words to the household's own SearXNG and fetches public pages (docs/WEB-SEARCH.md). It can do what the
 person can do in the app, through the same service functions as the UI, with the same roles, and every
 change is confirmed by the person and recorded in the audit log.
@@ -88,6 +88,8 @@ Implementing a redesigned journey includes updating its help, guide, tool descri
    (`core/tokens.ts`).
 7. **Audit**: every successful write (chat or MCP) is recorded in the household audit log
    (`core/tool-audit.ts`), with the person and the confirmation text.
+
+The [Collect&Go shopping integration](docs/COLLECT-AND-GO.md) extends the same Shopping skill with live browser observations and confirmed basket preparation.
 
 Other assistants on the LAN (Claude Desktop, LM Studio's MCP client) get the same tools over **MCP**
 (`POST /api/mcp`, `core/mcp.routes.ts`): read-only tokens by default, writes need `confirm: true`.

@@ -27,7 +27,12 @@
     "test:shopping-migrations": "node scripts/verify-shopping-migration.mjs",
     "test:shopping-browser": "tsx scripts/shopping-browser-smoke.mjs",
     "test:finance-integration": "FINANCE_INTEGRATION_TESTS=1 tsx --test ai/skills/expenses/*.integration.test.ts",
-    "test:energy-integration": "ENERGY_INTEGRATION_TESTS=1 tsx --test ai/skills/energy/*.integration.test.ts"
+    "test:energy-integration": "ENERGY_INTEGRATION_TESTS=1 tsx --test ai/skills/energy/*.integration.test.ts",
+    "assistant:pair": "tsx scripts/chatgpt-pair.ts",
+    "collectandgo:login": "tsx scripts/collect-and-go-login.ts",
+    "collectandgo:import": "tsx --env-file=.env scripts/collect-and-go-import.ts",
+    "test:assistant-browser": "node scripts/assistant-browser-smoke.mjs",
+    "test:collectandgo-browser": "DATABASE_URL=${DATABASE_URL:-postgresql://test@localhost/test} COLLECTANDGO_BROWSER_TESTS=1 tsx --test src/api/shopping/collect-and-go-browser.test.ts"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
@@ -42,6 +47,7 @@
     "croner": "^9.1.0",
     "express": "^5.2.1",
     "i18next": "^26.4.2",
+    "jose": "^6.2.17",
     "linkedom": "^0.18.13",
     "lucide-react": "^1.50.0",
     "pdfjs-dist": "~5.6.205",
@@ -50,13 +56,17 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-i18next": "^17.0.15",
+    "react-markdown": "^10.1.0",
     "react-router": "~7.18.4",
+    "rehype-highlight": "^7.0.2",
+    "remark-gfm": "^4.0.1",
     "sonner": "^2.0.8",
     "tailwind-merge": "^3.3.1",
     "uqr": "^0.1.3",
     "web-push": "^3.6.7",
     "ws": "^8.22.0",
-    "zod": "^4.6.5"
+    "zod": "^4.6.5",
+    "playwright": "1.65.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",
@@ -77,7 +87,6 @@
     "eslint-plugin-react-refresh": "^0.5.7",
     "eslint-plugin-storybook": "^10.6.1",
     "globals": "^17.13.0",
-    "playwright": "1.65.0",
     "prisma": "7.10.0",
     "storybook": "^10.6.1",
     "tailwindcss": "^4.3.3",

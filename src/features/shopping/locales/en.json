@@ -605,5 +605,20 @@
     "price": "Recorded price: {{price}}",
     "preferred": "Preferred shop for this product",
     "open": "Open recorded product page"
+  },
+  "collectAndGo": {
+    "description": "Find products and current promotions through the AI assistant. Basket changes always require confirmation; complete orders yourself.",
+    "serverSetup": "Administrator: enable the integration on the server, configure INTEGRATIONS_KEY and install the browser. Restart WickedHome afterward.",
+    "desktopLogin": "Run this from the WickedHome checkout on your desktop. Sign in to Collect&Go yourself and select your pickup point in the browser window.",
+    "importInstructions": "Transfer the protected session file to your server over SSH and import it with this command. Replace the example path. Delete the plaintext copies after import.",
+    "challenge": "Automation stops for a CAPTCHA or expired session. Complete the check yourself with the desktop helper and import again. Prices and promotion conditions can differ by pickup point.",
+    "disabled": "Browser integration disabled",
+    "imported": "Personal browser session imported",
+    "notImported": "No personal browser session imported",
+    "refresh": "Refresh status",
+    "disconnect": "Remove session",
+    "disconnectDescription": "Remove the saved session from WickedHome. Review active sessions in Collect&Go too.",
+    "open": "Open Collect&Go",
+    "error": "Collect&Go settings could not be loaded."
   }
 }

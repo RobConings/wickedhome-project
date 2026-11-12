@@ -24,7 +24,8 @@ export function ToolActivityChip({ label, status, error, className }: ToolActivi
           ? t("tool.cancelled", { label })
           : label;
   return (
-    <div className={cn("flex flex-col gap-1", className)}>
+    <details className={cn("flex flex-col gap-1 text-xs", className)}>
+      <summary className="w-fit cursor-pointer list-none">
       <span
         className={cn(
           "inline-flex max-w-full items-center gap-1.5 self-start rounded-full border px-2.5 py-1 text-xs",
@@ -44,7 +45,9 @@ export function ToolActivityChip({ label, status, error, className }: ToolActivi
         )}
         <span className="truncate">{text}</span>
       </span>
+      </summary>
+      <p className="mt-1 pl-2 text-muted-foreground">{t(`tool.state.${status}`)}</p>
       {status === "failed" && error && <span className="pl-2 text-xs text-muted-foreground">{t("tool.error", { error })}</span>}
-    </div>
+    </details>
   );
 }

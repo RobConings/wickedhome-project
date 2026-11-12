@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { StructuredResponse } from "@/features/assistant/types/response-components";
 import type { Role, SessionUser } from "@/features/auth/types/auth";
 import type { AssistantPreviewPayload } from "@/features/assistant/types/assistant";
 import type { Locale } from "@/types/common";
@@ -88,6 +89,8 @@ export type AssistantToolDefinition<Input extends z.ZodType = z.ZodType> = {
    * so the tool runner doesn't add one. Default: every successful write is recorded by the runner.
    */
   auditedByService?: boolean;
+  /** Trusted feature-owned presentation, persisted beside the original result. */
+  present?: (ctx: AssistantToolContext, input: z.output<Input>, data: unknown) => StructuredResponse | null;
   /**
    * The skill this tool belongs to (ai/core/skills.ts): its tools are sent to the model only while the skill
    * is active in the conversation. Default: the part of the name before the dot (`tasks.add` → `tasks`).

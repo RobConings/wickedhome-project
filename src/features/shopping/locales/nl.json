@@ -605,5 +605,20 @@
     "price": "Bewaarde prijs: {{price}}",
     "preferred": "Voorkeurswinkel voor dit product",
     "open": "Open bewaarde productpagina"
+  },
+  "collectAndGo": {
+    "description": "Zoek producten en actuele promoties via de AI-assistent. Een winkelmand wijzigen vraagt altijd bevestiging; bestellingen rond je zelf af.",
+    "serverSetup": "Beheerder: activeer de integratie op de server, stel INTEGRATIONS_KEY in en installeer de browser. Herstart WickedHome daarna.",
+    "desktopLogin": "Voer dit uit in de WickedHome-projectmap op je computer. Meld je zelf aan bij Collect&Go en kies je afhaalpunt in het geopende browservenster.",
+    "importInstructions": "Kopieer het beschermde sessiebestand via SSH naar je server en importeer het met dit commando. Vervang het voorbeeldpad. Verwijder de niet-versleutelde bestanden na import.",
+    "challenge": "Bij een CAPTCHA of verlopen sessie stopt de automatisering. Voltooi de controle zelf met de desktophelper en importeer opnieuw. Prijzen en promotievoorwaarden kunnen per afhaalpunt verschillen.",
+    "disabled": "Browserintegratie uitgeschakeld",
+    "imported": "Persoonlijke browsersessie geïmporteerd",
+    "notImported": "Geen persoonlijke browsersessie geïmporteerd",
+    "refresh": "Status vernieuwen",
+    "disconnect": "Sessie verwijderen",
+    "disconnectDescription": "De opgeslagen sessie wordt van WickedHome verwijderd. Controleer actieve sessies ook bij Collect&Go.",
+    "open": "Collect&Go openen",
+    "error": "Collect&Go-instellingen konden niet geladen worden."
   }
 }

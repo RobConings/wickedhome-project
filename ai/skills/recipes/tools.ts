@@ -1,3 +1,4 @@
+import { dataObject, dataRows, stringValue } from "@ai/core/presentation";
 import { z } from "zod";
 import {
   MAX_RECIPE_INGREDIENTS,
@@ -416,6 +417,11 @@ registerAssistantTool({
   permission: "read",
   confirm: "never",
   activity: { en: "Checked the recipes", nl: "Recepten bekeken" },
+  present: (ctx, _input, data) => {
+    const result = dataObject(data);
+    const items = result.name ? [result] : dataRows(result.items);
+    return { version: 1, components: [{ type: "recipes", title: say(ctx.locale, "Recipes", "Recepten"), items: items.map((item) => ({ name: stringValue(item.name), image: typeof item.imageUrl === "string" ? item.imageUrl : null, detail: [item.category, item.servings ? `${item.servings} p.` : null].filter(Boolean).join(" · "), href: "/recipes" })) }, ...(Array.isArray(result.ingredients) ? [{ type: "table" as const, title: say(ctx.locale, "Ingredients and stock", "Ingrediënten en voorraad"), columns: [say(ctx.locale, "Ingredient", "Ingrediënt"), say(ctx.locale, "Needed", "Nodig"), say(ctx.locale, "Stock", "Voorraad")], rows: dataRows(result.ingredients).map((item) => [stringValue(item.name), stringValue(item.need), stringValue(item.stock) || "?"]) }] : [])] };
+  },
   run: async (ctx, input) => {
     if (input.category && input.uncategorized) throw badRequest("Choose a category or uncategorized, not both.");
     const id = input.recipe?.id ?? (input.q || input.category || input.uncategorized ? undefined : screenTarget(ctx, "recipe"));

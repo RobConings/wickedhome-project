@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BotIcon, ExternalLinkIcon } from "lucide-react";
+import { BotIcon, Maximize2Icon, Minimize2Icon, MessagesSquareIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,10 @@ import { cn } from "@/lib/utils";
 import type { ScreenContext } from "@/types/screen-context";
 import { assistantClient, type AssistantClient } from "../data/assistant-client";
 import type { AssistantStatus } from "../types/assistant";
+import { useChatViewport } from "../hooks/use-chat-viewport";
+import { ConversationList } from "./conversation-list";
+import { AssistantProviderSettings } from "./assistant-provider-settings";
+import type { AssistantConversationSummary } from "../types/assistant";
 import { AssistantChat } from "./assistant-chat";
 
 type AskButtonProps = {
@@ -37,6 +41,10 @@ export function AskButton({ client = assistantClient, className, open: openProp,
     if (openProp === undefined) setInnerOpen(next);
     onOpenChange?.(next);
   };
+  const [expanded, setExpanded] = React.useState(false);
+  const [historyOpen, setHistoryOpen] = React.useState(false);
+  const [conversations, setConversations] = React.useState<AssistantConversationSummary[]>([]);
+  const viewportRef = useChatViewport(open);
   const [status, setStatus] = React.useState<AssistantStatus | null | "failed">(null);
   const [conversationId, setConversationId] = React.useState<string | null>(null);
   // A new chat each time the sheet opens after an answer was given (from the button or from outside).
@@ -57,10 +65,18 @@ export function AskButton({ client = assistantClient, className, open: openProp,
       .status()
       .then((value) => !cancelled && setStatus(value))
       .catch(() => !cancelled && setStatus("failed"));
+
     return () => {
       cancelled = true;
     };
   }, [client, open, status]);
+
+  React.useEffect(() => {
+    if (!open || !expanded) return;
+    let active = true;
+    void client.listConversations().then((rows) => { if (active) setConversations(rows); }).catch(() => undefined);
+    return () => { active = false; };
+  }, [client, open, expanded, conversationId]);
 
   return (
     <>
@@ -80,20 +96,18 @@ export function AskButton({ client = assistantClient, className, open: openProp,
         </Button>
       )}
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 pt-[env(safe-area-inset-top)] sm:max-w-md">
-          <SheetHeader className="border-b pr-12">
-            <SheetTitle>{t("ask.title")}</SheetTitle>
-            <SheetDescription className="flex flex-wrap items-center gap-x-2">
-              {t("ask.description")}
-              {conversationId && (
-                <Link to={`/assistant/${conversationId}`} onClick={() => setOpen(false)} className="inline-flex items-center gap-1 text-primary underline-offset-4 hover:underline">
-                  {t("chat.openFull")}
-                  <ExternalLinkIcon className="size-3" aria-hidden />
-                </Link>
-              )}
-            </SheetDescription>
+        <SheetContent ref={viewportRef} side="right" className={cn("top-[var(--chat-viewport-top,0px)] flex h-[var(--chat-viewport-height,100dvh)] w-full flex-col gap-0 p-0 pt-[env(safe-area-inset-top)]", expanded ? "sm:max-w-none" : "sm:max-w-md")}>
+          <SheetHeader className="flex-row items-center gap-2 border-b px-3 py-2 pr-12">
+            {expanded && <Button variant="ghost" size="icon" aria-label={t("conversations.open")} aria-expanded={historyOpen} onClick={() => setHistoryOpen((value) => !value)}><MessagesSquareIcon /></Button>}
+            <div className="min-w-0 flex-1"><SheetTitle className="truncate">{t("ask.title")}</SheetTitle><SheetDescription className="sr-only">{t("ask.description")}</SheetDescription></div>
+            <Button variant="ghost" size="icon" aria-label={t(expanded ? "chat.collapse" : "chat.openFull")} onClick={() => { const next = !expanded; setExpanded(next); setHistoryOpen(next && window.matchMedia("(min-width: 1024px)").matches); }}>{expanded ? <Minimize2Icon /> : <Maximize2Icon />}</Button>
           </SheetHeader>
-          <div className="flex min-h-0 flex-1 flex-col px-3">
+          <div className="flex min-h-0 flex-1">
+          {expanded && <aside className={cn("min-h-0 w-72 shrink-0 flex-col border-r p-3", historyOpen ? "flex w-full sm:w-72" : "hidden")}>
+            <ConversationList search={client.listConversations} conversations={conversations} activeId={conversationId} onNavigate={() => setOpen(false)} onRename={async (id, title) => { await client.renameConversation(id, title); setConversations(await client.listConversations()); }} onDelete={async (id) => { await client.deleteConversation(id); setConversations(await client.listConversations()); }} className="flex-1" />
+          </aside>}
+          <div className={cn("mx-auto flex min-h-0 min-w-0 flex-1 flex-col px-3", expanded && "max-w-4xl", expanded && historyOpen && "hidden sm:flex")}>
+            {status && status !== "failed" && <div className="py-2"><AssistantProviderSettings compact /></div>}
             {status === null ? (
               <LoadingState label={t("page.loading")} className="flex-1" />
             ) : status === "failed" ? (
@@ -104,7 +118,7 @@ export function AskButton({ client = assistantClient, className, open: openProp,
               <div className="flex flex-col gap-3 py-4">
                 <InlineAlert tone="info">{t("ask.notConfigured")}</InlineAlert>
                 <Button asChild variant="outline" onClick={() => setOpen(false)}>
-                  <Link to="/integrations">{t("ask.setup")}</Link>
+                  <Link to="/settings?section=assistant">{t("ask.setup")}</Link>
                 </Button>
               </div>
             ) : (
@@ -121,6 +135,7 @@ export function AskButton({ client = assistantClient, className, open: openProp,
                 autoFocus
               />
             )}
+          </div>
           </div>
         </SheetContent>
       </Sheet>

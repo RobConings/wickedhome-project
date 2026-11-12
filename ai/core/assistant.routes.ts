@@ -1,3 +1,4 @@
+import { z } from "zod";
 import express, { Router, type Request, type Response } from "express";
 import {
   ASSISTANT_IMAGE_MAX_BYTES,
@@ -38,6 +39,9 @@ import {
 import "./assistant.jobs";
 import { mcpOAuthManageRouter } from "./mcp-oauth.routes";
 import "./tool-audit";
+import { providerRouter } from "./providers/provider.routes";
+import { createResponsesModel } from "./providers/responses-client";
+import { accessToken, availableModels, providerStatus } from "./providers/provider-store";
 
 /**
  * `/api/assistant`: conversations, the streamed chat (Server-Sent Events over a POST response), the
@@ -46,6 +50,7 @@ import "./tool-audit";
  */
 export const assistantRouter = Router();
 
+assistantRouter.use(providerRouter);
 assistantRouter.use(requireUser);
 
 /** Questions per person: generous for a household, but a stuck client can't flood the model. */
@@ -118,18 +123,30 @@ async function startAndWatch(req: Request, res: Response, key: string, work: (op
 
 assistantRouter.get("/status", async (req, res) => {
   const [tts, web] = await Promise.all([ttsStatus(), webSearchStatus()]);
-  res.json({ ...getStatus(currentUser(req)), tts, web });
+  const user = currentUser(req);
+  const provider = await providerStatus(user.id);
+  const local = getStatus(user);
+  res.json({ ...local, ...(provider.provider === "chatgpt_subscription" && { configured: provider.connected && provider.permission && Boolean(provider.model), problem: null, host: "api.openai.com", model: provider.model }), provider: provider.provider, tts, web });
 });
 
 assistantRouter.post("/status/test", async (req, res) => {
   testsPerUser.hit(currentUser(req).id);
-  res.json(await testConnection());
+  const user = currentUser(req);
+  const provider = await providerStatus(user.id);
+  if (provider.provider === "local") { res.json(await testConnection()); return; }
+  const started = Date.now();
+  try {
+    const models = await availableModels(user.id);
+    if (!provider.model || !models.some((model) => model.slug === provider.model)) throw new Error("Select an available ChatGPT model in AI settings");
+    await createResponsesModel(provider.model, () => accessToken(user.id, provider.accountId!))({ messages: [{ role: "user", content: "Reply with OK." }], signal: AbortSignal.timeout(30000) });
+    res.json({ reachable: true, latencyMs: Date.now() - started, models: models.map((m) => m.slug), modelListed: true, error: null });
+  } catch { res.json({ reachable: false, latencyMs: Date.now() - started, models: [], modelListed: null, error: "ChatGPT inference is unavailable. Check your account, selected model and usage in AI settings." }); }
 });
 
 // ── Conversations ─────────────────────────────────────────────────────────────────────────────────────
 
 assistantRouter.get("/conversations", async (req, res) => {
-  res.json(await listConversations(currentUser(req)));
+  res.json(await listConversations(currentUser(req), parse(z.string().trim().max(80), req.query.q ?? "")));
 });
 
 /** A question in a new conversation: the first `start` event carries its id. */

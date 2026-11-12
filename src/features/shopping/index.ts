@@ -79,3 +79,5 @@ export { shoppingItemLoader, shoppingItemAction } from "./data/shopping-loaders"
 export { ShoppingItemScreen } from "./screens/shopping-item-screen";
 
 export { useLiveRevalidation as useShoppingRecordUpdates } from "./data/use-live-shopping";
+
+export { CollectAndGoSettings } from "./components/collect-and-go-settings";

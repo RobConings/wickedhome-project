@@ -20,7 +20,9 @@
     "menu": "Conversation options",
     "retention": "Conversations are kept for {{days}} days after the last message.",
     "loadFailed": "The conversations could not be loaded.",
-    "open": "Conversations"
+    "open": "Conversations",
+    "search": "Search conversations",
+    "noMatches": "No matching conversations."
   },
   "chat": {
     "placeholder": "Ask something…",
@@ -53,13 +55,27 @@
     "imageFailed": "Upload failed; remove it and try again",
     "screenOn": "About {{label}}; tap to leave it out",
     "screenOff": "Not about {{label}}; tap to ask about it",
-    "screenAbout": "Asked about"
+    "screenAbout": "Asked about",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyCode": "Copy code",
+    "edit": "Edit",
+    "resend": "Send edited message",
+    "collapse": "Collapse",
+    "close": "Back"
   },
   "tool": {
     "running": "Working: {{label}}",
     "failed": "Didn't work: {{label}}",
     "cancelled": "Cancelled: {{label}}",
-    "error": "Why: {{error}}"
+    "error": "Why: {{error}}",
+    "state": {
+      "running": "In progress",
+      "pending": "Waiting for confirmation",
+      "done": "Completed",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    }
   },
   "confirm": {
     "title": "Confirm",
@@ -87,7 +103,24 @@
     "network": "The connection to the app was lost. Check the network and try again.",
     "interrupted": "The answer was interrupted (the connection or the server stopped). Try again.",
     "empty_answer": "The model gave no answer. Try again, perhaps in other words.",
-    "generic": "Something went wrong. Try again."
+    "generic": "Something went wrong. Try again.",
+    "subscription_sharing_usage_limit_exceeded": "Your ChatGPT usage limit was reached. Manage your limits in ChatGPT.",
+    "subscription_sharing_usage_unavailable": "ChatGPT usage availability could not be checked. Try again later.",
+    "subscription_sharing_user_not_eligible": "Your ChatGPT account or workspace does not allow this usage.",
+    "subscription_sharing_unsupported_capability": "This model does not support part of the request. Choose another available model or adjust your request.",
+    "subscription_sharing_user_unavailable": "Your ChatGPT account is temporarily unavailable. Try again later.",
+    "subscription_sharing_invalid_user": "Reconnect your ChatGPT account in AI settings.",
+    "chatgpt_http_401": "ChatGPT access was refused. Reconnect your account.",
+    "chatgpt_http_403": "ChatGPT access is restricted by account or region policy.",
+    "chatgpt_http_503": "ChatGPT is temporarily unavailable. Try again later.",
+    "reconnect_required": "Reconnect ChatGPT.",
+    "plan_permission_required": "Authorize use of your ChatGPT plan.",
+    "incomplete": "The answer is incomplete. Try again.",
+    "invalid_client": "The ChatGPT client registration was refused. Check the integration configuration.",
+    "subscription_sharing_route_not_supported": "ChatGPT refused this inference route. Check the integration configuration.",
+    "chatpass_v2_scope_not_authorized": "The ChatGPT grant does not allow this operation. Check your account and permissions.",
+    "chatpass_v2_invalid_authorization_context": "The ChatGPT authorization context is invalid. Check the account registration.",
+    "chatgpt_unavailable": "ChatGPT is temporarily unreachable. Check the connection and try again later."
   },
   "voice": {
     "start": "Hold to talk",
@@ -327,5 +360,36 @@
     "failed": "That didn't work. Reload the page and try again.",
     "expiredTitle": "This request expired",
     "expiredDescription": "Start connecting again from the app you came from."
+  },
+  "provider": {
+    "title": "AI assistant",
+    "description": "Choose a local model or use your ChatGPT subscription. WickedHome keeps your conversations.",
+    "selected": "Provider and model",
+    "local": "Local model",
+    "chatgpt": "ChatGPT subscription",
+    "connected": "Connected",
+    "disconnected": "Not connected",
+    "reconnect": "Reconnect ChatGPT and choose an available model.",
+    "continue": "Continue with ChatGPT",
+    "refresh": "Refresh models",
+    "addAccount": "Connect another account",
+    "disconnect": "Disconnect",
+    "disconnectDescription": "ChatGPT requests will stop. Your conversations remain saved. Select a local model separately.",
+    "usage": "Manage usage and access in ChatGPT",
+    "storageSetup": "Configure INTEGRATIONS_KEY on the server to encrypt credentials. See ai/docs/CHATGPT-SUBSCRIPTION.md.",
+    "permissionRequired": "Authorize ChatGPT plan usage. Add --consent to the pairing command when reconnecting.",
+    "pairTitle": "Pair once from your desktop",
+    "pairInstructions": "Open the WickedHome checkout on a desktop with Node.js and a browser. Run this command and approve access in ChatGPT. The helper securely transfers credentials to your home server. Chat then works on your phone too.",
+    "expires": "Pairing code valid until {{time}}. Treat this command as a secret.",
+    "pairDone": "Paired, load models",
+    "pairDocs": "Official self-hosting instructions",
+    "loadFailed": "AI settings could not be loaded.",
+    "operationFailed": "This did not complete. Check the connection, refresh models or start pairing again.",
+    "revocationUnconfirmed": "Signed out locally, but OpenAI revocation was not confirmed. Disconnect the app in ChatGPT settings too.",
+    "account": "ChatGPT account",
+    "usingPlan": "Using ChatGPT plan",
+    "manageUsage": "Manage usage",
+    "planNotice": "AI requests with this provider use your ChatGPT plan. Manage access and usage limits in ChatGPT settings.",
+    "gotIt": "Got it"
   }
 }

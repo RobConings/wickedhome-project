@@ -2,8 +2,9 @@ import * as React from "react";
 import { MapPinIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import { RecordLink } from "@/components/shared/record-link";
-import { messageInline } from "./message-inline";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { AssistantMarkdown } from "./assistant-markdown";
 import type { ChatImage } from "../data/chat-state";
 
 type ChatMessageBubbleProps = {
@@ -17,23 +18,16 @@ type ChatMessageBubbleProps = {
   streaming?: boolean;
   className?: string;
   onRecordNavigate?: () => void;
+  onEdit?: (text: string) => void;
 };
 
-/** Bold text and safe record/source links; other model output remains escaped plain text. */
-function renderInline(text: string, onRecordNavigate?: () => void): React.ReactNode[] {
-  return messageInline(text).map((part, index) => {
-    if (part.kind === "strong") return <strong key={index}>{part.text}</strong>;
-    if (part.kind === "text") return part.text;
-    const className = "rounded-sm font-medium underline underline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-ring";
-    return part.external ? <a key={index} href={part.href} target="_blank" rel="noopener noreferrer" className={className}>{part.text}</a>
-      : <RecordLink key={index} to={part.href} className={className} onClick={(event) => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) onRecordNavigate?.(); }}>{part.text}</RecordLink>;
-  });
-}
-
 /** One question or answer in the chat. */
-export function ChatMessageBubble({ role, text, images = [], screen, streaming = false, className, onRecordNavigate }: ChatMessageBubbleProps) {
+export function ChatMessageBubble({ role, text, images = [], screen, streaming = false, className, onRecordNavigate, onEdit }: ChatMessageBubbleProps) {
   const { t } = useTranslation("assistant");
   const mine = role === "user";
+  const [copied, setCopied] = React.useState(false);
+  const [editing, setEditing] = React.useState(false);
+  const [draft, setDraft] = React.useState(text);
   return (
     <div className={cn("flex flex-col gap-1", mine ? "items-end" : "items-start", className)}>
       {screen && (
@@ -57,15 +51,19 @@ export function ChatMessageBubble({ role, text, images = [], screen, streaming =
       {(text || streaming || !images.length) && (
       <div
         className={cn(
-          "max-w-[85%] rounded-2xl px-3.5 py-2 text-sm whitespace-pre-wrap break-words sm:max-w-[75%]",
-          mine ? "rounded-br-sm bg-primary text-primary-foreground" : "rounded-bl-sm bg-muted",
+          "min-w-0 text-sm break-words",
+          mine ? "max-w-[90%] whitespace-pre-wrap rounded-2xl rounded-br-sm bg-muted px-4 py-2.5 sm:max-w-[80%]" : "w-full px-1 py-2",
         )}
       >
         <span className="sr-only">{mine ? t("chat.you") : t("chat.assistant")}: </span>
-        {renderInline(text, onRecordNavigate)}
+        {editing ? <form className="flex min-w-0 flex-col gap-2" onSubmit={(event) => { event.preventDefault(); if (draft.trim()) { onEdit?.(draft.trim()); setEditing(false); } }}><Textarea aria-label={t("chat.edit")} value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={4000} autoFocus /><div className="flex flex-wrap gap-2"><Button size="sm" type="submit">{t("chat.resend")}</Button><Button size="sm" type="button" variant="outline" onClick={() => setEditing(false)}>{t("confirm.cancel")}</Button></div></form> : mine ? text : text.length > 12000 && !streaming ? <details><summary className="cursor-pointer text-muted-foreground">{text.slice(0, 180)}…</summary><AssistantMarkdown text={text} onRecordNavigate={onRecordNavigate} /></details> : <AssistantMarkdown text={text} onRecordNavigate={onRecordNavigate} />}
         {streaming && <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse rounded-sm bg-current align-text-bottom opacity-60" aria-hidden />}
       </div>
       )}
+      {!streaming && !editing && text && <div className="flex gap-1 text-muted-foreground">
+        <Button variant="ghost" size="sm" onClick={() => { void navigator.clipboard.writeText(text).then(() => setCopied(true)).catch(() => setCopied(false)); }}>{t(copied ? "chat.copied" : "chat.copy")}</Button>
+        {mine && onEdit && <Button variant="ghost" size="sm" onClick={() => { setDraft(text); setEditing(true); }}>{t("chat.edit")}</Button>}
+      </div>}
     </div>
   );
 }

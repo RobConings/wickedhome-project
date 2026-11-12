@@ -412,3 +412,9 @@ token may use: MCP clients manage their own context), `tools/call`.
   `skills_load`, but a word like "recept" with a recipe photo is more reliable.
 - Voice needs HTTPS; on the LAN address the microphone button shows "not available".
 - No streaming over MCP and no MCP resources/prompts; tools only.
+
+## ChatGPT subscription and expanded chat
+
+See [ChatGPT subscription setup](CHATGPT-SUBSCRIPTION.md) for desktop-assisted pairing, account models,
+provider selection, secure server storage and the expanded chat UI. See [Collect&Go](COLLECT-AND-GO.md)
+for shopping-browser setup, promotion estimates, confirmations and the live verification boundary.

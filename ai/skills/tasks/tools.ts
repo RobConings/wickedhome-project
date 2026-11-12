@@ -1,3 +1,4 @@
+import { dataObject, dataRows, stringValue } from "@ai/core/presentation";
 import { z } from "zod";
 import { todayProgress } from "@/features/tasks/types/task-views";
 import {
@@ -216,6 +217,7 @@ registerAssistantTool({
   confirm: "never",
   core: true,
   activity: { en: "Checked the tasks", nl: "Taken bekeken" },
+  present: (ctx, _input, data) => ({ version: 1, components: [{ type: "tasks", title: say(ctx.locale, "Tasks", "Taken"), items: dataRows(dataObject(data).items).map((item) => ({ id: stringValue(item.id), label: stringValue(item.title), detail: [item.due, Array.isArray(item.who) ? item.who.join(", ") : null].filter(Boolean).join(" · "), href: `/tasks/${stringValue(item.id)}`, status: stringValue(item.state), actions: item.state === "done" || item.state === "cancelled" ? [] : [{ label: say(ctx.locale, "Complete", "Voltooien"), message: say(ctx.locale, `Complete task ${stringValue(item.id)} (${stringValue(item.title)}).`, `Voltooi taak ${stringValue(item.id)} (${stringValue(item.title)}).`) }] })) }] }),
   run: async (ctx, input) => {
     const [overview, names, deviceOverview] = await Promise.all([getTasksOverview(ctx.user), entityNames(ctx, "habitant"), input.device ? getTasksOverview(ctx.user, { deviceId: input.device.id }) : null]);
     const today = overview.today;

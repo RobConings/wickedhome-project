@@ -1,3 +1,5 @@
+import "./collect-and-go";
+import { dataObject, dataRows, stringValue } from "@ai/core/presentation";
 import { getItem } from "@/api/shopping/shopping.service";
 import "./sessions";
 import { updateShoppingItem } from "@/api/shopping/shopping-actions";
@@ -53,8 +55,8 @@ registerAssistantSkill({
   title: { en: "Shopping", nl: "Boodschappen" },
   summary: "Shopping needs and shared visits: select products, buy or skip, match receipts and payments once; realtime with web. Household counts, optional automatic replenishments, staples and materials.",
   keywords: {
-    nl: ["winkelsessie", "winkelbeurt", "kassabon", "nu niet", "boodschap", "boodschappen", "boodschappenlijst", "kopen", "halen", "op de lijst", "supermarkt", "delhaize", "colruyt", "aldi", "lidl", "nodig", "gekocht", "vaste boodschap", "lijstje"],
-    en: ["shopping visit", "shopping session", "shopping", "shopping list", "groceries", "buy", "on the list", "supermarket", "we need", "bought", "staple", "grocery list"],
+    nl: ["collect&go", "collectandgo", "promoties", "kortingen", "winkelmand", "winkelsessie", "winkelbeurt", "kassabon", "nu niet", "boodschap", "boodschappen", "boodschappenlijst", "kopen", "halen", "op de lijst", "supermarkt", "delhaize", "colruyt", "aldi", "lidl", "nodig", "gekocht", "vaste boodschap", "lijstje"],
+    en: ["collect&go", "collectandgo", "promotions", "basket", "shopping visit", "shopping session", "shopping", "shopping list", "groceries", "buy", "on the list", "supermarket", "we need", "bought", "staple", "grocery list"],
   },
 });
 
@@ -159,6 +161,7 @@ registerAssistantTool({
   confirm: "never",
   core: true,
   activity: { en: "Checked the shopping list", nl: "Boodschappenlijst bekeken" },
+  present: (ctx, _input, data) => ({ version: 1, components: [{ type: "shopping", title: say(ctx.locale, "Shopping list", "Boodschappenlijst"), items: dataRows(dataObject(data).items).map((item) => ({ id: stringValue(item.id), label: stringValue(item.name), detail: [item.qty, item.price, item.note].filter(Boolean).join(" · "), group: [item.shop, item.list].filter(Boolean).join(" · ") || say(ctx.locale, "Unassigned", "Niet toegewezen"), href: "/shopping" })) }] }),
   run: async (ctx, input) => {
     const overview = await getShoppingOverview(ctx.householdId, ctx.locale);
     const views = shoppingListViews(overview.lists, say(ctx.locale, "Groceries", "Boodschappen"));

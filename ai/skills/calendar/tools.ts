@@ -1,3 +1,4 @@
+import { dataObject, dataRows, stringValue } from "@ai/core/presentation";
 import { z } from "zod";
 import { CALENDAR_CATEGORIES, CALENDAR_ENTRY_KINDS, calendarEventInputSchema, type CalendarEntry } from "@/features/calendar/types/calendar";
 import { formatTime } from "@/types/date-format";
@@ -109,6 +110,7 @@ registerAssistantTool({
   confirm: "never",
   core: true,
   activity: { en: "Checked the agenda", nl: "Agenda bekeken" },
+  present: (ctx, _input, data) => ({ version: 1, components: [{ type: "calendar", title: say(ctx.locale, "Agenda", "Agenda"), items: dataRows(dataObject(data).items).map((item, index) => ({ id: stringValue(index), label: stringValue(item.title), detail: [item.date, item.time, item.location].filter(Boolean).join(" · "), href: "/calendar" })) }] }),
   run: async (ctx, input) => {
     const from = input.from ?? todayIn();
     let to = input.to ?? from;
