@@ -184,6 +184,66 @@ it("disconnects all selected accounts together", async () => {
   assert.equal((await collectAndGoStatus(wife)).canUse, false);
 });
 
+it("persists server-renewed sessions across cart/order reads and selected accounts without reimporting", async () => {
+  const owner = actor("renewal"), wife = actor("renewal-wife", "renewal", "adult");
+  const native = { ...state, cookies: [{ ...state.cookies[0]!, name: "WC_AUTHENTICATION_1", domain: "apip.collectandgo.be", value: "initial-cookie" }], cartApi: { storeId: "1", catalogId: "2", langId: "-11", authToken: "fixture-token", apiKey: "fixture-key" } };
+  await importCollectAndGoSession(owner, { state: native, userIds: [owner.id, wife.id] });
+  const before = (await readCollectAndGoConnection(owner.householdId))!;
+  let calls = 0;
+  mock.method(globalThis, "fetch", async (input: URL | RequestInfo, options?: RequestInit) => {
+    assert.equal(options?.method, "GET");
+    const cookies = new Headers(options?.headers).get("Cookie")!;
+    assert.ok(cookies.includes(`WC_AUTHENTICATION_1=${calls === 0 ? "initial-cookie" : `renewed-${calls}`}`), "the next account/request uses the last server-issued session");
+    calls++;
+    const path = new URL(String(input)).pathname;
+    const rawOrder = { resourceName: "order", orderId: "11", buyerId: "1", orderStatus: "M", recordSetCount: "0", recordSetTotal: "0", recordSetStartNumber: "0", orderItem: [] };
+    const body = path.endsWith("cart/@self") ? { resourceName: "cart", orderStatus: "P", orderId: "10", x_xtraEmailId: "fixture@example.test", totalProductPriceCurrency: "EUR", recordSetCount: "0", recordSetTotal: "0", recordSetStartNumber: "0" } : path.endsWith("@history") ? { resourceName: "order", recordSetCount: "1", recordSetTotal: "1", recordSetStartNumber: "0", Order: [rawOrder] } : rawOrder;
+    return Response.json(body, { headers: { "Set-Cookie": `WC_AUTHENTICATION_1=renewed-${calls}; Domain=.collectandgo.be; Path=/; Secure; HttpOnly; Max-Age=3600` } });
+  });
+  await readCollectAndGoCart(owner, signal());
+  await readCollectAndGoOrders(wife, signal());
+  await readCollectAndGoOrder(owner, "11", signal());
+  await readCollectAndGoCart(wife, signal());
+  const after = (await readCollectAndGoConnection(owner.householdId))!;
+  assert.equal(calls, 4); assert.equal(after.state.cookies.length, 1); assert.equal(after.state.cookies[0]?.value, "renewed-4");
+  assert.deepEqual(after.userIds, before.userIds); assert.equal(after.importedAt, before.importedAt); assert.equal(after.revision, before.revision); assert.equal(after.needsReconnect, false);
+  const exposed = JSON.stringify(await collectAndGoStatus(wife)); assert.ok(!exposed.includes("renewed-"));
+  const file = join(directory, "collect-and-go-shared", `${createHash("sha256").update(owner.householdId).digest("hex")}.enc`);
+  assert.ok(!(await readFile(file, "utf8")).includes("renewed-4")); assert.equal((await stat(file)).mode & 0o777, 0o600);
+});
+
+it("does not let an in-flight session renewal overwrite an owner's revoked connection", async () => {
+  const owner = actor("renewal-revoke"), wife = actor("renewal-revoke-wife", "renewal-revoke", "adult");
+  const native = { ...state, cookies: [{ ...state.cookies[0]!, name: "WC_AUTHENTICATION_1", domain: "apip.collectandgo.be" }], cartApi: { storeId: "1", catalogId: "2", langId: "-11", authToken: "fixture-token", apiKey: "fixture-key" } };
+  await importCollectAndGoSession(owner, { state: native, userIds: [wife.id] });
+  let release!: () => void, started!: () => void;
+  const waiting = new Promise<void>(resolve => { started = resolve; });
+  mock.method(globalThis, "fetch", async () => {
+    started(); await new Promise<void>(resolve => { release = resolve; });
+    return Response.json({ resourceName: "cart", orderStatus: "P", orderId: "1", x_xtraEmailId: "fixture@example.test", totalProductPriceCurrency: "EUR", recordSetCount: "0", recordSetTotal: "0", recordSetStartNumber: "0" }, { headers: { "Set-Cookie": "WC_AUTHENTICATION_1=must-not-save; Path=/; Secure" } });
+  });
+  const pending = readCollectAndGoCart(wife, signal()), rejected = assert.rejects(pending, /connection changed/);
+  await waiting; const revoke = setCollectAndGoAccess(owner, []); release();
+  await rejected; await revoke;
+  const saved = (await readCollectAndGoConnection(owner.householdId))!;
+  assert.deepEqual(saved.userIds, []); assert.equal(saved.state.cookies[0]?.value, native.cookies[0]!.value);
+});
+
+it("keeps a verified cookie renewal when a later activity request is unavailable, without accepting error cookies", async () => {
+  const owner = actor("renewal-partial");
+  const native = { ...state, cookies: [{ ...state.cookies[0]!, name: "WC_AUTHENTICATION_1", domain: "apip.collectandgo.be" }], cartApi: { storeId: "1", catalogId: "2", langId: "-11", authToken: "fixture-token", apiKey: "fixture-key" } };
+  await importCollectAndGoSession(owner, { state: native, userIds: [owner.id] });
+  mock.method(globalThis, "fetch", async (input: URL | RequestInfo, options?: RequestInit) => {
+    if (String(input).includes("cart/@self")) return Response.json({ resourceName: "cart", orderStatus: "P", orderId: "1", x_xtraEmailId: "fixture@example.test", totalProductPriceCurrency: "EUR", recordSetCount: "0", recordSetTotal: "0", recordSetStartNumber: "0" }, { headers: { "Set-Cookie": "WC_AUTHENTICATION_1=verified-renewal; Path=/; Secure" } });
+    assert.ok(new Headers(options?.headers).get("Cookie")?.includes("WC_AUTHENTICATION_1=verified-renewal"));
+    return Response.json({ error: "temporarily unavailable" }, { status: 503, headers: { "Set-Cookie": "WC_AUTHENTICATION_1=error-cookie; Path=/" } });
+  });
+  const result = await readCollectAndGoActivity(owner, signal());
+  assert.equal(result.cart?.authenticated, true); assert.equal(result.ordersError, "unavailable");
+  const saved = (await readCollectAndGoConnection(owner.householdId))!;
+  assert.equal(saved.state.cookies[0]?.value, "verified-renewal"); assert.equal(saved.needsReconnect, false);
+});
+
 it("reads reservations for selected adults and children with browser integration off; revocation blocks in-flight disclosure", async () => {
   const owner = actor("orders"), wife = actor("orders-wife", "orders", "adult"), child = actor("orders-child", "orders", "child");
   const enabled = process.env.COLLECTANDGO_ENABLED; process.env.COLLECTANDGO_ENABLED = "0";

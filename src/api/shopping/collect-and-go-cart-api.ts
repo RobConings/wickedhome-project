@@ -1,5 +1,5 @@
 import type { CollectAndGoCart, CollectAndGoState } from "@/features/shopping/types/collect-and-go";
-import { collectAndGoUnverified as invalid, retailerRecord as record, retailerDecimal as decimal, readCollectAndGoJson } from "./collect-and-go-api";
+import { collectAndGoUnverified as invalid, retailerRecord as record, retailerDecimal as decimal, readCollectAndGoResponse } from "./collect-and-go-api";
 
 /** Sanitized contract based on the actual wcscartsvcv2 response, never a guest or placed order. */
 export function parseCollectAndGoCartResponse(raw: unknown): CollectAndGoCart {
@@ -21,5 +21,8 @@ export function parseCollectAndGoCartResponse(raw: unknown): CollectAndGoCart {
 
 /** Read the pending basket; placed reservations are exposed separately. */
 export async function fetchCollectAndGoCart(state: CollectAndGoState, signal: AbortSignal): Promise<CollectAndGoCart> {
-  return parseCollectAndGoCartResponse(await readCollectAndGoJson(state, "cart/@self", signal));
+  const response = await readCollectAndGoResponse(state, "cart/@self", signal);
+  const cart = parseCollectAndGoCartResponse(response.body);
+  response.acceptSessionCookies();
+  return cart;
 }

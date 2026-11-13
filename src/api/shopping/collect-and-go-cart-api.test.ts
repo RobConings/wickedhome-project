@@ -37,3 +37,18 @@ it("recognizes the observed HTTP 405 AntiBot page and HTML challenges without ex
  mock.restoreAll();mock.method(globalThis,"fetch",async()=>Response.json({error:"Method not allowed"},{status:405}));
  await assert.rejects(fetchCollectAndGoCart(state,new AbortController().signal),{code:"collectandgo_unavailable"});
 });
+
+it("renews only from a verified basket, never from a guest response, error or challenge", async () => {
+ const saved=structuredClone(state); let calls=0;
+ mock.method(globalThis,"fetch",async(_input:unknown,options?:RequestInit)=>{
+  assert.equal(new Headers(options?.headers).get("Cookie"),calls++ === 0 ? "WC_AUTHENTICATION_1=fixture-cookie" : "WC_AUTHENTICATION_1=renewed-cookie");
+  return Response.json(response(),{headers:{"Set-Cookie":"WC_AUTHENTICATION_1=renewed-cookie; Path=/; Secure; HttpOnly"}});
+ });
+ await fetchCollectAndGoCart(saved,new AbortController().signal); await fetchCollectAndGoCart(saved,new AbortController().signal);
+ assert.equal(calls,2); assert.equal(saved.cookies.find(c=>c.name==="WC_AUTHENTICATION_1")?.value,"renewed-cookie");
+ for(const invalid of [()=>Response.json({...response(),x_xtraEmailId:""}),()=>Response.json({error:"expired"},{status:401}),()=>new Response("<title>Colruyt | AntiBot</title>",{status:405,headers:{"Content-Type":"text/html"}}),()=>Response.json({...response(),orderItem:[{...response().orderItem[0],quantity:"0"}]})]) {
+  mock.restoreAll(); const original=structuredClone(saved);
+  mock.method(globalThis,"fetch",async()=>{const result=invalid();result.headers.append("Set-Cookie","WC_AUTHENTICATION_1=unverified-cookie; Path=/; Secure");return result;});
+  await assert.rejects(fetchCollectAndGoCart(saved,new AbortController().signal)); assert.deepEqual(saved,original);
+ }
+});

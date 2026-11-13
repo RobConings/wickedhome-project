@@ -649,7 +649,7 @@
     },
     "browserDisabledWithCart": "Je online winkelmand uitlezen is beschikbaar. Browserfuncties voor producten zoeken en de mand wijzigen staan uit op de server.",
     "cartReady": "Cart-API-gegevens gelezen. Klaar om te importeren; klik na het importeren op Verbinding testen om de aangemelde winkelmand te controleren.",
-    "sessionReuse": "De opgeslagen sessie wordt hergebruikt. Bij een botblokkade pauzeert de automatische uitlezing. Met Verbinding testen kun je bewust opnieuw proberen met dezelfde sessie; importeer alleen opnieuw wanneer aanmelden echt moet worden vernieuwd."
+    "sessionReuse": "WickedHome bewaart sessiecookies die Collect&Go tijdens een geslaagde uitlezing vernieuwt automatisch voor de geselecteerde accounts. Dit kan een volledig verlopen login niet opnieuw aanmelden. Bij een botblokkade pauzeert de uitlezing; met Verbinding testen probeer je bewust dezelfde opgeslagen sessie opnieuw."
   },
   "xtra": {
     "description": "Colruyt Group: zoek Colruyt-producten en maak het gedeelde Xtra-lijstje voor boodschappen in een fysieke winkel.",

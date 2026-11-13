@@ -1,5 +1,6 @@
 import { collectAndGoCartApiSchema, type CollectAndGoState } from "@/features/shopping/types/collect-and-go";
 import { HttpError } from "../lib/http";
+import { collectAndGoRequestCookies, renewCollectAndGoCookies } from "./collect-and-go-cookies";
 
 export const collectAndGoUnverified = () => new HttpError(409, "collectandgo_unverified", "The Collect&Go response could not be verified. This does not establish that the saved session expired. Try again; if the problem persists, the integration needs checking.");
 export const retailerRecord = (value: unknown): Record<string, unknown> | null => value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
@@ -18,15 +19,16 @@ async function isChallengePage(response: Response): Promise<boolean> {
 }
 
 /** Fixed, verified read endpoints only. Never replay a captured HAR request or follow a redirect. */
-export async function readCollectAndGoJson(state: CollectAndGoState, resource: string, signal: AbortSignal, pageNumber = 1): Promise<unknown> {
+export async function readCollectAndGoResponse(state: CollectAndGoState, resource: string, signal: AbortSignal, pageNumber = 1): Promise<{ body: unknown; acceptSessionCookies: () => void }> {
   const parsed = collectAndGoCartApiSchema.safeParse(state.cartApi);
   if (!parsed.success) throw new HttpError(409, "collectandgo_credentials_missing", "This older import does not contain cart API credentials. An owner needs to import a cart API HAR once; the saved session is then reused.");
   if (!/^(?:cart\/@self|order\/(?:@history|\d{1,20}))$/.test(resource) || !Number.isSafeInteger(pageNumber) || pageNumber < 1 || pageNumber > 5) throw collectAndGoUnverified();
   const api = parsed.data, order = resource.startsWith("order/");
   const url = new URL(`https://apip.collectandgo.be/gateway/ecomfoodb2c.eshop.${order ? "wcsordersvcv2" : "wcscartsvcv2"}/v2/store/${api.storeId}/${resource}`);
   url.search = new URLSearchParams({ langId: api.langId, catalogId: api.catalogId, ...(order && { pageNumber: String(pageNumber), pageSize: "100" }) }).toString();
-  const cookies = state.cookies.filter((cookie) => cookie.value && /^(?:WC_AUTHENTICATION_\d+|WC_USERACTIVITY_\d+|WC_SESSION_ESTABLISHED|WC_ACTIVEPOINTER|WC_PERSISTENT|JSESSIONID|COL_RC|COL_SHOP|APP_C_LANGUAGE|reese84)$/.test(cookie.name) && (cookie.domain === "apip.collectandgo.be" || cookie.domain === ".collectandgo.be" || cookie.domain === "collectandgo.be") && (cookie.expires < 0 || cookie.expires * 1000 > Date.now()));
+  const cookies = collectAndGoRequestCookies(state, url);
   if (!cookies.some((cookie) => /^WC_AUTHENTICATION_\d+$/.test(cookie.name))) throw new HttpError(409, "collectandgo_login", "The saved Collect&Go session has no usable authentication cookie. Ask an owner to renew it in Settings.");
+  if (new Set(cookies.filter(cookie => /^WC_AUTHENTICATION_\d+$/.test(cookie.name)).map(cookie => cookie.name)).size !== 1) throw collectAndGoUnverified();
   try {
     const response = await fetch(url, { method: "GET", redirect: "error", signal: AbortSignal.any([signal, AbortSignal.timeout(20000)]), headers: { Accept: "application/json", WCAuthToken: api.authToken, "X-CG-APIKey": api.apiKey, Cookie: cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join("; "), Origin: "https://www.collectandgo.be", Referer: "https://www.collectandgo.be/", ...(state.userAgent && { "User-Agent": state.userAgent }) } });
     if (await isChallengePage(response) || response.status === 456) { await response.body?.cancel().catch(() => undefined); throw challenge(); }
@@ -37,7 +39,8 @@ export async function readCollectAndGoJson(state: CollectAndGoState, resource: s
     const chunks: Uint8Array[] = []; let size = 0;
     try { while (true) { const next = await reader.read(); if (next.done) break; size += next.value.length; if (size > 2000000) throw collectAndGoUnverified(); chunks.push(next.value); } }
     finally { await reader.cancel().catch(() => undefined); }
-    return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+    const body: unknown = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+    return { body, acceptSessionCookies: () => { signal.throwIfAborted(); renewCollectAndGoCookies(state, url, response.headers); } };
   } catch (error) {
     if (error instanceof HttpError) throw error;
     throw new HttpError(502, "collectandgo_unavailable", "Collect&Go could not be read. Check the connection and try again; no basket or order change was requested.");

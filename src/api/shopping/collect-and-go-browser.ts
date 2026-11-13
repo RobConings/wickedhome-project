@@ -157,16 +157,19 @@ async function orderRead<T>(user: SessionUser, signal: AbortSignal, read: (state
     signal.throwIfAborted();
     const saved = await requireCollectAndGoAccess(user);
     if (generation !== (generations.get(user.householdId) ?? 0) || saved.revision !== snapshot.revision) throw conflict("The Collect&Go connection changed. Read again.");
+    const previousCookies = saved.state.cookies;
     try {
       const result = await read(saved.state, signal, saved.revision);
       signal.throwIfAborted();
       if (generation !== (generations.get(user.householdId) ?? 0)) throw conflict("The Collect&Go connection changed before returning the order.");
-      if (cartObservation) await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: cartObservation(result) });
+      if (cartObservation || saved.state.cookies !== previousCookies) await saveCollectAndGoConnection(user.householdId, { ...saved, ...(cartObservation && { verifiedAt: cartObservation(result) }) });
       signal.throwIfAborted();
       if (generation !== (generations.get(user.householdId) ?? 0)) throw conflict("The Collect&Go connection changed before returning the snapshot.");
       return result;
     } catch (error) {
-      if (generation === (generations.get(user.householdId) ?? 0) && error instanceof HttpError && ["collectandgo_login", "collectandgo_challenge"].includes(error.code)) await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: null, needsReconnect: true, reconnectReason: error.code === "collectandgo_challenge" ? "challenge" : "login" });
+      activityCache.delete(user.householdId);
+      const authenticationError = error instanceof HttpError && ["collectandgo_login", "collectandgo_challenge"].includes(error.code);
+      if (!signal.aborted && generation === (generations.get(user.householdId) ?? 0) && (authenticationError || saved.state.cookies !== previousCookies)) await saveCollectAndGoConnection(user.householdId, { ...saved, ...(authenticationError && { verifiedAt: null, needsReconnect: true, reconnectReason: error.code === "collectandgo_challenge" ? "challenge" as const : "login" as const }) });
       throw error;
     }
   });

@@ -90,3 +90,24 @@ it("marks bounded history partial and refuses revisions changing between product
   });
   await assert.rejects(fetchCollectAndGoOrder(state, "11", signal()));
 });
+
+it("uses renewed cookies between order pages, keeping only cookies from verified account responses", async () => {
+  for (const kind of ["history", "detail"] as const) {
+    mock.restoreAll(); const saved = structuredClone(state); let calls = 0;
+    mock.method(globalThis, "fetch", async (_input: unknown, options?: RequestInit) => {
+      const cookie = new Headers(options?.headers).get("Cookie");
+      assert.equal(cookie, calls === 0 ? "WC_AUTHENTICATION_1=synthetic-cookie" : "WC_AUTHENTICATION_1=page-1");
+      calls++;
+      const rows = Array.from({ length: calls === 1 ? 100 : 1 }, (_, index) => kind === "history" ? { ...summary(), orderId: String(calls * 100 + index) } : item(String(calls * 100 + index)));
+      return Response.json({ ...(kind === "history" ? history(rows) : { ...detail(), orderItem: rows }), recordSetCount: String(rows.length), recordSetTotal: "101", recordSetStartNumber: calls === 1 ? "0" : "100" }, { headers: { "Set-Cookie": `WC_AUTHENTICATION_1=page-${calls}; Path=/; Secure` } });
+    });
+    await (kind === "history" ? fetchCollectAndGoOrders(saved, signal()) : fetchCollectAndGoOrder(saved, "11", signal()));
+    assert.equal(calls, 2); assert.equal(saved.cookies[0]?.value, "page-2");
+  }
+  for (const kind of ["history", "detail"] as const) {
+    mock.restoreAll(); const saved = structuredClone(state), original = structuredClone(saved);
+    mock.method(globalThis, "fetch", async () => Response.json(kind === "history" ? history([{ ...summary(), buyerId: "another-account" }]) : { ...detail(), buyerId: "another-account" }, { headers: { "Set-Cookie": "WC_AUTHENTICATION_1=unverified; Path=/" } }));
+    await assert.rejects(kind === "history" ? fetchCollectAndGoOrders(saved, signal()) : fetchCollectAndGoOrder(saved, "11", signal()));
+    assert.deepEqual(saved, original);
+  }
+});

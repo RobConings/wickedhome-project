@@ -649,7 +649,7 @@
     },
     "browserDisabledWithCart": "Reading your online basket is available. Browser functions for product search and basket changes are disabled on the server.",
     "cartReady": "Cart API credentials read. Ready to import; use Test connection after importing to verify signed-in basket access.",
-    "sessionReuse": "The saved session is reused. Automated reads pause on a bot block. Test connection explicitly retries the same saved session; only import again when sign-in actually needs renewing."
+    "sessionReuse": "WickedHome automatically saves session cookies renewed by Collect&Go during a successful read for the selected accounts. This cannot sign in again after a login fully expires. Automated reads pause on a bot block; Test connection explicitly retries the same saved session."
   },
   "xtra": {
     "description": "Colruyt Group: search Colruyt products and prepare the shared Xtra list for shopping in a physical store.",

@@ -1,5 +1,5 @@
 import { collectAndGoOrderIdSchema, type CollectAndGoOrder, type CollectAndGoOrderDetail, type CollectAndGoOrders, type CollectAndGoState } from "@/features/shopping/types/collect-and-go";
-import { collectAndGoUnverified as invalid, retailerRecord as record, retailerDecimal as decimal, retailerCents as cents, readCollectAndGoJson } from "./collect-and-go-api";
+import { collectAndGoUnverified as invalid, retailerRecord as record, retailerDecimal as decimal, retailerCents as cents, readCollectAndGoResponse } from "./collect-and-go-api";
 import { fetchCollectAndGoCart } from "./collect-and-go-cart-api";
 
 const timeZone = "Europe/Brussels" as const;
@@ -45,11 +45,14 @@ export async function fetchCollectAndGoOrders(state: CollectAndGoState, signal: 
   const buyerId = accountId(state);
   const values: Record<string, unknown>[] = []; const seen = new Set<string>(); let total: number | undefined;
   for (let page = 1; page <= 5; page++) {
-    const raw = record(await readCollectAndGoJson(state, "order/@history", signal, page));
+    const response = await readCollectAndGoResponse(state, "order/@history", signal, page);
+    const raw = record(response.body);
     if (!raw || raw.resourceName !== "order" || !Array.isArray(raw.Order)) throw invalid();
     total = pagination(raw, raw.Order, page, total);
     if (total === 0) await fetchCollectAndGoCart(state, signal); // Prove sign-in for explicitly empty history; non-empty rows prove their buyer themselves.
-    for (const value of raw.Order) { const order = owned(value, buyerId); const id = order.orderId as string; if (seen.has(id)) throw invalid(); seen.add(id); if (order.orderStatus !== "P") values.push(order); }
+    for (const value of raw.Order) { const order = owned(value, buyerId); const id = order.orderId as string; if (seen.has(id)) throw invalid(); seen.add(id); if (order.orderStatus !== "P") { parseCollectAndGoOrder(order, buyerId); values.push(order); } }
+    // Empty history is not itself identity proof. Its cart check can rotate newer cookies.
+    if (total > 0) response.acceptSessionCookies();
     if (page * 100 >= total) break;
   }
   const now = Date.now();
@@ -59,7 +62,8 @@ export async function fetchCollectAndGoOrder(state: CollectAndGoState, id: strin
   if (!collectAndGoOrderIdSchema.safeParse(id).success) throw invalid();
   const buyerId = accountId(state), items: CollectAndGoOrderDetail["items"] = [], seen = new Set<string>(); let total: number | undefined, summary: CollectAndGoOrder | undefined, signature: string | undefined;
   for (let page = 1; page <= 5; page++) {
-    const raw = record(await readCollectAndGoJson(state, `order/${id}`, signal, page));
+    const response = await readCollectAndGoResponse(state, `order/${id}`, signal, page);
+    const raw = record(response.body);
     if (!raw || raw.resourceName !== "order" || raw.orderId !== id || !Array.isArray(raw.orderItem)) throw invalid();
     const current = parseCollectAndGoOrder(raw, buyerId);
     const currentSignature = JSON.stringify([current, raw.lastUpdateDate]);
@@ -72,6 +76,7 @@ export async function fetchCollectAndGoOrder(state: CollectAndGoState, id: strin
       seen.add(item.orderItemId);
       items.push({ ...(typeof item.productId === "string" && /^\d{1,20}$/.test(item.productId) && { productId: item.productId }), ...(typeof item.partNumber === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(item.partNumber) && { articleNumber: item.partNumber }), name: item.xitem_productName.trim().slice(0, 300), url: null, quantity, unitPriceCents: cents(item.unitPrice) });
     }
+    response.acceptSessionCookies();
     if (page * 100 >= total) break;
   }
   const now = Date.now();

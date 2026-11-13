@@ -114,6 +114,9 @@ On AntiBot/CAPTCHA errors stop automatic requests. A blocked retailer may still 
 a fresh HAR does not guarantee server access. After checking the normal website, an allowed account can
 explicitly use Settings → Collect&Go → Test connection with the same saved session. Renew the imported
 sign-in only if it genuinely expired; do not repeatedly ask for a HAR or retry a blocked tool.
+Successful native reads preserve ordinary session cookies renewed by the retailer, shared across
+selected accounts. This maintains server-issued renewals; it does not automatically sign in again
+after complete login expiry or solve AntiBot challenges. Do not promise a permanently valid login.
 An imported cookie session is not proof of signed-in basket access, and a retailer block may still prevent server access.
 On an unverified write, say the basket may have changed and ask them to inspect it before retrying.
 Preparing a basket does not mark WickedHome needs bought or create a purchase, expense or stock entry.
