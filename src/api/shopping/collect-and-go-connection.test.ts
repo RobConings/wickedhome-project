@@ -10,7 +10,7 @@ import { config } from "../lib/config";
 import { db } from "../lib/db";
 import { decryptSecret } from "../lib/secrets";
 import { collectAndGoStatus, readCollectAndGoConnection, requireCollectAndGoAccess, withCollectAndGoConnection } from "./collect-and-go-connection";
-import { adoptCollectAndGoSession, disconnectCollectAndGoBrowser, importCollectAndGoSession, readCollectAndGoCart, rememberedCollectAndGoOffer, searchCollectAndGo, setCollectAndGoAccess, setCollectAndGoBasket } from "./collect-and-go-browser";
+import { adoptCollectAndGoSession, disconnectCollectAndGoBrowser, importCollectAndGoSession, readCollectAndGoCart, readCollectAndGoOrders, readCollectAndGoOrder, rememberedCollectAndGoOffer, searchCollectAndGo, setCollectAndGoAccess, setCollectAndGoBasket } from "./collect-and-go-browser";
 import { readCollectAndGoSession, saveCollectAndGoSession } from "./collect-and-go-session";
 const actor = (id: string, householdId = id, role: SessionUser["role"] = "owner"): SessionUser => ({ id, householdId, role, email: `${id}@example.test`, name: id, locale: "en", householdName: "Home", habitantId: null });
 const signal = () => new AbortController().signal;
@@ -182,4 +182,34 @@ it("disconnects all selected accounts together", async () => {
   await disconnectCollectAndGoBrowser(owner);
   assert.equal(await readCollectAndGoConnection(owner.householdId), null);
   assert.equal((await collectAndGoStatus(wife)).canUse, false);
+});
+
+it("reads reservations for selected adults and children with browser integration off; revocation blocks in-flight disclosure", async () => {
+  const owner = actor("orders"), wife = actor("orders-wife", "orders", "adult"), child = actor("orders-child", "orders", "child");
+  const enabled = process.env.COLLECTANDGO_ENABLED; process.env.COLLECTANDGO_ENABLED = "0";
+  try {
+    const native = { ...state, cookies: [{ ...state.cookies[0]!, name: "WC_AUTHENTICATION_1", domain: "apip.collectandgo.be" }], cartApi: { storeId: "1", catalogId: "2", langId: "-11", authToken: "fixture-token", apiKey: "fixture-key" } };
+    await importCollectAndGoSession(owner, { state: native, userIds: [wife.id, child.id] });
+    const raw = { resourceName: "order", orderId: "11", buyerId: "1", orderStatus: "M", locked: "false", x_isAmendable: "true", x_aortDate: "20300101", x_aortTime: "0900", recordSetCount: "0", recordSetTotal: "0", recordSetStartNumber: "0", orderItem: [] };
+    let hold: (() => void) | undefined, started: (() => void) | undefined;
+    const browser = mock.method(chromium, "launch", async () => { throw Error("Must not launch browser for orders"); });
+    mock.method(globalThis, "fetch", async (input: URL | RequestInfo, options?: RequestInit) => {
+      assert.equal(options?.method, "GET"); const path = new URL(String(input)).pathname;
+      if (path.endsWith("cart/@self")) return Response.json({ resourceName: "cart", orderId: "10", orderStatus: "P", x_xtraEmailId: "fixture@example.test", totalProductPriceCurrency: "EUR", recordSetCount: "0", recordSetTotal: "0", recordSetStartNumber: "0", orderItem: [] });
+      if (path.endsWith("@history")) return Response.json({ resourceName: "order", Order: [raw], recordSetCount: "1", recordSetTotal: "1", recordSetStartNumber: "0" });
+      if (started) { started(); await new Promise<void>(resolve => { hold = resolve; }); }
+      return Response.json(raw);
+    });
+    assert.equal((await readCollectAndGoOrders(wife, signal())).orders[0]?.id, "11");
+    assert.equal((await readCollectAndGoOrder(child, "11", signal())).authenticated, true);
+    await assert.rejects(readCollectAndGoOrder(owner, "11", signal()), /don't have access/);
+    const waiting = new Promise<void>(resolve => { started = resolve; });
+    const pending = readCollectAndGoOrder(wife, "11", signal());
+    const rejected = assert.rejects(pending, /connection changed/);
+    await waiting;
+    const revocation = setCollectAndGoAccess(owner, []); hold!();
+    await rejected; await revocation;
+    await assert.rejects(readCollectAndGoOrders(wife, signal()), /don't have access/);
+    assert.equal(browser.mock.callCount(), 0);
+  } finally { if (enabled === undefined) delete process.env.COLLECTANDGO_ENABLED; else process.env.COLLECTANDGO_ENABLED = enabled; }
 });

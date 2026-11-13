@@ -28,5 +28,6 @@ describe("Collect&Go browser safety and saved basket verification",{skip:!enable
  });
  it("sets an absolute quantity and verifies persisted state after reload; retry does not add twice",async()=>{await page.goto(origin);const result=await setCollectAndGoQuantityOnPage(page,offer,4);assert.equal(result.verified,true);assert.equal(result.orderPlaced,false);assert.equal(quantity,4);await setCollectAndGoQuantityOnPage(page,offer,4);assert.equal(quantity,4);assert.equal(writes,2);});
  it("refuses a changed price before any write",async()=>{price="1,99";await page.goto(origin);const before=writes;await assert.rejects(setCollectAndGoQuantityOnPage(page,offer,5),/price or promotion changed/);assert.equal(writes,before);});
+ it("refuses reservation amendment mode before touching any quantity control",async()=>{await page.goto(origin);await page.locator("body").evaluate(body=>body.prepend(Object.assign(document.createElement("p"),{textContent:"Je bent je reservatie aan het wijzigen"})));const before=writes;await assert.rejects(setCollectAndGoQuantityOnPage(page,offer,5),/cannot amend orders/);assert.equal(writes,before);});
  it("stops at a human verification challenge",async()=>{await page.setContent("<body>We vermoeden dat je een bot bent. Voltooi de CAPTCHA.</body>");await assert.rejects(checkCollectAndGoPage(page),/human browser check/);});
 });

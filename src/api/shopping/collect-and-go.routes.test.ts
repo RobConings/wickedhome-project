@@ -67,3 +67,12 @@ it("authenticates cart reads/checks, enforces selected accounts and honours the 
     assert.equal((await call("/check", "POST", {}, "wife")).status, 409, "selected adults can test access without being an owner");
   } finally { if (enabled === undefined) delete process.env.COLLECTANDGO_ENABLED; else process.env.COLLECTANDGO_ENABLED = enabled; }
 });
+
+it("protects reservation routes with authentication and the same selected-account grants", async () => {
+  for (const path of ["/orders", "/orders/11"]) {
+    assert.equal((await call(path)).status, 401);
+    assert.equal((await call(path, "GET", undefined, "child")).status, 403);
+    assert.equal((await call(path, "GET", undefined, "wife")).status, 409, "browser-only session cannot prove native reservation access");
+  }
+  assert.equal((await call("/orders/not-an-order", "GET", undefined, "wife")).status, 400);
+});

@@ -5,6 +5,9 @@ import "./core-tools";
 import { handleMcpMessage, mcpToolOf } from "./mcp.routes";
 import { getAssistantTool } from "./tools";
 import { skillsForRole } from "./skills";
+import { structuredResponseSchema } from "@/features/assistant/types/response-components";
+import type { AssistantToolContext } from "./tools";
+import type { CollectAndGoOrder } from "@/features/shopping/types/collect-and-go";
 import type { TokenIdentity } from "./assistant.service";
 
 const identity: TokenIdentity = {
@@ -83,6 +86,40 @@ describe("MCP workflow knowledge", () => {
     assert.match(mcpToolOf(cart).description, /signed-in/);
     assert.match(mcpToolOf(cart).description, /guest cart/i);
     assert.match(mcpToolOf(cart).description, /Never changes quantities/);
+  });
+
+  it("publishes separate read-only reservation tools and teaches cutoff-aware amendments", async () => {
+    const init = await rpc("initialize") as { result: { instructions: string } };
+    const loaded = await call("skills_load", { skills: ["shopping"] });
+    for (const text of [init.result.instructions, loaded.guides[0].guide]) {
+      assert.match(text, /shopping_collectandgo_orders/); assert.match(text, /shopping_collectandgo_order/);
+      assert.match(text, /Europe\/Brussels/); assert.match(text, /amend/); assert.match(text, /cutoff/);
+    }
+    for (const name of ["shopping.collectandgo_orders", "shopping.collectandgo_order"]) {
+      const tool = getAssistantTool(name)!;
+      assert.equal(tool.permission, "read"); assert.equal(tool.confirm, "never");
+      assert.match(mcpToolOf(tool).description, /pending basket/);
+      assert.match(mcpToolOf(tool).description, /cutoff/);
+    }
+    const tool = getAssistantTool("shopping.collectandgo_order")!;
+    assert.deepEqual(tool.input.parse({ orderId: "11" }), { orderId: "11" });
+    assert.throws(() => tool.input.parse({ orderId: "../cart" }));
+  });
+
+  it("renders large retailer results with shared tables and reservation links in both languages", () => {
+    const order: CollectAndGoOrder = { id: "11", url: "https://www.collectandgo.be/nl/bestelling/11", status: "M", pickupPoint: "Example", pickupFrom: "2026-11-14T07:30:00.000Z", pickupUntil: "2026-11-14T08:00:00.000Z", amendableUntil: "2026-11-13T08:00:00.000Z", providerAmendable: true, editState: "open", estimatedTotalCents: 1250 };
+    const items = Array.from({ length: 250 }, () => ({ name: "Example", url: null, quantity: 2, unitPriceCents: 48 }));
+    for (const locale of ["en", "nl"] as const) {
+      const ctx: AssistantToolContext = { user: identity.user, householdId: identity.user.householdId, locale, signal, channel: "chat" };
+      for (const [name, data] of [["shopping.collectandgo_orders", { orders: Array.from({ length: 250 }, () => order), observedAt: "now", truncated: false }], ["shopping.collectandgo_order", { ...order, items, observedAt: "now", truncated: false }], ["shopping.collectandgo_cart", { items, observedAt: "now", truncated: false }]] as const) {
+        const presentation = structuredResponseSchema.parse(getAssistantTool(name)!.present!(ctx, {}, data));
+        assert.equal(presentation.components.filter(component => component.type === "table").flatMap(component => component.rows).length, 250);
+        if (name === "shopping.collectandgo_order") {
+          const links = presentation.components.find(component => component.type === "links");
+          assert.equal(links?.links[0]?.href, order.url);
+        }
+      }
+    }
   });
 
   it("does not expose restricted guides to children", async () => {

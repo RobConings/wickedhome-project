@@ -55,6 +55,23 @@ just because you prepared a retailer list. See docs/XTRA.md.
 
 ## Collect&Go — online ordering
 
+There are two distinct online destinations, in addition to the separate Xtra in-store list:
+- `shopping_collectandgo_cart`: current pending basket, not submitted reservations.
+- `shopping_collectandgo_orders`: submitted reservations/history with pickup slots and editing cutoffs.
+- `shopping_collectandgo_order` with an observed/person-supplied `orderId`: the reservation's actual products.
+
+Never claim a reservation is empty because the pending basket is empty. Use the exact provider
+`amendableUntil`, `providerAmendable` and `editState` (open/closed/unknown), observed at `observedAt`.
+Times are Europe/Brussels. Missing, contradictory, expired or unknown state never means permission
+to amend. Do not invent a universal deadline or confuse pickup time with the amendment cutoff.
+These tools only read; they never switch into amendment mode. For now, finish reservation changes
+on its Collect&Go order link. Do not use `shopping_collectandgo_basket` to amend an existing order.
+Collect&Go requires finishing the shopping flow to submit amendments, and changing quantities can
+reprice the existing quantity too. A future amendment tool must identify the exact order, obtain human
+confirmation, re-read the provider's editability/deadline/price immediately before any change, and
+verify the amendment was submitted; opening an editing window alone is not success.
+
+
 Use `shopping_collectandgo_cart` to read the actual signed-in online basket or test the connection,
 without adding products, changing quantities or placing an order. It returns observed quantities,
 unit prices where readable, a timestamp and whether the result is partial. An explicitly empty basket

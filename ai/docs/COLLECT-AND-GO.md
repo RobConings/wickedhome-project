@@ -6,7 +6,8 @@ group but use separate lists/baskets, connections, account selections and channe
 promotions. An Xtra list is not an online basket. Do not transfer items unless explicitly requested
 and confirmed; if the intended channel is unclear, ask before changing either destination.
 
-The Shopping skill adds `shopping_collectandgo_cart`, `shopping_collectandgo_search` and `shopping_collectandgo_basket` to the existing
+The Shopping skill adds `shopping_collectandgo_cart`, `shopping_collectandgo_orders`,
+`shopping_collectandgo_order`, `shopping_collectandgo_search` and `shopping_collectandgo_basket` to the existing
 assistant/MCP registry. It reuses existing role checks, mandatory sensitive-action confirmation, progress,
 audit and typed response rendering. This integration does not create a separate shopping list, purchase
 ledger or assistant. It prepares an external basket; completing the order remains on Collect&Go.
@@ -59,6 +60,52 @@ functions and legacy browser fallback. Restart after environment configuration c
 The existing `collectandgo:login` and `collectandgo:import` scripts remain optional legacy tools, not the
 normal settings workflow. Login automation may be blocked even when regular Chrome works.
 
+
+## Placed reservations and editing deadlines
+
+A current pending basket (`orderStatus=P`) is separate from already submitted reservations. An empty
+basket never proves that no order exists. The upstream [xtra-mcp project](https://github.com/ddvlamin/xtra-mcp)
+handles the Xtra in-store list, not Collect&Go reservations; these reads use Collect&Go's order service.
+
+- `shopping_collectandgo_orders` / GET `/api/shopping/collect-and-go/orders`: placed reservation history,
+  excluding pending baskets, with pickup windows, estimated EUR totals and amendment cutoffs.
+- `shopping_collectandgo_order` (`orderId`) / GET `/api/shopping/collect-and-go/orders/:id`: one placed
+  reservation and its product quantities and unit prices.
+
+Both use the same imported cart API session and explicit household account grants, including selected
+children. No additional login or browser flag is needed. Native order reads call fixed GET endpoints in
+`ecomfoodb2c.eshop.wcsordersvcv2/v2/store/{storeId}/order/@history` and `order/{orderId}`
+([HCL order reference](https://help.hcl-software.com/commerce/7.0.0/com.ibm.commerce.starterstores.doc/code/rsm_order_fep8.htm)).
+They validate the provider's buyer ID against the single imported WC authentication account; order IDs
+cannot choose arbitrary paths. History verifies the signed-in basket first, including before returning
+empty history. Provider pagination is followed up to five 100-record pages, with explicit truncation;
+wrong offsets, duplicate IDs, changing totals/order details and incomplete pages fail verification.
+Email, phone, addresses, payment data and raw order fields never reach clients. Fresh access checks and
+connection-generation fences prevent queued or in-flight reads from returning data after revocation.
+
+The observed reservation API provides `x_isAmendable`, `locked`, `x_aortDate`/`x_aortTime` (amendment
+cutoff), and separate `x_handoverDate`/`x_handoverTimeFrom`/`x_handoverTimeTo` (pickup). Convert these
+strictly from **Europe/Brussels**, independently of server timezone. Invalid or ambiguous DST times
+remain unknown. `editState=open` requires the observed M reservation status, an explicit true amendment
+flag, an unlocked order and a strictly future cutoff. False flags, locks, completed orders or expired
+cutoffs close the window; incomplete/unknown states never imply permission. Recheck the cutoff after
+pagination, because it can pass during a read. These are timestamped observations, not write authorization.
+
+The official [reservation-change instructions](https://www.collectandgo.be/nl/reservatie-wijzigen)
+require finishing with "klaar met winkelen" to submit amendments. Some pickups have different cutoffs;
+never compute a universal 24-hour deadline. Increasing a product quantity can reprice its existing
+quantity too, and discounts may depend on pickup date. **Automated reservation amendments are not
+implemented.** Use the returned order link to finish them in Collect&Go. Never route a request to add to
+a placed reservation through the pending-basket write tool; it also stops at an explicit amendment-mode
+message before touching product controls. Any future amendment workflow must name the order and
+products, obtain human confirmation, freshly verify provider editability and pricing immediately before
+writing, and independently verify submission. No edit-mode activation, submit, cancel, checkout or
+quantity-change request was made while developing the order reader.
+
+Live read-only verification on 13 November 2026 returned 59 placed reservations and all 32 products in
+the upcoming reservation, with the same estimated total and cutoff shown by the account holder.
+Only GET requests were used. Committed tests contain synthetic fixtures; the private HAR and captured
+responses are local only. This verifies reads, not any automated amendment workflow.
 
 ## Search, promotions and basket behavior
 

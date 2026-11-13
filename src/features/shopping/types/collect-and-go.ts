@@ -9,6 +9,21 @@ export type CollectAndGoCart = {
   items: { name: string; url: string | null; quantity: number; unitPriceCents: number | null }[];
   truncated: boolean;
 };
+export const collectAndGoOrderIdSchema = z.string().regex(/^\d{1,20}$/);
+export type CollectAndGoOrder = {
+  id: string;
+  url: string;
+  status: string;
+  pickupPoint: string | null;
+  pickupFrom: string | null;
+  pickupUntil: string | null;
+  amendableUntil: string | null;
+  providerAmendable: boolean | null;
+  editState: "open" | "closed" | "unknown";
+  estimatedTotalCents: number | null;
+};
+export type CollectAndGoOrders = { authenticated: true; observedAt: string; timeZone: "Europe/Brussels"; orders: CollectAndGoOrder[]; truncated: boolean };
+export type CollectAndGoOrderDetail = CollectAndGoOrder & { authenticated: true; observedAt: string; timeZone: "Europe/Brussels"; items: CollectAndGoCart["items"]; truncated: boolean };
 export type CollectAndGoCheck = { status: CollectAndGoStatus; cart: CollectAndGoCart };
 
 const cookieSchema = z.object({ name: z.string().min(1).max(200).regex(/^[^\s;=\r\n]+$/), value: z.string().max(16000).regex(/^[^\r\n;]*$/), domain: z.string().refine((v) => /(^|\.)(collectandgo\.be|colruytgroup\.com|xtra\.be)$/.test(v)), path: z.string().startsWith("/").max(1000), expires: z.number().finite(), httpOnly: z.boolean(), secure: z.boolean(), sameSite: z.enum(["Strict", "Lax", "None"]) });

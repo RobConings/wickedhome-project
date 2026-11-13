@@ -9,6 +9,7 @@ import { secretsAvailable } from "../lib/secrets";
 import { productMatch, euroCents, promotionPrice } from "./collect-and-go-pricing";
 import { openCollectAndGoCart } from "./collect-and-go-cart";
 import { fetchCollectAndGoCart } from "./collect-and-go-cart-api";
+import { fetchCollectAndGoOrder, fetchCollectAndGoOrders } from "./collect-and-go-orders-api";
 import { readCollectAndGoSession, disconnectCollectAndGo } from "./collect-and-go-session";
 import { collectAndGoEnabled, collectAndGoMembers, collectAndGoStatus, deleteCollectAndGoConnection, readCollectAndGoConnection, requireCollectAndGoAccess, requireCollectAndGoOwner, saveCollectAndGoConnection, withCollectAndGoConnection, type CollectAndGoConnection } from "./collect-and-go-connection";
 export { collectAndGoCartAvailable, collectAndGoEnabled } from "./collect-and-go-connection";
@@ -140,6 +141,29 @@ export async function readCollectAndGoCart(user: SessionUser, signal: AbortSigna
     return cart;
   }, true);
 }
+/** Orders use the same household grants and revocation fence, but never mark a basket verified. */
+async function orderRead<T>(user: SessionUser, signal: AbortSignal, read: (state: CollectAndGoConnection["state"], signal: AbortSignal) => Promise<T>) {
+  const snapshot = await requireCollectAndGoAccess(user);
+  if (!snapshot.state.cartApi) throw fail("collectandgo_unverified", "Import a fresh Collect&Go cart API HAR to read placed reservations. A browser-only session cannot verify orders.");
+  const generation = generations.get(user.householdId) ?? 0;
+  return withCollectAndGoConnection(user.householdId, async () => {
+    signal.throwIfAborted();
+    const saved = await requireCollectAndGoAccess(user);
+    if (generation !== (generations.get(user.householdId) ?? 0) || saved.revision !== snapshot.revision) throw conflict("The Collect&Go connection changed. Read again.");
+    try {
+      const result = await read(saved.state, signal);
+      signal.throwIfAborted();
+      if (generation !== (generations.get(user.householdId) ?? 0)) throw conflict("The Collect&Go connection changed before returning the order.");
+      return result;
+    } catch (error) {
+      if (generation === (generations.get(user.householdId) ?? 0) && error instanceof HttpError && ["collectandgo_login", "collectandgo_challenge"].includes(error.code)) await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: null, needsReconnect: true });
+      throw error;
+    }
+  });
+}
+export const readCollectAndGoOrders = (user: SessionUser, signal: AbortSignal) => orderRead(user, signal, fetchCollectAndGoOrders);
+export const readCollectAndGoOrder = (user: SessionUser, id: string, signal: AbortSignal) => orderRead(user, signal, (state, pending) => fetchCollectAndGoOrder(state, id, pending));
+
 async function searchPage(page: Page, query: string, promotionsOnly: boolean) {
   await page.goto(promotionsOnly ? PROMOS : HOME, { waitUntil: "domcontentloaded" });
   await checkCollectAndGoPage(page);
@@ -209,6 +233,8 @@ export async function setCollectAndGoBasket(user: SessionUser, offerId: string, 
 
 /** Browser boundary, independently verified with persisted-page fixtures. */
 export async function setCollectAndGoQuantityOnPage(page: Page, expected: CollectAndGoOffer, quantity: number) {
+    const body = await checkCollectAndGoPage(page);
+    if (/je (?:bent.{0,30}(?:reservatie|bestelling).{0,30}(?:wijzigen|aanpassen)|(?:wijzigt|past).{0,30}(?:reservatie|bestelling))|(?:reservatie|bestelling) (?:aan het wijzigen|wordt gewijzigd)/i.test(body)) throw fail("collectandgo_amending", "Collect&Go is editing a placed reservation. This basket tool cannot amend orders. Inspect the reservation and its cutoff in Collect&Go; no quantity change was requested.");
     const tile = page.locator(".ds-product-tile").filter({ has: page.locator(`.ds-product-tag [role=heading]`).filter({ hasText: expected.name }) }).filter({ visible: true });
     // Exact identity, price and promotion are checked again after the person confirms.
     const exact = page.locator(`.ds-product-tile[href=${JSON.stringify(expected.url)}]`);
