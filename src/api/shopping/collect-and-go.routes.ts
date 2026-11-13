@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { currentUser, requireRole, requireUser } from "../lib/session";
-import { adoptCollectAndGoSession, disconnectCollectAndGoBrowser, importCollectAndGoSession, readCollectAndGoCart, readCollectAndGoOrders, readCollectAndGoOrder, setCollectAndGoAccess } from "./collect-and-go-browser";
+import { adoptCollectAndGoSession, disconnectCollectAndGoBrowser, importCollectAndGoSession, readCollectAndGoCart, readCollectAndGoActivity, readCollectAndGoOrders, readCollectAndGoOrder, setCollectAndGoAccess } from "./collect-and-go-browser";
 import { collectAndGoStatus } from "./collect-and-go-connection";
 import { collectAndGoAccessSchema, collectAndGoConnectionInputSchema, collectAndGoOrderIdSchema } from "@/features/shopping/types/collect-and-go";
 import { parse } from "../lib/http";
@@ -22,14 +22,15 @@ async function cartRequest(req: Request, res: Response, checking = false) {
 }
 collectAndGoRouter.get("/cart", (req, res) => cartRequest(req, res));
 collectAndGoRouter.post("/check", (req, res) => cartRequest(req, res, true));
-async function orderRequest(req: Request, res: Response, id?: string) {
+async function orderRequest(req: Request, res: Response, id?: string, activity = false) {
   const user = currentUser(req); changes.hit(user.id);
   const controller = new AbortController();
   const abort = () => { if (!res.writableEnded) controller.abort(); };
   res.on("close", abort);
-  try { res.json(id ? await readCollectAndGoOrder(user, id, controller.signal) : await readCollectAndGoOrders(user, controller.signal)); }
+  try { res.json(activity ? await readCollectAndGoActivity(user, controller.signal) : id ? await readCollectAndGoOrder(user, id, controller.signal) : await readCollectAndGoOrders(user, controller.signal)); }
   finally { res.off("close", abort); }
 }
+collectAndGoRouter.get("/activity", (req, res) => orderRequest(req, res, undefined, true));
 collectAndGoRouter.get("/orders", (req, res) => orderRequest(req, res));
 collectAndGoRouter.get("/orders/:id", (req, res) => orderRequest(req, res, parse(collectAndGoOrderIdSchema, req.params.id)));
 collectAndGoRouter.use(requireRole("owner"));

@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CollectAndGoPanel } from "../components/collect-and-go-panel";
 import { useCollectAndGo, type CollectAndGoInitial } from "../data/use-collect-and-go";
 import type { CollectAndGoOrderDetail } from "../types/collect-and-go";
-import { collectAndGoMatches } from "../types/collect-and-go-matches";
+import { shoppingAssignments } from "../types/shopping-assignments";
 import { Text } from "@/components/ui/text";
 import { useShoppingSort } from "../data/use-shopping-sort";
 import { ShoppingSortField } from "../components/shopping-sort-field";
@@ -81,9 +81,9 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
   const [searchParams, setSearchParams] = useSearchParams();
   const retailer = searchParams.get("retailer");
   const activeTab = retailer === "xtra" || retailer === "collectandgo" ? retailer : "wickedhome";
-  const collectAndGo = useCollectAndGo({ initial: collectAndGoInitial, intervalMs: refreshIntervalMs, includeOrders: activeTab === "collectandgo" });
+  const collectAndGo = useCollectAndGo({ initial: collectAndGoInitial, intervalMs: refreshIntervalMs });
   const now = useNow(30000);
-  const basketMatches = collectAndGoMatches(overview.items, products, collectAndGo.data?.cart, Boolean(collectAndGo.data?.status.canUse && !collectAndGo.data.status.needsReconnect && !collectAndGo.data.cartError), now);
+  const assignments = shoppingAssignments(overview.items, products, data.sessionCoverage, collectAndGo.data, now);
   const revalidator = useRevalidator();
   const fetcher = useFetcher<ShoppingActionResult>();
   const productSelections = useProductSelections({ initial: initialSelections?.products });
@@ -368,7 +368,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
                     groupByCategory={sort === "category"}
                     groupByNeed={sort === "category"}
                     shops={shops}
-                    collectAndGoMatches={basketMatches}
+                    assignments={assignments}
                     onToggle={(item) => void actions.toggle(item)}
                     onSkip={(item) => void actions.skip(item)}
                     onDelete={canManage ? (item) => void actions.remove(item) : undefined}

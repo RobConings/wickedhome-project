@@ -25,6 +25,7 @@ import {
   getShoppingSession,
   joinShoppingSession,
   listShoppingSessions,
+  shoppingSessionCoverage,
   planShoppingVisit,
   reconcileShoppingReceiptLine,
   updateShoppingSessionItem,
@@ -35,6 +36,7 @@ const id = (value: unknown) => parse(idSchema, value);
 shoppingSessionsRouter.get("/", async (req, res) => {
   res.json(await listShoppingSessions(currentUser(req)));
 });
+shoppingSessionsRouter.get("/coverage", async (req, res) => { res.setHeader("Cache-Control", "no-store"); res.json(await shoppingSessionCoverage(currentUser(req))); });
 shoppingSessionsRouter.post("/plan", async (req, res) => {
   res.json(await planShoppingVisit(currentUser(req)));
 });

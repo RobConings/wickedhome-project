@@ -240,3 +240,10 @@ export function sessionDisplayName(name: string, startedAt: string): string {
   const suffix = " · " + startedAt.slice(0, 10);
   return name.endsWith(suffix) ? name.slice(0, -suffix.length) : name;
 }
+
+/** Current active visit assignments; planned quantities never constitute purchases. */
+export type ShoppingSessionCoverage = {
+  observedAt: string;
+  truncated: boolean;
+  sessions: { id: string; name: string; status: "active"; startedAt: string; items: { productId: string | null; requirementIds: string[]; quantity: number; purchasedQuantity: number; unit: string | null }[] }[];
+};

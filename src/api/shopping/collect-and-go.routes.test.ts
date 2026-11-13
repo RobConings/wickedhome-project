@@ -69,7 +69,7 @@ it("authenticates cart reads/checks, enforces selected accounts and honours the 
 });
 
 it("protects reservation routes with authentication and the same selected-account grants", async () => {
-  for (const path of ["/orders", "/orders/11"]) {
+  for (const path of ["/orders", "/orders/11", "/activity"]) {
     assert.equal((await call(path)).status, 401);
     assert.equal((await call(path, "GET", undefined, "child")).status, 403);
     assert.equal((await call(path, "GET", undefined, "wife")).status, 409, "browser-only session cannot prove native reservation access");

@@ -4,3 +4,10 @@ export const disconnectedCollectAndGo: CollectAndGoInitial = { status: { connect
 const observedAt = new Date().toISOString();
 export const collectAndGoOrderFixture: CollectAndGoOrderDetail = { authenticated: true, observedAt, timeZone: "Europe/Brussels", id: "2201", url: "https://www.collectandgo.be/nl/bestelling/2201", status: "M", pickupPoint: "Example pickup point", pickupFrom: "2030-11-16T07:30:00.000Z", pickupUntil: "2030-11-16T08:00:00.000Z", amendableUntil: "2030-11-15T08:00:00.000Z", providerAmendable: true, editState: "open", estimatedTotalCents: 1250, items: [{ name: "Example reserved bread", quantity: 2, unitPriceCents: 48, url: null }], truncated: false };
 export const connectedCollectAndGo: CollectAndGoInitial = { status: { ...disconnectedCollectAndGo.status, connected: true, canUse: true, cartEnabled: true, importedAt: observedAt }, cart: { authenticated: true, observedAt, items: [{ productId: "1001", articleNumber: "1001", name: "Halfvolle melk", quantity: 2, unitPriceCents: 162, url: null }, { productId: "1002", name: "Bananen", quantity: 1.5, unitPriceCents: 210, url: null }], truncated: false }, orders: { authenticated: true, observedAt, timeZone: "Europe/Brussels", orders: [collectAndGoOrderFixture], truncated: false } };
+
+export const reservedCollectAndGo: CollectAndGoInitial = {
+  ...connectedCollectAndGo,
+  cart: { ...connectedCollectAndGo.cart!, items: [] },
+  orders: { ...connectedCollectAndGo.orders!, orders: [{ ...collectAndGoOrderFixture, status: "C", editState: "closed", providerAmendable: false, amendableUntil: "2020-11-15T08:00:00.000Z" }] },
+  reservations: [{ ...collectAndGoOrderFixture, status: "C", editState: "closed", providerAmendable: false, amendableUntil: "2020-11-15T08:00:00.000Z", items: [{ name: "Halfvolle melk", productId: "1001", quantity: 2, unitPriceCents: 162, url: null }] }],
+};

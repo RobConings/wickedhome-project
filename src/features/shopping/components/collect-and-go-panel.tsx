@@ -1,3 +1,4 @@
+import { upcomingCollectAndGoOrders } from "../types/collect-and-go-activity";
 import { useNow } from "@/lib/use-now";
 import { useAsyncResource } from "@/lib/use-async-resource";
 import * as React from "react";
@@ -32,7 +33,7 @@ function Products({ cart, loading, empty }: { cart?: Pick<CollectAndGoCart, "ite
       </Inline>} />
   </>;
 }
-function Reservation({ id, initial, refreshAt }: { id: string; initial?: CollectAndGoOrderDetail; refreshAt?: string }) {
+export function CollectAndGoReservation({ id, initial, refreshAt }: { id: string; initial?: CollectAndGoOrderDetail; refreshAt?: string }) {
   const { t, i18n } = useTranslation("shopping");
   const now = useNow(1000);
   const seed = React.useMemo(() => initial?.id === id ? { value: initial, error: null } : undefined, [initial, id]);
@@ -64,7 +65,7 @@ export function CollectAndGoPanel({ live, initialOrder }: { live: CollectAndGoLi
   const [selection, setSelection] = React.useState("");
   const status = data?.status;
   const orders = data?.orders?.orders ?? [];
-  const upcoming = orders.filter(order => order.status !== "C" && order.pickupUntil && Date.parse(order.pickupUntil) > now).sort((a, b) => (a.pickupFrom ?? "").localeCompare(b.pickupFrom ?? ""));
+  const upcoming = upcomingCollectAndGoOrders(orders, now);
   const selected = orders.find(order => order.id === selection) ?? upcoming[0] ?? orders[0];
   return <PageSection aria-label={t("collectAndGoList.title")}>
     <Inline gap="sm" align="center" wrap className="justify-between">
@@ -86,11 +87,13 @@ export function CollectAndGoPanel({ live, initialOrder }: { live: CollectAndGoLi
         {data?.ordersError && <InlineAlert tone="warning">{t(`collectAndGoList.errors.${data.ordersError}`)}{data.orders && ` ${t("collectAndGoList.stale")}`}</InlineAlert>}
         {data?.orders?.truncated && <InlineAlert tone="warning">{t("collectAndGoList.partial")}</InlineAlert>}
         {orders.length > 0 && <Select value={selected?.id ?? ""} onValueChange={setSelection}><SelectTrigger className="w-full" aria-label={t("collectAndGoList.chooseOrder")}><SelectValue /></SelectTrigger><SelectContent>{orders.map(order => <SelectItem key={order.id} value={order.id}>{t("collectAndGoList.order", { id: order.id })} · {order.pickupFrom ? new Date(order.pickupFrom).toLocaleDateString(i18n.language, { timeZone: "Europe/Brussels" }) : t("collectAndGoList.unknown")}</SelectItem>)}</SelectContent></Select>}
-        {selected && <Reservation key={selected.id} id={selected.id} initial={initialOrder} refreshAt={data?.orders?.observedAt} />}
+        {selected && <CollectAndGoReservation key={selected.id} id={selected.id} initial={data?.reservations?.find(order => order.id === selected.id) ?? initialOrder} refreshAt={data?.orders?.observedAt} />}
         {!selected && data?.orders && !data.orders.truncated && !data.ordersError && <Text size="sm" tone="muted">{t("collectAndGoList.emptyOrders")}</Text>}
         {!data?.orders && loading && <Text size="sm" role="status">{t("collectAndGoList.loading")}</Text>}
       </Card>
     </PageGrid>}
+    {data?.reservationsIncomplete && <InlineAlert tone="warning">{t("onlineVisits.partial")}</InlineAlert>}
+    <Link className="inline-flex min-h-10 items-center self-start text-sm underline" to="/shopping/sessions">{t("onlineVisits.allSessions")}</Link>
     <Link className="inline-flex min-h-10 items-center self-start text-sm underline" to="/settings?section=collectandgo">{t("collectAndGoList.settings")}</Link>
     <Text size="xs" tone="muted">{t("collectAndGoList.readOnly")}</Text>
   </PageSection>;

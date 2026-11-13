@@ -1,15 +1,16 @@
 import * as React from "react";
 import { ApiRequestError } from "@/lib/api-client";
 import { useLiveEvents } from "@/lib/live-events";
-import type { CollectAndGoCart, CollectAndGoOrders, CollectAndGoStatus } from "../types/collect-and-go";
+import type { CollectAndGoStatus } from "../types/collect-and-go";
 import { useRefreshWhileVisible } from "./use-live-shopping";
 import { collectAndGoClient } from "./collect-and-go-requests";
-export type CollectAndGoReadError = "unavailable" | "reconnect" | "unverified" | "credentials";
-export type CollectAndGoInitial = { status: CollectAndGoStatus; cart?: CollectAndGoCart; orders?: CollectAndGoOrders; cartError?: CollectAndGoReadError; ordersError?: CollectAndGoReadError };
+export type { CollectAndGoReadError } from "../types/collect-and-go-activity";
+import { collectAndGoIssue, type CollectAndGoReadError, type CollectAndGoActivity } from "../types/collect-and-go-activity";
+export type CollectAndGoInitial = CollectAndGoActivity & { status: CollectAndGoStatus };
 export function collectAndGoReadError(error: unknown): CollectAndGoReadError {
-  return error instanceof ApiRequestError ? error.code === "collectandgo_credentials_missing" ? "credentials" : ["collectandgo_login", "collectandgo_challenge"].includes(error.code) ? "reconnect" : error.code === "collectandgo_unverified" ? "unverified" : "unavailable" : "unavailable";
+  return collectAndGoIssue(error instanceof ApiRequestError ? error.code : "");
 }
-export function useCollectAndGo({ initial, intervalMs = 30000, includeOrders = false, client = collectAndGoClient }: { initial?: CollectAndGoInitial; intervalMs?: number | null; includeOrders?: boolean; client?: typeof collectAndGoClient } = {}) {
+export function useCollectAndGo({ initial, intervalMs = 30000, client = collectAndGoClient }: { initial?: CollectAndGoInitial; intervalMs?: number | null; client?: typeof collectAndGoClient } = {}) {
   const [data, setData] = React.useState<CollectAndGoInitial | null>(initial ?? null);
   const [loading, setLoading] = React.useState(false);
   const life = React.useRef({ mounted: false, epoch: 0, busy: false, queued: false });
@@ -24,22 +25,20 @@ export function useCollectAndGo({ initial, intervalMs = 30000, includeOrders = f
       if (!current()) return;
       if (!status.connected || !status.canUse || status.needsReconnect) { setData({ status, ...(status.needsReconnect && { cartError: "reconnect", ordersError: "reconnect" }) }); return; }
       setData(previous => ({ ...previous, status }));
-      const [cart, orders] = await Promise.allSettled([client.cart(), includeOrders ? client.orders() : Promise.resolve(undefined)]);
+      const activity = await client.activity();
       if (!current()) return;
-      const denied = [cart, orders].some(result => result.status === "rejected" && result.reason instanceof ApiRequestError && [401, 403].includes(result.reason.status));
-      if (denied) { setData(null); return; }
-      setData(previous => ({ status, cart: cart.status === "fulfilled" ? cart.value : previous?.cart, cartError: cart.status === "rejected" ? collectAndGoReadError(cart.reason) : undefined, orders: orders.status === "fulfilled" && orders.value ? orders.value : previous?.orders, ordersError: orders.status === "rejected" ? collectAndGoReadError(orders.reason) : includeOrders ? undefined : previous?.ordersError }));
+      setData(previous => ({ ...activity, status, cart: activity.cart ?? previous?.cart, orders: activity.orders ?? previous?.orders }));
     } catch (error) {
       if (current()) {
         if (error instanceof ApiRequestError && [401, 403].includes(error.status)) setData(null);
-        else setData(previous => previous ? { ...previous, cartError: collectAndGoReadError(error), ordersError: collectAndGoReadError(error) } : { status: { connected: false, enabled: false, configured: true, canManage: false, canUse: false, needsReconnect: false, legacyAvailable: false, importedAt: null, members: [] }, cartError: collectAndGoReadError(error) });
+        else setData(previous => previous ? { ...previous, cartError: collectAndGoReadError(error), ordersError: collectAndGoReadError(error), reservations: [] } : { status: { connected: false, enabled: false, configured: true, canManage: false, canUse: false, needsReconnect: false, legacyAvailable: false, importedAt: null, members: [] }, cartError: collectAndGoReadError(error) });
       }
     } finally {
       state.busy = false;
       if (current()) setLoading(false);
       if (state.mounted && state.queued) { state.queued = false; void run(); }
     }
-  }, [client, includeOrders]);
+  }, [client]);
   React.useEffect(() => {
     const state = { mounted: true, epoch: 0, busy: false, queued: false }; life.current = state;
     if (!initial) void refresh();

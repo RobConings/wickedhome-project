@@ -1,3 +1,4 @@
+import type { ShoppingAssignments } from "../types/shopping-assignments";
 import { Stack } from "@/components/layout/stack";
 import { Text } from "@/components/ui/text";
 import { ShoppingNeedSections } from "./shopping-need-sections";
@@ -29,7 +30,7 @@ type ShoppingItemListProps = {
   size?: "default" | "large";
   /** Text when there is nothing open. */
   emptyText?: string;
-  collectAndGoMatches?: ReadonlySet<string>;
+  assignments?: ShoppingAssignments;
   className?: string;
 };
 
@@ -49,7 +50,7 @@ export function ShoppingItemList({
   groupByNeed = true,
   size = "default",
   emptyText,
-  collectAndGoMatches,
+  assignments,
   className,
 }: ShoppingItemListProps) {
   const { t } = useTranslation("shopping");
@@ -67,7 +68,7 @@ export function ShoppingItemList({
     <ShoppingItemRow
       key={item.id}
       item={item}
-      inCollectAndGo={collectAndGoMatches?.has(item.id)}
+      assignments={assignments?.get(item.id)}
       shop={item.shopId ? shopsById.get(item.shopId) : null}
       showShop={showShop}
       showList={showList}

@@ -9,6 +9,7 @@ import { secretsAvailable } from "../lib/secrets";
 import { productMatch, euroCents, promotionPrice } from "./collect-and-go-pricing";
 import { openCollectAndGoCart } from "./collect-and-go-cart";
 import { fetchCollectAndGoCart } from "./collect-and-go-cart-api";
+import { fetchCollectAndGoActivity } from "./collect-and-go-activity";
 import { fetchCollectAndGoOrder, fetchCollectAndGoOrders } from "./collect-and-go-orders-api";
 import { readCollectAndGoSession, disconnectCollectAndGo } from "./collect-and-go-session";
 import { collectAndGoEnabled, collectAndGoMembers, collectAndGoStatus, deleteCollectAndGoConnection, readCollectAndGoConnection, requireCollectAndGoAccess, requireCollectAndGoOwner, saveCollectAndGoConnection, withCollectAndGoConnection, type CollectAndGoConnection } from "./collect-and-go-connection";
@@ -127,6 +128,8 @@ export async function readCollectAndGoCart(user: SessionUser, signal: AbortSigna
         signal.throwIfAborted();
         if (generation !== (generations.get(user.householdId) ?? 0)) throw conflict("The Collect&Go connection changed before returning the basket.");
         await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: cart.observedAt });
+        signal.throwIfAborted();
+        if (generation !== (generations.get(user.householdId) ?? 0)) throw conflict("The Collect&Go connection changed before returning the basket.");
         return cart;
       } catch (error) {
         if (generation === (generations.get(user.householdId) ?? 0)) await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: null, needsReconnect: error instanceof HttpError && ["collectandgo_login", "collectandgo_challenge"].includes(error.code) });
@@ -141,8 +144,8 @@ export async function readCollectAndGoCart(user: SessionUser, signal: AbortSigna
     return cart;
   }, true);
 }
-/** Orders use the same household grants and revocation fence, but never mark a basket verified. */
-async function orderRead<T>(user: SessionUser, signal: AbortSignal, read: (state: CollectAndGoConnection["state"], signal: AbortSignal) => Promise<T>) {
+/** Native reads share grants and revocation fences; only actual cart observations update verification. */
+async function orderRead<T>(user: SessionUser, signal: AbortSignal, read: (state: CollectAndGoConnection["state"], signal: AbortSignal) => Promise<T>, cartObservation?: (result: T) => string | null) {
   const snapshot = await requireCollectAndGoAccess(user);
   if (!snapshot.state.cartApi) throw fail("collectandgo_credentials_missing", "This older browser-only import lacks cart API credentials. Import a cart API HAR once in Settings; WickedHome reuses the saved session thereafter.");
   const generation = generations.get(user.householdId) ?? 0;
@@ -154,6 +157,9 @@ async function orderRead<T>(user: SessionUser, signal: AbortSignal, read: (state
       const result = await read(saved.state, signal);
       signal.throwIfAborted();
       if (generation !== (generations.get(user.householdId) ?? 0)) throw conflict("The Collect&Go connection changed before returning the order.");
+      if (cartObservation) await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: cartObservation(result) });
+      signal.throwIfAborted();
+      if (generation !== (generations.get(user.householdId) ?? 0)) throw conflict("The Collect&Go connection changed before returning the snapshot.");
       return result;
     } catch (error) {
       if (generation === (generations.get(user.householdId) ?? 0) && error instanceof HttpError && ["collectandgo_login", "collectandgo_challenge"].includes(error.code)) await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: null, needsReconnect: true });
@@ -161,6 +167,7 @@ async function orderRead<T>(user: SessionUser, signal: AbortSignal, read: (state
     }
   });
 }
+export const readCollectAndGoActivity = (user: SessionUser, signal: AbortSignal) => orderRead(user, signal, fetchCollectAndGoActivity, result => result.cart?.observedAt ?? null);
 export const readCollectAndGoOrders = (user: SessionUser, signal: AbortSignal) => orderRead(user, signal, fetchCollectAndGoOrders);
 export const readCollectAndGoOrder = (user: SessionUser, id: string, signal: AbortSignal) => orderRead(user, signal, (state, pending) => fetchCollectAndGoOrder(state, id, pending));
 

@@ -31,12 +31,40 @@ marker, pending-cart identity, EUR currency and explicit zero count/total/start 
 response missing its products, a null products field or a guest response still fails verification.
 This fixed a reproduced false reconnect prompt using the account holder's unchanged saved HAR.
 
-WickedHome rows show **Added in Collect&Go** when the current basket has one unambiguous exact full-name
-match or a recorded Collect&Go product URL/article match. Do not fuzzy-match names, strip package sizes,
-assume in-store identifiers match online, or consider alternative products interchangeable. Labels are
-presence indicators only; they do not claim quantity coverage, tick items bought or change stock.
-Failed reads, access revocation, invalid observation times and snapshots older than 90 seconds remove
-labels. An empty basket never hides a placed reservation. Basket and reservation errors remain separate.
+WickedHome needs and Shop view rows distinguish **In Collect&Go basket**, **Reserved with Collect&Go**
+and **In shopping session: …**, with real links to the corresponding workspace. Match retailer items
+only by an unambiguous exact full name or a recorded Collect&Go URL/article identity. Native reservation
+items retain the same validated product/article identifiers as the basket. Do not strip package sizes,
+fuzzy-match products, assume in-store identifiers match online or infer quantity coverage.
+
+GET `/api/shopping/collect-and-go/activity` uses the same household mutex, grants, revocation generation
+and rate limit as other native reads. It independently reads basket/history and preloads up to five
+upcoming reservations under a 45-second combined timeout. Successful reads survive unrelated format
+failures; a partial flag exposes omitted/unreadable reservations. The client reuses this one snapshot
+for labels, the online tab and linked session views, with visible-only polling at 30 seconds or slower.
+Labels ignore invalid/future-skewed observations, snapshots older than 90 seconds, failed history reads,
+revoked access, cancelled/unknown states and pickup windows that have ended.
+
+Live observation after the amendment cutoff on 13 November 2026 showed the same upcoming reservation
+changing from M to C while pickup was still the following day. **C is not evidence of collected goods**:
+M/C reservations with a future pickup remain reserved even when `editState=closed`. A read-only live
+check returned an empty pending basket, 32 reserved products and a reservation match for the person's
+fries using the original unchanged HAR. No order, quantity, stock or purchase was changed.
+
+Linked online sessions are live projections on the shopping sessions page, not new database visits.
+They preserve retailer account selection and disappear on revoked access. A reservation link opens its
+products, pickup slot and editing cutoff using the shared reservation component. Native sessions retain
+their own purchase/receipt/payment workflow. Reading or displaying a linked reservation never closes a
+local visit or records an acquisition.
+
+GET `/api/shopping/sessions/coverage` supplies current-household ACTIVE native visits with outstanding
+OPEN, nonremoved rows, independently of recent visit history. It selects only the references/quantities
+needed for labels, returns at most 100 visits with an explicit partial flag, and creates no writes.
+Assignments follow actual requirement references (including grouped needs) or exact catalogue product
+identity; unrelated shared-stock variants are not silently interchangeable. Closed/deleted sessions,
+skipped/removed/fully acquired rows and stale coverage do not add labels. The shopping loader refreshes
+these read models through the existing shopping events and loader refresh cycle. No schema migration
+or automatic retailer import into the household database is required.
 
 ## Shared account connection
 

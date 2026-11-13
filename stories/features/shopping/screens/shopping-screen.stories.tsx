@@ -1,4 +1,4 @@
-import { disconnectedCollectAndGo, connectedCollectAndGo, collectAndGoOrderFixture } from "../collect-and-go-fixtures";
+import { disconnectedCollectAndGo, connectedCollectAndGo, collectAndGoOrderFixture, reservedCollectAndGo } from "../collect-and-go-fixtures";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ShoppingScreen } from "@/features/shopping/screens/shopping-screen";
 import { emptyShoppingPageFixture, fakeLinkPreview, productSelectionsFixture, shopSelectionsFixture, shoppingPageFixture } from "../fixtures";
@@ -26,7 +26,7 @@ export const AllLists: Story = {};
 export const WithXtra: Story = { args: { xtraInitial: connectedXtra }, parameters: { router: { initialEntries: ["/shopping?retailer=xtra"] } } };
 export const WithCollectAndGo: Story = { args: { collectAndGoInitial: connectedCollectAndGo, collectAndGoOrderInitial: collectAndGoOrderFixture }, parameters: { router: { initialEntries: ["/shopping?retailer=collectandgo"] } } };
 export const WithCollectAndGoMatches: Story = { args: { collectAndGoInitial: connectedCollectAndGo, collectAndGoOrderInitial: collectAndGoOrderFixture } };
-export const LiveCollectAndGo: Story = { args: { collectAndGoInitial: undefined }, parameters: { router: { initialEntries: ["/shopping?retailer=collectandgo"] } } };
+export const LiveCollectAndGo: Story = { args: { collectAndGoInitial: undefined, refreshIntervalMs: 30000 }, parameters: { router: { initialEntries: ["/shopping?retailer=collectandgo"] } } };
 export const OneList: Story = { parameters: { router: { initialEntries: ["/shopping?list=l-weekly"] } } };
 export const Search: Story = { parameters: { router: { initialEntries: ["/shopping?q=melk"] } } };
 export const SearchWithinList: Story = { parameters: { router: { initialEntries: ["/shopping?list=l-weekly&q=melk"] } } };
@@ -37,3 +37,5 @@ export const Empty: Story = { args: { data: emptyShoppingPageFixture } };
 /** The dashboard's quick action (`?new=1`) opens the add dialog; the param is removed. */
 export const AddFromDashboard: Story = { parameters: { router: { initialEntries: ["/shopping?new=1"] } } };
 export const Mobile: Story = { globals: { viewport: { value: "mobile1" } } };
+
+export const WithReservation: Story = { args: { collectAndGoInitial: reservedCollectAndGo } };

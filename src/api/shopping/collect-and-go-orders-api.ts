@@ -70,7 +70,7 @@ export async function fetchCollectAndGoOrder(state: CollectAndGoState, id: strin
       const item = record(value), quantity = decimal(item?.quantity);
       if (!item || typeof item.orderItemId !== "string" || !item.orderItemId || seen.has(item.orderItemId) || typeof item.xitem_productName !== "string" || !item.xitem_productName.trim() || !Number.isFinite(quantity) || quantity <= 0 || quantity > 100000 || item.currency !== "EUR") throw invalid();
       seen.add(item.orderItemId);
-      items.push({ name: item.xitem_productName.trim().slice(0, 300), url: null, quantity, unitPriceCents: cents(item.unitPrice) });
+      items.push({ ...(typeof item.productId === "string" && /^\d{1,20}$/.test(item.productId) && { productId: item.productId }), ...(typeof item.partNumber === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(item.partNumber) && { articleNumber: item.partNumber }), name: item.xitem_productName.trim().slice(0, 300), url: null, quantity, unitPriceCents: cents(item.unitPrice) });
     }
     if (page * 100 >= total) break;
   }

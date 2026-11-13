@@ -34,6 +34,13 @@ report that promotions were not checked or remain unverified, then continue with
 
 Use shopping_sessions and shopping_session to obtain IDs and latest session/item revisions. An item update's purchasedQuantity means the TOTAL purchased so far, not the additional amount. Use stable operationId for idempotent retries, reread when revisions conflict, and never replay an independent purchase. Recording a real purchase credits a known stock location once. Adjusting planned quantity or chosen product alone creates no purchase. Close a session even if suggestions remain OPEN; they stay on the ordinary list. An ACTIVE session can be removed without closing or checking anything off, but do not remove genuine purchases, stock movements, receipts or payments. Closed sessions are not deletable through this workflow.
 
+**Planned coverage:** Shopping and Shop view show links for active local visits that still have open
+quantities, matched by requirement references or the exact catalogue product. Skipped/removed rows,
+closed/deleted visits and stale snapshots never establish coverage. Labels do not buy goods, cover an
+invented quantity or merge stock variants. `shopping_sessions` reads local visits; use the separate
+Collect&Go order tools for linked online reservations shown alongside them in the UI. Those remain
+live retailer data with their own selected-account grants, not duplicated household-wide purchase records.
+
 **Kassabonnen are optional.** You may buy, finish and pay without any receipt. If supplied, shopping_session_upload_receipt accepts the actual base64 contents of a PDF or image (max 4 MB) and stores it in household documents; otherwise attach a document already uploaded with shopping_session_attach_receipt. Use the date printed on the receipt. Match individual printed lines with stable receipt references using shopping_session_match_receipt. Link earlier acquisitions (including purchases through the ordinary shopping list before sessions existed) rather than adding the goods again. A receipt's actual retailer may supersede the originally planned shop; an item sold at another shop is not an error. Do not assume that a quantity discrepancy, old stock count, or unmatched item should add more stock without confirming it.
 
 **Payments:** Get valid expenses, payment accounts and payers from shopping_payment_options. Record each actual split with shopping_session_record_payment and a distinct stable reference, correct payer, method, and date. Linking an existing paid expense must not create another one. Receipts alone do not create expenses. Do not infer a paid amount from stock quantities. Preserve unrelated recurring expenses and household cost allocations.
@@ -54,6 +61,13 @@ separate from Collect&Go baskets/orders and WickedHome needs. Never record purch
 just because you prepared a retailer list. See docs/XTRA.md.
 
 ## Collect&Go — online ordering
+
+Collect&Go reservations appear as linked online shopping sessions, with product links back from
+WickedHome needs and Shop view. Observed retailer status M can become C when amendments close:
+a future pickup in either observed state is still reserved, not collected/bought. Use the pickup window
+separately from `editState`/amendment cutoff. Never infer a completed acquisition from C or a closed
+editing window. UI activity snapshots preload up to five upcoming reservations and mark partial coverage;
+read a specific order with the order tool when needed. Reads do not enter amendment mode or alter stock.
 
 There are two distinct online destinations, in addition to the separate Xtra in-store list:
 - `shopping_collectandgo_cart`: current pending basket, not submitted reservations.

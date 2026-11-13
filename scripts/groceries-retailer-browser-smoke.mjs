@@ -28,9 +28,10 @@ try {
   let allowed = true, expired = false, failure = false, reads = 0, fresh = false, imported = null, hold = null, held = false;
   let collectConnected = false, collectAccess = ["owner", "wife"], adopted = null;
   let verifiedAt = null, rejectCheck = false, checks = 0;
+  let reservedName = "Reserved bread for pickup", ordersPresent = true;
   let basketName = "Halfvolle melk", basketFails = false, basketReads = 0, holdBasket = null, heldBasket = false;
   const collectCart = () => ({ authenticated: true, observedAt: new Date().toISOString(), truncated: false, items: basketName ? [{ name: basketName, quantity: 2, unitPriceCents: 162, url: null }] : [] });
-  const reservation = () => ({ id: "2201", url: "https://www.collectandgo.be/nl/bestelling/2201", authenticated: true, observedAt: new Date().toISOString(), timeZone: "Europe/Brussels", status: "M", pickupPoint: "Example pickup", pickupFrom: "2030-11-16T07:30:00Z", pickupUntil: "2030-11-16T08:00:00Z", amendableUntil: "2030-11-15T08:00:00Z", providerAmendable: true, editState: "open", estimatedTotalCents: 1250, items: [{ name: "Reserved bread for pickup", quantity: 2, unitPriceCents: 48, url: null }], truncated: false });
+  const reservation = () => ({ id: "2201", url: "https://www.collectandgo.be/nl/bestelling/2201", authenticated: true, observedAt: new Date().toISOString(), timeZone: "Europe/Brussels", status: "M", pickupPoint: "Example pickup", pickupFrom: "2030-11-16T07:30:00Z", pickupUntil: "2030-11-16T08:00:00Z", amendableUntil: "2030-11-15T08:00:00Z", providerAmendable: true, editState: "open", estimatedTotalCents: 1250, items: [{ name: reservedName, quantity: 2, unitPriceCents: 48, url: null }], truncated: false });
   const collectStatus = () => ({ enabled: true, configured: true, connected: collectConnected, canManage: true, canUse: collectAccess.includes("owner"), needsReconnect: false, legacyAvailable: false, verifiedAt, importedAt: collectConnected ? "2026-11-12T12:00:00Z" : null, members: [{ id: "owner", name: "Rob", role: "owner", allowed: collectAccess.includes("owner") }, { id: "wife", name: "Partner", role: "adult", allowed: collectAccess.includes("wife") }, { id: "child", name: "Child", role: "child", allowed: collectAccess.includes("child") }] });
   let name = "Milk already on Xtra";
   const status = () => ({ configured: true, connected: true, canUse: allowed, canManage: false, needsReconnect: expired, connectedAt: "2026-11-12T12:00:00Z", checkedAt: "2026-11-12T12:00:00Z", placeId: "1234", members: [] });
@@ -47,6 +48,13 @@ try {
   });
   await page.route("**/api/shopping/collect-and-go/**", async (route) => {
     const request = route.request(), url = new URL(request.url());
+    if (request.method() === "GET" && url.pathname.endsWith("/activity")) {
+      basketReads++;
+      if (holdBasket) { heldBasket = true; await holdBasket; }
+      const observedAt = await page.evaluate(() => new Date().toISOString());
+      const current = { ...reservation(), observedAt, status: "C", editState: "closed", providerAmendable: false, amendableUntil: "2020-11-13T08:00:00Z" };
+      return route.fulfill({ json: { ...(basketFails ? { cartError: "unverified" } : { cart: { ...collectCart(), observedAt } }), orders: { authenticated: true, observedAt, timeZone: "Europe/Brussels", orders: ordersPresent ? [current] : [], truncated: false }, reservations: ordersPresent ? [current] : [], reservationsIncomplete: false } });
+    }
     if (request.method() === "GET" && url.pathname.endsWith("/cart")) {
       basketReads++;
       if (holdBasket) { heldBasket = true; await holdBasket; }
@@ -188,7 +196,7 @@ try {
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     await page.screenshot({ path: `${output}/collectandgo-tab-${locale}-${theme}-${width}.png`, fullPage: true });
     await page.getByRole("tab", { name: "WickedHome", exact: true }).click();
-    await page.getByText(locale === "en" ? "Added in Collect&Go" : "Toegevoegd in Collect&Go", { exact: true }).first().waitFor();
+    await page.getByText(locale === "en" ? "In Collect&Go basket" : "In winkelmand bij Collect&Go", { exact: true }).first().waitFor();
     assert.equal(await page.getByText("Example reserved bread", { exact: true }).count(), 0);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
   }
@@ -196,10 +204,10 @@ try {
   await open("Features/Shopping/Screens/ShoppingScreen", "LiveCollectAndGo");
   await page.getByText("Reserved bread for pickup", { exact: true }).waitFor();
   await page.getByRole("tab", { name: "WickedHome", exact: true }).click();
-  await page.getByText("Added in Collect&Go", { exact: true }).first().waitFor();
+  await page.getByText("In Collect&Go basket", { exact: true }).first().waitFor();
   basketName = "";
   await page.clock.fastForward(31000);
-  await page.getByText("Added in Collect&Go", { exact: true }).waitFor({ state: "hidden" });
+  await page.getByText("In Collect&Go basket", { exact: true }).waitFor({ state: "hidden" });
   await page.getByRole("tab", { name: "Collect&Go", exact: true }).click();
   await page.getByText("Your online basket is empty. Placed reservations are shown separately.", { exact: true }).waitFor();
   await page.getByText("Reserved bread for pickup", { exact: true }).waitFor();
@@ -210,18 +218,48 @@ try {
   basketFails = false; basketName = "Halfvolle melk";
   await page.getByRole("button", { name: "Refresh Collect&Go", exact: true }).click();
   await page.getByRole("tab", { name: "WickedHome", exact: true }).click();
-  await page.getByText("Added in Collect&Go", { exact: true }).first().waitFor();
+  await page.getByText("In Collect&Go basket", { exact: true }).first().waitFor();
   let releaseBasket; holdBasket = new Promise(done => { releaseBasket = done; });
   await page.clock.fastForward(31000);
   for (let tries = 0; !heldBasket && tries < 100; tries++) await new Promise(done => setTimeout(done, 10));
   assert.equal(heldBasket, true);
   collectAccess = []; for (const stream of streams) stream.write(`event: shopping.collectandgo_changed\ndata: ${JSON.stringify({ type: "shopping.collectandgo_changed", at: new Date().toISOString(), data: null })}\n\n`);
-  await page.getByText("Added in Collect&Go", { exact: true }).waitFor({ state: "hidden" });
+  await page.getByText("In Collect&Go basket", { exact: true }).waitFor({ state: "hidden" });
   releaseBasket(); holdBasket = null;
   await page.getByRole("tab", { name: "Collect&Go", exact: true }).click();
   await page.getByText("An owner must select your WickedHome account to share this Collect&Go account.", { exact: true }).waitFor();
   assert.equal(await page.getByText("Reserved bread for pickup", { exact: true }).count(), 0);
   assert.ok(basketReads > 1);
+  // Reservation coverage works before opening the retailer tab and in the shop view too.
+  for (const locale of ["en", "nl"]) for (const theme of ["light", "dark"]) for (const width of [320, 390, 1440]) {
+    await open("Features/Shopping/Screens/ShopViewScreen", "WithReservation", locale, theme, width);
+    const label = locale === "en" ? "Reserved with Collect&Go" : "In reservatie bij Collect&Go";
+    const assignment = page.getByRole("link", { name: label, exact: true });
+    await assignment.waitFor(); assert.match(await assignment.getAttribute("href"), /sessions\?retailer=collectandgo&order=2201/);
+    assert.equal(await assignment.evaluate(el => el.closest("button") !== null), false);
+    assert.equal(await page.getByRole("checkbox", { name: /Halfvolle melk/ }).getAttribute("aria-checked"), "false");
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    await page.screenshot({ path: `${output}/reserved-shop-${locale}-${theme}-${width}.png`, fullPage: true });
+    await open("Features/Shopping/Screens/SessionsScreen", "WithOnlineReservation", locale, theme, width);
+    await page.getByRole("link", { name: /Collect&Go.*2201/ }).waitFor();
+    await page.getByRole("link", { name: /Colruyt-groep/ }).waitFor();
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    await page.screenshot({ path: `${output}/online-session-${locale}-${theme}-${width}.png`, fullPage: true });
+  }
+  await open("Features/Shopping/Screens/ShopViewScreen", "WithVisitAssignments");
+  await page.getByRole("link", { name: "In shopping session: Winkelronde", exact: true }).waitFor();
+  assert.equal(await page.getByRole("link", { name: "In shopping session: Winkelronde", exact: true }).getAttribute("href"), "/shopping/sessions/gamma-trip");
+  await open("Features/Shopping/Screens/SessionsScreen", "OnlineReservationDetail");
+  await page.getByText("Halfvolle melk", { exact: true }).waitFor();
+  await page.getByText("Closed", { exact: true }).waitFor();
+  assert.equal(await page.getByRole("button", { name: /Close visit|Delete visit|Join visit/ }).count(), 0);
+  collectAccess = ["owner", "wife"]; basketName = ""; reservedName = "Halfvolle melk"; ordersPresent = true;
+  await open("Features/Shopping/Screens/ShoppingScreen", "LiveCollectAndGo");
+  await page.getByRole("tab", { name: "WickedHome", exact: true }).click();
+  await page.getByRole("link", { name: "Reserved with Collect&Go", exact: true }).waitFor();
+  assert.equal(await page.getByText("In Collect&Go basket", { exact: true }).count(), 0);
+  ordersPresent = false; await page.clock.fastForward(31000);
+  await page.getByRole("link", { name: "Reserved with Collect&Go", exact: true }).waitFor({ state: "hidden" });
   assert.deepEqual(errors, []);
-  console.log(`Retailer groceries UI: 48 EN/NL mobile/desktop renders; destination tabs, basket presence labels, verified empty basket with separate reservations, independent failures and revoked in-flight basket reads; in-store/online channel labels and settings navigation, automatic reads, visible-only polling, focus refresh, MCP events, stale/expired reads, revoked in-flight reads, and Collect&Go shared grants, explicit legacy adoption and import without CLI passed. Screenshots: ${output}`);
+  console.log(`Retailer groceries UI: 72 EN/NL mobile/desktop renders; linked online sessions, reservation labels after cutoff, local active-visit assignments and removed reservation coverage; destination tabs, basket presence labels, verified empty basket with separate reservations, independent failures and revoked in-flight basket reads; in-store/online channel labels and settings navigation, automatic reads, visible-only polling, focus refresh, MCP events, stale/expired reads, revoked in-flight reads, and Collect&Go shared grants, explicit legacy adoption and import without CLI passed. Screenshots: ${output}`);
 } finally { await browser.close(); for (const stream of streams) stream.end(); await new Promise((done) => server.close(done)); }

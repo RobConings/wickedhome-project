@@ -11,13 +11,13 @@ import { formatDate } from "@/types/date-format";
 import { sessionDisplayName, type SessionSummary } from "../types/sessions";
 
 /** A real, fully clickable workspace entry, with the actual shops and their saved logos. */
-export function SessionVisitCard({ visit, shops }: { visit: SessionSummary; shops: Shop[] }) {
+export function SessionVisitCard({ visit, shops, to, statusLabel, metadata, actionLabel }: { visit: SessionSummary; shops: Shop[]; to?: string; statusLabel?: string; metadata?: string; actionLabel?: string }) {
   const { t } = useTranslation("shopping");
   const active = visit.status === "active";
   const visitShops = visit.shopIds.flatMap((id) => shops.find((shop) => shop.id === id) ?? []);
   return (
     <Link
-      to={`/shopping/sessions/${encodeURIComponent(visit.id)}`}
+      to={to ?? `/shopping/sessions/${encodeURIComponent(visit.id)}`}
       aria-label={t("sessions.openSession", { name: visit.name })}
       className="group block min-w-0 rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-section/50"
     >
@@ -40,17 +40,17 @@ export function SessionVisitCard({ visit, shops }: { visit: SessionSummary; shop
           <div className="min-w-0 flex-1">
             <Inline gap="sm" align="center" wrap>
               <h3 className="min-w-0 break-words font-semibold leading-snug group-hover:text-section">{sessionDisplayName(visit.name, visit.startedAt)}</h3>
-              <Badge variant={active ? "success" : "neutral"}>{t(`sessions.${visit.status}`)}</Badge>
+              <Badge variant={active ? "success" : "neutral"}>{statusLabel ?? t(`sessions.${visit.status}`)}</Badge>
             </Inline>
             <Text size="xs" tone="muted" className="mt-1">
-              {formatDate(visit.startedAt, currentLocale())}
+              {metadata ?? formatDate(visit.startedAt, currentLocale())}
               {visitShops.length > 0 && <> · {visitShops.map((shop) => shop.name).join(" · ")}</>}
             </Text>
           </div>
           <ArrowUpRightIcon className="size-5 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-section" aria-hidden="true" />
         </Inline>
         <Inline gap="none" align="center" justify="end" className="text-sm font-medium text-section">
-          {t(active ? "sessions.continue" : "sessions.viewSession")}
+          {actionLabel ?? t(active ? "sessions.continue" : "sessions.viewSession")}
         </Inline>
       </Card>
     </Link>

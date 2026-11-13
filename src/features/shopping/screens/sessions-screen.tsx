@@ -1,3 +1,6 @@
+import { CollectAndGoSessions } from "../components/collect-and-go-sessions";
+import type { CollectAndGoInitial } from "../data/use-collect-and-go";
+import type { CollectAndGoOrderDetail } from "../types/collect-and-go";
 import { SessionItemForm } from "../components/session-item-form";
 import { PageGrid } from "@/components/layout/page-grid";
 import { Stack } from "@/components/layout/stack";
@@ -75,6 +78,8 @@ type Props = {
   session: SessionView | null;
   canManage: boolean;
   live?: boolean;
+  collectAndGoInitial?: CollectAndGoInitial;
+  collectAndGoOrderInitial?: CollectAndGoOrderDetail;
   initialSelections?: React.ComponentProps<typeof SessionStartCard>["initialSelections"];
 };
 const selectClass =
@@ -86,7 +91,7 @@ export function SessionsScreen({
   shopping,
   sessions,
   session,
-  canManage, live = true, initialSelections,
+  canManage, live = true, initialSelections, collectAndGoInitial, collectAndGoOrderInitial,
 }: Props) {
   const { t } = useTranslation("shopping");
   const { t: tCommon } = useTranslation();
@@ -103,6 +108,7 @@ export function SessionsScreen({
   const [startOpen, setStartOpen] = React.useState(false);
 
   const [params, setParams] = useSearchParams();
+  const onlineSelected = params.get("retailer") === "collectandgo" && Boolean(params.get("order"));
   const stockFilter = parseStockFilter(params.get("stock"));
   const setStockFilter = (value: ShoppingStockFilter) => setParams((current) => { if (value === "all") current.delete("stock"); else current.set("stock", value); return current; }, { preventScrollReset: true });
   const { sort, changeSort } = useShoppingSort();
@@ -152,7 +158,7 @@ export function SessionsScreen({
     );
   return (
     <PageContainer className="gap-3 px-3 py-4 sm:gap-4 sm:px-6 sm:py-6 lg:px-8">
-      {!session && canManage && (
+      {!session && !onlineSelected && canManage && (
         <Dialog open={startOpen} onOpenChange={setStartOpen}>
           <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-visible sm:max-w-lg">
             <DialogHeader>
@@ -179,7 +185,7 @@ export function SessionsScreen({
           </span>
         ) : t("sessions.overviewDescription")}
         actions={!session ? (
-          canManage && <Button onClick={() => setStartOpen(true)}><PlusIcon />{t("sessions.startShopping")}</Button>
+          !onlineSelected && canManage && <Button onClick={() => setStartOpen(true)}><PlusIcon />{t("sessions.startShopping")}</Button>
         ) : active && (
           <PageGrid gap="sm" className="w-full min-w-0 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:justify-center xl:justify-end">
             {!session.participants.some((participant) => participant.userId === user?.id) && (
@@ -218,7 +224,8 @@ export function SessionsScreen({
         })} />}
       {!session ? (
         <Stack gap="md" className="min-w-0">
-          {activeSessions.length > 0 && (
+          <CollectAndGoSessions shops={shopping.shops} initial={collectAndGoInitial} initialOrder={collectAndGoOrderInitial} />
+          {!onlineSelected && activeSessions.length > 0 && (
             <section className="space-y-2" aria-labelledby="active-sessions">
               <Inline gap="md" align="baseline" justify="between">
                 <h2 id="active-sessions" className="text-lg font-semibold">{t("sessions.activeSessions")}</h2>
@@ -229,7 +236,7 @@ export function SessionsScreen({
               </PageGrid>
             </section>
           )}
-          {pastSessions.length > 0 && (
+          {!onlineSelected && pastSessions.length > 0 && (
             <section className="space-y-2" aria-labelledby="past-sessions">
               <h2 id="past-sessions" className="text-lg font-semibold">{t("sessions.pastSessions")}</h2>
               <PageGrid gap="3" className="md:grid-cols-2 xl:grid-cols-3">
@@ -237,13 +244,13 @@ export function SessionsScreen({
               </PageGrid>
             </section>
           )}
-          {sessions.length === 0 && (
+          {!onlineSelected && sessions.length === 0 && (
             <Card tone="section" className="p-5">
-              <Text weight="medium">{t("sessions.noHistory")}</Text>
+              <Text weight="medium">{t("onlineVisits.noLocalSessions")}</Text>
               <Text size="sm" tone="muted">{t("sessions.simpleDescription")}</Text>
             </Card>
           )}
-          {canManage && (
+          {!onlineSelected && canManage && (
             <details className="rounded-xl border p-4">
               <summary className="min-h-11 cursor-pointer py-2 font-medium">{t("sessions.advancedPlanning")}</summary>
             <Card className="space-y-4 border-0 p-0 shadow-none">

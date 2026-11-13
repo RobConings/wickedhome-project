@@ -1,3 +1,5 @@
+import { fetchShoppingSessionCoverage } from "./sessions-requests";
+import type { ShoppingSessionCoverage } from "../types/sessions";
 import i18n from "i18next";
 import { redirect, type LoaderFunctionArgs, type ActionFunctionArgs, type ShouldRevalidateFunctionArgs } from "react-router";
 import { fetchShops, fetchShopGroups, type Shop, type SavedShopGroup } from "@/features/shops";
@@ -37,15 +39,15 @@ import {
   upsertProductLink,
 } from "./shopping-requests";
 
-export type ShoppingPageData = { overview: ShoppingOverview; shops: Shop[]; products: Product[]; shopGroups?: SavedShopGroup[] };
+export type ShoppingPageData = { overview: ShoppingOverview; shops: Shop[]; products: Product[]; shopGroups?: SavedShopGroup[]; sessionCoverage?: ShoppingSessionCoverage | null };
 export type ProductsPageData = { products: Product[]; shops: Shop[] };
 
 export type ShoppingActionResult = FormResult & { intent?: string; id?: string };
 
 /** Shopping page and shop view: lists, items and staples, with shops and products for the pickers. */
 export async function shoppingLoader(): Promise<ShoppingPageData> {
-  const [overview, shops, products, shopGroups] = await Promise.all([fetchShoppingOverview(), fetchShops(), fetchProducts(), fetchShopGroups()]);
-  return { overview, shops, products, shopGroups };
+  const [overview, shops, products, shopGroups, sessionCoverage] = await Promise.all([fetchShoppingOverview(), fetchShops(), fetchProducts(), fetchShopGroups(), fetchShoppingSessionCoverage().catch(() => null)]);
+  return { overview, shops, products, shopGroups, sessionCoverage };
 }
 
 /**

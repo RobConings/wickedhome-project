@@ -15,6 +15,7 @@ import type {
   SessionItemUpdateInput,
   SessionView,
   SessionSummary,
+  ShoppingSessionCoverage,
 } from "@/features/shopping/types/sessions";
 import {
   shoppingAmount,
@@ -66,6 +67,16 @@ export async function listShoppingSessions(user: SessionUser) {
       take: 100,
     })
   ).map(summary);
+}
+
+/** Read active assignments independently of the most-recent-100 visit history. */
+export async function shoppingSessionCoverage(user: SessionUser): Promise<ShoppingSessionCoverage> {
+  const rows = await db.shoppingSession.findMany({
+    where: { householdId: user.householdId, status: "ACTIVE" },
+    orderBy: [{ startedAt: "desc" }, { id: "asc" }], take: 101,
+    select: { id: true, name: true, startedAt: true, items: { where: { removedAt: null, status: "OPEN" }, select: { productId: true, requirementIds: true, quantity: true, purchasedQuantity: true, unit: true } } },
+  });
+  return { observedAt: new Date().toISOString(), truncated: rows.length > 100, sessions: rows.slice(0, 100).map(row => ({ id: row.id, name: row.name, status: "active", startedAt: row.startedAt.toISOString(), items: row.items.filter(item => Number(item.quantity) > Number(item.purchasedQuantity)).map(item => ({ ...item, quantity: Number(item.quantity), purchasedQuantity: Number(item.purchasedQuantity) })) })) };
 }
 
 export async function getShoppingSession(

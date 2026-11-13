@@ -1,0 +1,10 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { CollectAndGoSessions } from "@/features/shopping/components/collect-and-go-sessions";
+import { reservedCollectAndGo, disconnectedCollectAndGo } from "../collect-and-go-fixtures";
+import { shoppingPageFixture } from "../fixtures";
+const meta = { title: "Features/Shopping/Components/CollectAndGoSessions", component: CollectAndGoSessions, args: { initial: reservedCollectAndGo, shops: shoppingPageFixture.shops } } satisfies Meta<typeof CollectAndGoSessions>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+export const Upcoming: Story = {};
+export const Disconnected: Story = { args: { initial: disconnectedCollectAndGo } };
+export const Detail: Story = { parameters: { router: { initialEntries: ["/shopping/sessions?retailer=collectandgo&order=2201"] } } };

@@ -7,10 +7,12 @@ import type {
   SessionCreateInput,
   SessionItemUpdateInput,
   SessionSummary,
+  ShoppingSessionCoverage,
   SessionView,
 } from "../types/sessions";
 const base = "/shopping/sessions";
 const path = (id: string) => `${base}/${encodeURIComponent(id)}`;
+export const fetchShoppingSessionCoverage = () => api.get<ShoppingSessionCoverage>(`${base}/coverage`);
 export const fetchShoppingSessions = () => api.get<SessionSummary[]>(base);
 export const fetchShoppingSession = (id: string) =>
   api.get<SessionView>(path(id));

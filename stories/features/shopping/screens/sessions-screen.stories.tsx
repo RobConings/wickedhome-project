@@ -1,9 +1,10 @@
+import { disconnectedCollectAndGo, reservedCollectAndGo } from "../collect-and-go-fixtures";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { SessionsScreen } from "@/features/shopping/screens/sessions-screen";
 import { shoppingPageFixture } from "../fixtures";
 import { sessionFixture } from "../session-fixtures";
 const meta = { title: "Features/Shopping/Screens/SessionsScreen", component: SessionsScreen, parameters: { layout: "fullscreen" },
-  args: { shopping: shoppingPageFixture, sessions: [], session: null, canManage: true, live: false, initialSelections: { shops: { favoriteIds: [], recentIds: [] }, groups: { favoriteIds: [], recentIds: [] } } },
+  args: { collectAndGoInitial: disconnectedCollectAndGo, shopping: shoppingPageFixture, sessions: [], session: null, canManage: true, live: false, initialSelections: { shops: { favoriteIds: [], recentIds: [] }, groups: { favoriteIds: [], recentIds: [] } } },
 } satisfies Meta<typeof SessionsScreen>;
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -32,3 +33,6 @@ export const ClosedChecklist: Story = { args: {
   sessions: [completedVisit],
 } };
 
+
+export const WithOnlineReservation: Story = { args: { sessions: [activeVisit], collectAndGoInitial: reservedCollectAndGo } };
+export const OnlineReservationDetail: Story = { args: { collectAndGoInitial: reservedCollectAndGo }, parameters: { router: { initialEntries: ["/shopping/sessions?retailer=collectandgo&order=2201"] } } };

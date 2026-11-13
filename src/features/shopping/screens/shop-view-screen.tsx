@@ -1,3 +1,6 @@
+import { useNow } from "@/lib/use-now";
+import { useCollectAndGo, type CollectAndGoInitial } from "../data/use-collect-and-go";
+import { shoppingAssignments } from "../types/shopping-assignments";
 import { useShoppingSort } from "../data/use-shopping-sort";
 import { ShoppingNavigation } from "../components/shopping-navigation";
 import { useCategoryOrder } from "../data/use-category-order";
@@ -49,6 +52,7 @@ type ShopViewScreenProps = {
   previewLink?: (url: string) => Promise<LinkPreview>;
   /** Refresh interval in ms; `null` turns polling off (stories). */
   refreshIntervalMs?: number | null;
+  collectAndGoInitial?: CollectAndGoInitial;
 };
 
 /**
@@ -62,9 +66,12 @@ export function ShopViewScreen({
   initialSelections,
   previewLink,
   refreshIntervalMs = LIVE_REFRESH_MS,
+  collectAndGoInitial,
 }: ShopViewScreenProps) {
   const { t } = useTranslation("shopping");
   const { overview, shops, products } = data;
+  const collectAndGo = useCollectAndGo({ initial: collectAndGoInitial, intervalMs: refreshIntervalMs === null ? null : Math.max(refreshIntervalMs, 30000) });
+  const assignments = shoppingAssignments(overview.items, products, data.sessionCoverage, collectAndGo.data, useNow(30000));
   const { order } = useCategoryOrder();
   const [includeLowStock, setIncludeLowStock] = React.useState(true);
   const groups = data.shopGroups ?? [];
@@ -203,6 +210,7 @@ export function ShopViewScreen({
           groupShopViewItems(visibleOpen, sort, order).map((group) => {
             const list = (
               <ShoppingItemList
+                assignments={assignments}
                 groupByCategory={false}
                 groupByNeed={sort === "category"}
                 items={group.items}
@@ -243,6 +251,7 @@ export function ShopViewScreen({
         )}
         {visibleBought.length > 0 && (
           <ShoppingItemList
+                assignments={assignments}
             items={visibleBought}
             shops={shops}
             size="large"

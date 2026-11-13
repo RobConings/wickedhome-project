@@ -780,5 +780,24 @@
       "reconnect": "Collect&Go requires a new login or browser verification. An owner can renew the saved session in Settings.",
       "credentials": "This older import has no cart API credentials. An owner needs to import a cart API HAR once in Settings; it will then be reused."
     }
+  },
+  "assignments": {
+    "label": "Planned shopping destinations",
+    "basket": "In Collect&Go basket",
+    "reservation": "Reserved with Collect&Go",
+    "session": "In shopping session: {{name}}",
+    "presenceOnly": "Planned or reserved only. Check the quantity; this is not a purchase and does not change stock."
+  },
+  "onlineVisits": {
+    "title": "Linked online shopping sessions",
+    "reserved": "Reserved",
+    "open": "View reservation",
+    "allSessions": "All shopping sessions",
+    "orderTitle": "Collect&Go · Reservation {{id}}",
+    "linked": "Linked to your Collect&Go reservation. Products, pickup slot and amendment deadline are read from the retailer.",
+    "noPurchase": "A reservation or closed editing window does not mean goods were collected or bought. Complete amendments on Collect&Go; record actual purchases separately.",
+    "notFound": "This reservation could not be verified for the connected account.",
+    "partial": "Some upcoming reservations could not be read, or only the first five were loaded. Coverage labels may be incomplete.",
+    "noLocalSessions": "No other shopping sessions yet."
   }
 }

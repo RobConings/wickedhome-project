@@ -780,5 +780,24 @@
       "reconnect": "Collect&Go vraagt om opnieuw aan te melden of een browsercontrole. Een eigenaar kan de opgeslagen sessie vernieuwen in Instellingen.",
       "credentials": "Deze oudere import bevat geen cart-API-gegevens. Een eigenaar moet eenmalig een cart-API-HAR importeren in Instellingen; die wordt daarna hergebruikt."
     }
+  },
+  "assignments": {
+    "label": "Geplande boodschappenmomenten",
+    "basket": "In winkelmand bij Collect&Go",
+    "reservation": "In reservatie bij Collect&Go",
+    "session": "In winkelsessie: {{name}}",
+    "presenceOnly": "Alleen gepland of gereserveerd. Controleer het aantal; dit is geen aankoop en wijzigt de voorraad niet."
+  },
+  "onlineVisits": {
+    "title": "Gekoppelde online winkelsessies",
+    "reserved": "Gereserveerd",
+    "open": "Reservatie bekijken",
+    "allSessions": "Alle winkelsessies",
+    "orderTitle": "Collect&Go · Reservatie {{id}}",
+    "linked": "Gekoppeld aan je Collect&Go-reservatie. Producten, afhaalmoment en wijzigingsdeadline worden bij de winkel uitgelezen.",
+    "noPurchase": "Een reservatie of gesloten wijzigingsvenster betekent niet dat de boodschappen al afgehaald of gekocht zijn. Rond wijzigingen af bij Collect&Go; registreer de echte aankoop apart.",
+    "notFound": "Deze reservatie kon niet worden gecontroleerd voor het gekoppelde account.",
+    "partial": "Sommige komende reservaties konden niet worden gelezen, of alleen de eerste vijf werden geladen. De aanduidingen bij boodschappen kunnen daardoor onvolledig zijn.",
+    "noLocalSessions": "Nog geen andere winkelsessies."
   }
 }

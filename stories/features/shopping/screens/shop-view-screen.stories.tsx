@@ -1,3 +1,4 @@
+import { disconnectedCollectAndGo, reservedCollectAndGo } from "../collect-and-go-fixtures";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ShopViewScreen } from "@/features/shopping/screens/shop-view-screen";
 import { emptyShoppingPageFixture, fakeLinkPreview, productSelectionsFixture, shopSelectionsFixture, shoppingPageFixture } from "../fixtures";
@@ -8,6 +9,7 @@ const meta = {
   parameters: { layout: "fullscreen" },
   args: {
     data: shoppingPageFixture,
+    collectAndGoInitial: disconnectedCollectAndGo,
     shopKey: "s-colruyt",
     canManage: true,
     previewLink: fakeLinkPreview,
@@ -35,3 +37,6 @@ export const SavedShopGroup: Story = {
 };
 export const NothingToBuy: Story = { args: { data: emptyShoppingPageFixture, shopKey: null } };
 export const Mobile: Story = { globals: { viewport: { value: "mobile1" } } };
+
+export const WithReservation: Story = { args: { collectAndGoInitial: reservedCollectAndGo } };
+export const WithVisitAssignments: Story = { args: { data: { ...shoppingPageFixture, sessionCoverage: { observedAt: new Date().toISOString(), truncated: false, sessions: [{ id: "gamma-trip", name: "Winkelronde", status: "active", startedAt: "2026-11-13T08:00:00Z", items: [{ productId: "pr-milk", requirementIds: ["i-milk"], quantity: 2, purchasedQuantity: 0, unit: "l" }] }] } } } };
