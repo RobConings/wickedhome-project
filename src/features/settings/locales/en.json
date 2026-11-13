@@ -3,6 +3,10 @@
   "description": "How WickedHome knows your home: the household, its address and the services it connects to.",
   "jumpTo": "Jump to section",
   "sections": {
+    "shopping": {
+      "title": "Shopping",
+      "description": "One category order for all shopping lists, shops and shopping sessions on this device."
+    },
     "household": {
       "title": "Household",
       "description": "Name and home address. The address gives the weather forecast its location."

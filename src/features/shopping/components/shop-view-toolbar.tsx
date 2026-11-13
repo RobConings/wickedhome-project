@@ -16,6 +16,8 @@ import {
   type ShopViewSort,
 } from "./shopping-grouping";
 import { ShoppingStockFilterField } from "./shopping-stock-filter";
+import { AutomaticShoppingFilter } from "./shopping-preferences";
+import { ShoppingGuidance } from "./shopping-guidance";
 
 type ShopViewToolbarProps = {
   sort: ShopViewSort;
@@ -26,15 +28,17 @@ type ShopViewToolbarProps = {
   categories: ProductCategory[];
   /** Lists the items here are on. */
   lists: { id: string; name: string }[];
+  includeLowStock: boolean;
+  onIncludeLowStockChange: (included: boolean) => void;
 };
 
 /** Search stays visible; mobile sort and filters open on demand instead of pushing the list down. */
-export function ShopViewToolbar({ sort, onSortChange, filters, onFiltersChange, categories, lists }: ShopViewToolbarProps) {
+export function ShopViewToolbar({ sort, onSortChange, filters, onFiltersChange, categories, lists, includeLowStock, onIncludeLowStockChange }: ShopViewToolbarProps) {
   const { t } = useTranslation("shopping");
   const set = (patch: Partial<ShopViewFilters>) => onFiltersChange({ ...filters, ...patch });
 
   const { t: common } = useTranslation();
-  const filterCount = [filters.category !== "all", filters.listId !== "all", filters.priority !== "all", (filters.stock ?? "all") !== "all"].filter(Boolean).length;
+  const filterCount = [filters.category !== "all", filters.listId !== "all", filters.priority !== "all", (filters.stock ?? "all") !== "all", !includeLowStock].filter(Boolean).length;
   const controls = (
     <PageGrid gap="3" className="min-w-0 sm:flex sm:flex-wrap sm:items-center sm:gap-2">
         <Select value={sort} onValueChange={(value) => onSortChange(value as ShopViewSort)}>
@@ -91,18 +95,20 @@ export function ShopViewToolbar({ sort, onSortChange, filters, onFiltersChange, 
 
   return (
     <Stack gap="sm" className="min-w-0" role="group" aria-label={t("shopView.filters.label")}>
+      <ShoppingStockFilterField value={filters.stock ?? "all"} onChange={(stock) => set({ stock })} />
       <Inline gap="sm" align="center" className="min-w-0">
         <SearchField className="min-w-0 flex-1" value={filters.query} onValueChange={(query) => set({ query })} placeholder={t("shopView.filters.search")} />
         <Dialog>
-          <DialogTrigger asChild><Button variant="outline" size="icon" className="size-10 shrink-0 sm:hidden" aria-label={t("shopView.filters.viewOptions")}><SlidersHorizontalIcon />{filterCount > 0 && <span className="text-xs">{filterCount}</span>}</Button></DialogTrigger>
+          <DialogTrigger asChild><Button variant="outline" className="h-10 shrink-0" aria-label={t("shopView.filters.viewOptions")}><SlidersHorizontalIcon /><span className="hidden sm:inline">{t("shopView.filters.viewOptions")}</span>{filterCount > 0 && <span className="text-xs">{filterCount}</span>}</Button></DialogTrigger>
           <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
             <DialogHeader><DialogTitle>{t("shopView.filters.viewOptions")}</DialogTitle><DialogDescription>{t("shopView.filters.viewOptionsDescription")}</DialogDescription></DialogHeader>
             {controls}
+            <AutomaticShoppingFilter included={includeLowStock} onChange={onIncludeLowStockChange} />
+            <ShoppingGuidance />
             <DialogFooter><DialogClose asChild><Button>{common("actions.close")}</Button></DialogClose></DialogFooter>
           </DialogContent>
         </Dialog>
       </Inline>
-      <ShoppingStockFilterField value={filters.stock ?? "all"} onChange={(stock) => set({ stock })} />
       <div className="hidden sm:block">{controls}</div>
     </Stack>
   );

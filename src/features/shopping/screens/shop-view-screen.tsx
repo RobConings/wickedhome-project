@@ -1,14 +1,12 @@
 import { useShoppingSort } from "../data/use-shopping-sort";
 import { ShoppingNavigation } from "../components/shopping-navigation";
 import { useCategoryOrder } from "../data/use-category-order";
-import { AutomaticShoppingFilter, CategoryOrder } from "../components/shopping-preferences";
 import * as React from "react";
 import { CircleHelpIcon, PartyPopperIcon, RefreshCwIcon, SearchXIcon, StoreIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useRevalidator, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { PageContainer } from "@/components/layout/page-container";
-import { PageGrid } from "@/components/layout/page-grid";
 import { PageSection } from "@/components/layout/page-section";
 import { Stack } from "@/components/layout/stack";
 import { Card, CardTitle } from "@/components/shared/card";
@@ -33,7 +31,6 @@ import { ShopViewToolbar } from "../components/shop-view-toolbar";
 import { ShopSummaryList } from "../components/shop-summary-list";
 import { ShoppingItemFormDialog } from "../components/shopping-item-form-dialog";
 import { ShoppingItemList } from "../components/shopping-item-list";
-import { ShoppingGuidance } from "../components/shopping-guidance";
 import { ShopViewSelection } from "../components/shop-view-selection";
 import { shoppingListViews } from "../types/shopping-list-views";
 import { shoppingItemListIds } from "../types/shopping-product-rows";
@@ -68,7 +65,7 @@ export function ShopViewScreen({
 }: ShopViewScreenProps) {
   const { t } = useTranslation("shopping");
   const { overview, shops, products } = data;
-  const { order, change } = useCategoryOrder();
+  const { order } = useCategoryOrder();
   const [includeLowStock, setIncludeLowStock] = React.useState(true);
   const groups = data.shopGroups ?? [];
   const navigate = useNavigate();
@@ -160,7 +157,7 @@ export function ShopViewScreen({
     <PageContainer className="gap-4 px-3 py-4 sm:gap-6 sm:px-6 sm:py-8 lg:px-8">
       {actions.confirmation}
       <PageHeader
-        backTo="/shopping"
+        backTo="/shopping/shops"
         actions={addAction}
         title={
           <span className="flex items-center gap-3">
@@ -185,86 +182,78 @@ export function ShopViewScreen({
       />
       <ShoppingNavigation />
 
-      <PageGrid columns="main-sidebar" className="items-start">
-        <Stack gap="lg" className="gap-3 sm:gap-6">
-          {selection}
-          <AutomaticShoppingFilter included={includeLowStock} onChange={setIncludeLowStock} />
-          <CategoryOrder order={order} onChange={change} />
-          {open.length > 0 && <ShoppingGuidance />}
-          {open.length > 0 && (
-            <ShopViewToolbar
-              sort={sort}
-              onSortChange={changeSort}
-              filters={filters}
-              onFiltersChange={setFilters}
-              categories={categories}
-              lists={lists}
-            />
-          )}
-          {open.length === 0 ? (
-            <EmptyState icon={PartyPopperIcon} title={t("shopView.empty")} description={here.length > 0 ? t("shopView.emptyDescription") : undefined} />
-          ) : visibleOpen.length === 0 ? (
-            <EmptyState icon={SearchXIcon} title={t("shopView.filters.noResults")} description={t("shopView.filters.noResultsDescription")} />
-          ) : (
-            groupShopViewItems(visibleOpen, sort, order).map((group) => {
-              const list = (
-                <ShoppingItemList
-                  groupByCategory={false}
-                  groupByNeed={sort === "category"}
-                  items={group.items}
-                  shops={shops}
-                  size="large"
-                  showShop={combined}
-                  showStockStatus={sort !== "priority"}
-                  onToggle={(item) => void actions.toggle(item)}
-                    onSkip={(item) => void actions.skip(item)}
-                  onDelete={canManage ? (item) => void actions.remove(item) : undefined}
-                  onEdit={setEditing}
+      <Stack gap="lg" className="gap-3 sm:gap-6">
+        {open.length > 0 && (
+          <ShopViewToolbar
+            sort={sort}
+            onSortChange={changeSort}
+            filters={filters}
+            onFiltersChange={setFilters}
+            categories={categories}
+            lists={lists}
+            includeLowStock={includeLowStock}
+            onIncludeLowStockChange={setIncludeLowStock}
+          />
+        )}
+        {open.length === 0 ? (
+          <EmptyState icon={PartyPopperIcon} title={t("shopView.empty")} description={here.length > 0 ? t("shopView.emptyDescription") : undefined} />
+        ) : visibleOpen.length === 0 ? (
+          <EmptyState icon={SearchXIcon} title={t("shopView.filters.noResults")} description={t("shopView.filters.noResultsDescription")} />
+        ) : (
+          groupShopViewItems(visibleOpen, sort, order).map((group) => {
+            const list = (
+              <ShoppingItemList
+                groupByCategory={false}
+                groupByNeed={sort === "category"}
+                items={group.items}
+                shops={shops}
+                size="large"
+                showShop={combined}
+                showStockStatus={sort !== "priority"}
+                onToggle={(item) => void actions.toggle(item)}
+                  onSkip={(item) => void actions.skip(item)}
+                onDelete={canManage ? (item) => void actions.remove(item) : undefined}
+                onEdit={setEditing}
+              />
+            );
+            if (group.key === "all") return <React.Fragment key="all">{list}</React.Fragment>;
+            return (
+              <PageSection key={group.key} aria-labelledby={`aisle-${group.key}`} className="gap-2">
+                <SectionHeader
+                  id={`aisle-${group.key}`}
+                  className="[&_h2]:text-sm sm:[&_h2]:text-base"
+                  title={
+                    <span className="flex items-center gap-2">
+                      {sort === "category" ? (
+                        <>
+                          <ProductCategoryIcon category={group.key as ProductCategory} className="size-5 text-primary" />
+                          {group.key === "other" ? t("shopView.otherItems") : t(`categories.${group.key}`)}
+                        </>
+                      ) : (
+                        t(`shopView.tiers.${group.key}`)
+                      )}
+                      <span className="text-sm font-normal text-muted-foreground">{group.items.length}</span>
+                    </span>
+                  }
                 />
-              );
-              if (group.key === "all") return <React.Fragment key="all">{list}</React.Fragment>;
-              return (
-                <PageSection key={group.key} aria-labelledby={`aisle-${group.key}`} className="gap-2">
-                  <SectionHeader
-                    id={`aisle-${group.key}`}
-                    className="[&_h2]:text-sm sm:[&_h2]:text-base"
-                    title={
-                      <span className="flex items-center gap-2">
-                        {sort === "category" ? (
-                          <>
-                            <ProductCategoryIcon category={group.key as ProductCategory} className="size-5 text-primary" />
-                            {group.key === "other" ? t("shopView.otherItems") : t(`categories.${group.key}`)}
-                          </>
-                        ) : (
-                          t(`shopView.tiers.${group.key}`)
-                        )}
-                        <span className="text-sm font-normal text-muted-foreground">{group.items.length}</span>
-                      </span>
-                    }
-                  />
-                  {list}
-                </PageSection>
-              );
-            })
-          )}
-          {visibleBought.length > 0 && (
-            <ShoppingItemList
-              items={visibleBought}
-              shops={shops}
-              size="large"
-              showShop={combined}
-              onToggle={(item) => void actions.toggle(item)}
-                    onSkip={(item) => void actions.skip(item)}
-              onDelete={canManage ? (item) => void actions.remove(item) : undefined}
-            />
-          )}
-        </Stack>
+                {list}
+              </PageSection>
+            );
+          })
+        )}
+        {visibleBought.length > 0 && (
+          <ShoppingItemList
+            items={visibleBought}
+            shops={shops}
+            size="large"
+            showShop={combined}
+            onToggle={(item) => void actions.toggle(item)}
+                  onSkip={(item) => void actions.skip(item)}
+            onDelete={canManage ? (item) => void actions.remove(item) : undefined}
+          />
+        )}
+      </Stack>
 
-        <Card className="max-lg:hidden">
-          <CardTitle>{t("shopView.chooseShop")}</CardTitle>
-          <ShopSummaryList items={actions.items} shops={shops} activeKey={shop?.id ?? (selectedKeys[0] === NO_SHOP && !combined ? NO_SHOP : undefined)} savedGroups={groups} activeGroupId={activeGroup?.id} className="-mx-2" />
-        </Card>
-      </PageGrid>
       <ShoppingItemFormDialog
         item={editing}
         onOpenChange={(open) => !open && setEditing(null)}

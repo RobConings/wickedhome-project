@@ -48,10 +48,7 @@ import type {
   SessionSummary,
   SessionView,
 } from "../types/sessions";
-import {
-  AutomaticShoppingFilter,
-  CategoryOrder,
-} from "../components/shopping-preferences";
+import { AutomaticShoppingFilter } from "../components/shopping-preferences";
 import {
   groupChecklistItems,
   parseStockFilter,
@@ -95,7 +92,7 @@ export function SessionsScreen({
   const { t: tCommon } = useTranslation();
   const user = useOptionalCurrentUser();
   const locale = currentLocale();
-  const { order, change } = useCategoryOrder();
+  const { order } = useCategoryOrder();
   const navigate = useNavigate();
   const revalidator = useRevalidator();
   useLiveRevalidation(live ? 10_000 : null);
@@ -292,7 +289,6 @@ export function SessionsScreen({
                   included={includeLowStock}
                   onChange={setIncludeLowStock}
                 />
-                <CategoryOrder order={order} onChange={change} />
                 <ShoppingStockFilterField value={stockFilter} onChange={setStockFilter} />
                 <Stack gap="md">
                   {groupChecklistItems(open, sort, order, locale).map((group) => (
@@ -391,7 +387,6 @@ export function SessionsScreen({
                           </SelectContent>
                         </Select>
                       </Stack>
-                      <CategoryOrder order={order} onChange={change} />
                     </PopoverContent>
                   </Popover>
                 </Inline>

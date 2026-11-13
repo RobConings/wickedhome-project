@@ -82,3 +82,4 @@ export { useLiveRevalidation as useShoppingRecordUpdates } from "./data/use-live
 
 export { CollectAndGoSettings } from "./components/collect-and-go-settings";
 export { XtraSettings } from "./components/xtra-settings";
+export { ShoppingSettingsSection } from "./components/shopping-preferences";

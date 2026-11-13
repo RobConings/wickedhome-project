@@ -3,6 +3,10 @@
   "description": "Wat WickedHome over je huis weet: het huishouden, het adres en de diensten waarmee het verbonden is.",
   "jumpTo": "Ga naar onderdeel",
   "sections": {
+    "shopping": {
+      "title": "Boodschappen",
+      "description": "Eén categorievolgorde voor alle boodschappenlijsten, winkels en winkelsessies op dit apparaat."
+    },
     "household": {
       "title": "Huishouden",
       "description": "Naam en adres. Het adres bepaalt de locatie van de weersvoorspelling."

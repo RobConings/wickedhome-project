@@ -430,6 +430,7 @@
   "planning": {
     "includeAutomatic": "Show automatic stock replenishments",
     "categoryOrder": "Category order",
+    "categoryOrderDescription": "This order applies on this device to all shopping lists, shops and shopping sessions when sorting by category.",
     "moveUp": "Move {{name}} up",
     "moveDown": "Move {{name}} down",
     "skipped": "Not now",

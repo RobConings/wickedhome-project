@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CloudSunIcon, HouseIcon, LayoutGridIcon, SettingsIcon, Trash2Icon, type LucideIcon } from "lucide-react";
+import { CloudSunIcon, HouseIcon, LayoutGridIcon, SettingsIcon, ShoppingCartIcon, Trash2Icon, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
 import { PageContainer } from "@/components/layout/page-container";
@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { RelatedRecordCards } from "@/components/shared/related-record-cards";
 import { SectionNavigation } from "@/components/shared/section-navigation";
 import { HouseholdSettingsForm } from "@/features/household";
+import { ShoppingSettingsSection } from "@/features/shopping";
 import { WasteSettingsSection } from "@/features/waste";
 import { WeatherSettingsSection } from "@/features/weather";
 import type { SectionAccent } from "@/lib/section-accent";
@@ -84,6 +85,14 @@ export function SettingsScreen({ data, canManage, extraSections = [] }: Settings
       title: t("sections.weather.title"),
       description: t("sections.weather.description"),
       content: data.weather ? <WeatherSettingsSection settings={data.weather} canManage={canManage} /> : unavailable,
+    },
+    {
+      id: "shopping",
+      icon: ShoppingCartIcon,
+      accent: "shopping",
+      title: t("sections.shopping.title"),
+      description: t("sections.shopping.description"),
+      content: <ShoppingSettingsSection />,
     },
     // Spot for sections owned by other features (Automations next), passed in by the route.
     ...extraSections,

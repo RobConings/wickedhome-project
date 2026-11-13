@@ -14,7 +14,7 @@ export function PageBackButton({ to, fallback = "/" }: { to?: To; fallback?: To 
   const destination = safeOrigin ?? to;
   const content = <ArrowLeftIcon aria-hidden="true" />;
   // Keep the visual control compact; the accessible name stays on the link/button.
-  const className = "page-back-button shrink-0 self-start";
+  const className = "page-back-button shrink-0";
   if (destination) return <Button asChild variant="outline" size="icon" className={className} data-slot="page-back">
     <Link to={destination} aria-label={safeOrigin ? t("navigation.returnToContext") : t("actions.back")}>{content}</Link>
   </Button>;

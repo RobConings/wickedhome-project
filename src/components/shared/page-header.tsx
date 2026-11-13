@@ -38,7 +38,7 @@ export function PageHeader({ title, description, eyebrow, icon, breadcrumbs, bac
   return (
     <header className={cn("flex min-w-0 flex-col gap-2.5", className)}>
       {trail && trail.length > 0 && <BreadcrumbTrail items={trail} label={t("navigation.breadcrumbs")} className="hidden sm:block" />}
-      <div data-slot="page-heading-layout" className="flex min-w-0 flex-col gap-4 xl:flex-row xl:items-start xl:justify-between xl:gap-6">
+      <div data-slot="page-heading-layout" className="flex min-w-0 flex-col gap-4 xl:flex-row xl:items-center xl:justify-between xl:gap-6">
         <div
           data-slot="page-heading"
           className={cn(
@@ -46,9 +46,12 @@ export function PageHeader({ title, description, eyebrow, icon, breadcrumbs, bac
             showBack || shownIcon ? "grid-cols-[auto_minmax(0,1fr)]" : "grid-cols-1",
           )}
         >
-          {(showBack || shownIcon) && <div className="col-start-1 row-start-1 flex shrink-0 items-start gap-2">
+          {(showBack || shownIcon) && <div className={cn(
+            "col-start-1 row-start-1 flex shrink-0 items-center gap-2 self-center",
+            description && (actions ? "2xl:row-span-2" : "md:row-span-2"),
+          )}>
             {showBack && <PageBackButton to={backTo ?? trail?.slice().reverse().find((item) => item.to)?.to ?? (identity && !identity.isSectionRoot ? identity.section.to : undefined)} />}
-            {shownIcon && <IconChip icon={shownIcon} className="mt-1" />}
+            {shownIcon && <IconChip icon={shownIcon} />}
           </div>}
           <div className={cn("min-w-0", (showBack || shownIcon) && "col-start-2 row-start-1")}>
             <span aria-hidden="true" data-slot="page-accent" className="mb-2 block h-1 w-8 rounded-full bg-section" />

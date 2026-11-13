@@ -2,8 +2,7 @@ import { Text } from "@/components/ui/text";
 import { useShoppingSort } from "../data/use-shopping-sort";
 import { ShoppingSortField } from "../components/shopping-sort-field";
 import { ShoppingNavigation } from "../components/shopping-navigation";
-import { useCategoryOrder } from "../data/use-category-order";
-import { AutomaticShoppingFilter, CategoryOrder } from "../components/shopping-preferences";
+import { AutomaticShoppingFilter } from "../components/shopping-preferences";
 import { currentLocale } from "@/lib/i18n";
 import * as React from "react";
 import { PackageIcon, PencilIcon, PlusIcon, SearchXIcon, ShoppingCartIcon, SlidersHorizontalIcon, StoreIcon, Trash2Icon } from "lucide-react";
@@ -70,7 +69,6 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
   const { t } = useTranslation("shopping");
   const { t: tCommon } = useTranslation();
   const { overview, shops, products } = data;
-  const { order, change } = useCategoryOrder();
   const [includeLowStock, setIncludeLowStock] = React.useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const revalidator = useRevalidator();
@@ -273,7 +271,6 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
                   </Select>
                 </Stack>
                 <AutomaticShoppingFilter included={includeLowStock} onChange={setIncludeLowStock} />
-                <CategoryOrder order={order} onChange={change} />
                 {totalOpen > 0 && <ShoppingGuidance />}
               </PopoverContent>
             </Popover>

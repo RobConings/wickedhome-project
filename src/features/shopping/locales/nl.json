@@ -430,6 +430,7 @@
   "planning": {
     "includeAutomatic": "Minimumvoorraadaanvullingen tonen",
     "categoryOrder": "Categorievolgorde",
+    "categoryOrderDescription": "Deze volgorde geldt op dit apparaat voor alle boodschappenlijsten, winkels en winkelsessies wanneer je op categorie sorteert.",
     "moveUp": "{{name}} omhoog",
     "moveDown": "{{name}} omlaag",
     "skipped": "Nu niet",

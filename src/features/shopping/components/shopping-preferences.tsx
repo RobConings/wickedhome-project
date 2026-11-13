@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import type { ProductCategory } from "../types/shopping";
+import { Card, CardDescription, CardTitle } from "@/components/shared/card";
+import { useCategoryOrder } from "../data/use-category-order";
 
 export function AutomaticShoppingFilter({
   included,
@@ -22,25 +23,20 @@ export function AutomaticShoppingFilter({
   );
 }
 
-export function CategoryOrder({
-  order,
-  onChange,
-}: {
-  order: ProductCategory[];
-  onChange: (value: ProductCategory[]) => void;
-}) {
+/** One category order for every list, shop and session on this device. */
+export function ShoppingSettingsSection() {
   const { t } = useTranslation("shopping");
+  const { order, change } = useCategoryOrder();
   const move = (index: number, delta: number) => {
     const next = [...order];
     [next[index], next[index + delta]] = [next[index + delta]!, next[index]!];
-    onChange(next);
+    change(next);
   };
   return (
-    <details className="rounded-lg border p-3 text-sm">
-      <summary className="cursor-pointer">
-        {t("planning.categoryOrder")}
-      </summary>
-      <ol className="mt-3 space-y-1">
+    <Card>
+      <CardTitle>{t("planning.categoryOrder")}</CardTitle>
+      <CardDescription>{t("planning.categoryOrderDescription")}</CardDescription>
+      <ol className="space-y-1 text-sm">
         {order.map((category, index) => (
           <li
             className="flex items-center justify-between gap-2"
@@ -76,6 +72,6 @@ export function CategoryOrder({
           </li>
         ))}
       </ol>
-    </details>
+    </Card>
   );
 }

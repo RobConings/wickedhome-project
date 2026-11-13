@@ -21,7 +21,7 @@ type SectionHeaderProps = {
 export function SectionHeader({ title, description, actions, id, accent = false, attention = false, icon, className }: SectionHeaderProps) {
   return (
     // Actions sit next to the title when there is room and move under it when there is not (phones).
-    <div className={cn("flex flex-wrap items-end justify-between gap-x-4 gap-y-2", className)}>
+    <div className={cn("flex flex-wrap items-center justify-between gap-x-4 gap-y-2", className)}>
       <div className="flex min-w-0 flex-[1_1_14rem] items-center gap-3">
         {icon && <IconChip icon={icon} tone={attention ? "highlight" : "primary"} size="sm" />}
         <div className="flex min-w-0 flex-col gap-0.5">

@@ -41,6 +41,7 @@ export const SectionFailed: Story = { parameters: { router: { initialEntries: ["
 export const Mobile: Story = { globals: { viewport: { value: "mobile1" } } };
 
 export const Household: Story = { parameters: { router: { initialEntries: ["/settings?section=household"] } } };
+export const Shopping: Story = { parameters: { router: { initialEntries: ["/settings?section=shopping"] } } };
 export const LegacyWasteLink: Story = { parameters: { router: { initialEntries: ["/settings#waste"] } } };
 export const AllSections: Story = { args: { extraSections } };
 export const Units: Story = { args: { extraSections }, parameters: { router: { initialEntries: ["/settings?section=units"] } } };
