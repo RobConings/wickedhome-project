@@ -17,3 +17,10 @@ it("refuses mixed sessions, malformed JSON and header-injection values without e
     try { importCollectAndGoBrowserData(text); assert.fail("accepted invalid export"); } catch (error) { assert.ok(error instanceof Error); assert.ok(!error.message.includes("secret")); }
   }
 });
+
+it("extracts native cart credentials from a successful cart HAR, never replaying POST bodies or importing analytics", () => {
+  const request = { method: "POST", url: "https://apip.collectandgo.be/gateway/ecomfoodb2c.eshop.wcscartsvcv2/v2/store/1/cart?langId=-11&catalogId=2", headers: [{ name: "WCAuthToken", value: "fixture-token" }, { name: "X-CG-APIKey", value: "fixture-key" }, { name: "Cookie", value: "WC_AUTHENTICATION_1=fixture-cookie; analytics=discard" }], postData: { text: "PRIVATE WRITE BODY" } };
+  const result = importCollectAndGoBrowserData(har([{ request, response: { status: 201, content: { mimeType: "application/json" } } }]));
+  assert.equal(result.cartApi?.authToken,"fixture-token"); assert.equal(result.cartApi?.storeId,"1");assert.equal(result.cookies.length,1);assert.equal(result.cookies[0]?.domain,"apip.collectandgo.be");assert.ok(!JSON.stringify(result).includes("PRIVATE WRITE BODY"));assert.ok(!JSON.stringify(result).includes("analytics"));
+  const guest={...request,headers:request.headers.filter(h=>h.name!=="Cookie")};assert.throws(()=>importCollectAndGoBrowserData(har([{request:guest,response:{status:201,content:{mimeType:"application/json"}}}])));
+});

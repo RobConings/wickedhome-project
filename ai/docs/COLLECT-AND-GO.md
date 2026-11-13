@@ -6,32 +6,31 @@ group but use separate lists/baskets, connections, account selections and channe
 promotions. An Xtra list is not an online basket. Do not transfer items unless explicitly requested
 and confirmed; if the intended channel is unclear, ask before changing either destination.
 
-The Shopping skill adds `shopping_collectandgo_search` and `shopping_collectandgo_basket` to the existing
+The Shopping skill adds `shopping_collectandgo_cart`, `shopping_collectandgo_search` and `shopping_collectandgo_basket` to the existing
 assistant/MCP registry. It reuses existing role checks, mandatory sensitive-action confirmation, progress,
 audit and typed response rendering. This integration does not create a separate shopping list, purchase
 ledger or assistant. It prepares an external basket; completing the order remains on Collect&Go.
 
-## Browser connection
+## Shared account connection
 
 Collect&Go has a household-shared browser session with its own account selection; importing a shared
 Xtra/Colruyt connection does not automatically authenticate a Collect&Go basket. Settings → Collect&Go now uses normal-browser
 import, without asking household users to run a login helper or server import command:
 
-1. In normal Chrome, sign in at Collect&Go and choose your pickup point.
-2. Open DevTools → Network, select Doc, filter for `collectandgo.be/nl/`, clear the log and reload the
-   signed-in shop page. Use a successful (200) page request.
-3. In DevTools Settings → Preferences → Network enable HAR export with sensitive data. Copy the
-   filtered requests with **Copy all listed as HAR (with sensitive data)**.
-4. An owner selects the permitted WickedHome accounts in Settings → Collect&Go, pastes the export
-   there and clicks **Import browser session**. Alternatively, upload
-   an existing browser storage-state JSON file there. No raw archive is sent to the server.
+1. In normal Chrome, sign in at Collect&Go and open your online basket.
+2. In DevTools → Network filter on `wcscartsvcv2`, clear the log and reload the basket. Select the
+   successful GET cart request (200), then export the filtered request as HAR with sensitive data.
+3. An owner selects the permitted WickedHome accounts in Settings → Online · Collect&Go and imports it.
+4. Click **Test connection / Verbinding testen** to read the signed-in basket and record verification.
 
-The browser extracts only cookies observed on successful `https://www.collectandgo.be/nl/` HTML/JSON
-requests and the recorded user agent. Cookie credentials are bound to that exact host; no cookie domain
-or local-storage state is invented. Blocked/error pages, unrelated origins, sanitized cookie-free exports
-and conflicting sessions are rejected. The normal-browser cookie import does not include local storage,
-so some shop/pickup/account state may still require a complete storage-state file. An import is explicitly
-labelled **unverified**: it cannot guarantee signed-in basket access or overcome a retailer block.
+The importer recognizes only the exact `apip.collectandgo.be` cart service. It extracts `WCAuthToken`,
+`X-CG-APIKey`, the store/catalog/language identifiers and a small set of first-party session cookies.
+It can also extract credentials from a successful captured add-to-cart POST (201), but **never replays
+that POST or imports its body**. Unrelated tracking cookies, advertising requests, page content and
+response bodies are discarded locally. Conflicting credentials and missing authentication cookies are
+rejected. The raw HAR never goes to WickedHome's server and must never be committed or pasted into chat.
+Legacy successful www.collectandgo.be page exports and full storage-state files remain importable;
+those may need renewal using the cart API export for reliable basket reads. Import alone stays unverified.
 
 POST `/api/shopping/collect-and-go/session` requires a household owner, the app's normal CSRF header,
 a configured integration encryption key and an explicit `{ state, userIds }` body. PUT `/access` changes
@@ -53,13 +52,41 @@ If an owner has one, Settings offers **Share my saved session** after choosing t
 It cannot adopt someone else's personal session, and will not overwrite an existing shared connection.
 The older CLI import remains a private staging step until an owner explicitly adopts the session.
 
-Administrator setup remains on the server: `COLLECTANDGO_ENABLED=1`, a valid `INTEGRATIONS_KEY`, and an
-installed Playwright Chromium (or `COLLECTANDGO_BROWSER_PATH`). Restart after configuration changes.
+Native cart reading needs a valid `INTEGRATIONS_KEY`, an explicitly imported cart API session and selected
+account access. It does not require Chromium or `COLLECTANDGO_ENABLED=1`. The latter flag and an installed
+Playwright Chromium (or `COLLECTANDGO_BROWSER_PATH`) still enable the separate browser search/write
+functions and legacy browser fallback. Restart after environment configuration changes.
 The existing `collectandgo:login` and `collectandgo:import` scripts remain optional legacy tools, not the
 normal settings workflow. Login automation may be blocked even when regular Chrome works.
 
 
 ## Search, promotions and basket behavior
+
+`shopping_collectandgo_cart` reads the signed-in online basket; Settings' **Test connection / Verbinding
+testen** calls the same reader through `POST /api/shopping/collect-and-go/check`. Selected accounts,
+including selected children, may read it. `GET /api/shopping/collect-and-go/cart` returns the same basket.
+Both paths recheck household access, are rate-limited, and honour client cancellation. Verification
+uses a fresh GET to the fixed cart API and persists only its timestamp in the encrypted connection.
+The API is the observed wcscartsvcv2 service with the documented `cart/@self` read operation
+([HCL cart reference](https://help.hcl-software.com/commerce/7.0.0/com.ibm.commerce.starterstores.doc/code/rsm_cart_fep8.htm)).
+No request method, host, path or request body is taken verbatim from the HAR. Redirects are refused;
+response size and time are bounded. Cookies are sent only to the fixed Collect&Go API host.
+
+A successful read requires a pending cart, an account email marker, consistent pagination, positive
+quantities and EUR prices. The email and other account/order details are discarded from tool output.
+Malformed/guest/completed-order responses, authentication failures and bot challenges fail explicitly.
+Missing unit prices remain unknown; a partial response is marked partial. Preparing or reading a cart
+never submits an order, copies anything into Xtra, or updates WickedHome purchases or inventory.
+
+The optional legacy browser fallback follows only an observed cart link, requires explicit sign-in and
+cart-page evidence, and blocks all non-GET/HEAD/OPTIONS requests. Unknown layouts fail rather than being
+reported as empty. These selectors are covered by fixtures; native API reading is the recommended path.
+
+The native reader was independently checked against a locally supplied authenticated HAR: its GET
+returned two cart products with prices. No captured POST, quantity change or order was submitted. The
+raw HAR, tokens, personal details and captured response are excluded from committed fixtures. Tests use
+synthetic data with the verified response shape. Verification can expire; failed checks clear the saved
+verification marker, and a replacement import starts unverified.
 
 Ask the assistant to find a named product, compare alternatives or check Collect&Go promotions.
 The browser reads visible public product cards, including product identity, photos, base price, unit

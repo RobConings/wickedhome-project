@@ -57,3 +57,13 @@ it("does not automatically share a legacy session, and lets an owner adopt it ex
   assert.equal((await call("/session/adopt", "POST", { userIds: ["owner", "wife"] }, "owner")).status, 200);
   assert.equal((await call("/status", "GET", undefined, "wife").then((response) => response.json())).canUse, true);
 });
+it("authenticates cart reads/checks, enforces selected accounts and honours the browser feature flag", async () => {
+  const enabled = process.env.COLLECTANDGO_ENABLED; process.env.COLLECTANDGO_ENABLED = "0";
+  try {
+    assert.equal((await call("/cart")).status, 401);
+    assert.equal((await call("/check", "POST", {}, "wife", false)).status, 403);
+    assert.equal((await call("/cart", "GET", undefined, "child")).status, 403);
+    assert.equal((await call("/cart", "GET", undefined, "wife")).status, 409);
+    assert.equal((await call("/check", "POST", {}, "wife")).status, 409, "selected adults can test access without being an owner");
+  } finally { if (enabled === undefined) delete process.env.COLLECTANDGO_ENABLED; else process.env.COLLECTANDGO_ENABLED = enabled; }
+});

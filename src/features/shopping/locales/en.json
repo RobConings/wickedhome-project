@@ -617,11 +617,11 @@
     "error": "Collect&Go settings could not be loaded.",
     "xtraSeparate": "For shopping in a Colruyt store: manage the separate Xtra list",
     "importedUnverified": "Browser session imported; signed-in basket access has not been verified.",
-    "adminEnable": "The server administrator must enable the Collect&Go browser integration before its basket tools can run.",
-    "browserSignIn": "Use your normal Chrome window to sign in at collectandgo.be and select your pickup point.",
-    "browserNetwork": "Open Developer Tools → Network. Select Doc and filter for collectandgo.be/nl/. Clear the log, then reload the Collect&Go page. Use a successful page request (status 200).",
+    "adminEnable": "The browser integration is disabled. Import the cart API HAR below to read the basket without a browser. Product search and basket changes require the browser integration to be enabled on the server.",
+    "browserSignIn": "Sign in to Collect&Go in your normal Chrome window, then open your online basket.",
+    "browserNetwork": "Open Developer Tools → Network. Filter on wcscartsvcv2, clear the log and reload the basket. Select the successful GET cart request (status 200). Include sensitive data when exporting the filtered request as HAR.",
     "browserCopy": "Right-click the matching request → Copy → Copy all listed as HAR (with sensitive data). Paste it below.",
-    "browserInvalid": "No usable Collect&Go session was found. Copy only a successful Collect&Go page with sensitive data included. An Xtra export cannot connect Collect&Go.",
+    "browserInvalid": "No usable Collect&Go session was found. Export the cart API request including cookies, WCAuthToken and X-CG-APIKey. An Xtra export does not connect Collect&Go.",
     "browserReady": "Shop cookies read. Ready to import; retailer access is not yet verified.",
     "existingFile": "Import an existing browser-session file",
     "saveSession": "Import browser session",
@@ -632,7 +632,21 @@
     "reconnect": "The shared Collect&Go session needs a new login or browser verification. Ask a household owner to renew it here.",
     "sectionTitle": "Online · Collect&Go",
     "sectionDescription": "Prepare a basket for an online order with Collect&Go.",
-    "channel": "Online ordering"
+    "channel": "Online ordering",
+    "check": "Test connection",
+    "checkHelp": "Reads the signed-in online basket without changing products, quantities or orders. A public search or guest basket does not verify account access.",
+    "verified": "Signed-in online basket last verified: {{date}}.",
+    "checkedItems_one": "Read {{count}} product from the online basket.",
+    "checkedItems_other": "Read {{count}} products from the online basket.",
+    "checkErrors": {
+      "collectandgo_login": "Sign in again in your normal browser, then import a new session.",
+      "collectandgo_challenge": "Collect&Go blocked the server with a browser check. A normal-browser login does not guarantee server access.",
+      "collectandgo_unverified": "Signed-in basket access could not be verified. This may be a guest session, missing login data or an unsupported page layout. No basket changes were requested.",
+      "collectandgo_browser": "The browser could not read Collect&Go. Import the cart API HAR to read your basket without a browser.",
+      "collectandgo_unavailable": "Collect&Go could not return the basket. Try again later; no basket changes were requested."
+    },
+    "browserDisabledWithCart": "Reading your online basket is available. Browser functions for product search and basket changes are disabled on the server.",
+    "cartReady": "Cart API credentials read. Ready to import; use Test connection after importing to verify signed-in basket access."
   },
   "xtra": {
     "description": "Colruyt Group: search Colruyt products and prepare the shared Xtra list for shopping in a physical store.",

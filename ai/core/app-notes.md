@@ -35,7 +35,7 @@ Read at runtime by ai/core/app-map.ts; never part of the system prompt.
 - Planning for servings adds missing groceries by default, skipping in-stock, optional and already-listed items. Cooking use consumes stock and may trigger low-stock groceries; done finishes the meal.
 
 ## Shops | winkels, winkel, shop, store, supermarkt
-- Shops have type, address and opening details. Combine several physical shops for a shopping trip, or save a household-wide group (e.g. Colruyt, OKay). The combined view keeps each item's original shop, product links and price. Xtra/Colruyt is the in-store shopping list; Collect&Go is the online ordering basket, including pickup orders. Same retail group, separate destinations, connections and account access. If the intended channel is unclear, ask before changing a retailer list or basket; never transfer items without an explicit request and confirmation, or reuse one channel's prices/promotions for the other.
+- Shop groups combine physical visits (e.g. Colruyt, OKay), preserving shop links and prices. Xtra/Colruyt = in-store list; Collect&Go = separate online basket. Read it with shopping_collectandgo_cart. Ask if the channel is unclear before changes. Transfer only on explicit request and confirmation; verify promotions per channel.
 
 ## Inventory | voorraad, stock, inventaris, scannen, barcode, houdbaar, vervaldatum, expiry, pantry, op
 - Stock is "product at a place" with quantity, minimum and expiry date. Scan a barcode or the app's own QR label to use, add or look up stock; unknown barcodes are filled in automatically when known.

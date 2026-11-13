@@ -78,6 +78,11 @@ describe("MCP workflow knowledge", () => {
       assert.match(mcpToolOf(tool).description, /online order/);
       if (name.endsWith("basket")) assert.equal(tool.confirm, "always");
     }
+    const cart = getAssistantTool("shopping.collectandgo_cart")!;
+    assert.equal(cart.permission, "read"); assert.equal(cart.confirm, "never");
+    assert.match(mcpToolOf(cart).description, /signed-in/);
+    assert.match(mcpToolOf(cart).description, /guest cart/i);
+    assert.match(mcpToolOf(cart).description, /Never changes quantities/);
   });
 
   it("does not expose restricted guides to children", async () => {

@@ -1,6 +1,6 @@
-import { Router } from "express";
+import { Router, type Request, type Response } from "express";
 import { currentUser, requireRole, requireUser } from "../lib/session";
-import { adoptCollectAndGoSession, disconnectCollectAndGoBrowser, importCollectAndGoSession, setCollectAndGoAccess } from "./collect-and-go-browser";
+import { adoptCollectAndGoSession, disconnectCollectAndGoBrowser, importCollectAndGoSession, readCollectAndGoCart, setCollectAndGoAccess } from "./collect-and-go-browser";
 import { collectAndGoStatus } from "./collect-and-go-connection";
 import { collectAndGoAccessSchema, collectAndGoConnectionInputSchema } from "@/features/shopping/types/collect-and-go";
 import { parse } from "../lib/http";
@@ -10,6 +10,18 @@ export const collectAndGoRouter = Router();
 collectAndGoRouter.use(requireUser);
 collectAndGoRouter.use((_req, res, next) => { res.setHeader("Cache-Control", "no-store"); next(); });
 collectAndGoRouter.get("/status", async (req, res) => { res.json(await collectAndGoStatus(currentUser(req))); });
+async function cartRequest(req: Request, res: Response, checking = false) {
+  const user = currentUser(req); changes.hit(user.id);
+  const controller = new AbortController();
+  const abort = () => { if (!res.writableEnded) controller.abort(); };
+  res.on("close", abort);
+  try {
+    const cart = await readCollectAndGoCart(user, controller.signal);
+    res.json(checking ? { cart, status: await collectAndGoStatus(user) } : cart);
+  } finally { res.off("close", abort); }
+}
+collectAndGoRouter.get("/cart", (req, res) => cartRequest(req, res));
+collectAndGoRouter.post("/check", (req, res) => cartRequest(req, res, true));
 collectAndGoRouter.use(requireRole("owner"));
 collectAndGoRouter.post("/session", async (req, res) => {
   const user = currentUser(req); changes.hit(user.id);

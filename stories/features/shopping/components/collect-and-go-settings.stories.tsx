@@ -8,3 +8,6 @@ export const Default: Story = {};
 export const Imported: Story = { args: { initial: { ...initial, connected: true, canUse: true, importedAt: "2026-11-12T12:00:00Z" } } };
 export const LegacySession: Story = { args: { initial: { ...initial, legacyAvailable: true } } };
 export const SelectedAccount: Story = { args: { initial: { ...initial, connected: true, canManage: false, canUse: true, members: [] } } };
+export const Verified: Story = { args: { initial: { ...initial, connected: true, canUse: true, verifiedAt: "2026-11-13T07:00:00Z" } } };
+export const Disabled: Story = { args: { initial: { ...initial, connected: true, canUse: true, enabled: false } } };
+export const NativeCart: Story = { args: { initial: { ...initial, connected: true, canUse: true, enabled: false, cartEnabled: true } } };

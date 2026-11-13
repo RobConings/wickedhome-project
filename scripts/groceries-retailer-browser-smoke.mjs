@@ -27,7 +27,8 @@ try {
   const page = await browser.newPage(), errors = []; await page.clock.install(); page.on("pageerror", (error) => errors.push(error.message));
   let allowed = true, expired = false, failure = false, reads = 0, fresh = false, imported = null, hold = null, held = false;
   let collectConnected = false, collectAccess = ["owner", "wife"], adopted = null;
-  const collectStatus = () => ({ enabled: true, configured: true, connected: collectConnected, canManage: true, canUse: collectAccess.includes("owner"), needsReconnect: false, legacyAvailable: false, importedAt: collectConnected ? "2026-11-12T12:00:00Z" : null, members: [{ id: "owner", name: "Rob", role: "owner", allowed: collectAccess.includes("owner") }, { id: "wife", name: "Partner", role: "adult", allowed: collectAccess.includes("wife") }, { id: "child", name: "Child", role: "child", allowed: collectAccess.includes("child") }] });
+  let verifiedAt = null, rejectCheck = false, checks = 0;
+  const collectStatus = () => ({ enabled: true, configured: true, connected: collectConnected, canManage: true, canUse: collectAccess.includes("owner"), needsReconnect: false, legacyAvailable: false, verifiedAt, importedAt: collectConnected ? "2026-11-12T12:00:00Z" : null, members: [{ id: "owner", name: "Rob", role: "owner", allowed: collectAccess.includes("owner") }, { id: "wife", name: "Partner", role: "adult", allowed: collectAccess.includes("wife") }, { id: "child", name: "Child", role: "child", allowed: collectAccess.includes("child") }] });
   let name = "Milk already on Xtra";
   const status = () => ({ configured: true, connected: true, canUse: allowed, canManage: false, needsReconnect: expired, connectedAt: "2026-11-12T12:00:00Z", checkedAt: "2026-11-12T12:00:00Z", placeId: "1234", members: [] });
   const snapshot = () => ({ placeId: "1234", observedAt: "2026-11-12T12:00:00Z", truncated: false, items: [{ id: "retailer-item", name, productId: "123456", quantity: 2, unit: "P", completed: false }] });
@@ -43,6 +44,12 @@ try {
   });
   await page.route("**/api/shopping/collect-and-go/**", async (route) => {
     const request = route.request(), url = new URL(request.url());
+    if (request.method() === "POST" && url.pathname.endsWith("/check")) {
+      checks++;
+      if (rejectCheck) { verifiedAt = null; return route.fulfill({ status: 409, json: { error: { code: "collectandgo_unverified", message: "guest basket" } } }); }
+      verifiedAt = "2026-11-12T12:05:00Z";
+      return route.fulfill({ json: { status: collectStatus(), cart: { observedAt: verifiedAt, authenticated: true, truncated: false, items: [{ name: "Milk", url: "https://www.collectandgo.be/nl/assortiment/milk", quantity: 2, unitPriceCents: 162 }] } } });
+    }
     if (request.method() === "POST" && url.pathname.endsWith("/adopt")) { adopted = request.postDataJSON(); collectAccess = adopted.userIds; collectConnected = true; }
     else if (request.method() === "POST") { imported = request.postDataJSON(); collectAccess = imported.userIds; collectConnected = true; }
     else if (request.method() === "PUT") collectAccess = request.postDataJSON().userIds;
@@ -91,6 +98,16 @@ try {
   await page.getByText("Browser session imported; signed-in basket access has not been verified.", { exact: true }).waitFor();
   assert.equal(imported.state.cookies[0].domain, "www.collectandgo.be"); assert.ok(!JSON.stringify(imported).includes("PRIVATE PAGE"));
   assert.deepEqual(imported.userIds, ["owner", "wife"]);
+  const savedImport = JSON.stringify(imported);
+  await page.getByRole("button", { name: "Test connection", exact: true }).click();
+  await page.getByText("Read 1 product from the online basket.", { exact: true }).waitFor();
+  await page.getByText(/^Signed-in online basket last verified:/).waitFor();
+  assert.equal(checks, 1); assert.equal(JSON.stringify(imported), savedImport, "Testing never imports a replacement or changes the basket");
+  rejectCheck = true;
+  await page.getByRole("button", { name: "Test connection", exact: true }).click();
+  await page.getByText(/Signed-in basket access could not be verified/).waitFor();
+  assert.equal(await page.getByText(/^Signed-in online basket last verified:/).count(), 0, "A failed check cannot retain a verified label");
+  assert.equal(checks, 2); rejectCheck = false;
   await page.screenshot({ path: `${output}/collectandgo-shared-imported.png`, fullPage: true });
   await page.getByRole("checkbox").nth(1).uncheck();
   await page.getByRole("button", { name: "Save access", exact: true }).click();
@@ -106,6 +123,18 @@ try {
   assert.equal(await page.getByRole("checkbox").count(), 0);
   assert.equal(await page.getByRole("button", { name: "Import browser session", exact: true }).count(), 0);
   assert.equal(await page.getByRole("button", { name: "Disconnect everyone", exact: true }).count(), 0);
+  await open("Features/Shopping/Components/CollectAndGoSettings", "Disabled");
+  assert.equal(await page.getByRole("button", { name: "Test connection", exact: true }).isDisabled(), true);
+  await open("Features/Shopping/Components/CollectAndGoSettings", "NativeCart");
+  assert.equal(await page.getByRole("button", { name: "Test connection", exact: true }).isEnabled(), true);
+  await page.getByText("Reading your online basket is available. Browser functions for product search and basket changes are disabled on the server.", { exact: true }).waitFor();
+  await open("Features/Shopping/Components/CollectAndGoSettings", "Default");
+  const apiArchive = JSON.stringify({ log: { entries: [{ request: { method: "POST", url: "https://apip.collectandgo.be/gateway/ecomfoodb2c.eshop.wcscartsvcv2/v2/store/1/cart?langId=-11&catalogId=2", headers: [{ name: "WCAuthToken", value: "fixture-token" }, { name: "X-CG-APIKey", value: "fixture-key" }, { name: "Cookie", value: "WC_AUTHENTICATION_1=fixture-cookie; analytics=discard" }], postData: { text: "DO NOT REPLAY THIS WRITE" } }, response: { status: 201, content: { mimeType: "application/json" } } }] } });
+  await page.locator("#collectandgo-browser-data").evaluate((element, data) => { const clipboard = new DataTransfer(); clipboard.setData("text/plain", data); element.dispatchEvent(new ClipboardEvent("paste", { clipboardData: clipboard, bubbles: true, cancelable: true })); }, apiArchive);
+  await page.getByText("Cart API credentials read. Ready to import; use Test connection after importing to verify signed-in basket access.", { exact: true }).waitFor();
+  await page.getByRole("button", { name: "Import browser session", exact: true }).click();
+  await page.waitForFunction(() => !document.querySelector("fieldset")?.disabled);
+  assert.equal(imported.state.cartApi.storeId, "1"); assert.equal(imported.state.cartApi.authToken, "fixture-token"); assert.ok(!JSON.stringify(imported).includes("DO NOT REPLAY")); assert.ok(!JSON.stringify(imported).includes("analytics"));
   await open("Features/Shopping/Components/XtraListPanel", "Live");
   await page.getByText(name, { exact: true }).waitFor();
   assert.equal(fresh, true);

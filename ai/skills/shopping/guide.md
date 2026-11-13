@@ -55,6 +55,15 @@ just because you prepared a retailer list. See docs/XTRA.md.
 
 ## Collect&Go — online ordering
 
+Use `shopping_collectandgo_cart` to read the actual signed-in online basket or test the connection,
+without adding products, changing quantities or placing an order. It returns observed quantities,
+unit prices where readable, a timestamp and whether the result is partial. An explicitly empty basket
+is only accepted with sign-in evidence. A guest cart, failed login, bot challenge or unsupported layout
+is an error, not a verified empty cart. Never claim this read succeeded just because public search works.
+Settings → Online · Collect&Go → Test connection uses the same reader. Import the cart API HAR to retain
+its authentication headers; native reads do not need the browser integration to be enabled. Browser
+search/write tools still require `COLLECTANDGO_ENABLED=1` and an installed Playwright browser.
+
 When the browser integration is enabled and a household owner has selected your account, use `shopping_collectandgo_search` for live product matches or
 promotion-page results. Use Dutch product search words for the Dutch storefront. Read the observed date, price context, package name and conditions. A lexical
 match is not a dietary or quantity equivalence guarantee. Never invent savings from mix-and-match,

@@ -10,7 +10,7 @@ import { config } from "../lib/config";
 import { db } from "../lib/db";
 import { decryptSecret } from "../lib/secrets";
 import { collectAndGoStatus, readCollectAndGoConnection, requireCollectAndGoAccess, withCollectAndGoConnection } from "./collect-and-go-connection";
-import { adoptCollectAndGoSession, disconnectCollectAndGoBrowser, importCollectAndGoSession, rememberedCollectAndGoOffer, searchCollectAndGo, setCollectAndGoAccess, setCollectAndGoBasket } from "./collect-and-go-browser";
+import { adoptCollectAndGoSession, disconnectCollectAndGoBrowser, importCollectAndGoSession, readCollectAndGoCart, rememberedCollectAndGoOffer, searchCollectAndGo, setCollectAndGoAccess, setCollectAndGoBasket } from "./collect-and-go-browser";
 import { readCollectAndGoSession, saveCollectAndGoSession } from "./collect-and-go-session";
 const actor = (id: string, householdId = id, role: SessionUser["role"] = "owner"): SessionUser => ({ id, householdId, role, email: `${id}@example.test`, name: id, locale: "en", householdName: "Home", habitantId: null });
 const signal = () => new AbortController().signal;
@@ -27,20 +27,72 @@ before(async () => {
 });
 afterEach(() => mock.restoreAll());
 after(async () => { config.STORAGE_DIR = previous.storage; config.INTEGRATIONS_KEY = previous.key; if (previous.enabled === undefined) delete process.env.COLLECTANDGO_ENABLED; else process.env.COLLECTANDGO_ENABLED = previous.enabled; Reflect.set(db.user, "findMany", previous.members); Reflect.set(db.auditEntry, "create", previous.audit); await rm(directory, { recursive: true, force: true }); });
-function fakeBrowser(body = "Current products") {
+function fakeBrowser(body = "Current products", authenticated = true) {
   const options: unknown[] = [];
+  const routes: ((route: unknown) => Promise<unknown>)[] = [];
   const launch = mock.method(chromium, "launch", async () => ({
     close: async () => undefined,
     newContext: async (input: unknown) => {
       options.push(input);
       return {
-        route: async () => undefined, storageState: async () => state,
-        newPage: async () => ({ setDefaultTimeout: () => undefined, setDefaultNavigationTimeout: () => undefined, goto: async () => undefined, locator: (selector: string) => selector === "body" ? { innerText: async () => body } : { first: () => ({ waitFor: async () => undefined }), evaluateAll: async () => [{ name: "Milk", url: "https://www.collectandgo.be/nl/assortiment/milk", image: null, price: "€ 1,50", unitPrice: null, promotion: null }] } }),
+        route: async (_pattern: string, handler: (route: unknown) => Promise<unknown>) => { routes.push(handler); }, storageState: async () => (input as { storageState: typeof state }).storageState,
+        newPage: async () => ({ setDefaultTimeout: () => undefined, setDefaultNavigationTimeout: () => undefined, goto: async () => undefined, url: () => "https://www.collectandgo.be/nl/home",
+          getByRole: (role: string) => role === "link" ? { evaluateAll: async () => [{ href: "/nl/winkelwagen", label: "Winkelwagen" }] } : role === "heading" ? { first: () => ({ waitFor: async () => undefined }) } : { filter: () => ({ count: async () => 0 }) },
+          evaluate: async () => ({ signedIn: authenticated, cart: true, empty: false, unresolved: false, rows: [{ name: "Milk", url: "https://www.collectandgo.be/nl/assortiment/milk", quantity: "2", price: "€ 1,50" }] }),
+          locator: (selector: string) => selector === "body" ? { innerText: async () => body } : { first: () => ({ waitFor: async () => undefined }), evaluateAll: async () => [{ name: "Milk", url: "https://www.collectandgo.be/nl/assortiment/milk", image: null, price: "€ 1,50", unitPrice: null, promotion: null }] } }),
       };
     },
   }));
-  return { launch, options };
+  return { launch, options, routes };
 }
+it("reads native cart credentials with browser integration disabled and still enforces explicit grants", async () => {
+  const owner = actor("native"), wife = actor("native-wife", "native", "adult"), child = actor("native-child", "native", "child");
+  const enabled = process.env.COLLECTANDGO_ENABLED; process.env.COLLECTANDGO_ENABLED = "0";
+  try {
+    const native = { ...state, cookies: [{ ...state.cookies[0]!, name: "WC_AUTHENTICATION_1", domain: "apip.collectandgo.be" }], cartApi: { storeId: "1", catalogId: "2", langId: "-11", authToken: "fixture-token", apiKey: "fixture-key" } };
+    await importCollectAndGoSession(owner, { state: native, userIds: [wife.id, child.id] });
+    let reads = 0;
+    const browser = mock.method(chromium, "launch", async () => { throw Error("Native read must not launch a browser"); });
+    mock.method(globalThis, "fetch", async (_url: unknown, options?: RequestInit) => {
+      assert.equal(options?.method, "GET"); reads++;
+      return Response.json({ resourceName: "cart", orderStatus: "P", orderId: "1", x_xtraEmailId: "fixture@example.test", totalProductPriceCurrency: "EUR", recordSetCount: "0", recordSetTotal: "0", recordSetStartNumber: "0", orderItem: [] });
+    });
+    assert.deepEqual((await readCollectAndGoCart(wife, signal())).items, []);
+    assert.equal((await collectAndGoStatus(wife)).enabled, false); assert.equal((await collectAndGoStatus(wife)).cartEnabled, true); assert.ok((await collectAndGoStatus(wife)).verifiedAt);
+    assert.deepEqual((await readCollectAndGoCart(child, signal())).items, []);
+    await assert.rejects(readCollectAndGoCart(owner, signal()), /don't have access/);
+    await setCollectAndGoAccess(owner, []); await assert.rejects(readCollectAndGoCart(wife, signal()), /don't have access/);
+    assert.equal(reads, 2); assert.equal(browser.mock.callCount(), 0);
+    await setCollectAndGoAccess(owner, [wife.id]); process.env.COLLECTANDGO_ENABLED = "1";
+    mock.restoreAll(); fakeBrowser();
+    const { offers } = await searchCollectAndGo(wife, "Milk", 1, true, signal());
+    assert.equal((await readCollectAndGoConnection(owner.householdId))?.state.cartApi?.authToken, "fixture-token", "Browser observations preserve the native credentials");
+    await assert.rejects(setCollectAndGoBasket(wife, offers[0]!.id, 1, signal()), /signed-in www.collectandgo.be browser session/);
+  } finally { if (enabled === undefined) delete process.env.COLLECTANDGO_ENABLED; else process.env.COLLECTANDGO_ENABLED = enabled; }
+});
+it("reads a selected account's cart, records verification, and blocks mutation requests on the browser boundary", async () => {
+  const owner = actor("cart"), wife = actor("cart-wife", "cart", "adult"), fake = fakeBrowser();
+  await importCollectAndGoSession(owner, { state, userIds: [wife.id] });
+  const cart = await readCollectAndGoCart(wife, signal());
+  assert.equal(cart.items[0]?.quantity, 2); assert.equal((await collectAndGoStatus(wife)).verifiedAt, cart.observedAt);
+  let continued = 0, blocked = 0;
+  for (const [url, method] of [["https://www.collectandgo.be/nl/winkelwagen", "GET"], ["https://www.collectandgo.be/nl/winkelwagen", "POST"], ["https://attacker.example/read", "GET"]]) {
+    await fake.routes[0]!({ request: () => ({ url: () => url, method: () => method }), continue: async () => { continued++; }, abort: async () => { blocked++; } });
+  }
+  assert.equal(continued, 1); assert.equal(blocked, 2);
+  await assert.rejects(readCollectAndGoCart(owner, signal()), /don't have access/);
+  await setCollectAndGoAccess(owner, []);
+  await assert.rejects(readCollectAndGoCart(wife, signal()), /don't have access/);
+  assert.equal(fake.launch.mock.callCount(), 1);
+});
+it("never verifies a guest cart or keeps an old verification after a failed check", async () => {
+  const owner = actor("guest-cart");
+  await importCollectAndGoSession(owner, { state, userIds: [owner.id] });
+  fakeBrowser(); await readCollectAndGoCart(owner, signal()); assert.ok((await collectAndGoStatus(owner)).verifiedAt);
+  mock.restoreAll(); fakeBrowser("Current products", false);
+  await assert.rejects(readCollectAndGoCart(owner, signal()), /could not be verified/);
+  assert.equal((await collectAndGoStatus(owner)).verifiedAt, null);
+});
 it("connects once for selected accounts and protects shared credentials at rest and in status", async () => {
   const owner = actor("shared"), wife = actor("shared-wife", "shared", "adult");
   await importCollectAndGoSession(owner, { state, userIds: [owner.id, wife.id] });

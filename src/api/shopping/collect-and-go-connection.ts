@@ -10,11 +10,12 @@ import { forbidden, HttpError } from "../lib/http";
 import { decryptSecret, encryptSecret, secretsAvailable } from "../lib/secrets";
 import { readCollectAndGoSession } from "./collect-and-go-session";
 
-const connectionSchema = z.object({ version: z.literal(1), revision: z.string(), state: collectAndGoStateSchema, userIds: z.array(z.string()).max(100), importedAt: z.string(), needsReconnect: z.boolean() });
+const connectionSchema = z.object({ version: z.literal(1), revision: z.string(), state: collectAndGoStateSchema, userIds: z.array(z.string()).max(100), importedAt: z.string(), needsReconnect: z.boolean(), verifiedAt: z.string().datetime().nullable().optional() });
 export type CollectAndGoConnection = z.infer<typeof connectionSchema>;
 const root = () => resolve(config.STORAGE_DIR, "..", "collect-and-go-shared");
 const fileOf = (householdId: string) => join(root(), `${createHash("sha256").update(householdId).digest("hex")}.enc`);
 export const collectAndGoEnabled = () => process.env.COLLECTANDGO_ENABLED === "1";
+export const collectAndGoCartAvailable = () => secretsAvailable() || collectAndGoEnabled();
 export function requireCollectAndGoOwner(user: SessionUser) { if (user.role !== "owner") throw forbidden("Only household owners can manage the shared Collect&Go connection."); }
 export async function collectAndGoMembers(householdId: string, userIds: string[]) {
   const members = await db.user.findMany({ where: { householdId, disabledAt: null }, select: { id: true, email: true, role: true, habitant: { select: { name: true } } }, orderBy: { createdAt: "asc" } });
@@ -56,5 +57,5 @@ export async function collectAndGoStatus(user: SessionUser): Promise<CollectAndG
   const connection = await readCollectAndGoConnection(user.householdId).catch((error) => { if (!canManage) throw error; unreadable = true; return null; });
   const canUse = Boolean(connection?.userIds.includes(user.id)), visible = canUse || canManage;
   const legacy = canManage && !connection ? await readCollectAndGoSession(user.id).catch(() => null) : null;
-  return { enabled: collectAndGoEnabled(), configured: secretsAvailable(), connected: visible && Boolean(connection), canManage, canUse, needsReconnect: unreadable || (visible && Boolean(connection?.needsReconnect)), legacyAvailable: Boolean(legacy), importedAt: visible ? connection?.importedAt ?? null : null, members: canManage ? (await collectAndGoMembers(user.householdId, [])).map((member) => ({ id: member.id, name: member.habitant?.name ?? member.email, role: member.role.toLowerCase(), allowed: connection?.userIds.includes(member.id) ?? false })) : [] };
+  return { enabled: collectAndGoEnabled(), cartEnabled: visible && secretsAvailable() && Boolean(connection?.state.cartApi), configured: secretsAvailable(), connected: visible && Boolean(connection), canManage, canUse, needsReconnect: unreadable || (visible && Boolean(connection?.needsReconnect)), legacyAvailable: Boolean(legacy), importedAt: visible ? connection?.importedAt ?? null : null, verifiedAt: visible && !connection?.needsReconnect ? connection?.verifiedAt ?? null : null, members: canManage ? (await collectAndGoMembers(user.householdId, [])).map((member) => ({ id: member.id, name: member.habitant?.name ?? member.email, role: member.role.toLowerCase(), allowed: connection?.userIds.includes(member.id) ?? false })) : [] };
 }

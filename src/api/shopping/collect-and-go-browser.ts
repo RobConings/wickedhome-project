@@ -7,9 +7,11 @@ import { appActor, audit } from "../audit/audit.service";
 import { publish } from "../lib/events";
 import { secretsAvailable } from "../lib/secrets";
 import { productMatch, euroCents, promotionPrice } from "./collect-and-go-pricing";
+import { openCollectAndGoCart } from "./collect-and-go-cart";
+import { fetchCollectAndGoCart } from "./collect-and-go-cart-api";
 import { readCollectAndGoSession, disconnectCollectAndGo } from "./collect-and-go-session";
 import { collectAndGoEnabled, collectAndGoMembers, collectAndGoStatus, deleteCollectAndGoConnection, readCollectAndGoConnection, requireCollectAndGoAccess, requireCollectAndGoOwner, saveCollectAndGoConnection, withCollectAndGoConnection, type CollectAndGoConnection } from "./collect-and-go-connection";
-export { collectAndGoEnabled } from "./collect-and-go-connection";
+export { collectAndGoCartAvailable, collectAndGoEnabled } from "./collect-and-go-connection";
 
 const HOME = "https://www.collectandgo.be/nl/home";
 const PROMOS = "https://www.collectandgo.be/nl/assortiment/promo-strafste-kortingen";
@@ -73,7 +75,7 @@ export async function checkCollectAndGoPage(page: Page) {
   if (/sessie.*verlopen|opnieuw aanmelden|session.*expired/i.test(content)) throw fail("collectandgo_login", "Ask an owner to sign in again in a normal browser and renew the shared session in Settings → Collect&Go.");
   return content;
 }
-async function browserWork<T>(user: SessionUser, signal: AbortSignal, work: (page: Page, connection: CollectAndGoConnection) => Promise<T>): Promise<T> {
+async function browserWork<T>(user: SessionUser, signal: AbortSignal, work: (page: Page, connection: CollectAndGoConnection) => Promise<T>, readOnly = false): Promise<T> {
   const key = user.householdId, generation = generations.get(key) ?? 0;
   return withCollectAndGoConnection(key, async () => {
     signal.throwIfAborted();
@@ -91,21 +93,52 @@ async function browserWork<T>(user: SessionUser, signal: AbortSignal, work: (pag
       await context.route("**/*", async (route) => {
         const u = new URL(route.request().url());
         const allowed = u.protocol === "https:" && !u.port && /(^|\.)(collectandgo\.be|colruytgroup\.com|xtra\.be)$/.test(u.hostname);
-        return allowed ? route.continue() : route.abort();
+        return allowed && (!readOnly || ["GET", "HEAD", "OPTIONS"].includes(route.request().method())) ? route.continue() : route.abort();
       });
       const page = await context.newPage();
       page.setDefaultTimeout(12000); page.setDefaultNavigationTimeout(30000);
       const result = await work(page, saved);
-      if (generation === (generations.get(key) ?? 0)) await saveCollectAndGoConnection(key, { ...saved, state: { ...await context.storageState(), ...(saved.state.userAgent && { userAgent: saved.state.userAgent }) } });
+      signal.throwIfAborted();
+      if (generation !== (generations.get(key) ?? 0)) throw conflict("The shared Collect&Go connection changed before the result could be returned. Read again with current access.");
+      if (generation === (generations.get(key) ?? 0)) await saveCollectAndGoConnection(key, { ...saved, state: { ...await context.storageState(), ...(saved.state.userAgent && { userAgent: saved.state.userAgent }), ...(saved.state.cartApi && { cartApi: saved.state.cartApi }) } });
       return result;
     } catch (error) {
       if (error instanceof HttpError) {
-        if (["collectandgo_challenge", "collectandgo_login"].includes(error.code) && generation === (generations.get(key) ?? 0)) await saveCollectAndGoConnection(key, { ...saved, needsReconnect: true });
+        if (generation === (generations.get(key) ?? 0) && (["collectandgo_challenge", "collectandgo_login"].includes(error.code) || readOnly)) await saveCollectAndGoConnection(key, { ...saved, verifiedAt: null, needsReconnect: saved.needsReconnect || ["collectandgo_challenge", "collectandgo_login"].includes(error.code) });
         throw error;
       }
+      if (readOnly && generation === (generations.get(key) ?? 0)) await saveCollectAndGoConnection(key, { ...saved, verifiedAt: null });
+      if (readOnly) throw fail("collectandgo_browser", "Collect&Go could not be read. Check browser installation, sign-in and whether the basket page layout is supported. No basket changes were requested.");
       throw fail("collectandgo_browser", signal.aborted ? "Collect&Go browser operation stopped. Check the basket before retrying an interrupted change." : "Collect&Go could not complete this browser operation. Check browser installation, sign-in and the website. Inspect the basket before retrying a change.");
     } finally { clearTimeout(timeout); signal.removeEventListener("abort", abort); await browser.close(); if (activeBrowsers.get(key) === browser) activeBrowsers.delete(key); }
   });
+}
+/** Read only the signed-in online basket. Search results and guest carts never verify this connection. */
+export async function readCollectAndGoCart(user: SessionUser, signal: AbortSignal) {
+  const snapshot = await requireCollectAndGoAccess(user);
+  if (snapshot.state.cartApi) {
+    const generation = generations.get(user.householdId) ?? 0;
+    return withCollectAndGoConnection(user.householdId, async () => {
+      const saved = await requireCollectAndGoAccess(user);
+      if (generation !== (generations.get(user.householdId) ?? 0) || saved.revision !== snapshot.revision) throw conflict("The Collect&Go connection changed. Read again.");
+      try {
+        const cart = await fetchCollectAndGoCart(saved.state, signal);
+        signal.throwIfAborted();
+        if (generation !== (generations.get(user.householdId) ?? 0)) throw conflict("The Collect&Go connection changed before returning the basket.");
+        await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: cart.observedAt });
+        return cart;
+      } catch (error) {
+        if (generation === (generations.get(user.householdId) ?? 0)) await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: null, needsReconnect: error instanceof HttpError && ["collectandgo_login", "collectandgo_challenge"].includes(error.code) });
+        throw error;
+      }
+    });
+  }
+  return browserWork(user, signal, async (page, connection) => {
+    await page.goto(HOME, { waitUntil: "domcontentloaded" });
+    const cart = await openCollectAndGoCart(page, () => checkCollectAndGoPage(page));
+    connection.verifiedAt = cart.observedAt;
+    return cart;
+  }, true);
 }
 async function searchPage(page: Page, query: string, promotionsOnly: boolean) {
   await page.goto(promotionsOnly ? PROMOS : HOME, { waitUntil: "domcontentloaded" });
@@ -165,6 +198,8 @@ export async function searchCollectAndGo(user: SessionUser, query: string, quant
 export async function setCollectAndGoBasket(user: SessionUser, offerId: string, quantity: number, signal: AbortSignal) {
   if (user.role === "child") throw forbidden("Children can search Collect&Go but cannot change its basket.");
   const expected = await rememberedCollectAndGoOffer(user, offerId);
+  const connection = await requireCollectAndGoAccess(user);
+  if (connection.state.cartApi && !connection.state.cookies.some((cookie) => /^WC_AUTHENTICATION_\d+$/.test(cookie.name) && ["www.collectandgo.be", ".collectandgo.be", "collectandgo.be"].includes(cookie.domain))) throw conflict("This API HAR supports reading the signed-in basket. A signed-in www.collectandgo.be browser session is also required before browser basket changes; use Collect&Go directly to change it.");
   return browserWork(user, signal, async (page) => {
     await rememberedCollectAndGoOffer(user, offerId);
     await searchPage(page, expected.name, false);

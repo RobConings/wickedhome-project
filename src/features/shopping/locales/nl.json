@@ -617,11 +617,11 @@
     "error": "Collect&Go-instellingen konden niet geladen worden.",
     "xtraSeparate": "Boodschappen in een Colruyt-winkel: beheer het aparte Xtra-lijstje",
     "importedUnverified": "Browsersessie geïmporteerd; toegang tot je aangemelde winkelmand is nog niet gecontroleerd.",
-    "adminEnable": "De serverbeheerder moet de Collect&Go-browserintegratie inschakelen voordat de winkelmandhulpmiddelen kunnen werken.",
-    "browserSignIn": "Meld je in je gewone Chrome-venster aan op collectandgo.be en kies je afhaalpunt.",
-    "browserNetwork": "Open Ontwikkelaarstools → Network. Kies Doc en filter op collectandgo.be/nl/. Wis het logboek en vernieuw de Collect&Go-pagina. Gebruik een geslaagd paginaverzoek (status 200).",
+    "adminEnable": "De browserintegratie staat uit. Importeer hieronder het cart-API-HAR om de mand zonder browser uit te lezen. Voor producten zoeken en de mand wijzigen moet de browserintegratie op de server aanstaan.",
+    "browserSignIn": "Meld je in je gewone Chrome aan bij Collect&Go en open je online winkelmand.",
+    "browserNetwork": "Open Ontwikkelaarstools → Network. Filter op wcscartsvcv2, wis het logboek en vernieuw de winkelmand. Kies het geslaagde GET-cartverzoek (status 200). Neem gevoelige gegevens op bij het exporteren van dit gefilterde verzoek als HAR.",
     "browserCopy": "Rechtsklik op het passende verzoek → Copy → Copy all listed as HAR (with sensitive data). Plak dit hieronder.",
-    "browserInvalid": "Geen bruikbare Collect&Go-sessie gevonden. Kopieer alleen een geslaagde Collect&Go-pagina met gevoelige gegevens. Een Xtra-export koppelt Collect&Go niet.",
+    "browserInvalid": "Geen bruikbare Collect&Go-sessie gevonden. Exporteer het cart-API-verzoek met cookies, WCAuthToken en X-CG-APIKey. Een Xtra-export koppelt Collect&Go niet.",
     "browserReady": "Winkelcookies gelezen. Klaar om te importeren; winkeltoegang is nog niet gecontroleerd.",
     "existingFile": "Bestaand browsersessiebestand importeren",
     "saveSession": "Browsersessie importeren",
@@ -632,7 +632,21 @@
     "reconnect": "Opnieuw aanmelden of browserverificatie nodig voor de gedeelde Collect&Go-sessie. Vraag een eigenaar om de koppeling hier te vernieuwen.",
     "sectionTitle": "Online · Collect&Go",
     "sectionDescription": "Maak een winkelmand voor een online bestelling bij Collect&Go.",
-    "channel": "Online bestellen"
+    "channel": "Online bestellen",
+    "check": "Verbinding testen",
+    "checkHelp": "Leest de aangemelde online winkelmand zonder producten, aantallen of bestellingen te wijzigen. Een openbare zoekopdracht of gastmandje bewijst geen accounttoegang.",
+    "verified": "Aangemelde online winkelmand laatst gecontroleerd: {{date}}.",
+    "checkedItems_one": "{{count}} product uit de online winkelmand gelezen.",
+    "checkedItems_other": "{{count}} producten uit de online winkelmand gelezen.",
+    "checkErrors": {
+      "collectandgo_login": "Meld je opnieuw aan in je gewone browser en importeer daarna een nieuwe sessie.",
+      "collectandgo_challenge": "Collect&Go blokkeert de server met een browserverificatie. Aanmelden in je gewone browser garandeert geen servertoegang.",
+      "collectandgo_unverified": "Toegang tot de aangemelde winkelmand kon niet worden gecontroleerd. Mogelijk gaat het om een gastsessie, ontbreken aanmeldgegevens of wordt de pagina-indeling nog niet ondersteund. Er zijn geen wijzigingen aan de winkelmand gevraagd.",
+      "collectandgo_browser": "De browser kon Collect&Go niet uitlezen. Importeer het cart-API-HAR om je mand zonder browser uit te lezen.",
+      "collectandgo_unavailable": "Collect&Go kon de winkelmand niet teruggeven. Probeer later opnieuw; er zijn geen wijzigingen aan de winkelmand gevraagd."
+    },
+    "browserDisabledWithCart": "Je online winkelmand uitlezen is beschikbaar. Browserfuncties voor producten zoeken en de mand wijzigen staan uit op de server.",
+    "cartReady": "Cart-API-gegevens gelezen. Klaar om te importeren; klik na het importeren op Verbinding testen om de aangemelde winkelmand te controleren."
   },
   "xtra": {
     "description": "Colruyt Group: zoek Colruyt-producten en maak het gedeelde Xtra-lijstje voor boodschappen in een fysieke winkel.",
