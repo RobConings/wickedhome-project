@@ -144,7 +144,7 @@ export async function readCollectAndGoCart(user: SessionUser, signal: AbortSigna
 /** Orders use the same household grants and revocation fence, but never mark a basket verified. */
 async function orderRead<T>(user: SessionUser, signal: AbortSignal, read: (state: CollectAndGoConnection["state"], signal: AbortSignal) => Promise<T>) {
   const snapshot = await requireCollectAndGoAccess(user);
-  if (!snapshot.state.cartApi) throw fail("collectandgo_unverified", "Import a fresh Collect&Go cart API HAR to read placed reservations. A browser-only session cannot verify orders.");
+  if (!snapshot.state.cartApi) throw fail("collectandgo_credentials_missing", "This older browser-only import lacks cart API credentials. Import a cart API HAR once in Settings; WickedHome reuses the saved session thereafter.");
   const generation = generations.get(user.householdId) ?? 0;
   return withCollectAndGoConnection(user.householdId, async () => {
     signal.throwIfAborted();

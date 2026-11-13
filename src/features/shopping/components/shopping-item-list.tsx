@@ -29,6 +29,7 @@ type ShoppingItemListProps = {
   size?: "default" | "large";
   /** Text when there is nothing open. */
   emptyText?: string;
+  collectAndGoMatches?: ReadonlySet<string>;
   className?: string;
 };
 
@@ -48,6 +49,7 @@ export function ShoppingItemList({
   groupByNeed = true,
   size = "default",
   emptyText,
+  collectAndGoMatches,
   className,
 }: ShoppingItemListProps) {
   const { t } = useTranslation("shopping");
@@ -65,6 +67,7 @@ export function ShoppingItemList({
     <ShoppingItemRow
       key={item.id}
       item={item}
+      inCollectAndGo={collectAndGoMatches?.has(item.id)}
       shop={item.shopId ? shopsById.get(item.shopId) : null}
       showShop={showShop}
       showList={showList}

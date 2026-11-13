@@ -28,6 +28,9 @@ try {
   let allowed = true, expired = false, failure = false, reads = 0, fresh = false, imported = null, hold = null, held = false;
   let collectConnected = false, collectAccess = ["owner", "wife"], adopted = null;
   let verifiedAt = null, rejectCheck = false, checks = 0;
+  let basketName = "Halfvolle melk", basketFails = false, basketReads = 0, holdBasket = null, heldBasket = false;
+  const collectCart = () => ({ authenticated: true, observedAt: new Date().toISOString(), truncated: false, items: basketName ? [{ name: basketName, quantity: 2, unitPriceCents: 162, url: null }] : [] });
+  const reservation = () => ({ id: "2201", url: "https://www.collectandgo.be/nl/bestelling/2201", authenticated: true, observedAt: new Date().toISOString(), timeZone: "Europe/Brussels", status: "M", pickupPoint: "Example pickup", pickupFrom: "2030-11-16T07:30:00Z", pickupUntil: "2030-11-16T08:00:00Z", amendableUntil: "2030-11-15T08:00:00Z", providerAmendable: true, editState: "open", estimatedTotalCents: 1250, items: [{ name: "Reserved bread for pickup", quantity: 2, unitPriceCents: 48, url: null }], truncated: false });
   const collectStatus = () => ({ enabled: true, configured: true, connected: collectConnected, canManage: true, canUse: collectAccess.includes("owner"), needsReconnect: false, legacyAvailable: false, verifiedAt, importedAt: collectConnected ? "2026-11-12T12:00:00Z" : null, members: [{ id: "owner", name: "Rob", role: "owner", allowed: collectAccess.includes("owner") }, { id: "wife", name: "Partner", role: "adult", allowed: collectAccess.includes("wife") }, { id: "child", name: "Child", role: "child", allowed: collectAccess.includes("child") }] });
   let name = "Milk already on Xtra";
   const status = () => ({ configured: true, connected: true, canUse: allowed, canManage: false, needsReconnect: expired, connectedAt: "2026-11-12T12:00:00Z", checkedAt: "2026-11-12T12:00:00Z", placeId: "1234", members: [] });
@@ -44,6 +47,13 @@ try {
   });
   await page.route("**/api/shopping/collect-and-go/**", async (route) => {
     const request = route.request(), url = new URL(request.url());
+    if (request.method() === "GET" && url.pathname.endsWith("/cart")) {
+      basketReads++;
+      if (holdBasket) { heldBasket = true; await holdBasket; }
+      return basketFails ? route.fulfill({ status: 409, json: { error: { code: "collectandgo_unverified", message: "Unsupported response, not an expired login" } } }) : route.fulfill({ json: { ...collectCart(), observedAt: await page.evaluate(() => new Date().toISOString()) } });
+    }
+    if (request.method() === "GET" && url.pathname.endsWith("/orders")) return route.fulfill({ json: { authenticated: true, observedAt: await page.evaluate(() => new Date().toISOString()), timeZone: "Europe/Brussels", orders: [reservation()], truncated: false } });
+    if (request.method() === "GET" && /\/orders\/\d+$/.test(url.pathname)) return route.fulfill({ json: { ...reservation(), observedAt: await page.evaluate(() => new Date().toISOString()) } });
     if (request.method() === "POST" && url.pathname.endsWith("/check")) {
       checks++;
       if (rejectCheck) { verifiedAt = null; return route.fulfill({ status: 409, json: { error: { code: "collectandgo_unverified", message: "guest basket" } } }); }
@@ -61,6 +71,8 @@ try {
     const story = Object.values(index.entries).find((entry) => entry.title === title && entry.exportName === exported); assert.ok(story, `${title}/${exported}`);
     await page.goto(`${origin}/iframe.html?id=${story.id}&viewMode=story&globals=locale:${locale};theme:${theme}`, { waitUntil: "domcontentloaded" });
     await page.waitForFunction(() => document.querySelector("#storybook-root")?.childElementCount > 0);
+    // Theme changes animate shared control colours; capture the settled theme, not the first frame.
+    await page.evaluate(async () => { await Promise.all(document.getAnimations().filter(animation => animation.constructor.name === "CSSTransition").map(animation => animation.finished.catch(() => undefined))); });
   }
   for (const locale of ["en", "nl"]) for (const theme of ["light", "dark"]) for (const width of [320, 390, 1440]) {
     await open("Features/Shopping/Screens/ShoppingScreen", "WithXtra", locale, theme, width);
@@ -105,7 +117,7 @@ try {
   assert.equal(checks, 1); assert.equal(JSON.stringify(imported), savedImport, "Testing never imports a replacement or changes the basket");
   rejectCheck = true;
   await page.getByRole("button", { name: "Test connection", exact: true }).click();
-  await page.getByText(/Signed-in basket access could not be verified/).waitFor();
+  await page.getByText(/The retailer response could not be verified/).waitFor();
   assert.equal(await page.getByText(/^Signed-in online basket last verified:/).count(), 0, "A failed check cannot retain a verified label");
   assert.equal(checks, 2); rejectCheck = false;
   await page.screenshot({ path: `${output}/collectandgo-shared-imported.png`, fullPage: true });
@@ -166,6 +178,50 @@ try {
   allowed = false; emit("access"); release(); hold = null;
   await page.getByRole("region", { name: "Xtra / Colruyt · In-store list" }).waitFor({ state: "hidden" });
   assert.equal(await page.getByText(name, { exact: true }).count(), 0);
+  // Retailer destinations are tabs. Online data never sits on top of household needs.
+  for (const locale of ["en", "nl"]) for (const theme of ["light", "dark"]) for (const width of [320, 390, 1440]) {
+    await open("Features/Shopping/Screens/ShoppingScreen", "WithCollectAndGo", locale, theme, width);
+    await page.getByRole("tab", { name: "Collect&Go", exact: true }).waitFor();
+    await page.getByText("Example reserved bread", { exact: true }).waitFor();
+    assert.equal(await page.getByRole("tab", { name: "Collect&Go", exact: true }).getAttribute("aria-selected"), "true");
+    assert.equal(await page.getByRole("region", { name: locale === "en" ? "Xtra / Colruyt · In-store list" : "Xtra / Colruyt · Winkellijstje" }).count(), 0);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    await page.screenshot({ path: `${output}/collectandgo-tab-${locale}-${theme}-${width}.png`, fullPage: true });
+    await page.getByRole("tab", { name: "WickedHome", exact: true }).click();
+    await page.getByText(locale === "en" ? "Added in Collect&Go" : "Toegevoegd in Collect&Go", { exact: true }).first().waitFor();
+    assert.equal(await page.getByText("Example reserved bread", { exact: true }).count(), 0);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+  }
+  collectConnected = true; collectAccess = ["owner", "wife"]; basketName = "Halfvolle melk";
+  await open("Features/Shopping/Screens/ShoppingScreen", "LiveCollectAndGo");
+  await page.getByText("Reserved bread for pickup", { exact: true }).waitFor();
+  await page.getByRole("tab", { name: "WickedHome", exact: true }).click();
+  await page.getByText("Added in Collect&Go", { exact: true }).first().waitFor();
+  basketName = "";
+  await page.clock.fastForward(31000);
+  await page.getByText("Added in Collect&Go", { exact: true }).waitFor({ state: "hidden" });
+  await page.getByRole("tab", { name: "Collect&Go", exact: true }).click();
+  await page.getByText("Your online basket is empty. Placed reservations are shown separately.", { exact: true }).waitFor();
+  await page.getByText("Reserved bread for pickup", { exact: true }).waitFor();
+  basketFails = true;
+  await page.getByRole("button", { name: "Refresh Collect&Go", exact: true }).click();
+  await page.getByText(/The retailer response could not be verified/).waitFor();
+  assert.equal(await page.getByText("Reserved bread for pickup", { exact: true }).isVisible(), true, "A basket layout error cannot hide valid reservations");
+  basketFails = false; basketName = "Halfvolle melk";
+  await page.getByRole("button", { name: "Refresh Collect&Go", exact: true }).click();
+  await page.getByRole("tab", { name: "WickedHome", exact: true }).click();
+  await page.getByText("Added in Collect&Go", { exact: true }).first().waitFor();
+  let releaseBasket; holdBasket = new Promise(done => { releaseBasket = done; });
+  await page.clock.fastForward(31000);
+  for (let tries = 0; !heldBasket && tries < 100; tries++) await new Promise(done => setTimeout(done, 10));
+  assert.equal(heldBasket, true);
+  collectAccess = []; for (const stream of streams) stream.write(`event: shopping.collectandgo_changed\ndata: ${JSON.stringify({ type: "shopping.collectandgo_changed", at: new Date().toISOString(), data: null })}\n\n`);
+  await page.getByText("Added in Collect&Go", { exact: true }).waitFor({ state: "hidden" });
+  releaseBasket(); holdBasket = null;
+  await page.getByRole("tab", { name: "Collect&Go", exact: true }).click();
+  await page.getByText("An owner must select your WickedHome account to share this Collect&Go account.", { exact: true }).waitFor();
+  assert.equal(await page.getByText("Reserved bread for pickup", { exact: true }).count(), 0);
+  assert.ok(basketReads > 1);
   assert.deepEqual(errors, []);
-  console.log(`Retailer groceries UI: 36 EN/NL mobile/desktop renders; in-store/online channel labels and settings navigation, automatic reads, visible-only polling, focus refresh, MCP events, stale/expired reads, revoked in-flight reads, and Collect&Go shared grants, explicit legacy adoption and import without CLI passed. Screenshots: ${output}`);
+  console.log(`Retailer groceries UI: 48 EN/NL mobile/desktop renders; destination tabs, basket presence labels, verified empty basket with separate reservations, independent failures and revoked in-flight basket reads; in-store/online channel labels and settings navigation, automatic reads, visible-only polling, focus refresh, MCP events, stale/expired reads, revoked in-flight reads, and Collect&Go shared grants, explicit legacy adoption and import without CLI passed. Screenshots: ${output}`);
 } finally { await browser.close(); for (const stream of streams) stream.end(); await new Promise((done) => server.close(done)); }

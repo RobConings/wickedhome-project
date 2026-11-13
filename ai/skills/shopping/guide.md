@@ -77,6 +77,13 @@ without adding products, changing quantities or placing an order. It returns obs
 unit prices where readable, a timestamp and whether the result is partial. An explicitly empty basket
 is only accepted with sign-in evidence. A guest cart, failed login, bot challenge or unsupported layout
 is an error, not a verified empty cart. Never claim this read succeeded just because public search works.
+In WickedHome, Shopping → Collect&Go shows the current basket and placed reservations in a separate
+shopping-list tab; Shopping → Xtra / Colruyt shows the in-store list. Basket presence labels on WickedHome
+needs do not mark them bought or prove the entire required quantity is covered. The saved session is
+reused; no HAR import is needed for every visit. A response-verification error does not establish login
+expiry. Ask an owner to renew only for a real login/challenge error or a one-time older import missing API
+credentials. Collect&Go may omit the products array on a verified empty basket.
+
 Settings → Online · Collect&Go → Test connection uses the same reader. Import the cart API HAR to retain
 its authentication headers; native reads do not need the browser integration to be enabled. Browser
 search/write tools still require `COLLECTANDGO_ENABLED=1` and an installed Playwright browser.

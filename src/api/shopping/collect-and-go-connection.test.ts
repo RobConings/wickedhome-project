@@ -55,7 +55,7 @@ it("reads native cart credentials with browser integration disabled and still en
     const browser = mock.method(chromium, "launch", async () => { throw Error("Native read must not launch a browser"); });
     mock.method(globalThis, "fetch", async (_url: unknown, options?: RequestInit) => {
       assert.equal(options?.method, "GET"); reads++;
-      return Response.json({ resourceName: "cart", orderStatus: "P", orderId: "1", x_xtraEmailId: "fixture@example.test", totalProductPriceCurrency: "EUR", recordSetCount: "0", recordSetTotal: "0", recordSetStartNumber: "0", orderItem: [] });
+      return Response.json({ resourceName: "cart", orderStatus: "P", orderId: "1", x_xtraEmailId: "fixture@example.test", totalProductPriceCurrency: "EUR", recordSetCount: "0", recordSetTotal: "0", recordSetStartNumber: "0" });
     });
     assert.deepEqual((await readCollectAndGoCart(wife, signal())).items, []);
     assert.equal((await collectAndGoStatus(wife)).enabled, false); assert.equal((await collectAndGoStatus(wife)).cartEnabled, true); assert.ok((await collectAndGoStatus(wife)).verifiedAt);

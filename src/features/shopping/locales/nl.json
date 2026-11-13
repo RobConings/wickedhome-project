@@ -642,12 +642,14 @@
     "checkErrors": {
       "collectandgo_login": "Meld je opnieuw aan in je gewone browser en importeer daarna een nieuwe sessie.",
       "collectandgo_challenge": "Collect&Go blokkeert de server met een browserverificatie. Aanmelden in je gewone browser garandeert geen servertoegang.",
-      "collectandgo_unverified": "Toegang tot de aangemelde winkelmand kon niet worden gecontroleerd. Mogelijk gaat het om een gastsessie, ontbreken aanmeldgegevens of wordt de pagina-indeling nog niet ondersteund. Er zijn geen wijzigingen aan de winkelmand gevraagd.",
+      "collectandgo_unverified": "De winkelreactie kon niet worden gecontroleerd. Dit betekent niet dat je opgeslagen login verlopen is; probeer te vernieuwen.",
       "collectandgo_browser": "De browser kon Collect&Go niet uitlezen. Importeer het cart-API-HAR om je mand zonder browser uit te lezen.",
-      "collectandgo_unavailable": "Collect&Go kon de winkelmand niet teruggeven. Probeer later opnieuw; er zijn geen wijzigingen aan de winkelmand gevraagd."
+      "collectandgo_unavailable": "Collect&Go kon de winkelmand niet teruggeven. Probeer later opnieuw; er zijn geen wijzigingen aan de winkelmand gevraagd.",
+      "collectandgo_credentials_missing": "Deze oudere import bevat geen cart-API-gegevens. Een eigenaar moet eenmalig een cart-API-HAR importeren in Instellingen; die wordt daarna hergebruikt."
     },
     "browserDisabledWithCart": "Je online winkelmand uitlezen is beschikbaar. Browserfuncties voor producten zoeken en de mand wijzigen staan uit op de server.",
-    "cartReady": "Cart-API-gegevens gelezen. Klaar om te importeren; klik na het importeren op Verbinding testen om de aangemelde winkelmand te controleren."
+    "cartReady": "Cart-API-gegevens gelezen. Klaar om te importeren; klik na het importeren op Verbinding testen om de aangemelde winkelmand te controleren.",
+    "sessionReuse": "De geïmporteerde sessie wordt bij elk bezoek hergebruikt. Je hoeft niet telkens een HAR te importeren. Alleen als Collect&Go opnieuw aanmelden vereist, moet een eigenaar de koppeling vernieuwen."
   },
   "xtra": {
     "description": "Colruyt Group: zoek Colruyt-producten en maak het gedeelde Xtra-lijstje voor boodschappen in een fysieke winkel.",
@@ -725,5 +727,58 @@
     "reconnect": "Opnieuw aanmelden of browserverificatie nodig voor Xtra. Koppel opnieuw bij Instellingen.",
     "stale": "Het laatst opgehaalde lijstje wordt getoond; dit kan inmiddels gewijzigd zijn.",
     "truncated": "Dit is een gedeeltelijk lijstje omdat de winkel te veel items terugstuurde. Open Colruyt voor de volledige lijst."
+  },
+  "retailerTabs": {
+    "label": "Boodschappenlijsten per bestemming",
+    "wickedhome": "WickedHome",
+    "xtra": "Xtra / Colruyt",
+    "collectandgo": "Collect&Go",
+    "xtraNotConnected": "Koppel Xtra in Instellingen om hier het winkellijstje voor je winkelbezoek te zien."
+  },
+  "collectAndGoList": {
+    "title": "Collect&Go · Online boodschappen",
+    "description": "Jullie gedeelde Collect&Go-account voor online bestellingen. Dit staat los van het Xtra-winkellijstje.",
+    "basket": "Huidige online winkelmand",
+    "basketDescription": "Producten die nog in je winkelmand staan. Ze zijn nog niet als reservatie doorgestuurd.",
+    "orders": "Geplaatste reservaties",
+    "ordersDescription": "Producten die al gereserveerd zijn om af te halen. Kies een reservatie om de inhoud te bekijken.",
+    "products": "Collect&Go-producten",
+    "refresh": "Collect&Go vernieuwen",
+    "settings": "Collect&Go-koppeling beheren",
+    "noAccess": "Een eigenaar moet jouw WickedHome-account selecteren om dit Collect&Go-account te delen.",
+    "notConnected": "Koppel Collect&Go in Instellingen om hier de online winkelmand en reservaties te zien.",
+    "quantity": "Aantal: {{quantity}}",
+    "unitPrice": "{{price}} per stuk",
+    "unknownPrice": "Prijs onbekend",
+    "unknown": "Onbekend",
+    "emptyBasket": "Je online winkelmand is leeg. Geplaatste reservaties staan apart.",
+    "emptyOrder": "Geen producten in deze reservatie.",
+    "emptyOrders": "Geen geplaatste reservaties gevonden.",
+    "partial": "Gedeeltelijke winkelgegevens. Open Collect&Go om de volledige inhoud te bekijken.",
+    "pickup": "Afhaalmoment",
+    "amendUntil": "Aanpasbaar tot",
+    "belgianTime": "Belgische tijd (Europe/Brussels)",
+    "estimatedTotal": "Geschat totaal",
+    "editStatus": "Wijzigingsvenster",
+    "editStates": {
+      "open": "Open — rond wijzigingen af bij Collect&Go",
+      "closed": "Gesloten",
+      "unknown": "Niet gecontroleerd"
+    },
+    "checked": "Laatst gelezen: {{date}}",
+    "openOrder": "Deze reservatie openen bij Collect&Go",
+    "chooseOrder": "Kies een Collect&Go-reservatie",
+    "order": "Reservatie {{id}}",
+    "loading": "Reservaties lezen…",
+    "stale": "Een eerdere geslaagde uitlezing wordt getoond; de inhoud kan gewijzigd zijn.",
+    "readOnly": "Uitlezen wijzigt je winkelmand niet, dient geen aanpassingen in en vinkt WickedHome-producten niet af. Rond bestellingen en wijzigingen af bij Collect&Go.",
+    "added": "Toegevoegd in Collect&Go",
+    "addedHelp": "Een overeenkomend product staat in de huidige online winkelmand. Controleer het aantal; dit vinkt het niet af en garandeert niet dat de volledige benodigde hoeveelheid gedekt is.",
+    "errors": {
+      "unavailable": "Collect&Go kon niet worden vernieuwd. Probeer later opnieuw.",
+      "unverified": "De winkelreactie kon niet worden gecontroleerd. Dit betekent niet dat je opgeslagen login verlopen is; probeer te vernieuwen.",
+      "reconnect": "Collect&Go vraagt om opnieuw aan te melden of een browsercontrole. Een eigenaar kan de opgeslagen sessie vernieuwen in Instellingen.",
+      "credentials": "Deze oudere import bevat geen cart-API-gegevens. Een eigenaar moet eenmalig een cart-API-HAR importeren in Instellingen; die wordt daarna hergebruikt."
+    }
   }
 }

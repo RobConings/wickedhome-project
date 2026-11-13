@@ -12,6 +12,32 @@ assistant/MCP registry. It reuses existing role checks, mandatory sensitive-acti
 audit and typed response rendering. This integration does not create a separate shopping list, purchase
 ledger or assistant. It prepares an external basket; completing the order remains on Collect&Go.
 
+## Shopping page tabs and presence labels
+
+The shopping page has separate **WickedHome**, **Xtra / Colruyt**, and **Collect&Go** destination tabs,
+preserved by `?retailer=xtra` / `?retailer=collectandgo`. The Xtra panel is inside its own tab, rather
+than above household needs. The Collect&Go tab shows the pending basket and placed reservations in
+separate shared cards, with product quantities, unit prices, pickup windows and editing cutoffs.
+Reservation contents load on selection; upcoming pickups are selected ahead of past orders.
+
+The saved session is reused on page entry, visible-only polling, focus and connection events. No HAR
+import is required on each visit. True retailer sign-in expiry or browser verification may eventually
+require an owner to reconnect; imported browser credentials do not provide permanent authentication.
+Do not present a response-format error as evidence that the session expired. Older browser-only
+imports missing API credentials receive a distinct, one-time upgrade message.
+
+Collect&Go omits `orderItem` on an empty basket. Accept the omission only with the signed-in account
+marker, pending-cart identity, EUR currency and explicit zero count/total/start metadata. A non-empty
+response missing its products, a null products field or a guest response still fails verification.
+This fixed a reproduced false reconnect prompt using the account holder's unchanged saved HAR.
+
+WickedHome rows show **Added in Collect&Go** when the current basket has one unambiguous exact full-name
+match or a recorded Collect&Go product URL/article match. Do not fuzzy-match names, strip package sizes,
+assume in-store identifiers match online, or consider alternative products interchangeable. Labels are
+presence indicators only; they do not claim quantity coverage, tick items bought or change stock.
+Failed reads, access revocation, invalid observation times and snapshots older than 90 seconds remove
+labels. An empty basket never hides a placed reservation. Basket and reservation errors remain separate.
+
 ## Shared account connection
 
 Collect&Go has a household-shared browser session with its own account selection; importing a shared
@@ -77,8 +103,8 @@ children. No additional login or browser flag is needed. Native order reads call
 `ecomfoodb2c.eshop.wcsordersvcv2/v2/store/{storeId}/order/@history` and `order/{orderId}`
 ([HCL order reference](https://help.hcl-software.com/commerce/7.0.0/com.ibm.commerce.starterstores.doc/code/rsm_order_fep8.htm)).
 They validate the provider's buyer ID against the single imported WC authentication account; order IDs
-cannot choose arbitrary paths. History verifies the signed-in basket first, including before returning
-empty history. Provider pagination is followed up to five 100-record pages, with explicit truncation;
+cannot choose arbitrary paths. Non-empty history verifies each returned buyer directly; empty history additionally verifies the
+signed-in basket before it can be reported empty. Provider pagination is followed up to five 100-record pages, with explicit truncation;
 wrong offsets, duplicate IDs, changing totals/order details and incomplete pages fail verification.
 Email, phone, addresses, payment data and raw order fields never reach clients. Fresh access checks and
 connection-generation fences prevent queued or in-flight reads from returning data after revocation.

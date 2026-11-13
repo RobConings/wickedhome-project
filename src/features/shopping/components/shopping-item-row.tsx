@@ -48,6 +48,7 @@ type ShoppingItemRowProps = {
   actions?: React.ReactNode;
   /** Extra chips after the others (e.g. "On invoice Toppy · 09/10/2026" on a project's page). */
   extraBadges?: React.ReactNode;
+  inCollectAndGo?: boolean;
   className?: string;
 };
 
@@ -69,6 +70,7 @@ export function ShoppingItemRow({
   showRecordLink = true,
   actions,
   extraBadges,
+  inCollectAndGo = false,
   className,
 }: ShoppingItemRowProps) {
   const { t } = useTranslation("shopping");
@@ -138,7 +140,7 @@ export function ShoppingItemRow({
         onClick={() => setDetailsOpen((open) => !open)}
         aria-expanded={detailsOpen}
         aria-controls={detailsId}
-        aria-label={t("item.showDetails", { name: item.name })}
+        aria-label={`${t("item.showDetails", { name: item.name })}${inCollectAndGo ? ` · ${t("collectAndGoList.added")}` : ""}`}
         className="flex min-w-0 items-center gap-2 rounded-md text-left outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
       >
         {item.imageUrl ? (
@@ -148,6 +150,7 @@ export function ShoppingItemRow({
         )}
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span title={item.name} className={cn("line-clamp-2 text-sm leading-5 font-medium [overflow-wrap:anywhere] sm:line-clamp-1", bought && "text-muted-foreground line-through")}>{item.name}</span>
+          {inCollectAndGo && <Badge variant="secondary" className="self-start whitespace-normal text-left text-xs" title={t("collectAndGoList.addedHelp")}>{t("collectAndGoList.added")}</Badge>}
           <span className="flex min-w-0 items-center gap-1.5 text-xs leading-4 text-muted-foreground">
             <span className={cn("tabular-nums", !item.amounts && "shrink-0", item.amounts && "truncate")}>{quantity}</span>
             {showShop && shopForBadge && <><span aria-hidden="true">·</span><span className="truncate">{shopForBadge.name}</span></>}

@@ -12,11 +12,11 @@ import { InlineAlert } from "@/components/shared/inline-alert";
 import { useXtraList, type XtraListInitial } from "../data/use-xtra-list";
 import type { XtraListItem } from "../types/xtra";
 
-export function XtraListPanel({ initial, intervalMs }: { initial?: XtraListInitial; intervalMs?: number | null }) {
+export function XtraListPanel({ initial, intervalMs, showDisconnected = false }: { initial?: XtraListInitial; intervalMs?: number | null; showDisconnected?: boolean }) {
   const { t, i18n } = useTranslation("shopping");
   const { status, snapshot, error, loading, refresh } = useXtraList({ initial, intervalMs });
   const [visible, setVisible] = React.useState(50);
-  if (!error && (!status?.connected || (!status.canUse && !status.canManage))) return null;
+  if (!error && (!status?.connected || (!status.canUse && !status.canManage))) return showDisconnected ? <Card><Text size="sm" tone="muted">{t(status?.connected ? "xtraList.noAccess" : "retailerTabs.xtraNotConnected")}</Text><Link to="/settings?section=xtra" className="inline-flex min-h-10 items-center self-start text-sm underline">{t("xtraList.settings")}</Link></Card> : null;
   const active = snapshot?.items.filter((item) => !item.completed) ?? [];
   const completed = snapshot?.items.filter((item) => item.completed) ?? [];
   function rows(items: XtraListItem[]) {

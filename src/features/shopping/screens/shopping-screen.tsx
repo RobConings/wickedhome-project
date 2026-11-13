@@ -1,3 +1,9 @@
+import { useNow } from "@/lib/use-now";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CollectAndGoPanel } from "../components/collect-and-go-panel";
+import { useCollectAndGo, type CollectAndGoInitial } from "../data/use-collect-and-go";
+import type { CollectAndGoOrderDetail } from "../types/collect-and-go";
+import { collectAndGoMatches } from "../types/collect-and-go-matches";
 import { Text } from "@/components/ui/text";
 import { useShoppingSort } from "../data/use-shopping-sort";
 import { ShoppingSortField } from "../components/shopping-sort-field";
@@ -62,15 +68,22 @@ type ShoppingScreenProps = {
   refreshIntervalMs?: number | null;
   /** Seed the external list in stories; production reads it separately from household needs. */
   xtraInitial?: XtraListInitial;
+  collectAndGoInitial?: CollectAndGoInitial;
+  collectAndGoOrderInitial?: CollectAndGoOrderDetail;
 };
 
 /** All shopping lists: add items, tick them off, see where to buy them, and manage weekly staples. */
-export function ShoppingScreen({ data, canManage, initialSelections, previewLink, refreshIntervalMs = 30_000, xtraInitial }: ShoppingScreenProps) {
+export function ShoppingScreen({ data, canManage, initialSelections, previewLink, refreshIntervalMs = 30_000, xtraInitial, collectAndGoInitial, collectAndGoOrderInitial }: ShoppingScreenProps) {
   const { t } = useTranslation("shopping");
   const { t: tCommon } = useTranslation();
   const { overview, shops, products } = data;
   const [includeLowStock, setIncludeLowStock] = React.useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
+  const retailer = searchParams.get("retailer");
+  const activeTab = retailer === "xtra" || retailer === "collectandgo" ? retailer : "wickedhome";
+  const collectAndGo = useCollectAndGo({ initial: collectAndGoInitial, intervalMs: refreshIntervalMs, includeOrders: activeTab === "collectandgo" });
+  const now = useNow(30000);
+  const basketMatches = collectAndGoMatches(overview.items, products, collectAndGo.data?.cart, Boolean(collectAndGo.data?.status.canUse && !collectAndGo.data.status.needsReconnect && !collectAndGo.data.cartError), now);
   const revalidator = useRevalidator();
   const fetcher = useFetcher<ShoppingActionResult>();
   const productSelections = useProductSelections({ initial: initialSelections?.products });
@@ -213,13 +226,21 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
           />
         </DialogContent>
       </Dialog>
-      <PageHeader title={t("page.title")} description={t("page.description")} actions={headerActions} />
+      <PageHeader title={t("page.title")} description={t("page.description")} actions={activeTab === "wickedhome" ? headerActions : undefined} />
       <ShoppingNavigation />
+      <Tabs value={activeTab} onValueChange={value => setSearchParams(params => { if (value === "wickedhome") params.delete("retailer"); else params.set("retailer", value); return params; }, { preventScrollReset: true })}>
+      <TabsList aria-label={t("retailerTabs.label")} className="w-full justify-start">
+        <TabsTrigger value="wickedhome">{t("retailerTabs.wickedhome")}</TabsTrigger>
+        <TabsTrigger value="xtra">{t("retailerTabs.xtra")}</TabsTrigger>
+        <TabsTrigger value="collectandgo">{t("retailerTabs.collectandgo")}</TabsTrigger>
+      </TabsList>
+      <TabsContent value="xtra"><XtraListPanel initial={xtraInitial} intervalMs={refreshIntervalMs} showDisconnected /></TabsContent>
+      <TabsContent value="collectandgo"><CollectAndGoPanel live={collectAndGo} initialOrder={collectAndGoOrderInitial} /></TabsContent>
+      <TabsContent value="wickedhome" className="space-y-4">
       {productFilterId && <Button variant="secondary" className="self-start" onClick={() => setSearchParams((params) => { params.delete("productId"); return params; }, { preventScrollReset: true })}><PackageIcon />{productFilter?.name ?? t("picker.product")} · {tCommon("list.clearSearch")}</Button>}
 
       <PageGrid columns="main-sidebar" className="items-start">
         <Stack gap="lg" className="gap-3 sm:gap-6">
-          <XtraListPanel initial={xtraInitial} intervalMs={refreshIntervalMs} />
           <PageGrid gap="sm" className="min-w-0 grid-cols-[minmax(0,1fr)_auto] sm:flex sm:items-center" role="group" aria-label={t("shopView.filters.label")}>
             {listViews.length > 1 && (
               <Select value={activeView?.id ?? "all"} onValueChange={(value) => selectList(value === "all" ? null : value)}>
@@ -347,6 +368,7 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
                     groupByCategory={sort === "category"}
                     groupByNeed={sort === "category"}
                     shops={shops}
+                    collectAndGoMatches={basketMatches}
                     onToggle={(item) => void actions.toggle(item)}
                     onSkip={(item) => void actions.skip(item)}
                     onDelete={canManage ? (item) => void actions.remove(item) : undefined}
@@ -406,6 +428,8 @@ export function ShoppingScreen({ data, canManage, initialSelections, previewLink
           </Card>
         </Stack>
       </PageGrid>
+      </TabsContent>
+      </Tabs>
       <ShoppingItemFormDialog
         item={editing}
         onOpenChange={(open) => !open && setEditing(null)}

@@ -43,12 +43,12 @@ function pagination(raw: Record<string, unknown>, rows: unknown[], page: number,
 }
 export async function fetchCollectAndGoOrders(state: CollectAndGoState, signal: AbortSignal): Promise<CollectAndGoOrders> {
   const buyerId = accountId(state);
-  await fetchCollectAndGoCart(state, signal); // Also proves sign-in when history is explicitly empty.
   const values: Record<string, unknown>[] = []; const seen = new Set<string>(); let total: number | undefined;
   for (let page = 1; page <= 5; page++) {
     const raw = record(await readCollectAndGoJson(state, "order/@history", signal, page));
     if (!raw || raw.resourceName !== "order" || !Array.isArray(raw.Order)) throw invalid();
     total = pagination(raw, raw.Order, page, total);
+    if (total === 0) await fetchCollectAndGoCart(state, signal); // Prove sign-in for explicitly empty history; non-empty rows prove their buyer themselves.
     for (const value of raw.Order) { const order = owned(value, buyerId); const id = order.orderId as string; if (seen.has(id)) throw invalid(); seen.add(id); if (order.orderStatus !== "P") values.push(order); }
     if (page * 100 >= total) break;
   }

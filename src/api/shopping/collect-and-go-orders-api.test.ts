@@ -36,7 +36,7 @@ it("keeps pending carts and other buyers out of reservation results and excludes
     return Response.json(url.pathname.endsWith("cart/@self") ? cart() : history([{ ...summary(), orderId: "10", orderStatus: "P" }, summary()]));
   });
   const orders = await fetchCollectAndGoOrders(state, signal());
-  assert.deepEqual(orders.orders.map((order) => order.id), ["11"]); assert.equal(orders.truncated, false); assert.equal(orders.timeZone, "Europe/Brussels"); assert.equal(calls, 2);
+  assert.deepEqual(orders.orders.map((order) => order.id), ["11"]); assert.equal(orders.truncated, false); assert.equal(orders.timeZone, "Europe/Brussels"); assert.equal(calls, 1);
   assert.ok(!JSON.stringify(orders).includes("private"));
   assert.throws(() => parseCollectAndGoOrder({ ...summary(), buyerId: "other" }, "1"));
   assert.throws(() => parseCollectAndGoOrder({ ...summary(), orderStatus: "P" }, "1"));

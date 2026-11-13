@@ -12,10 +12,13 @@ it("extracts only pending signed-in basket data, quantities and observed prices"
  assert.deepEqual(result.items,[{name:"Example milk",url:null,quantity:2,unitPriceCents:162},{name:"Example apples",url:null,quantity:1.5,unitPriceCents:200}]);
  assert.ok(!JSON.stringify(result).includes("fixture@example.test"));
  const empty={...response(),recordSetCount:"0",recordSetTotal:"0",orderItem:[]};assert.deepEqual(parseCollectAndGoCartResponse(empty).items,[]);
+ assert.deepEqual(parseCollectAndGoCartResponse({...empty,orderItem:undefined}).items,[], "Live empty baskets omit the products array without expiring the login");
+ assert.throws(()=>parseCollectAndGoCartResponse({...empty,orderItem:null}));
+ assert.throws(()=>parseCollectAndGoCartResponse({...empty,orderItem:undefined,x_xtraEmailId:""}));
  assert.equal(parseCollectAndGoCartResponse({...response(),recordSetTotal:"3"}).truncated,true);
 });
 it("rejects guest responses, completed orders, unknown shapes and invalid quantities", () => {
- for(const raw of [{...response(),x_xtraEmailId:""},{...response(),orderStatus:"D"},{...response(),totalProductPriceCurrency:"USD"},{...response(),orderItem:undefined},{...response(),recordSetTotal:"1"},{...response(),orderItem:response().orderItem.map(i=>({...i,quantity:"0"}))}])assert.throws(()=>parseCollectAndGoCartResponse(raw),/did not prove access/);
+ for(const raw of [{...response(),x_xtraEmailId:""},{...response(),orderStatus:"D"},{...response(),totalProductPriceCurrency:"USD"},{...response(),orderItem:undefined},{...response(),recordSetTotal:"1"},{...response(),orderItem:response().orderItem.map(i=>({...i,quantity:"0"}))}])assert.throws(()=>parseCollectAndGoCartResponse(raw),/could not be verified/);
  assert.equal(parseCollectAndGoCartResponse({...response(),orderItem:response().orderItem.map(i=>({...i,unitPrice:"unknown"}))}).items[0]?.unitPriceCents,null);
 });
 it("uses only the fixed read endpoint, credentials and GET, with no redirects or tracking cookies", async () => {

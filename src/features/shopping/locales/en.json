@@ -642,12 +642,14 @@
     "checkErrors": {
       "collectandgo_login": "Sign in again in your normal browser, then import a new session.",
       "collectandgo_challenge": "Collect&Go blocked the server with a browser check. A normal-browser login does not guarantee server access.",
-      "collectandgo_unverified": "Signed-in basket access could not be verified. This may be a guest session, missing login data or an unsupported page layout. No basket changes were requested.",
+      "collectandgo_unverified": "The retailer response could not be verified. This does not mean your saved login expired; try refreshing.",
       "collectandgo_browser": "The browser could not read Collect&Go. Import the cart API HAR to read your basket without a browser.",
-      "collectandgo_unavailable": "Collect&Go could not return the basket. Try again later; no basket changes were requested."
+      "collectandgo_unavailable": "Collect&Go could not return the basket. Try again later; no basket changes were requested.",
+      "collectandgo_credentials_missing": "This older import has no cart API credentials. An owner needs to import a cart API HAR once in Settings; it will then be reused."
     },
     "browserDisabledWithCart": "Reading your online basket is available. Browser functions for product search and basket changes are disabled on the server.",
-    "cartReady": "Cart API credentials read. Ready to import; use Test connection after importing to verify signed-in basket access."
+    "cartReady": "Cart API credentials read. Ready to import; use Test connection after importing to verify signed-in basket access.",
+    "sessionReuse": "Your imported session is reused on every visit. You do not need to import a HAR each time. An owner only needs to renew the connection when Collect&Go requires sign-in again."
   },
   "xtra": {
     "description": "Colruyt Group: search Colruyt products and prepare the shared Xtra list for shopping in a physical store.",
@@ -725,5 +727,58 @@
     "reconnect": "Xtra needs a new login or browser verification. Open Settings to reconnect.",
     "stale": "Showing the last successfully retrieved list; it may have changed.",
     "truncated": "This is a partial list because the retailer returned too many items. Open Colruyt to inspect the full list."
+  },
+  "retailerTabs": {
+    "label": "Shopping lists by destination",
+    "wickedhome": "WickedHome",
+    "xtra": "Xtra / Colruyt",
+    "collectandgo": "Collect&Go",
+    "xtraNotConnected": "Connect Xtra in Settings to see the in-store shopping list here."
+  },
+  "collectAndGoList": {
+    "title": "Collect&Go · Online shopping",
+    "description": "Your shared Collect&Go account for online ordering. This is separate from the Xtra in-store list.",
+    "basket": "Current online basket",
+    "basketDescription": "Products waiting in the basket. They have not been submitted as a reservation.",
+    "orders": "Placed reservations",
+    "ordersDescription": "Products already reserved for pickup. Choose a reservation to inspect its contents.",
+    "products": "Collect&Go products",
+    "refresh": "Refresh Collect&Go",
+    "settings": "Manage Collect&Go connection",
+    "noAccess": "An owner must select your WickedHome account to share this Collect&Go account.",
+    "notConnected": "Connect Collect&Go in Settings to see the online basket and reservations here.",
+    "quantity": "Quantity: {{quantity}}",
+    "unitPrice": "{{price}} each",
+    "unknownPrice": "Price unknown",
+    "unknown": "Unknown",
+    "emptyBasket": "Your online basket is empty. Placed reservations are shown separately.",
+    "emptyOrder": "No products in this reservation.",
+    "emptyOrders": "No placed reservations found.",
+    "partial": "Partial retailer data. Open Collect&Go to inspect the complete contents.",
+    "pickup": "Pickup slot",
+    "amendUntil": "Amendable until",
+    "belgianTime": "Belgian time (Europe/Brussels)",
+    "estimatedTotal": "Estimated total",
+    "editStatus": "Editing window",
+    "editStates": {
+      "open": "Open — finish changes in Collect&Go",
+      "closed": "Closed",
+      "unknown": "Not verified"
+    },
+    "checked": "Last read: {{date}}",
+    "openOrder": "Open this reservation in Collect&Go",
+    "chooseOrder": "Choose a Collect&Go reservation",
+    "order": "Reservation {{id}}",
+    "loading": "Reading reservations…",
+    "stale": "Showing an earlier successful read; it may have changed.",
+    "readOnly": "Reading does not change your basket, submit amendments or mark WickedHome items bought. Complete orders and amendments on Collect&Go.",
+    "added": "Added in Collect&Go",
+    "addedHelp": "A matching product was found in the current online basket. Check the quantity; this does not mark it bought or guarantee the full required amount.",
+    "errors": {
+      "unavailable": "Collect&Go could not be refreshed. Try again later.",
+      "unverified": "The retailer response could not be verified. This does not mean your saved login expired; try refreshing.",
+      "reconnect": "Collect&Go requires a new login or browser verification. An owner can renew the saved session in Settings.",
+      "credentials": "This older import has no cart API credentials. An owner needs to import a cart API HAR once in Settings; it will then be reused."
+    }
   }
 }

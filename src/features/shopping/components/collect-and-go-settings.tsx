@@ -34,7 +34,7 @@ export function CollectAndGoSettings({ initial }: { initial?: CollectAndGoStatus
       accept(result.status); setCheckedItems(result.cart.items.length);
     } catch (cause) {
       setStatus((current) => current ? { ...current, verifiedAt: null } : current);
-      setError(cause instanceof ApiRequestError && ["collectandgo_login", "collectandgo_challenge", "collectandgo_unverified", "collectandgo_browser", "collectandgo_unavailable"].includes(cause.code) ? `checkErrors.${cause.code}` : "error");
+      setError(cause instanceof ApiRequestError && ["collectandgo_login", "collectandgo_challenge", "collectandgo_unverified", "collectandgo_credentials_missing", "collectandgo_browser", "collectandgo_unavailable"].includes(cause.code) ? `checkErrors.${cause.code}` : "error");
     } finally { setBusy(false); setChecking(false); }
   }
   async function perform(work: () => Promise<CollectAndGoStatus>) { setBusy(true); setError(null); try { accept(await work()); } catch { setError("error"); } finally { setBusy(false); } }
@@ -84,5 +84,6 @@ export function CollectAndGoSettings({ initial }: { initial?: CollectAndGoStatus
       <a href="https://www.collectandgo.be/nl/home" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center text-sm underline">{t("collectAndGo.open")}</a>
     </Inline>
     <Text size="xs" tone="muted">{t("collectAndGo.checkHelp")}</Text>
+    <Text size="xs" tone="muted">{t("collectAndGo.sessionReuse")}</Text>
   </PageSection>;
 }

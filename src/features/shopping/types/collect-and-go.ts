@@ -6,7 +6,7 @@ export type CollectAndGoStatus = { connected: boolean; enabled: boolean; cartEna
 export type CollectAndGoCart = {
   observedAt: string;
   authenticated: true;
-  items: { name: string; url: string | null; quantity: number; unitPriceCents: number | null }[];
+  items: { productId?: string; articleNumber?: string; name: string; url: string | null; quantity: number; unitPriceCents: number | null }[];
   truncated: boolean;
 };
 export const collectAndGoOrderIdSchema = z.string().regex(/^\d{1,20}$/);
