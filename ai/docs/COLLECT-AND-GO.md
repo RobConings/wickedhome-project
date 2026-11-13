@@ -216,6 +216,31 @@ serialized per household, and work has an overall timeout plus the assistant's S
 expired session, changed layout or unverifiable quantity is an explicit error. There is no CAPTCHA solving,
 stealth fingerprinting, authentication bypass or automatic checkout.
 
+## AntiBot handling and shared reads
+
+On 13 November 2026, previously successful native reads later returned HTTP 405 HTML with title
+`Colruyt | AntiBot`. This is a retailer challenge, not proof of expired credentials or an empty basket.
+The reader recognizes bounded HTML challenge evidence (also on 200/403 responses), cancels the body,
+and returns `collectandgo_challenge` without exposing page contents. A plain JSON 405 remains an
+availability error. No challenge solver, browser fingerprint manipulation or bypass is attempted.
+
+Activity reads are sequential to avoid bursts and stop at the first real login/challenge failure,
+including failures while loading reservation products. A challenge persists `needsReconnect` with an
+optional `reconnectReason=challenge`; existing encrypted connections remain readable. Subsequent
+automatic reads stop before making retailer requests. The UI distinguishes AntiBot from sign-in expiry,
+hides live coverage and points to normal-browser access and an explicit connection test.
+
+Selected accounts share verified activity snapshots for at most 60 seconds per household, connection
+revision and generation. Cache hits still recheck current grants; replacing a connection, changing
+access or disconnecting invalidates the cache. Failed reads are not cached. This reduces duplicate
+traffic across pages and household members; it does not guarantee retailer approval.
+
+POST `/check` explicitly makes one native read with the saved session even while automatic access is
+paused. Success clears the pause, records verification and notifies household clients; failure leaves
+the pause in place. Ordinary GET/MCP reads cannot silently resume it. This permits a deliberate retry
+after a person checks the normal website without forcing another HAR import. A new import is needed
+only when authentication really must be renewed; even a new import may still face the retailer block.
+
 ## Verification boundary
 
 Observed the public Collect&Go homepage/product tile markup on 12 November 2026. A subsequent live

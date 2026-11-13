@@ -641,7 +641,7 @@
     "checkedItems_other": "Read {{count}} products from the online basket.",
     "checkErrors": {
       "collectandgo_login": "Sign in again in your normal browser, then import a new session.",
-      "collectandgo_challenge": "Collect&Go blocked the server with a browser check. A normal-browser login does not guarantee server access.",
+      "collectandgo_challenge": "Collect&Go is blocking automated reads with an AntiBot check. Automatic attempts are paused. Check the normal Collect&Go website, then use Test connection in Settings. A new HAR does not guarantee server access.",
       "collectandgo_unverified": "The retailer response could not be verified. This does not mean your saved login expired; try refreshing.",
       "collectandgo_browser": "The browser could not read Collect&Go. Import the cart API HAR to read your basket without a browser.",
       "collectandgo_unavailable": "Collect&Go could not return the basket. Try again later; no basket changes were requested.",
@@ -649,7 +649,7 @@
     },
     "browserDisabledWithCart": "Reading your online basket is available. Browser functions for product search and basket changes are disabled on the server.",
     "cartReady": "Cart API credentials read. Ready to import; use Test connection after importing to verify signed-in basket access.",
-    "sessionReuse": "Your imported session is reused on every visit. You do not need to import a HAR each time. An owner only needs to renew the connection when Collect&Go requires sign-in again."
+    "sessionReuse": "The saved session is reused. Automated reads pause on a bot block. Test connection explicitly retries the same saved session; only import again when sign-in actually needs renewing."
   },
   "xtra": {
     "description": "Colruyt Group: search Colruyt products and prepare the shared Xtra list for shopping in a physical store.",
@@ -778,7 +778,8 @@
       "unavailable": "Collect&Go could not be refreshed. Try again later.",
       "unverified": "The retailer response could not be verified. This does not mean your saved login expired; try refreshing.",
       "reconnect": "Collect&Go requires a new login or browser verification. An owner can renew the saved session in Settings.",
-      "credentials": "This older import has no cart API credentials. An owner needs to import a cart API HAR once in Settings; it will then be reused."
+      "credentials": "This older import has no cart API credentials. An owner needs to import a cart API HAR once in Settings; it will then be reused.",
+      "blocked": "Collect&Go is blocking automated reads with an AntiBot check. Automatic attempts are paused. Check the normal Collect&Go website, then use Test connection in Settings. A new HAR does not guarantee server access."
     }
   },
   "assignments": {

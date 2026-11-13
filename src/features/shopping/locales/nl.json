@@ -641,7 +641,7 @@
     "checkedItems_other": "{{count}} producten uit de online winkelmand gelezen.",
     "checkErrors": {
       "collectandgo_login": "Meld je opnieuw aan in je gewone browser en importeer daarna een nieuwe sessie.",
-      "collectandgo_challenge": "Collect&Go blokkeert de server met een browserverificatie. Aanmelden in je gewone browser garandeert geen servertoegang.",
+      "collectandgo_challenge": "Collect&Go blokkeert automatische uitlezing met een botcontrole. Automatische pogingen zijn gepauzeerd. Controleer de gewone Collect&Go-website en gebruik daarna Verbinding testen in Instellingen. Een nieuwe HAR garandeert geen servertoegang.",
       "collectandgo_unverified": "De winkelreactie kon niet worden gecontroleerd. Dit betekent niet dat je opgeslagen login verlopen is; probeer te vernieuwen.",
       "collectandgo_browser": "De browser kon Collect&Go niet uitlezen. Importeer het cart-API-HAR om je mand zonder browser uit te lezen.",
       "collectandgo_unavailable": "Collect&Go kon de winkelmand niet teruggeven. Probeer later opnieuw; er zijn geen wijzigingen aan de winkelmand gevraagd.",
@@ -649,7 +649,7 @@
     },
     "browserDisabledWithCart": "Je online winkelmand uitlezen is beschikbaar. Browserfuncties voor producten zoeken en de mand wijzigen staan uit op de server.",
     "cartReady": "Cart-API-gegevens gelezen. Klaar om te importeren; klik na het importeren op Verbinding testen om de aangemelde winkelmand te controleren.",
-    "sessionReuse": "De geïmporteerde sessie wordt bij elk bezoek hergebruikt. Je hoeft niet telkens een HAR te importeren. Alleen als Collect&Go opnieuw aanmelden vereist, moet een eigenaar de koppeling vernieuwen."
+    "sessionReuse": "De opgeslagen sessie wordt hergebruikt. Bij een botblokkade pauzeert de automatische uitlezing. Met Verbinding testen kun je bewust opnieuw proberen met dezelfde sessie; importeer alleen opnieuw wanneer aanmelden echt moet worden vernieuwd."
   },
   "xtra": {
     "description": "Colruyt Group: zoek Colruyt-producten en maak het gedeelde Xtra-lijstje voor boodschappen in een fysieke winkel.",
@@ -778,7 +778,8 @@
       "unavailable": "Collect&Go kon niet worden vernieuwd. Probeer later opnieuw.",
       "unverified": "De winkelreactie kon niet worden gecontroleerd. Dit betekent niet dat je opgeslagen login verlopen is; probeer te vernieuwen.",
       "reconnect": "Collect&Go vraagt om opnieuw aan te melden of een browsercontrole. Een eigenaar kan de opgeslagen sessie vernieuwen in Instellingen.",
-      "credentials": "Deze oudere import bevat geen cart-API-gegevens. Een eigenaar moet eenmalig een cart-API-HAR importeren in Instellingen; die wordt daarna hergebruikt."
+      "credentials": "Deze oudere import bevat geen cart-API-gegevens. Een eigenaar moet eenmalig een cart-API-HAR importeren in Instellingen; die wordt daarna hergebruikt.",
+      "blocked": "Collect&Go blokkeert automatische uitlezing met een botcontrole. Automatische pogingen zijn gepauzeerd. Controleer de gewone Collect&Go-website en gebruik daarna Verbinding testen in Instellingen. Een nieuwe HAR garandeert geen servertoegang."
     }
   },
   "assignments": {

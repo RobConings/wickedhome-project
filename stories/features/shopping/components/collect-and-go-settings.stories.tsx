@@ -11,3 +11,5 @@ export const SelectedAccount: Story = { args: { initial: { ...initial, connected
 export const Verified: Story = { args: { initial: { ...initial, connected: true, canUse: true, verifiedAt: "2026-11-13T07:00:00Z" } } };
 export const Disabled: Story = { args: { initial: { ...initial, connected: true, canUse: true, enabled: false } } };
 export const NativeCart: Story = { args: { initial: { ...initial, connected: true, canUse: true, enabled: false, cartEnabled: true } } };
+
+export const Blocked: Story = { args: { initial: { ...initial, connected: true, canUse: true, enabled: false, cartEnabled: true, needsReconnect: true, reconnectReason: "challenge" } } };

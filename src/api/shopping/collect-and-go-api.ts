@@ -6,6 +6,17 @@ export const retailerRecord = (value: unknown): Record<string, unknown> | null =
 export const retailerDecimal = (value: unknown) => typeof value === "string" && /^\d+(?:\.\d+)?$/.test(value) ? Number(value) : NaN;
 export const retailerCents = (value: unknown) => { const price = retailerDecimal(value); return Number.isFinite(price) && price >= 0 && price < 1000000 ? Math.round(price * 100) : null; };
 
+const challenge = () => new HttpError(409, "collectandgo_challenge", "Collect&Go returned an AntiBot challenge requiring browser verification. Automatic reads have stopped. A new HAR does not guarantee server access; an owner can check the normal website and explicitly test the saved connection in Settings.");
+async function isChallengePage(response: Response): Promise<boolean> {
+  if (!response.headers.get("content-type")?.toLowerCase().includes("text/html")) return false;
+  const reader = response.body?.getReader(); if (!reader) return false;
+  const chunks: Uint8Array[] = []; let size = 0;
+  try { while (size < 65536) { const next = await reader.read(); if (next.done) break; const chunk = next.value.subarray(0, 65536 - size); chunks.push(chunk); size += chunk.length; } }
+  finally { await reader.cancel().catch(() => undefined); }
+  const html = Buffer.concat(chunks).toString("utf8");
+  return /<title[^>]*>[^<]*(?:anti.?bot|captcha)[^<]*<\/title>/i.test(html) || /vermoeden dat je een bot|suspected.{0,40}bot|incapsula incident/i.test(html);
+}
+
 /** Fixed, verified read endpoints only. Never replay a captured HAR request or follow a redirect. */
 export async function readCollectAndGoJson(state: CollectAndGoState, resource: string, signal: AbortSignal, pageNumber = 1): Promise<unknown> {
   const parsed = collectAndGoCartApiSchema.safeParse(state.cartApi);
@@ -18,9 +29,10 @@ export async function readCollectAndGoJson(state: CollectAndGoState, resource: s
   if (!cookies.some((cookie) => /^WC_AUTHENTICATION_\d+$/.test(cookie.name))) throw new HttpError(409, "collectandgo_login", "The saved Collect&Go session has no usable authentication cookie. Ask an owner to renew it in Settings.");
   try {
     const response = await fetch(url, { method: "GET", redirect: "error", signal: AbortSignal.any([signal, AbortSignal.timeout(20000)]), headers: { Accept: "application/json", WCAuthToken: api.authToken, "X-CG-APIKey": api.apiKey, Cookie: cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join("; "), Origin: "https://www.collectandgo.be", Referer: "https://www.collectandgo.be/", ...(state.userAgent && { "User-Agent": state.userAgent }) } });
-    if ([401, 403, 456].includes(response.status)) { await response.body?.cancel(); throw new HttpError(409, response.status === 456 ? "collectandgo_challenge" : "collectandgo_login", "Collect&Go rejected the session or requires browser verification. Import a fresh cart API HAR."); }
-    if (!response.ok) { await response.body?.cancel(); throw new HttpError(502, "collectandgo_unavailable", "Collect&Go could not return the requested basket or order."); }
-    if (!response.headers.get("content-type")?.includes("application/json")) { await response.body?.cancel(); throw collectAndGoUnverified(); }
+    if (await isChallengePage(response) || response.status === 456) { await response.body?.cancel().catch(() => undefined); throw challenge(); }
+    if ([401, 403].includes(response.status)) { await response.body?.cancel().catch(() => undefined); throw new HttpError(409, "collectandgo_login", "Collect&Go rejected the session used for saved sign-in. Ask an owner to renew it in Settings."); }
+    if (!response.ok) { await response.body?.cancel().catch(() => undefined); throw new HttpError(502, "collectandgo_unavailable", "Collect&Go could not return the requested basket or order."); }
+    if (!response.headers.get("content-type")?.includes("application/json")) { await response.body?.cancel().catch(() => undefined); throw collectAndGoUnverified(); }
     const reader = response.body?.getReader(); if (!reader) throw collectAndGoUnverified();
     const chunks: Uint8Array[] = []; let size = 0;
     try { while (true) { const next = await reader.read(); if (next.done) break; size += next.value.length; if (size > 2000000) throw collectAndGoUnverified(); chunks.push(next.value); } }

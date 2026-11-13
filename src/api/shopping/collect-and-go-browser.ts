@@ -20,12 +20,14 @@ const PROMOS = "https://www.collectandgo.be/nl/assortiment/promo-strafste-kortin
 const offers = new Map<string, { userId: string; householdId: string; revision: string; offer: CollectAndGoOffer; expires: number }>();
 const activeBrowsers = new Map<string, Browser>();
 const generations = new Map<string, number>();
+const activityCache = new Map<string, { revision: string; generation: number; expiresAt: number; data: Awaited<ReturnType<typeof fetchCollectAndGoActivity>> }>();
 const fail = (code: string, message: string) => new HttpError(409, code, message);
 
 async function changeSharedConnection<T>(user: SessionUser, work: () => Promise<T>) {
   requireCollectAndGoOwner(user);
   const key = user.householdId;
   generations.set(key, (generations.get(key) ?? 0) + 1);
+  activityCache.delete(key);
   const active = activeBrowsers.get(key);
   const update = withCollectAndGoConnection(key, work);
   const [result] = await Promise.all([update, active?.close()]);
@@ -106,7 +108,7 @@ async function browserWork<T>(user: SessionUser, signal: AbortSignal, work: (pag
       return result;
     } catch (error) {
       if (error instanceof HttpError) {
-        if (generation === (generations.get(key) ?? 0) && (["collectandgo_challenge", "collectandgo_login"].includes(error.code) || readOnly)) await saveCollectAndGoConnection(key, { ...saved, verifiedAt: null, needsReconnect: saved.needsReconnect || ["collectandgo_challenge", "collectandgo_login"].includes(error.code) });
+        if (generation === (generations.get(key) ?? 0) && (["collectandgo_challenge", "collectandgo_login"].includes(error.code) || readOnly)) await saveCollectAndGoConnection(key, { ...saved, verifiedAt: null, needsReconnect: saved.needsReconnect || ["collectandgo_challenge", "collectandgo_login"].includes(error.code), reconnectReason: error.code === "collectandgo_challenge" ? "challenge" : error.code === "collectandgo_login" ? "login" : saved.reconnectReason });
         throw error;
       }
       if (readOnly && generation === (generations.get(key) ?? 0)) await saveCollectAndGoConnection(key, { ...saved, verifiedAt: null });
@@ -116,23 +118,25 @@ async function browserWork<T>(user: SessionUser, signal: AbortSignal, work: (pag
   });
 }
 /** Read only the signed-in online basket. Search results and guest carts never verify this connection. */
-export async function readCollectAndGoCart(user: SessionUser, signal: AbortSignal) {
-  const snapshot = await requireCollectAndGoAccess(user);
+export async function readCollectAndGoCart(user: SessionUser, signal: AbortSignal, explicitCheck = false) {
+  const snapshot = await requireCollectAndGoAccess(user, explicitCheck);
   if (snapshot.state.cartApi) {
     const generation = generations.get(user.householdId) ?? 0;
     return withCollectAndGoConnection(user.householdId, async () => {
-      const saved = await requireCollectAndGoAccess(user);
+      const saved = await requireCollectAndGoAccess(user, explicitCheck);
       if (generation !== (generations.get(user.householdId) ?? 0) || saved.revision !== snapshot.revision) throw conflict("The Collect&Go connection changed. Read again.");
       try {
         const cart = await fetchCollectAndGoCart(saved.state, signal);
         signal.throwIfAborted();
         if (generation !== (generations.get(user.householdId) ?? 0)) throw conflict("The Collect&Go connection changed before returning the basket.");
-        await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: cart.observedAt });
+        await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: cart.observedAt, needsReconnect: false, reconnectReason: undefined });
         signal.throwIfAborted();
         if (generation !== (generations.get(user.householdId) ?? 0)) throw conflict("The Collect&Go connection changed before returning the basket.");
+        if (saved.needsReconnect) { activityCache.delete(user.householdId); publish(user.householdId, "shopping.collectandgo_changed", null); }
         return cart;
       } catch (error) {
-        if (generation === (generations.get(user.householdId) ?? 0)) await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: null, needsReconnect: error instanceof HttpError && ["collectandgo_login", "collectandgo_challenge"].includes(error.code) });
+        activityCache.delete(user.householdId);
+        if (generation === (generations.get(user.householdId) ?? 0)) await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: null, needsReconnect: saved.needsReconnect || error instanceof HttpError && ["collectandgo_login", "collectandgo_challenge"].includes(error.code), reconnectReason: error instanceof HttpError && error.code === "collectandgo_challenge" ? "challenge" : error instanceof HttpError && error.code === "collectandgo_login" ? "login" : saved.reconnectReason });
         throw error;
       }
     });
@@ -145,7 +149,7 @@ export async function readCollectAndGoCart(user: SessionUser, signal: AbortSigna
   }, true);
 }
 /** Native reads share grants and revocation fences; only actual cart observations update verification. */
-async function orderRead<T>(user: SessionUser, signal: AbortSignal, read: (state: CollectAndGoConnection["state"], signal: AbortSignal) => Promise<T>, cartObservation?: (result: T) => string | null) {
+async function orderRead<T>(user: SessionUser, signal: AbortSignal, read: (state: CollectAndGoConnection["state"], signal: AbortSignal, revision: string) => Promise<T>, cartObservation?: (result: T) => string | null) {
   const snapshot = await requireCollectAndGoAccess(user);
   if (!snapshot.state.cartApi) throw fail("collectandgo_credentials_missing", "This older browser-only import lacks cart API credentials. Import a cart API HAR once in Settings; WickedHome reuses the saved session thereafter.");
   const generation = generations.get(user.householdId) ?? 0;
@@ -154,7 +158,7 @@ async function orderRead<T>(user: SessionUser, signal: AbortSignal, read: (state
     const saved = await requireCollectAndGoAccess(user);
     if (generation !== (generations.get(user.householdId) ?? 0) || saved.revision !== snapshot.revision) throw conflict("The Collect&Go connection changed. Read again.");
     try {
-      const result = await read(saved.state, signal);
+      const result = await read(saved.state, signal, saved.revision);
       signal.throwIfAborted();
       if (generation !== (generations.get(user.householdId) ?? 0)) throw conflict("The Collect&Go connection changed before returning the order.");
       if (cartObservation) await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: cartObservation(result) });
@@ -162,12 +166,24 @@ async function orderRead<T>(user: SessionUser, signal: AbortSignal, read: (state
       if (generation !== (generations.get(user.householdId) ?? 0)) throw conflict("The Collect&Go connection changed before returning the snapshot.");
       return result;
     } catch (error) {
-      if (generation === (generations.get(user.householdId) ?? 0) && error instanceof HttpError && ["collectandgo_login", "collectandgo_challenge"].includes(error.code)) await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: null, needsReconnect: true });
+      if (generation === (generations.get(user.householdId) ?? 0) && error instanceof HttpError && ["collectandgo_login", "collectandgo_challenge"].includes(error.code)) await saveCollectAndGoConnection(user.householdId, { ...saved, verifiedAt: null, needsReconnect: true, reconnectReason: error.code === "collectandgo_challenge" ? "challenge" : "login" });
       throw error;
     }
   });
 }
-export const readCollectAndGoActivity = (user: SessionUser, signal: AbortSignal) => orderRead(user, signal, fetchCollectAndGoActivity, result => result.cart?.observedAt ?? null);
+export const readCollectAndGoActivity = (user: SessionUser, signal: AbortSignal) => orderRead(user, signal, async (state, pending, revision) => {
+  const generation = generations.get(user.householdId) ?? 0;
+  const cached = activityCache.get(user.householdId);
+  if (cached && cached.revision === revision && cached.generation === generation && cached.expiresAt > Date.now()) return cached.data;
+  activityCache.delete(user.householdId);
+  const data = await fetchCollectAndGoActivity(state, pending);
+  pending.throwIfAborted();
+  if (!data.cartError && !data.ordersError && generation === (generations.get(user.householdId) ?? 0)) {
+    if (activityCache.size >= 100) activityCache.delete(activityCache.keys().next().value!);
+    activityCache.set(user.householdId, { revision, generation, expiresAt: Date.now() + 60000, data });
+  }
+  return data;
+}, result => result.cart?.observedAt ?? null);
 export const readCollectAndGoOrders = (user: SessionUser, signal: AbortSignal) => orderRead(user, signal, fetchCollectAndGoOrders);
 export const readCollectAndGoOrder = (user: SessionUser, id: string, signal: AbortSignal) => orderRead(user, signal, (state, pending) => fetchCollectAndGoOrder(state, id, pending));
 

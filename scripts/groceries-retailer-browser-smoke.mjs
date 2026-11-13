@@ -27,12 +27,12 @@ try {
   const page = await browser.newPage(), errors = []; await page.clock.install(); page.on("pageerror", (error) => errors.push(error.message));
   let allowed = true, expired = false, failure = false, reads = 0, fresh = false, imported = null, hold = null, held = false;
   let collectConnected = false, collectAccess = ["owner", "wife"], adopted = null;
-  let verifiedAt = null, rejectCheck = false, checks = 0;
+  let verifiedAt = null, rejectCheck = false, checks = 0, collectBlocked = false;
   let reservedName = "Reserved bread for pickup", ordersPresent = true;
   let basketName = "Halfvolle melk", basketFails = false, basketReads = 0, holdBasket = null, heldBasket = false;
   const collectCart = () => ({ authenticated: true, observedAt: new Date().toISOString(), truncated: false, items: basketName ? [{ name: basketName, quantity: 2, unitPriceCents: 162, url: null }] : [] });
   const reservation = () => ({ id: "2201", url: "https://www.collectandgo.be/nl/bestelling/2201", authenticated: true, observedAt: new Date().toISOString(), timeZone: "Europe/Brussels", status: "M", pickupPoint: "Example pickup", pickupFrom: "2030-11-16T07:30:00Z", pickupUntil: "2030-11-16T08:00:00Z", amendableUntil: "2030-11-15T08:00:00Z", providerAmendable: true, editState: "open", estimatedTotalCents: 1250, items: [{ name: reservedName, quantity: 2, unitPriceCents: 48, url: null }], truncated: false });
-  const collectStatus = () => ({ enabled: true, configured: true, connected: collectConnected, canManage: true, canUse: collectAccess.includes("owner"), needsReconnect: false, legacyAvailable: false, verifiedAt, importedAt: collectConnected ? "2026-11-12T12:00:00Z" : null, members: [{ id: "owner", name: "Rob", role: "owner", allowed: collectAccess.includes("owner") }, { id: "wife", name: "Partner", role: "adult", allowed: collectAccess.includes("wife") }, { id: "child", name: "Child", role: "child", allowed: collectAccess.includes("child") }] });
+  const collectStatus = () => ({ enabled: true, configured: true, connected: collectConnected, canManage: true, canUse: collectAccess.includes("owner"), needsReconnect: collectBlocked, reconnectReason: collectBlocked ? "challenge" : undefined, legacyAvailable: false, verifiedAt, importedAt: collectConnected ? "2026-11-12T12:00:00Z" : null, members: [{ id: "owner", name: "Rob", role: "owner", allowed: collectAccess.includes("owner") }, { id: "wife", name: "Partner", role: "adult", allowed: collectAccess.includes("wife") }, { id: "child", name: "Child", role: "child", allowed: collectAccess.includes("child") }] });
   let name = "Milk already on Xtra";
   const status = () => ({ configured: true, connected: true, canUse: allowed, canManage: false, needsReconnect: expired, connectedAt: "2026-11-12T12:00:00Z", checkedAt: "2026-11-12T12:00:00Z", placeId: "1234", members: [] });
   const snapshot = () => ({ placeId: "1234", observedAt: "2026-11-12T12:00:00Z", truncated: false, items: [{ id: "retailer-item", name, productId: "123456", quantity: 2, unit: "P", completed: false }] });
@@ -65,7 +65,7 @@ try {
     if (request.method() === "POST" && url.pathname.endsWith("/check")) {
       checks++;
       if (rejectCheck) { verifiedAt = null; return route.fulfill({ status: 409, json: { error: { code: "collectandgo_unverified", message: "guest basket" } } }); }
-      verifiedAt = "2026-11-12T12:05:00Z";
+      collectBlocked = false; verifiedAt = "2026-11-12T12:05:00Z";
       return route.fulfill({ json: { status: collectStatus(), cart: { observedAt: verifiedAt, authenticated: true, truncated: false, items: [{ name: "Milk", url: "https://www.collectandgo.be/nl/assortiment/milk", quantity: 2, unitPriceCents: 162 }] } } });
     }
     if (request.method() === "POST" && url.pathname.endsWith("/adopt")) { adopted = request.postDataJSON(); collectAccess = adopted.userIds; collectConnected = true; }
@@ -260,6 +260,23 @@ try {
   assert.equal(await page.getByText("In Collect&Go basket", { exact: true }).count(), 0);
   ordersPresent = false; await page.clock.fastForward(31000);
   await page.getByRole("link", { name: "Reserved with Collect&Go", exact: true }).waitFor({ state: "hidden" });
+  // A challenge is distinct from an expired login. Recovery explicitly tests the saved session.
+  for (const locale of ["en", "nl"]) for (const width of [320, 390, 1440]) {
+    await open("Features/Shopping/Components/CollectAndGoPanel", "Blocked", locale, "dark", width);
+    await page.getByText(locale === "en" ? /Collect&Go is blocking automated reads/ : /Collect&Go blokkeert automatische uitlezing/).waitFor();
+    assert.equal(await page.getByText("Halfvolle melk", { exact: true }).count(), 0);
+    await page.getByRole("link", { name: locale === "en" ? "Open Collect&Go" : "Collect&Go openen", exact: true }).waitFor();
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    await page.screenshot({ path: `${output}/antibot-${locale}-${width}.png`, fullPage: true });
+  }
+  collectConnected = true; collectAccess = ["owner", "wife"]; collectBlocked = true;
+  await open("Features/Shopping/Components/CollectAndGoSettings", "Blocked");
+  await page.getByText(/Collect&Go is blocking automated reads/).waitFor();
+  assert.equal(await page.locator("details").first().getAttribute("open"), null, "A challenge does not force the HAR import form open");
+  const checkBefore = checks, previousImport = JSON.stringify(imported);
+  await page.getByRole("button", { name: "Test connection", exact: true }).click();
+  await page.getByText(/^Signed-in online basket last verified:/).waitFor();
+  assert.equal(checks, checkBefore + 1); assert.equal(JSON.stringify(imported), previousImport, "Recovery reuses the saved session, without a new import");
   assert.deepEqual(errors, []);
-  console.log(`Retailer groceries UI: 72 EN/NL mobile/desktop renders; linked online sessions, reservation labels after cutoff, local active-visit assignments and removed reservation coverage; destination tabs, basket presence labels, verified empty basket with separate reservations, independent failures and revoked in-flight basket reads; in-store/online channel labels and settings navigation, automatic reads, visible-only polling, focus refresh, MCP events, stale/expired reads, revoked in-flight reads, and Collect&Go shared grants, explicit legacy adoption and import without CLI passed. Screenshots: ${output}`);
+  console.log(`Retailer groceries UI: 78 EN/NL mobile/desktop renders; AntiBot messages, paused reads and explicit saved-session recovery; linked online sessions, reservation labels after cutoff, local active-visit assignments and removed reservation coverage; destination tabs, basket presence labels, verified empty basket with separate reservations, independent failures and revoked in-flight basket reads; in-store/online channel labels and settings navigation, automatic reads, visible-only polling, focus refresh, MCP events, stale/expired reads, revoked in-flight reads, and Collect&Go shared grants, explicit legacy adoption and import without CLI passed. Screenshots: ${output}`);
 } finally { await browser.close(); for (const stream of streams) stream.end(); await new Promise((done) => server.close(done)); }

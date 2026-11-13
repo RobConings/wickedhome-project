@@ -28,3 +28,12 @@ it("uses only the fixed read endpoint, credentials and GET, with no redirects or
 it("stops at authentication/challenge errors without echoing credentials or parsing the error page", async () => {
  for(const status of [401,403,456]){mock.restoreAll();mock.method(globalThis,"fetch",async()=>new Response("fixture-auth-token",{status}));await assert.rejects(fetchCollectAndGoCart(state,new AbortController().signal),(error:unknown)=>error instanceof Error&&!error.message.includes("fixture-auth-token"));}
 });
+
+it("recognizes the observed HTTP 405 AntiBot page and HTML challenges without exposing their contents", async () => {
+ for(const status of [200,403,405]) {
+  mock.restoreAll(); mock.method(globalThis,"fetch",async()=>new Response("<html><title>Colruyt | AntiBot</title>captcha fixture-auth-token</html>",{status,headers:{"Content-Type":"text/html; charset=UTF-8"}}));
+  await assert.rejects(fetchCollectAndGoCart(state,new AbortController().signal),(error:unknown)=>error instanceof Error&&Reflect.get(error,"code")==="collectandgo_challenge"&&!error.message.includes("fixture-auth-token"));
+ }
+ mock.restoreAll();mock.method(globalThis,"fetch",async()=>Response.json({error:"Method not allowed"},{status:405}));
+ await assert.rejects(fetchCollectAndGoCart(state,new AbortController().signal),{code:"collectandgo_unavailable"});
+});

@@ -48,7 +48,7 @@ export function CollectAndGoSettings({ initial }: { initial?: CollectAndGoStatus
     <Text size="sm" tone="muted">{t("collectAndGo.description")}</Text>
     <Link to="/settings?section=xtra" className="inline-flex min-h-10 items-center text-sm underline">{t("collectAndGo.xtraSeparate")}</Link>
     {error && <InlineAlert tone="error">{t(`collectAndGo.${error}`)}</InlineAlert>}
-    {status && <Text size="sm" role="status">{(status.enabled || status.cartEnabled) && status.canUse && status.verifiedAt && !status.needsReconnect ? t("collectAndGo.verified", { date: new Date(status.verifiedAt).toLocaleString(i18n.language, { timeZone: "Europe/Brussels" }) }) : t(!status.enabled && !status.cartEnabled ? "collectAndGo.disabled" : status.needsReconnect ? "collectAndGo.reconnect" : status.connected ? status.canUse ? "collectAndGo.importedUnverified" : "xtra.noAccess" : "collectAndGo.notImported")}</Text>}
+    {status && <Text size="sm" role="status">{(status.enabled || status.cartEnabled) && status.canUse && status.verifiedAt && !status.needsReconnect ? t("collectAndGo.verified", { date: new Date(status.verifiedAt).toLocaleString(i18n.language, { timeZone: "Europe/Brussels" }) }) : t(!status.enabled && !status.cartEnabled ? "collectAndGo.disabled" : status.needsReconnect ? status.reconnectReason === "challenge" ? "collectAndGo.checkErrors.collectandgo_challenge" : "collectAndGo.reconnect" : status.connected ? status.canUse ? "collectAndGo.importedUnverified" : "xtra.noAccess" : "collectAndGo.notImported")}</Text>}
     {checkedItems !== null && <Text size="sm" role="status">{t("collectAndGo.checkedItems", { count: checkedItems })}</Text>}
     {status && !status.enabled && <InlineAlert>{t(status.cartEnabled ? "collectAndGo.browserDisabledWithCart" : "collectAndGo.adminEnable")}</InlineAlert>}
     {status?.canManage && <>
@@ -57,7 +57,7 @@ export function CollectAndGoSettings({ initial }: { initial?: CollectAndGoStatus
       <RetailerAccountAccess members={status.members} userIds={userIds} onChange={setUserIds} disabled={busy || !status.configured}
         actions={status.connected && <Button type="button" variant="outline" onClick={() => void perform(() => api.put<CollectAndGoStatus>("/shopping/collect-and-go/access", { userIds }))}>{t("xtra.saveAccess")}</Button>} />
       {status.legacyAvailable && <InlineAlert><Text>{t("collectAndGo.legacyHelp")}</Text><Button className="mt-2" type="button" variant="outline" disabled={busy || !status.configured} onClick={() => void perform(async () => { const next = await api.post<CollectAndGoStatus>("/shopping/collect-and-go/session/adopt", { userIds }); setState(null); return next; })}>{t("collectAndGo.shareSaved")}</Button></InlineAlert>}
-      <details open={!status.connected || status.needsReconnect} className="rounded-lg border p-3">
+      <details open={!status.connected || (status.needsReconnect && status.reconnectReason !== "challenge")} className="rounded-lg border p-3">
         <summary className="cursor-pointer text-sm font-medium">{t("xtra.connectTitle")}</summary>
         <RetailerBrowserImport id="collectandgo-browser-data" disabled={busy} onImport={paste}
           steps={[t("collectAndGo.browserSignIn"), t("collectAndGo.browserNetwork"), t("xtra.browserSensitive"), t("collectAndGo.browserCopy")]}

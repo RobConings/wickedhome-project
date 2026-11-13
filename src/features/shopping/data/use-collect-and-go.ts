@@ -23,7 +23,7 @@ export function useCollectAndGo({ initial, intervalMs = 30000, client = collectA
     try {
       const status = await client.status();
       if (!current()) return;
-      if (!status.connected || !status.canUse || status.needsReconnect) { setData({ status, ...(status.needsReconnect && { cartError: "reconnect", ordersError: "reconnect" }) }); return; }
+      if (!status.connected || !status.canUse || status.needsReconnect) { setData({ status, ...(status.needsReconnect && { cartError: status.reconnectReason === "challenge" ? "blocked" : "reconnect", ordersError: status.reconnectReason === "challenge" ? "blocked" : "reconnect" }) }); return; }
       setData(previous => ({ ...previous, status }));
       const activity = await client.activity();
       if (!current()) return;

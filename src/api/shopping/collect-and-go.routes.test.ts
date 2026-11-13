@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { after, before, it } from "node:test";
+import { after, before, it, mock } from "node:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -75,4 +75,22 @@ it("protects reservation routes with authentication and the same selected-accoun
     assert.equal((await call(path, "GET", undefined, "wife")).status, 409, "browser-only session cannot prove native reservation access");
   }
   assert.equal((await call("/orders/not-an-order", "GET", undefined, "wife")).status, 400);
+});
+
+it("lets an allowed person explicitly test a paused native session without reimporting the HAR", async () => {
+ const native = { ...state, cookies: [{ ...state.cookies[0]!, name: "WC_AUTHENTICATION_1", domain: "apip.collectandgo.be" }], cartApi: { storeId: "1", catalogId: "2", langId: "-11", authToken: "fixture-token", apiKey: "fixture-key" } };
+ assert.equal((await call("/session","POST",{state:native,userIds:["wife"]},"owner")).status,200);
+ const original=globalThis.fetch;let blocked=true,requests=0;
+ const intercept=mock.method(globalThis,"fetch",async(input:URL|RequestInfo, options?:RequestInit)=>{
+  if(!String(input).startsWith("https://apip.collectandgo.be/"))return original(input,options);
+  requests++;
+  return blocked?new Response("<title>Colruyt | AntiBot</title>",{status:405,headers:{"Content-Type":"text/html"}}):Response.json({resourceName:"cart",orderId:"1",orderStatus:"P",x_xtraEmailId:"fixture@example.test",totalProductPriceCurrency:"EUR",recordSetCount:"0",recordSetTotal:"0",recordSetStartNumber:"0"});
+ });
+ try {
+  assert.equal((await call("/cart","GET",undefined,"wife")).status,409);
+  assert.equal((await call("/status","GET",undefined,"wife").then(response=>response.json())).reconnectReason,"challenge");
+  assert.equal((await call("/cart","GET",undefined,"wife")).status,409);assert.equal(requests,1);
+  blocked=false;
+  const result=await call("/check","POST",{},"wife");assert.equal(result.status,200);const data=await result.json();assert.equal(data.status.needsReconnect,false);assert.deepEqual(data.cart.items,[]);assert.equal(requests,2);
+ }finally{intercept.mock.restore();}
 });

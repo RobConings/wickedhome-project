@@ -10,7 +10,7 @@ import { forbidden, HttpError } from "../lib/http";
 import { decryptSecret, encryptSecret, secretsAvailable } from "../lib/secrets";
 import { readCollectAndGoSession } from "./collect-and-go-session";
 
-const connectionSchema = z.object({ version: z.literal(1), revision: z.string(), state: collectAndGoStateSchema, userIds: z.array(z.string()).max(100), importedAt: z.string(), needsReconnect: z.boolean(), verifiedAt: z.string().datetime().nullable().optional() });
+const connectionSchema = z.object({ version: z.literal(1), revision: z.string(), state: collectAndGoStateSchema, userIds: z.array(z.string()).max(100), importedAt: z.string(), needsReconnect: z.boolean(), reconnectReason: z.enum(["login", "challenge"]).optional(), verifiedAt: z.string().datetime().nullable().optional() });
 export type CollectAndGoConnection = z.infer<typeof connectionSchema>;
 const root = () => resolve(config.STORAGE_DIR, "..", "collect-and-go-shared");
 const fileOf = (householdId: string) => join(root(), `${createHash("sha256").update(householdId).digest("hex")}.enc`);
@@ -45,10 +45,10 @@ export async function withCollectAndGoConnection<T>(householdId: string, work: (
   locks.set(householdId, current);
   try { return await current; } finally { if (locks.get(householdId) === current) locks.delete(householdId); }
 }
-export async function requireCollectAndGoAccess(user: SessionUser) {
+export async function requireCollectAndGoAccess(user: SessionUser, allowReconnect = false) {
   const connection = await readCollectAndGoConnection(user.householdId);
   if (!connection || !connection.userIds.includes(user.id)) throw forbidden("You don't have access to the shared Collect&Go connection. Ask an owner to select your account in Settings.");
-  if (connection.needsReconnect) throw new HttpError(409, "collectandgo_login", "The shared Collect&Go connection needs a new login or browser verification. Ask an owner to reconnect it in Settings.");
+  if (connection.needsReconnect && !allowReconnect) throw new HttpError(409, connection.reconnectReason === "challenge" ? "collectandgo_challenge" : "collectandgo_login", "Collect&Go automatic access is paused for this saved connection. Check the normal website, then explicitly test the saved connection in Settings; a new import is only needed if sign-in must be renewed.");
   return connection;
 }
 export async function collectAndGoStatus(user: SessionUser): Promise<CollectAndGoStatus> {
@@ -57,5 +57,5 @@ export async function collectAndGoStatus(user: SessionUser): Promise<CollectAndG
   const connection = await readCollectAndGoConnection(user.householdId).catch((error) => { if (!canManage) throw error; unreadable = true; return null; });
   const canUse = Boolean(connection?.userIds.includes(user.id)), visible = canUse || canManage;
   const legacy = canManage && !connection ? await readCollectAndGoSession(user.id).catch(() => null) : null;
-  return { enabled: collectAndGoEnabled(), cartEnabled: visible && secretsAvailable() && Boolean(connection?.state.cartApi), configured: secretsAvailable(), connected: visible && Boolean(connection), canManage, canUse, needsReconnect: unreadable || (visible && Boolean(connection?.needsReconnect)), legacyAvailable: Boolean(legacy), importedAt: visible ? connection?.importedAt ?? null : null, verifiedAt: visible && !connection?.needsReconnect ? connection?.verifiedAt ?? null : null, members: canManage ? (await collectAndGoMembers(user.householdId, [])).map((member) => ({ id: member.id, name: member.habitant?.name ?? member.email, role: member.role.toLowerCase(), allowed: connection?.userIds.includes(member.id) ?? false })) : [] };
+  return { enabled: collectAndGoEnabled(), cartEnabled: visible && secretsAvailable() && Boolean(connection?.state.cartApi), configured: secretsAvailable(), connected: visible && Boolean(connection), canManage, canUse, needsReconnect: unreadable || (visible && Boolean(connection?.needsReconnect)), reconnectReason: visible ? connection?.reconnectReason : undefined, legacyAvailable: Boolean(legacy), importedAt: visible ? connection?.importedAt ?? null : null, verifiedAt: visible && !connection?.needsReconnect ? connection?.verifiedAt ?? null : null, members: canManage ? (await collectAndGoMembers(user.householdId, [])).map((member) => ({ id: member.id, name: member.habitant?.name ?? member.email, role: member.role.toLowerCase(), allowed: connection?.userIds.includes(member.id) ?? false })) : [] };
 }

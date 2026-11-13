@@ -10,3 +10,5 @@ export const Stale: Story = { args: { live: { ...meta.args.live, data: { ...conn
 export const Disconnected: Story = { args: { live: { ...meta.args.live, data: disconnectedCollectAndGo } } };
 export const NoAccess: Story = { args: { live: { ...meta.args.live, data: { status: { ...connectedCollectAndGo.status, canUse: false } } } } };
 export const Reconnect: Story = { args: { live: { ...meta.args.live, data: { status: { ...connectedCollectAndGo.status, needsReconnect: true } } } } };
+
+export const Blocked: Story = { args: { live: { ...meta.args.live, data: { status: { ...connectedCollectAndGo.status, needsReconnect: true, reconnectReason: "challenge" } } } } };

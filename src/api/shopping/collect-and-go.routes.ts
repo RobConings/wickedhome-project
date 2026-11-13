@@ -16,7 +16,7 @@ async function cartRequest(req: Request, res: Response, checking = false) {
   const abort = () => { if (!res.writableEnded) controller.abort(); };
   res.on("close", abort);
   try {
-    const cart = await readCollectAndGoCart(user, controller.signal);
+    const cart = await readCollectAndGoCart(user, controller.signal, checking);
     res.json(checking ? { cart, status: await collectAndGoStatus(user) } : cart);
   } finally { res.off("close", abort); }
 }

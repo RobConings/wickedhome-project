@@ -74,7 +74,7 @@ export function CollectAndGoPanel({ live, initialOrder }: { live: CollectAndGoLi
     </Inline>
     {!loading && !data?.cartError && (!status?.connected || !status.canUse) && <Text size="sm" tone="muted">{t(status?.connected ? "collectAndGoList.noAccess" : "collectAndGoList.notConnected")}</Text>}
     {data?.cartError && !status?.connected && <InlineAlert tone="warning">{t(`collectAndGoList.errors.${data.cartError}`)}</InlineAlert>}
-    {status?.needsReconnect && <InlineAlert tone="warning">{t("collectAndGoList.errors.reconnect")}</InlineAlert>}
+    {status?.needsReconnect && <InlineAlert tone="warning">{t(status.reconnectReason === "challenge" ? "collectAndGoList.errors.blocked" : "collectAndGoList.errors.reconnect")}</InlineAlert>}
     {((status?.connected && status.canUse && !status.needsReconnect) || loading) && <PageGrid className="lg:grid-cols-2">
       <Card role="region" aria-label={t("collectAndGoList.basket")}>
         <CardHeader><CardHeading title={t("collectAndGoList.basket")} description={t("collectAndGoList.basketDescription")} /></CardHeader>
@@ -94,6 +94,7 @@ export function CollectAndGoPanel({ live, initialOrder }: { live: CollectAndGoLi
     </PageGrid>}
     {data?.reservationsIncomplete && <InlineAlert tone="warning">{t("onlineVisits.partial")}</InlineAlert>}
     <Link className="inline-flex min-h-10 items-center self-start text-sm underline" to="/shopping/sessions">{t("onlineVisits.allSessions")}</Link>
+    <a className="inline-flex min-h-10 items-center self-start text-sm underline" href="https://www.collectandgo.be/nl/home" target="_blank" rel="noopener noreferrer">{t("collectAndGo.open")}</a>
     <Link className="inline-flex min-h-10 items-center self-start text-sm underline" to="/settings?section=collectandgo">{t("collectAndGoList.settings")}</Link>
     <Text size="xs" tone="muted">{t("collectAndGoList.readOnly")}</Text>
   </PageSection>;

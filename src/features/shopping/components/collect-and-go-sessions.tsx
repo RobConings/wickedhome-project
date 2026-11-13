@@ -21,7 +21,7 @@ export function CollectAndGoSessions({ shops, initial, initialOrder }: { shops: 
   const now = useNow(30000);
   const requested = params.get("retailer") === "collectandgo" ? params.get("order") : null;
   const selected = data?.orders?.orders.find(order => order.id === requested);
-  if (!data?.status.connected || !data.status.canUse || data.status.needsReconnect) return requested ? <InlineAlert tone="warning">{t(data?.status.needsReconnect ? "collectAndGoList.errors.reconnect" : "collectAndGoList.noAccess")}</InlineAlert> : null;
+  if (!data?.status.connected || !data.status.canUse || data.status.needsReconnect) return requested ? <InlineAlert tone="warning">{t(data?.status.needsReconnect ? data.status.reconnectReason === "challenge" ? "collectAndGoList.errors.blocked" : "collectAndGoList.errors.reconnect" : "collectAndGoList.noAccess")}</InlineAlert> : null;
   const upcoming = upcomingCollectAndGoOrders(data.orders?.orders ?? [], now);
   if (!upcoming.length && !requested && !data.ordersError && !data.reservationsIncomplete) return null;
   return <PageSection aria-label={t("onlineVisits.title")}>

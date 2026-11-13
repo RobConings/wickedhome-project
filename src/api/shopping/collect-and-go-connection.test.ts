@@ -10,7 +10,7 @@ import { config } from "../lib/config";
 import { db } from "../lib/db";
 import { decryptSecret } from "../lib/secrets";
 import { collectAndGoStatus, readCollectAndGoConnection, requireCollectAndGoAccess, withCollectAndGoConnection } from "./collect-and-go-connection";
-import { adoptCollectAndGoSession, disconnectCollectAndGoBrowser, importCollectAndGoSession, readCollectAndGoCart, readCollectAndGoOrders, readCollectAndGoOrder, rememberedCollectAndGoOffer, searchCollectAndGo, setCollectAndGoAccess, setCollectAndGoBasket } from "./collect-and-go-browser";
+import { adoptCollectAndGoSession, disconnectCollectAndGoBrowser, importCollectAndGoSession, readCollectAndGoCart, readCollectAndGoActivity, readCollectAndGoOrders, readCollectAndGoOrder, rememberedCollectAndGoOffer, searchCollectAndGo, setCollectAndGoAccess, setCollectAndGoBasket } from "./collect-and-go-browser";
 import { readCollectAndGoSession, saveCollectAndGoSession } from "./collect-and-go-session";
 const actor = (id: string, householdId = id, role: SessionUser["role"] = "owner"): SessionUser => ({ id, householdId, role, email: `${id}@example.test`, name: id, locale: "en", householdName: "Home", habitantId: null });
 const signal = () => new AbortController().signal;
@@ -173,7 +173,7 @@ it("persists expiry/challenge failures for the shared session and requires owner
   await importCollectAndGoSession(owner, { state, userIds: [wife.id] });
   await assert.rejects(searchCollectAndGo(wife, "Milk", 1, true, signal()), /human browser check/);
   assert.equal((await collectAndGoStatus(wife)).needsReconnect, true);
-  await assert.rejects(searchCollectAndGo(wife, "Milk", 1, true, signal()), /needs a new login/);
+  await assert.rejects(searchCollectAndGo(wife, "Milk", 1, true, signal()), { code: "collectandgo_challenge" });
   assert.equal(fake.launch.mock.callCount(), 1);
 });
 it("disconnects all selected accounts together", async () => {
@@ -212,4 +212,34 @@ it("reads reservations for selected adults and children with browser integration
     await assert.rejects(readCollectAndGoOrders(wife, signal()), /don't have access/);
     assert.equal(browser.mock.callCount(), 0);
   } finally { if (enabled === undefined) delete process.env.COLLECTANDGO_ENABLED; else process.env.COLLECTANDGO_ENABLED = enabled; }
+});
+
+it("pauses after native AntiBot HTML, allows one explicit check with the same session, and shares verified activity safely", async () => {
+  const owner = actor("antibot"), wife = actor("antibot-wife", "antibot", "adult");
+  const native = { ...state, cookies: [{ ...state.cookies[0]!, name: "WC_AUTHENTICATION_1", domain: "apip.collectandgo.be" }], cartApi: { storeId: "1", catalogId: "2", langId: "-11", authToken: "fixture-token", apiKey: "fixture-key" } };
+  await importCollectAndGoSession(owner, { state: native, userIds: [owner.id, wife.id] });
+  const revision = (await readCollectAndGoConnection(owner.householdId))!.revision;
+  let requests = 0, blocked = true;
+  mock.method(globalThis, "fetch", async (input: URL | RequestInfo) => {
+    requests++;
+    if (blocked) return new Response("<html><title>Colruyt | AntiBot</title>captcha</html>", { status: 405, headers: { "Content-Type": "text/html" } });
+    return Response.json(String(input).includes("cart/@self") ? { resourceName: "cart", orderId: "1", orderStatus: "P", x_xtraEmailId: "fixture@example.test", totalProductPriceCurrency: "EUR", recordSetCount: "0", recordSetTotal: "0", recordSetStartNumber: "0" } : { resourceName: "order", Order: [{ orderId: "1", buyerId: "1", orderStatus: "P" }], recordSetCount: "1", recordSetTotal: "1", recordSetStartNumber: "0" });
+  });
+  await assert.rejects(readCollectAndGoActivity(owner, signal()), { code: "collectandgo_challenge" }); assert.equal(requests, 1);
+  assert.equal((await collectAndGoStatus(owner)).reconnectReason, "challenge");
+  await assert.rejects(readCollectAndGoActivity(wife, signal()), { code: "collectandgo_challenge" }); assert.equal(requests, 1, "automatic reads stop across accounts");
+  await assert.rejects(readCollectAndGoCart(owner, signal(), true), { code: "collectandgo_challenge" }); assert.equal(requests, 2, "explicit checks make only one attempt");
+  blocked = false;
+  await readCollectAndGoCart(owner, signal(), true);
+  assert.equal((await collectAndGoStatus(owner)).needsReconnect, false); assert.equal((await readCollectAndGoConnection(owner.householdId))!.revision, revision, "no HAR replacement required");
+  const before = requests;
+  await Promise.all([readCollectAndGoActivity(owner, signal()), readCollectAndGoActivity(wife, signal())]);
+  assert.equal(requests - before, 2, "one shared snapshot, without parallel retailer requests");
+  const cacheBefore = requests;
+  await readCollectAndGoActivity(owner, signal()); assert.equal(requests, cacheBefore);
+  const now = Date.now(); mock.method(Date, "now", () => now + 61000);
+  await readCollectAndGoActivity(wife, signal()); assert.equal(requests, cacheBefore + 2, "cache expires within one minute");
+  await setCollectAndGoAccess(owner, [wife.id]);
+  await assert.rejects(readCollectAndGoActivity(owner, signal()), /don't have access/);
+  const revoked = requests; await readCollectAndGoActivity(wife, signal()); assert.equal(requests, revoked + 2, "grant changes invalidate shared cache");
 });

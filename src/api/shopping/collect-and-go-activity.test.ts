@@ -35,3 +35,8 @@ it("returns real login failures for reconnect handling instead of repeated inval
  mock.method(globalThis, "fetch", async () => new Response("private", { status: 401 }));
  await assert.rejects(fetchCollectAndGoActivity(state, new AbortController().signal), (error: unknown) => error instanceof Error && /rejected the session/.test(error.message) && !error.message.includes("private"));
 });
+
+it("stops after the first AntiBot response instead of issuing history or detail requests", async () => {
+ let requests=0; mock.method(globalThis,"fetch",async()=>{requests++;return new Response("<title>Colruyt | AntiBot</title>captcha",{status:405,headers:{"Content-Type":"text/html"}});});
+ await assert.rejects(fetchCollectAndGoActivity(state,new AbortController().signal),{code:"collectandgo_challenge"});assert.equal(requests,1);
+});

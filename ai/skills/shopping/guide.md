@@ -110,7 +110,10 @@ service costs or loyalty offers. Show the products and ask the person to choose 
 asks for confirmation and never places an order. If an offer expired or the price changed, search again.
 The session is shared across selected accounts. Only owners can import, share an older personal session,
 change grants or disconnect everyone in Settings → Collect&Go. Selected children can only search/read.
-On CAPTCHA/login errors, ask an owner to renew the shared session from their normal browser.
+On AntiBot/CAPTCHA errors stop automatic requests. A blocked retailer may still work in normal Chrome;
+a fresh HAR does not guarantee server access. After checking the normal website, an allowed account can
+explicitly use Settings → Collect&Go → Test connection with the same saved session. Renew the imported
+sign-in only if it genuinely expired; do not repeatedly ask for a HAR or retry a blocked tool.
 An imported cookie session is not proof of signed-in basket access, and a retailer block may still prevent server access.
 On an unverified write, say the basket may have changed and ask them to inspect it before retrying.
 Preparing a basket does not mark WickedHome needs bought or create a purchase, expense or stock entry.
