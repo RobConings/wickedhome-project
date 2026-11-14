@@ -1,0 +1,58 @@
+/// User-owned household actions; draft and published definitions never contain alarm codes.
+model HomeAction {
+  id                String @id @default(cuid())
+  householdId       String
+  household         Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  definition        Json
+  revision          Int @default(1)
+  published         Json?
+  publishedRevision Int?
+  archived          Boolean @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  runs              HomeActionRun[]
+  rules             HomeRule[]
+  @@index([householdId, archived])
+  @@map("home_actions")
+}
+
+/// Immutable action snapshot plus confirmed observations; never replayed automatically after downtime.
+model HomeActionRun {
+  id            String @id
+  householdId   String
+  household     Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  actionId      String
+  action        HomeAction @relation(fields: [actionId], references: [id], onDelete: Restrict)
+  revision      Int
+  snapshot      Json
+  actorName     String
+  source        String
+  requestKey    String
+  status        String @default("requested")
+  steps         Json @default("[]")
+  detail        String?
+  startedAt     DateTime @default(now())
+  finishedAt    DateTime?
+  updatedAt     DateTime @updatedAt
+  @@unique([householdId, requestKey])
+  @@index([householdId, startedAt])
+  @@index([householdId, status])
+  @@map("home_action_runs")
+}
+
+/// Native HA trigger definition. Publication is explicit and keeps unrelated HA rules intact.
+model HomeRule {
+  id                String @id @default(cuid())
+  householdId       String
+  household         Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  actionId          String
+  action            HomeAction @relation(fields: [actionId], references: [id], onDelete: Restrict)
+  definition        Json
+  published         Json?
+  revision          Int @default(1)
+  publishedRevision Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  @@index([householdId])
+  @@map("home_rules")
+}

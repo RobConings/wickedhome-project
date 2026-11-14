@@ -1,4 +1,3 @@
-import { CanvasOverlay } from "@/components/layout/canvas-overlay";
 import { Stack } from "@/components/layout/stack";
 import { Inline } from "@/components/layout/inline";
 import * as React from "react";
@@ -36,14 +35,15 @@ type HouseScreenProps = {
   initialDeviceId?: string;
   /** Show this connection state without connecting (stories). */
   liveStatus?: LiveEventsStatus;
-  /** On top of the side panel, composed by the route (the Home Assistant alarm card). */
-  asideTop?: React.ReactNode;
+  navigation?: React.ReactNode;
+  mapActions?: React.ReactNode;
   renderRoomPanel?: (roomId: string) => React.ReactNode;
+  renderDeviceControls?: (device: Device) => React.ReactNode;
   roomMarkers?: Record<string, PlanMarker[]>;
 };
 
 /** The live house: floor tabs, the plan with an indicator per device, a legend and the clicked device. */
-export function HouseScreen({ plans, devices: loaded, profiles, canSetValues, live = true, now: fixedNow, initialDeviceId, liveStatus, asideTop, renderRoomPanel, roomMarkers }: HouseScreenProps) {
+export function HouseScreen({ plans, devices: loaded, profiles, canSetValues, live = true, now: fixedNow, initialDeviceId, liveStatus, navigation, mapActions, renderRoomPanel, renderDeviceControls, roomMarkers }: HouseScreenProps) {
   const { t } = useTranslation("devices");
   const now = useNow(30_000, fixedNow);
   const devices = useLiveDevices(loaded, { enabled: live && !liveStatus });
@@ -52,7 +52,7 @@ export function HouseScreen({ plans, devices: loaded, profiles, canSetValues, li
   const stateOf = useDeviceStates(profiles, now);
   const [searchParams, setSearchParams] = useSearchParams();
   const [showUnplaced, setShowUnplaced] = React.useState(false);
-  const [selectedId, setSelectedId] = React.useState<string | null>(initialDeviceId ?? searchParams.get("device") ?? null);
+  const [selectedId, setSelectedId] = React.useState<string | null>(initialDeviceId ?? null);
 
   const requested = searchParams.get("floor");
   const plan = plans.find((candidate) => candidate.floor.id === requested) ?? plans[0];
@@ -61,6 +61,7 @@ export function HouseScreen({ plans, devices: loaded, profiles, canSetValues, li
 
   const profilesById = React.useMemo(() => new Map(profiles.map((profile) => [profile.id, profile])), [profiles]);
   const unplaced = devices.filter((device) => !device.position);
+  const housewide = unplaced.filter((device) => !device.floorId && !device.place);
   const legendProfiles = profiles.filter((profile) => devices.some((device) => device.floorId === floorId && device.position && device.profileId === profile.id));
   const selected = devices.find((device) => device.id === (searchParams.get("device") ?? selectedId));
   const selectedProfile = selected ? profilesById.get(selected.profileId) : undefined;
@@ -83,7 +84,7 @@ export function HouseScreen({ plans, devices: loaded, profiles, canSetValues, li
   if (!plan) {
     return (
       <Stack gap="md" className="px-4 py-6 sm:px-6 lg:px-8">
-        {asideTop}
+        {navigation}
         <EmptyState
           icon={MapIcon}
           title={t("house.noFloors.title")}
@@ -104,29 +105,37 @@ export function HouseScreen({ plans, devices: loaded, profiles, canSetValues, li
     setSearchParams((params) => { params.delete("device"); params.set("room", id); return params; }, { preventScrollReset: true });
   };
   const selectedOnFloor = selected && (selected.floorId === floorId || selected.place?.floorId === floorId || !selected.floorId) ? selected : undefined;
+  const selectDevice = (id: string) => {
+    const device = devices.find((candidate) => candidate.id === id);
+    setSelectedId(null); setShowUnplaced(false);
+    setSearchParams((params) => { params.delete("room"); params.set("device", id); const targetFloor = device?.floorId ?? device?.place?.floorId; if (targetFloor) params.set("floor", targetFloor); return params; }, { preventScrollReset: true });
+  };
   return (
     <Stack gap="3" className="h-[calc(100dvh-3.5rem-var(--mobile-nav-height,0px)-env(safe-area-inset-bottom))] min-h-[32rem] p-3 sm:p-4 lg:h-dvh">
       <PageHeader title={t("house.title")} actions={<>
         {(live || liveStatus) && <LiveStatusBadge status={liveStatus} refreshing={refreshing} />}
         {canSetValues && <Button asChild variant="outline"><Link to={`/places/floors/${plan.floor.id}/plan`}>{t("placement.placeOnPlan")}</Link></Button>}
       </>} />
+      {navigation}
       <Inline gap="md" align="center" wrap className="min-w-0">
         <SegmentedControl label={t("house.floors")} value={plan.floor.id} onChange={selectFloor} options={plans.map((item) => ({ value: item.floor.id, label: item.floor.name, icon: MapIcon }))} />
         {unplaced.length > 0 && <Button variant="ghost" onClick={() => setShowUnplaced((value) => !value)}><MapPinOffIcon />{t("house.unplaced", { count: unplaced.length })}</Button>}
+        {housewide.map((device) => <Button key={device.id} variant="outline" onClick={() => selectDevice(device.id)}>{device.name}</Button>)}
+        {mapActions}
       </Inline>
+      <Inline align="stretch" gap="md" className="min-h-0 flex-1">
         <FloorPlanView plan={plan} markers={[...markers, ...(roomMarkers?.[plan.floor.id] ?? [])]} selectedMarkerId={selectedOnFloor?.id} selectedPlaceId={selectedRoom?.id}
           onPlaceClick={selectRoom} onMarkerClick={(id) => {
             if (id.startsWith("room:")) { selectRoom(id.slice(5)); return; }
-            setSelectedId(id);
-            setSearchParams((params) => { params.delete("room"); params.set("device", id); return params; }, { preventScrollReset: true });
+            selectDevice(id);
           }} className="min-h-0 flex-1 rounded-2xl border bg-muted/30" legend={legendProfiles.length > 0 ? <DeviceLegend profiles={legendProfiles} /> : undefined}>
-        <MapInspector title={selectedOnFloor?.name ?? selectedRoom?.name ?? t("house.unplaced", { count: unplaced.length })} open={Boolean(selectedOnFloor || selectedRoom || showUnplaced)} onClose={closeInspector}>
-          {selectedOnFloor && selectedProfile ? <DeviceSidePanel device={selectedOnFloor} profile={selectedProfile} state={stateOf(selectedOnFloor)} canSetValues={canSetValues} now={now} hideHeading className="border-0 bg-transparent p-0 shadow-none" />
-            : selectedRoom ? <>{renderRoomPanel?.(selectedRoom.id)}<Button asChild><RecordLink to={`/places/${encodeURIComponent(selectedRoom.id)}`}>{t("house.openRoom")}</RecordLink></Button></>
-            : <Stack gap="sm">{unplaced.map((device) => <Button key={device.id} variant="outline" onClick={() => { setShowUnplaced(false); setSelectedId(device.id); }}>{device.name}</Button>)}</Stack>}
-        </MapInspector>
-        {asideTop && <CanvasOverlay>{asideTop}</CanvasOverlay>}
       </FloorPlanView>
+        <MapInspector title={selectedOnFloor?.name ?? selectedRoom?.name ?? t("house.unplaced", { count: unplaced.length })} open={Boolean(selectedOnFloor || selectedRoom || showUnplaced)} onClose={closeInspector}>
+          {selectedOnFloor && selectedProfile ? <DeviceSidePanel device={selectedOnFloor} profile={selectedProfile} state={stateOf(selectedOnFloor)} canSetValues={canSetValues} now={now} hideHeading controls={renderDeviceControls?.(selectedOnFloor)} className="border-0 bg-transparent p-0 shadow-none" />
+            : selectedRoom ? <>{renderRoomPanel?.(selectedRoom.id)}<Button asChild><RecordLink to={`/places/${encodeURIComponent(selectedRoom.id)}`}>{t("house.openRoom")}</RecordLink></Button></>
+            : <Stack gap="sm">{unplaced.map((device) => <Button key={device.id} variant="outline" onClick={() => selectDevice(device.id)}>{device.name}</Button>)}</Stack>}
+        </MapInspector>
+      </Inline>
     </Stack>
   );
 }

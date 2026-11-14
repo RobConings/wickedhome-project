@@ -1,4 +1,5 @@
 import express from "express";
+import { homeActionsRouter } from "./home-actions/home-actions.routes";
 import { purchasesRouter } from "./purchases/purchases.routes";
 import { catalogueRouter } from "./catalogue/catalogue.routes";
 // The assistant lives in ai/ (ai/README.md): its core (chat, MCP) and every skill, registered here once.
@@ -111,6 +112,7 @@ export function createApp() {
   api.use("/calendar", calendarRouter);
   api.use("/energy", energyRouter);
   api.use("/devices", devicesRouter);
+  api.use("/home-actions", homeActionsRouter);
   // Home Assistant (docs/INTEGRATIONS.md); the connection itself is started by server.ts.
   api.use("/home-assistant", homeAssistantRouter);
   api.use("/weather", weatherRouter);

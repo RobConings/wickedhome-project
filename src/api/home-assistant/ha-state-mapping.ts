@@ -101,6 +101,10 @@ const LAUNDRY_WORDS = /(wash|dryer|laundry|wasmachine|droogkast|droger|wasdroger
 export function suggestPreset(entity: Pick<HaEntity, "entityId" | "domain" | "deviceClass" | "unit" | "name">): { presetKey: HaImportPreset; fieldKey: string } | null {
   const words = `${entity.entityId} ${entity.name}`.toLowerCase();
   switch (entity.domain) {
+    case "media_player":
+      return { presetKey: "media_player", fieldKey: "state" };
+    case "camera":
+      return { presetKey: "camera", fieldKey: "state" };
     case "alarm_control_panel":
       return { presetKey: "alarm_panel", fieldKey: "state" };
     case "binary_sensor":

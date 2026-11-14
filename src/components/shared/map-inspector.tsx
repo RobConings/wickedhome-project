@@ -11,7 +11,7 @@ const subscribeWidth = (changed: () => void) => {
   return () => query.removeEventListener("change", changed);
 };
 
-/** Selection details overlay the canvas; a phone sheet leaves the map visible above it. */
+/** Desktop details take their own column beside the canvas; a phone sheet opens only after selection. */
 export function MapInspector({ title, open, onClose, children }: { title: string; open: boolean; onClose: () => void; children: React.ReactNode }) {
   const desktop = React.useSyncExternalStore(subscribeWidth, wideScreen, () => false);
   const { t } = useTranslation();
@@ -34,7 +34,7 @@ export function MapInspector({ title, open, onClose, children }: { title: string
     </SheetContent>
   </Sheet>;
   if (!open) return null;
-  return <aside ref={ref} tabIndex={-1} aria-label={title} className="absolute inset-y-4 right-4 z-20 flex w-96 max-w-[calc(100%-2rem)] flex-col gap-4 overflow-y-auto rounded-2xl border bg-card/95 p-5 shadow-xl outline-none backdrop-blur">
+  return <aside ref={ref} tabIndex={-1} aria-label={title} className="relative flex w-96 max-w-[50%] shrink-0 flex-col gap-4 overflow-y-auto rounded-2xl border bg-card p-5 outline-none">
     <div className="flex items-center justify-between gap-2"><h2 className="min-w-0 text-lg font-semibold break-words">{title}</h2><Button variant="ghost" size="icon" aria-label={t("actions.close")} onClick={onClose}><XIcon /></Button></div>
     {children}
   </aside>;

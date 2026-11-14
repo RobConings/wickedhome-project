@@ -38,6 +38,33 @@ const ALARM_STATES = {
 
 export const DEVICE_PRESETS: readonly Preset[] = [
   {
+    key: "media_player", name: { en: "TV / audio", nl: "TV / audio" },
+    description: { en: "Current media state and supported power, playback, source and volume controls.", nl: "Actuele mediastatus en ondersteunde bediening voor aan/uit, afspelen, bron en volume." },
+    icon: "tv", category: "appliance", fields: [
+      { key: "state", label: { en: "State", nl: "Status" }, type: "text" },
+    ], primaryField: "state", rules: [
+      { id: "playing", field: "state", operator: "eq", value: "playing", tone: "success", label: { en: "Playing", nl: "Speelt af" } },
+      { id: "off", field: "state", operator: "eq", value: "off", tone: "neutral", label: { en: "Off", nl: "Uit" } },
+    ], staleAfterMinutes: null,
+  },
+  {
+    key: "camera", name: { en: "Camera", nl: "Camera" },
+    description: { en: "Camera status, latest image and supported camera actions.", nl: "Camerastatus, laatste beeld en ondersteunde camera-acties." },
+    icon: "camera", category: "camera",
+    fields: [{ key: "state", label: { en: "Status", nl: "Status" }, type: "choice", choices: [
+      { value: "idle", label: { en: "Available", nl: "Beschikbaar" } },
+      { value: "streaming", label: { en: "Live", nl: "Live" } },
+      { value: "recording", label: { en: "Recording", nl: "Opname bezig" } },
+      { value: "off", label: { en: "Off", nl: "Uit" } },
+    ] }],
+    primaryField: "state", rules: [
+      { id: "available", field: "state", operator: "eq", value: "idle", tone: "success", label: { en: "Available", nl: "Beschikbaar" } },
+      { id: "streaming", field: "state", operator: "eq", value: "streaming", tone: "info", label: { en: "Live", nl: "Live" } },
+      { id: "recording", field: "state", operator: "eq", value: "recording", tone: "info", label: { en: "Recording", nl: "Opname bezig" } },
+      { id: "off", field: "state", operator: "eq", value: "off", tone: "neutral", label: { en: "Off", nl: "Uit" } },
+    ], staleAfterMinutes: null,
+  },
+  {
     key: "contact",
     name: { en: "Window/door contact", nl: "Raam-/deurcontact" },
     description: { en: "Open or closed, with an optional battery level.", nl: "Open of dicht, met optioneel het batterijniveau." },

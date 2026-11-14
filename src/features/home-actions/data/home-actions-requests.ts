@@ -1,0 +1,10 @@
+import { api } from "@/lib/api-client";
+import type { HomeAction, HomeActionInput, HomeActionPreview, HomeActionRun, HomeActionsOverview, HomeRule, HomeRuleInput } from "../types/home-actions";
+export const fetchHomeActions = () => api.get<HomeActionsOverview>("/home-actions");
+export const saveAction = (definition: HomeActionInput, id?: string, revision?: number) => id ? api.put<HomeAction>(`/home-actions/actions/${id}`, { definition, revision }) : api.post<HomeAction>("/home-actions/actions", { definition });
+export const publishAction = (action: HomeAction) => api.post(`/home-actions/actions/${action.id}/publish`, { revision: action.revision });
+export const previewAction = (id: string) => api.post<HomeActionPreview>(`/home-actions/actions/${id}/preview`);
+export const runAction = (action: HomeAction, requestKey: string, code?: string) => api.post<HomeActionRun>(`/home-actions/actions/${action.id}/run`, { revision: action.revision, requestKey, confirm: true, ...(code ? { code } : {}) });
+export const stopActionRun = (id: string) => api.post(`/home-actions/runs/${id}/stop`);
+export const saveRule = (definition: HomeRuleInput, id?: string, revision?: number) => id ? api.put<HomeRule>(`/home-actions/rules/${id}`, { definition, revision }) : api.post<HomeRule>("/home-actions/rules", { definition });
+export const publishRule = (rule: HomeRule) => api.post(`/home-actions/rules/${rule.id}/publish`, { revision: rule.revision });

@@ -1,0 +1,244 @@
+<style>
+#wh-home-proposal{--wh-bg:light-dark(#f6f7f8,#0e1211);--wh-panel:light-dark(#fff,#161b1a);--wh-text:light-dark(#0f172a,#ecf0ee);--wh-muted:light-dark(#5b6779,#a6b2ad);--wh-line:light-dark(#dde4df,#35413b);--wh-green:light-dark(#124734,#74dca6);--wh-on-green:light-dark(#fff,#062417);--wh-soft:light-dark(#e8f2ec,#232b28);--wh-warn:light-dark(#92400e,#fcd34d);--wh-warn-bg:light-dark(#fdf1dc,#2e2410);--wh-red:light-dark(#991b1b,#fca5a5);--wh-red-bg:light-dark(#fce8e8,#351718);--wh-gap:16px;font:400 14px/1.5 Inter,system-ui,sans-serif;color:var(--wh-text);background:var(--wh-bg);border:1px solid var(--wh-line);border-radius:16px;overflow:clip;color-scheme:light dark}
+#wh-home-proposal *{box-sizing:border-box}
+#wh-home-proposal [hidden]{display:none!important}
+#wh-home-proposal h2,#wh-home-proposal h3,#wh-home-proposal p{margin:0}
+#wh-home-proposal h2{font-size:22px;font-weight:500;line-height:1.3}
+#wh-home-proposal h3{font-size:16px;font-weight:500}
+#wh-home-proposal button,#wh-home-proposal input,#wh-home-proposal select{font:inherit;color:inherit}
+#wh-home-proposal button{min-height:40px;border:1px solid var(--wh-line);border-radius:8px;padding:8px 12px;background:var(--wh-panel);display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:normal}
+#wh-home-proposal button:hover{background:var(--wh-soft)}
+#wh-home-proposal button:disabled{opacity:.5}
+#wh-home-proposal .wh-primary{background:var(--wh-green);color:var(--wh-on-green);border-color:transparent}
+#wh-home-proposal .wh-primary:hover{filter:brightness(.95)}
+#wh-home-proposal button[aria-pressed=true],#wh-home-proposal .wh-tabs button[aria-selected=true]{background:var(--wh-soft);border-color:var(--wh-green);color:var(--wh-green)}
+#wh-home-proposal input,#wh-home-proposal select{width:100%;min-width:0;min-height:40px;padding:8px;border:1px solid var(--wh-line);border-radius:7px;background:var(--wh-panel)}
+#wh-home-proposal input[type=checkbox]{width:18px;min-height:18px;accent-color:var(--wh-green);flex:none}
+#wh-home-proposal label{display:grid;gap:5px;min-width:0}
+#wh-home-proposal .wh-check{display:flex;align-items:center;gap:9px}
+#wh-home-proposal .wh-top{padding:18px 110px 14px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--wh-panel)}
+#wh-home-proposal .wh-brand{font-size:18px;font-weight:500;display:flex;gap:8px;align-items:center;color:var(--wh-green)}
+#wh-home-proposal .wh-demo{font-size:12px;color:var(--wh-muted)}
+#wh-home-proposal .wh-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:10px 16px;border-block:1px solid var(--wh-line);background:var(--wh-panel)}
+#wh-home-proposal .wh-tabs button{border-color:transparent;background:transparent}
+#wh-home-proposal .wh-page{padding:20px;display:grid;gap:var(--wh-gap)}
+#wh-home-proposal .wh-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#wh-home-proposal .wh-inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#wh-home-proposal .wh-muted{color:var(--wh-muted)}
+#wh-home-proposal .wh-small{font-size:12px}
+#wh-home-proposal .wh-badge{display:inline-flex;padding:3px 8px;border-radius:20px;background:var(--wh-soft);font-size:12px;font-weight:500}
+#wh-home-proposal .wh-warn{background:var(--wh-warn-bg);color:var(--wh-warn)}
+#wh-home-proposal .wh-error{background:var(--wh-red-bg);color:var(--wh-red)}
+#wh-home-proposal .wh-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:var(--wh-gap);align-items:start}
+#wh-home-proposal .wh-map-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--wh-gap);align-items:start}
+#wh-home-proposal .wh-map-layout.wh-inspecting{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+#wh-home-proposal .wh-stack{display:grid;gap:var(--wh-gap);min-width:0}
+#wh-home-proposal .wh-panel{padding:16px;border:1px solid var(--wh-line);border-radius:12px;background:var(--wh-panel);display:grid;gap:12px;min-width:0}
+#wh-home-proposal .wh-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#wh-home-proposal .wh-actions button{justify-content:flex-start;text-align:left;min-height:58px}
+#wh-home-proposal .wh-actions strong{display:block;font-weight:500}
+#wh-home-proposal .wh-item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding-block:9px;border-bottom:1px solid var(--wh-line)}
+#wh-home-proposal .wh-item:last-child{border-bottom:0}
+#wh-home-proposal .wh-item>div{min-width:0}
+#wh-home-proposal .wh-number{font-size:24px;font-weight:500;font-variant-numeric:tabular-nums}
+#wh-home-proposal .wh-room-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#wh-home-proposal .wh-room-grid button{justify-content:space-between;text-align:left}
+#wh-home-proposal .wh-room-map{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:12px;background:var(--wh-soft);border-radius:9px}
+#wh-home-proposal .wh-room-map button{min-height:100px;flex-direction:column;align-items:flex-start;justify-content:center}
+#wh-home-proposal .wh-room-map button:first-child{grid-row:span 2}
+#wh-home-proposal .wh-room-map .wh-room-name{font-weight:500}
+#wh-home-proposal .wh-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#wh-home-proposal .wh-step{border:1px solid var(--wh-line);border-radius:10px;padding:12px;display:grid;gap:10px}
+#wh-home-proposal .wh-step-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#wh-home-proposal .wh-step-head .wh-step-label{flex:1;min-width:100px;font-weight:500}
+#wh-home-proposal .wh-step-head button{padding:4px 9px;min-height:34px}
+#wh-home-proposal .wh-field-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+#wh-home-proposal .wh-notice{padding:12px;border-radius:8px;background:var(--wh-soft)}
+#wh-home-proposal .wh-results{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+#wh-home-proposal .wh-results li{display:flex;gap:9px;align-items:start}
+#wh-home-proposal .wh-status-dot{width:8px;height:8px;background:var(--wh-green);border-radius:50%;margin-top:7px;flex:none}
+#wh-home-proposal .wh-status-dot.wh-skipped{background:var(--wh-warn)}
+#wh-home-proposal .wh-status-dot.wh-failed{background:var(--wh-red)}
+#wh-home-proposal .wh-camera-placeholder{display:grid;place-items:center;min-height:105px;background:var(--wh-soft);border-radius:8px;gap:6px;padding:14px}
+#wh-home-proposal .wh-footer{padding:12px 20px;background:var(--wh-panel);border-top:1px solid var(--wh-line);color:var(--wh-muted);font-size:12px}
+#wh-home-proposal i[data-lucide],#wh-home-proposal svg.lucide{width:18px;height:18px;flex:none}
+@media(max-width:700px){#wh-home-proposal .wh-grid,#wh-home-proposal .wh-map-layout.wh-inspecting{grid-template-columns:minmax(0,1fr)}#wh-home-proposal .wh-page{padding:14px}#wh-home-proposal .wh-tabs{padding:8px}#wh-home-proposal .wh-tabs button{padding:8px;font-size:13px}}
+@media(max-width:390px){#wh-home-proposal .wh-two,#wh-home-proposal .wh-field-row{grid-template-columns:minmax(0,1fr)}#wh-home-proposal .wh-top{padding-left:14px}#wh-home-proposal button,#wh-home-proposal input,#wh-home-proposal select{min-height:44px}#wh-home-proposal input,#wh-home-proposal select{font-size:16px}}
+</style>
+<div id="wh-home-proposal" aria-label="Voorstel WickedHome woningbediening">
+  <header class="wh-top"><div class="wh-brand"><i data-lucide="house" aria-hidden="true"></i>WickedHome</div><div class="wh-demo">Interactief ontwerp · voorbeeldgegevens<br>Geen verbinding met apparaten</div></header>
+  <nav class="wh-tabs" aria-label="Woningweergave">
+    <button type="button" data-view="overzicht" aria-selected="true">Overzicht</button>
+    <button type="button" data-view="kaart" aria-selected="false">Plattegrond</button>
+    <button type="button" data-view="apparaten" aria-selected="false">Apparaten</button>
+    <button type="button" data-view="acties" aria-selected="false">Acties</button>
+    <button type="button" data-view="regels" aria-selected="false">Automatiseringen</button>
+  </nav>
+  <main>
+    <section class="wh-page" data-panel="overzicht" aria-label="Woningoverzicht">
+      <div class="wh-row"><div><h2>Jouw huis</h2><p class="wh-muted">De belangrijkste bediening bij elkaar.</p></div><div class="wh-inline"><span class="wh-badge">Profiel: Thuis</span><button type="button" data-open-alarm><i data-lucide="shield" aria-hidden="true"></i>Alarm: uitgeschakeld</button></div></div>
+      <div class="wh-grid">
+        <div class="wh-stack">
+          <section class="wh-panel"><div class="wh-row"><h3>Mijn actieknoppen</h3><button type="button" data-template="nieuw"><i data-lucide="plus" aria-hidden="true"></i>Nieuwe actie</button></div>
+            <div class="wh-actions">
+              <button type="button" data-template="weg"><i data-lucide="log-out" aria-hidden="true"></i><span><strong>Weg van huis</strong><span class="wh-small wh-muted">Alarm · verwarming · TV</span></span></button>
+              <button type="button" data-template="thuis"><i data-lucide="house" aria-hidden="true"></i><span><strong>Ik ben thuis</strong><span class="wh-small wh-muted">Tijdprogramma hervatten</span></span></button>
+              <button type="button" data-template="slapen"><i data-lucide="moon" aria-hidden="true"></i><span><strong>Slapen</strong><span class="wh-small wh-muted">Eigen nachtinstellingen</span></span></button>
+              <button type="button" data-template="tv"><i data-lucide="tv" aria-hidden="true"></i><span><strong>TV-avond</strong><span class="wh-small wh-muted">Zelf samenstellen</span></span></button>
+            </div>
+          </section>
+          <section class="wh-panel"><h3>Verwarming</h3>
+            <div class="wh-item"><div>Vloerverwarming HC1<p class="wh-small wh-muted">Gelijkvloers en badkamer · tijdprogramma</p></div><div class="wh-number">19°</div></div>
+            <div class="wh-item"><div>Radiatoren HC2<p class="wh-small wh-muted">Alle zes radiatoren · tijdprogramma</p></div><div class="wh-number">19°</div></div>
+            <div class="wh-row"><span class="wh-small wh-muted">Gemeten temperatuur en circuitinstelling apart zichtbaar.</span><button type="button" data-open-view="apparaten">Bediening bekijken</button></div>
+          </section>
+          <section class="wh-panel" id="wh-room-overview"><h3>Kamers</h3><div class="wh-room-grid"><button type="button" data-room="Zithoek">Zithoek <span class="wh-small">HC1</span></button><button type="button" data-room="Inkomhal">Inkomhal <span class="wh-small">HC1 + HC2</span></button><button type="button" data-room="Badkamer">Badkamer <span class="wh-small">HC1 + HC2</span></button><button type="button" data-room="Bureau">Bureau <span class="wh-small">HC2</span></button></div></section>
+        </div>
+        <div class="wh-stack">
+          <section class="wh-panel"><h3>Aandacht</h3><div class="wh-item"><div>Open ramen en deuren<p class="wh-small wh-muted">Met links naar het contact en de kamer</p></div><span class="wh-badge">Voorbeeld: 0</span></div><div class="wh-item"><div>Verbindingen<p class="wh-small wh-muted">Lokale bron en cloud afzonderlijk</p></div><span class="wh-badge">Inzichtelijk</span></div></section>
+          <section class="wh-panel"><div class="wh-row"><h3>Camera's</h3><span class="wh-badge">Foto's</span></div><div class="wh-camera-placeholder"><i data-lucide="camera" aria-hidden="true"></i><span>Living · Keuken · Garage</span><span class="wh-small wh-muted">Laatste foto, met ouderdom waar bekend</span></div><button type="button" id="wh-photo">Foto opvragen · voorbeeld</button><p id="wh-photo-status" class="wh-small wh-muted" aria-live="polite">Livestreaming wacht op een geschikte koppeling.</p></section>
+          <section class="wh-panel"><h3>Recente acties</h3><p class="wh-muted wh-small">Na uitvoering zie je hier wie startte, welke stappen bevestigd zijn en wat aandacht vraagt.</p><button type="button" data-template="weg">Bekijk voorbeeldverloop</button></section>
+        </div>
+      </div>
+    </section>
+    <section class="wh-page" data-panel="kaart" hidden aria-label="Plattegrond en kamerbediening">
+      <div class="wh-row"><div><h2>Plattegrond</h2><p class="wh-muted">Alle apparaten op de kaart, met dezelfde bediening als in het overzicht.</p></div><label>Verdieping<select id="wh-floor"><option>Gelijkvloers</option><option>Tussenverdiep</option><option>Bovenverdiep</option></select></label></div>
+      <div class="wh-map-layout" id="wh-map-layout"><section class="wh-panel"><div class="wh-row"><h3 id="wh-floor-title">Gelijkvloers</h3><span class="wh-small wh-muted">Schematisch ontwerp</span></div><div class="wh-inline"><button type="button" data-open-alarm><i data-lucide="shield" aria-hidden="true"></i>Alarm · uitgeschakeld</button><span class="wh-small wh-muted">Huisbreed</span></div><div id="wh-map" class="wh-room-map"></div><p class="wh-small wh-muted">Alle toestellen krijgen een kaartpunt. Klik op een kamer of het alarmelement; details verschijnen pas na selectie.</p></section><section class="wh-panel" id="wh-inspector" hidden><div class="wh-row"><h3 id="wh-selected-room">Kamer</h3><button type="button" data-close-detail aria-label="Kamerbediening sluiten">Sluiten</button></div><label>Bediening<select id="wh-circuit"><option value="hc1">Vloerverwarming HC1</option><option value="hc2">Radiatoren HC2</option></select></label><div class="wh-notice" id="wh-circuit-scope"></div><div class="wh-item"><span>Ingestelde circuittemperatuur</span><span class="wh-number">19°</span></div><label>Voorbeeldinstelling <span><output id="wh-map-target">19</output> °C</span><input id="wh-map-range" type="range" min="5" max="30" step=".5" value="19"></label><p class="wh-small wh-muted">Deze schuif is een ontwerpvoorbeeld. In de echte bediening wordt de gewijzigde toestand teruggelezen.</p></section></div>
+    </section>
+    <section class="wh-page" data-panel="apparaten" hidden aria-label="Apparaatfuncties">
+      <div><h2>Apparaten en functies</h2><p class="wh-muted">Eén toestel, met de functies die echt beschikbaar zijn.</p></div>
+      <div class="wh-grid"><div class="wh-stack">
+        <section class="wh-panel"><h3>Buderus</h3><div class="wh-item"><div>Vloerverwarming HC1<p class="wh-small wh-muted">Temperatuur · tijdprogramma · lokale bron</p></div><span class="wh-badge">Bedienen</span></div><div class="wh-item"><div>Radiatoren HC2<p class="wh-small wh-muted">Eén gedeelde regeling voor zes radiatoren</p></div><span class="wh-badge">Bedienen</span></div><div class="wh-item"><div>Warm water<p class="wh-small wh-muted">Metingen nu; modus en extra warm water uitbreiden</p></div><span class="wh-badge">Uitlezen</span></div></section>
+        <section class="wh-panel"><h3>TV en audio</h3><div class="wh-item"><div>Philips TV<p class="wh-small wh-muted">Eén kaart voor de passende TV-koppelingen</p></div><span class="wh-badge wh-warn">Uitbreiden</span></div><div class="wh-item"><div>Yamaha / MusicCast<p class="wh-small wh-muted">Aan/uit · volume · bron waar ondersteund</p></div><span class="wh-badge wh-warn">Uitbreiden</span></div><div class="wh-item"><div>Google Cast-displays<p class="wh-small wh-muted">Functies volgens de beschikbare bron</p></div><span class="wh-badge wh-warn">Uitbreiden</span></div></section>
+      </div><div class="wh-stack">
+        <section class="wh-panel"><h3>Verisure</h3><div class="wh-item"><div>Alarm<p class="wh-small wh-muted">Inschakelen met bevestiging en pincode</p></div><button type="button" data-open-alarm>Bedienen</button></div><div class="wh-item"><div>Raam- en deurcontacten<p class="wh-small wh-muted">Open/dicht · kamertoewijzing · laatste melding</p></div><span class="wh-badge">Uitlezen</span></div><div class="wh-item"><div>Living, Keuken en Garage<p class="wh-small wh-muted">Foto bekijken en nieuwe foto aanvragen</p></div><span class="wh-badge">Foto's</span></div></section>
+        <section class="wh-panel"><h3>Wasmachine en droogkast</h3><p class="wh-muted">Programma, resterende tijd en klaar-meldingen verschijnen na de Home Connect-koppeling.</p><span class="wh-badge wh-warn">Nog koppelen</span></section>
+        <section class="wh-panel"><h3>Alle overige functies</h3><p class="wh-muted">Sensoren, schakelaars en instellingen krijgen per toestel een duidelijke plek en dekkingstatus. Technische details staan onder Beheer.</p></section>
+      </div></div>
+    </section>
+    <section class="wh-page" data-panel="acties" hidden aria-label="Actie samenstellen">
+      <div class="wh-row"><div><h2>Je eigen actieknop</h2><p class="wh-muted">Eenmaal samenstellen, overal gebruiken.</p></div><span class="wh-badge">Voorbeeldeditor</span></div>
+      <div class="wh-grid"><div class="wh-stack">
+        <section class="wh-panel"><div class="wh-field-row"><label>Naam<input id="wh-action-name" maxlength="60" value="Weg van huis"></label><label>Pictogram<select id="wh-action-icon"><option value="log-out">Vertrekken</option><option value="house">Thuis</option><option value="moon">Slapen</option><option value="tv">TV</option><option value="sparkles">Eigen actie</option></select></label></div><label class="wh-check"><input id="wh-favourite" type="checkbox" checked>Op mijn startscherm tonen</label></section>
+        <section class="wh-panel"><h3>Controle bij starten</h3><label class="wh-check"><input id="wh-contacts" type="checkbox" checked>Stop bij een open raam of deur uit mijn selectie</label><label class="wh-check"><input id="wh-security" type="checkbox" checked>Alarm inschakelen als handmatige startstap</label><p class="wh-small wh-muted">Met alarm: overzicht en pincode bij het starten in de app. De code wordt niet in de actie bewaard.</p></section>
+        <section class="wh-panel"><div class="wh-row"><h3>Daarna uitvoeren</h3><button type="button" id="wh-add-step"><i data-lucide="plus" aria-hidden="true"></i>Stap toevoegen</button></div><div class="wh-stack" id="wh-steps"></div></section>
+        <div class="wh-inline"><button type="button" class="wh-primary" id="wh-save">Voorbeeldactie bewaren</button><span id="wh-saved" class="wh-small wh-muted" aria-live="polite"></span></div>
+      </div><section class="wh-panel" aria-label="Actievoorbeeld testen"><h3 id="wh-preview-title">Weg van huis</h3><p class="wh-small wh-muted">Instellingen hieronder zijn voorbeeldwaarden. Er wordt geen apparaat aangestuurd.</p><label>Testscenario<select id="wh-scenario"><option value="ok">Alles bereikbaar</option><option value="window">Er staat een raam open</option><option value="tv-offline">TV is niet bereikbaar</option><option value="alarm-failed">Alarm niet bevestigd</option></select></label><div class="wh-inline"><button type="button" id="wh-dry">Controleer voorbeeld</button><button type="button" id="wh-simulate" class="wh-primary">Simuleer uitvoering</button></div><div id="wh-run-status" class="wh-notice" aria-live="polite">Kies een scenario en bekijk het verloop.</div><ol id="wh-run-steps" class="wh-results"></ol></section></div>
+    </section>
+    <section class="wh-page" data-panel="regels" hidden aria-label="Automatisering samenstellen">
+      <div><h2>Wanneer · Als · Doe</h2><p class="wh-muted">Dezelfde acties laten reageren op tijd en gebeurtenissen.</p></div>
+      <div class="wh-grid"><section class="wh-panel"><label>Wanneer<select id="wh-trigger"><option value="time">Op een vast tijdstip</option><option value="window">Een raam blijft open</option><option value="sunset">Na zonsondergang</option><option disabled>Wasmachine klaar · eerst Home Connect koppelen</option><option disabled>Iedereen weg · eerst aanwezigheid instellen</option></select></label><label id="wh-time-label">Tijdstip<input id="wh-rule-time" type="time" value="22:30"></label><label class="wh-check"><input id="wh-weekdays" type="checkbox" checked>Alleen op weekdagen</label><label>Doe actie<select id="wh-rule-action"><option>Slapen</option> <option>TV-avond</option><option>Eigen actie</option></select></label><div class="wh-notice" id="wh-rule-summary" aria-live="polite"></div><button type="button" id="wh-rule-save" class="wh-primary">Regel bewaren · voorbeeld</button><p id="wh-rule-message" class="wh-small wh-muted" aria-live="polite"></p></section><section class="wh-panel"><h3>Regels en geschiedenis</h3><div class="wh-item"><div>Raam lang open<p class="wh-small wh-muted">Na 15 minuten · stuur een melding</p></div><span class="wh-badge">Voorbeeld</span></div><div class="wh-item"><div>Wasmachine klaar<p class="wh-small wh-muted">Melding zodra programma eindigt</p></div><span class="wh-badge wh-warn">Nog koppelen</span></div><div class="wh-notice">Een actie met een alarmpincode blijft een handmatige start. Automatische regels kunnen wel een vertrekactie voorstellen.</div></section></div>
+    </section>
+    <section class="wh-panel" id="wh-alarm-detail" hidden aria-label="Alarmbediening"><div class="wh-row"><h3>Verisure-alarm</h3><button type="button" data-close-detail aria-label="Alarmbediening sluiten">Sluiten</button></div><span class="wh-badge">Voorbeeldstatus: uitgeschakeld</span><div class="wh-inline"><button type="button" data-alarm-mode="Afwezig inschakelen">Afwezig</button><button type="button" data-alarm-mode="Thuis inschakelen">Thuis</button><button type="button" data-alarm-mode="Uitschakelen">Uitschakelen</button></div><p class="wh-small wh-muted" id="wh-alarm-message" aria-live="polite">In de echte app volgt bevestiging met pincode. Vul hier geen echte code in.</p><button type="button" data-template="weg">Opnemen in een eigen actie</button></section>
+  </main>
+  <footer class="wh-footer">Ontwerpvoorstel. De echte implementatie gebruikt bestaande apparaten, ruimtes en toegangsrechten.</footer>
+</div>
+<script>
+(function(){
+ const root=document.getElementById('wh-home-proposal');
+ const q=function(s){return root.querySelector(s)};
+ const escape=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+ const defaultSteps=function(){return [{kind:'hc1',value:18,policy:'stop'},{kind:'hc2',value:17,policy:'stop'},{kind:'tv',value:0,policy:'continue'}]};
+ const state={view:'overzicht',name:'Weg van huis',icon:'log-out',contacts:true,security:true,favourite:true,steps:defaultSteps(),room:null};
+ let detailTrigger=null;
+ const design={density:'Rustig',showRooms:true};
+ function restore(w){const s=w&&((w.modelContent&&w.modelContent.actionDesigner)||w.actionDesigner);if(!s||!Array.isArray(s.steps))return;state.name=String(s.name||'Eigen actie').slice(0,60);state.icon=['log-out','house','moon','tv','sparkles'].includes(s.icon)?s.icon:'sparkles';state.contacts=!!s.contacts;state.security=!!s.security;state.favourite=!!s.favourite;state.steps=s.steps.filter(function(x){return ['hc1','hc2','auto1','auto2','tv','wait','notice'].includes(x.kind)}).slice(0,20).map(function(x){return {kind:x.kind,value:Number.isFinite(x.value)?x.value:19,policy:x.policy==='continue'?'continue':'stop'}})}
+ if(window.openai)restore(window.openai.widgetState);
+ function persist(){if(window.openai&&window.openai.setWidgetState){window.openai.setWidgetState({modelContent:{actionDesigner:{name:state.name,icon:state.icon,contacts:state.contacts,security:state.security,favourite:state.favourite,steps:state.steps}},privateContent:{view:state.view}}).catch(function(){})}}
+ function closeDetail(returnFocus){state.room=null;q('#wh-inspector').hidden=true;q('#wh-alarm-detail').hidden=true;q('#wh-map-layout').classList.remove('wh-inspecting');if(returnFocus&&detailTrigger&&detailTrigger.isConnected)detailTrigger.focus();detailTrigger=null;}
+ function show(view){if(state.view!==view)closeDetail(false);state.view=view;root.querySelectorAll('[data-panel]').forEach(function(e){e.hidden=e.dataset.panel!==view});root.querySelectorAll('[data-view]').forEach(function(e){e.setAttribute('aria-selected',String(e.dataset.view===view))});}
+ function openAlarm(trigger){closeDetail(false);detailTrigger=trigger;const host=state.view==='kaart'?q('#wh-map-layout'):q('[data-panel="'+state.view+'"]');host.append(q('#wh-alarm-detail'));q('#wh-alarm-detail').hidden=false;q('#wh-alarm-message').textContent='In de echte app volgt bevestiging met pincode. Vul hier geen echte code in.';if(state.view==='kaart')q('#wh-map-layout').classList.add('wh-inspecting');q('#wh-alarm-detail [data-close-detail]').focus();}
+ function iconRefresh(){if(globalThis.lucide)globalThis.lucide.createIcons({attrs:{width:18,height:18}})}
+ function stepLabel(s){return ({hc1:'Vloerverwarming HC1 naar '+s.value+' °C',hc2:'Alle radiatoren HC2 naar '+s.value+' °C',auto1:'Tijdprogramma HC1 hervatten',auto2:'Tijdprogramma HC2 hervatten',tv:'TV in de zithoek uit',wait:'Wacht '+s.value+' seconden',notice:'Stuur een melding'})[s.kind]}
+ function renderSteps(){
+  q('#wh-steps').innerHTML=state.steps.map(function(s,i){
+   const options=[['hc1','Temperatuur HC1'],['hc2','Temperatuur HC2'],['auto1','HC1 tijdprogramma hervatten'],['auto2','HC2 tijdprogramma hervatten'],['tv','TV uit'],['wait','Wachten'],['notice','Melding']].map(function(v){return '<option value="'+v[0]+'" '+(s.kind===v[0]?'selected':'')+'>'+v[1]+'</option>'}).join('');
+   const numeric=s.kind==='hc1'||s.kind==='hc2'||s.kind==='wait';
+   const field=numeric?'<label>'+(s.kind==='wait'?'Seconden':'Voorbeeldtemperatuur °C')+'<input type="number" data-value="'+i+'" min="'+(s.kind==='wait'?0:5)+'" max="'+(s.kind==='wait'?3600:30)+'" step="'+(s.kind==='wait'?1:.5)+'" value="'+escape(s.value)+'"></label>':'<p class="wh-small wh-muted">'+(s.kind==='tv'?'De gepaste TV-bron wordt bij uitvoering gecontroleerd.':s.kind==='notice'?'Melding met de uitkomst van deze actie.':'Hervat de regeling volgens het eigen tijdprogramma.')+'</p>';
+   return '<div class="wh-step"><div class="wh-step-head"><span class="wh-badge">'+(i+1)+'</span><span class="wh-step-label">'+escape(stepLabel(s))+'</span><button type="button" data-up="'+i+'" aria-label="Stap '+(i+1)+' omhoog" '+(i===0?'disabled':'')+'>↑</button><button type="button" data-remove="'+i+'" aria-label="Stap '+(i+1)+' verwijderen">×</button></div><div class="wh-field-row"><label>Wat doen<select data-kind="'+i+'">'+options+'</select></label>'+field+'</div><label>Als dit niet lukt<select data-policy="'+i+'"><option value="stop" '+(s.policy==='stop'?'selected':'')+'>Stop en vraag aandacht</option><option value="continue" '+(s.policy==='continue'?'selected':'')+'>Ga verder en vermeld de fout</option></select></label></div>';
+  }).join('')||'<p class="wh-muted">Voeg je eerste stap toe.</p>';
+  q('#wh-add-step').disabled=state.steps.length>=20;
+ }
+ function syncEditor(){q('#wh-action-name').value=state.name;q('#wh-action-icon').value=state.icon;q('#wh-contacts').checked=state.contacts;q('#wh-security').checked=state.security;q('#wh-favourite').checked=state.favourite;q('#wh-preview-title').textContent=state.name;renderSteps();}
+ function resetResult(){q('#wh-run-steps').innerHTML='';q('#wh-run-status').className='wh-notice';q('#wh-run-status').textContent='Kies een scenario en bekijk het verloop.'}
+ function useTemplate(template){
+  state.steps=defaultSteps();state.security=true;state.contacts=true;state.icon='log-out';
+  if(template==='thuis'){state.name='Ik ben thuis';state.steps=[{kind:'auto1',value:0,policy:'stop'},{kind:'auto2',value:0,policy:'stop'}];state.security=false;state.contacts=false;state.icon='house'}
+  else if(template==='slapen'){state.name='Slapen';state.security=false;state.icon='moon'}
+  else if(template==='tv'){state.name='TV-avond';state.steps=[];state.security=false;state.contacts=false;state.icon='tv'}
+  else if(template==='nieuw'){state.name='Mijn actie';state.steps=[];state.security=false;state.contacts=false;state.icon='sparkles'}
+  else state.name='Weg van huis';
+  syncEditor();resetResult();show('acties');persist();
+ }
+ function validate(){
+  if(!state.name.trim())return 'Geef de actie een naam.';
+  if(!state.steps.length&&!state.security)return 'Voeg minstens één stap toe.';
+  const temperatures={};
+  for(const s of state.steps){
+   if(s.kind==='hc1'||s.kind==='hc2'){
+    if(!Number.isFinite(s.value)||s.value<5||s.value>30||Math.abs(s.value*2-Math.round(s.value*2))>.000001)return 'Kies een temperatuur van 5 tot 30 °C, in stappen van 0,5 °C.';
+   }
+   const circuit=s.kind==='hc1'||s.kind==='auto1'?'hc1':s.kind==='hc2'||s.kind==='auto2'?'hc2':null;
+   if(circuit){const value=s.kind.indexOf('auto')===0?'auto':s.value;if(temperatures[circuit]!==undefined&&temperatures[circuit]!==value)return 'Tegenstrijdige instellingen voor '+circuit.toUpperCase()+'. Dit is één gedeeld circuit.';temperatures[circuit]=value}
+   if(s.kind==='wait'&&(!Number.isFinite(s.value)||s.value<0||s.value>3600))return 'Kies een geldige wachttijd.';
+  }
+  return null;
+ }
+ function simulate(dry){
+  const error=validate(),scenario=q('#wh-scenario').value,status=q('#wh-run-status');q('#wh-run-steps').innerHTML='';
+  function setStatus(text,bad){status.textContent=text;status.className='wh-notice'+(bad?' wh-error':'')}
+  function log(text,type){const li=document.createElement('li');const dot=document.createElement('span');dot.className='wh-status-dot'+(type?' wh-'+type:'');const span=document.createElement('span');span.textContent=text;li.append(dot,span);q('#wh-run-steps').append(li)}
+  if(error){setStatus(error,true);return}
+  if(state.contacts&&scenario==='window'){setStatus('Geblokkeerd: er staat een raam open. Er is niets uitgevoerd.',true);log('Controle contacten: aandacht nodig','failed');return}
+  if(dry){setStatus('Voorbeeldcontrole geslaagd. Onderstaand plan is niet uitgevoerd.',false);if(state.security)log('Bij starten: alarm bevestigen met pincode in de app');state.steps.forEach(function(s){log(stepLabel(s))});return}
+  if(state.security){if(scenario==='alarm-failed'){setStatus('Gestopt: alarm niet bevestigd. De overige stappen zijn niet uitgevoerd.',true);log('Alarm: niet bevestigd','failed');return}log('Alarm inschakelen: bevestigd in dit voorbeeld')}
+  let partial=false;
+  for(const s of state.steps){
+   if(s.kind==='tv'&&scenario==='tv-offline'){log('TV niet bereikbaar',s.policy==='continue'?'skipped':'failed');if(s.policy==='stop'){setStatus('Gestopt bij de TV. Eerdere stappen blijven uitgevoerd in dit voorbeeld.',true);return}partial=true;continue}
+   log(stepLabel(s)+': bevestigd in dit voorbeeld');
+  }
+  setStatus(partial?'Gedeeltelijk afgerond: één stap overgeslagen. Bekijk de uitkomst hierboven.':'Voorbeeld afgerond: alle gevraagde toestanden bevestigd.',false);
+ }
+ const floorRooms={'Gelijkvloers':['Zithoek','Keuken','Eethoek','Wasberging','Inkomhal'],'Tussenverdiep':['Badkamer','Slaapkamer 1'],'Bovenverdiep':['Bureau','Slaapkamer 2','Slaapkamer 3']};
+ function renderMap(){const floor=q('#wh-floor').value;q('#wh-floor-title').textContent=floor;q('#wh-map').innerHTML=floorRooms[floor].map(function(room){const both=room==='Badkamer'||room==='Inkomhal';const c=floor==='Gelijkvloers'?'HC1':'HC2';return '<button type="button" data-room="'+escape(room)+'"><span class="wh-room-name">'+escape(room)+'</span><span class="wh-small wh-muted">'+(both?'HC1 + HC2':c)+'</span></button>'}).join('')}
+ function inspect(room){show('kaart');closeDetail(false);state.room=room;q('#wh-selected-room').textContent=room;const floor=Object.keys(floorRooms).find(function(f){return floorRooms[f].includes(room)})||'Gelijkvloers';q('#wh-floor').value=floor;renderMap();detailTrigger=q('#wh-map [data-room="'+room+'"]');q('#wh-circuit').value=floor==='Gelijkvloers'&&room!=='Inkomhal'?'hc1':'hc2';updateScope();q('#wh-inspector').hidden=false;q('#wh-map-layout').classList.add('wh-inspecting');q('#wh-inspector [data-close-detail]').focus();}
+ function updateScope(){q('#wh-circuit-scope').textContent=q('#wh-circuit').value==='hc1'?'Deze instelling geldt voor het volledige circuit HC1: gelijkvloers én badkamer.':'Deze instelling geldt voor alle zes radiatoren op HC2, ook in de andere kamers.'}
+ function updateRule(){const trigger=q('#wh-trigger').value;q('#wh-time-label').hidden=trigger!=='time';q('#wh-rule-summary').textContent=(trigger==='time'?'Om '+q('#wh-rule-time').value:trigger==='window'?'Als een raam 15 minuten open blijft':'Na zonsondergang')+(q('#wh-weekdays').checked?' op weekdagen':'')+' → '+q('#wh-rule-action').value}
+ root.addEventListener('click',function(event){
+  const b=event.target.closest('button');if(!b||!root.contains(b))return;
+  if(b.dataset.view)show(b.dataset.view);
+  if(b.dataset.openView)show(b.dataset.openView);
+  if(b.dataset.template)useTemplate(b.dataset.template);
+  if(b.dataset.room)inspect(b.dataset.room);
+  if(b.hasAttribute('data-open-alarm'))openAlarm(b);
+  if(b.hasAttribute('data-close-detail'))closeDetail(true);
+  if(b.dataset.alarmMode)q('#wh-alarm-message').textContent=b.dataset.alarmMode+': hier zou de bevestiging met pincode volgen. Dit voorbeeld stuurt geen opdracht.';
+  if(b.dataset.up!==undefined){const i=Number(b.dataset.up);if(i>0){const a=state.steps[i-1];state.steps[i-1]=state.steps[i];state.steps[i]=a;renderSteps();persist()}}
+  if(b.dataset.remove!==undefined){state.steps.splice(Number(b.dataset.remove),1);renderSteps();persist()}
+  if(b.id==='wh-add-step'){if(state.steps.length<20){state.steps.push({kind:'hc1',value:18,policy:'stop'});renderSteps();persist()}}
+  if(b.id==='wh-save'){const error=validate();q('#wh-saved').textContent=error||'Bewaard in dit ontwerpvoorbeeld.';if(!error)persist()}
+  if(b.id==='wh-dry')simulate(true);
+  if(b.id==='wh-simulate')simulate(false);
+  if(b.id==='wh-photo')q('#wh-photo-status').textContent='Voorbeeld: foto aangevraagd. Hier wordt geen echte aanvraag verstuurd.';
+  if(b.id==='wh-rule-save')q('#wh-rule-message').textContent='Voorbeeldregel bewaard. Er is geen echte automatisering ingeschakeld.';
+ });
+ root.addEventListener('change',function(event){
+  const e=event.target;
+  if(e.dataset.kind!==undefined){const s=state.steps[Number(e.dataset.kind)];s.kind=e.value;s.value=e.value==='wait'?30:18;renderSteps();persist()}
+  if(e.dataset.value!==undefined){state.steps[Number(e.dataset.value)].value=Number(e.value);renderSteps();persist()}
+  if(e.dataset.policy!==undefined){state.steps[Number(e.dataset.policy)].policy=e.value;persist()}
+  if(e.id==='wh-action-name'){state.name=e.value.slice(0,60);q('#wh-preview-title').textContent=state.name;persist()}
+  if(e.id==='wh-action-icon'){state.icon=e.value;persist()}
+  if(e.id==='wh-contacts'){state.contacts=e.checked;persist()}
+  if(e.id==='wh-security'){state.security=e.checked;persist()}
+  if(e.id==='wh-favourite'){state.favourite=e.checked;persist()}
+  if(e.id==='wh-floor'){closeDetail(false);renderMap()}
+  if(e.id==='wh-circuit')updateScope();
+  if(['wh-trigger','wh-rule-time','wh-weekdays','wh-rule-action'].includes(e.id))updateRule();
+ });
+ q('#wh-map-range').addEventListener('input',function(e){q('#wh-map-target').value=e.target.value});
+ window.addEventListener('openai:set_globals',function(e){if(e.detail&&e.detail.globals&&e.detail.globals.widgetState){restore(e.detail.globals.widgetState);syncEditor()}});
+ syncEditor();renderMap();updateScope();updateRule();iconRefresh();
+ if(globalThis.Tweak){const tweak=new Tweak({container:root,onChange:function(){root.style.setProperty('--wh-gap',design.density==='Compact'?'10px':'16px');q('#wh-room-overview').hidden=!design.showRooms}});tweak.addSelect(design,'density',{label:'Dichtheid',options:['Rustig','Compact']});tweak.addToggle(design,'showRooms',{label:'Kamers in overzicht tonen'})}
+})();
+</script>

@@ -18,6 +18,8 @@ import { connectionStatusFor, isHaHousehold, testConnection } from "./ha-connect
 import { getEnergyOverview, saveApplianceLinks } from "./ha-energy";
 import { importDevices, listEntities, listSuggestions, mapHaError, saveSettings } from "./home-assistant.service";
 import { HA_ENERGY_JOB_ID } from "./home-assistant.jobs";
+import { captureCameraImage, getCameraImage, getCameraStreamAsset, getDeviceCameras, startCameraStream, stopCameraStream } from "./ha-camera";
+import { z } from "zod";
 
 export const homeAssistantRouter = Router();
 
@@ -26,6 +28,38 @@ homeAssistantRouter.use(requireUser);
 /** Owners and adults set things up and use the alarm; children see the status and the alarm state. */
 const canManage = requireRole("owner", "adult");
 const household = (req: Request) => currentUser(req).householdId;
+const cameraInput = z.object({ entityId: z.string().regex(/^camera\.[a-z0-9_]+$/) });
+const privateMedia = { "Cache-Control": "private, no-store, max-age=0", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer" };
+
+// Camera access is private to signed-in adults/owners and the device's household.
+homeAssistantRouter.get("/devices/:deviceId/cameras", canManage, async (req, res) => {
+  res.json(await getDeviceCameras(household(req), String(req.params.deviceId)));
+});
+homeAssistantRouter.get("/devices/:deviceId/cameras/image", canManage, async (req, res) => {
+  const { entityId } = parse(cameraInput, req.query);
+  const media = await getCameraImage(household(req), String(req.params.deviceId), entityId);
+  res.set(privateMedia).set("Content-Type", media.type).set("X-Camera-Image-Version", media.version).send(media.body);
+});
+homeAssistantRouter.post("/devices/:deviceId/cameras/snapshot", canManage, async (req, res) => {
+  const { entityId } = parse(cameraInput, req.body);
+  res.status(202).json(await captureCameraImage(household(req), String(req.params.deviceId), entityId));
+});
+homeAssistantRouter.post("/devices/:deviceId/cameras/streams", canManage, async (req, res) => {
+  const { entityId } = parse(cameraInput, req.body); const user = currentUser(req);
+  res.set(privateMedia).status(201).json(await startCameraStream(user.householdId, user.id, String(req.params.deviceId), entityId));
+});
+homeAssistantRouter.get("/devices/:deviceId/cameras/streams/:sessionId/:assetId", canManage, async (req, res) => {
+  const user = currentUser(req);
+  const media = await getCameraStreamAsset(user.householdId, user.id, String(req.params.deviceId), String(req.params.sessionId), String(req.params.assetId), req.get("range"));
+  res.set(privateMedia).status(media.status).set("Content-Type", media.type);
+  if (media.contentRange) res.set("Content-Range", media.contentRange);
+  res.send(media.body);
+});
+homeAssistantRouter.delete("/devices/:deviceId/cameras/streams/:sessionId", canManage, async (req, res) => {
+  const user = currentUser(req);
+  stopCameraStream(user.householdId, user.id, String(req.params.deviceId), String(req.params.sessionId));
+  res.status(204).end();
+});
 
 /** The signed-in person as an alarm actor (always `kind: "user"`: these routes are the UI). */
 function uiActor(req: Request): AlarmActor {

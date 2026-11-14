@@ -42,8 +42,15 @@ export function HaDeviceControlPanel({ deviceId, initial }: { deviceId: string; 
             schema={z.object({ value: z.coerce.number().min(control.adjustment.min).max(control.adjustment.max).refine((value) => { const steps = (value - control.adjustment!.min) / control.adjustment!.step; return Math.abs(steps - Math.round(steps)) < 0.000001; }) })}
             defaultValues={{ value: control.adjustment.value ?? undefined }} fields={[{ name: "value", type: "number", label: `${t(`controls.${control.adjustment.action}`)} (${control.adjustment.unit})`, min: control.adjustment.min, max: control.adjustment.max, step: control.adjustment.step }]}
             onSuccess={() => resource.refresh()} />}
+          {control.choices?.map((choice) => <GeneralFormDialog key={choice.action} trigger={<Button variant="outline" disabled={busy}>{t(`controls.${choice.action}`)}{choice.value ? ` · ${choice.value}` : ""}</Button>}
+            title={`${control.name} · ${t(`controls.${choice.action}`)}`} description={t("controls.adjustHint")}
+            action={`/home-assistant?device=${encodeURIComponent(deviceId)}`} intent="control-device"
+            hiddenFields={{ deviceId, entityId: control.entityId, controlAction: choice.action }}
+            schema={z.object({ option: z.string().refine((option) => choice.values.includes(option)) })}
+            defaultValues={{ option: choice.value ?? choice.values[0] }} fields={[{ name: "option", type: "select", label: t(`controls.${choice.action}`), options: choice.values.map((option) => ({ value: option, label: option })) }]}
+            onSuccess={() => resource.refresh()} />)}
         </Inline>
-        {!control.actions.length && !control.adjustment && <Text size="sm" tone="muted">{t("controls.unavailable")}</Text>}
+        {!control.actions.length && !control.adjustment && !control.choices?.length && <Text size="sm" tone="muted">{t("controls.unavailable")}</Text>}
       </Stack>)}
     </>}
     {error && <InlineAlert tone="error">{error}</InlineAlert>}

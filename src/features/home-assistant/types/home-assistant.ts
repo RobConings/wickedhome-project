@@ -74,10 +74,12 @@ export type HaEntitiesResponse = {
 // Device import ------------------------------------------------------------------------------------------------
 
 /** Presets "Import from Home Assistant" can create devices with (src/features/devices/types/device-presets.ts). */
-export const HA_IMPORT_PRESETS = ["contact", "climate", "laundry", "alarm_panel", "motion", "alarm_component", "light"] as const;
+export const HA_IMPORT_PRESETS = ["contact", "climate", "laundry", "alarm_panel", "motion", "alarm_component", "light", "camera", "media_player"] as const;
 export type HaImportPreset = (typeof HA_IMPORT_PRESETS)[number];
 
 export type HaDeviceSuggestion = {
+  /** Exact, unique room-name match in this household, when available. */
+  placeId?: string | null;
   entityId: string;
   name: string;
   area: string | null;
@@ -96,6 +98,7 @@ export type HaSuggestionsResponse = {
 };
 
 export const haImportInputSchema = z.object({
+  placeOnPlan: z.boolean().optional(),
   items: z
     .array(
       z.object({
@@ -264,16 +267,4 @@ export const HA_STATUS_EVENT = "home_assistant.status";
 export const ALARM_STATE_EVENT = "alarm.state";
 export type AlarmStateEvent = { entityId: string; state: AlarmState; at: string };
 
-/** Controls offered by the server from the actual HA entity, never from a device icon/category. */
-export const haControlInputSchema = z.object({
-  entityId: z.string().min(1).max(255),
-  action: z.enum(["on", "off", "open", "close", "brightness", "position", "temperature"]),
-  value: z.number().finite().optional(),
-});
-export type HaControl = { entityId: string; name: string; state: string; updatedAt: string | null;
-  actions: ("on" | "off" | "open" | "close")[];
-  adjustment: { action: "brightness" | "position" | "temperature"; value: number | null; min: number; max: number; step: number; unit: string } | null;
-};
-export type HaDeviceControls = { connected: boolean; controls: HaControl[] };
-
-export type HaControlInput = z.infer<typeof haControlInputSchema>;
+export { HA_CONTROL_ACTIONS, haControlInputSchema, type HaControlAction, type HaControl, type HaDeviceControls, type HaControlInput } from "@/types/home-controls";

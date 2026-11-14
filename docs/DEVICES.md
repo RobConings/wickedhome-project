@@ -155,3 +155,54 @@ The adapter's feature flags follow Home Assistant's [cover entity contract](http
 ## Maintenance tasks
 
 Device details have a Maintenance relationship card and a Tasks-owned panel for planning work, completing it and reviewing completed tasks. New work defaults to the device and its current room, with type Maintenance; recurrence, assignments, reminders and materials use the ordinary task form. The Devices-owned picker is also available in the Tasks workspace and task details. An unavailable picker preserves an existing device relationship when other task fields save. Device membership is a typed `Task.deviceId` relationship, not inferred from notes or nearby room tasks. See [Tasks](TASKS.md#device-maintenance) for API, history and MCP semantics.
+
+
+## Cameras in the device and map workflows
+
+Home Assistant camera entities can be imported with the Camera preset. Exact, unique matches between
+HA area names and household rooms are reused; ambiguous names stay unassigned. The import's floor-plan
+option places markers inside drawn rooms at an approximate initial position. Drag them to their actual
+location afterward. Already bound entities are skipped, including repeated items in the same import;
+requests for the same household are serialized by the server.
+
+Selecting a camera on `/house` opens the same camera panel used on device details. Owners and adults
+can view the latest image, request a Verisure SmartCam snapshot, and start live viewing when the actual
+HA entity reports stream support. Children cannot access camera images, actions or stream assets.
+Pictures are labelled as the latest image rather than live video. Snapshot requests show a waiting
+state; a changed image is required before claiming a new image arrived. If there is no baseline image,
+the panel explicitly says that the camera supplied no capture time.
+
+The current Verisure HA integration exposes snapshots for the household cameras, but no stream
+capability. A camera's live feature in the vendor app does not establish a live source in HA. The
+WickedHome live viewer is available only for a camera integration that supplies an HLS stream.
+No recording endpoint, recording control or media archive is added by this feature.
+
+Camera API: `GET /api/home-assistant/devices/:deviceId/cameras`, `GET .../cameras/image?entityId=...`,
+`POST .../cameras/snapshot`, `POST .../cameras/streams`, `GET .../cameras/streams/:sessionId/:assetId`,
+`DELETE .../cameras/streams/:sessionId`. Every media request checks the current session's role,
+household and linked device. Media responses are private/no-store; HA credentials and HLS addresses
+stay server-side. Viewing sessions belong to the initiating user and expire after ten minutes.
+Closing the panel, stopping playback, or hiding the tab releases the viewing session. HLS playlists
+and media assets are proxied through opaque local IDs with origin/path checks and response-size caps.
+
+Checks: camera capability/import/location tests, real HTTP route authorization and CSRF checks,
+media redirect/size/path tests, EN/NL mobile and desktop stories. The household's Keuken snapshot
+service was exercised and returned a changed JPEG on 2026-11-14. Live playback against these Verisure
+cameras remains unavailable until the HA integration exposes a compatible live source.
+
+
+### Buderus circuits and shared heating markers
+
+The KM200 local integration exposes HC1 (ground-floor and bathroom underfloor heating), HC2
+(the shared radiator circuit) and domestic hot water. Circuit records show the temperature
+measured by the circuit's controller. Map markers for a radiator or underfloor area show the
+shared circuit setpoint, labelled as a circuit setting. They do not represent independent room
+measurements or separate thermostat controls. The same circuit name appears on the control
+button, and device notes explain the affected rooms before controls in the map inspector.
+
+Climate controls read the current HA system temperature unit when an entity omits its own unit.
+Unknown units and Fahrenheit do not expose Celsius commands. Both device-bound controls and
+direct entity commands validate the supported temperature range, increment and finite value
+before sending a service call. Reading these capabilities never changes a thermostat setting.
+The local source is used for the current household bindings; the separately loaded cloud entry
+remains available in HA. Automatic cloud/local failover is not implemented by these bindings.

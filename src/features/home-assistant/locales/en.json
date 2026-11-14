@@ -99,7 +99,7 @@
     "done_other": "{{count}} devices imported",
     "empty": {
       "title": "Nothing to import",
-      "description": "No door or window contacts, temperature sensors, alarm panel, washer/dryer power, motion or smoke sensors found."
+      "description": "No supported cameras, contacts, temperature sensors, alarm panels or appliances were found."
     },
     "presets": {
       "contact": "Window/door contact",
@@ -108,13 +108,17 @@
       "alarm_panel": "Alarm panel",
       "motion": "Motion sensor",
       "alarm_component": "Smoke detector",
-      "light": "Light"
+      "light": "Light",
+      "camera": "Camera",
+      "media_player": "TV / audio"
     },
     "name": "Device name",
-    "hint": "Profiles come from the presets and stay editable. Place the new devices on the floor plan afterwards.",
+    "hint": "Matching room names are reused. Map markers start near the room centre; drag them to the exact spot.",
     "importing": "Importing…",
     "action_one": "Import {{count}} device",
-    "action_other": "Import {{count}} devices"
+    "action_other": "Import {{count}} devices",
+    "placeOnPlan": "Place matched devices on their room’s floor plan",
+    "roomMatched": "Room matched"
   },
   "energy": {
     "title": "Energy from Home Assistant",
@@ -266,6 +270,43 @@
     "adjustHint": "Choose a value within the range reported by the device.",
     "scenes": "Scenes",
     "scenesHint": "Run a scene from your connected Home Assistant. Only supported scenes appear here.",
-    "noScenes": "No supported scenes are available."
+    "noScenes": "No supported scenes are available.",
+    "mode": "Heating mode",
+    "preset": "Heating profile",
+    "operation": "Hot water mode",
+    "volume": "Volume",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "play": "Play",
+    "pause": "Pause",
+    "stop": "Stop",
+    "source": "Source"
+  },
+  "camera": {
+    "title": "Camera",
+    "description": "View the latest picture, take a snapshot or watch supported live video.",
+    "loading": "Loading camera controls…",
+    "loadFailed": "Camera controls could not be loaded.",
+    "noImage": "No picture is available yet. Try refreshing or take a snapshot.",
+    "offline": "Offline",
+    "offlineHint": "This camera is offline. Its pictures and controls are unavailable.",
+    "snapshot": "Latest picture",
+    "live": "Live",
+    "imageAlt": "Latest picture from {{name}}",
+    "imageHint": "Latest picture supplied by the camera. This is not a live view.",
+    "requesting": "Requesting a new snapshot…",
+    "waiting": "Snapshot requested. Waiting for a new picture; this can take up to 90 seconds.",
+    "received": "A new picture has arrived.",
+    "delayed": "A new picture has not arrived yet. Refresh later to check again.",
+    "captureFailed": "The snapshot request failed. Check camera permissions and try again later.",
+    "streamFailed": "Live video could not be opened or has ended. Try starting it again.",
+    "refresh": "Refresh image",
+    "capture": "Take snapshot",
+    "watch": "Watch live",
+    "stop": "Stop viewing",
+    "liveHint": "Viewing ends when you close this panel or leave this tab.",
+    "liveAvailable": "Live video is available when you choose Watch live.",
+    "liveUnsupported": "Live video is not available through this camera connection yet.",
+    "receivedUnverified": "A picture is available. The camera did not supply a capture time."
   }
 }

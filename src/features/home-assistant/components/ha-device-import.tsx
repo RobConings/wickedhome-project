@@ -36,6 +36,7 @@ export function HaDeviceImport({ suggestions, canManage }: HaDeviceImportProps) 
   );
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [placeOnPlan, setPlaceOnPlan] = React.useState(true);
   const chosen = suggestions.filter((suggestion) => rows[suggestion.entityId]?.selected);
 
   if (suggestions.length === 0) {
@@ -50,10 +51,12 @@ export function HaDeviceImport({ suggestions, canManage }: HaDeviceImportProps) 
     setError(null);
     try {
       const result = await importHaDevices({
+        placeOnPlan,
         items: chosen.map((suggestion) => ({
           entityId: suggestion.entityId,
           name: (rows[suggestion.entityId]?.name ?? suggestion.name).trim().slice(0, 60) || suggestion.name,
           presetKey: suggestion.presetKey,
+          placeId: suggestion.placeId ?? null,
         })),
       });
       toast.success(t("import.done", { count: result.created }));
@@ -69,6 +72,7 @@ export function HaDeviceImport({ suggestions, canManage }: HaDeviceImportProps) 
   return (
     <Stack gap="3">
       {error && !busy && <InlineAlert tone="error">{error}</InlineAlert>}
+      <label className="flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" className="size-5 accent-primary" checked={placeOnPlan} disabled={busy || !canManage} onChange={(event) => setPlaceOnPlan(event.target.checked)} />{t("import.placeOnPlan")}</label>
       <fieldset disabled={busy || !canManage} className="contents">
         <ul className="flex flex-col divide-y rounded-lg border">
           {suggestions.map((suggestion) => {
@@ -82,6 +86,7 @@ export function HaDeviceImport({ suggestions, canManage }: HaDeviceImportProps) 
                     type="checkbox"
                     className="size-5 shrink-0 accent-primary"
                     checked={row?.selected ?? false}
+                    disabled={suggestion.alreadyBound}
                     onChange={(event) => update(suggestion.entityId, { selected: event.target.checked })}
                   />
                   <span className="flex min-w-0 flex-col gap-0.5">
@@ -100,6 +105,7 @@ export function HaDeviceImport({ suggestions, canManage }: HaDeviceImportProps) 
                         <span className="flex items-center gap-1">
                           <MapPinIcon className="size-3" aria-hidden="true" />
                           {suggestion.area}
+                          {suggestion.placeId && <Badge variant="secondary">{t("import.roomMatched")}</Badge>}
                         </span>
                       )}
                       <span className="tabular-nums">

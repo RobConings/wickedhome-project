@@ -1,0 +1,15 @@
+# Home controls and household actions
+
+`/house` provides Overview, Floor plan, Devices, Actions and Automations. Legacy floor/device links still open the map. The map opens without a permanent alarm card; device selection uses the same panel as the device browser. Desktop details occupy a separate column; phones use a dismissible sheet. House-wide devices remain accessible beside the floor selector without inventing a physical room.
+
+Adults and owners can save drafts, publish actions and manually start them after reviewing a read-only preflight. Children can view device states. Action definitions contain typed device commands and waits, optional selected closed contacts and an optional manual alarm gate. Shared circuit commands are coalesced; contradictory settings are rejected. Alarm codes exist only in the transient request and the existing alarm service, never in definitions, database snapshots, HA script variables or execution history.
+
+Ordinary actions run in a generated Home Assistant script with a single executor. Each step checks availability, skips already-satisfied targets and waits for the requested state. Transport acceptance alone is not success. The native script emits household action progress; WickedHome records the immutable definition snapshot and observed results in `home_action_runs`. Missing observations are marked incomplete, never automatically replayed. Stopping retains changes already made. Native HA traces remain the authority for periods when WickedHome cannot observe events.
+
+Publishing uses HA's script/automation configuration endpoints and checks that managed configuration still matches the previous publication. External edits cause a conflict. Unrelated scripts and rules are preserved. Rule publication is explicit. Time, sunset and device-state triggers reuse the latest published action; editing a draft does not change execution. Actions with an alarm gate cannot run unattended. State recovery from unknown/unavailable does not trigger a physical routine. Times use Europe/Brussels.
+
+Migration `20261114210000_home_actions` adds three tables without modifying existing records. HA requires `script: !include scripts.yaml` and `automation: !include automations.yaml`; existing configuration must be backed up and preserved. Those includes were prepared and checked on the current server. No user routine is enabled automatically by deployment.
+
+Validation: TypeScript, targeted ESLint, component composition audit, Home Assistant/control unit tests, isolated PostgreSQL/HA-transport integration test, native HA wait-only execution and denied alarm-gate check, browser flows in English/Dutch on phone and desktop. No real heating, TV or alarm commands were used for verification.
+
+Home Connect authentication and appliance availability remain separate from UI deployment. The Bosch WTU87650NL/05 dryer has no Home Connect. Verisure snapshots are supported; GuardVision live video still requires a working provider stream source. Local/cloud Buderus availability is not yet an automatic failover mechanism.

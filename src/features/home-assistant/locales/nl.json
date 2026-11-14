@@ -99,7 +99,7 @@
     "done_other": "{{count}} toestellen geïmporteerd",
     "empty": {
       "title": "Niets te importeren",
-      "description": "Geen deur- of raamcontacten, temperatuursensoren, alarmcentrale, vermogen van wasmachine/droogkast, bewegings- of rookmelders gevonden."
+      "description": "Geen ondersteunde camera’s, contacten, temperatuursensoren, alarmpanelen of toestellen gevonden."
     },
     "presets": {
       "contact": "Raam-/deurcontact",
@@ -108,13 +108,17 @@
       "alarm_panel": "Alarmcentrale",
       "motion": "Bewegingsmelder",
       "alarm_component": "Rookmelder",
-      "light": "Lamp"
+      "light": "Lamp",
+      "camera": "Camera",
+      "media_player": "TV / audio"
     },
     "name": "Naam van het toestel",
-    "hint": "Profielen komen uit de voorinstellingen en blijven aanpasbaar. Zet de nieuwe toestellen daarna op het grondplan.",
+    "hint": "Gelijke ruimtenamen worden gekoppeld. Kaartmarkeringen starten bij het midden van de ruimte; sleep ze naar de exacte plek.",
     "importing": "Importeren…",
     "action_one": "{{count}} toestel importeren",
-    "action_other": "{{count}} toestellen importeren"
+    "action_other": "{{count}} toestellen importeren",
+    "placeOnPlan": "Plaats gekoppelde toestellen op de plattegrond van hun ruimte",
+    "roomMatched": "Ruimte gekoppeld"
   },
   "energy": {
     "title": "Energie uit Home Assistant",
@@ -256,8 +260,8 @@
     "loadError": "Kon de toestelbediening niet laden.",
     "retry": "Opnieuw proberen",
     "failed": "De opdracht is niet uitgevoerd. Controleer de verbinding en probeer opnieuw.",
-    "on": "Inschakelen",
-    "off": "Uitschakelen",
+    "on": "Aanzetten",
+    "off": "Uitzetten",
     "open": "Openen",
     "close": "Sluiten",
     "brightness": "Helderheid",
@@ -266,6 +270,43 @@
     "adjustHint": "Kies een waarde binnen het bereik van het toestel.",
     "scenes": "Scènes",
     "scenesHint": "Start een scène uit je gekoppelde Home Assistant. Alleen ondersteunde scènes verschijnen hier.",
-    "noScenes": "Geen ondersteunde scènes beschikbaar."
+    "noScenes": "Geen ondersteunde scènes beschikbaar.",
+    "mode": "Verwarmingsmodus",
+    "preset": "Verwarmingsprofiel",
+    "operation": "Warmwatermodus",
+    "volume": "Volume",
+    "mute": "Geluid uit",
+    "unmute": "Geluid aan",
+    "play": "Afspelen",
+    "pause": "Pauzeren",
+    "stop": "Stoppen",
+    "source": "Bron"
+  },
+  "camera": {
+    "title": "Camera",
+    "description": "Bekijk het laatste beeld, maak een foto of bekijk ondersteunde livebeelden.",
+    "loading": "Camerabediening laden…",
+    "loadFailed": "De camerabediening kon niet worden geladen.",
+    "noImage": "Er is nog geen beeld beschikbaar. Vernieuw of maak een foto.",
+    "offline": "Offline",
+    "offlineHint": "Deze camera is offline. Beelden en bediening zijn niet beschikbaar.",
+    "snapshot": "Laatste beeld",
+    "live": "Live",
+    "imageAlt": "Laatste beeld van {{name}}",
+    "imageHint": "Het laatste beeld van de camera. Dit is geen livebeeld.",
+    "requesting": "Nieuwe foto aanvragen…",
+    "waiting": "Foto aangevraagd. Wachten op een nieuw beeld; dit kan tot 90 seconden duren.",
+    "received": "Er is een nieuw beeld ontvangen.",
+    "delayed": "Er is nog geen nieuw beeld ontvangen. Vernieuw later om opnieuw te kijken.",
+    "captureFailed": "De fotoaanvraag is mislukt. Controleer de camerarechten en probeer later opnieuw.",
+    "streamFailed": "Livebeelden konden niet worden geopend of zijn gestopt. Probeer opnieuw.",
+    "refresh": "Beeld vernieuwen",
+    "capture": "Foto maken",
+    "watch": "Live kijken",
+    "stop": "Kijken stoppen",
+    "liveHint": "Het kijken stopt als je dit paneel sluit of dit tabblad verlaat.",
+    "liveAvailable": "Livebeelden zijn beschikbaar als je Live kijken kiest.",
+    "liveUnsupported": "Livebeelden zijn nog niet beschikbaar via deze cameraverbinding.",
+    "receivedUnverified": "Er is een beeld beschikbaar. De camera gaf geen opnametijd door."
   }
 }

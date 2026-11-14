@@ -42,7 +42,7 @@ export async function homeAssistantAction({ request }: ActionFunctionArgs): Prom
   try {
     switch (intent) {
       case "control-device": {
-        const input = haControlInputSchema.safeParse({ entityId: body.entityId, action: body.controlAction, value: Number(body.value) });
+        const input = haControlInputSchema.safeParse({ entityId: body.entityId, action: body.controlAction, ...(body.value !== undefined && body.value !== "" ? { value: Number(body.value) } : {}), ...(body.option ? { option: body.option } : {}) });
         if (!input.success || typeof body.deviceId !== "string") return { formError: i18n.t("common:errors.generic"), intent };
         await sendDeviceControl(body.deviceId, input.data);
         return { ok: true, intent };

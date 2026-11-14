@@ -27,6 +27,7 @@ export { DeviceProfileEditorScreen } from "./screens/device-profile-editor-scree
 export { DeviceProfilesScreen } from "./screens/device-profiles-screen";
 export { DevicesScreen } from "./screens/devices-screen";
 export { HouseScreen } from "./screens/house-screen";
+export { HomeDeviceBrowser } from "./components/home-device-browser";
 export {
   canManageDevices,
   type Device,

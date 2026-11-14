@@ -3,6 +3,7 @@ import path from "node:path";
 import express from "express";
 import { startTtsWarmup } from "@ai/core/assistant-tts";
 import { createApp } from "./app";
+import { startHomeActionsRuntime, stopHomeActionsRuntime } from "./home-actions/home-actions.runtime";
 import { startHomeAssistantIntegration, stopHomeAssistantIntegration } from "./home-assistant/home-assistant.lifecycle";
 import { startScheduler, stopScheduler } from "./jobs/job-scheduler";
 import { config, isProduction } from "./lib/config";
@@ -41,6 +42,7 @@ server.listen(config.PORT, config.HOST, () => {
   void startScheduler();
   // Home Assistant WebSocket (docs/INTEGRATIONS.md): a no-op until HOME_ASSISTANT_URL/TOKEN are set.
   startHomeAssistantIntegration();
+  startHomeActionsRuntime();
   // Speech output (ai/docs/ASSISTANT.md): loads every voice once, so none loads mid-answer. A no-op without ASSISTANT_TTS_URL.
   startTtsWarmup();
 });
@@ -48,6 +50,7 @@ server.listen(config.PORT, config.HOST, () => {
 async function shutdown(signal: string) {
   console.log(`${signal} received, shutting down`);
   server.close();
+  await stopHomeActionsRuntime();
   await stopHomeAssistantIntegration();
   await stopScheduler();
   await db.$disconnect();

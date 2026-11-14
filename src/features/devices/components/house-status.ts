@@ -56,7 +56,17 @@ export function summarizeHouse(
   const temperatures = all
     .filter((entry) => {
       const primary = entry.state.indicator.primary;
-      return entry.profile.category === "climate" && primary?.field.type === "number" && primary.field.unit === "°C" && primary.value !== null;
+      if (entry.profile.category !== "climate" || primary?.field.type !== "number" || primary.field.unit !== "°C" || primary.value === null || !fresh(entry)) return false;
+      const binding = entry.device.values.find((value) => value.fieldKey === primary.field.key);
+      // A circuit setpoint or hot-water temperature isn't a room measurement.
+      if (binding?.haEntityId?.startsWith("water_heater.")) return false;
+      if (binding?.haEntityId?.startsWith("climate.") && binding.haAttribute !== "current_temperature") return false;
+      return true;
+    })
+    .filter((entry, index, list) => {
+      const primary = entry.state.indicator.primary!;
+      const binding = entry.device.values.find((value) => value.fieldKey === primary.field.key);
+      return !binding?.haEntityId || list.findIndex((other) => other.device.values.some((value) => value.haEntityId === binding.haEntityId && value.haAttribute === binding.haAttribute)) === index;
     })
     .sort(byWorstTone)
     .slice(0, maxTemperatures);

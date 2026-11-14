@@ -6,7 +6,7 @@
  */
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { controlCall, controlRefusal } from "./ha-control";
+import { controlCall, controlRefusal, describeControl, validateControlRequest } from "./ha-control";
 
 const entity = (entity_id: string, attributes: Record<string, unknown> = {}) => ({ entity_id, attributes });
 
@@ -45,6 +45,23 @@ describe("Home Assistant control", () => {
     assert.equal(typeof controlCall(entity("switch.boiler"), { action: "temperature", value: 20 }), "string");
     assert.equal(typeof controlCall(entity("scene.film"), { action: "off" }), "string");
   });
+});
+
+it("uses the current HA unit for Buderus circuits and rejects unsupported temperature requests", () => {
+  const circuit = { ...entity("climate.heating_circuit_hc1_hc1", { supported_features: 17, min_temp: 5, max_temp: 30, temperature: 19 }), state: "auto", last_changed: "2026-11-14T12:00:00Z", last_updated: "2026-11-14T12:00:00Z", context: { id: "test", parent_id: null, user_id: null } };
+  const control = describeControl(circuit, "°C");
+  assert.deepEqual(control?.adjustment, { action: "temperature", value: 19, min: 5, max: 30, step: 0.5, unit: "°C" });
+  assert.doesNotThrow(() => validateControlRequest(control, { action: "temperature", value: 20.5 }));
+  for (const value of [undefined, 4, 31, 20.2, NaN, Infinity]) {
+    assert.throws(() => validateControlRequest(control, { action: "temperature", value }));
+  }
+  for (const unit of [null, "°F", "K"]) {
+    const unsupported = describeControl(circuit, unit);
+    assert.equal(unsupported?.adjustment, null);
+    assert.throws(() => validateControlRequest(unsupported, { action: "temperature", value: 20 }));
+  }
+  assert.equal(describeControl({ ...circuit, attributes: { ...circuit.attributes, temperature_unit: "°F" } }, "°C")?.adjustment, null);
+  assert.equal(describeControl({ ...circuit, state: "unavailable" }, "°C")?.adjustment, null);
 });
 
 it("offers only reported, available device capabilities and preserves unknown values", async () => {

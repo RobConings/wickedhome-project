@@ -30,7 +30,7 @@ export function DashboardStats({ tasks, shopping, expenses, homeStatus }: Dashbo
 
   return (
     // One tile per row on phones (full width, stacked), two from `sm`, four from `lg`.
-    <PageGrid as="section" columns="stats-4" aria-label={t("stats.label")}>
+    <PageGrid as="section" columns="stats-4" className="items-start" aria-label={t("stats.label")}>
       <StatTile
         label={t("stats.tasks.label")}
         // Same counts as the tasks page: done today of (done today + overdue + due today).

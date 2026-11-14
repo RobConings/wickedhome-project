@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { RecordLink as Link } from "@/components/shared/record-link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/shared/card";
+import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
 import { PlaceBadge } from "@/features/places";
 import type { Device, DeviceProfile } from "../types/devices";
@@ -22,10 +23,11 @@ type DeviceSidePanelProps = {
   onClose?: () => void;
   hideHeading?: boolean;
   className?: string;
+  controls?: React.ReactNode;
 };
 
 /** The device clicked on the live plan: state, every value (manual ones settable) and a link to it. */
-export function DeviceSidePanel({ device, profile, state, canSetValues, now, onClose, hideHeading = false, className }: DeviceSidePanelProps) {
+export function DeviceSidePanel({ device, profile, state, canSetValues, now, onClose, hideHeading = false, className, controls }: DeviceSidePanelProps) {
   const { t } = useTranslation("devices");
   const { t: tCommon } = useTranslation();
   return (
@@ -48,7 +50,9 @@ export function DeviceSidePanel({ device, profile, state, canSetValues, now, onC
         {state && <DeviceStateChip state={state} />}
         {device.place && <PlaceBadge place={device.place} />}
       </Inline>
+      {device.notes && <Text size="sm" tone="muted" className="whitespace-pre-line">{device.notes}</Text>}
       <DeviceValuesList device={device} profile={profile} canSetValues={canSetValues} now={now} />
+      {controls}
       <Button asChild variant="outline" size="sm" className="self-start">
         <Link to={`/devices/${device.id}`}>
           <ExternalLinkIcon />

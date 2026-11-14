@@ -85,6 +85,9 @@ export function houseShouldRevalidate({ currentUrl, nextUrl, formMethod, default
     params.delete("floor");
     params.delete("device");
     params.delete("room");
+    params.delete("section");
+    params.delete("q");
+    params.delete("place");
     return params.toString();
   };
   return strip(currentUrl) === strip(nextUrl) ? false : defaultShouldRevalidate;

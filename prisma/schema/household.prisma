@@ -18,6 +18,9 @@ enum HouseholdLocationSource {
 }
 
 model Household {
+  homeActions HomeAction[]
+  homeActionRuns HomeActionRun[]
+  homeRules HomeRule[]
   shoppingSessions ShoppingSession[]
   id                  String                   @id @default(cuid())
   name                String

@@ -1,0 +1,22 @@
+import { Router } from "express";
+import { z } from "zod";
+import { homeActionRunSchema, homeActionSaveSchema, homeRuleInputSchema } from "@/features/home-actions/types/home-actions";
+import { currentUser, requireRole, requireUser } from "../lib/session";
+import { parse } from "../lib/http";
+import { homeActionsOverview, previewHomeAction, publishHomeAction, publishHomeRule, saveHomeAction, saveHomeRule, startHomeAction, stopHomeAction } from "./home-actions.service";
+
+export const homeActionsRouter = Router();
+homeActionsRouter.use(requireUser);
+homeActionsRouter.get("/", async (req, res) => { res.set("Cache-Control", "private, no-store").json(await homeActionsOverview(currentUser(req))); });
+homeActionsRouter.use(requireRole("owner", "adult"));
+const version = z.object({ revision: z.number().int().positive() }).strict();
+const rule = z.object({ definition: homeRuleInputSchema, revision: z.number().int().positive().optional() }).strict();
+homeActionsRouter.post("/actions", async (req, res) => { const input = parse(homeActionSaveSchema, req.body); res.status(201).json(await saveHomeAction(currentUser(req), null, input.definition)); });
+homeActionsRouter.put("/actions/:id", async (req, res) => { const input = parse(homeActionSaveSchema, req.body); res.json(await saveHomeAction(currentUser(req), String(req.params.id), input.definition, input.revision)); });
+homeActionsRouter.post("/actions/:id/preview", async (req, res) => { res.json(await previewHomeAction(currentUser(req), String(req.params.id))); });
+homeActionsRouter.post("/actions/:id/publish", async (req, res) => { const input = parse(version, req.body); await publishHomeAction(currentUser(req), String(req.params.id), input.revision); res.status(204).end(); });
+homeActionsRouter.post("/actions/:id/run", async (req, res) => { const input = parse(homeActionRunSchema, req.body); res.status(202).json(await startHomeAction(currentUser(req), String(req.params.id), input)); });
+homeActionsRouter.post("/runs/:id/stop", async (req, res) => { await stopHomeAction(currentUser(req), String(req.params.id)); res.status(204).end(); });
+homeActionsRouter.post("/rules", async (req, res) => { const input = parse(rule, req.body); res.status(201).json(await saveHomeRule(currentUser(req), null, input.definition)); });
+homeActionsRouter.put("/rules/:id", async (req, res) => { const input = parse(rule, req.body); res.json(await saveHomeRule(currentUser(req), String(req.params.id), input.definition, input.revision)); });
+homeActionsRouter.post("/rules/:id/publish", async (req, res) => { const input = parse(version, req.body); await publishHomeRule(currentUser(req), String(req.params.id), input.revision); res.status(204).end(); });

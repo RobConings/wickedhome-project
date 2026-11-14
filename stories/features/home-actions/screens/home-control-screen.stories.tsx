@@ -1,0 +1,17 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { HomeControlScreen } from "@/features/home-actions/screens/home-control-screen";
+import { HomeControlNavigation } from "@/features/home-actions/components/home-control-navigation";
+import { HouseScreen } from "@/features/devices";
+import { Text } from "@/components/ui/text";
+import { devicesFixture, profilesFixture, housePlansFixture, DEVICES_NOW } from "../../devices/fixtures";
+import { overviewFixture } from "../fixtures";
+const meta = { title: "Features/HomeActions/Screens/HomeControlScreen", component: HomeControlScreen, parameters: { layout: "fullscreen", router: { initialEntries: ["/house?section=overview"] } }, args: { initial: overviewFixture, devices: devicesFixture, profiles: profilesFixture, rooms: housePlansFixture.flatMap((plan) => plan.places.map((room) => ({ id: room.id, name: room.name, floorName: plan.floor.name }))), canManage: true, live: false, alarm: <Text>Alarm: disarmed</Text>, renderDeviceControls: () => <Text>Shared device controls</Text>, map: <HouseScreen plans={housePlansFixture} devices={devicesFixture} profiles={profilesFixture} canSetValues live={false} now={DEVICES_NOW} navigation={<HomeControlNavigation />} renderDeviceControls={() => <Text>Shared device controls</Text>} /> } } satisfies Meta<typeof HomeControlScreen>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+export const Overview: Story = {};
+export const Devices: Story = { parameters: { router: { initialEntries: ["/house?section=devices"] } } };
+export const Map: Story = { parameters: { router: { initialEntries: ["/house?section=map"] } } };
+export const Actions: Story = { parameters: { router: { initialEntries: ["/house?section=actions"] } } };
+export const Rules: Story = { parameters: { router: { initialEntries: ["/house?section=rules"] } } };
+export const AsChild: Story = { args: { canManage: false } };
+export const Offline: Story = { args: { initial: { ...overviewFixture, connected: false, publishingReady: false } } };

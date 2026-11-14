@@ -82,8 +82,8 @@ export function HouseStatusCard({ status, live = true, liveStatus, now: fixedNow
             </Text>
           )}
 
-          {/* Phones: one fact per line (label left, value right); three columns from `sm`. */}
-          <dl className="grid grid-cols-1 gap-2 border-t pt-3 text-sm sm:grid-cols-3 sm:gap-3">
+          {/* This card can be narrow on a desktop dashboard too. Rows follow the card width. */}
+          <dl className="grid min-w-0 grid-cols-1 gap-3 border-t pt-3 text-sm">
             <Fact label={t("houseStatus.open")}>
               {summary.open.length === 0 ? t("houseStatus.allClosed") : t("houseStatus.openCount", { count: summary.open.length })}
             </Fact>
@@ -104,12 +104,12 @@ export function HouseStatusCard({ status, live = true, liveStatus, now: fixedNow
           </dl>
 
           {summary.temperatures.length > 0 && (
-            <ul className="grid grid-cols-1 gap-x-4 gap-y-1 text-sm sm:grid-cols-2" aria-label={t("houseStatus.temperatures")}>
+            <ul className="grid grid-cols-1 gap-y-2 text-sm" aria-label={t("houseStatus.temperatures")}>
               {summary.temperatures.map(({ device, state }) => (
                 <li key={device.id} className="flex min-w-0 items-center justify-between gap-2">
                   <span className="flex min-w-0 items-center gap-2">
                     <PlanMarkerDot tone={state.indicator.tone} color={state.indicator.color} />
-                    <span className="truncate">{device.place?.name ?? device.name}</span>
+                    <span className="min-w-0 break-words">{device.place?.name ?? device.name}</span>
                   </span>
                   <span className="shrink-0 font-medium tabular-nums">{state.primaryText ?? state.label}</span>
                 </li>
@@ -143,10 +143,10 @@ function DeviceLine({ entry }: { entry: DeviceWithState }) {
 
 function Fact({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <Inline gap="md" align="baseline" justify="between" className="min-w-0 sm:flex-col sm:items-start sm:justify-start sm:gap-1">
+    <Inline gap="md" align="start" justify="between" wrap className="min-w-0">
       <dt className="shrink-0 text-xs text-muted-foreground">{label}</dt>
       {/* Wraps: the running appliances are only listed here, so nothing may be cut off. */}
-      <dd className="min-w-0 text-right font-medium break-words sm:text-left">{children}</dd>
+      <dd className="min-w-0 max-w-full text-right font-medium break-words">{children}</dd>
     </Inline>
   );
 }

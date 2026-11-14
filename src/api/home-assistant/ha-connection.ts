@@ -20,11 +20,13 @@ type StateListener = (entityId: string, state: HaState | null, previous: HaState
 let client: HomeAssistantClient | null = null;
 const states = new Map<string, HaState>();
 let areaByEntity = new Map<string, string>();
+let platformByEntity = new Map<string, string>();
 let lastEventAt: Date | null = null;
 const stateListeners = new Set<StateListener>();
 const syncListeners = new Set<() => void>();
 let householdCache: { id: string | null; at: number } | null = null;
 let statusPublishTimer: ReturnType<typeof setTimeout> | null = null;
+let registryRefreshTimer: ReturnType<typeof setTimeout> | null = null;
 
 export const isHomeAssistantConfigured = () => Boolean(config.HOME_ASSISTANT_URL && config.HOME_ASSISTANT_TOKEN);
 
@@ -60,6 +62,7 @@ export function getHaClient(): HomeAssistantClient | null {
 export const getEntityStates = (): HaState[] => [...states.values()];
 export const getEntityState = (entityId: string): HaState | null => states.get(entityId) ?? null;
 export const getEntityArea = (entityId: string): string | null => areaByEntity.get(entityId) ?? null;
+export const getEntityPlatform = (entityId: string): string | null => platformByEntity.get(entityId) ?? null;
 
 /** Every state change (and removal: `null`) of any entity. Returns the unsubscribe function. */
 export function onEntityState(listener: StateListener): () => void {
@@ -143,14 +146,30 @@ export function startHomeAssistant(options: { socketFactory?: HaSocketFactory } 
     }
   });
   client.start();
+  // Room and entity changes must reach the import picker without restarting WickedHome.
+  for (const event of ["area_registry_updated", "device_registry_updated", "entity_registry_updated"]) {
+    client.subscribeEvents(event, () => {
+      if (registryRefreshTimer) clearTimeout(registryRefreshTimer);
+      registryRefreshTimer = setTimeout(() => {
+        registryRefreshTimer = null;
+        const current = client;
+        if (current?.connected) void loadAreas(current).then((areas) => { if (client === current) areaByEntity = areas; }).catch(() => {});
+      }, 150);
+      registryRefreshTimer.unref?.();
+    });
+  }
 }
 
 export async function stopHomeAssistant(): Promise<void> {
+  if (registryRefreshTimer) clearTimeout(registryRefreshTimer);
+  registryRefreshTimer = null;
   if (statusPublishTimer) clearTimeout(statusPublishTimer);
   statusPublishTimer = null;
   client?.stop();
   client = null;
   states.clear();
+  areaByEntity.clear();
+  platformByEntity.clear();
 }
 
 /** Status changes go to the HA household's browsers (debounced: a reconnect storm is one event). */
@@ -195,7 +214,7 @@ async function loadEverything() {
 
 type AreaRow = { area_id: string; name: string };
 type DeviceRow = { id: string; area_id: string | null };
-type EntityRow = { entity_id: string; area_id: string | null; device_id: string | null };
+type EntityRow = { entity_id: string; area_id: string | null; device_id: string | null; platform?: string };
 
 /** entity → area name, from the entity registry (own area, else its device's area). */
 async function loadAreas(current: HomeAssistantClient): Promise<Map<string, string>> {
@@ -207,11 +226,14 @@ async function loadAreas(current: HomeAssistantClient): Promise<Map<string, stri
   const areaName = new Map(areas.map((area) => [area.area_id, area.name]));
   const deviceArea = new Map(devices.map((device) => [device.id, device.area_id]));
   const result = new Map<string, string>();
+  const platforms = new Map<string, string>();
   for (const entity of entities) {
+    if (entity.platform) platforms.set(entity.entity_id, entity.platform);
     const areaId = entity.area_id ?? (entity.device_id ? deviceArea.get(entity.device_id) : null);
     const name = areaId ? areaName.get(areaId) : undefined;
     if (name) result.set(entity.entity_id, name);
   }
+  if (client === current) platformByEntity = platforms;
   return result;
 }
 

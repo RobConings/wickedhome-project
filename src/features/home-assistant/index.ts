@@ -14,4 +14,6 @@ export {
 } from "./types/home-assistant";
 
 export { HaDeviceControlPanel } from "./components/ha-device-controls";
+export { HaDeviceActions } from "./components/ha-device-actions";
+export { HaCameraPanel } from "./components/ha-camera-panel";
 export { HaScenesPanel } from "./components/ha-scenes-panel";
